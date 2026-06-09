@@ -267,3 +267,32 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Worked well: the task stayed outside runtime code and package contents.
 - Confusing: labels still need manual GitHub setup unless a future label-sync tool is introduced.
 - Improve: add a public good-first-issues list after real issues exist.
+
+## 2026-06-09: npm Trusted Publishing Recovery Docs
+
+- Task contract: `.agentloop/tasks/2026-06-09-clarify-npm-trusted-publishing-recovery.md`
+- Product cycle: `.agentloop/research/interview-cycle-013.md`
+- Trigger:
+  - GitHub release `v0.2.0` is public, but npm still reports `agentloopkit@0.1.1` as latest.
+  - Local browser-auth publish retry failed at npm's auth completion endpoint.
+- Verification planned:
+  - `git diff --check`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Verification completed:
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+- Product changes:
+  - Publishing docs now name exact npm trusted publisher fields.
+  - Launch checklist records the current `0.2.0` recovery state.
+  - Final handoff explains the npm gap without asking for credentials.
+- Worked well: the change improves release trust without changing package contents.
+- Confusing: npm reports authorization problems as 404 errors in more than one path.
+- Improve: configure npm trusted publishing on npmjs.com, then rerun the Publish workflow.

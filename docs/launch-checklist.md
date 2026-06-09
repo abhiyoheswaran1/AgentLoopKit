@@ -12,7 +12,7 @@ Use this before publishing AgentLoopKit.
 - [x] `v0.1.1` tag exists.
 - [x] GitHub release notes are reviewed for `v0.1.1`.
 - [x] GitHub release `v0.1.1` is published.
-- [ ] Good-first-issue labels are created.
+- [x] Good-first-issue labels are created.
 
 ## npm
 
@@ -51,7 +51,17 @@ npx --yes --package ./agentloopkit-0.2.0.tgz agentloop status --json
 Preferred path:
 
 1. Publish `agentloopkit@0.1.0` manually once.
-2. Configure npm trusted publishing for future releases.
-3. Publish GitHub releases.
+2. Configure npm trusted publishing for future releases:
+   - Owner: `abhiyoheswaran1`
+   - Repository: `AgentLoopKit`
+   - Workflow filename: `publish.yml`
+   - Allowed action: `npm publish`
+3. Publish GitHub releases, or rerun the manual Publish workflow for an existing release.
 4. Confirm the publish workflow either skips an existing version or publishes the new version.
 5. Run `npx agentloopkit init --dry-run` from a separate test repo.
+
+Current recovery note:
+
+- GitHub release `v0.2.0` is public.
+- npm still reports `agentloopkit@0.1.1` as latest.
+- Publish `0.2.0` from the `v0.2.0` tag after npm trusted publishing is configured, or bump and release a later version.
