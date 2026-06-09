@@ -476,13 +476,14 @@ Top remaining items:
 
 ## Known limitations
 
-- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, and `v0.4.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.5.0` is prepared on `main`, but its GitHub release and npm publish still need to complete.
-- `agentloopkit@0.4.0` is the latest GitHub release, but it is not on npm yet.
+- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, and `v0.5.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.5.0` is the latest GitHub release, but it is not on npm yet.
+- `agentloopkit@0.4.0` is also not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
 - The stale manual GitHub Publish workflow for `0.3.0` targeted an older commit and was cancelled after the release workflow ran.
 - The release-triggered GitHub Publish workflow for `v0.3.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.4.0` passed checks and failed at npm authorization with `E404`.
+- The release-triggered GitHub Publish workflow for `v0.5.0` passed checks and failed at npm authorization with `E404`.
 - npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must complete local browser/OTP authentication.
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
@@ -517,7 +518,8 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.4.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.4.0` to npm.
 - [x] Prepare `agentloopkit@0.5.0` task-list release candidate.
-- [ ] Publish GitHub release `v0.5.0` with npm-pending notes.
+- [x] Publish GitHub release `v0.5.0` with npm-pending notes.
+- [x] Run GitHub Publish workflow for `v0.5.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.5.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
