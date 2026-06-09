@@ -902,3 +902,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Detection stayed transparent and did not change config schema or project type semantics.
 - Improve:
   - Add per-package verification guidance later without building a workspace orchestrator.
+
+## 2026-06-09: 0.7.0 Monorepo Doctor Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-7-0-monorepo-doctor-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-029.md`
+- Verification report: `.agentloop/reports/2026-06-09-18-48-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-18-48-pr-summary.md`
+- Trigger:
+  - Monorepo doctor awareness landed after the `v0.6.0` tag.
+  - Package metadata still reported `0.6.0`, which already points at the task-show release.
+- Verification completed:
+  - `npx tsx src/cli/index.ts version`: pass, reported `0.7.0`
+  - Packed CLI smoke: pass, packed `agentloop version` reported `0.7.0` and `agentloop doctor --json` reported package workspaces plus `lerna.json`
+  - `git diff --check`: pass
+  - `npx prettier --check ...`: pass for edited release metadata files
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 18 files and 51 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npm publish --access public --dry-run`: pass
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.7.0.tgz`
+  - VHS render: pass for `agentloopkit-cli.gif` using the `0.7.0` tarball name
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-7-0-monorepo-doctor-release.md`: pass
+  - `agentloop task clear --json`: pass, removed `.agentloop/state.json`
+  - `agentloop handoff`: pass, wrote the handoff above
+- Product changes:
+  - Bumped package metadata to `0.7.0`.
+  - Moved monorepo doctor notes into a `0.7.0` changelog entry.
+  - Updated README, VHS tape, launch checklist, npm publishing docs, final handoff, backlog, and product-panel release records.
+- Worked well:
+  - The release candidate keeps the new doctor behavior separate from the already-published `v0.6.0` GitHub release.
+- Improve:
+  - After the GitHub release, record the Publish workflow result and npm registry state.

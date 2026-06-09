@@ -320,6 +320,20 @@ Latest local verification for the `0.6.0` README visual refresh and GitHub relea
 - GitHub Publish workflow run `27220705510`: package checks and `prepublishOnly` passed, final `npm publish` failed with authorization `E404`
 - Local `npm publish --access public`: package checks passed, npm stopped at `EOTP`
 
+Latest local verification for unreleased monorepo doctor awareness:
+
+- Red focused test: `npx pnpm@10.12.1 test tests/project-detection.test.ts tests/doctor.test.ts` failed before implementation because `detectMonorepo` did not exist and doctor had no `Monorepo` check.
+- Focused green test: `npx pnpm@10.12.1 test tests/project-detection.test.ts tests/doctor.test.ts`: pass, 2 files and 8 tests
+- CLI smoke in a temp workspace root: pass, `doctor --json` reported package workspaces, `pnpm-workspace.yaml`, and `turbo.json`
+- `git diff --check`: pass
+- `npx pnpm@10.12.1 lint`: pass
+- `npx pnpm@10.12.1 typecheck`: pass
+- `npx pnpm@10.12.1 test`: pass, 18 files and 51 tests
+- `npx pnpm@10.12.1 build`: pass
+- `npx projscan doctor --format markdown`: A, 100/100
+- `npx pnpm@10.12.1 pack`: pass
+- Packed CLI smoke: pass, `doctor --json` reported package workspaces and `rush.json`
+
 ## How to package
 
 ```bash
@@ -365,6 +379,7 @@ Current publish gap:
 - The `v0.2.1` publish workflow passed install, lint, typecheck, tests, build, and `prepublishOnly`, then npm rejected `npm publish` with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - The `v0.6.0` publish workflow passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - Local `npm publish --access public` for `0.6.0` passed typecheck, Vitest, and build through `prepublishOnly`, then npm stopped at `EOTP`.
+- Package-content changes after the `v0.6.0` tag are prepared on `main` as `agentloopkit@0.7.0`, but are not on npm yet.
 - Do not paste npm OTPs or tokens into chat, issues, PRs, or release notes.
 
 ## How users install it
@@ -520,6 +535,27 @@ Implemented:
 - README copy clarifying the source-versus-npm version split
 - `v0.6.0` GitHub release with attached tarball and npm-pending notes
 
+### Cycle 28: Monorepo doctor awareness
+
+Decision: add a warning-only doctor check for common workspace markers.
+
+Implemented:
+
+- `detectMonorepo`
+- `Monorepo` doctor check in markdown and JSON output
+- Vitest coverage for package workspaces, `pnpm-workspace.yaml`, Turbo, Nx, Lerna, and Rush markers
+- README and getting-started docs
+
+### Cycle 29: 0.7.0 release candidate
+
+Decision: prepare monorepo doctor awareness as `0.7.0` because `v0.6.0` already points at task reading and README visual refresh.
+
+Implemented:
+
+- package metadata bump to `0.7.0`
+- `0.7.0` changelog entry for monorepo doctor awareness
+- launch, publishing, final handoff, backlog, and product-panel release records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -539,7 +575,7 @@ Strongest signals:
 
 Top remaining items:
 
-1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.6.0`.
+1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.7.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
 3. Monorepo project detection.
 4. Markdown link checking for docs.
@@ -548,6 +584,7 @@ Top remaining items:
 ## Known limitations
 
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, and `v0.6.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.7.0` is prepared on `main`, but its GitHub release and npm publish still need to complete.
 - `agentloopkit@0.6.0` is the latest GitHub release, but it is not on npm yet.
 - `agentloopkit@0.5.0` and `agentloopkit@0.4.0` are also not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -601,6 +638,9 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.6.0`; package checks passed, npm authorization failed.
 - [x] Try local `npm publish --access public` for `0.6.0`; package checks passed, npm required browser/OTP authentication.
 - [ ] Publish `agentloopkit@0.6.0` to npm.
+- [x] Prepare `agentloopkit@0.7.0` monorepo doctor release candidate.
+- [ ] Publish GitHub release `v0.7.0` with npm-pending notes.
+- [ ] Publish `agentloopkit@0.7.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
@@ -652,7 +692,7 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Repair npm publishing for `0.6.0`: high usefulness, low repo effort, external npm setting required.
+1. Repair npm publishing for `0.7.0`: high usefulness, low repo effort, external npm setting required.
 2. Improve monorepo detection: high usefulness, medium effort, medium maintenance.
 3. Add markdown link checks: medium usefulness, low effort, low maintenance.
 4. Add shell completions: medium usefulness, medium effort, low maintenance.

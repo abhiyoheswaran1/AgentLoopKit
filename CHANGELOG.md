@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.7.0
+
+Monorepo doctor awareness GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:
 
 - Added monorepo marker detection to `agentloop doctor` for package workspaces, `pnpm-workspace.yaml`, Turbo, Nx, Lerna, and Rush config files
 - `doctor` now reports detected workspace markers as warnings without changing project type or failing setup

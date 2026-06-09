@@ -18,6 +18,7 @@ Use this before publishing AgentLoopKit.
 - [x] GitHub release `v0.4.0` is published with npm-pending notes.
 - [x] GitHub release `v0.5.0` is published with npm-pending notes.
 - [x] GitHub release `v0.6.0` is published with npm-pending notes.
+- [ ] GitHub release `v0.7.0` is published with npm-pending notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -46,6 +47,9 @@ Use this before publishing AgentLoopKit.
 - [x] Try local `npm publish --access public` for `0.6.0`; package checks passed, npm required browser/OTP authentication.
 - [ ] Package `agentloopkit@0.6.0` is published.
 - [ ] Local `agentloopkit@0.6.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
+- [x] Package `agentloopkit@0.7.0` is prepared on `main`.
+- [ ] Package `agentloopkit@0.7.0` is published.
+- [ ] Local `agentloopkit@0.7.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
 - [ ] npm trusted publishing is configured for this repository.
 - [x] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -75,6 +79,7 @@ npx --yes --package ./agentloopkit-0.2.1.tgz agentloop status --json
 npx --yes --package ./agentloopkit-0.4.0.tgz agentloop version
 npx --yes --package ./agentloopkit-0.5.0.tgz agentloop task list --json
 npx --yes --package ./agentloopkit-0.6.0.tgz agentloop task show .agentloop/tasks/smoke-task.md --json
+npx --yes --package ./agentloopkit-0.7.0.tgz agentloop doctor --json
 ```
 
 ## Publish
@@ -112,4 +117,5 @@ Current recovery note:
 - `agentloopkit@0.6.0` is now prepared on `main` for the task-show command.
 - GitHub Publish workflow for `v0.6.0` passed package checks and `prepublishOnly`, then npm rejected the final publish with `E404`.
 - Local `npm publish --access public` for `0.6.0` passed `prepublishOnly`, then npm stopped at `EOTP`.
-- Publish `0.6.0` only after npm trusted publishing is configured or local browser authentication succeeds.
+- `agentloopkit@0.7.0` is now prepared on `main` for monorepo doctor awareness.
+- Publish `0.7.0` only after npm trusted publishing is configured or local browser authentication succeeds.
