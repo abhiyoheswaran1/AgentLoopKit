@@ -28,7 +28,7 @@ Use this before publishing AgentLoopKit.
 - [x] GitHub release `v0.14.0` is published with npm-pending notes.
 - [x] GitHub release `v0.15.0` is published with npm-pending notes.
 - [x] GitHub release `v0.15.1` is published with npm-pending notes.
-- [ ] GitHub release `v0.16.0` is published with badge release notes.
+- [x] GitHub release `v0.16.0` is published with badge release notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -100,9 +100,10 @@ Use this before publishing AgentLoopKit.
 - [x] Publish workflow for `v0.15.1` passed package checks and failed at npm authorization.
 - [ ] Package `agentloopkit@0.15.1` is published.
 - [ ] Local `agentloopkit@0.15.1` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
-- [x] Package `agentloopkit@0.16.0` is being prepared on `main` for the badge release.
+- [x] Package `agentloopkit@0.16.0` is prepared on `main` for the badge release.
 - [ ] Package `agentloopkit@0.16.0` is published.
 - [x] Try local `npm publish --access public` for `0.16.0`; package checks passed, npm required browser/OTP authentication.
+- [x] Publish workflow for `v0.16.0` passed package checks and failed at npm authorization.
 - [ ] Local `agentloopkit@0.16.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
 - [ ] npm trusted publishing is configured for this repository.
 - [x] `npm whoami` works for manual fallback.
@@ -179,10 +180,11 @@ Current recovery note:
 - GitHub release `v0.14.0` is public with attached `agentloopkit-0.14.0.tgz`.
 - GitHub release `v0.15.0` is public with attached `agentloopkit-0.15.0.tgz`.
 - GitHub release `v0.15.1` is public with attached `agentloopkit-0.15.1.tgz`.
+- GitHub release `v0.16.0` is public with attached `agentloopkit-0.16.0.tgz`.
 - `agentloopkit@0.14.0` is prepared, verified, and published as GitHub release `v0.14.0` for `agentloop check-gates --strict`.
 - `agentloopkit@0.15.0` is prepared, verified, and published as GitHub release `v0.15.0` for CI context in verification reports.
 - `agentloopkit@0.15.1` is prepared, verified, and published as GitHub release `v0.15.1` for doctor risk-file details and config schema URL trust.
-- `agentloopkit@0.16.0` is the current release target for local evidence badges and npm catch-up.
+- `agentloopkit@0.16.0` is prepared, verified, and published as GitHub release `v0.16.0` for local evidence badges and npm catch-up.
 - npm still reports `agentloopkit@0.1.1` as latest.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.3.0` is now prepared on `main` after the handoff command, create-task flag, latest artifact selection, and create-task alias work.
@@ -227,3 +229,5 @@ Current recovery note:
 - npm should jump from `0.1.1` to `0.16.0` for the catch-up release because `main` now includes badge behavior after `v0.15.1`.
 - Do not publish `0.15.1` to npm with newer source. Publish `0.16.0` from the matching release commit.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP`.
+- GitHub Publish workflow for `v0.16.0` passed package checks and failed at npm authorization with `E404`.
+- GitHub release `v0.16.0` tarball SHA-256: `687dac923ee3976e4975641a20844ece4ce41c2123794423c46cd72091f8cb18`.

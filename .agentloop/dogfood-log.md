@@ -2145,6 +2145,10 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
   - `npm publish --access public`: package checks passed, then npm stopped with `EOTP` for browser/OTP authentication.
   - npm registry proof after the publish attempt: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
+  - GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.16.0
+  - GitHub release asset: `agentloopkit-0.16.0.tgz`
+  - GitHub release tarball SHA-256: `687dac923ee3976e4975641a20844ece4ce41c2123794423c46cd72091f8cb18`
+  - GitHub Publish workflow run `27241996432`: package checks passed, then npm rejected `npm publish --access public` with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
   - Packed tarball smoke: first assertion used the wrong `doctor --json` shape; corrected smoke test passed with `agentloop version` reporting `0.16.0`, `init --json` creating files, `doctor --json` returning no serious errors, and `badge --json` writing a missing-verification badge.
   - AgentLoop verification report: `.agentloop/reports/2026-06-10-01-10-verification-report.md`, overall status `pass`.
   - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-01-11-pr-summary.md`.

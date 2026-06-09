@@ -1423,10 +1423,13 @@ Top remaining items:
 
 ## Known limitations
 
-- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, `v0.15.0`, and `v0.15.1` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, `v0.15.0`, `v0.15.1`, and `v0.16.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - npm should jump from `0.1.1` to `0.16.0` for the catch-up release because current source now includes `agentloop badge` after the `v0.15.1` tag.
 - Do not publish `0.15.1` to npm with newer source. Publish `0.16.0` from the matching release commit.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP` for browser/OTP authentication.
+- The release-triggered GitHub Publish workflow for `v0.16.0` passed checks and failed at npm authorization with `E404`.
+- GitHub release `v0.16.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.16.0
+- GitHub release `v0.16.0` tarball SHA-256: `687dac923ee3976e4975641a20844ece4ce41c2123794423c46cd72091f8cb18`.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -1539,9 +1542,10 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.15.1`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.15.1` to npm.
 - [x] Prepare `agentloopkit@0.16.0` badge release candidate.
-- [ ] Publish GitHub release `v0.16.0` with badge release notes.
+- [x] Publish GitHub release `v0.16.0` with badge release notes.
 - [ ] Publish `agentloopkit@0.16.0` to npm.
 - [x] Try local `npm publish --access public` for `0.16.0`; package checks passed, npm required browser/OTP authentication.
+- [x] Run GitHub Publish workflow for `v0.16.0`; package checks passed, npm authorization failed.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
