@@ -4,7 +4,7 @@ import { loadAgentLoopConfig } from './config.js';
 import { pathExists, readTextIfExists } from './file-system.js';
 import { commandExists, getGitStatus, isInsideGitRepo } from './git.js';
 import { detectPackageManager } from './package-manager.js';
-import { detectPackageScripts, detectProjectType } from './project-detection.js';
+import { detectMonorepo, detectPackageScripts, detectProjectType } from './project-detection.js';
 import { detectRiskFiles } from './safety.js';
 
 export type DoctorCheck = {
@@ -78,9 +78,19 @@ export async function runDoctor(options: { cwd: string }): Promise<DoctorResult>
 
   const packageManager = await detectPackageManager(cwd);
   const projectType = await detectProjectType(cwd);
+  const monorepo = await detectMonorepo(cwd);
   const commands = await detectPackageScripts(cwd, packageManager);
   checks.push(check('Package manager', 'pass', packageManager));
   checks.push(check('Project type', 'pass', projectType));
+  checks.push(
+    check(
+      'Monorepo',
+      monorepo.detected ? 'warn' : 'pass',
+      monorepo.detected
+        ? `workspace markers detected: ${monorepo.markers.join(', ')}`
+        : 'not detected',
+    ),
+  );
 
   for (const key of ['test', 'lint', 'typecheck', 'build'] as const) {
     checks.push(

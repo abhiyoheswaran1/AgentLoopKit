@@ -88,25 +88,25 @@ pnpm build
 
 ## CLI Commands
 
-| Command                         | Purpose                                                 |
-| ------------------------------- | ------------------------------------------------------- |
-| `agentloop init`                | Generate the repo harness and config                    |
-| `agentloop init --dry-run`      | Preview generated files without writing them            |
-| `agentloop doctor`              | Check setup health, commands, git state, and risk files |
-| `agentloop create-task`         | Create a task contract in `.agentloop/tasks/`           |
-| `agentloop task list`           | List task contracts and show the pinned active task     |
-| `agentloop task show <path>`    | Print a task contract without changing active state     |
-| `agentloop task set <path>`     | Pin the active task for status and handoffs             |
-| `agentloop task current`        | Print the pinned active task                            |
-| `agentloop task clear`          | Clear the active task pointer                           |
-| `agentloop status`              | Show active task, latest report, dirty files, next step |
-| `agentloop verify`              | Run configured checks and write a verification report   |
-| `agentloop summarize`           | Generate a deterministic PR or reviewer summary         |
-| `agentloop handoff`             | Write a reviewer handoff summary                        |
-| `agentloop install-agent codex` | Add agent-specific instructions                         |
-| `agentloop install-agent all`   | Add all bundled agent instruction files                 |
-| `agentloop list-templates`      | List bundled templates                                  |
-| `agentloop version`             | Print the CLI version                                   |
+| Command                         | Purpose                                                                   |
+| ------------------------------- | ------------------------------------------------------------------------- |
+| `agentloop init`                | Generate the repo harness and config                                      |
+| `agentloop init --dry-run`      | Preview generated files without writing them                              |
+| `agentloop doctor`              | Check setup health, commands, git state, monorepo markers, and risk files |
+| `agentloop create-task`         | Create a task contract in `.agentloop/tasks/`                             |
+| `agentloop task list`           | List task contracts and show the pinned active task                       |
+| `agentloop task show <path>`    | Print a task contract without changing active state                       |
+| `agentloop task set <path>`     | Pin the active task for status and handoffs                               |
+| `agentloop task current`        | Print the pinned active task                                              |
+| `agentloop task clear`          | Clear the active task pointer                                             |
+| `agentloop status`              | Show active task, latest report, dirty files, next step                   |
+| `agentloop verify`              | Run configured checks and write a verification report                     |
+| `agentloop summarize`           | Generate a deterministic PR or reviewer summary                           |
+| `agentloop handoff`             | Write a reviewer handoff summary                                          |
+| `agentloop install-agent codex` | Add agent-specific instructions                                           |
+| `agentloop install-agent all`   | Add all bundled agent instruction files                                   |
+| `agentloop list-templates`      | List bundled templates                                                    |
+| `agentloop version`             | Print the CLI version                                                     |
 
 The package exposes two binaries:
 

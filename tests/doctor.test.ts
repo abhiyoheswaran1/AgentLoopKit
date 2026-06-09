@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir } from './helpers.js';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -35,5 +36,26 @@ describe('doctor', () => {
     const result = await runDoctor({ cwd: dir });
 
     expect(result.serious.some((check) => check.name === 'agentloop.config.json')).toBe(true);
+  });
+
+  test('warns when common monorepo markers are present', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'pnpm-workspace.yaml'), 'packages:\n  - packages/*\n');
+    await writeFile(path.join(dir, 'turbo.json'), '{}');
+
+    const result = await runDoctor({ cwd: dir });
+    const monorepoCheck = result.checks.find((check) => check.name === 'Monorepo');
+
+    expect(result.serious).toHaveLength(0);
+    expect(monorepoCheck).toEqual({
+      name: 'Monorepo',
+      status: 'warn',
+      message: 'workspace markers detected: pnpm-workspace.yaml, turbo.json',
+    });
+    expect(result.markdown).toContain(
+      '[warn] Monorepo: workspace markers detected: pnpm-workspace.yaml, turbo.json',
+    );
   });
 });

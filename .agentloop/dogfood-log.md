@@ -868,3 +868,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - GitHub release and tarball distribution are available while npm auth remains blocked.
 - Improve:
   - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.6.0`.
+
+## 2026-06-09: Monorepo Doctor Awareness
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-monorepo-doctor-awareness.md`
+- Product cycle: `.agentloop/research/interview-cycle-028.md`
+- Verification report: `.agentloop/reports/2026-06-09-18-40-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-18-40-pr-summary.md`
+- Trigger:
+  - `doctor` reported project type and scripts but did not warn when AgentLoopKit was running at a workspace root.
+  - Teams using workspaces need a visible reminder that root-level verification may not cover every package.
+- Red tests:
+  - `npx pnpm@10.12.1 test tests/project-detection.test.ts tests/doctor.test.ts` failed because `detectMonorepo` did not exist and doctor did not include a `Monorepo` check.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/project-detection.test.ts tests/doctor.test.ts`: pass, 2 files and 8 tests
+  - CLI smoke in a temp workspace root: pass, `doctor --json` reported `package.json workspaces`, `pnpm-workspace.yaml`, and `turbo.json`
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 18 files and 51 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.6.0.tgz`
+  - Packed CLI smoke: pass, `agentloop doctor --json` reported package workspaces and `nx.json`
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-monorepo-doctor-awareness.md`: pass
+  - `agentloop task clear --json`: pass, removed `.agentloop/state.json`
+  - `agentloop handoff`: pass, wrote the handoff above
+- Product changes:
+  - Added `detectMonorepo` for package workspaces, `pnpm-workspace.yaml`, `turbo.json`, `nx.json`, `lerna.json`, and `rush.json`.
+  - Added a `Monorepo` doctor check that warns instead of failing.
+  - Updated README, getting-started docs, changelog, roadmap, backlog, and product-panel record.
+- Worked well:
+  - Detection stayed transparent and did not change config schema or project type semantics.
+- Improve:
+  - Add per-package verification guidance later without building a workspace orchestrator.

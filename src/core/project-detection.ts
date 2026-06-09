@@ -10,7 +10,21 @@ type PackageJson = {
   scripts?: Record<string, string>;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
+  workspaces?: string[] | { packages?: string[] };
 };
+
+export type MonorepoInfo = {
+  detected: boolean;
+  markers: string[];
+};
+
+const MONOREPO_FILE_MARKERS = [
+  'pnpm-workspace.yaml',
+  'turbo.json',
+  'nx.json',
+  'lerna.json',
+  'rush.json',
+] as const;
 
 export async function readPackageJson(cwd: string): Promise<PackageJson | undefined> {
   const filePath = path.join(cwd, 'package.json');
@@ -48,6 +62,22 @@ export async function detectProjectType(cwd: string): Promise<ProjectType> {
   if (hasDocs && !hasCode) return 'docs-only';
 
   return 'generic';
+}
+
+export async function detectMonorepo(cwd: string): Promise<MonorepoInfo> {
+  const markers: string[] = [];
+  const packageJson = await readPackageJson(cwd);
+  if (packageJson?.workspaces) {
+    markers.push('package.json workspaces');
+  }
+
+  for (const marker of MONOREPO_FILE_MARKERS) {
+    if (await pathExists(path.join(cwd, marker))) {
+      markers.push(marker);
+    }
+  }
+
+  return { detected: markers.length > 0, markers };
 }
 
 export async function detectPackageScripts(

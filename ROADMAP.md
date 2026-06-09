@@ -3,7 +3,7 @@
 ## Near Term
 
 - Configure npm trusted publishing for GitHub Actions.
-- Add richer doctor checks for monorepos.
+- Add per-package verification guidance for monorepos.
 - Add task status transitions.
 - Add Markdown link checking for docs.
 - Add optional shell completion.
