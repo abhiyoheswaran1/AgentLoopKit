@@ -1080,7 +1080,7 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npx pnpm@10.12.1 lint`: pass
   - `npx pnpm@10.12.1 typecheck`: pass
   - `npx pnpm@10.12.1 test`: pass, 19 files and 55 tests
-  - `npx pnpm@10.12.1 check:links`: pass, 250 Markdown files checked
+  - `npx pnpm@10.12.1 check:links`: pass, 251 Markdown files checked
   - `npx pnpm@10.12.1 build`: pass
   - `npx projscan doctor --format markdown`: A, 100/100
   - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.8.0.tgz`
@@ -1097,3 +1097,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release candidate keeps GitHub tarballs aligned with the current launch-quality source.
 - Improve:
   - After the GitHub release, record CI, Publish workflow, local npm publish, and registry status.
+
+## 2026-06-09: 0.8.0 GitHub Release and npm Auth Result
+
+- Release: `v0.8.0`
+- Commit: `a6a4f2f9e1309e70868cb76d51503f803afa1966`
+- GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.8.0
+- Attached asset: `agentloopkit-0.8.0.tgz`
+- CI run: `27223604805`
+- Publish workflow run: `27223669061`
+- npm registry check:
+  - latest: `0.1.1`
+  - versions: `0.1.0`, `0.1.1`
+- Verification completed:
+  - GitHub CI for `a6a4f2f`: pass
+  - GitHub release creation: pass
+  - GitHub Publish workflow package checks: pass
+  - GitHub Publish workflow final `npm publish`: failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`
+  - Local `npm whoami`: pass, reported `abhiyoheswaran`
+  - Local `npm publish --access public`: typecheck pass, Vitest pass with 19 files and 55 tests, build pass, then npm stopped at `EOTP`
+- Product changes:
+  - GitHub now has a public `v0.8.0` release with npm-pending notes.
+  - Launch checklist, npm publishing docs, final handoff, backlog, and release notes record the actual npm blocker.
+- Worked well:
+  - The release tarball is available from GitHub while npm auth remains blocked.
+- Improve:
+  - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.8.0`.
