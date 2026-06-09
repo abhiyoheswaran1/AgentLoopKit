@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.14.0
+
+check-gates strict-mode GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:
+
+- Added `agentloop check-gates --strict` so CI can treat warning gates as failures
+- Kept default `agentloop check-gates` warning behavior unchanged for local use
+- Added `strict` to `check-gates --json` output
+- Added strict-mode text to generated gate-check reports
+- Added Vitest coverage for default warning behavior and strict warning failure
+- Updated README, getting-started docs, gate-check docs, generated harness guidance, and README visual sources
+
 ## 0.13.0
 
 check-gates GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:

@@ -1657,3 +1657,41 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Strict mode gives CI a deterministic failure path without changing local defaults.
 - Improve:
   - Add GitHub Actions recipes for `agentloop verify`, `agentloop handoff`, and `agentloop check-gates --strict` in a later cycle.
+
+## 2026-06-09: 0.14.0 Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-14-0-strict-gates-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-052.md`
+- Verification report: `.agentloop/reports/2026-06-09-22-40-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-22-42-pr-summary.md`
+- Trigger:
+  - `check-gates --strict` is on `main`, but `v0.13.0` does not contain it.
+  - Product panel chose a catch-up `0.14.0` release candidate instead of reusing the existing tag.
+- Verification completed:
+  - Source CLI version: `npx tsx src/cli/index.ts version`: pass, reported `0.14.0`
+  - Built CLI version: `node dist/cli/index.js version`: pass, reported `0.14.0`
+  - Playwright README screenshot render: pass for `agentloopkit-showcase.png` and `agentloopkit-verification.png`
+  - VHS README terminal render: pass for `agentloopkit-cli.gif` using the `0.14.0` tarball name and showing `check-gates --strict`
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 71 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 320 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.14.0.tgz`
+  - `npm publish --access public --dry-run`: pass
+  - Packed CLI smoke: pass, `agentloop version` reported `0.14.0`, and `check-gates --strict --json` passed with task, verification, and handoff evidence
+  - Packed strict warning smoke: pass, `check-gates --strict --json` exited `1` with warning-only evidence
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-14-0-strict-gates-release.md`: pass
+  - npm registry proof: latest `0.1.1`, versions `0.1.0` and `0.1.1`
+- Tarball SHA-256: `1cb8b7dc178e6668839577a780943710e8d8689eb0f7a6599b027e9226e30b78`
+- Product changes:
+  - Bumped package metadata to `0.14.0`.
+  - Added a `0.14.0` changelog entry.
+  - Refreshed README source note, screenshots, and VHS terminal demo for strict gates.
+  - Updated launch checklist, npm publishing docs, final handoff, backlog, and product-panel records.
+- Worked well:
+  - The packed artifact proves strict pass and warning-failure paths from the npm tarball.
+- Improve:
+  - After the GitHub release, record CI, Publish workflow, npm registry state, and release asset digest.

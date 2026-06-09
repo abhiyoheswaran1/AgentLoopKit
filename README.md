@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Source on `main` documents `0.13.0`. npm currently serves `0.1.1` while publishing auth for later release candidates is being repaired. GitHub release tarballs contain the newer source commands.
+Source on `main` targets `0.14.0`. npm currently serves `0.1.1`; GitHub release candidates from `0.2.0` onward were produced while npm publishing auth was blocked. The next successful npm publish may jump to `0.14.0`, then normal semver releases resume.
 
 Run the CLI after install:
 
@@ -61,6 +61,7 @@ npx agentloopkit status
 npx agentloopkit verify
 npx agentloopkit handoff
 npx agentloopkit check-gates
+npx agentloopkit check-gates --strict
 npx agentloopkit task archive .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit install-agent codex
 npx agentloopkit install-agent all

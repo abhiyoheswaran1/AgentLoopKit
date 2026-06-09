@@ -19,7 +19,7 @@ Set PlaybackSpeed 1.08
 Set LoopOffset 13%
 Set Theme "Catppuccin Latte"
 
-Type@1ms "npm pack --pack-destination /tmp --silent >/dev/null && rm -rf /tmp/agentloopkit-vhs-demo && mkdir /tmp/agentloopkit-vhs-demo && cd /tmp/agentloopkit-vhs-demo && git init -q && npm init -y >/dev/null && npm pkg set scripts.test='echo demo tests pass' scripts.typecheck='echo types pass' scripts.build='echo build pass' >/dev/null && npm install -D /tmp/agentloopkit-0.13.0.tgz >/dev/null && clear"
+Type@1ms "npm pack --pack-destination /tmp --silent >/dev/null && rm -rf /tmp/agentloopkit-vhs-demo && mkdir /tmp/agentloopkit-vhs-demo && cd /tmp/agentloopkit-vhs-demo && git init -q && npm init -y >/dev/null && npm pkg set scripts.test='echo demo tests pass' scripts.typecheck='echo types pass' scripts.build='echo build pass' >/dev/null && npm install -D /tmp/agentloopkit-0.14.0.tgz >/dev/null && clear"
 Enter
 Sleep 250ms
 
@@ -63,7 +63,7 @@ Type "npx agentloop task status .agentloop/tasks/add-settings-page.md done"
 Enter
 Sleep 1s
 
-Type "npx agentloop check-gates"
+Type "npx agentloop check-gates --strict"
 Enter
 Sleep 1.5s
 
