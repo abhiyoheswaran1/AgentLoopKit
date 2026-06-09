@@ -61,6 +61,7 @@ As of June 9, 2026:
 - GitHub Publish workflow run `27217477927` for `v0.4.0` passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.5.0` is prepared on `main` after the `agentloop task list` command and generated agent guidance updates.
 - GitHub Publish workflow run `27218845454` for `v0.5.0` passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- A local `npm publish --access public` attempt for `0.5.0` passed typecheck, Vitest, and build through `prepublishOnly`, then npm stopped at `EOTP` because the account requires browser or one-time-password authentication.
 
 Publish `0.5.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.
 

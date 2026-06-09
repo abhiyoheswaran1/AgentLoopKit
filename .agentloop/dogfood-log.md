@@ -726,6 +726,7 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - CI run `27218787075`: pass on commit `bf746f5`
   - GitHub release `v0.5.0`: created with attached `agentloopkit-0.5.0.tgz`
   - GitHub Publish workflow `27218845454`: package checks passed, final `npm publish` failed with `E404`
+  - Local `npm publish --access public` for `0.5.0`: typecheck pass, Vitest pass with 18 files and 45 tests, build pass, then npm stopped at `EOTP`
   - npm registry check: latest remains `0.1.1`; available versions are `0.1.0` and `0.1.1`
 - Product changes:
   - Bumped package metadata to `0.5.0`.

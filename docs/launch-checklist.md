@@ -100,4 +100,5 @@ Current recovery note:
 - GitHub Publish workflow for `v0.4.0` passed package checks and failed at npm authorization with `E404`.
 - `agentloopkit@0.5.0` is now prepared on `main` for the task-list command.
 - GitHub Publish workflow for `v0.5.0` passed package checks and failed at npm authorization with `E404`.
+- Local `npm publish --access public` for `0.5.0` passed `prepublishOnly`, then npm stopped at `EOTP`.
 - Publish `0.5.0` only after npm trusted publishing is configured or local browser authentication succeeds.

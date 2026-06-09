@@ -484,6 +484,7 @@ Top remaining items:
 - The release-triggered GitHub Publish workflow for `v0.3.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.4.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.5.0` passed checks and failed at npm authorization with `E404`.
+- Local `npm publish --access public` for `0.5.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must complete local browser/OTP authentication.
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
@@ -520,6 +521,7 @@ Top remaining items:
 - [x] Prepare `agentloopkit@0.5.0` task-list release candidate.
 - [x] Publish GitHub release `v0.5.0` with npm-pending notes.
 - [x] Run GitHub Publish workflow for `v0.5.0`; package checks passed, npm authorization failed.
+- [x] Try local `npm publish --access public` for `0.5.0`; package checks passed, npm required browser/OTP authentication.
 - [ ] Publish `agentloopkit@0.5.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
