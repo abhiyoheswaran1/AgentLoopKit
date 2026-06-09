@@ -1593,3 +1593,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The packed artifact proves both `check-gates` failure and pass paths in a fresh repo.
 - Improve:
   - After the GitHub release, record CI, Publish workflow, npm registry state, and release asset digest.
+
+## 2026-06-09: 0.13.0 GitHub Release and npm Auth Result
+
+- Task contract: `.agentloop/tasks/2026-06-09-document-0-13-0-release-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-050.md`
+- Verification report: `.agentloop/reports/2026-06-09-22-15-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-22-15-pr-summary.md`
+- Release: `v0.13.0`
+- Commit: `193916c23450c6c619c7732c80c8f339ce875109`
+- GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.13.0
+- Attached asset: `agentloopkit-0.13.0.tgz`
+- Tarball SHA-256: `2c04fd3eba66fe662fb6fe97037b3950099d228b3759d2b418dcb57debef7e18`
+- CI run: `27232669795`
+- Publish workflow run: `27232852066`
+- npm registry check:
+  - latest: `0.1.1`
+  - versions: `0.1.0`, `0.1.1`
+- Verification completed:
+  - GitHub CI for `193916c`: pass
+  - GitHub release creation: pass
+  - GitHub release asset upload: pass, digest matches local SHA-256
+  - GitHub Publish workflow package checks: pass
+  - GitHub Publish workflow final `npm publish`: failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`
+  - npm registry check: pass, latest remains `0.1.1`
+- Product changes:
+  - GitHub now has a public `v0.13.0` release with npm-pending notes.
+  - Release notes explain that npm may jump from `0.1.1` to `0.13.0` because intermediate versions were GitHub-only while npm publish was blocked.
+  - Launch checklist, npm publishing docs, final handoff, backlog, and release notes record the actual npm blocker.
+- Worked well:
+  - The release tarball is available from GitHub while npm auth remains blocked.
+- Improve:
+  - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.13.0`.

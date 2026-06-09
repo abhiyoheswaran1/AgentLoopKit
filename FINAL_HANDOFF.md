@@ -206,10 +206,12 @@ Latest local verification for shell completions:
 
 Latest release status:
 
-- GitHub release `v0.12.0`: public, tarball attached.
-- GitHub release URL: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.12.0
-- Tarball SHA-256: `13c69f4016dc2eb1876e4469fe7f51d1c1f75f4edb04936b10bc5410ab491903`.
-- Publish workflow run `27231031745`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- GitHub release `v0.13.0`: public, tarball attached.
+- GitHub release URL: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.13.0
+- Tarball SHA-256: `2c04fd3eba66fe662fb6fe97037b3950099d228b3759d2b418dcb57debef7e18`.
+- GitHub release asset digest: `sha256:2c04fd3eba66fe662fb6fe97037b3950099d228b3759d2b418dcb57debef7e18`.
+- CI run `27232669795`: passed for commit `193916c23450c6c619c7732c80c8f339ce875109`.
+- Publish workflow run `27232852066`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - npm registry proof after release: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
 
 Latest local verification for the `0.9.0` release candidate:
@@ -1025,6 +1027,16 @@ Implemented:
 - VHS tape update to use `agentloopkit-0.13.0.tgz` and show `check-gates`
 - launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-candidate records
 
+### Cycle 50: 0.13.0 release status
+
+Decision: document `v0.13.0` as a public GitHub release and keep npm status explicit after the publish workflow failed at authorization.
+
+Implemented:
+
+- GitHub release `v0.13.0` with attached `agentloopkit-0.13.0.tgz`
+- release notes updated with the npm version-jump explanation and exact `E404` failure
+- launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1047,6 +1059,7 @@ Strongest signals:
 - Release readers need `0.12.0` metadata and visuals to match `create-task --json` before the GitHub release.
 - Agents and reviewers need one deterministic command that checks review evidence without running tests.
 - Release readers need `0.13.0` metadata and visuals to match `check-gates` before the GitHub release.
+- Release readers need a plain explanation that npm may jump from `0.1.1` to `0.13.0` because intermediate versions were GitHub-only while npm publish was blocked.
 
 ## Backlog
 
@@ -1059,9 +1072,9 @@ Top remaining items:
 
 ## Known limitations
 
-- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, and `v0.12.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.12.0` is the latest GitHub release, but it is not on npm yet.
-- `agentloopkit@0.13.0` is prepared locally for `check-gates`, but it is not a GitHub release or npm version yet.
+- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, and `v0.13.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.13.0` is the latest GitHub release, but it is not on npm yet.
+- npm may jump from `0.1.1` to `0.13.0` after authorization is repaired. Versions `0.2.0` through `0.12.0` were GitHub-only release candidates.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -1076,6 +1089,7 @@ Top remaining items:
 - The release-triggered GitHub Publish workflow for `v0.10.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.11.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.12.0` passed checks and failed at npm authorization with `E404`.
+- The release-triggered GitHub Publish workflow for `v0.13.0` passed checks and failed at npm authorization with `E404`.
 - Local `npm publish --access public` for `0.5.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.6.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.7.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
@@ -1151,8 +1165,8 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.12.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.12.0` to npm.
 - [x] Prepare `agentloopkit@0.13.0` check-gates release candidate.
-- [ ] Publish GitHub release `v0.13.0` with npm-pending notes.
-- [ ] Run GitHub Publish workflow for `v0.13.0`.
+- [x] Publish GitHub release `v0.13.0` with npm-pending notes.
+- [x] Run GitHub Publish workflow for `v0.13.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.13.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.

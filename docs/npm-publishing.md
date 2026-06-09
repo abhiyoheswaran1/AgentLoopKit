@@ -55,7 +55,8 @@ As of June 9, 2026:
 - GitHub release `v0.10.0` is public with a tarball asset.
 - GitHub release `v0.11.0` is public with a tarball asset.
 - GitHub release `v0.12.0` is public with a tarball asset.
-- `agentloopkit@0.13.0` is prepared locally after `agentloop check-gates` was added.
+- GitHub release `v0.13.0` is public with a tarball asset.
+- `agentloopkit@0.13.0` is prepared on `main` after `agentloop check-gates` was added.
 - npm latest is still `agentloopkit@0.1.1`.
 - `agentloopkit@0.2.0` passed local preflight, `npm publish --dry-run`, tarball smoke testing, and the GitHub publish workflow's install, lint, typecheck, test, and build steps.
 - GitHub Actions reached `npm publish`, then npm rejected the workflow because the package does not have a matching trusted publisher configuration.
@@ -90,9 +91,13 @@ As of June 9, 2026:
 - `agentloopkit@0.12.0` is prepared on `main` after `create-task --json` was added and README assets were refreshed.
 - GitHub Publish workflow run `27231031745` for `v0.12.0` passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - npm registry proof after the `v0.12.0` release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
-- `agentloopkit@0.13.0` is prepared locally after `check-gates`, refreshed README assets, and the 70-test suite update.
+- `agentloopkit@0.13.0` is prepared on `main` after `check-gates`, refreshed README assets, and the 70-test suite update.
 - Local `0.13.0` release-candidate checks passed: source version, built version, Playwright screenshot render, VHS terminal render, lint, typecheck, Vitest, Markdown link check, build, projscan, pack, `npm publish --access public --dry-run`, and packed-tarball smoke testing.
 - npm registry proof before the `v0.13.0` GitHub release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
+- GitHub release `v0.13.0` is public with attached `agentloopkit-0.13.0.tgz`.
+- GitHub Publish workflow run `27232852066` for `v0.13.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- npm registry proof after the `v0.13.0` release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
+- npm may jump from `0.1.1` to `0.13.0` after authorization is repaired. Versions `0.2.0` through `0.12.0` were GitHub-only release candidates during the npm publishing blocker.
 
 Publish `0.13.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.
 
