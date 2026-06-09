@@ -14,6 +14,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - repo init flow with `--dry-run` and JSON output
 - doctor checks with JSON output
 - task contract generation
+- active task pinning with `.agentloop/state.json`
 - verification report generation
 - deterministic PR summary generation
 - local status command for active task, latest verification, dirty files, configured commands, and next action
@@ -32,6 +33,9 @@ agentloop init --dry-run
 agentloop doctor
 agentloop doctor --json
 agentloop create-task --title "Add settings page" --type feature
+agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
+agentloop task current --json
+agentloop task clear
 agentloop status
 agentloop status --json
 agentloop verify
@@ -206,6 +210,22 @@ Latest local verification for the `0.3.0` create-task alias and npm auth recover
 - Stale manual GitHub Publish workflow run `27215293502`: cancelled because it targeted an older `0.3.0` commit
 - npm registry check: latest remains `0.1.1`
 
+Latest local verification for the unreleased active task lifecycle command:
+
+- Red test first: `npx pnpm@10.12.1 test tests/task-state.test.ts tests/status.test.ts tests/pr-summary.test.ts tests/handoff.test.ts` failed because `src/core/task-state.ts` did not exist and status/handoff selected the newest task.
+- Focused green test: `npx pnpm@10.12.1 test tests/task-state.test.ts tests/status.test.ts tests/pr-summary.test.ts tests/handoff.test.ts`: pass, 4 files and 15 tests
+- `git diff --check`: pass
+- `npx pnpm@10.12.1 lint`: pass
+- `npx pnpm@10.12.1 typecheck`: pass
+- `npx pnpm@10.12.1 test`: pass, 18 files and 43 tests
+- `npx pnpm@10.12.1 build`: pass
+- `npx projscan doctor --format markdown`: A, 100/100
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.3.0.tgz`
+- Tarball smoke: pass, packed `agentloop task set`, `status --json`, and `task clear` behaved as expected
+- `npm publish --access public --dry-run`: pass
+- `agentloop verify --task .agentloop/tasks/2026-06-09-add-active-task-lifecycle-command.md`: pass, wrote `.agentloop/reports/2026-06-09-17-26-verification-report.md`
+- `agentloop handoff --json`: pass, wrote `.agentloop/handoffs/2026-06-09-17-26-pr-summary.md`
+
 ## How to package
 
 ```bash
@@ -347,7 +367,7 @@ Strongest signals:
 Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.3.0`.
-2. Better task status lifecycle.
+2. Prepare the next release version after the active task command, likely `0.4.0`.
 3. Monorepo project detection.
 4. Markdown link checking for docs.
 5. Shell completions.
@@ -355,7 +375,7 @@ Top remaining items:
 ## Known limitations
 
 - GitHub releases `v0.2.0`, `v0.2.1`, and `v0.3.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.3.0` is prepared on `main`, not published on npm yet.
+- `agentloopkit@0.3.0` is the latest GitHub release, but `main` now contains unreleased active task lifecycle work.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
 - The stale manual GitHub Publish workflow for `0.3.0` targeted an older commit and was cancelled after the release workflow ran.
 - The release-triggered GitHub Publish workflow for `v0.3.0` passed checks and failed at npm authorization with `E404`.
@@ -440,11 +460,11 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.3.0`: high usefulness, low repo effort, external npm setting required.
-2. Add task status lifecycle: high usefulness, medium effort, medium maintenance.
+2. Prepare `0.4.0` release metadata for the active task command: high usefulness, low effort, low maintenance.
 3. Improve monorepo detection: high usefulness, medium effort, medium maintenance.
 4. Add markdown link checks: medium usefulness, low effort, low maintenance.
 5. Add shell completions: medium usefulness, medium effort, low maintenance.
-6. Add shell completions: medium usefulness, medium effort, low maintenance.
+6. Add `agentloop task list`: medium usefulness, medium effort, low maintenance.
 7. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
 8. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
 9. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.

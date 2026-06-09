@@ -12,11 +12,13 @@ This directory contains AgentLoopKit's own repo-local engineering loop artifacts
 - Task contracts: `tasks/`
 - Verification reports: `reports/`
 - Handoffs: `handoffs/`
+- Active task pointer: `state.json`
 
 ## Dogfood Commands
 
 ```bash
 agentloop create-task --title "Describe the next focused change" --type feature
+agentloop task set .agentloop/tasks/<task-file>.md
 agentloop status
 agentloop verify
 agentloop handoff

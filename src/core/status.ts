@@ -11,6 +11,7 @@ import {
   GitFileStatus,
 } from './git.js';
 import { latestMarkdownFile } from './artifacts.js';
+import { getActiveTaskPath } from './task-state.js';
 
 export type StatusArtifact = {
   path: string;
@@ -169,7 +170,8 @@ export async function getAgentLoopStatus(options: {
   const changedFiles = await parseGitStatus(rawStatus);
   const activeTask = await readTask(
     options.cwd,
-    await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir)),
+    (await getActiveTaskPath(options)) ??
+      (await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir))),
   );
   const latestReport = await readReport(
     options.cwd,

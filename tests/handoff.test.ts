@@ -26,6 +26,16 @@ async function createSummaryFixture() {
   return dir;
 }
 
+async function createExplicitTaskFixture() {
+  const dir = await createSummaryFixture();
+  await writeFile(path.join(dir, '.agentloop/tasks/2026-06-09-newer.md'), '# Newer task\n');
+  await writeFile(
+    path.join(dir, '.agentloop/state.json'),
+    JSON.stringify({ version: 1, activeTaskPath: '.agentloop/tasks/2026-06-09-demo.md' }),
+  );
+  return dir;
+}
+
 describe('handoff command', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
@@ -51,5 +61,15 @@ describe('handoff command', () => {
     const output = JSON.parse(result.stdout);
     expect(output.outPath).toContain('.agentloop/handoffs');
     expect(existsSync(output.outPath)).toBe(false);
+  });
+
+  test('uses explicit active task state when writing handoff', async () => {
+    const dir = await createExplicitTaskFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'handoff', '--json'], { cwd: dir });
+
+    const output = JSON.parse(result.stdout);
+    expect(output.markdown).toContain('Task context: Demo task');
+    expect(output.markdown).not.toContain('Task context: Newer task');
   });
 });

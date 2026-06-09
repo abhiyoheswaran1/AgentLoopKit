@@ -580,3 +580,42 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Configure npm trusted publishing or complete local browser/OTP publish before creating another npm-aligned release.
   - Add a task lifecycle command after publish recovery if no P0 release blocker remains.
+
+## 2026-06-09: Active Task Lifecycle Command
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-active-task-lifecycle-command.md`
+- Product cycle: `.agentloop/research/interview-cycle-021.md`
+- Verification report: `.agentloop/reports/2026-06-09-17-26-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-17-26-pr-summary.md`
+- Trigger:
+  - `status` and handoffs inferred the active task from newest Markdown file modification time.
+  - Product-panel Cycle 21 identified that long autonomous sessions need an explicit active task pointer without turning AgentLoopKit into project management software.
+- Red tests:
+  - `npx pnpm@10.12.1 test tests/task-state.test.ts tests/status.test.ts tests/pr-summary.test.ts tests/handoff.test.ts` failed because `src/core/task-state.ts` did not exist and status/handoff still selected the newest task.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/task-state.test.ts tests/status.test.ts tests/pr-summary.test.ts tests/handoff.test.ts`: pass, 4 files and 15 tests
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 18 files and 43 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.3.0.tgz`
+  - Tarball smoke: pass, packed `agentloop task set`, `status --json`, and `task clear` behaved as expected
+  - `npm publish --access public --dry-run`: pass
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-active-task-lifecycle-command.md`: pass
+  - `agentloop handoff --json`: pass, wrote the handoff above and used the pinned task
+- Product changes:
+  - Added `agentloop task set <path>`, `agentloop task current`, and `agentloop task clear`.
+  - Added `.agentloop/state.json` as a transparent active task pointer. `clear` removes the file.
+  - Updated `status` and deterministic handoffs to prefer the explicit active task when it points to an existing Markdown task inside `.agentloop/tasks/`.
+  - Preserved newest-task fallback when no active task is pinned.
+  - Updated README, docs, generated templates, repo harness, changelog, decisions, and final handoff.
+- Worked well:
+  - A one-file state model improved determinism without adding task boards, accounts, or persistence outside the repo.
+  - Dogfooding showed `status --json` and `handoff` now cite the intended task.
+- Confusing:
+  - The package version remains `0.3.0` because this task avoided package metadata. A release-prep task should bump the next version before another GitHub or npm release.
+- Improve:
+  - Add a release-prep task for `0.4.0` after npm trusted publishing is configured or local browser/OTP publish works.
+  - Consider `agentloop task current` in agent install guidance after more dogfooding.

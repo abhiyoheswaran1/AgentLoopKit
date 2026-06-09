@@ -5,6 +5,7 @@ import { formatTimestamp } from './dates.js';
 import { getGitDiffStat, getGitStatus, parseGitStatus, GitFileStatus } from './git.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import { latestMarkdownFile } from './artifacts.js';
+import { getActiveTaskPath } from './task-state.js';
 
 export type PrSummaryInput = {
   timestamp: string;
@@ -94,6 +95,7 @@ export async function summarizeRepository(options: {
   const diffStat = await getGitDiffStat(options.cwd);
   const taskPath =
     options.taskPath ??
+    (await getActiveTaskPath({ cwd: options.cwd, config: options.config })) ??
     (await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir)));
   const reportPath =
     options.reportPath ??

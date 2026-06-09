@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+Active task lifecycle:
+
+- Added `agentloop task set <path>` to pin the active task contract
+- Added `agentloop task current` and `agentloop task clear`
+- Added `.agentloop/state.json` as a transparent repo-local active task pointer
+- Updated `agentloop status` and deterministic handoffs to prefer the pinned active task before falling back to newest task file
+
 ## 0.3.0
 
 Handoff command GitHub release. npm publish is pending trusted-publishing or local-auth repair:

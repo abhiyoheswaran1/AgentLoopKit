@@ -118,4 +118,30 @@ describe('status command', () => {
     expect(status.activeTask.title).toBe('Newer task');
     expect(status.activeTask.path).toContain('2026-06-09-a-new-task.md');
   });
+
+  test('prefers explicit active task state over modified time fallback', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    const explicitPath = path.join(dir, '.agentloop/tasks/2026-06-09-explicit-task.md');
+    const newerPath = path.join(dir, '.agentloop/tasks/2026-06-09-newer-task.md');
+    await writeFile(explicitPath, '# Explicit task\n\n- Status: in progress\n');
+    await writeFile(newerPath, '# Newer task\n\n- Status: proposed\n');
+    await utimes(explicitPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
+    await utimes(newerPath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({ version: 1, activeTaskPath: '.agentloop/tasks/2026-06-09-explicit-task.md' }),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const status = JSON.parse(result.stdout);
+    expect(status.activeTask.title).toBe('Explicit task');
+    expect(status.activeTask.path).toBe('.agentloop/tasks/2026-06-09-explicit-task.md');
+  });
 });

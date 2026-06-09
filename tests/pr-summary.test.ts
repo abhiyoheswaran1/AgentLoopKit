@@ -66,4 +66,25 @@ describe('PR summary generation', () => {
 
     expect(summary.markdown).toContain('Task context: Newer task');
   });
+
+  test('uses explicit active task state before latest task fallback', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    const explicitPath = path.join(dir, '.agentloop/tasks/2026-06-09-explicit-task.md');
+    const newerPath = path.join(dir, '.agentloop/tasks/2026-06-09-newer-task.md');
+    await writeFile(explicitPath, '# Explicit task\n');
+    await writeFile(newerPath, '# Newer task\n');
+    await utimes(explicitPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
+    await utimes(newerPath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({ version: 1, activeTaskPath: '.agentloop/tasks/2026-06-09-explicit-task.md' }),
+    );
+
+    const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
+
+    expect(summary.markdown).toContain('Task context: Explicit task');
+  });
 });

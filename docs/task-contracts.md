@@ -30,4 +30,10 @@ A contract includes:
 - verification commands
 - rollback notes
 
+Pin the active contract for long sessions:
+
+```bash
+agentloop task set .agentloop/tasks/2026-06-09-fix-checkout-redirect.md
+```
+
 Agents should use the contract as the boundary for implementation and review.

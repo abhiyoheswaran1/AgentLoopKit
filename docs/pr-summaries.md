@@ -10,7 +10,7 @@ The summary uses deterministic inputs:
 
 - git status
 - git diff stats
-- latest task contract
+- active task contract from `agentloop task set`, or the newest task when no task is pinned
 - latest verification report
 - config
 

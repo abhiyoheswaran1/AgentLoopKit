@@ -5,7 +5,8 @@
 It reads:
 
 - `agentloop.config.json`
-- latest task contract in `.agentloop/tasks/`
+- active task pointer in `.agentloop/state.json`, when present
+- newest task contract in `.agentloop/tasks/` when no active task is pinned
 - latest verification report in `.agentloop/reports/`
 - git branch, commit, and working tree status
 - configured verification commands
@@ -20,6 +21,14 @@ Use JSON for scripts and agents:
 
 ```bash
 agentloop status --json
+```
+
+Pin the active task:
+
+```bash
+agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
+agentloop task current --json
+agentloop task clear
 ```
 
 The command suggests one next action:

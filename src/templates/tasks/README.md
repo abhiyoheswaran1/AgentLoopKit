@@ -15,3 +15,9 @@ agentloop create-task --type feature --title "Add settings page" \
 ```
 
 Task contracts turn fuzzy requests into scoped engineering work. A good contract names the desired outcome, constraints, non-goals, likely files, files not to touch, acceptance criteria, verification commands, and rollback notes.
+
+When several task contracts exist, pin the one in progress:
+
+```bash
+agentloop task set .agentloop/tasks/<task-file>.md
+```

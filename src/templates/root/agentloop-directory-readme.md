@@ -10,6 +10,7 @@ This directory contains repo-local engineering loop artifacts for coding agents 
 
 ```bash
 agentloop create-task --title "Describe the next focused change" --type feature
+agentloop task set .agentloop/tasks/<task-file>.md
 ```
 
 4. Check current loop state:

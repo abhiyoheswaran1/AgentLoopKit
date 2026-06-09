@@ -8,6 +8,7 @@ import { installAgentCommand } from './commands/install-agent.js';
 import { listTemplatesCommand } from './commands/list-templates.js';
 import { versionCommand } from './commands/version.js';
 import { statusCommand } from './commands/status.js';
+import { taskCommand } from './commands/task.js';
 import { getPackageVersion } from '../core/version.js';
 
 const program = new Command();
@@ -24,6 +25,7 @@ program.addCommand(verifyCommand());
 program.addCommand(summarizeCommand());
 program.addCommand(handoffCommand());
 program.addCommand(statusCommand());
+program.addCommand(taskCommand());
 program.addCommand(installAgentCommand());
 program.addCommand(listTemplatesCommand());
 program.addCommand(versionCommand());

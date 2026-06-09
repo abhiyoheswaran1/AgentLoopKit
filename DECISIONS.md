@@ -43,3 +43,7 @@ Launch visuals live in `docs/assets/readme/` with source HTML and a VHS tape so 
 ## 2026-06-09: Handoff Writes, Summarize Previews
 
 `agentloop handoff` is the clear command for writing reviewer handoff files. It reuses the deterministic summary core instead of introducing a second summary implementation. `agentloop summarize` remains read-only by default for preview use and existing scripts can keep using `agentloop summarize --write`.
+
+## 2026-06-09: Active Task State Is Transparent
+
+`agentloop task set` stores the active task pointer in `.agentloop/state.json`. The file contains only a version and a relative task path. `status` and handoff summaries use that pointer when it references an existing Markdown task inside `.agentloop/tasks/`; otherwise they fall back to the newest task contract. This keeps task lifecycle local and auditable without adding a database, daemon, or hosted service.
