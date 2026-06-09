@@ -99,12 +99,24 @@ Latest local verification for `agentloop status`:
 - `0.2.0` tarball smoke: pass
 - `agentloop verify`: pass after this repo's config was aligned to `npx pnpm@10.12.1`
 
+Latest local verification for the `0.2.1` release candidate:
+
+- `git diff --check`: pass
+- `npx pnpm@10.12.1 lint`: pass
+- `npx pnpm@10.12.1 typecheck`: pass
+- `npx pnpm@10.12.1 test`: pass, 15 files and 31 tests
+- `npx pnpm@10.12.1 build`: pass
+- `npx projscan doctor --format markdown`: A, 100/100
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.2.1.tgz`
+- `npm publish --access public --dry-run`: pass
+- Tarball smoke: version reports `0.2.1`; custom verification passes when default checks are disabled with `--no-test --no-lint --no-typecheck --no-build`
+
 ## How to package
 
 ```bash
 npx pnpm@10.12.1 build
 npx pnpm@10.12.1 pack
-npx --yes --package ./agentloopkit-0.2.0.tgz agentloop version
+npx --yes --package ./agentloopkit-0.2.1.tgz agentloop version
 ```
 
 ## How to publish to npm
@@ -139,6 +151,7 @@ Current publish gap:
 - npm latest is still `0.1.1`.
 - The `v0.2.0` publish workflow passed install, lint, typecheck, test, and build, then npm rejected `npm publish` because trusted publishing is not configured for this package/workflow.
 - A local `npm publish --access public` retry reached npm browser authentication, then failed at npm's auth completion endpoint.
+- Package-content changes after the `v0.2.0` tag are prepared as `agentloopkit@0.2.1`.
 - Do not paste npm OTPs or tokens into chat, issues, PRs, or release notes.
 
 ## How users install it
@@ -237,7 +250,7 @@ Strongest signals:
 Top remaining items:
 
 1. Better failed-command excerpts in verification reports.
-2. Publish `agentloopkit@0.2.0` to npm, or bump and release a later version.
+2. Publish `agentloopkit@0.2.1` to npm after trusted publishing or local browser auth works.
 3. Better task status lifecycle.
 4. Monorepo project detection.
 5. Markdown link checking for docs.
@@ -245,6 +258,7 @@ Top remaining items:
 ## Known limitations
 
 - GitHub release `v0.2.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.2.1` is prepared as the next release candidate, not published.
 - npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must publish locally with browser/OTP authentication.
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
@@ -267,6 +281,8 @@ Top remaining items:
 - [x] Prepare `agentloopkit@0.2.0` status release.
 - [x] Publish GitHub release `v0.2.0`.
 - [ ] Publish `agentloopkit@0.2.0` to npm.
+- [x] Prepare `agentloopkit@0.2.1` release candidate.
+- [ ] Publish `agentloopkit@0.2.1` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.

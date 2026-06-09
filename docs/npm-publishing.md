@@ -49,7 +49,7 @@ As of June 9, 2026:
 - GitHub Actions reached `npm publish`, then npm rejected the workflow because the package does not have a matching trusted publisher configuration.
 - A local `npm publish --access public` retry also reached npm browser authentication, then failed at npm's auth completion endpoint.
 
-Do not merge new package-content changes into a `0.2.0` publish attempt. Publish from the `v0.2.0` tag, or bump the package to the next version and release that version instead.
+Package-content changes landed after the `v0.2.0` GitHub tag. `agentloopkit@0.2.1` is now the next release candidate. Publish `0.2.1` only after npm trusted publishing is configured or local browser authentication succeeds.
 
 Preferred release path after the first publish:
 
@@ -101,7 +101,7 @@ npm view agentloopkit version
 npm view agentloopkit versions --json
 ```
 
-For `v0.2.0`, the expected successful result is latest `0.2.0` and a versions list containing `0.2.0`.
+For `v0.2.1`, the expected successful result is latest `0.2.1` and a versions list containing `0.2.1`.
 
 ## Package Contents
 
