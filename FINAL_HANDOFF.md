@@ -229,8 +229,8 @@ Top remaining items:
 
 ## Known limitations
 
-- npm trusted publishing still needs to be configured for future releases.
-- `agentloopkit@0.2.0` needs final package verification and npm publish.
+- GitHub release `v0.2.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must publish locally with browser/OTP authentication.
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
 - Third-party agent config files are not created unless conventions are safe and known.
@@ -249,7 +249,8 @@ Top remaining items:
 - [x] Prepare `agentloopkit@0.1.1` README visual release.
 - [x] Publish `agentloopkit@0.1.1` to npm.
 - [x] Publish GitHub release `v0.1.1`.
-- [ ] Prepare `agentloopkit@0.2.0` status release.
+- [x] Prepare `agentloopkit@0.2.0` status release.
+- [x] Publish GitHub release `v0.2.0`.
 - [ ] Publish `agentloopkit@0.2.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.

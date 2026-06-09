@@ -144,3 +144,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Confusing: task lifecycle remains file-based; richer transitions still belong in future work.
 - Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
 - Improve: make issue and PR templates ask for AgentLoopKit status output.
+
+## 2026-06-09: Publish Workflow Hardening
+
+- Task contract: `.agentloop/tasks/2026-06-09-harden-npm-publish-workflow-after-trusted-publishing-failure.md`
+- Product cycle: `.agentloop/research/interview-cycle-009.md`
+- Trigger:
+  - Published GitHub release `v0.2.0`.
+  - GitHub Actions publish workflow passed install, lint, typecheck, test, and build.
+  - `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`, indicating npm did not authorize the workflow to publish.
+- Verification planned:
+  - `git diff --check`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Verification completed:
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-15-18-verification-report.md`
+  - `agentloop summarize --write`: pass, wrote `.agentloop/handoffs/2026-06-09-15-18-pr-summary.md`
+- Product changes:
+  - Publish workflow can be run manually after npm trusted publishing is configured.
+  - Publish workflow uses explicit `npm publish --access public`.
+  - Release notes now state that npm `0.2.0` is pending.
+  - Publishing docs explain the observed failure and safe local fallback.
+- Worked well: GitHub release automation verified the package before hitting npm authorization.
+- Confusing: npm returns a 404 for an authorization/trusted-publisher problem.
+- Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
+- Improve: configure npm trusted publishing on npmjs.com, then rerun the Publish workflow.
