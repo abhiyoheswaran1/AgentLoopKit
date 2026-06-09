@@ -25,7 +25,7 @@ Use this before publishing AgentLoopKit.
 - [x] GitHub release `v0.11.0` is published with npm-pending notes.
 - [x] GitHub release `v0.12.0` is published with npm-pending notes.
 - [x] GitHub release `v0.13.0` is published with npm-pending notes.
-- [ ] GitHub release `v0.14.0` is published with npm-pending notes.
+- [x] GitHub release `v0.14.0` is published with npm-pending notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -86,7 +86,7 @@ Use this before publishing AgentLoopKit.
 - [ ] Package `agentloopkit@0.13.0` is published.
 - [ ] Local `agentloopkit@0.13.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
 - [x] Package `agentloopkit@0.14.0` is prepared on `main`.
-- [ ] Publish workflow for `v0.14.0` passed checks.
+- [x] Publish workflow for `v0.14.0` passed package checks and failed at npm authorization.
 - [ ] Package `agentloopkit@0.14.0` is published.
 - [ ] Local `agentloopkit@0.14.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
 - [ ] npm trusted publishing is configured for this repository.
@@ -158,7 +158,8 @@ Current recovery note:
 - GitHub release `v0.11.0` is public with attached `agentloopkit-0.11.0.tgz`.
 - GitHub release `v0.12.0` is public with attached `agentloopkit-0.12.0.tgz`.
 - GitHub release `v0.13.0` is public with attached `agentloopkit-0.13.0.tgz`.
-- `agentloopkit@0.14.0` is prepared and verified on `main` for `agentloop check-gates --strict`; GitHub release is pending.
+- GitHub release `v0.14.0` is public with attached `agentloopkit-0.14.0.tgz`.
+- `agentloopkit@0.14.0` is prepared, verified, and published as GitHub release `v0.14.0` for `agentloop check-gates --strict`.
 - npm still reports `agentloopkit@0.1.1` as latest.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.3.0` is now prepared on `main` after the handoff command, create-task flag, latest artifact selection, and create-task alias work.
@@ -194,5 +195,7 @@ Current recovery note:
 - Local `0.13.0` checks passed: `npm publish --access public --dry-run`, packed-tarball smoke test, and npm registry proof that latest remains `0.1.1`.
 - GitHub Publish workflow for `v0.13.0` passed package checks and failed at npm authorization with `E404`.
 - Local `npm publish --access public` for `0.13.0` passed package checks and stopped at `EOTP`; npm requires browser/OTP authentication.
+- Local `0.14.0` checks passed: `npm publish --access public --dry-run`, packed-tarball smoke test, and npm registry proof that latest remains `0.1.1`.
+- GitHub Publish workflow for `v0.14.0` passed package checks and failed at npm authorization with `E404`.
 - npm may jump from `0.1.1` to `0.14.0` after publish auth is repaired; skipped npm versions were GitHub-only release candidates.
 - Publish `0.14.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.

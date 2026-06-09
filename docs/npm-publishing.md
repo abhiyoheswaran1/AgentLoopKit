@@ -56,6 +56,7 @@ As of June 9, 2026:
 - GitHub release `v0.11.0` is public with a tarball asset.
 - GitHub release `v0.12.0` is public with a tarball asset.
 - GitHub release `v0.13.0` is public with a tarball asset.
+- GitHub release `v0.14.0` is public with a tarball asset.
 - `agentloopkit@0.14.0` is prepared on `main` after `agentloop check-gates --strict` was added.
 - npm latest is still `agentloopkit@0.1.1`.
 - `agentloopkit@0.2.0` passed local preflight, `npm publish --dry-run`, tarball smoke testing, and the GitHub publish workflow's install, lint, typecheck, test, and build steps.
@@ -99,6 +100,9 @@ As of June 9, 2026:
 - Local `npm publish --access public` for `0.13.0` passed `prepublishOnly`, then npm stopped with `EOTP` because the account requires browser or one-time-password authentication.
 - npm registry proof after the `v0.13.0` release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 - `agentloopkit@0.14.0` is prepared on `main` after `check-gates --strict`, refreshed README asset sources, and the 71-test suite update.
+- GitHub release `v0.14.0` is public with attached `agentloopkit-0.14.0.tgz`.
+- GitHub Publish workflow run `27234726013` for `v0.14.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- npm registry proof after the `v0.14.0` release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 - npm may jump from `0.1.1` to `0.14.0` after authorization is repaired. Versions `0.2.0` through `0.13.0` were GitHub-only release candidates during the npm publishing blocker.
 
 Publish `0.14.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.

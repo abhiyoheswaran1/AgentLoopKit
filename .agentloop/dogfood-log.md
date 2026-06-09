@@ -1695,3 +1695,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The packed artifact proves strict pass and warning-failure paths from the npm tarball.
 - Improve:
   - After the GitHub release, record CI, Publish workflow, npm registry state, and release asset digest.
+
+## 2026-06-09: 0.14.0 GitHub Release and npm Auth Result
+
+- Task contract: `.agentloop/tasks/2026-06-09-document-0-14-0-release-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-053.md`
+- Verification report: `.agentloop/reports/2026-06-09-22-48-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-22-48-pr-summary.md`
+- Release: `v0.14.0`
+- Commit: `a739f834e42d6d2b8f1e96af6bddf49f62ae39c5`
+- GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.14.0
+- Attached asset: `agentloopkit-0.14.0.tgz`
+- Tarball SHA-256: `1cb8b7dc178e6668839577a780943710e8d8689eb0f7a6599b027e9226e30b78`
+- CI run: `27234655492`
+- Publish workflow run: `27234726013`
+- npm registry check:
+  - latest: `0.1.1`
+  - versions: `0.1.0`, `0.1.1`
+- Verification completed:
+  - GitHub CI for `a739f83`: pass
+  - GitHub release creation: pass
+  - GitHub release asset upload: pass, digest matches local SHA-256
+  - GitHub Publish workflow package checks: pass
+  - GitHub Publish workflow final `npm publish`: failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`
+  - npm registry check: pass, latest remains `0.1.1`
+  - Release-status docs verification: pass, Markdown links checked 324 files and projscan reported A 100/100
+- Product changes:
+  - GitHub now has a public `v0.14.0` release with npm-pending notes.
+  - Release notes explain that npm may jump from `0.1.1` to `0.14.0` because intermediate versions were GitHub-only while npm publish was blocked.
+  - Launch checklist, npm publishing docs, final handoff, backlog, and release notes record the actual npm blocker.
+- Worked well:
+  - The release tarball is available from GitHub while npm auth remains blocked.
+- Improve:
+  - Complete local browser/OTP auth for `0.14.0`, or configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`.
