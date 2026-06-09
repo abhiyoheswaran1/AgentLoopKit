@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.0
+
+Shell completions GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:
+
+- Added `agentloop completion <bash|zsh|fish>` to print shell completion scripts
+- Added static bash, zsh, and fish completion output with no shell profile mutation
+- Completion scripts cover top-level commands, task subcommands, task status values, install-agent names, and supported shell names
+- Added Vitest coverage for completion rendering and unsupported shell errors
+- Updated README, getting-started docs, and README visual assets for the shell-completion workflow
+
 ## 0.9.0
 
 Task status transitions GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:

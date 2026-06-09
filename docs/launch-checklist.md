@@ -21,6 +21,7 @@ Use this before publishing AgentLoopKit.
 - [x] GitHub release `v0.7.0` is published with npm-pending notes.
 - [x] GitHub release `v0.8.0` is published with npm-pending notes.
 - [x] GitHub release `v0.9.0` is published with npm-pending notes.
+- [ ] GitHub release `v0.10.0` is published with npm-pending notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -63,6 +64,9 @@ Use this before publishing AgentLoopKit.
 - [x] Publish workflow for `v0.9.0` passed checks and failed at npm authorization.
 - [ ] Package `agentloopkit@0.9.0` is published.
 - [ ] Local `agentloopkit@0.9.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
+- [x] Package `agentloopkit@0.10.0` is prepared on `main`.
+- [ ] Package `agentloopkit@0.10.0` is published.
+- [ ] Local `agentloopkit@0.10.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
 - [ ] npm trusted publishing is configured for this repository.
 - [x] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -96,6 +100,7 @@ npx --yes --package ./agentloopkit-0.6.0.tgz agentloop task show .agentloop/task
 npx --yes --package ./agentloopkit-0.7.0.tgz agentloop doctor --json
 npx --yes --package ./agentloopkit-0.8.0.tgz agentloop doctor --json
 npx --yes --package ./agentloopkit-0.9.0.tgz agentloop task status .agentloop/tasks/smoke-task.md done --json
+npx --yes --package ./agentloopkit-0.10.0.tgz agentloop completion zsh
 ```
 
 ## Publish
@@ -147,3 +152,5 @@ Current recovery note:
 - GitHub Publish workflow for `v0.9.0` passed package checks and failed at npm authorization with `E404`.
 - npm latest remains `0.1.1`; registry versions are `0.1.0` and `0.1.1`.
 - Publish `0.9.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.
+- `agentloopkit@0.10.0` is now prepared on `main` for shell completions.
+- Publish `0.10.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.

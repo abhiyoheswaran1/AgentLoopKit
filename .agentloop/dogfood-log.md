@@ -1259,3 +1259,38 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The command gives repeat users CLI polish while keeping the security story simple: print only, no shell profile mutation.
 - Improve:
   - Prepare a new release candidate after this feature, because `v0.9.0` already points at the task-status release.
+
+## 2026-06-09: 0.10.0 Shell Completions Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-10-0-shell-completions-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-040.md`
+- Verification report: `.agentloop/reports/2026-06-09-20-16-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-20-18-pr-summary.md`
+- Trigger:
+  - Shell completions landed on `main` after the `v0.9.0` release.
+  - Package metadata, changelog, README status, and visual assets needed to match the new source state.
+- Verification completed:
+  - `npx tsx src/cli/index.ts version`: pass, reported `0.10.0`
+  - Playwright README screenshot render: pass for `agentloopkit-showcase.png` and `agentloopkit-verification.png`
+  - VHS README terminal render: pass for `agentloopkit-cli.gif` using the `0.10.0` tarball name and showing `agentloop completion zsh`
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 20 files and 64 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 269 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.10.0.tgz`
+  - `npm publish --access public --dry-run`: pass
+  - Packed CLI smoke: pass, `agentloop version` reported `0.10.0` and completions rendered for zsh, bash, and fish
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-10-0-shell-completions-release.md`: pass
+- Product changes:
+  - Bumped package metadata to `0.10.0`.
+  - Added a `0.10.0` changelog entry.
+  - Updated README source note, quickstart command list, and visual alt text.
+  - Refreshed Playwright screenshots and VHS GIF.
+  - Updated launch checklist, npm publishing docs, final handoff, backlog, and product-panel records.
+- Worked well:
+  - The release candidate keeps the GitHub source, tarball, README, and visual assets aligned.
+- Improve:
+  - After the GitHub release, record CI, Publish workflow, local npm publish, and registry status.

@@ -80,7 +80,24 @@ npx pnpm@10.12.1 build
 npx projscan doctor --format markdown
 ```
 
-Latest local verification for the product-panel iteration:
+Latest local verification for the `0.10.0` release candidate:
+
+- `npx tsx src/cli/index.ts version`: pass, reported `0.10.0`.
+- Playwright README screenshot render: pass for `agentloopkit-showcase.png` and `agentloopkit-verification.png`.
+- VHS README terminal render: pass for `agentloopkit-cli.gif` using the `0.10.0` tarball name and showing `agentloop completion zsh`.
+- `git diff --check`: pass.
+- `npx pnpm@10.12.1 lint`: pass.
+- `npx pnpm@10.12.1 typecheck`: pass.
+- `npx pnpm@10.12.1 test`: pass, 20 files and 64 tests.
+- `npx pnpm@10.12.1 check:links`: pass, 269 Markdown files checked.
+- `npx pnpm@10.12.1 build`: pass.
+- `npx projscan doctor --format markdown`: A, 100/100.
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.10.0.tgz`.
+- `npm publish --access public --dry-run`: pass.
+- Packed CLI smoke: pass, `agentloop version` reported `0.10.0` and completions rendered for zsh, bash, and fish.
+- `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-10-0-shell-completions-release.md`: pass.
+
+Latest local verification for shell completions:
 
 - Shell completion red test first: `npx pnpm@10.12.1 test tests/completion.test.ts` failed before `src/core/completions.ts` existed.
 - Focused green test: `npx pnpm@10.12.1 test tests/completion.test.ts`: pass, 1 file and 6 tests.
@@ -501,6 +518,7 @@ Current publish gap:
 - GitHub release `v0.2.0` is public.
 - GitHub release `v0.2.1` is public.
 - GitHub releases `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, and `v0.9.0` are public with tarball assets.
+- Source metadata on `main` is prepared as `0.10.0` for shell completions.
 - npm latest is still `0.1.1`.
 - The `v0.2.0` publish workflow passed install, lint, typecheck, test, and build, then npm rejected `npm publish` because trusted publishing is not configured for this package/workflow.
 - A local `npm publish --access public` retry reached npm browser authentication, then failed at npm's auth completion endpoint.
@@ -797,6 +815,19 @@ Implemented:
 - top-level command, task subcommand, task status, install-agent, and shell-name completions
 - README and getting-started docs that tell users the command does not edit shell profiles
 
+### Cycle 40: 0.10.0 release candidate
+
+Decision: package shell completions as `0.10.0` because `v0.9.0` already points at the task-status release.
+
+Implemented:
+
+- package metadata bump to `0.10.0`
+- `0.10.0` changelog entry for shell completions
+- README source note update
+- VHS tape update to use `agentloopkit-0.10.0.tgz` and show `agentloop completion zsh`
+- Playwright screenshot refresh for current test and verification counts
+- launch, publishing, final handoff, backlog, and product-panel release records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -818,15 +849,16 @@ Strongest signals:
 
 Top remaining items:
 
-1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.9.0`.
-2. Prepare the next npm-publishable release after trusted publishing is repaired.
-3. Config schema hosting.
-4. Task archive command.
-5. `agentloop check-gates`.
+1. Publish GitHub release `v0.10.0` with npm-pending notes after CI passes.
+2. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.10.0`.
+3. Prepare the next npm-publishable release after trusted publishing is repaired.
+4. Config schema hosting.
+5. Task archive command.
 
 ## Known limitations
 
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, and `v0.9.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.10.0` is prepared on `main` but not released on GitHub or npm yet.
 - `agentloopkit@0.9.0` is the latest GitHub release, but it is not on npm yet.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
@@ -901,6 +933,10 @@ Top remaining items:
 - [x] Publish GitHub release `v0.9.0` with npm-pending notes.
 - [x] Run GitHub Publish workflow for `v0.9.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.9.0` to npm.
+- [x] Prepare `agentloopkit@0.10.0` shell-completions release candidate.
+- [ ] Publish GitHub release `v0.10.0` with npm-pending notes.
+- [ ] Run GitHub Publish workflow for `v0.10.0`.
+- [ ] Publish `agentloopkit@0.10.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
@@ -952,8 +988,8 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Repair npm publishing for `0.9.0`: high usefulness, low repo effort, external npm setting required.
-2. Prepare a `0.10.0` release candidate for shell completions: high usefulness, low effort, low maintenance.
+1. Publish GitHub release `v0.10.0`: high usefulness, low repo effort, release notes and tarball needed.
+2. Repair npm publishing for `0.10.0`: high usefulness, low repo effort, external npm setting required.
 3. Add task archive command: medium usefulness, medium effort, low maintenance.
 4. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
 5. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
