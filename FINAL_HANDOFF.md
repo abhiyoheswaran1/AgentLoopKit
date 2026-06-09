@@ -185,6 +185,25 @@ Latest local verification for the `0.3.0` create-task area flags:
 - Tarball smoke: pass, packed `create-task` wrote repeated likely and forbidden file entries
 - `npm publish --access public --dry-run`: pass
 
+Latest local verification for the `0.3.0` create-task alias and npm auth recovery work:
+
+- Dogfood reproduction: `node dist/cli/index.js create-task ... --desired-outcome ...` failed with `unknown option '--desired-outcome'`.
+- Red test first: `npx pnpm@10.12.1 test tests/create-task.test.ts` failed with `unknown option '--problem-statement'`.
+- Focused green test: `npx pnpm@10.12.1 test tests/create-task.test.ts`: pass, 2 tests
+- `npx tsx src/cli/index.ts create-task ... --problem-statement ... --desired-outcome ... --verification ... --rollback ...`: pass, wrote `.agentloop/tasks/2026-06-09-document-npm-otp-publish-blocker.md`
+- `git diff --check`: pass
+- `npx pnpm@10.12.1 lint`: pass
+- `npx pnpm@10.12.1 typecheck`: pass
+- `npx pnpm@10.12.1 test`: pass, 17 files and 37 tests
+- `npx pnpm@10.12.1 build`: pass
+- `npx projscan doctor --format markdown`: A, 100/100
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.3.0.tgz`
+- Tarball smoke: pass, packed `create-task` accepted the alias flags and wrote the expected task contract fields
+- `npm publish --access public --dry-run`: pass
+- Local `npm publish --access public` for `0.3.0`: typecheck pass, Vitest pass with 17 files and 36 tests, build pass, then npm stopped at `EOTP`
+- Manual GitHub Publish workflow run `27215293502`: queued at the time this handoff was updated
+- npm registry check: latest remains `0.1.1`
+
 ## How to package
 
 ```bash
@@ -335,7 +354,9 @@ Top remaining items:
 
 - GitHub releases `v0.2.0` and `v0.2.1` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - `agentloopkit@0.3.0` is prepared on `main`, not published on npm yet.
-- npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must publish locally with browser/OTP authentication.
+- Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
+- The manual GitHub Publish workflow for `0.3.0` was queued when this handoff was updated; verify it before claiming trusted publishing worked.
+- npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must complete local browser/OTP authentication.
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
 - Third-party agent config files are not created unless conventions are safe and known.

@@ -77,4 +77,48 @@ describe('create-task command', () => {
     expect(markdown).toContain('- pnpm test');
     expect(markdown).toContain('- pnpm build');
   });
+
+  test('accepts task-contract field aliases in non-interactive mode', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Document npm OTP publish blocker',
+        '--type',
+        'docs',
+        '--out',
+        '.agentloop/tasks/npm-otp-blocker.md',
+        '--problem-statement',
+        'Local npm publish passed checks but stopped at EOTP authentication.',
+        '--desired-outcome',
+        'Release docs explain the safe publish paths.',
+        '--assumption',
+        'No OTP is available to the CLI session.',
+        '--verification',
+        'git diff --check',
+        '--verification',
+        'pnpm test',
+        '--rollback',
+        'Revert the docs-only update.',
+      ],
+      { cwd: dir },
+    );
+
+    const markdown = await readFile(path.join(dir, '.agentloop/tasks/npm-otp-blocker.md'), 'utf8');
+    expect(markdown).toContain('Local npm publish passed checks but stopped at EOTP authentication.');
+    expect(markdown).toContain('Release docs explain the safe publish paths.');
+    expect(markdown).toContain('- No OTP is available to the CLI session.');
+    expect(markdown).toContain('- git diff --check');
+    expect(markdown).toContain('- pnpm test');
+    expect(markdown).toContain('Revert the docs-only update.');
+  });
 });

@@ -52,6 +52,8 @@ As of June 9, 2026:
 - `agentloopkit@0.2.1` passed local lint, typecheck, Vitest, build, projscan, pack, dry-run publish, and tarball smoke tests.
 - The `v0.2.1` GitHub Publish workflow passed install, lint, typecheck, tests, build, and `prepublishOnly`, then npm rejected `npm publish` with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.3.0` is prepared on `main` after the `agentloop handoff` command, create-task flag fixes, and latest artifact selection were added.
+- A local `npm publish --access public` attempt for `0.3.0` passed typecheck, Vitest, and build through `prepublishOnly`, then npm stopped at `EOTP` because the account requires browser or one-time-password authentication.
+- Manual GitHub Publish workflow run `27215293502` was queued for `0.3.0`; verify its result before claiming a GitHub Actions publish completed.
 
 Package-content changes landed after the `v0.2.1` GitHub tag. Publish `0.3.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.
 

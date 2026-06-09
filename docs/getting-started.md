@@ -19,8 +19,13 @@ Create a task:
 
 ```bash
 npx agentloopkit create-task --type feature --title "Add settings page" \
+  --problem-statement "Users cannot manage account preferences" \
+  --desired-outcome "Users can update settings from the app" \
   --likely-file src/settings \
-  --forbidden-file migrations/
+  --forbidden-file migrations/ \
+  --acceptance "Settings can be saved" \
+  --verification "pnpm test" \
+  --rollback "Remove the settings route"
 ```
 
 Check the current loop state:

@@ -540,3 +540,39 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Updated README, getting-started docs, and task-contract docs.
 - Worked well: the core task renderer already supported the fields, so the fix stayed in the CLI surface.
 - Improve: task lifecycle remains the next higher-value product item after npm publishing repair.
+
+## 2026-06-09: create-task Alias Flags and npm OTP Recovery
+
+- Task contract: `.agentloop/tasks/2026-06-09-document-npm-otp-publish-blocker.md`
+- Product cycle: `.agentloop/research/interview-cycle-020.md`
+- Trigger:
+  - Local `npm publish --access public` for `agentloopkit@0.3.0` passed the package checks, then npm stopped at `EOTP`.
+  - Dogfooding a docs task failed because `create-task` rejected natural flags such as `--desired-outcome`.
+- Root cause:
+  - Non-interactive `create-task` only accepted the shorter internal names `--outcome` and `--verify-command`.
+  - Rollback notes and assumptions were only reachable from the interactive prompt.
+- Verification completed:
+  - Dogfood reproduction: `node dist/cli/index.js create-task ... --desired-outcome ...` failed with `unknown option '--desired-outcome'`.
+  - Red test first: `npx pnpm@10.12.1 test tests/create-task.test.ts` failed with `unknown option '--problem-statement'`.
+  - Focused green test: `npx pnpm@10.12.1 test tests/create-task.test.ts`: pass, 2 tests
+  - Dogfood command after fix: `npx tsx src/cli/index.ts create-task ... --problem-statement ... --desired-outcome ... --verification ... --rollback ...`: pass
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 17 files and 37 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.3.0.tgz`
+  - Tarball smoke: pass, packed `create-task` accepted the alias flags and wrote the expected task contract fields
+  - `npm publish --access public --dry-run`: pass
+- Product changes:
+  - Added `--problem-statement`, `--desired-outcome`, `--assumption`, `--verification`, and `--rollback` to non-interactive task creation.
+  - Kept existing shorter flags working.
+  - Updated README, getting-started docs, task-contract docs, generated task README, npm publishing docs, and final handoff.
+- Worked well: dogfooding exposed a CLI naming mismatch before release notes could freeze it.
+- Confusing:
+  - npm local publish may pass package checks and still stop at account authentication.
+  - The manual GitHub Publish workflow can remain queued even when CI runs quickly.
+- Improve:
+  - Verify the GitHub Publish workflow result before creating a public `v0.3.0` release.
+  - Add a task lifecycle command after publish recovery if no P0 release blocker remains.

@@ -147,8 +147,13 @@ Create a contract before a coding session:
 
 ```bash
 agentloop create-task --type feature --title "Add settings page" \
+  --problem-statement "Users cannot manage account preferences" \
+  --desired-outcome "Users can update settings from the app" \
   --likely-file src/settings \
-  --forbidden-file migrations/
+  --forbidden-file migrations/ \
+  --acceptance "Settings can be saved" \
+  --verification "pnpm test" \
+  --rollback "Remove the settings route"
 ```
 
 Each contract records:

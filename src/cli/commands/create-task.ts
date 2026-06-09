@@ -14,6 +14,17 @@ function lines(value: string | undefined, previous: string[]) {
   return [...previous, ...current];
 }
 
+function stringOption(options: Record<string, unknown>, ...keys: string[]) {
+  for (const key of keys) {
+    if (typeof options[key] === 'string') return options[key] as string;
+  }
+  return '';
+}
+
+function listOption(options: Record<string, unknown>, ...keys: string[]) {
+  return keys.flatMap((key) => (Array.isArray(options[key]) ? (options[key] as string[]) : []));
+}
+
 async function collectInteractive(initial: { title?: string; type?: TaskType }) {
   const answers = await prompts([
     {
@@ -88,13 +99,18 @@ export function createTaskCommand() {
     .option('--type <type>', 'task type')
     .option('--out <path>', 'output file path')
     .option('--problem <text>', 'problem statement')
+    .option('--problem-statement <text>', 'problem statement')
     .option('--outcome <text>', 'desired outcome')
+    .option('--desired-outcome <text>', 'desired outcome')
     .option('--constraint <text>', 'constraint; repeat or use newlines', lines, [])
     .option('--non-goal <text>', 'non-goal; repeat or use newlines', lines, [])
+    .option('--assumption <text>', 'assumption; repeat or use newlines', lines, [])
     .option('--likely-file <path>', 'likely file or area; repeat or use newlines', lines, [])
     .option('--forbidden-file <path>', 'file or area not to touch; repeat or use newlines', lines, [])
     .option('--acceptance <text>', 'acceptance criterion; repeat or use newlines', lines, [])
     .option('--verify-command <command>', 'verification command; repeat or use newlines', lines, [])
+    .option('--verification <command>', 'verification command; repeat or use newlines', lines, [])
+    .option('--rollback <text>', 'rollback notes')
     .action(async (options: Record<string, unknown>) => {
       const type =
         typeof options.type === 'string' && TASK_TYPES.includes(options.type as TaskType)
@@ -107,14 +123,16 @@ export function createTaskCommand() {
           ? {
               title,
               type,
-              problemStatement: String(options.problem ?? ''),
-              desiredOutcome: String(options.outcome ?? ''),
-              constraints: options.constraint as string[],
-              nonGoals: options.nonGoal as string[],
-              likelyFiles: options.likelyFile as string[],
-              forbiddenFiles: options.forbiddenFile as string[],
-              acceptanceCriteria: options.acceptance as string[],
-              verificationCommands: options.verifyCommand as string[],
+              problemStatement: stringOption(options, 'problemStatement', 'problem'),
+              desiredOutcome: stringOption(options, 'desiredOutcome', 'outcome'),
+              constraints: listOption(options, 'constraint'),
+              nonGoals: listOption(options, 'nonGoal'),
+              assumptions: listOption(options, 'assumption'),
+              likelyFiles: listOption(options, 'likelyFile'),
+              forbiddenFiles: listOption(options, 'forbiddenFile'),
+              acceptanceCriteria: listOption(options, 'acceptance'),
+              verificationCommands: listOption(options, 'verifyCommand', 'verification'),
+              rollbackNotes: stringOption(options, 'rollback'),
             }
           : await collectInteractive({ title, type });
       const result = await createTaskContractFile({
