@@ -27,6 +27,34 @@ npx pnpm@10.12.1 install
 - Update docs when commands or generated files change.
 - Put future work in `ROADMAP.md` instead of scattering TODO comments.
 
+## First Contributions
+
+Start with issues labeled `good first issue` or `docs`. A good first change should name the files it touches, avoid package publishing changes, and include the verification commands you ran.
+
+Before editing, run:
+
+```bash
+npx agentloopkit status
+```
+
+If the repo has an active task contract, read it first. For behavior changes, add or update a Vitest test before changing production code.
+
+Good first contribution areas:
+
+- docs pages and examples
+- generated template wording
+- doctor or status output copy
+- small tests for existing behavior
+- issue, PR, and contributor guidance
+
+Avoid these areas for a first PR unless a maintainer points you there:
+
+- npm publishing workflow
+- dependency upgrades
+- security policy changes
+- public CLI command contracts
+- large refactors
+
 ## Pull Requests
 
 Include:

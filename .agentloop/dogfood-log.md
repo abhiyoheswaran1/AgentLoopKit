@@ -239,3 +239,31 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Confusing: the action runtime warning can persist even when the project itself uses a supported Node version.
 - Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
 - Improve: verify the PR CI annotation disappears before merging.
+
+## 2026-06-09: Good First Contributor Path
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-good-first-contributor-path.md`
+- Product cycle: `.agentloop/research/interview-cycle-012.md`
+- Trigger:
+  - Product-panel review identified contributor entry points as useful launch polish with no npm package risk.
+- Verification planned:
+  - `git diff --check`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Verification completed:
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+- Product changes:
+  - Added a maintainer-authored good-first issue template.
+  - Added a checked-in GitHub label map.
+  - Added a first-contribution path to `CONTRIBUTING.md`.
+- Worked well: the task stayed outside runtime code and package contents.
+- Confusing: labels still need manual GitHub setup unless a future label-sync tool is introduced.
+- Improve: add a public good-first-issues list after real issues exist.
