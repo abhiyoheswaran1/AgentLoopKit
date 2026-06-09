@@ -34,7 +34,15 @@ export type VerificationResult = {
 
 function excerpt(output: string, limit = 5000) {
   if (output.length <= limit) return output;
-  return `${output.slice(0, limit)}\n\n[output truncated to ${limit} characters]`;
+  const headLimit = Math.ceil(limit / 2);
+  const tailLimit = Math.floor(limit / 2);
+  return `${output.slice(0, headLimit)}
+
+[output truncated: showing first ${headLimit} and last ${tailLimit} characters of ${
+    output.length
+  } total]
+
+${output.slice(-tailLimit)}`;
 }
 
 function commandEntries(config: AgentLoopConfig, options: VerificationOptions) {

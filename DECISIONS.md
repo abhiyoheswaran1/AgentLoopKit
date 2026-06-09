@@ -31,3 +31,7 @@ Launch visuals live in `docs/assets/readme/` with source HTML and a VHS tape so 
 ## 2026-06-09: Status Is Read-Only
 
 `agentloop status` reads config, git status, latest task, and latest verification report. It does not execute configured commands, read environment file contents, call a model, or mutate files. The command exists to orient agents and reviewers, not to replace `verify`.
+
+## 2026-06-09: Verification Excerpts Preserve Failure Tails
+
+`agentloop verify` keeps both the beginning and ending output when a command log is too long for a report. This preserves setup context and final error lines while keeping reports reviewable. The CLI does not summarize, redact, or reinterpret command output.

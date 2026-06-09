@@ -116,6 +116,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Confusing: latest task/report detection is intentionally file-based; future task status lifecycle work can make this more explicit.
 - Improve: add richer task status transitions after this release.
 
+## 2026-06-09: Verification Output Excerpts
+
+- Task contract: `.agentloop/tasks/2026-06-09-improve-verification-output-excerpts.md`
+- Product cycle: `.agentloop/research/interview-cycle-006.md`
+- Verification planned:
+  - `npx pnpm@10.12.1 test tests/verification.test.ts`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Verification completed:
+  - Red test first: `npx pnpm@10.12.1 test tests/verification.test.ts` failed because long output dropped `END: assertion failed at final line`.
+  - Focused green test: `npx pnpm@10.12.1 test tests/verification.test.ts`: pass, 1 file and 3 tests.
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 30 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-14-57-verification-report.md`
+  - `agentloop summarize --write`: pass, wrote `.agentloop/handoffs/2026-06-09-14-57-pr-summary.md`
+- Product changes:
+  - Verification reports now keep the beginning and ending output when logs are truncated.
+  - Added a clear truncation marker with the original output length.
+  - Updated docs and decision records.
+- Worked well: the failing test reproduced the exact review problem before implementation.
+- Confusing: report excerpt limits are still fixed; future work can make them configurable if users ask.
+- Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
+- Improve: add a small status hint when the latest verification report failed.
+
 ## 2026-06-09: Contributor Template Evidence Prompts
 
 - Task contract: `.agentloop/tasks/2026-06-09-ask-for-agentloopkit-evidence-in-github-templates.md`
@@ -127,24 +157,6 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npx pnpm@10.12.1 test`
   - `npx pnpm@10.12.1 build`
   - `npx projscan doctor --format markdown`
-- Verification completed:
-  - `git diff --check`: pass
-  - `npx pnpm@10.12.1 lint`: pass
-  - `npx pnpm@10.12.1 typecheck`: pass
-  - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
-  - `npx pnpm@10.12.1 build`: pass
-  - `npx projscan doctor --format markdown`: A, 100/100
-  - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-15-34-verification-report.md`
-  - `agentloop summarize --write`: pass, wrote `.agentloop/handoffs/2026-06-09-15-34-pr-summary.md`
-- Verification completed:
-  - `git diff --check`: pass
-  - `npx pnpm@10.12.1 lint`: pass
-  - `npx pnpm@10.12.1 typecheck`: pass
-  - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
-  - `npx pnpm@10.12.1 build`: pass
-  - `npx projscan doctor --format markdown`: A, 100/100
-  - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-15-30-verification-report.md`
-  - `agentloop summarize --write`: pass, wrote `.agentloop/handoffs/2026-06-09-15-30-pr-summary.md`
 - Verification completed:
   - `git diff --check`: pass
   - `npx pnpm@10.12.1 lint`: pass
