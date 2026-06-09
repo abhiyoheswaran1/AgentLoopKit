@@ -12,6 +12,12 @@ assignees: ''
 
 ## Non-Goals
 
-## Proposed CLI Or Template Change
+## Affected Area
+
+- CLI command:
+- Template, policy, or harness file:
+- Agent workflow:
+
+## Proposed Change
 
 ## Verification
