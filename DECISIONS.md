@@ -51,3 +51,7 @@ Launch visuals live in `docs/assets/readme/` with source HTML and a VHS tape so 
 ## 2026-06-09: Verification Reports Use Allowlisted CI Context
 
 `agentloop verify` may include CI provenance in generated reports, but only from a small allowlist of CI variables. GitHub Actions reports can include workflow, event, ref, commit, run URL, and run attempt. Generic CI reports only identify `Generic CI`. AgentLoopKit does not read `.env` files, print arbitrary environment variables, call CI APIs, or upload artifacts.
+
+## 2026-06-09: Doctor Reports Risk Paths, Not Secrets
+
+`agentloop doctor` reports potential risk files by category with capped path examples. It keeps these findings as warnings, not failures. The scanner does not read file contents, inspect credentials, score risk, or claim secret detection.

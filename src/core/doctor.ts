@@ -27,6 +27,22 @@ function check(name: string, status: DoctorCheck['status'], message: string): Do
   return { name, status, message };
 }
 
+const RISK_CATEGORY_LABELS = {
+  migrations: 'migrations',
+  auth: 'auth',
+  security: 'security',
+  billing: 'billing',
+  deployment: 'deployment',
+  lockfiles: 'lockfiles',
+  envFiles: 'env files',
+} as const;
+
+function formatRiskFiles(files: string[]) {
+  const preview = files.slice(0, 3).join(', ');
+  const remaining = files.length - 3;
+  return `${files.length} detected: ${preview}${remaining > 0 ? ` (+${remaining} more)` : ''}`;
+}
+
 export async function runDoctor(options: { cwd: string }): Promise<DoctorResult> {
   const cwd = options.cwd;
   const checks: DoctorCheck[] = [];
@@ -110,6 +126,16 @@ export async function runDoctor(options: { cwd: string }): Promise<DoctorResult>
       riskCount ? `${riskCount} risk file(s) detected` : 'none detected',
     ),
   );
+  for (const [category, files] of Object.entries(risks)) {
+    if (files.length === 0) continue;
+    checks.push(
+      check(
+        `Risk files: ${RISK_CATEGORY_LABELS[category as keyof typeof RISK_CATEGORY_LABELS]}`,
+        'warn',
+        formatRiskFiles(files),
+      ),
+    );
+  }
   if (!commands.test) {
     checks.push(check('Tests', 'warn', 'no test command detected'));
   }

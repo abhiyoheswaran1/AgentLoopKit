@@ -13,6 +13,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - binaries: `agentloop` and `agentloopkit`
 - repo init flow with `--dry-run` and JSON output
 - doctor checks with JSON output
+- doctor risk-file category warnings with capped path examples
 - task contract generation
 - task contract creation with JSON output for agents and scripts
 - active task pinning with `.agentloop/state.json`
@@ -88,7 +89,25 @@ npx pnpm@10.12.1 build
 npx projscan doctor --format markdown
 ```
 
-Latest local verification for the `0.15.0` release candidate:
+Latest local verification:
+
+- Doctor risk-file details iteration:
+  - Red doctor test: `npx pnpm@10.12.1 test tests/doctor.test.ts` failed because category-level `Risk files:` checks were missing.
+  - Red safety test: `npx pnpm@10.12.1 test tests/safety.test.ts` failed because Markdown docs such as `docs/migration-guide.md` were treated as semantic risk files.
+  - Focused green test: `npx pnpm@10.12.1 test tests/doctor.test.ts tests/safety.test.ts`: pass, 2 files and 7 tests.
+  - Live `doctor --json` smoke: pass, current repo reports deployment workflow files and the lockfile, not template Markdown docs.
+  - `git diff --check`: pass.
+  - Prettier check on touched files: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 76 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 349 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-09-23-44-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-09-23-45-pr-summary.md`.
+
+Earlier `0.15.0` release-candidate verification:
 
 - `npx tsx src/cli/index.ts version`: pass, reported `0.15.0`.
 - `node dist/cli/index.js version`: pass, reported `0.15.0`.
@@ -1176,6 +1195,19 @@ Implemented:
 - npm registry proof after release: latest `0.1.1`, versions `0.1.0` and `0.1.1`
 - launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
 
+### Cycle 59: doctor risk file details
+
+Decision: improve first-run trust by making `doctor` show risk-file categories and capped path examples while keeping all findings warning-only.
+
+Implemented:
+
+- category-level `Risk files: <category>` checks in `doctor`
+- three-path preview with a `(+N more)` suffix
+- env-file path reporting without reading or printing contents
+- Markdown documentation skipped for semantic risk categories to avoid template and policy false positives
+- focused doctor and safety tests for category output and env-content privacy
+- README, getting-started docs, backlog, dogfood log, decisions, and final handoff updates
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1208,6 +1240,7 @@ Strongest signals:
 - Platform users need monorepo recipes that separate root checks from package checks.
 - Reviewers need CI-generated verification reports to show workflow, event, ref, commit, and run URL.
 - Release readers need `0.15.0` metadata and visuals to match CI context in verification reports before the GitHub release.
+- Reviewers and agents need `doctor` to name risk categories instead of reporting only a total count.
 
 ## Backlog
 
@@ -1217,7 +1250,7 @@ Top remaining items:
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
 3. Config schema hosting.
 4. Static HTML report export.
-5. Richer doctor risk-file details.
+5. Policy pack customization.
 
 ## Known limitations
 

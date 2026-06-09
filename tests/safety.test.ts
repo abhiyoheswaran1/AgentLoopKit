@@ -37,4 +37,19 @@ describe('safety scanning', () => {
 
     expect(risks.security).toEqual([]);
   });
+
+  test('ignores documentation and template markdown when scanning semantic risk categories', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    await mkdir(path.join(dir, 'src/templates/policies'), { recursive: true });
+    await writeFile(path.join(dir, 'SECURITY.md'), '# Security policy');
+    await writeFile(path.join(dir, 'docs/migration-guide.md'), '# Migration guide');
+    await writeFile(path.join(dir, 'src/templates/policies/security-policy.md'), '# Security');
+
+    const risks = await detectRiskFiles(dir);
+
+    expect(risks.migrations).toEqual([]);
+    expect(risks.security).toEqual([]);
+  });
 });

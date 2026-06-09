@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir } from './helpers.js';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -57,5 +57,62 @@ describe('doctor', () => {
       message: expectedMessage,
     });
     expect(result.markdown).toContain(`[warn] Monorepo: ${expectedMessage}`);
+  });
+
+  test('shows risk file categories with capped path examples', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await mkdir(path.join(dir, 'migrations'), { recursive: true });
+    await mkdir(path.join(dir, 'src/auth'), { recursive: true });
+    await mkdir(path.join(dir, '.github/workflows'), { recursive: true });
+    await writeFile(path.join(dir, 'migrations/001-create-users.sql'), 'select 1;');
+    await writeFile(path.join(dir, 'migrations/002-add-index.sql'), 'select 1;');
+    await writeFile(path.join(dir, 'migrations/003-add-team.sql'), 'select 1;');
+    await writeFile(path.join(dir, 'migrations/004-add-plan.sql'), 'select 1;');
+    await writeFile(path.join(dir, 'src/auth/session.ts'), 'export const session = true;');
+    await writeFile(path.join(dir, '.env.local'), 'SECRET_VALUE=do-not-print');
+    await writeFile(path.join(dir, '.github/workflows/deploy.yml'), 'name: Deploy');
+    await writeFile(path.join(dir, 'package-lock.json'), '{}');
+
+    const result = await runDoctor({ cwd: dir });
+    const riskChecks = result.checks.filter((check) => check.name.startsWith('Risk files: '));
+
+    expect(result.serious).toHaveLength(0);
+    expect(result.checks).toContainEqual({
+      name: 'Potential risk files',
+      status: 'warn',
+      message: '8 risk file(s) detected',
+    });
+    expect(riskChecks).toEqual([
+      {
+        name: 'Risk files: migrations',
+        status: 'warn',
+        message:
+          '4 detected: migrations/001-create-users.sql, migrations/002-add-index.sql, migrations/003-add-team.sql (+1 more)',
+      },
+      {
+        name: 'Risk files: auth',
+        status: 'warn',
+        message: '1 detected: src/auth/session.ts',
+      },
+      {
+        name: 'Risk files: deployment',
+        status: 'warn',
+        message: '1 detected: .github/workflows/deploy.yml',
+      },
+      {
+        name: 'Risk files: lockfiles',
+        status: 'warn',
+        message: '1 detected: package-lock.json',
+      },
+      {
+        name: 'Risk files: env files',
+        status: 'warn',
+        message: '1 detected: .env.local',
+      },
+    ]);
+    expect(result.markdown).toContain('- [warn] Risk files: env files: 1 detected: .env.local');
+    expect(result.markdown).not.toContain('do-not-print');
   });
 });

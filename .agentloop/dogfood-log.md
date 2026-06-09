@@ -1883,3 +1883,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release artifact gives CI users a current tarball while npm remains behind.
 - Improve:
   - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.15.0`.
+
+## 2026-06-09: Doctor Risk File Details
+
+- Task contract: `.agentloop/tasks/2026-06-09-show-doctor-risk-file-details.md`
+- Product cycle: `.agentloop/research/interview-cycle-059.md`
+- Trigger:
+  - `doctor` reported only a total risk-file count, which made first-run output less useful for agents and reviewers.
+  - Product panel chose a small safety/trust improvement over broader policy-pack or dashboard work.
+- Verification completed:
+  - Red test: `npx pnpm@10.12.1 test tests/doctor.test.ts` failed because category-level `Risk files:` checks were missing.
+  - Focused green test: `npx pnpm@10.12.1 test tests/doctor.test.ts tests/safety.test.ts` passed, 2 files and 6 tests.
+  - False-positive red test: `npx pnpm@10.12.1 test tests/safety.test.ts` failed because Markdown docs such as `docs/migration-guide.md` were treated as risk files.
+  - Focused scanner test after refinement: `npx pnpm@10.12.1 test tests/doctor.test.ts tests/safety.test.ts` passed, 2 files and 7 tests.
+  - `git diff --check`: pass.
+  - Prettier check on touched files: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 76 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 349 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-show-doctor-risk-file-details.md --command "npx projscan doctor --format markdown"`: pass, wrote `.agentloop/reports/2026-06-09-23-44-verification-report.md`.
+  - `agentloop handoff --task .agentloop/tasks/2026-06-09-show-doctor-risk-file-details.md --report .agentloop/reports/2026-06-09-23-44-verification-report.md`: pass, wrote `.agentloop/handoffs/2026-06-09-23-45-pr-summary.md`.
+- Product changes:
+  - `doctor` keeps the aggregate `Potential risk files` check.
+  - `doctor` now adds category-level risk checks with capped path examples.
+  - Semantic risk categories skip Markdown documentation to avoid noisy template and policy false positives.
+  - Env files are reported as paths only. AgentLoopKit does not read `.env` contents or scan secrets.
+- Worked well:
+  - The live `doctor --json` smoke caught a noisy scanner edge case before commit.
+- Improve:
+  - Consider adding a short `doctor` doc page if risk category heuristics need more examples.

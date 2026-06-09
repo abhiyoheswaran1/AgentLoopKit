@@ -17,6 +17,8 @@ npx agentloopkit doctor
 
 `doctor` detects common monorepo markers such as `pnpm-workspace.yaml`, package `workspaces`, Turbo, Nx, Lerna, and Rush config files. It reports them as warnings and suggests package-specific verification commands so you can confirm whether root-level checks are enough for the task.
 
+`doctor` also reports potential risk files by category. For example, it can warn that migrations, auth files, deployment config, lockfiles, or env files exist and show a few path examples. Env files appear only as paths. AgentLoopKit does not read `.env` contents or scan secrets.
+
 In monorepos, root checks do not always prove that one package was tested. Add package-specific commands to the task contract when the change lives under one workspace:
 
 ```bash
