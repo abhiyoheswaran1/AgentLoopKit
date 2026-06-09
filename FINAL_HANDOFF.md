@@ -78,6 +78,23 @@ npx projscan doctor --format markdown
 
 Latest local verification for the product-panel iteration:
 
+- `npx tsx src/cli/index.ts version`: pass, reported `0.9.0`.
+- `git diff --check`: pass.
+- `npx pnpm@10.12.1 lint`: pass.
+- `npx pnpm@10.12.1 typecheck`: pass.
+- `npx pnpm@10.12.1 test`: pass, 19 files and 58 tests.
+- `npx pnpm@10.12.1 check:links`: pass, 259 Markdown files checked.
+- `npx pnpm@10.12.1 build`: pass.
+- `npx projscan doctor --format markdown`: A, 100/100.
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.9.0.tgz`.
+- `npm publish --access public --dry-run`: pass.
+- Packed CLI smoke: pass, `agentloop version` reported `0.9.0` and `agentloop task status` updated a temp task to `done`.
+- Playwright README screenshot render: pass for hero and verification PNGs.
+- VHS README terminal render: pass for `agentloopkit-cli.gif` with the `0.9.0` tarball.
+- `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-9-0-task-status-release.md`: pass.
+
+Latest local verification for task status transitions:
+
 - Red test first: `npx pnpm@10.12.1 test tests/task-state.test.ts` failed because `updateTaskStatus` did not exist and `agentloop task status` was unknown.
 - Focused green test: `npx pnpm@10.12.1 test tests/task-state.test.ts`: pass, 1 file and 11 tests.
 - `git diff --check`: pass.
@@ -464,7 +481,7 @@ Current publish gap:
 - The `v0.2.1` publish workflow passed install, lint, typecheck, tests, build, and `prepublishOnly`, then npm rejected `npm publish` with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - The `v0.6.0` publish workflow passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - Local `npm publish --access public` for `0.6.0` passed typecheck, Vitest, and build through `prepublishOnly`, then npm stopped at `EOTP`.
-- Package-content changes after the `v0.7.0` tag are prepared on `main` as `agentloopkit@0.8.0`, but are not on npm yet.
+- Package-content changes after the `v0.8.0` tag are prepared on `main` as `agentloopkit@0.9.0`, but are not on npm yet.
 - Do not paste npm OTPs or tokens into chat, issues, PRs, or release notes.
 
 ## How users install it
@@ -720,6 +737,18 @@ Implemented:
 - generated agent, harness, README, and getting-started guidance
 - refreshed README screenshots and VHS terminal demo
 
+### Cycle 37: 0.9.0 release candidate
+
+Decision: package task status transitions as `0.9.0` because `v0.8.0` already points at the previous launch-quality release.
+
+Implemented:
+
+- package metadata bump to `0.9.0`
+- `0.9.0` changelog entry for task status transitions
+- README source note update
+- VHS tape update to use `agentloopkit-0.9.0.tgz`
+- launch, publishing, final handoff, backlog, and product-panel release records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -740,7 +769,7 @@ Strongest signals:
 
 Top remaining items:
 
-1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.8.0`.
+1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.9.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
 3. Shell completions.
 4. Config schema hosting.
@@ -749,6 +778,7 @@ Top remaining items:
 ## Known limitations
 
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, and `v0.8.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.9.0` is prepared on `main`, but not released or published yet.
 - `agentloopkit@0.8.0` is the latest GitHub release, but it is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -817,6 +847,10 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.8.0`; package checks passed, npm authorization failed.
 - [x] Try local `npm publish --access public` for `0.8.0`; package checks passed, npm required browser/OTP authentication.
 - [ ] Publish `agentloopkit@0.8.0` to npm.
+- [x] Prepare `agentloopkit@0.9.0` task-status release candidate.
+- [ ] Publish GitHub release `v0.9.0` with npm-pending notes.
+- [ ] Run GitHub Publish workflow for `v0.9.0` and record result.
+- [ ] Publish `agentloopkit@0.9.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
@@ -868,18 +902,18 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Repair npm publishing for `0.8.0`: high usefulness, low repo effort, external npm setting required.
-2. Prepare the next GitHub release after task status transitions: high usefulness, low effort.
-3. Add shell completions: medium usefulness, medium effort, low maintenance.
-4. Add task archive command: medium usefulness, medium effort, low maintenance.
-5. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
-6. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-7. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
-8. Add CI import notes to verification reports: medium usefulness, medium effort.
-9. Add policy pack customization: medium commercial optionality, medium effort.
-10. Add local static HTML report: medium star potential, high effort, medium maintenance.
-11. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
-12. Add richer doctor risk-file details: medium usefulness, low effort.
-13. Add package recipe examples for monorepos: medium usefulness, low effort.
-14. Add generated security-review example: medium trust improvement, low effort.
+1. Repair npm publishing for `0.9.0`: high usefulness, low repo effort, external npm setting required.
+2. Add shell completions: medium usefulness, medium effort, low maintenance.
+3. Add task archive command: medium usefulness, medium effort, low maintenance.
+4. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
+5. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
+6. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
+7. Add CI import notes to verification reports: medium usefulness, medium effort.
+8. Add policy pack customization: medium commercial optionality, medium effort.
+9. Add local static HTML report: medium star potential, high effort, medium maintenance.
+10. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+11. Add richer doctor risk-file details: medium usefulness, low effort.
+12. Add package recipe examples for monorepos: medium usefulness, low effort.
+13. Add generated security-review example: medium trust improvement, low effort.
+14. Add config migration helper for future schema versions: medium usefulness, medium effort.
 15. Add team/cloud roadmap only after open-source traction: high commercial optionality, high effort, high maintenance.

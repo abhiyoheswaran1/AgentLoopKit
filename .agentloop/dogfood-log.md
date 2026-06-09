@@ -1159,3 +1159,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The new command lets agents keep task state current without adding hidden state beyond the existing active-task pointer.
 - Improve:
   - Prepare a new release candidate after this feature, because `v0.8.0` already points at the previous launch-quality release.
+
+## 2026-06-09: 0.9.0 Task Status Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-9-0-task-status-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-037.md`
+- Verification report: `.agentloop/reports/2026-06-09-19-51-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-19-52-pr-summary.md`
+- Trigger:
+  - Task status transitions landed on `main` after the `v0.8.0` release.
+  - Version metadata and release docs still pointed at `0.8.0`.
+- Verification completed:
+  - `npx tsx src/cli/index.ts version`: pass, reported `0.9.0`
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 19 files and 58 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 259 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.9.0.tgz`
+  - `npm publish --access public --dry-run`: pass
+  - Packed CLI smoke: pass, `agentloop version` reported `0.9.0` and `agentloop task status` updated a temp task to `done`
+  - Playwright README screenshot render: pass for hero and verification PNGs
+  - VHS README terminal render: pass for `agentloopkit-cli.gif` using the `0.9.0` tarball name
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-9-0-task-status-release.md`: pass
+- Product changes:
+  - Bumped package metadata to `0.9.0`.
+  - Added a `0.9.0` changelog entry.
+  - Updated README source note and VHS tape.
+  - Updated launch checklist, npm publishing docs, final handoff, backlog, and product-panel records.
+- Worked well:
+  - Separating the feature commit from the release commit kept history easier to audit.
+- Improve:
+  - After the GitHub release, record CI, Publish workflow, local npm publish, and registry status.

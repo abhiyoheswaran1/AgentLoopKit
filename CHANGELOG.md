@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.0
+
+Task status transitions GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:
+
+- Added `agentloop task status <path> <status>` to update a task contract's `- Status:` line
+- Added JSON output for status updates
+- Added a fixed status set: `proposed`, `in-progress`, `blocked`, `review`, and `done`
+- Updated generated AGENTS, AGENTLOOP, harness, task, and agent templates with task-status guidance
+- Refreshed README screenshots and VHS terminal demo to show the task lifecycle command
+
 ## 0.8.0
 
 Launch-quality monorepo guidance and docs trust GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:
