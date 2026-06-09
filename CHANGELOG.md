@@ -2,7 +2,7 @@
 
 ## 0.3.0
 
-Handoff command release candidate. npm publish is pending trusted-publishing or local-auth repair:
+Handoff command GitHub release. npm publish is pending trusted-publishing or local-auth repair:
 
 - Added `agentloop handoff` as the clearer command for writing reviewer handoffs
 - Kept `agentloop summarize` read-only unless `--write` is passed

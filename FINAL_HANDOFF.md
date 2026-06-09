@@ -201,7 +201,9 @@ Latest local verification for the `0.3.0` create-task alias and npm auth recover
 - Tarball smoke: pass, packed `create-task` accepted the alias flags and wrote the expected task contract fields
 - `npm publish --access public --dry-run`: pass
 - Local `npm publish --access public` for `0.3.0`: typecheck pass, Vitest pass with 17 files and 36 tests, build pass, then npm stopped at `EOTP`
-- Manual GitHub Publish workflow run `27215293502`: queued at the time this handoff was updated
+- GitHub release `v0.3.0`: created with npm-pending notes and attached `agentloopkit-0.3.0.tgz`
+- GitHub Publish workflow run `27215993837` for `v0.3.0`: passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`; npm rejected the final publish with `E404`
+- Stale manual GitHub Publish workflow run `27215293502`: cancelled because it targeted an older `0.3.0` commit
 - npm registry check: latest remains `0.1.1`
 
 ## How to package
@@ -352,10 +354,11 @@ Top remaining items:
 
 ## Known limitations
 
-- GitHub releases `v0.2.0` and `v0.2.1` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- GitHub releases `v0.2.0`, `v0.2.1`, and `v0.3.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - `agentloopkit@0.3.0` is prepared on `main`, not published on npm yet.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
-- The manual GitHub Publish workflow for `0.3.0` was queued when this handoff was updated; verify it before claiming trusted publishing worked.
+- The stale manual GitHub Publish workflow for `0.3.0` targeted an older commit and was cancelled after the release workflow ran.
+- The release-triggered GitHub Publish workflow for `v0.3.0` passed checks and failed at npm authorization with `E404`.
 - npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must complete local browser/OTP authentication.
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
@@ -382,6 +385,8 @@ Top remaining items:
 - [x] Publish GitHub release `v0.2.1` with npm-pending notes.
 - [ ] Publish `agentloopkit@0.2.1` to npm.
 - [x] Prepare `agentloopkit@0.3.0` handoff command release candidate.
+- [x] Publish GitHub release `v0.3.0` with npm-pending notes.
+- [x] Run GitHub Publish workflow for `v0.3.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.3.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.

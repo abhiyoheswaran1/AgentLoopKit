@@ -565,6 +565,9 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.3.0.tgz`
   - Tarball smoke: pass, packed `create-task` accepted the alias flags and wrote the expected task contract fields
   - `npm publish --access public --dry-run`: pass
+  - GitHub release `v0.3.0`: created with attached `agentloopkit-0.3.0.tgz`
+  - GitHub Publish workflow `27215993837`: package checks passed, final `npm publish` failed with `E404`
+  - Stale manual Publish workflow `27215293502`: cancelled because it targeted an older `0.3.0` commit
 - Product changes:
   - Added `--problem-statement`, `--desired-outcome`, `--assumption`, `--verification`, and `--rollback` to non-interactive task creation.
   - Kept existing shorter flags working.
@@ -573,6 +576,7 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Confusing:
   - npm local publish may pass package checks and still stop at account authentication.
   - The manual GitHub Publish workflow can remain queued even when CI runs quickly.
+  - GitHub Actions can still fail at npm authorization after passing every package check.
 - Improve:
-  - Verify the GitHub Publish workflow result before creating a public `v0.3.0` release.
+  - Configure npm trusted publishing or complete local browser/OTP publish before creating another npm-aligned release.
   - Add a task lifecycle command after publish recovery if no P0 release blocker remains.
