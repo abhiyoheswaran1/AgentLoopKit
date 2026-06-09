@@ -699,3 +699,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Sorting by modification time works for local task discovery, but future archive/status lifecycle work may need stronger filtering.
 - Improve:
   - Consider a read-only `task show <path>` before adding any richer lifecycle state.
+
+## 2026-06-09: 0.5.0 Task List Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-5-0-task-list-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-024.md`
+- Verification report: `.agentloop/reports/2026-06-09-17-54-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-17-54-pr-summary.md`
+- Trigger:
+  - `agentloop task list` landed on `main` after the `v0.4.0` tag.
+  - Package metadata still reported `0.4.0`, which would make release artifacts ambiguous.
+- Verification completed:
+  - `npx tsx src/cli/index.ts version`: pass, reported `0.5.0`
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 18 files and 45 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.5.0.tgz`
+  - Tarball smoke: pass, packed `agentloop version` reported `0.5.0` and `agentloop task list` behaved as expected
+  - `npm publish --access public --dry-run`: pass
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-5-0-task-list-release.md`: pass
+  - `agentloop task clear --json`: pass, removed `.agentloop/state.json`
+  - `agentloop handoff`: pass, wrote the handoff above
+- Product changes:
+  - Bumped package metadata to `0.5.0`.
+  - Moved task-list changelog notes into `0.5.0`.
+  - Updated README, launch checklist, npm publishing docs, final handoff, backlog, and product-panel records.
+- Worked well:
+  - The release candidate keeps tag, source, package metadata, and tarball contents aligned.
+- Confusing:
+  - npm latest still remains `0.1.1` until npm accepts a real publish.
+- Improve:
+  - After the GitHub release, record the publish workflow result and npm registry state.

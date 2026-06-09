@@ -16,6 +16,7 @@ Use this before publishing AgentLoopKit.
 - [x] GitHub release `v0.2.1` is published with npm-pending notes.
 - [x] GitHub release `v0.3.0` is published with npm-pending notes.
 - [x] GitHub release `v0.4.0` is published with npm-pending notes.
+- [ ] GitHub release `v0.5.0` is published with npm-pending notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -35,6 +36,9 @@ Use this before publishing AgentLoopKit.
 - [x] Publish workflow for `v0.4.0` passed checks and failed at npm authorization.
 - [ ] Package `agentloopkit@0.4.0` is published.
 - [ ] Local `agentloopkit@0.4.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
+- [x] Package `agentloopkit@0.5.0` is prepared on `main`.
+- [ ] Package `agentloopkit@0.5.0` is published.
+- [ ] Local `agentloopkit@0.5.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
 - [ ] npm trusted publishing is configured for this repository.
 - [x] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -62,6 +66,7 @@ npx --yes --package ./agentloopkit-0.2.0.tgz agentloop status --json
 npx --yes --package ./agentloopkit-0.2.1.tgz agentloop version
 npx --yes --package ./agentloopkit-0.2.1.tgz agentloop status --json
 npx --yes --package ./agentloopkit-0.4.0.tgz agentloop version
+npx --yes --package ./agentloopkit-0.5.0.tgz agentloop task list --json
 ```
 
 ## Publish
@@ -91,4 +96,5 @@ Current recovery note:
 - GitHub Publish workflow for `v0.3.0` passed package checks and failed at npm authorization with `E404`.
 - `agentloopkit@0.4.0` is now prepared on `main` for the active task lifecycle command.
 - GitHub Publish workflow for `v0.4.0` passed package checks and failed at npm authorization with `E404`.
-- Publish `0.4.0` only after npm trusted publishing is configured or local browser authentication succeeds.
+- `agentloopkit@0.5.0` is now prepared on `main` for the task-list command.
+- Publish `0.5.0` only after npm trusted publishing is configured or local browser authentication succeeds.

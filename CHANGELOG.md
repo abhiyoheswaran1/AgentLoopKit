@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.5.0
+
+Task discovery GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:
 
 - Added `agentloop task list` and `agentloop task list --json` to inspect task contracts before pinning one
 - Updated agent and harness templates to guide agents toward task discovery before active-task selection
