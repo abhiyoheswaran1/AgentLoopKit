@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -131,10 +131,14 @@ describe('task command', () => {
 
   test('lists task contracts from the CLI without writing state', async () => {
     const { dir } = await createTaskStateFixture();
+    const demoTask = path.join(dir, '.agentloop/tasks/2026-06-09-demo.md');
+    const secondTask = path.join(dir, '.agentloop/tasks/2026-06-09-second.md');
     await writeFile(
-      path.join(dir, '.agentloop/tasks/2026-06-09-second.md'),
+      secondTask,
       '# Second task\n\n- Status: in progress\n',
     );
+    await utimes(demoTask, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
+    await utimes(secondTask, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
 
     const result = await execa(tsxPath, [cliPath, 'task', 'list', '--json'], { cwd: dir });
 
