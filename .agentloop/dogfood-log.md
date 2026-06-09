@@ -1822,3 +1822,39 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - CI env can leak into tests unless local-mode tests pass `env: {}` explicitly.
 - Improve:
   - Prepare the next release candidate after npm publishing is repaired or after the next feature batch.
+
+## 2026-06-09: 0.15.0 Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-15-0-ci-context-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-057.md`
+- Trigger:
+  - CI context is on `main`, but package metadata and public tarball pins still pointed at `0.14.0`.
+  - Product panel chose a `0.15.0` GitHub release candidate while keeping npm status explicit.
+- Verification completed:
+  - Source CLI version: `npx tsx src/cli/index.ts version`: pass, reported `0.15.0`
+  - Built CLI version: `node dist/cli/index.js version`: pass, reported `0.15.0`
+  - VHS README terminal render: pass for `agentloopkit-cli.gif` using the `0.15.0` tarball name
+  - Playwright README screenshot render: pass for `agentloopkit-showcase.png` and `agentloopkit-verification.png`
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 74 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 341 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.15.0.tgz`
+  - `npm publish --access public --dry-run`: pass
+  - Packed CLI smoke: pass, `agentloop version` reported `0.15.0`, `init` created 50 files, and `verify --json --no-*` wrote a not-run report
+  - Packed CI-context smoke: pass, `verify --json --no-*` included GitHub Actions workflow, event, ref, commit, run URL, and run attempt
+  - Tarball SHA-256 before release: `e92f28382d16cccbebd027bbbcb5324f60de088e49bb611482b1e205f673f965`
+  - npm registry proof before release: latest `0.1.1`, versions `0.1.0` and `0.1.1`
+- Product changes:
+  - Bumped package metadata to `0.15.0`.
+  - Added a `0.15.0` changelog entry.
+  - Updated README and CI recipes to pin the future `v0.15.0` GitHub tarball while npm is behind.
+  - Refreshed README visual sources and generated assets with the current 74-test count.
+  - Updated npm publishing docs, launch checklist, backlog, and final handoff status.
+- Worked well:
+  - Packed-tarball smoke tested both the normal init/verify path and the new CI-context path.
+- Improve:
+  - After the GitHub release is created, record the Publish workflow result and npm registry proof without claiming npm availability.

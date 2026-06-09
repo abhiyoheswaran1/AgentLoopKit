@@ -22,6 +22,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - static bash, zsh, and fish shell completion scripts
 - verification report generation
 - deterministic PR summary generation
+- verification reports with allowlisted CI context
 - local status command for active task, latest verification, dirty files, configured commands, and next action
 - local gate-check command for task, verification, handoff, harness, policy, and git evidence
 - agent instruction installation, including `install-agent all`
@@ -86,6 +87,26 @@ npx pnpm@10.12.1 check:links
 npx pnpm@10.12.1 build
 npx projscan doctor --format markdown
 ```
+
+Latest local verification for the `0.15.0` release candidate:
+
+- `npx tsx src/cli/index.ts version`: pass, reported `0.15.0`.
+- `node dist/cli/index.js version`: pass, reported `0.15.0`.
+- Playwright README screenshot render: pass for `agentloopkit-showcase.png` and `agentloopkit-verification.png`.
+- VHS README terminal render: pass for `agentloopkit-cli.gif` using the `0.15.0` tarball name.
+- `git diff --check`: pass.
+- `npx pnpm@10.12.1 lint`: pass.
+- `npx pnpm@10.12.1 typecheck`: pass.
+- `npx pnpm@10.12.1 test`: pass, 21 files and 74 tests.
+- `npx pnpm@10.12.1 check:links`: pass, 341 Markdown files checked.
+- `npx pnpm@10.12.1 build`: pass.
+- `npx projscan doctor --format markdown`: A, 100/100.
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.15.0.tgz`.
+- `npm publish --access public --dry-run`: pass.
+- Packed CLI smoke: pass, `agentloop version` reported `0.15.0`, `init` created 50 files, and `verify --json --no-*` wrote a not-run report.
+- Packed CI-context smoke: pass, `verify --json --no-*` included GitHub Actions workflow, event, ref, commit, run URL, and run attempt.
+- Tarball SHA-256 before release: `e92f28382d16cccbebd027bbbcb5324f60de088e49bb611482b1e205f673f965`.
+- npm registry proof before release: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
 
 Latest local verification for the `0.14.0` release candidate:
 
@@ -1130,6 +1151,19 @@ Implemented:
 - tests for GitHub Actions metadata, generic CI metadata, and local-report omission
 - README, verification docs, GitHub Actions docs, examples, and generated harness guidance
 
+### Cycle 57: 0.15.0 release candidate
+
+Decision: package CI context in verification reports as `0.15.0` because `main` now contains behavior that `v0.14.0` does not.
+
+Implemented:
+
+- package metadata bump to `0.15.0`
+- `0.15.0` changelog entry for CI context in verification reports
+- README and CI recipe updates that pin the future `v0.15.0` GitHub tarball while npm remains behind
+- VHS tape update to use `agentloopkit-0.15.0.tgz`
+- Playwright screenshot refresh with the current 74-test count
+- launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-candidate records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1161,12 +1195,13 @@ Strongest signals:
 - Developers need stack-specific starter commands before task contracts feel concrete.
 - Platform users need monorepo recipes that separate root checks from package checks.
 - Reviewers need CI-generated verification reports to show workflow, event, ref, commit, and run URL.
+- Release readers need `0.15.0` metadata and visuals to match CI context in verification reports before the GitHub release.
 
 ## Backlog
 
 Top remaining items:
 
-1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.14.0`.
+1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.15.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
 3. Config schema hosting.
 4. Static HTML report export.
@@ -1175,8 +1210,8 @@ Top remaining items:
 ## Known limitations
 
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, and `v0.14.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.14.0` is the latest GitHub release, but it is not on npm yet.
-- npm may jump from `0.1.1` to `0.14.0` after authorization is repaired. Versions `0.2.0` through `0.13.0` were GitHub-only release candidates.
+- `agentloopkit@0.15.0` is prepared locally but does not have a GitHub release or npm publish yet.
+- npm may jump from `0.1.1` to `0.15.0` after authorization is repaired. Versions `0.2.0` through `0.14.0` were GitHub-only release candidates.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -1278,6 +1313,10 @@ Top remaining items:
 - [x] Publish GitHub release `v0.14.0` with npm-pending notes.
 - [x] Run GitHub Publish workflow for `v0.14.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.14.0` to npm.
+- [x] Prepare `agentloopkit@0.15.0` CI-context release candidate.
+- [ ] Publish GitHub release `v0.15.0` with npm-pending notes.
+- [ ] Run GitHub Publish workflow for `v0.15.0`.
+- [ ] Publish `agentloopkit@0.15.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
@@ -1329,9 +1368,9 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Repair npm publishing for `0.14.0`: high usefulness, low repo effort, external npm setting required.
+1. Repair npm publishing for `0.15.0`: high usefulness, low repo effort, external npm setting required.
 2. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-3. Prepare the next release candidate after CI context lands: high usefulness, low effort.
+3. Publish GitHub release `v0.15.0` after release-candidate CI passes: high usefulness, low effort.
 4. Add policy pack customization: medium commercial optionality, medium effort.
 5. Add local static HTML report: medium star potential, high effort, medium maintenance.
 6. Add generated release-note handoff: medium usefulness, low effort, low maintenance.

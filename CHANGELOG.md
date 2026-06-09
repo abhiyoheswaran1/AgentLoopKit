@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.15.0
+
+CI-context GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:
+
+- Added allowlisted GitHub Actions context to `agentloop verify` reports
+- Added a generic `CI=true` fallback for verification reports outside GitHub Actions
+- Kept local verification reports quiet when CI is not detected
+- Added tests for GitHub Actions metadata, generic CI metadata, local omission, and CI-env test isolation
+- Updated README, verification docs, GitHub Actions docs, examples, generated harness guidance, product-panel records, and release handoff notes
+
 ## 0.14.0
 
 check-gates strict-mode GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:

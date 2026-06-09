@@ -6,7 +6,7 @@ AgentLoopKit does not install workflows into user repositories. Copy a recipe in
 
 ## npm Status
 
-`agentloop check-gates --strict` is in the `v0.14.0` GitHub release. npm still serves `agentloopkit@0.1.1` until publishing auth is repaired.
+CI context in verification reports is in the `v0.15.0` GitHub release. npm still serves `agentloopkit@0.1.1` until publishing auth is repaired.
 
 After npm catches up, use:
 
@@ -17,7 +17,7 @@ npx agentloopkit check-gates --strict
 Until then, pin the GitHub release tarball in CI:
 
 ```bash
-npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.14.0/agentloopkit-0.14.0.tgz
+npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.15.0/agentloopkit-0.15.0.tgz
 npx --no-install agentloop check-gates --strict
 ```
 
@@ -42,7 +42,7 @@ jobs:
           node-version: 24
 
       - name: Install AgentLoopKit
-        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.14.0/agentloopkit-0.14.0.tgz
+        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.15.0/agentloopkit-0.15.0.tgz
 
       - name: Check AgentLoop evidence
         run: npx --no-install agentloop check-gates --strict
@@ -74,7 +74,7 @@ jobs:
         run: npm ci
 
       - name: Install AgentLoopKit
-        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.14.0/agentloopkit-0.14.0.tgz
+        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.15.0/agentloopkit-0.15.0.tgz
 
       - name: Run AgentLoop verification
         run: npx --no-install agentloop verify
