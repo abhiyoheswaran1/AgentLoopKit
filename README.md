@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Source on `main` documents `0.11.0`. npm currently serves `0.1.1` while publishing auth for later release candidates is being repaired. GitHub release tarballs contain the newer source commands.
+Source on `main` documents `0.12.0`. npm currently serves `0.1.1` while publishing auth for later release candidates is being repaired. GitHub release tarballs contain the newer source commands.
 
 Run the CLI after install:
 

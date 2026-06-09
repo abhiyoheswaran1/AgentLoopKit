@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.12.0
+
+create-task JSON output GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:
+
+- Added `agentloop create-task --json` for machine-readable task creation
+- JSON output includes the created task path and Markdown content
+- Default human-readable `create-task` output remains unchanged
+- Added Vitest coverage for JSON task creation output
+- Updated README, getting-started docs, task-contract docs, generated task guidance, and README visual assets for the current task lifecycle
+
 ## 0.11.0
 
 Task archive GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:

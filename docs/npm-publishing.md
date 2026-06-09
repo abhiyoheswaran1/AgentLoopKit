@@ -39,7 +39,7 @@ npm publish --access public
 
 The first publish creates the npm package. That step may require an OTP, depending on the npm account's security settings.
 
-## Current `0.11.0` Publishing State
+## Current `0.12.0` Publishing State
 
 As of June 9, 2026:
 
@@ -54,7 +54,7 @@ As of June 9, 2026:
 - GitHub release `v0.9.0` is public with a tarball asset.
 - GitHub release `v0.10.0` is public with a tarball asset.
 - GitHub release `v0.11.0` is public with a tarball asset.
-- `agentloopkit@0.11.0` is prepared on `main` after the `agentloop task archive <path>` command was added.
+- `agentloopkit@0.12.0` is prepared on `main` after `agentloop create-task --json` was added.
 - npm latest is still `agentloopkit@0.1.1`.
 - `agentloopkit@0.2.0` passed local preflight, `npm publish --dry-run`, tarball smoke testing, and the GitHub publish workflow's install, lint, typecheck, test, and build steps.
 - GitHub Actions reached `npm publish`, then npm rejected the workflow because the package does not have a matching trusted publisher configuration.
@@ -86,8 +86,9 @@ As of June 9, 2026:
 - `agentloopkit@0.11.0` is prepared on `main` after task archiving was added.
 - GitHub Publish workflow run `27228991068` for `v0.11.0` passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - npm registry proof after the `v0.11.0` release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
+- `agentloopkit@0.12.0` is prepared on `main` after `create-task --json` was added and README assets were refreshed.
 
-Publish `0.11.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.
+Publish `0.12.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.
 
 Preferred release path after the first publish:
 
@@ -139,7 +140,7 @@ npm view agentloopkit version
 npm view agentloopkit versions --json
 ```
 
-For `v0.11.0`, the expected successful result is latest `0.11.0` and a versions list containing `0.11.0`.
+For `v0.12.0`, the expected successful result is latest `0.12.0` and a versions list containing `0.12.0`.
 
 ## Package Contents
 
