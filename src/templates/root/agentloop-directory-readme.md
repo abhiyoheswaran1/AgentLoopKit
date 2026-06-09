@@ -47,6 +47,8 @@ agentloop check-gates --strict
 `check-gates` inspects local evidence. It does not run tests or call an LLM.
 Use `--strict` in CI when warning gates should fail.
 
+CI can either check committed AgentLoop evidence or generate reports and handoffs as build artifacts. Do not let CI commit generated files unless maintainers explicitly want that behavior.
+
 ## Directories
 
 - `loops/`: task-specific workflows

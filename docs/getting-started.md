@@ -90,3 +90,5 @@ npx agentloopkit check-gates --strict
 
 `check-gates` does not run tests. It checks whether task, verification, handoff, harness, policy, and git evidence exists before review.
 Use `--strict` in CI when warning gates should fail.
+
+For pull request CI recipes, see `github-actions.md`.

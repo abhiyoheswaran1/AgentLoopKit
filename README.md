@@ -287,6 +287,12 @@ See `docs/check-gates.md` for gate statuses and exit-code behavior.
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report screenshot showing command results and reviewer handoff sections" width="100%">
 </p>
 
+## GitHub Actions
+
+Use `agentloop check-gates --strict` as a review-evidence gate in pull request CI. Use `agentloop verify` and `agentloop handoff` in CI when you want reports and handoffs uploaded as build artifacts.
+
+See `docs/github-actions.md` and `examples/github-actions/` for copy-pasteable workflows. Because npm latest is still `0.1.1`, the examples pin the `v0.14.0` GitHub tarball. Switch them to normal npm usage after npm publishing catches up.
+
 ## PR Summaries
 
 `agentloop handoff` writes a reviewer-ready summary using deterministic inputs:
@@ -350,6 +356,7 @@ See `examples/` for sample generated harnesses:
 - `examples/python-service`
 - `examples/docs-only`
 - `examples/empty-repo`
+- `examples/github-actions`
 
 ## Roadmap
 

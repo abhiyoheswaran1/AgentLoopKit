@@ -1,0 +1,61 @@
+# GitHub Actions Example
+
+These workflow snippets show how a repository can use AgentLoopKit in pull request CI.
+
+They are examples only. AgentLoopKit does not install workflows automatically.
+
+## Evidence Gate
+
+Use this when task contracts, verification reports, and handoff summaries are committed with the pull request.
+
+```yaml
+name: AgentLoop Evidence
+
+on:
+  pull_request:
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.14.0/agentloopkit-0.14.0.tgz
+      - run: npx --no-install agentloop check-gates --strict
+```
+
+## Verification Artifacts
+
+Use this when CI should create reports and upload them for reviewers.
+
+```yaml
+name: AgentLoop Verification
+
+on:
+  pull_request:
+
+jobs:
+  agentloop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.14.0/agentloopkit-0.14.0.tgz
+      - run: npx --no-install agentloop verify
+      - run: npx --no-install agentloop handoff
+      - run: npx --no-install agentloop check-gates --strict
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentloop-evidence
+          path: |
+            .agentloop/reports/*.md
+            .agentloop/handoffs/*.md
+```
+
+The tarball pin is temporary while npm latest is behind the GitHub release. After npm publishes a current version, replace the install step with normal npm or pnpm usage.

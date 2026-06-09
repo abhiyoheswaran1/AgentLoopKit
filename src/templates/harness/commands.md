@@ -23,6 +23,12 @@ Rules:
 - If a command fails, report the failure and fix it when reasonable.
 - If a command is not configured, say so in the handoff.
 
+## CI Usage
+
+Use `agentloop check-gates --strict` in CI after task, verification, and handoff evidence exists. If CI generates reports and handoffs, upload `.agentloop/reports/*.md` and `.agentloop/handoffs/*.md` as build artifacts instead of committing them automatically.
+
+`check-gates` checks evidence. It does not prove the code is correct and does not replace review.
+
 ## Monorepos
 
 If `agentloop doctor` reports workspace or monorepo markers, treat root commands as coverage clues, not proof that every package was checked.

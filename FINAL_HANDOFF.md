@@ -1094,6 +1094,18 @@ Implemented:
 - release notes updated with exact `E404` failure and npm registry state
 - launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
 
+### Cycle 54: GitHub Actions usage recipes
+
+Decision: add CI recipes as documentation and examples instead of adding a workflow installer.
+
+Implemented:
+
+- `docs/github-actions.md` with committed-evidence and CI-generated-artifact recipes
+- `examples/github-actions/README.md` with copy-pasteable workflow snippets
+- README and getting-started links to the CI recipes
+- generated harness guidance explaining strict gates in CI
+- npm-status-honest install notes that pin the `v0.14.0` GitHub tarball while npm latest remains behind
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1120,6 +1132,8 @@ Strongest signals:
 - CI users need `check-gates` to fail on warnings without changing the default local command behavior.
 - Release readers need `0.14.0` metadata and visuals to match `check-gates --strict` before the GitHub release.
 - npm readers need a direct note that the next successful npm publish may jump to `0.14.0`, then normal semver resumes.
+- Teams need CI recipes that show where `verify`, `handoff`, and `check-gates --strict` belong in pull request checks.
+- Maintainers need those recipes to avoid branch mutation, hidden uploads, and stale npm claims.
 
 ## Backlog
 
@@ -1128,7 +1142,8 @@ Top remaining items:
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.14.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
 3. Config schema hosting.
-4. Static HTML report export.
+4. Stack-specific starter recipes.
+5. Static HTML report export.
 
 ## Known limitations
 
@@ -1160,6 +1175,7 @@ Top remaining items:
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
 - Monorepo support is warning and guidance only; AgentLoopKit does not infer package graphs or orchestrate workspace checks.
+- GitHub Actions recipes are documentation only; `agentloop init` does not install workflows.
 - Third-party agent config files are not created unless conventions are safe and known.
 - PR summaries are deterministic and do not infer semantic intent from code.
 - No cloud dashboard, shared history, team accounts, or telemetry.
@@ -1289,15 +1305,15 @@ Title: I built a local-first engineering loop for coding agents
 1. Repair npm publishing for `0.14.0`: high usefulness, low repo effort, external npm setting required.
 2. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
 3. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
-4. Add GitHub Actions usage recipes for `verify`, `handoff`, and `check-gates --strict`: medium usefulness, low effort.
-5. Add CI import notes to verification reports: medium usefulness, medium effort.
-6. Add policy pack customization: medium commercial optionality, medium effort.
-7. Add local static HTML report: medium star potential, high effort, medium maintenance.
-8. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
-9. Add richer doctor risk-file details: medium usefulness, low effort.
-10. Add package recipe examples for monorepos: medium usefulness, low effort.
-11. Add generated security-review example: medium trust improvement, low effort.
-12. Add config migration helper for future schema versions: medium usefulness, medium effort.
-13. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
-14. Add static HTML verification report export after CLI gates stabilize: medium usefulness, medium effort.
-15. Add release-status compaction so future handoffs stay shorter: medium maintainability, low effort.
+4. Add CI import notes to verification reports: medium usefulness, medium effort.
+5. Add policy pack customization: medium commercial optionality, medium effort.
+6. Add local static HTML report: medium star potential, high effort, medium maintenance.
+7. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+8. Add richer doctor risk-file details: medium usefulness, low effort.
+9. Add package recipe examples for monorepos: medium usefulness, low effort.
+10. Add generated security-review example: medium trust improvement, low effort.
+11. Add config migration helper for future schema versions: medium usefulness, medium effort.
+12. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
+13. Add static HTML verification report export after CLI gates stabilize: medium usefulness, medium effort.
+14. Add release-status compaction so future handoffs stay shorter: medium maintainability, low effort.
+15. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.

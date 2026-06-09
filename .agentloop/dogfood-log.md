@@ -1728,3 +1728,32 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release tarball is available from GitHub while npm auth remains blocked.
 - Improve:
   - Complete local browser/OTP auth for `0.14.0`, or configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`.
+
+## 2026-06-09: GitHub Actions CI Recipes
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-github-actions-ci-recipes.md`
+- Product cycle: `.agentloop/research/interview-cycle-054.md`
+- Verification report: `.agentloop/reports/2026-06-09-22-55-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-22-55-pr-summary.md`
+- Trigger:
+  - `verify`, `handoff`, and `check-gates --strict` exist, but docs did not show safe pull request CI usage.
+  - Product panel chose docs and examples instead of a workflow installer.
+- Verification completed:
+  - Tarball install recipe smoke: pass, local packed `agentloopkit-0.14.0.tgz` installed and `npx --no-install agentloop version` reported `0.14.0`
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 check:links`: pass, 330 Markdown files checked
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 71 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-github-actions-ci-recipes.md`: pass
+- Product changes:
+  - Added `docs/github-actions.md`.
+  - Added `examples/github-actions/README.md`.
+  - Linked CI recipes from README, getting-started docs, and check-gates docs.
+  - Updated generated harness guidance with strict gate and CI artifact notes.
+- Worked well:
+  - The docs keep npm status honest by pinning the GitHub release tarball while npm latest is behind.
+- Improve:
+  - Consider an optional workflow generator only after the docs recipes prove useful.

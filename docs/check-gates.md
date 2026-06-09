@@ -37,3 +37,5 @@ agentloop check-gates --strict --json
 Strict mode preserves each gate status in the output, but it reports overall status `fail` when any gate is `warn`.
 
 Use `agentloop doctor` for setup health. Use `agentloop check-gates` after implementation, verification, and handoff to see whether the work has the evidence reviewers expect.
+
+For GitHub Actions recipes that use strict gates, see `github-actions.md`.
