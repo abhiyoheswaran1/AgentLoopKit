@@ -115,3 +115,32 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Worked well: red tests caught both the missing command and stale version output.
 - Confusing: latest task/report detection is intentionally file-based; future task status lifecycle work can make this more explicit.
 - Improve: add richer task status transitions after this release.
+
+## 2026-06-09: Contributor Template Evidence Prompts
+
+- Task contract: `.agentloop/tasks/2026-06-09-ask-for-agentloopkit-evidence-in-github-templates.md`
+- Product cycle: `.agentloop/research/interview-cycle-008.md`
+- Verification planned:
+  - `git diff --check`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Verification completed:
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-15-08-verification-report.md`
+  - `agentloop summarize --write`: pass, wrote `.agentloop/handoffs/2026-06-09-15-09-pr-summary.md`
+- Product changes:
+  - Bug reports now ask for `agentloop status` when available.
+  - Feature requests identify the affected command, template, policy, or agent workflow.
+  - Pull requests ask for task contract, status, verification report, and handoff summary.
+- Worked well: templates now reinforce the product's review loop at contribution time.
+- Confusing: GitHub labels still need repository-side setup outside the codebase.
+- Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
+- Improve: add curated good-first-issue labels after launch.
