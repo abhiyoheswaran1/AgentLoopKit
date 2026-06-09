@@ -118,6 +118,12 @@ function chooseNextAction(input: {
       reason: 'A task exists, but no verification report was found.',
     };
   }
+  if (input.latestReport.overallStatus === 'fail') {
+    return {
+      command: 'agentloop verify',
+      reason: 'The latest verification report failed. Fix the failures and rerun verification.',
+    };
+  }
   if (input.dirty) {
     return {
       command: 'agentloop summarize --write',

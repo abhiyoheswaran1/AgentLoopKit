@@ -62,4 +62,37 @@ describe('status command', () => {
     expect(result.stdout).toContain('# AgentLoopKit Status');
     expect(result.stdout).toContain('agentloop create-task');
   });
+
+  test('points back to verification when the latest report failed', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'changed.txt'), 'pending change\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-fix-login.md'),
+      '# Fix login\n\n- Status: in progress\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: fail\n',
+    );
+
+    const jsonResult = await execa('npx', ['tsx', cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa('npx', ['tsx', cliPath, 'status'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    const status = JSON.parse(jsonResult.stdout);
+    expect(status.latestReport.overallStatus).toBe('fail');
+    expect(status.nextAction.command).toBe('agentloop verify');
+    expect(status.nextAction.reason).toContain('failed');
+    expect(markdownResult.stdout).toContain('Latest verification: fail');
+    expect(markdownResult.stdout).toContain('Run `agentloop verify`.');
+  });
 });
