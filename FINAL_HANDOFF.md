@@ -25,6 +25,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - deterministic PR summary generation
 - deterministic PR summary change-area classification and review-focus hints
 - local static HTML evidence reports with `agentloop report`
+- local SVG evidence badges with `agentloop badge`
 - verification reports with allowlisted CI context
 - local status command for active task, latest verification, dirty files, configured commands, and next action
 - local gate-check command for task, verification, handoff, harness, policy, and git evidence
@@ -62,6 +63,9 @@ agentloop check-gates --json
 agentloop check-gates --strict
 agentloop report
 agentloop report --json
+agentloop badge
+agentloop badge --source gates
+agentloop badge --json
 agentloop verify
 agentloop verify --command "node smoke-test.js"
 agentloop handoff
@@ -1341,6 +1345,20 @@ Implemented:
 - Vitest coverage for escaping, repository output, and CLI JSON behavior
 - README, docs, generated harness templates, GitHub Actions recipe, changelog, roadmap, backlog, dogfood, final handoff, and README visual refresh
 
+### Cycle 66: Local evidence badges
+
+Decision: add `agentloop badge` as a local SVG status pointer for existing verification or gate evidence, without using a remote badge service.
+
+Implemented:
+
+- `agentloop badge` CLI command with `--source verification`, `--source gates`, `--strict`, `--out`, and `--json`
+- dependency-free SVG badge renderer with escaped label and message text
+- verification badge output at `.agentloop/reports/agentloop-verification.svg`
+- gate badge output at `.agentloop/reports/agentloop-gates.svg`
+- compact JSON output without embedding SVG contents
+- Vitest coverage for SVG escaping, verification badge output, and gate-source CLI output
+- README, badge docs, GitHub Actions examples, generated harness templates, roadmap, changelog, backlog, and dogfood updates
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1379,16 +1397,17 @@ Strongest signals:
 - Public roadmap readers need shipped work and future work separated clearly after `v0.15.1`.
 - Reviewers need deterministic PR summaries to group changed files by review area without LLM calls.
 - Teams need one local HTML evidence artifact after task, verification, and handoff files exist.
+- Reviewers need small local status badges that point back to verification or gate evidence.
 
 ## Backlog
 
 Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.15.1`.
-2. Generated badges for local reports.
-3. Policy pack customization.
-4. Template version and migration guidance.
-5. Optional schema-store submission after npm publishing is stable.
+2. Policy pack customization.
+3. Template version and migration guidance.
+4. Optional schema-store submission after npm publishing is stable.
+5. CI summary import.
 
 ## Known limitations
 
@@ -1559,7 +1578,7 @@ Title: I built a local-first engineering loop for coding agents
 1. Repair npm publishing for `0.15.1`: high usefulness, low repo effort, external npm setting required.
 2. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
 3. Add policy pack customization: medium commercial optionality, medium effort.
-4. Add generated evidence badges for local reports: medium star potential, low effort, low maintenance.
+4. Add policy pack customization: medium star potential, medium effort, medium maintenance.
 5. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
 6. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
 7. Add generated security-review example: medium trust improvement, low effort.

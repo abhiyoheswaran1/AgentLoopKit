@@ -14,6 +14,7 @@ const topLevelCommands = [
   ['status', 'Show current loop state'],
   ['check-gates', 'Check review gate evidence'],
   ['report', 'Write a local HTML evidence report'],
+  ['badge', 'Write a local SVG evidence badge'],
   ['task', 'List, inspect, update, or archive task contracts'],
   ['install-agent', 'Install agent-specific instructions'],
   ['list-templates', 'List bundled templates'],

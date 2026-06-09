@@ -12,6 +12,7 @@ describe('completion scripts', () => {
 
     expect(script).toContain('#compdef agentloop agentloopkit');
     expect(script).toContain('report:Write a local HTML evidence report');
+    expect(script).toContain('badge:Write a local SVG evidence badge');
     expect(script).toContain('task:List, inspect, update, or archive task contracts');
     expect(script).toContain('status:Update a task contract status');
     expect(script).toContain('in-progress');

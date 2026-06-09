@@ -63,6 +63,10 @@ Type "npx agentloop report"
 Enter
 Sleep 1.5s
 
+Type "npx agentloop badge"
+Enter
+Sleep 1s
+
 Type "npx agentloop task status .agentloop/tasks/add-settings-page.md done"
 Enter
 Sleep 1s

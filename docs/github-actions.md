@@ -79,6 +79,9 @@ jobs:
       - name: Run AgentLoop verification
         run: npx --no-install agentloop verify
 
+      - name: Write verification badge
+        run: npx --no-install agentloop badge
+
       - name: Write reviewer handoff
         run: npx --no-install agentloop handoff
 
@@ -96,10 +99,11 @@ jobs:
           path: |
             .agentloop/reports/*.md
             .agentloop/reports/*.html
+            .agentloop/reports/*.svg
             .agentloop/handoffs/*.md
 ```
 
-This workflow does not commit generated files. It uploads reports, HTML reports, and handoffs as CI artifacts.
+This workflow does not commit generated files. It uploads reports, HTML reports, badges, and handoffs as CI artifacts.
 
 The verification report includes a `CI Context` section when GitHub Actions creates it. Reviewers can see the workflow, event, ref, commit, run URL, and run attempt inside the Markdown artifact.
 
@@ -118,6 +122,7 @@ Run `agentloop init` and `agentloop create-task` before relying on CI gates.
 ## Failure Semantics
 
 - `agentloop verify` exits non-zero when a configured command fails.
+- `agentloop badge` writes a local SVG badge from existing evidence.
 - `agentloop handoff` writes a deterministic reviewer summary.
 - `agentloop report` writes a static HTML evidence artifact from local files.
 - `agentloop check-gates` exits non-zero when a required gate fails.

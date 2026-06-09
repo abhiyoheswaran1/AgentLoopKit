@@ -43,7 +43,14 @@ agentloop handoff
 agentloop report
 ```
 
-8. Check review gates:
+8. Optional: write a local SVG evidence badge:
+
+```bash
+agentloop badge
+agentloop badge --source gates
+```
+
+9. Check review gates:
 
 ```bash
 agentloop check-gates
@@ -52,6 +59,7 @@ agentloop check-gates --strict
 
 `check-gates` inspects local evidence. It does not run tests or call an LLM.
 `report` reads local evidence and writes one static HTML file under `reports/`.
+`badge` reads local evidence and writes SVG files under `reports/`.
 Use `--strict` in CI when warning gates should fail.
 
 CI can either check committed AgentLoop evidence or generate reports and handoffs as build artifacts. Do not let CI commit generated files unless maintainers explicitly want that behavior.

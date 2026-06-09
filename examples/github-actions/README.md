@@ -47,6 +47,7 @@ jobs:
       - run: npm ci
       - run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.15.1/agentloopkit-0.15.1.tgz
       - run: npx --no-install agentloop verify
+      - run: npx --no-install agentloop badge
       - run: npx --no-install agentloop handoff
       - run: npx --no-install agentloop report
       - run: npx --no-install agentloop check-gates --strict
@@ -57,6 +58,7 @@ jobs:
           path: |
             .agentloop/reports/*.md
             .agentloop/reports/*.html
+            .agentloop/reports/*.svg
             .agentloop/handoffs/*.md
 ```
 

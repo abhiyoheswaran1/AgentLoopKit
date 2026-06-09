@@ -63,3 +63,7 @@ Generated configs use the GitHub raw URL for `schema/agentloop.config.schema.jso
 ## 2026-06-10: HTML Reports Are Local Static Evidence
 
 `agentloop report` writes a static HTML file from existing local task, verification, handoff, git, and deterministic summary artifacts. It does not run project commands, call an LLM, fetch external assets, upload files, or read `.env` contents. The renderer escapes Markdown-derived and git-derived text and uses inline CSS instead of a Markdown parser or browser app.
+
+## 2026-06-10: Evidence Badges Are Local SVG Files
+
+`agentloop badge` writes SVG badges from existing local verification or gate evidence. It does not run project verification commands, call remote badge services, fetch assets, upload files, or read `.env` contents. Badges are status pointers for reports and CI artifacts; the Markdown and HTML evidence remains the source of truth.

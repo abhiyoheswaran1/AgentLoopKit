@@ -2080,3 +2080,41 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - AgentLoop HTML report: `.agentloop/reports/2026-06-10-00-47-agentloop-report.html`.
 - Improve:
   - Consider generated evidence badges after npm publishing is stable.
+
+## 2026-06-10: Local Evidence Badges
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-local-evidence-badges.md`
+- Product cycle: `.agentloop/research/interview-cycle-066.md`
+- Trigger:
+  - Reports and HTML evidence helped reviewers, but README snippets, PR descriptions, and CI artifact lists still needed a compact local status signal.
+  - The product panel rejected hosted badge services and command execution inside badge generation.
+- Product changes:
+  - Added `agentloop badge`.
+  - Added dependency-free SVG badge rendering from existing verification or gate evidence.
+  - Added `--source verification`, `--source gates`, `--strict`, `--out`, and `--json`.
+  - Updated shell completions, README, badge docs, GitHub Actions examples, generated harness templates, roadmap, changelog, decisions, final handoff, and README visual assets.
+- Dogfooding:
+  - Created and pinned the task with AgentLoopKit, then marked it `done`.
+  - Ran `npx tsx src/cli/index.ts badge --json`: pass, wrote `.agentloop/reports/agentloop-verification.svg`.
+  - Ran `npx tsx src/cli/index.ts badge --source gates --strict --json`: pass, wrote `.agentloop/reports/agentloop-gates.svg`.
+  - Rendered README PNG screenshots with Playwright.
+  - Rendered the README terminal GIF with VHS.
+- Verification run:
+  - Focused red test: `npx pnpm@10.12.1 test tests/badge.test.ts` failed before `src/core/badge.ts` existed.
+  - Focused green test: `npx pnpm@10.12.1 test tests/badge.test.ts`: pass, 1 file and 3 tests.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 23 files and 83 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 379 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm pack --dry-run`: pass, produced the `agentloopkit@0.15.1` package preview.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-00-59-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-01-00-pr-summary.md`.
+  - AgentLoop HTML report: `.agentloop/reports/2026-06-10-01-00-agentloop-report.html`.
+- Worked well:
+  - A missing verification report cannot produce a pass badge.
+  - `agentloop badge --json` gives CI and agents a compact machine-readable result without embedding SVG contents.
+- Improve:
+  - Decide the next public npm release number now that npm already serves `0.1.1` and GitHub has higher release tags.

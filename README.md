@@ -63,6 +63,7 @@ npx agentloopkit handoff
 npx agentloopkit check-gates
 npx agentloopkit check-gates --strict
 npx agentloopkit report
+npx agentloopkit badge
 npx agentloopkit task archive .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit install-agent codex
 npx agentloopkit install-agent all
@@ -70,7 +71,7 @@ npx agentloopkit completion zsh
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, task status, completion, verify, handoff, report, and task archive commands" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, task status, completion, verify, handoff, report, badge, and task archive commands" width="100%">
 </p>
 
 The VHS demo runs the local built CLI so the command flow matches this repository even when npm is behind.
@@ -114,6 +115,7 @@ pnpm build
 | `agentloop summarize`                   | Generate a deterministic PR or reviewer summary                                |
 | `agentloop handoff`                     | Write a reviewer handoff summary                                               |
 | `agentloop report`                      | Write a local static HTML evidence report                                      |
+| `agentloop badge`                       | Write a local SVG evidence badge                                               |
 | `agentloop install-agent codex`         | Add agent-specific instructions                                                |
 | `agentloop install-agent all`           | Add all bundled agent instruction files                                        |
 | `agentloop list-templates`              | List bundled templates                                                         |
@@ -303,13 +305,27 @@ The command does not run tests, call an LLM, fetch assets, read `.env` contents,
 
 See `docs/html-reports.md` for inputs, output paths, and safety behavior.
 
+## Evidence Badges
+
+`agentloop badge` writes a local SVG badge from existing evidence:
+
+```bash
+agentloop badge
+agentloop badge --source gates
+agentloop badge --json
+```
+
+The default badge reads the latest verification report and writes `.agentloop/reports/agentloop-verification.svg`. Gate badges read local gate status and write `.agentloop/reports/agentloop-gates.svg`. The command does not run tests, call a badge service, read `.env`, or upload anything.
+
+See `docs/badges.md` for badge sources and CI usage.
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report screenshot showing command results and reviewer handoff sections" width="100%">
 </p>
 
 ## GitHub Actions
 
-Use `agentloop check-gates --strict` as a review-evidence gate in pull request CI. Use `agentloop verify` and `agentloop handoff` in CI when you want reports and handoffs uploaded as build artifacts.
+Use `agentloop check-gates --strict` as a review-evidence gate in pull request CI. Use `agentloop verify`, `agentloop handoff`, `agentloop report`, and `agentloop badge` in CI when you want evidence artifacts uploaded for reviewers.
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 

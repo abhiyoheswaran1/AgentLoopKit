@@ -23,6 +23,7 @@ agentloop status
 agentloop verify
 agentloop handoff
 agentloop report
+agentloop badge
 ```
 
 Use `npx projscan doctor --format markdown` during implementation work in this repository.

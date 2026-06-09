@@ -16,6 +16,7 @@ Before changing code:
 - Run `agentloop status` when you need the current task, verification, dirty-file, and next-action state.
 - Run `agentloop check-gates` before stopping to check review evidence.
 - Run `agentloop report` after verification and handoff when a local HTML evidence artifact helps review.
+- Run `agentloop badge` when a local SVG evidence badge helps review or CI artifact uploads.
 - Follow the Specify, Constrain, Plan, Implement, Verify, Review, Handoff loop.
 - Keep changes small and tied to the task contract.
 - Do not run destructive git or filesystem commands unless the user asks for them.

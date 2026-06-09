@@ -7,6 +7,7 @@
 - Added `agentloop report` for local static HTML evidence reports built from task, verification, handoff, git, and deterministic summary artifacts
 - Kept `agentloop report --json` compact by returning the output path, metadata, and source paths without embedding the full HTML body
 - Made `agentloop report` ignore bundled handoff templates when looking for the latest generated handoff
+- Added `agentloop badge` for local SVG evidence badges built from verification or gate status
 
 ## 0.15.1
 
