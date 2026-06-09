@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Current source targets `0.16.0`. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.16.0` carry the current source. npm publish for `0.16.0` reached the registry and stopped at OTP/browser authentication; after that publish lands, normal semver releases resume.
+Current source targets `0.17.0`. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.16.0` carry earlier source. `0.17.0` adds read-only policy inspection and should be the next catch-up release after package authentication is fixed.
 
 Run the CLI after install:
 
@@ -64,6 +64,8 @@ npx agentloopkit check-gates
 npx agentloopkit check-gates --strict
 npx agentloopkit report
 npx agentloopkit badge
+npx agentloopkit policy list
+npx agentloopkit policy show security
 npx agentloopkit task archive .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit install-agent codex
 npx agentloopkit install-agent all
@@ -116,6 +118,8 @@ pnpm build
 | `agentloop handoff`                     | Write a reviewer handoff summary                                               |
 | `agentloop report`                      | Write a local static HTML evidence report                                      |
 | `agentloop badge`                       | Write a local SVG evidence badge                                               |
+| `agentloop policy list`                 | List local safety policy files                                                 |
+| `agentloop policy show <policy>`        | Print a local safety policy without mutating files                             |
 | `agentloop install-agent codex`         | Add agent-specific instructions                                                |
 | `agentloop install-agent all`           | Add all bundled agent instruction files                                        |
 | `agentloop list-templates`              | List bundled templates                                                         |
@@ -326,13 +330,27 @@ See `docs/badges.md` for badge sources and CI usage.
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report screenshot showing command results and reviewer handoff sections" width="100%">
 </p>
 
+## Policies
+
+`agentloop policy` makes generated repo policy files visible from the CLI:
+
+```bash
+agentloop policy list
+agentloop policy show security
+agentloop policy list --json
+```
+
+The command reads Markdown files from `.agentloop/policies/`. It does not enforce compliance, scan source code, fetch remote policy packs, or mutate policy files.
+
+See `docs/policies.md`.
+
 ## GitHub Actions
 
 Use `agentloop check-gates --strict` as a review-evidence gate in pull request CI. Use `agentloop verify`, `agentloop handoff`, `agentloop report`, and `agentloop badge` in CI when you want evidence artifacts uploaded for reviewers.
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
-See `docs/github-actions.md` and `examples/github-actions/` for copy-pasteable workflows. Until npm publishes `0.16.0`, the examples pin the `v0.16.0` GitHub tarball so CI can use the current source.
+See `docs/github-actions.md` and `examples/github-actions/` for copy-pasteable workflows. Until npm publishes `0.17.0`, the examples pin the current GitHub release tarball so CI can use the current source.
 
 ## PR Summaries
 
@@ -409,7 +427,7 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. `0.16.0` is the catch-up release that aligns npm with the current GitHub source after earlier GitHub-only release candidates. The local publish attempt passed package checks and stopped at npm OTP/browser authentication.
+AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. `0.17.0` is the next catch-up release for the current source. Earlier GitHub-only release candidates remain public, and npm authentication still needs browser/OTP completion or trusted-publishing repair.
 
 The repository includes a GitHub Actions publish workflow for npm trusted publishing after the package is configured on npm. The workflow runs checks before `npm publish` and skips publish when the version already exists.
 

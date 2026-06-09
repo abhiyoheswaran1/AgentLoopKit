@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+## 0.17.0
+
+Policy inspection and template-provenance release candidate. npm publish is pending browser/OTP authentication or trusted-publishing repair:
+
 - Added `.agentloop/manifest.json` during init to record generated template provenance
 - Added `agentloop doctor` template manifest checks for current, missing, stale, invalid, and newer generated harness metadata
 - Added manual template migration guidance without changing config validation or overwriting edited harness files
+- Added `agentloop policy list` and `agentloop policy show <policy>` for read-only local safety policy inspection
+- Added JSON output for policy listing and policy reads
 
 ## 0.16.0
 

@@ -68,6 +68,15 @@ npx agentloopkit status
 npx agentloopkit status --json
 ```
 
+Inspect the generated safety policies:
+
+```bash
+npx agentloopkit policy list
+npx agentloopkit policy show security
+```
+
+`policy` is read-only. It prints Markdown guidance from `.agentloop/policies/` and does not enforce policy or scan source code.
+
 Optional shell completions:
 
 ```bash

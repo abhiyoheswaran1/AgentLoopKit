@@ -75,3 +75,7 @@ GitHub already has public releases from `v0.2.0` through `v0.15.1`, and `main` n
 ## 2026-06-10: Template Versioning Uses A Local Manifest
 
 Generated harness provenance lives in `.agentloop/manifest.json`, not in `agentloop.config.json`. The manifest records the generated template version and generator name without changing config validation for existing users. `doctor` can warn about missing, invalid, old, or newer manifests, but AgentLoopKit does not automatically rewrite edited harness files.
+
+## 2026-06-10: Policy Inspection Is Read-Only
+
+`agentloop policy` lists and reads local Markdown files under `.agentloop/policies/`. It does not enforce policy, scan source code, fetch remote policy packs, mutate policy files, or claim compliance. The command exists so humans and agents can find repo guidance before risky edits while keeping policies as plain files.

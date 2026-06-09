@@ -14,6 +14,7 @@ Before changing code:
 - Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
 - Use `agentloop task archive <path>` only after verification and handoff are complete.
 - Run `agentloop status` when you need the current task, verification, dirty-file, and next-action state.
+- Run `agentloop policy list` and `agentloop policy show <policy>` before touching security, dependency, database, git, public API, or secret-handling areas.
 - Run `agentloop check-gates` before stopping to check review evidence.
 - Run `agentloop report` after verification and handoff when a local HTML evidence artifact helps review.
 - Run `agentloop badge` when a local SVG evidence badge helps review or CI artifact uploads.

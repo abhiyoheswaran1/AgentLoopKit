@@ -15,6 +15,7 @@ const topLevelCommands = [
   ['check-gates', 'Check review gate evidence'],
   ['report', 'Write a local HTML evidence report'],
   ['badge', 'Write a local SVG evidence badge'],
+  ['policy', 'List or inspect local AgentLoopKit policies'],
   ['task', 'List, inspect, update, or archive task contracts'],
   ['install-agent', 'Install agent-specific instructions'],
   ['list-templates', 'List bundled templates'],
@@ -33,6 +34,11 @@ const taskCommandSpecs = [
 ] as const;
 
 const taskCommands = taskCommandSpecs.map(([name]) => name);
+const policyCommandSpecs = [
+  ['list', 'List local policies'],
+  ['show', 'Show a local policy'],
+] as const;
+const policyCommands = policyCommandSpecs.map(([name]) => name);
 const taskStatuses = ['proposed', 'in-progress', 'blocked', 'review', 'done'] as const;
 const agentNames = [
   'codex',
@@ -81,6 +87,12 @@ _agentloop_completion() {
           ;;
       esac
       ;;
+    policy)
+      if [[ \${COMP_CWORD} -eq 2 ]]; then
+        COMPREPLY=( $(compgen -W "${policyCommands.join(' ')}" -- "$current") )
+        return 0
+      fi
+      ;;
     install-agent)
       COMPREPLY=( $(compgen -W "${agentNames.join(' ')}" -- "$current") )
       return 0
@@ -128,6 +140,9 @@ _agentloop() {
             _describe 'task command' taskCommandSpecs
           fi
           ;;
+        policy)
+          _describe 'policy command' policyCommandSpecs
+          ;;
         install-agent)
           _values 'agent' ${agentNames.map((agent) => `"${agent}"`).join(' ')}
           ;;
@@ -147,6 +162,10 @@ taskCommandSpecs=(
 ${taskCommandSpecs.map(([name, description]) => `  '${name}:${description}'`).join('\n')}
 )
 
+policyCommandSpecs=(
+${policyCommandSpecs.map(([name, description]) => `  '${name}:${description}'`).join('\n')}
+)
+
 _agentloop "$@"
 `;
 }
@@ -164,11 +183,13 @@ complete -c agentloop -f
 complete -c agentloopkit -f
 ${fishLine('__fish_use_subcommand', topCommands, 'AgentLoopKit command')}
 complete -c agentloop -n '__fish_seen_subcommand_from task' -a '${taskCommands.join(' ')}' -d 'Task command'
+complete -c agentloop -n '__fish_seen_subcommand_from policy' -a '${policyCommands.join(' ')}' -d 'Policy command'
 complete -c agentloop -n '__fish_seen_subcommand_from status' -a '${taskStatuses.join(' ')}' -d 'Task status'
 complete -c agentloop -n '__fish_seen_subcommand_from install-agent' -a '${agentNames.join(' ')}' -d 'Agent name'
 complete -c agentloop -n '__fish_seen_subcommand_from completion' -a '${COMPLETION_SHELLS.join(' ')}' -d 'Shell'
 complete -c agentloopkit -n '__fish_use_subcommand' -a '${topCommands.join(' ')}' -d 'AgentLoopKit command'
 complete -c agentloopkit -n '__fish_seen_subcommand_from task' -a '${taskCommands.join(' ')}' -d 'Task command'
+complete -c agentloopkit -n '__fish_seen_subcommand_from policy' -a '${policyCommands.join(' ')}' -d 'Policy command'
 complete -c agentloopkit -n '__fish_seen_subcommand_from status' -a '${taskStatuses.join(' ')}' -d 'Task status'
 complete -c agentloopkit -n '__fish_seen_subcommand_from install-agent' -a '${agentNames.join(' ')}' -d 'Agent name'
 complete -c agentloopkit -n '__fish_seen_subcommand_from completion' -a '${COMPLETION_SHELLS.join(' ')}' -d 'Shell'

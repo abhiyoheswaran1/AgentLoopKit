@@ -19,7 +19,7 @@ Set PlaybackSpeed 1.08
 Set LoopOffset 13%
 Set Theme "Catppuccin Latte"
 
-Type@1ms "npm pack --pack-destination /tmp --silent >/dev/null && rm -rf /tmp/agentloopkit-vhs-demo && mkdir /tmp/agentloopkit-vhs-demo && cd /tmp/agentloopkit-vhs-demo && git init -q && npm init -y >/dev/null && npm pkg set scripts.test='echo demo tests pass' scripts.typecheck='echo types pass' scripts.build='echo build pass' >/dev/null && npm install -D /tmp/agentloopkit-0.16.0.tgz >/dev/null && clear"
+Type@1ms "npm pack --pack-destination /tmp --silent >/dev/null && rm -rf /tmp/agentloopkit-vhs-demo && mkdir /tmp/agentloopkit-vhs-demo && cd /tmp/agentloopkit-vhs-demo && git init -q && npm init -y >/dev/null && npm pkg set scripts.test='echo demo tests pass' scripts.typecheck='echo types pass' scripts.build='echo build pass' >/dev/null && npm install -D /tmp/agentloopkit-0.17.0.tgz >/dev/null && clear"
 Enter
 Sleep 250ms
 
@@ -46,6 +46,14 @@ Sleep 1s
 Type "npx agentloop task status .agentloop/tasks/add-settings-page.md in-progress"
 Enter
 Sleep 1s
+
+Type "npx agentloop policy list"
+Enter
+Sleep 1s
+
+Type "npx agentloop policy show security"
+Enter
+Sleep 1.5s
 
 Type "npx agentloop completion zsh"
 Enter

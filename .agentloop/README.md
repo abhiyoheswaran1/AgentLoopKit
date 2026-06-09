@@ -23,6 +23,8 @@ This directory contains AgentLoopKit's own repo-local engineering loop artifacts
 agentloop create-task --title "Describe the next focused change" --type feature
 agentloop task set .agentloop/tasks/<task-file>.md
 agentloop status
+agentloop policy list
+agentloop policy show security
 agentloop verify
 agentloop handoff
 agentloop report

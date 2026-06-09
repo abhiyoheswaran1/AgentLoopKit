@@ -13,6 +13,8 @@ describe('completion scripts', () => {
     expect(script).toContain('#compdef agentloop agentloopkit');
     expect(script).toContain('report:Write a local HTML evidence report');
     expect(script).toContain('badge:Write a local SVG evidence badge');
+    expect(script).toContain('policy:List or inspect local AgentLoopKit policies');
+    expect(script).toContain('show:Show a local policy');
     expect(script).toContain('task:List, inspect, update, or archive task contracts');
     expect(script).toContain('status:Update a task contract status');
     expect(script).toContain('in-progress');
@@ -26,6 +28,7 @@ describe('completion scripts', () => {
     expect(script).toContain('_agentloop_completion()');
     expect(script).toContain('COMPREPLY');
     expect(script).toContain('list show set status archive current clear');
+    expect(script).toContain('compgen -W "list show"');
     expect(script).toContain(
       'codex claude-code cursor opencode gemini-cli github-copilot-cli generic all',
     );
@@ -36,6 +39,7 @@ describe('completion scripts', () => {
 
     expect(script).toContain('complete -c agentloop');
     expect(script).toContain("complete -c agentloop -n '__fish_seen_subcommand_from task'");
+    expect(script).toContain("complete -c agentloop -n '__fish_seen_subcommand_from policy'");
     expect(script).toContain('review');
     expect(script).not.toContain('config.fish');
   });

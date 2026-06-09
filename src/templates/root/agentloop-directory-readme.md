@@ -27,32 +27,39 @@ Archive only after verification and handoff. The archive command moves one named
 agentloop status
 ```
 
-5. Run verification when work is ready:
+5. Inspect safety policies when the task touches protected areas:
+
+```bash
+agentloop policy list
+agentloop policy show security
+```
+
+6. Run verification when work is ready:
 
 ```bash
 agentloop verify
 ```
 
-6. Generate a reviewer handoff:
+7. Generate a reviewer handoff:
 
 ```bash
 agentloop handoff
 ```
 
-7. Optional: write a local HTML evidence report:
+8. Optional: write a local HTML evidence report:
 
 ```bash
 agentloop report
 ```
 
-8. Optional: write a local SVG evidence badge:
+9. Optional: write a local SVG evidence badge:
 
 ```bash
 agentloop badge
 agentloop badge --source gates
 ```
 
-9. Check review gates:
+10. Check review gates:
 
 ```bash
 agentloop check-gates

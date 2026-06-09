@@ -2194,3 +2194,53 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `doctor` keeps template metadata problems as warnings, so old repos are not broken.
 - Improve:
   - Policy pack customization can build on this provenance later, but it should remain explicit and reviewable.
+
+## 2026-06-10: Local Policy Inspection And 0.17.0 Preparation
+
+- Task contract: `.agentloop/tasks/2026-06-10-expose-policy-guidance-through-cli.md`
+- Product cycle: `.agentloop/research/interview-cycle-069.md`
+- Trigger:
+  - Generated policies existed under `.agentloop/policies/`, but agents and humans needed a direct CLI path to inspect them.
+  - `main` moved after the public `v0.16.0` release, so the next package line must not reuse `0.16.0`.
+- Product changes:
+  - Added read-only `agentloop policy list`.
+  - Added read-only `agentloop policy show <policy>`.
+  - Added JSON output for policy list and show.
+  - Restricted policy lookup to known Markdown files under `.agentloop/policies/`.
+  - Added `docs/policies.md`.
+  - Updated README, getting-started docs, generated harness templates, agent templates, completions, roadmap, changelog, decisions, backlog, launch checklist, publishing docs, and README VHS source.
+  - Bumped package metadata to `0.17.0`.
+- Dogfooding:
+  - Created and pinned the task with AgentLoopKit, then marked it `in-progress`.
+  - Focused red test: `npx pnpm@10.12.1 test tests/policy.test.ts` failed before `src/core/policy.ts` existed.
+  - Focused green test: `npx pnpm@10.12.1 test tests/policy.test.ts`: pass, 1 file and 4 tests.
+  - Completion red test: `npx pnpm@10.12.1 test tests/completion.test.ts` failed because static completions did not include `policy`.
+  - Focused policy and completion tests: `npx pnpm@10.12.1 test tests/policy.test.ts tests/completion.test.ts`: pass, 2 files and 10 tests.
+- Verification run:
+  - Live CLI smoke: `npx tsx src/cli/index.ts version`: pass, reported `0.17.0`.
+  - Live CLI smoke: `npx tsx src/cli/index.ts policy list --json`: pass, listed local policy files.
+  - Live CLI smoke: `npx tsx src/cli/index.ts policy show security`: pass, printed `# Security Policy`.
+  - Live CLI smoke: `npx tsx src/cli/index.ts policy show ../AGENTS.md`: pass, exited `1` with `Policy not found`.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 24 files and 89 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 393 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm pack`: pass, produced `agentloopkit-0.17.0.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: first assertion used the wrong `init --json` shape; corrected smoke passed with `agentloop version` reporting `0.17.0`, `init --json` creating `.agentloop/policies/security-policy.md`, `policy list --json` listing `security-policy`, `policy show security` printing the policy, and traversal-style lookup failing.
+  - README terminal GIF regenerated with VHS from `docs/assets/readme/agentloopkit-cli.tape`.
+  - README screenshots regenerated with Playwright from committed HTML sources.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-01-40-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-01-42-pr-summary.md`.
+  - AgentLoop HTML report: `.agentloop/reports/2026-06-10-01-42-agentloop-report.html`.
+  - AgentLoop badge: `.agentloop/reports/agentloop-verification.svg`.
+  - `agentloop check-gates --strict --json`: pass.
+  - Marked the task contract `done` and cleared active task state.
+- Worked well:
+  - Policy lookup stayed read-only and local.
+  - The command exposes generated guidance without claiming compliance or building a policy engine.
+- Improve:
+  - After verification, decide whether to publish a `v0.17.0` GitHub release and record npm auth status without claiming npm availability.

@@ -26,6 +26,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - deterministic PR summary change-area classification and review-focus hints
 - local static HTML evidence reports with `agentloop report`
 - local SVG evidence badges with `agentloop badge`
+- read-only local policy inspection with `agentloop policy`
 - verification reports with allowlisted CI context
 - local status command for active task, latest verification, dirty files, configured commands, and next action
 - local gate-check command for task, verification, handoff, harness, policy, and git evidence
@@ -66,6 +67,9 @@ agentloop report --json
 agentloop badge
 agentloop badge --source gates
 agentloop badge --json
+agentloop policy list
+agentloop policy show security
+agentloop policy show security --json
 agentloop verify
 agentloop verify --command "node smoke-test.js"
 agentloop handoff
@@ -99,6 +103,28 @@ npx projscan doctor --format markdown
 ```
 
 Latest local verification:
+
+- `0.17.0` policy-inspection release-candidate verification:
+  - Focused red test: `npx pnpm@10.12.1 test tests/policy.test.ts` failed before `src/core/policy.ts` existed.
+  - Focused green test: `npx pnpm@10.12.1 test tests/policy.test.ts`: pass, 1 file and 4 tests.
+  - Completion red test: `npx pnpm@10.12.1 test tests/completion.test.ts` failed before completions included `policy`.
+  - Focused policy and completion tests: pass, 2 files and 10 tests.
+  - Live CLI smoke: `agentloop version` reported `0.17.0`; `policy list --json` listed local policies; `policy show security` printed `# Security Policy`; traversal-style lookup failed with `Policy not found`.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 24 files and 89 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 393 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm pack`: pass, produced `agentloopkit-0.17.0.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: pass after correcting the smoke assertion to match `init --json` path-string output.
+  - README terminal GIF regenerated with VHS.
+  - README screenshots regenerated with Playwright.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-01-40-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-01-42-pr-summary.md`.
+  - AgentLoop HTML report: `.agentloop/reports/2026-06-10-01-42-agentloop-report.html`.
 
 - `0.15.1` release-candidate verification:
   - `npx tsx src/cli/index.ts version`: pass, reported `0.15.1`.
@@ -1384,6 +1410,21 @@ Implemented:
 - README, getting-started, configuration, generated workspace README, roadmap, changelog, backlog, and dogfood updates
 - Vitest coverage for init manifest generation and doctor manifest checks
 
+### Cycle 69: Local policy inspection
+
+Decision: add read-only policy inspection instead of a policy engine. Users and agents need a direct way to find generated safety guidance, but AgentLoopKit should not claim compliance, scan source code, fetch policy packs, or mutate policy files.
+
+Implemented:
+
+- `agentloop policy list`
+- `agentloop policy show <policy>`
+- JSON output for policy list and show
+- safe lookup restricted to known Markdown files under `.agentloop/policies/`
+- static shell completion updates
+- `docs/policies.md`, README, generated harness, agent-template, publishing, and release-doc updates
+- package metadata bump to `0.17.0` because `main` moved after the public `v0.16.0` tag
+- README terminal GIF regenerated with VHS and screenshots regenerated with Playwright
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1611,10 +1652,10 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Complete browser/OTP npm publish for `0.16.0`: high usefulness, low repo effort, external auth required.
+1. Complete browser/OTP npm publish or trusted publishing for `0.17.0`: high usefulness, low repo effort, external auth required.
 2. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
-3. Add policy pack customization: medium commercial optionality, medium effort.
-4. Add policy pack customization: medium star potential, medium effort, medium maintenance.
+3. Add policy editing/customization guidance: medium commercial optionality, low effort.
+4. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
 5. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
 6. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
 7. Add generated security-review example: medium trust improvement, low effort.
