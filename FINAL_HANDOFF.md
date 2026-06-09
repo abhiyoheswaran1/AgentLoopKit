@@ -17,6 +17,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - active task pinning with `.agentloop/state.json`
 - read-only task contract listing with active-task markers
 - explicit task status transitions in Markdown task contracts
+- static bash, zsh, and fish shell completion scripts
 - verification report generation
 - deterministic PR summary generation
 - local status command for active task, latest verification, dirty files, configured commands, and next action
@@ -54,6 +55,9 @@ agentloop summarize --write
 agentloop install-agent codex
 agentloop install-agent all
 agentloop list-templates
+agentloop completion zsh
+agentloop completion bash
+agentloop completion fish
 agentloop version
 ```
 
@@ -77,6 +81,21 @@ npx projscan doctor --format markdown
 ```
 
 Latest local verification for the product-panel iteration:
+
+- Shell completion red test first: `npx pnpm@10.12.1 test tests/completion.test.ts` failed before `src/core/completions.ts` existed.
+- Focused green test: `npx pnpm@10.12.1 test tests/completion.test.ts`: pass, 1 file and 6 tests.
+- `git diff --check`: pass.
+- `npx pnpm@10.12.1 lint`: pass.
+- `npx pnpm@10.12.1 typecheck`: pass.
+- `npx pnpm@10.12.1 test`: pass, 20 files and 64 tests.
+- `npx pnpm@10.12.1 check:links`: pass, 265 Markdown files checked.
+- `npx pnpm@10.12.1 build`: pass.
+- `npx projscan doctor --format markdown`: A, 100/100.
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.9.0.tgz`.
+- Packed CLI smoke: pass for zsh, bash, fish, and unsupported-shell failure output.
+- `agentloop verify --task .agentloop/tasks/2026-06-09-add-shell-completions.md`: pass.
+
+Latest release status:
 
 - GitHub release `v0.9.0`: public, tarball attached.
 - Publish workflow run `27225348061`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
@@ -767,6 +786,17 @@ Implemented:
 - release notes updated with Publish workflow `E404` and npm registry state
 - launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
 
+### Cycle 39: Shell completions
+
+Decision: add shell completion script generation for repeat CLI users, with no profile-file mutation.
+
+Implemented:
+
+- `agentloop completion <bash|zsh|fish>`
+- static completion scripts printed to stdout
+- top-level command, task subcommand, task status, install-agent, and shell-name completions
+- README and getting-started docs that tell users the command does not edit shell profiles
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -782,6 +812,7 @@ Strongest signals:
 - Agents need a deterministic way to list task contracts before choosing the active task.
 - Agents need a deterministic way to read a selected task contract without changing active state.
 - Agents need a safe status command so task contracts move through the loop without hand-editing Markdown.
+- Repeat CLI users need completions for the growing command surface, but security-sensitive users want inspectable scripts rather than dotfile installers.
 
 ## Backlog
 
@@ -789,9 +820,9 @@ Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.9.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
-3. Shell completions.
-4. Config schema hosting.
-5. Task archive command.
+3. Config schema hosting.
+4. Task archive command.
+5. `agentloop check-gates`.
 
 ## Known limitations
 
@@ -922,7 +953,7 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.9.0`: high usefulness, low repo effort, external npm setting required.
-2. Add shell completions: medium usefulness, medium effort, low maintenance.
+2. Prepare a `0.10.0` release candidate for shell completions: high usefulness, low effort, low maintenance.
 3. Add task archive command: medium usefulness, medium effort, low maintenance.
 4. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
 5. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
@@ -935,4 +966,4 @@ Title: I built a local-first engineering loop for coding agents
 12. Add package recipe examples for monorepos: medium usefulness, low effort.
 13. Add generated security-review example: medium trust improvement, low effort.
 14. Add config migration helper for future schema versions: medium usefulness, medium effort.
-15. Add team/cloud roadmap only after open-source traction: high commercial optionality, high effort, high maintenance.
+15. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.

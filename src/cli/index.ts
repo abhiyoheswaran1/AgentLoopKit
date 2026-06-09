@@ -9,6 +9,7 @@ import { listTemplatesCommand } from './commands/list-templates.js';
 import { versionCommand } from './commands/version.js';
 import { statusCommand } from './commands/status.js';
 import { taskCommand } from './commands/task.js';
+import { completionCommand } from './commands/completion.js';
 import { getPackageVersion } from '../core/version.js';
 
 const program = new Command();
@@ -28,6 +29,7 @@ program.addCommand(statusCommand());
 program.addCommand(taskCommand());
 program.addCommand(installAgentCommand());
 program.addCommand(listTemplatesCommand());
+program.addCommand(completionCommand());
 program.addCommand(versionCommand());
 
 program.parseAsync(process.argv).catch((error: unknown) => {

@@ -108,6 +108,7 @@ pnpm build
 | `agentloop install-agent codex`         | Add agent-specific instructions                                           |
 | `agentloop install-agent all`           | Add all bundled agent instruction files                                   |
 | `agentloop list-templates`              | List bundled templates                                                    |
+| `agentloop completion <shell>`          | Print bash, zsh, or fish completion scripts                               |
 | `agentloop version`                     | Print the CLI version                                                     |
 
 The package exposes two binaries:
@@ -115,6 +116,25 @@ The package exposes two binaries:
 ```bash
 agentloop init
 agentloopkit init
+```
+
+## Shell Completions
+
+AgentLoopKit prints completion scripts to stdout. It does not edit `.zshrc`, `.bashrc`, fish config, or other shell profile files.
+
+Inspect a script before installing it:
+
+```bash
+agentloop completion zsh
+agentloop completion bash
+agentloop completion fish
+```
+
+Example zsh setup:
+
+```bash
+mkdir -p ~/.zsh/completions
+agentloop completion zsh > ~/.zsh/completions/_agentloop
 ```
 
 ## Generated Files

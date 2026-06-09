@@ -1226,3 +1226,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release tarball is available from GitHub while npm auth remains blocked.
 - Improve:
   - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.9.0`.
+
+## 2026-06-09: Shell Completions
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-shell-completions.md`
+- Product cycle: `.agentloop/research/interview-cycle-039.md`
+- Verification report: `.agentloop/reports/2026-06-09-20-07-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-20-09-pr-summary.md`
+- Trigger:
+  - Repeat CLI users now have task listing, task reading, active task pinning, status changes, status, verify, and handoff commands.
+  - The growing command surface needs tab completion without a dotfile installer or new dependency.
+- Red test:
+  - `npx pnpm@10.12.1 test tests/completion.test.ts` failed before implementation because `src/core/completions.ts` did not exist.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/completion.test.ts`: pass, 1 file and 6 tests
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 20 files and 64 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 265 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.9.0.tgz`
+  - Packed CLI smoke: pass for zsh, bash, fish, and unsupported-shell failure output
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-shell-completions.md`: pass
+- Product changes:
+  - Added `agentloop completion <bash|zsh|fish>`.
+  - Added static bash, zsh, and fish completion scripts.
+  - Completion covers top-level commands, task subcommands, task status values, completion shells, and install-agent names.
+  - Updated README and getting-started docs.
+- Worked well:
+  - The command gives repeat users CLI polish while keeping the security story simple: print only, no shell profile mutation.
+- Improve:
+  - Prepare a new release candidate after this feature, because `v0.9.0` already points at the task-status release.

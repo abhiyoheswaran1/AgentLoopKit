@@ -59,6 +59,16 @@ npx agentloopkit status
 npx agentloopkit status --json
 ```
 
+Optional shell completions:
+
+```bash
+npx agentloopkit completion zsh
+npx agentloopkit completion bash
+npx agentloopkit completion fish
+```
+
+These commands print scripts to stdout. AgentLoopKit does not edit shell profile files.
+
 Ask your coding agent to read:
 
 - `AGENTS.md`
