@@ -27,6 +27,8 @@ In monorepos, root checks do not always prove that one package was tested. Add p
 
 AgentLoopKit records and runs the commands you configure. It does not infer package graphs or run workspace commands on its own.
 
+For stack-specific command examples, see `stack-recipes.md`.
+
 Create a task:
 
 ```bash

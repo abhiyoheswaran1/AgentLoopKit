@@ -358,6 +358,8 @@ See `examples/` for sample generated harnesses:
 - `examples/empty-repo`
 - `examples/github-actions`
 
+See `docs/stack-recipes.md` for Next.js, React/Vite, Node API, Python, docs-only, empty-repo, and monorepo verification recipes.
+
 ## Roadmap
 
 See `ROADMAP.md`.

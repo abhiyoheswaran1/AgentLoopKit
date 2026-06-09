@@ -1757,3 +1757,31 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The docs keep npm status honest by pinning the GitHub release tarball while npm latest is behind.
 - Improve:
   - Consider an optional workflow generator only after the docs recipes prove useful.
+
+## 2026-06-09: Stack-Specific Starter Recipes
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-stack-specific-starter-recipes.md`
+- Product cycle: `.agentloop/research/interview-cycle-055.md`
+- Verification report: `.agentloop/reports/2026-06-09-23-00-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-23-01-pr-summary.md`
+- Trigger:
+  - Examples existed, but they did not give enough copy-pasteable verification guidance.
+  - Product panel chose docs recipes instead of a framework runner.
+- Verification completed:
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 check:links`: pass, 335 Markdown files checked
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 71 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-stack-specific-starter-recipes.md`: pass
+- Product changes:
+  - Added `docs/stack-recipes.md`.
+  - Updated Next.js, Node API, Python service, docs-only, and empty-repo examples.
+  - Linked stack recipes from README and getting-started docs.
+  - Added monorepo recipe guidance without adding package graph inference.
+- Worked well:
+  - Recipes make task contracts more concrete without changing CLI behavior.
+- Improve:
+  - Add more framework recipes later for Remix, SvelteKit, Django, and FastAPI.

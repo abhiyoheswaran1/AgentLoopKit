@@ -1106,6 +1106,18 @@ Implemented:
 - generated harness guidance explaining strict gates in CI
 - npm-status-honest install notes that pin the `v0.14.0` GitHub tarball while npm latest remains behind
 
+### Cycle 55: stack-specific starter recipes
+
+Decision: add stack recipes as documentation and example guidance instead of adding framework automation.
+
+Implemented:
+
+- `docs/stack-recipes.md` with Next.js, React/Vite, Node API, Python, docs-only, empty-repo, and monorepo recipes
+- example README updates for Next.js, Node API, Python service, docs-only, and empty repos
+- README and getting-started links to stack recipes
+- copy-pasteable task contract examples and verification commands
+- explicit reminder that root monorepo checks do not prove package-level coverage unless the repo documents that behavior
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1134,6 +1146,8 @@ Strongest signals:
 - npm readers need a direct note that the next successful npm publish may jump to `0.14.0`, then normal semver resumes.
 - Teams need CI recipes that show where `verify`, `handoff`, and `check-gates --strict` belong in pull request checks.
 - Maintainers need those recipes to avoid branch mutation, hidden uploads, and stale npm claims.
+- Developers need stack-specific starter commands before task contracts feel concrete.
+- Platform users need monorepo recipes that separate root checks from package checks.
 
 ## Backlog
 
@@ -1142,8 +1156,8 @@ Top remaining items:
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.14.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
 3. Config schema hosting.
-4. Stack-specific starter recipes.
-5. Static HTML report export.
+4. Static HTML report export.
+5. CI import notes in verification reports.
 
 ## Known limitations
 
@@ -1304,16 +1318,16 @@ Title: I built a local-first engineering loop for coding agents
 
 1. Repair npm publishing for `0.14.0`: high usefulness, low repo effort, external npm setting required.
 2. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-3. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
-4. Add CI import notes to verification reports: medium usefulness, medium effort.
-5. Add policy pack customization: medium commercial optionality, medium effort.
-6. Add local static HTML report: medium star potential, high effort, medium maintenance.
-7. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
-8. Add richer doctor risk-file details: medium usefulness, low effort.
-9. Add package recipe examples for monorepos: medium usefulness, low effort.
-10. Add generated security-review example: medium trust improvement, low effort.
-11. Add config migration helper for future schema versions: medium usefulness, medium effort.
-12. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
-13. Add static HTML verification report export after CLI gates stabilize: medium usefulness, medium effort.
-14. Add release-status compaction so future handoffs stay shorter: medium maintainability, low effort.
-15. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
+3. Add CI import notes to verification reports: medium usefulness, medium effort.
+4. Add policy pack customization: medium commercial optionality, medium effort.
+5. Add local static HTML report: medium star potential, high effort, medium maintenance.
+6. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+7. Add richer doctor risk-file details: medium usefulness, low effort.
+8. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
+9. Add generated security-review example: medium trust improvement, low effort.
+10. Add config migration helper for future schema versions: medium usefulness, medium effort.
+11. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
+12. Add static HTML verification report export after CLI gates stabilize: medium usefulness, medium effort.
+13. Add release-status compaction so future handoffs stay shorter: medium maintainability, low effort.
+14. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
+15. Add framework-specific example task contracts for Remix, SvelteKit, Django, and FastAPI: medium star potential, low effort.
