@@ -5,10 +5,11 @@ These files generate the screenshots and terminal animation used in the root REA
 Regenerate the terminal GIF:
 
 ```bash
+npx pnpm@10.12.1 build
 vhs docs/assets/readme/agentloopkit-cli.tape
 ```
 
-Run VHS from the repository root. The tape starts in a clean temp repository before the visible AgentLoopKit commands begin.
+Run VHS from the repository root. The tape packs the local build to `/tmp`, installs it into a clean temp repository, then runs the visible AgentLoopKit commands.
 
 Regenerate the Playwright screenshots:
 

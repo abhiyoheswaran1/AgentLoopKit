@@ -805,3 +805,40 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release candidate keeps tag, source, package metadata, and tarball contents aligned.
 - Improve:
   - After the GitHub release, record the publish workflow result and npm registry state.
+
+## 2026-06-09: README Visual Refresh for 0.6.0
+
+- Task contract: `.agentloop/tasks/2026-06-09-refresh-readme-visuals-for-0-6-0.md`
+- Product cycle: `.agentloop/research/interview-cycle-027.md`
+- Verification report: `.agentloop/reports/2026-06-09-18-26-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-18-27-pr-summary.md`
+- Trigger:
+  - The README visuals existed, but the VHS tape still depended on npm output while npm latest remains behind the current source.
+  - The Playwright screenshots had old verification counts and did not show the current task list/show workflow.
+- Verification completed:
+  - `npx prettier --check ...`: pass for edited Markdown and HTML files
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 18 files and 48 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.6.0.tgz`
+  - Packed CLI smoke: pass, `agentloop version` reported `0.6.0` and `agentloop task show --json` returned the smoke task
+  - Playwright screenshot render: pass for `agentloopkit-showcase.png` and `agentloopkit-verification.png`
+  - VHS render: pass for `agentloopkit-cli.gif`
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-refresh-readme-visuals-for-0-6-0.md`: pass
+  - `agentloop task clear --json`: pass, removed `.agentloop/state.json`
+  - `agentloop handoff`: pass, wrote the handoff above
+- Product changes:
+  - Refreshed README hero and verification screenshots with Playwright.
+  - Regenerated the README terminal GIF with VHS from a locally packed `0.6.0` tarball.
+  - Updated README copy to state the source-versus-npm version split directly.
+  - Recorded product-panel cycle 27 and backlog scoring.
+- Worked well:
+  - Packing the local build inside the VHS tape avoids stale npm output while preserving an end-user-like install path.
+  - The screenshots now show task inspection and current verification counts.
+- Confusing:
+  - The tape hardcodes the current tarball name, so future version bumps should update the tape before rerendering.
+- Improve:
+  - Consider a tiny asset-render script later if README screenshot regeneration becomes frequent.

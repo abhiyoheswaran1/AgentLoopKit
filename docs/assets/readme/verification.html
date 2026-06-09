@@ -8,9 +8,9 @@
       :root {
         --ink: oklch(22% 0.026 142);
         --muted: oklch(48% 0.023 142);
-        --paper: oklch(96% 0.015 112);
-        --surface: oklch(99% 0.007 112);
-        --line: oklch(84% 0.022 118);
+        --paper: oklch(95% 0.012 182);
+        --surface: oklch(99% 0.008 162);
+        --line: oklch(83% 0.022 156);
         --green: oklch(54% 0.11 145);
         --red: oklch(55% 0.13 31);
         --blue: oklch(46% 0.08 236);
@@ -26,7 +26,14 @@
         min-height: 100vh;
         display: grid;
         place-items: center;
-        background: linear-gradient(135deg, var(--paper), oklch(91% 0.02 78));
+        background:
+          linear-gradient(90deg, oklch(88% 0.018 178 / 34%) 1px, transparent 1px),
+          linear-gradient(180deg, oklch(88% 0.018 178 / 26%) 1px, transparent 1px),
+          linear-gradient(135deg, var(--paper), oklch(92% 0.018 88));
+        background-size:
+          80px 80px,
+          80px 80px,
+          auto;
         color: var(--ink);
         font-family:
           Inter,
@@ -239,7 +246,7 @@
           <strong>agentloop verify</strong>
           Repo: agentloopkit<br />
           Branch: main<br />
-          Generated: 2026-06-09 14:22
+          Generated: 2026-06-09 18:15
         </div>
       </section>
 
@@ -264,14 +271,13 @@
             <h2>Commands</h2>
             <div class="command-list">
               <div class="command">
-                <span class="pill">PASS</span><code>npm test</code><span class="exit">0</span>
+                <span class="pill">PASS</span><code>pnpm test</code><span class="exit">0</span>
               </div>
               <div class="command">
-                <span class="pill">PASS</span><code>npm run typecheck</code
-                ><span class="exit">0</span>
+                <span class="pill">PASS</span><code>pnpm typecheck</code><span class="exit">0</span>
               </div>
               <div class="command">
-                <span class="pill">PASS</span><code>npm run build</code><span class="exit">0</span>
+                <span class="pill">PASS</span><code>pnpm build</code><span class="exit">0</span>
               </div>
               <div class="command">
                 <span class="pill">PASS</span><code>npx projscan doctor</code
@@ -279,8 +285,8 @@
               </div>
             </div>
             <div class="excerpt">
-              <span class="green">Test Files</span> 13 passed (13)<br />
-              <span class="green">Tests</span> 26 passed (26)<br />
+              <span class="green">Test Files</span> 18 passed (18)<br />
+              <span class="green">Tests</span> 48 passed (48)<br />
               Health Score: A (100/100)<br />
               Report written to .agentloop/reports/
             </div>
@@ -305,7 +311,7 @@
             </div>
             <div class="risk">
               AgentLoopKit does not ask an LLM to summarize intent. It uses local repo evidence,
-              configured commands, and generated task contracts.
+              configured commands, and task contracts checked into the project.
             </div>
           </div>
         </div>

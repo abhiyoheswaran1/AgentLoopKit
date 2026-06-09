@@ -9,9 +9,9 @@
         color-scheme: light;
         --ink: oklch(23% 0.032 142);
         --muted: oklch(47% 0.025 142);
-        --paper: oklch(96% 0.018 120);
-        --surface: oklch(98% 0.012 120);
-        --line: oklch(84% 0.024 118);
+        --paper: oklch(95% 0.012 182);
+        --surface: oklch(98% 0.01 162);
+        --line: oklch(83% 0.022 156);
         --green: oklch(51% 0.11 145);
         --blue: oklch(47% 0.08 236);
         --rust: oklch(54% 0.12 42);
@@ -28,8 +28,13 @@
         display: grid;
         place-items: center;
         background:
-          radial-gradient(circle at 12% 0%, oklch(89% 0.04 143), transparent 28%),
-          linear-gradient(135deg, oklch(96% 0.016 112), oklch(92% 0.022 76));
+          linear-gradient(90deg, oklch(88% 0.018 178 / 36%) 1px, transparent 1px),
+          linear-gradient(180deg, oklch(88% 0.018 178 / 28%) 1px, transparent 1px),
+          linear-gradient(135deg, oklch(96% 0.014 174), oklch(93% 0.018 88));
+        background-size:
+          80px 80px,
+          80px 80px,
+          auto;
         color: var(--ink);
         font-family:
           Inter,
@@ -78,7 +83,7 @@
           SFMono-Regular,
           Menlo,
           monospace;
-        box-shadow: 0 16px 40px oklch(24% 0.03 145 / 16%);
+        box-shadow: 0 16px 40px oklch(24% 0.03 145 / 14%);
       }
 
       .badge {
@@ -303,15 +308,15 @@
 
       <section class="grid">
         <div>
-          <h1>Give coding agents an engineering loop.</h1>
+          <h1>A repo-local loop for coding agents.</h1>
           <p class="lede">
-            AgentLoopKit drops task contracts, safety policies, verification evidence, and reviewer
-            handoffs into any repo.
+            AgentLoopKit gives Codex, Claude Code, Cursor, OpenCode, Gemini CLI, and GitHub Copilot
+            CLI the same task contract, verification, and handoff ritual.
           </p>
           <div class="command"><span class="prompt">$</span> npx agentloopkit init</div>
           <div class="proof">
             <div>
-              <strong>50</strong><span>repo-local harness files generated on first run</span>
+              <strong>50+</strong><span>repo-local harness files generated on first run</span>
             </div>
             <div>
               <strong>0</strong
@@ -367,10 +372,10 @@
               </ul>
             </div>
             <div class="terminal">
-              <span class="green">PASS</span> npm test<br />
-              <span class="green">PASS</span> npm run typecheck<br />
-              <span class="green">PASS</span> npm run build<br />
-              <span class="blue">WRITE</span> .agentloop/handoffs/2026-06-09-14-22-pr-summary.md
+              <span class="blue">SHOW</span> .agentloop/tasks/add-settings-page.md<br />
+              <span class="green">PASS</span> pnpm test <span class="blue">(48 tests)</span><br />
+              <span class="green">PASS</span> pnpm typecheck<br />
+              <span class="blue">WRITE</span> .agentloop/handoffs/2026-06-09-18-15-pr-summary.md
             </div>
           </div>
         </div>
@@ -378,8 +383,8 @@
 
       <div class="footer">
         <span
-          >Works with Codex, Claude Code, Cursor, OpenCode, Gemini CLI, Copilot CLI, and generic
-          agents.</span
+          >Works with Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and
+          generic agents.</span
         >
         <span>No LLM required.</span>
       </div>

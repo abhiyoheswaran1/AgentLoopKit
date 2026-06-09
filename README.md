@@ -2,13 +2,15 @@
 
 A drop-in engineering loop for coding agents.
 
-Your coding agent can already write code. AgentLoopKit helps it work like a disciplined engineer: scoped task contracts, explicit safety rules, verification evidence, review summaries, and clean handoffs.
+Your coding agent can write code. AgentLoopKit gives it the repo habits reviewers need: scoped task contracts, safety rules, verification evidence, review summaries, and clean handoffs.
 
 Vibe coding produces code. Agentic engineering produces auditable work.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-showcase.png" alt="AgentLoopKit workflow showing task contracts, verification reports, and handoff artifacts" width="100%">
 </p>
+
+The screenshots and terminal demo in this README are generated from committed sources in `docs/assets/readme/` with Playwright and VHS.
 
 ## What It Is
 
@@ -44,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Current source on `main` documents `0.6.0`. npm latest is still `0.1.1` until trusted publishing or local npm authentication is repaired.
+Source on `main` documents `0.6.0`. npm currently serves `0.1.1` while publishing auth for later release candidates is being repaired. GitHub release tarballs contain the newer source commands.
 
 Run the CLI after install:
 
@@ -62,8 +64,10 @@ npx agentloopkit install-agent all
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, doctor, create-task, and reviewer summary commands" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, verify, and handoff commands" width="100%">
 </p>
+
+The VHS demo runs the local built CLI so the command flow matches this repository even when npm is behind.
 
 Pinned team usage:
 

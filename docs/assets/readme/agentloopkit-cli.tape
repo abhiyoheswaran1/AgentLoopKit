@@ -19,22 +19,34 @@ Set PlaybackSpeed 1.08
 Set LoopOffset 13%
 Set Theme "Catppuccin Latte"
 
-Type@1ms "rm -rf /tmp/agentloopkit-vhs-demo && mkdir /tmp/agentloopkit-vhs-demo && cd /tmp/agentloopkit-vhs-demo && git init -q && npm init -y >/dev/null && clear"
+Type@1ms "npm pack --pack-destination /tmp --silent >/dev/null && rm -rf /tmp/agentloopkit-vhs-demo && mkdir /tmp/agentloopkit-vhs-demo && cd /tmp/agentloopkit-vhs-demo && git init -q && npm init -y >/dev/null && npm pkg set scripts.test='echo demo tests pass' scripts.typecheck='echo types pass' scripts.build='echo build pass' >/dev/null && npm install -D /tmp/agentloopkit-0.6.0.tgz >/dev/null && clear"
 Enter
 Sleep 250ms
 
-Type "npx --yes agentloopkit init"
+Type "npx agentloop init"
 Enter
 Sleep 2s
 
-Type "npx --yes agentloopkit doctor"
+Type "npx agentloop create-task --title add-settings-page --type feature --out .agentloop/tasks/add-settings-page.md --acceptance settings-contract-exists --verification npm-test"
 Enter
 Sleep 2s
 
-Type "npx --yes agentloopkit create-task --title add-settings-page --type feature --out .agentloop/tasks/add-settings-page.md"
+Type "npx agentloop task list"
+Enter
+Sleep 1s
+
+Type "npx agentloop task show .agentloop/tasks/add-settings-page.md"
 Enter
 Sleep 1.5s
 
-Type "npx --yes agentloopkit summarize"
+Type "npx agentloop task set .agentloop/tasks/add-settings-page.md"
 Enter
-Sleep 4s
+Sleep 1s
+
+Type "npx agentloop verify --no-lint"
+Enter
+Sleep 2s
+
+Type "npx agentloop handoff"
+Enter
+Sleep 3s
