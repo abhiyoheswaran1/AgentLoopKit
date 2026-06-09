@@ -16,6 +16,14 @@ assignees: ''
 
 ```
 
+## AgentLoopKit Context
+
+Paste `agentloop status` if the project is initialized:
+
+```text
+
+```
+
 ## Environment
 
 - OS:
@@ -23,4 +31,4 @@ assignees: ''
 - Package manager:
 - AgentLoopKit version:
 
-## Logs
+## Logs Or Verification Report

@@ -145,6 +145,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
 - Improve: make issue and PR templates ask for AgentLoopKit status output.
 
+## 2026-06-09: Contributor Template Evidence Prompts
+
+- Task contract: `.agentloop/tasks/2026-06-09-ask-for-agentloopkit-evidence-in-github-templates.md`
+- Product cycle: `.agentloop/research/interview-cycle-008.md`
+- Verification planned:
+  - `git diff --check`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Verification completed:
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-15-08-verification-report.md`
+  - `agentloop summarize --write`: pass, wrote `.agentloop/handoffs/2026-06-09-15-09-pr-summary.md`
+- Product changes:
+  - Bug reports now ask for `agentloop status` when available.
+  - Feature requests identify the affected command, template, policy, or agent workflow.
+  - Pull requests ask for task contract, status, verification report, and handoff summary.
+- Worked well: templates now reinforce the product's review loop at contribution time.
+- Confusing: GitHub labels still need repository-side setup outside the codebase.
+- Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
+- Improve: add curated good-first-issue labels after launch.
+
 ## 2026-06-09: Publish Workflow Hardening
 
 - Task contract: `.agentloop/tasks/2026-06-09-harden-npm-publish-workflow-after-trusted-publishing-failure.md`
@@ -178,3 +207,46 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Confusing: npm returns a 404 for an authorization/trusted-publisher problem.
 - Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
 - Improve: configure npm trusted publishing on npmjs.com, then rerun the Publish workflow.
+
+## 2026-06-09: CI Node 24 Runtime Opt-In
+
+- Task contract: `.agentloop/tasks/2026-06-09-opt-ci-actions-into-node-24-runtime.md`
+- Product cycle: `.agentloop/research/interview-cycle-010.md`
+- Trigger:
+  - `main` CI passed after contributor-template polish.
+  - GitHub warned that JavaScript actions were running on deprecated Node.js 20.
+- Verification planned:
+  - `git diff --check`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Product changes:
+  - CI workflow now sets `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true`.
+- Worked well: the fix is workflow-only and does not alter the npm package artifact.
+- Confusing: GitHub's warning points at action runtime, not the project's `node-version`.
+- Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
+- Improve: consider upgrading action major versions when Node 24-native versions are available.
+
+## 2026-06-09: GitHub Actions v6 Upgrade
+
+- Task contract: `.agentloop/tasks/2026-06-09-upgrade-github-actions-to-v6.md`
+- Product cycle: `.agentloop/research/interview-cycle-011.md`
+- Trigger:
+  - `main` CI passed after Node 24 runtime opt-in.
+  - GitHub still warned that pinned actions target Node 20.
+  - Upstream tags exist for `actions/checkout@v6`, `actions/setup-node@v6`, and `pnpm/action-setup@v6`.
+- Verification planned:
+  - `git diff --check`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Product changes:
+  - CI and Publish workflows now use v6 major action lines.
+- Worked well: this keeps launch CI aligned with GitHub's runtime migration.
+- Confusing: the action runtime warning can persist even when the project itself uses a supported Node version.
+- Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
+- Improve: verify the PR CI annotation disappears before merging.
