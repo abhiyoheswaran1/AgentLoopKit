@@ -116,6 +116,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Confusing: latest task/report detection is intentionally file-based; future task status lifecycle work can make this more explicit.
 - Improve: add richer task status transitions after this release.
 
+## 2026-06-09: Verification Output Excerpts
+
+- Task contract: `.agentloop/tasks/2026-06-09-improve-verification-output-excerpts.md`
+- Product cycle: `.agentloop/research/interview-cycle-006.md`
+- Verification planned:
+  - `npx pnpm@10.12.1 test tests/verification.test.ts`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Verification completed:
+  - Red test first: `npx pnpm@10.12.1 test tests/verification.test.ts` failed because long output dropped `END: assertion failed at final line`.
+  - Focused green test: `npx pnpm@10.12.1 test tests/verification.test.ts`: pass, 1 file and 3 tests.
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 30 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-14-57-verification-report.md`
+  - `agentloop summarize --write`: pass, wrote `.agentloop/handoffs/2026-06-09-14-57-pr-summary.md`
+- Product changes:
+  - Verification reports now keep the beginning and ending output when logs are truncated.
+  - Added a clear truncation marker with the original output length.
+  - Updated docs and decision records.
+- Worked well: the failing test reproduced the exact review problem before implementation.
+- Confusing: report excerpt limits are still fixed; future work can make them configurable if users ask.
+- Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
+- Improve: add a small status hint when the latest verification report failed.
+
 ## 2026-06-09: Failed Verification Status Next Action
 
 - Task contract: `.agentloop/tasks/2026-06-09-show-failed-verification-next-action-in-status.md`
@@ -250,3 +280,60 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Confusing: the action runtime warning can persist even when the project itself uses a supported Node version.
 - Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
 - Improve: verify the PR CI annotation disappears before merging.
+
+## 2026-06-09: Good First Contributor Path
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-good-first-contributor-path.md`
+- Product cycle: `.agentloop/research/interview-cycle-012.md`
+- Trigger:
+  - Product-panel review identified contributor entry points as useful launch polish with no npm package risk.
+- Verification planned:
+  - `git diff --check`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Verification completed:
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+- Product changes:
+  - Added a maintainer-authored good-first issue template.
+  - Added a checked-in GitHub label map.
+  - Added a first-contribution path to `CONTRIBUTING.md`.
+- Worked well: the task stayed outside runtime code and package contents.
+- Confusing: labels still need manual GitHub setup unless a future label-sync tool is introduced.
+- Improve: add a public good-first-issues list after real issues exist.
+
+## 2026-06-09: npm Trusted Publishing Recovery Docs
+
+- Task contract: `.agentloop/tasks/2026-06-09-clarify-npm-trusted-publishing-recovery.md`
+- Product cycle: `.agentloop/research/interview-cycle-013.md`
+- Trigger:
+  - GitHub release `v0.2.0` is public, but npm still reports `agentloopkit@0.1.1` as latest.
+  - Local browser-auth publish retry failed at npm's auth completion endpoint.
+- Verification planned:
+  - `git diff --check`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Verification completed:
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+- Product changes:
+  - Publishing docs now name exact npm trusted publisher fields.
+  - Launch checklist records the current `0.2.0` recovery state.
+  - Final handoff explains the npm gap without asking for credentials.
+- Worked well: the change improves release trust without changing package contents.
+- Confusing: npm reports authorization problems as 404 errors in more than one path.
+- Improve: configure npm trusted publishing on npmjs.com, then rerun the Publish workflow.

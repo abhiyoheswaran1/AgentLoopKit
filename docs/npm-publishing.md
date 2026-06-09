@@ -39,6 +39,18 @@ npm publish --access public
 
 The first publish creates the npm package. That step may require an OTP, depending on the npm account's security settings.
 
+## Current `0.2.0` Recovery State
+
+As of June 9, 2026:
+
+- GitHub release `v0.2.0` is public.
+- npm latest is still `agentloopkit@0.1.1`.
+- `agentloopkit@0.2.0` passed local preflight, `npm publish --dry-run`, tarball smoke testing, and the GitHub publish workflow's install, lint, typecheck, test, and build steps.
+- GitHub Actions reached `npm publish`, then npm rejected the workflow because the package does not have a matching trusted publisher configuration.
+- A local `npm publish --access public` retry also reached npm browser authentication, then failed at npm's auth completion endpoint.
+
+Do not merge new package-content changes into a `0.2.0` publish attempt. Publish from the `v0.2.0` tag, or bump the package to the next version and release that version instead.
+
 Preferred release path after the first publish:
 
 1. Configure npm trusted publishing for this GitHub repository.
@@ -55,6 +67,18 @@ Trusted publisher settings:
 
 npm trusted publishing requires npm CLI `11.5.1` or newer and Node.js `22.14.0` or newer. The publish workflow uses Node.js 24 and updates npm before publishing.
 
+Configure this on npmjs.com:
+
+1. Open `https://www.npmjs.com/package/agentloopkit`.
+2. Go to package settings.
+3. Open Trusted publishing.
+4. Choose GitHub Actions.
+5. Enter the owner, repository, workflow filename, and allowed action above.
+6. Save the trusted publisher.
+7. Rerun the GitHub Actions `Publish` workflow for the intended version.
+
+Reference: [npm trusted publishing documentation](https://docs.npmjs.com/trusted-publishers/).
+
 The publish workflow can also be run manually from GitHub Actions after npm trusted publishing is configured. It checks whether the current `package.json` version already exists and skips publishing when npm already has that version.
 
 If GitHub Actions reaches `npm publish` and npm returns `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`, check npm package permissions and trusted publisher settings. That error means npm did not authorize the workflow to publish the package.
@@ -70,7 +94,14 @@ Use browser or OTP authentication locally when npm asks for it. Do not paste npm
 
 Trusted publishing creates provenance from GitHub Actions. Local fallback publishes do not create GitHub Actions provenance.
 
-This machine is not logged in to npm until `npm whoami` succeeds.
+Before claiming a publish completed, verify:
+
+```bash
+npm view agentloopkit version
+npm view agentloopkit versions --json
+```
+
+For `v0.2.0`, the expected successful result is latest `0.2.0` and a versions list containing `0.2.0`.
 
 ## Package Contents
 

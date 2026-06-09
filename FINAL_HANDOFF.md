@@ -112,9 +112,16 @@ npx --yes --package ./agentloopkit-0.2.0.tgz agentloop version
 Preferred path after `0.1.0`:
 
 1. Configure npm trusted publishing for this GitHub repository.
-2. Publish future GitHub releases.
+2. Publish future GitHub releases, or rerun the Publish workflow for an existing release.
 3. Let `.github/workflows/publish.yml` run checks and `npm publish` through OIDC.
 4. If a version already exists on npm, the workflow skips the publish step.
+
+Trusted publisher settings:
+
+- Owner: `abhiyoheswaran1`
+- Repository: `AgentLoopKit`
+- Workflow filename: `publish.yml`
+- Allowed action: `npm publish`
 
 Manual fallback:
 
@@ -125,6 +132,14 @@ npm publish --access public
 ```
 
 The first manual publish for `agentloopkit@0.1.0` was completed with npm browser/OTP authentication.
+
+Current publish gap:
+
+- GitHub release `v0.2.0` is public.
+- npm latest is still `0.1.1`.
+- The `v0.2.0` publish workflow passed install, lint, typecheck, test, and build, then npm rejected `npm publish` because trusted publishing is not configured for this package/workflow.
+- A local `npm publish --access public` retry reached npm browser authentication, then failed at npm's auth completion endpoint.
+- Do not paste npm OTPs or tokens into chat, issues, PRs, or release notes.
 
 ## How users install it
 
@@ -222,7 +237,7 @@ Strongest signals:
 Top remaining items:
 
 1. Better failed-command excerpts in verification reports.
-2. Good-first-issue guidance and repo labels.
+2. Publish `agentloopkit@0.2.0` to npm, or bump and release a later version.
 3. Better task status lifecycle.
 4. Monorepo project detection.
 5. Markdown link checking for docs.
@@ -254,8 +269,8 @@ Top remaining items:
 - [ ] Publish `agentloopkit@0.2.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
-- [ ] Add GitHub repo description.
-- [ ] Add initial good-first-issue labels.
+- [x] Add GitHub repo description and discovery topics.
+- [x] Add initial good-first-issue labels.
 - [ ] Announce launch.
 
 ## Suggested announcement copy

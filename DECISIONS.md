@@ -35,3 +35,7 @@ Launch visuals live in `docs/assets/readme/` with source HTML and a VHS tape so 
 ## 2026-06-09: Failed Verification Blocks Handoff Suggestions
 
 `agentloop status` treats a failed latest verification report as a blocker for handoff suggestions. The next action remains `agentloop verify` until the user fixes failures and reruns verification.
+
+## 2026-06-09: Verification Excerpts Preserve Failure Tails
+
+`agentloop verify` keeps both the beginning and ending output when a command log is too long for a report. This preserves setup context and final error lines while keeping reports reviewable. The CLI does not summarize, redact, or reinterpret command output.
