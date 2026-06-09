@@ -67,3 +67,7 @@ Generated configs use the GitHub raw URL for `schema/agentloop.config.schema.jso
 ## 2026-06-10: Evidence Badges Are Local SVG Files
 
 `agentloop badge` writes SVG badges from existing local verification or gate evidence. It does not run project verification commands, call remote badge services, fetch assets, upload files, or read `.env` contents. Badges are status pointers for reports and CI artifacts; the Markdown and HTML evidence remains the source of truth.
+
+## 2026-06-10: Use 0.16.0 For npm Catch-Up
+
+GitHub already has public releases from `v0.2.0` through `v0.15.1`, and `main` now contains badge behavior that is not in `v0.15.1`. The next npm catch-up release must use a new version, `0.16.0`, so npm package contents, the GitHub tag, and release notes describe the same source. Do not backfill old npm versions with newer code, and do not keep creating higher versions only because npm authorization was previously blocked.

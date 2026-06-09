@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.16.0
+
+Local evidence badge and reviewer-artifact release. This is the npm catch-up release after GitHub-only release candidates from `0.2.0` through `0.15.1`:
+
 - Added deterministic PR summary change-area classification for source, tests, docs, CI, config, AgentLoop, risk-sensitive, and uncategorized paths
 - Added path-based review-focus hints to PR summaries without LLM calls or file-content inspection
 - Added `agentloop report` for local static HTML evidence reports built from task, verification, handoff, git, and deterministic summary artifacts

@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Source on `main` targets `0.15.1`. npm currently serves `0.1.1`; GitHub release candidates from `0.2.0` onward were produced while npm publishing auth was blocked. The next successful npm publish may jump to `0.15.1`, then normal semver releases resume.
+Current source targets `0.16.0`. npm previously lagged at `0.1.1` while GitHub releases from `v0.2.0` through `v0.15.1` were published during an npm auth blocker. `0.16.0` is the catch-up release for the current source, including `agentloop badge`; after it lands on npm, normal semver releases resume.
 
 Run the CLI after install:
 
@@ -329,7 +329,7 @@ Use `agentloop check-gates --strict` as a review-evidence gate in pull request C
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
-See `docs/github-actions.md` and `examples/github-actions/` for copy-pasteable workflows. Because npm latest is still `0.1.1`, the examples pin the `v0.15.1` GitHub tarball. Switch them to normal npm usage after npm publishing catches up.
+See `docs/github-actions.md` and `examples/github-actions/` for copy-pasteable workflows. The examples install `agentloopkit@0.16.0` from npm so CI uses the same package users install with `npx`.
 
 ## PR Summaries
 
@@ -406,7 +406,7 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1` while GitHub release `v0.15.1` is the latest source release. The next successful npm publish may jump from `0.1.1` to `0.15.1`, then normal semver releases resume.
+AgentLoopKit is published on npm as `agentloopkit`. `0.16.0` is the catch-up release that aligns npm with the current GitHub source after earlier GitHub-only release candidates. Do not publish older npm versions with newer code.
 
 The repository includes a GitHub Actions publish workflow for npm trusted publishing after the package is configured on npm. The workflow runs checks before `npm publish` and skips publish when the version already exists.
 

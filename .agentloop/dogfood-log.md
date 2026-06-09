@@ -2118,3 +2118,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `agentloop badge --json` gives CI and agents a compact machine-readable result without embedding SVG contents.
 - Improve:
   - Decide the next public npm release number now that npm already serves `0.1.1` and GitHub has higher release tags.
+
+## 2026-06-10: 0.16.0 npm Catch-Up Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-10-prepare-0-16-0-badge-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-067.md`
+- Trigger:
+  - `main` contains `agentloop badge` after public GitHub release `v0.15.1`.
+  - npm previously lagged at `0.1.1`, and publishing `0.15.1` now would make npm source disagree with the `v0.15.1` GitHub tag.
+- Product changes:
+  - Bumped package metadata to `0.16.0`.
+  - Moved unreleased changelog entries into `0.16.0`.
+  - Updated README, publishing docs, launch checklist, roadmap, final handoff, and GitHub Actions examples with the one-time npm catch-up explanation.
+  - Updated the VHS README source and regenerated the terminal GIF against `agentloopkit-0.16.0.tgz`.
+- Verification run:
+  - `npx tsx src/cli/index.ts version`: pass, reported `0.16.0`.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 23 files and 83 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 383 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `node dist/cli/index.js version`: pass, reported `0.16.0`.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm pack --dry-run`: pass, previewed `agentloopkit@0.16.0`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: first assertion used the wrong `doctor --json` shape; corrected smoke test passed with `agentloop version` reporting `0.16.0`, `init --json` creating files, `doctor --json` returning no serious errors, and `badge --json` writing a missing-verification badge.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-01-10-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-01-11-pr-summary.md`.
+  - AgentLoop HTML report: `.agentloop/reports/2026-06-10-01-11-agentloop-report.html`.
+- Worked well:
+  - The product-panel release decision prevented reusing stale public tags.
+  - `npm publish --dry-run` proved package contents and prepublish checks before the real registry publish.
+- Improve:
+  - After npm and GitHub release steps, record registry proof, release URL, CI result, and tarball digest.
