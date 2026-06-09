@@ -184,10 +184,10 @@ Latest local verification for shell completions:
 
 Latest release status:
 
-- GitHub release `v0.11.0`: public, tarball attached.
-- GitHub release URL: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.11.0
-- Tarball SHA-256: `3d9d312e8e824cce5a4d961388d64782254800532e442a2486a1273555690677`.
-- Publish workflow run `27228991068`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- GitHub release `v0.12.0`: public, tarball attached.
+- GitHub release URL: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.12.0
+- Tarball SHA-256: `13c69f4016dc2eb1876e4469fe7f51d1c1f75f4edb04936b10bc5410ab491903`.
+- Publish workflow run `27231031745`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - npm registry proof after release: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
 
 Latest local verification for the `0.9.0` release candidate:
@@ -968,6 +968,16 @@ Implemented:
 - VHS tape update to use `agentloopkit-0.12.0.tgz` and show `create-task --json`
 - launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-candidate records
 
+### Cycle 47: 0.12.0 release status
+
+Decision: document the public GitHub release and npm authorization failure without claiming npm availability.
+
+Implemented:
+
+- public GitHub release `v0.12.0` with attached `agentloopkit-0.12.0.tgz`
+- release notes updated with Publish workflow `E404` and npm registry state
+- launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -994,16 +1004,14 @@ Strongest signals:
 Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.12.0`.
-2. Publish the `v0.12.0` GitHub release and record the Publish workflow result.
-3. Prepare the next npm-publishable release after trusted publishing is repaired.
-4. Config schema hosting.
-5. `agentloop check-gates`.
+2. Prepare the next npm-publishable release after trusted publishing is repaired.
+3. Config schema hosting.
+4. `agentloop check-gates`.
 
 ## Known limitations
 
-- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, and `v0.11.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.12.0` is prepared as the current release candidate, but it is not on npm yet.
-- `agentloopkit@0.11.0` is the latest GitHub release at the time of this release-candidate handoff, but it is not on npm yet.
+- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, and `v0.12.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.12.0` is the latest GitHub release, but it is not on npm yet.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -1017,6 +1025,7 @@ Top remaining items:
 - The release-triggered GitHub Publish workflow for `v0.9.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.10.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.11.0` passed checks and failed at npm authorization with `E404`.
+- The release-triggered GitHub Publish workflow for `v0.12.0` passed checks and failed at npm authorization with `E404`.
 - Local `npm publish --access public` for `0.5.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.6.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.7.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
@@ -1088,8 +1097,8 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.11.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.11.0` to npm.
 - [x] Prepare `agentloopkit@0.12.0` create-task JSON release candidate.
-- [ ] Publish GitHub release `v0.12.0` with npm-pending notes.
-- [ ] Run GitHub Publish workflow for `v0.12.0`.
+- [x] Publish GitHub release `v0.12.0` with npm-pending notes.
+- [x] Run GitHub Publish workflow for `v0.12.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.12.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
@@ -1143,17 +1152,17 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.12.0`: high usefulness, low repo effort, external npm setting required.
-2. Publish and document `v0.12.0`: high usefulness, low effort, low maintenance.
-3. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
-4. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-5. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
-6. Add GitHub Actions usage recipes for `verify` and `handoff`: medium usefulness, low effort.
-7. Add CI import notes to verification reports: medium usefulness, medium effort.
-8. Add policy pack customization: medium commercial optionality, medium effort.
-9. Add local static HTML report: medium star potential, high effort, medium maintenance.
-10. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
-11. Add richer doctor risk-file details: medium usefulness, low effort.
-12. Add package recipe examples for monorepos: medium usefulness, low effort.
-13. Add generated security-review example: medium trust improvement, low effort.
-14. Add config migration helper for future schema versions: medium usefulness, medium effort.
-15. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
+2. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
+3. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
+4. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
+5. Add GitHub Actions usage recipes for `verify` and `handoff`: medium usefulness, low effort.
+6. Add CI import notes to verification reports: medium usefulness, medium effort.
+7. Add policy pack customization: medium commercial optionality, medium effort.
+8. Add local static HTML report: medium star potential, high effort, medium maintenance.
+9. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+10. Add richer doctor risk-file details: medium usefulness, low effort.
+11. Add package recipe examples for monorepos: medium usefulness, low effort.
+12. Add generated security-review example: medium trust improvement, low effort.
+13. Add config migration helper for future schema versions: medium usefulness, medium effort.
+14. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
+15. Add static HTML verification report export after CLI gates stabilize: medium usefulness, medium effort.
