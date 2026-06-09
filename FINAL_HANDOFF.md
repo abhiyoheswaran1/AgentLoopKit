@@ -114,10 +114,11 @@ Latest local verification for shell completions:
 
 Latest release status:
 
-- GitHub release `v0.9.0`: public, tarball attached.
-- Publish workflow run `27225348061`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- GitHub release `v0.10.0`: public, tarball attached.
+- GitHub release URL: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.10.0
+- Tarball SHA-256: `c5966164b6c32e781c87ad180f994dfb50e3a2459b043d271d766c2aa424228f`.
+- Publish workflow run `27226815977`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - npm registry proof after release: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
-- Status-doc verification: `git diff --check` pass, `npx pnpm@10.12.1 check:links` pass with 263 Markdown files, `agentloop verify --task .agentloop/tasks/2026-06-09-document-0-9-0-release-status.md` pass.
 
 Latest local verification for the `0.9.0` release candidate:
 
@@ -517,8 +518,7 @@ Current publish gap:
 
 - GitHub release `v0.2.0` is public.
 - GitHub release `v0.2.1` is public.
-- GitHub releases `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, and `v0.9.0` are public with tarball assets.
-- Source metadata on `main` is prepared as `0.10.0` for shell completions.
+- GitHub releases `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, and `v0.10.0` are public with tarball assets.
 - npm latest is still `0.1.1`.
 - The `v0.2.0` publish workflow passed install, lint, typecheck, test, and build, then npm rejected `npm publish` because trusted publishing is not configured for this package/workflow.
 - A local `npm publish --access public` retry reached npm browser authentication, then failed at npm's auth completion endpoint.
@@ -526,7 +526,8 @@ Current publish gap:
 - The `v0.6.0` publish workflow passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - Local `npm publish --access public` for `0.6.0` passed typecheck, Vitest, and build through `prepublishOnly`, then npm stopped at `EOTP`.
 - `v0.9.0` Publish workflow run `27225348061` passed package checks and failed at npm authorization with `E404`.
-- npm registry proof after `v0.9.0` still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
+- `v0.10.0` Publish workflow run `27226815977` passed package checks and failed at npm authorization with `E404`.
+- npm registry proof after `v0.10.0` still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 - Do not paste npm OTPs or tokens into chat, issues, PRs, or release notes.
 
 ## How users install it
@@ -828,6 +829,16 @@ Implemented:
 - Playwright screenshot refresh for current test and verification counts
 - launch, publishing, final handoff, backlog, and product-panel release records
 
+### Cycle 41: 0.10.0 release status
+
+Decision: publish the GitHub release and record the npm authorization blocker without implying npm availability.
+
+Implemented:
+
+- public GitHub release `v0.10.0` with attached `agentloopkit-0.10.0.tgz`
+- release notes updated with Publish workflow `E404` and npm registry state
+- launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -849,17 +860,16 @@ Strongest signals:
 
 Top remaining items:
 
-1. Publish GitHub release `v0.10.0` with npm-pending notes after CI passes.
-2. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.10.0`.
-3. Prepare the next npm-publishable release after trusted publishing is repaired.
-4. Config schema hosting.
-5. Task archive command.
+1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.10.0`.
+2. Prepare the next npm-publishable release after trusted publishing is repaired.
+3. Config schema hosting.
+4. Task archive command.
+5. `agentloop check-gates`.
 
 ## Known limitations
 
-- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, and `v0.9.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.10.0` is prepared on `main` but not released on GitHub or npm yet.
-- `agentloopkit@0.9.0` is the latest GitHub release, but it is not on npm yet.
+- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, and `v0.10.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.10.0` is the latest GitHub release, but it is not on npm yet.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -871,6 +881,7 @@ Top remaining items:
 - The release-triggered GitHub Publish workflow for `v0.7.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.8.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.9.0` passed checks and failed at npm authorization with `E404`.
+- The release-triggered GitHub Publish workflow for `v0.10.0` passed checks and failed at npm authorization with `E404`.
 - Local `npm publish --access public` for `0.5.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.6.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.7.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
@@ -934,8 +945,8 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.9.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.9.0` to npm.
 - [x] Prepare `agentloopkit@0.10.0` shell-completions release candidate.
-- [ ] Publish GitHub release `v0.10.0` with npm-pending notes.
-- [ ] Run GitHub Publish workflow for `v0.10.0`.
+- [x] Publish GitHub release `v0.10.0` with npm-pending notes.
+- [x] Run GitHub Publish workflow for `v0.10.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.10.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
@@ -988,12 +999,12 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Publish GitHub release `v0.10.0`: high usefulness, low repo effort, release notes and tarball needed.
-2. Repair npm publishing for `0.10.0`: high usefulness, low repo effort, external npm setting required.
-3. Add task archive command: medium usefulness, medium effort, low maintenance.
-4. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
-5. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-6. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
+1. Repair npm publishing for `0.10.0`: high usefulness, low repo effort, external npm setting required.
+2. Add task archive command: medium usefulness, medium effort, low maintenance.
+3. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
+4. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
+5. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
+6. Add GitHub Actions usage recipes for `verify` and `handoff`: medium usefulness, low effort.
 7. Add CI import notes to verification reports: medium usefulness, medium effort.
 8. Add policy pack customization: medium commercial optionality, medium effort.
 9. Add local static HTML report: medium star potential, high effort, medium maintenance.
