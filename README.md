@@ -60,6 +60,7 @@ npx agentloopkit task status .agentloop/tasks/2026-06-09-add-settings-page.md in
 npx agentloopkit status
 npx agentloopkit verify
 npx agentloopkit handoff
+npx agentloopkit check-gates
 npx agentloopkit task archive .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit install-agent codex
 npx agentloopkit install-agent all
@@ -105,6 +106,7 @@ pnpm build
 | `agentloop task current`                | Print the pinned active task                                              |
 | `agentloop task clear`                  | Clear the active task pointer                                             |
 | `agentloop status`                      | Show active task, latest report, dirty files, next step                   |
+| `agentloop check-gates`                 | Check task, verification, handoff, harness, policy, and git evidence      |
 | `agentloop verify`                      | Run configured checks and write a verification report                     |
 | `agentloop summarize`                   | Generate a deterministic PR or reviewer summary                           |
 | `agentloop handoff`                     | Write a reviewer handoff summary                                          |
@@ -254,6 +256,27 @@ agentloop status --json
 ```
 
 See `docs/status.md` for output fields and next-action rules.
+
+## Gate Checks
+
+`agentloop check-gates` checks review evidence without running tests or calling an LLM. It looks for:
+
+- a task contract
+- a generated verification report
+- a generated handoff summary
+- repo harness files
+- core safety policies
+- git working tree context
+
+Use JSON output in scripts:
+
+```bash
+agentloop check-gates --json
+```
+
+`doctor` checks setup health. `check-gates` checks whether the current work session has the evidence reviewers expect.
+
+See `docs/check-gates.md` for gate statuses and exit-code behavior.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report screenshot showing command results and reviewer handoff sections" width="100%">

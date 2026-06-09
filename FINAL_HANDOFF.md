@@ -23,6 +23,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - verification report generation
 - deterministic PR summary generation
 - local status command for active task, latest verification, dirty files, configured commands, and next action
+- local gate-check command for task, verification, handoff, harness, policy, and git evidence
 - agent instruction installation, including `install-agent all`
 - template system for loops, gates, handoffs, agents, policies, tasks, and harness files
 - generated `.agentloop/README.md`
@@ -51,6 +52,8 @@ agentloop task current --json
 agentloop task clear
 agentloop status
 agentloop status --json
+agentloop check-gates
+agentloop check-gates --json
 agentloop verify
 agentloop verify --command "node smoke-test.js"
 agentloop handoff
@@ -978,6 +981,17 @@ Implemented:
 - release notes updated with Publish workflow `E404` and npm registry state
 - launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
 
+### Cycle 48: check-gates command
+
+Decision: add a local review-evidence checker instead of a policy engine.
+
+Implemented:
+
+- `agentloop check-gates`
+- `agentloop check-gates --json`
+- gate checks for task contract, verification report, handoff summary, repo harness, safety policies, and git context
+- README, getting-started docs, dedicated gate-check docs, generated harness guidance, and agent templates
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -998,6 +1012,7 @@ Strongest signals:
 - Release readers need the README visuals and changelog to match the newest source command before a GitHub release is cut.
 - Agents need `create-task` to return machine-readable output like the rest of the task lifecycle commands.
 - Release readers need `0.12.0` metadata and visuals to match `create-task --json` before the GitHub release.
+- Agents and reviewers need one deterministic command that checks review evidence without running tests.
 
 ## Backlog
 
@@ -1006,7 +1021,7 @@ Top remaining items:
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.12.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
 3. Config schema hosting.
-4. `agentloop check-gates`.
+4. Static HTML report export.
 
 ## Known limitations
 
@@ -1152,17 +1167,17 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.12.0`: high usefulness, low repo effort, external npm setting required.
-2. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
-3. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-4. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
-5. Add GitHub Actions usage recipes for `verify` and `handoff`: medium usefulness, low effort.
-6. Add CI import notes to verification reports: medium usefulness, medium effort.
-7. Add policy pack customization: medium commercial optionality, medium effort.
-8. Add local static HTML report: medium star potential, high effort, medium maintenance.
-9. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
-10. Add richer doctor risk-file details: medium usefulness, low effort.
-11. Add package recipe examples for monorepos: medium usefulness, low effort.
-12. Add generated security-review example: medium trust improvement, low effort.
-13. Add config migration helper for future schema versions: medium usefulness, medium effort.
-14. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
-15. Add static HTML verification report export after CLI gates stabilize: medium usefulness, medium effort.
+2. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
+3. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
+4. Add GitHub Actions usage recipes for `verify`, `handoff`, and `check-gates`: medium usefulness, low effort.
+5. Add CI import notes to verification reports: medium usefulness, medium effort.
+6. Add policy pack customization: medium commercial optionality, medium effort.
+7. Add local static HTML report: medium star potential, high effort, medium maintenance.
+8. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+9. Add richer doctor risk-file details: medium usefulness, low effort.
+10. Add package recipe examples for monorepos: medium usefulness, low effort.
+11. Add generated security-review example: medium trust improvement, low effort.
+12. Add config migration helper for future schema versions: medium usefulness, medium effort.
+13. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
+14. Add static HTML verification report export after CLI gates stabilize: medium usefulness, medium effort.
+15. Add optional `--strict` mode for `check-gates` warnings after users try the default behavior.

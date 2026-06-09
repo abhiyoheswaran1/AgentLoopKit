@@ -37,6 +37,14 @@ agentloop verify
 agentloop handoff
 ```
 
+7. Check review gates:
+
+```bash
+agentloop check-gates
+```
+
+`check-gates` inspects local evidence. It does not run tests or call an LLM.
+
 ## Directories
 
 - `loops/`: task-specific workflows

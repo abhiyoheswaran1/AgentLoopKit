@@ -11,6 +11,7 @@ Before editing:
 - Run `agentloop task show <path>` before implementing a selected task.
 - Run `agentloop task status <path> in-progress` when implementation starts.
 - Run `agentloop task archive <path>` only after verification and handoff are complete.
+- Run `agentloop check-gates` before stopping to check review evidence.
 
 Loop:
 

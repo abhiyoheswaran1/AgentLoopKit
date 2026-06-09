@@ -84,4 +84,7 @@ After implementation:
 npx agentloopkit verify
 npx agentloopkit status
 npx agentloopkit handoff
+npx agentloopkit check-gates
 ```
+
+`check-gates` does not run tests. It checks whether task, verification, handoff, harness, policy, and git evidence exists before review.

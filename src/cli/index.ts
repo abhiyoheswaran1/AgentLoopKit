@@ -10,6 +10,7 @@ import { versionCommand } from './commands/version.js';
 import { statusCommand } from './commands/status.js';
 import { taskCommand } from './commands/task.js';
 import { completionCommand } from './commands/completion.js';
+import { checkGatesCommand } from './commands/check-gates.js';
 import { getPackageVersion } from '../core/version.js';
 
 const program = new Command();
@@ -26,6 +27,7 @@ program.addCommand(verifyCommand());
 program.addCommand(summarizeCommand());
 program.addCommand(handoffCommand());
 program.addCommand(statusCommand());
+program.addCommand(checkGatesCommand());
 program.addCommand(taskCommand());
 program.addCommand(installAgentCommand());
 program.addCommand(listTemplatesCommand());

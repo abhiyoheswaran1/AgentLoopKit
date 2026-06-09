@@ -1524,3 +1524,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release tarball is available from GitHub while npm auth remains blocked.
 - Improve:
   - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.12.0`.
+
+## 2026-06-09: check-gates Command
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-check-gates-command.md`
+- Product cycle: `.agentloop/research/interview-cycle-048.md`
+- Verification report: `.agentloop/reports/2026-06-09-21-52-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-21-53-pr-summary.md`
+- Trigger:
+  - Product panel selected `check-gates` as the next low-risk P1 after `v0.12.0`.
+  - Agents needed one local command to check review evidence without running tests or calling an LLM.
+- Red test:
+  - `npx pnpm@10.12.1 test tests/check-gates.test.ts` failed because `agentloop check-gates` did not exist.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/check-gates.test.ts`: pass, 1 file and 2 tests
+  - Completion focused test: `npx pnpm@10.12.1 test tests/completion.test.ts`: pass, 1 file and 6 tests
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 70 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 304 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - Built CLI smoke: pass, missing evidence returned `overallStatus: fail` and `agentloop create-task`
+  - Dogfood `agentloop check-gates --json`: pass, overall status `pass` with task, verification, handoff, harness, policy, and git gates
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-check-gates-command.md`: pass
+- Product changes:
+  - Added `agentloop check-gates` and `agentloop check-gates --json`.
+  - Added gate checks for task contract, verification report, handoff summary, repo harness, safety policies, and git context.
+  - Updated README, getting-started docs, gate-check docs, generated harness guidance, shell completions, and agent templates.
+- Worked well:
+  - The command gives review readiness without turning AgentLoopKit into a policy engine.
+- Improve:
+  - Consider `--strict` later if users want warnings to fail in CI.
