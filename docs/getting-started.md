@@ -39,5 +39,5 @@ After implementation:
 ```bash
 npx agentloopkit verify
 npx agentloopkit status
-npx agentloopkit summarize --write
+npx agentloopkit handoff
 ```

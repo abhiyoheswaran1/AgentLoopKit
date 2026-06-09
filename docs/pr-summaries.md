@@ -3,7 +3,7 @@
 Run:
 
 ```bash
-agentloop summarize --write
+agentloop handoff
 ```
 
 The summary uses deterministic inputs:
@@ -21,3 +21,5 @@ It writes:
 ```
 
 No LLM is required.
+
+Use `agentloop summarize` to preview the same deterministic summary without writing a file. `agentloop summarize --write` remains available for scripts that already use it.

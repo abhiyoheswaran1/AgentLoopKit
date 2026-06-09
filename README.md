@@ -44,6 +44,8 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
+Current source on `main` documents `0.3.0`. npm latest is still `0.1.1` until trusted publishing or local npm authentication is repaired.
+
 Run the CLI after install:
 
 ```bash
@@ -51,13 +53,13 @@ npx agentloopkit doctor
 npx agentloopkit create-task --title "Add settings page" --type feature
 npx agentloopkit status
 npx agentloopkit verify
-npx agentloopkit summarize --write
+npx agentloopkit handoff
 npx agentloopkit install-agent codex
 npx agentloopkit install-agent all
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, doctor, create-task, and summarize" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, doctor, create-task, and reviewer summary commands" width="100%">
 </p>
 
 Pinned team usage:
@@ -88,6 +90,7 @@ pnpm build
 | `agentloop status`              | Show active task, latest report, dirty files, next step |
 | `agentloop verify`              | Run configured checks and write a verification report   |
 | `agentloop summarize`           | Generate a deterministic PR or reviewer summary         |
+| `agentloop handoff`             | Write a reviewer handoff summary                        |
 | `agentloop install-agent codex` | Add agent-specific instructions                         |
 | `agentloop install-agent all`   | Add all bundled agent instruction files                 |
 | `agentloop list-templates`      | List bundled templates                                  |
@@ -193,7 +196,7 @@ See `docs/status.md` for output fields and next-action rules.
 
 ## PR Summaries
 
-`agentloop summarize` uses deterministic inputs:
+`agentloop handoff` writes a reviewer-ready summary using deterministic inputs:
 
 - git status
 - git diff stats
@@ -202,6 +205,8 @@ See `docs/status.md` for output fields and next-action rules.
 - config settings
 
 It does not call an LLM.
+
+Use `agentloop summarize` to preview the same output without writing a handoff file. `agentloop summarize --write` remains available for scripts.
 
 ## Safety Principles
 

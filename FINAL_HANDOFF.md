@@ -36,6 +36,7 @@ agentloop status
 agentloop status --json
 agentloop verify
 agentloop verify --command "node smoke-test.js"
+agentloop handoff
 agentloop summarize --write
 agentloop install-agent codex
 agentloop install-agent all
@@ -114,12 +115,29 @@ Latest local verification for the `0.2.1` GitHub release:
 - GitHub Publish workflow for `v0.2.1`: checks passed, npm publish failed with authorization `E404`
 - npm registry check: latest remains `0.1.1`
 
+Latest local verification for the `0.3.0` handoff command release candidate:
+
+- Red test first: `npx pnpm@10.12.1 test tests/handoff.test.ts` failed with `unknown command 'handoff'`.
+- Status red test: `npx pnpm@10.12.1 test tests/status.test.ts` failed because status still suggested `agentloop summarize --write`.
+- Focused green tests: `npx pnpm@10.12.1 test tests/handoff.test.ts tests/status.test.ts`: pass, 2 files and 5 tests
+- `git diff --check`: pass
+- `npx pnpm@10.12.1 lint`: pass
+- `npx pnpm@10.12.1 typecheck`: pass
+- `npx pnpm@10.12.1 test`: pass, 16 files and 33 tests
+- `npx pnpm@10.12.1 build`: pass
+- `npx projscan doctor --format markdown`: A, 100/100
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.3.0.tgz`
+- Tarball smoke: pass, `agentloop handoff --json` wrote a handoff file from an isolated temp repo
+- `npm publish --access public --dry-run`: pass
+- `agentloop verify`: pass
+- `agentloop handoff --task .agentloop/tasks/2026-06-09-add-handoff-command-alias.md --json`: pass
+
 ## How to package
 
 ```bash
 npx pnpm@10.12.1 build
 npx pnpm@10.12.1 pack
-npx --yes --package ./agentloopkit-0.2.1.tgz agentloop version
+npx --yes --package ./agentloopkit-0.3.0.tgz agentloop version
 ```
 
 ## How to publish to npm
@@ -156,7 +174,7 @@ Current publish gap:
 - The `v0.2.0` publish workflow passed install, lint, typecheck, test, and build, then npm rejected `npm publish` because trusted publishing is not configured for this package/workflow.
 - A local `npm publish --access public` retry reached npm browser authentication, then failed at npm's auth completion endpoint.
 - The `v0.2.1` publish workflow passed install, lint, typecheck, tests, build, and `prepublishOnly`, then npm rejected `npm publish` with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
-- Package-content changes after the `v0.2.0` tag are released on GitHub as `v0.2.1`, but are not on npm yet.
+- Package-content changes after the `v0.2.1` tag are prepared on `main` as `agentloopkit@0.3.0`, but are not on npm yet.
 - Do not paste npm OTPs or tokens into chat, issues, PRs, or release notes.
 
 ## How users install it
@@ -254,16 +272,16 @@ Strongest signals:
 
 Top remaining items:
 
-1. Better failed-command excerpts in verification reports.
-2. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.2.1`.
-3. Better task status lifecycle.
-4. Monorepo project detection.
-5. Markdown link checking for docs.
+1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.3.0`.
+2. Fix repeated `create-task` option accumulation.
+3. Improve active task detection.
+4. Better task status lifecycle.
+5. Monorepo project detection.
 
 ## Known limitations
 
 - GitHub releases `v0.2.0` and `v0.2.1` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.2.1` is a GitHub release, not an npm-published version yet.
+- `agentloopkit@0.3.0` is prepared on `main`, not published on npm yet.
 - npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must publish locally with browser/OTP authentication.
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
@@ -289,6 +307,8 @@ Top remaining items:
 - [x] Prepare `agentloopkit@0.2.1` release candidate.
 - [x] Publish GitHub release `v0.2.1` with npm-pending notes.
 - [ ] Publish `agentloopkit@0.2.1` to npm.
+- [x] Prepare `agentloopkit@0.3.0` handoff command release candidate.
+- [ ] Publish `agentloopkit@0.3.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
@@ -334,24 +354,24 @@ Title: I built a local-first engineering loop for coding agents
 - Approach: repo-level task contracts, gates, policies, verification reports, and handoffs
 - Install: npx agentloopkit init
 - What it does not do: no LLM wrapper, no SaaS, no telemetry
-- Example workflow: create-task, verify, summarize
+- Example workflow: create-task, verify, handoff
 - Ask: feedback from people using Codex, Claude Code, Cursor, OpenCode, Gemini CLI, or Copilot CLI
 ```
 
 ## Next 15 improvements
 
-1. Add `agentloop status`: high star potential, high usefulness, medium effort, low maintenance, medium monetisation optionality.
-2. Improve verification output excerpts: medium star potential, high usefulness, medium effort, low maintenance, low monetisation optionality.
-3. Add task status lifecycle: medium star potential, high usefulness, medium effort, medium maintenance, medium monetisation optionality.
-4. Improve monorepo detection: high usefulness, medium effort, medium maintenance, medium commercial optionality.
-5. Add good-first-issue docs and labels: medium usefulness, low effort, low maintenance.
+1. Repair npm publishing for `0.3.0`: high usefulness, low repo effort, external npm setting required.
+2. Fix repeated `create-task` flags: medium usefulness, low effort, low maintenance.
+3. Improve active task detection: medium usefulness, medium effort, low maintenance.
+4. Add task status lifecycle: high usefulness, medium effort, medium maintenance.
+5. Improve monorepo detection: high usefulness, medium effort, medium maintenance.
 6. Add shell completions: medium usefulness, medium effort, low maintenance.
-7. Add `agentloop handoff` alias for `summarize --write`: medium usefulness, low effort, low maintenance.
-8. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
-9. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-10. Add markdown link checks: medium usefulness, low effort, low maintenance.
-11. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
-12. Add CI import notes to verification reports: medium usefulness, medium effort.
-13. Add policy pack customization: medium commercial optionality, medium effort.
-14. Add local static HTML report: medium star potential, high effort, medium maintenance.
+7. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
+8. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
+9. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
+10. Add CI import notes to verification reports: medium usefulness, medium effort.
+11. Add policy pack customization: medium commercial optionality, medium effort.
+12. Add local static HTML report: medium star potential, high effort, medium maintenance.
+13. Add task archive/list command: medium usefulness, medium effort, low maintenance.
+14. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
 15. Add team/cloud roadmap only after open-source traction: high commercial optionality, high effort, high maintenance.

@@ -27,7 +27,7 @@ agentloop verify
 6. Generate a reviewer handoff:
 
 ```bash
-agentloop summarize --write
+agentloop handoff
 ```
 
 ## Directories

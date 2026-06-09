@@ -39,3 +39,7 @@ Launch visuals live in `docs/assets/readme/` with source HTML and a VHS tape so 
 ## 2026-06-09: Verification Excerpts Preserve Failure Tails
 
 `agentloop verify` keeps both the beginning and ending output when a command log is too long for a report. This preserves setup context and final error lines while keeping reports reviewable. The CLI does not summarize, redact, or reinterpret command output.
+
+## 2026-06-09: Handoff Writes, Summarize Previews
+
+`agentloop handoff` is the clear command for writing reviewer handoff files. It reuses the deterministic summary core instead of introducing a second summary implementation. `agentloop summarize` remains read-only by default for preview use and existing scripts can keep using `agentloop summarize --write`.

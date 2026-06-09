@@ -27,6 +27,6 @@ The command suggests one next action:
 - `agentloop create-task` when no task contract exists
 - `agentloop verify` when a task exists without verification evidence
 - `agentloop verify` when the latest verification report failed
-- `agentloop summarize --write` when task evidence exists and the working tree has changes
+- `agentloop handoff` when task evidence exists and the working tree has changes
 
 `status` does not execute project commands, read `.env` contents, call an LLM, or make network requests.

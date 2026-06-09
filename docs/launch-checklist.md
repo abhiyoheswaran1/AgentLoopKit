@@ -25,6 +25,8 @@ Use this before publishing AgentLoopKit.
 - [x] Package `agentloopkit@0.2.1` is prepared.
 - [ ] Package `agentloopkit@0.2.1` is published.
 - [x] Publish workflow for `v0.2.1` passed checks and failed at npm authorization.
+- [x] Package `agentloopkit@0.3.0` is prepared on `main`.
+- [ ] Package `agentloopkit@0.3.0` is published.
 - [ ] npm trusted publishing is configured for this repository.
 - [x] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -51,6 +53,7 @@ npx --yes --package ./agentloopkit-0.1.1.tgz agentloop version
 npx --yes --package ./agentloopkit-0.2.0.tgz agentloop status --json
 npx --yes --package ./agentloopkit-0.2.1.tgz agentloop version
 npx --yes --package ./agentloopkit-0.2.1.tgz agentloop status --json
+npx --yes --package ./agentloopkit-0.3.0.tgz agentloop version
 ```
 
 ## Publish
@@ -73,4 +76,5 @@ Current recovery note:
 - GitHub release `v0.2.1` is public.
 - npm still reports `agentloopkit@0.1.1` as latest.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
-- Publish `0.2.1` only after npm trusted publishing is configured or local browser authentication succeeds.
+- `agentloopkit@0.3.0` is now prepared on `main` after the handoff-command work.
+- Publish `0.3.0` only after npm trusted publishing is configured or local browser authentication succeeds.

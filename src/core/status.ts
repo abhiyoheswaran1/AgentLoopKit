@@ -126,7 +126,7 @@ function chooseNextAction(input: {
   }
   if (input.dirty) {
     return {
-      command: 'agentloop summarize --write',
+      command: 'agentloop handoff',
       reason: 'Task and verification evidence exist, and the working tree has changes.',
     };
   }

@@ -399,3 +399,38 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Worked well: release notes now tell the truth about GitHub release status versus npm availability.
 - Confusing: npm uses 404 wording for a permission/trusted-publisher failure.
 - Improve: configure npm trusted publishing on npmjs.com for owner `abhiyoheswaran1`, repository `AgentLoopKit`, workflow `publish.yml`, allowed action `npm publish`.
+
+## 2026-06-09: Handoff Command Alias
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-handoff-command-alias.md`
+- Product cycle: `.agentloop/research/interview-cycle-016.md`
+- Trigger:
+  - Product panel identified a wording mismatch: the methodology says handoff, but the write command was `agentloop summarize --write`.
+  - npm publishing remains blocked by npm-side authorization, so this became the next repo-side launch polish item.
+- Verification completed:
+  - Red test first: `npx pnpm@10.12.1 test tests/handoff.test.ts` failed with `unknown command 'handoff'`.
+  - Status red test: `npx pnpm@10.12.1 test tests/status.test.ts` failed because status still suggested `agentloop summarize --write`.
+  - Focused green tests: `npx pnpm@10.12.1 test tests/handoff.test.ts tests/status.test.ts`: pass, 2 files and 5 tests
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 16 files and 33 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.3.0.tgz`
+  - Tarball smoke: pass, `agentloop handoff --json` wrote a handoff file from an isolated temp repo
+  - `npm publish --access public --dry-run`: pass
+  - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-16-37-verification-report.md`
+  - `agentloop handoff --task .agentloop/tasks/2026-06-09-add-handoff-command-alias.md --json`: pass, wrote `.agentloop/handoffs/2026-06-09-16-37-pr-summary.md`
+- Product changes:
+  - Added `agentloop handoff` as a write-by-default wrapper around deterministic PR summaries.
+  - Kept `agentloop summarize` read-only unless `--write` is passed.
+  - Updated `agentloop status` to suggest `agentloop handoff` after task and passing verification evidence exist.
+  - Prepared `agentloopkit@0.3.0` on `main` because the change landed after the public `v0.2.1` GitHub tag.
+- Worked well: the alias made the loop read naturally without adding a second summary implementation.
+- Confusing:
+  - Repeating `create-task --constraint` style flags kept only the last value.
+  - Latest task detection picked an older same-day task by filename order until the handoff command was rerun with `--task`.
+- Improve:
+  - Fix repeated create-task option accumulation.
+  - Improve active task detection beyond filename sorting.

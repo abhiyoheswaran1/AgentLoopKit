@@ -39,7 +39,7 @@ npm publish --access public
 
 The first publish creates the npm package. That step may require an OTP, depending on the npm account's security settings.
 
-## Current `0.2.1` Recovery State
+## Current `0.3.0` Recovery State
 
 As of June 9, 2026:
 
@@ -51,8 +51,9 @@ As of June 9, 2026:
 - A local `npm publish --access public` retry also reached npm browser authentication, then failed at npm's auth completion endpoint.
 - `agentloopkit@0.2.1` passed local lint, typecheck, Vitest, build, projscan, pack, dry-run publish, and tarball smoke tests.
 - The `v0.2.1` GitHub Publish workflow passed install, lint, typecheck, tests, build, and `prepublishOnly`, then npm rejected `npm publish` with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- `agentloopkit@0.3.0` is prepared on `main` after the `agentloop handoff` command was added.
 
-Package-content changes landed after the `v0.2.0` GitHub tag and were released on GitHub as `v0.2.1`. Publish `0.2.1` to npm only after npm trusted publishing is configured or local browser authentication succeeds.
+Package-content changes landed after the `v0.2.1` GitHub tag. Publish `0.3.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.
 
 Preferred release path after the first publish:
 
@@ -104,7 +105,7 @@ npm view agentloopkit version
 npm view agentloopkit versions --json
 ```
 
-For `v0.2.1`, the expected successful result is latest `0.2.1` and a versions list containing `0.2.1`.
+For `v0.3.0`, the expected successful result is latest `0.3.0` and a versions list containing `0.3.0`.
 
 ## Package Contents
 

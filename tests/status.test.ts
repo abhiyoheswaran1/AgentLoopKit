@@ -48,7 +48,7 @@ describe('status command', () => {
     expect(status.workingTree.dirty).toBe(true);
     expect(status.workingTree.changedFileCount).toBeGreaterThan(0);
     expect(status.commands.configured).toContain('test');
-    expect(status.nextAction.command).toBe('agentloop summarize --write');
+    expect(status.nextAction.command).toBe('agentloop handoff');
   });
 
   test('prints markdown next action when no task exists', async () => {
