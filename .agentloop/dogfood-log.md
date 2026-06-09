@@ -146,6 +146,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
 - Improve: add a small status hint when the latest verification report failed.
 
+## 2026-06-09: Failed Verification Status Next Action
+
+- Task contract: `.agentloop/tasks/2026-06-09-show-failed-verification-next-action-in-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-007.md`
+- Verification planned:
+  - `npx pnpm@10.12.1 test tests/status.test.ts`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Verification completed:
+  - Red test first: `npx pnpm@10.12.1 test tests/status.test.ts` failed because a failed report still led to a next-task path.
+  - Focused green test: `npx pnpm@10.12.1 test tests/status.test.ts`: pass, 1 file and 3 tests.
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 30 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-15-05-verification-report.md`
+  - `agentloop summarize --write`: pass, wrote `.agentloop/handoffs/2026-06-09-15-05-pr-summary.md`
+- Product changes:
+  - `agentloop status` now points back to `agentloop verify` when the latest report failed.
+  - Updated status docs and decision records.
+- Worked well: the test caught an unsafe next-action ordering bug.
+- Confusing: task lifecycle remains file-based; richer transitions still belong in future work.
+- Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
+- Improve: make issue and PR templates ask for AgentLoopKit status output.
+
 ## 2026-06-09: Contributor Template Evidence Prompts
 
 - Task contract: `.agentloop/tasks/2026-06-09-ask-for-agentloopkit-evidence-in-github-templates.md`
