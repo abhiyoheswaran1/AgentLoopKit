@@ -134,6 +134,15 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
   - `npx pnpm@10.12.1 build`: pass
   - `npx projscan doctor --format markdown`: A, 100/100
+  - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-15-34-verification-report.md`
+  - `agentloop summarize --write`: pass, wrote `.agentloop/handoffs/2026-06-09-15-34-pr-summary.md`
+- Verification completed:
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
   - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-15-30-verification-report.md`
   - `agentloop summarize --write`: pass, wrote `.agentloop/handoffs/2026-06-09-15-30-pr-summary.md`
 - Verification completed:
@@ -208,3 +217,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Confusing: GitHub's warning points at action runtime, not the project's `node-version`.
 - Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
 - Improve: consider upgrading action major versions when Node 24-native versions are available.
+
+## 2026-06-09: GitHub Actions v6 Upgrade
+
+- Task contract: `.agentloop/tasks/2026-06-09-upgrade-github-actions-to-v6.md`
+- Product cycle: `.agentloop/research/interview-cycle-011.md`
+- Trigger:
+  - `main` CI passed after Node 24 runtime opt-in.
+  - GitHub still warned that pinned actions target Node 20.
+  - Upstream tags exist for `actions/checkout@v6`, `actions/setup-node@v6`, and `pnpm/action-setup@v6`.
+- Verification planned:
+  - `git diff --check`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Product changes:
+  - CI and Publish workflows now use v6 major action lines.
+- Worked well: this keeps launch CI aligned with GitHub's runtime migration.
+- Confusing: the action runtime warning can persist even when the project itself uses a supported Node version.
+- Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
+- Improve: verify the PR CI annotation disappears before merging.
