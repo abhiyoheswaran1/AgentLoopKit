@@ -212,6 +212,7 @@ Latest release status:
 - GitHub release asset digest: `sha256:2c04fd3eba66fe662fb6fe97037b3950099d228b3759d2b418dcb57debef7e18`.
 - CI run `27232669795`: passed for commit `193916c23450c6c619c7732c80c8f339ce875109`.
 - Publish workflow run `27232852066`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- Local `npm publish --access public` for `0.13.0`: package checks passed, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - npm registry proof after release: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
 
 Latest local verification for the `0.9.0` release candidate:
@@ -1094,6 +1095,7 @@ Top remaining items:
 - Local `npm publish --access public` for `0.6.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.7.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.8.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
+- Local `npm publish --access public` for `0.13.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must complete local browser/OTP authentication.
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
@@ -1167,6 +1169,7 @@ Top remaining items:
 - [x] Prepare `agentloopkit@0.13.0` check-gates release candidate.
 - [x] Publish GitHub release `v0.13.0` with npm-pending notes.
 - [x] Run GitHub Publish workflow for `v0.13.0`; package checks passed, npm authorization failed.
+- [x] Try local `npm publish --access public` for `0.13.0`; package checks passed, npm required browser/OTP authentication.
 - [ ] Publish `agentloopkit@0.13.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.

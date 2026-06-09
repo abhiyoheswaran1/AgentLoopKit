@@ -96,6 +96,7 @@ As of June 9, 2026:
 - npm registry proof before the `v0.13.0` GitHub release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 - GitHub release `v0.13.0` is public with attached `agentloopkit-0.13.0.tgz`.
 - GitHub Publish workflow run `27232852066` for `v0.13.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- Local `npm publish --access public` for `0.13.0` passed `prepublishOnly`, then npm stopped with `EOTP` because the account requires browser or one-time-password authentication.
 - npm registry proof after the `v0.13.0` release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 - npm may jump from `0.1.1` to `0.13.0` after authorization is repaired. Versions `0.2.0` through `0.12.0` were GitHub-only release candidates during the npm publishing blocker.
 

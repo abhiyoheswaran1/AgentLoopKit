@@ -81,6 +81,7 @@ Use this before publishing AgentLoopKit.
 - [ ] Local `agentloopkit@0.12.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
 - [x] Package `agentloopkit@0.13.0` is prepared on `main`.
 - [x] Publish workflow for `v0.13.0` passed checks and failed at npm authorization.
+- [x] Try local `npm publish --access public` for `0.13.0`; package checks passed, npm required browser/OTP authentication.
 - [ ] Package `agentloopkit@0.13.0` is published.
 - [ ] Local `agentloopkit@0.13.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
 - [ ] npm trusted publishing is configured for this repository.
@@ -185,5 +186,6 @@ Current recovery note:
 - `agentloopkit@0.13.0` is prepared on `main` and published as GitHub release `v0.13.0` for `agentloop check-gates`.
 - Local `0.13.0` checks passed: `npm publish --access public --dry-run`, packed-tarball smoke test, and npm registry proof that latest remains `0.1.1`.
 - GitHub Publish workflow for `v0.13.0` passed package checks and failed at npm authorization with `E404`.
+- Local `npm publish --access public` for `0.13.0` passed package checks and stopped at `EOTP`; npm requires browser/OTP authentication.
 - npm may jump from `0.1.1` to `0.13.0` after publish auth is repaired; skipped npm versions were GitHub-only release candidates.
 - Publish `0.13.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.

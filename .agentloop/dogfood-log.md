@@ -1616,6 +1616,7 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - GitHub release asset upload: pass, digest matches local SHA-256
   - GitHub Publish workflow package checks: pass
   - GitHub Publish workflow final `npm publish`: failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`
+  - Local `npm publish --access public`: package checks passed, then npm stopped at `EOTP` for browser/OTP authentication
   - npm registry check: pass, latest remains `0.1.1`
 - Product changes:
   - GitHub now has a public `v0.13.0` release with npm-pending notes.
@@ -1624,4 +1625,4 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Worked well:
   - The release tarball is available from GitHub while npm auth remains blocked.
 - Improve:
-  - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.13.0`.
+  - Complete local browser/OTP auth for `0.13.0`, or configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`.
