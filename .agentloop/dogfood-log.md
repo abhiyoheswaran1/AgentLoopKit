@@ -738,3 +738,38 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - npm latest still remains `0.1.1` until npm accepts a real publish.
 - Improve:
   - Configure npm trusted publishing or complete local browser/OTP publish before claiming npm `0.5.0` availability.
+
+## 2026-06-09: Task Show Command
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-task-show-command.md`
+- Product cycle: `.agentloop/research/interview-cycle-025.md`
+- Verification report: `.agentloop/reports/2026-06-09-18-09-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-18-09-pr-summary.md`
+- Trigger:
+  - `agentloop task list` made task discovery deterministic.
+  - Agents still needed shell-specific file reads to inspect a selected task contract.
+- Red tests:
+  - `npx pnpm@10.12.1 test tests/task-state.test.ts` failed because `readTaskContract` did not exist and `agentloop task show` was an unknown command.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/task-state.test.ts`: pass, 1 file and 8 tests
+  - `npx tsx src/cli/index.ts task show .agentloop/tasks/2026-06-09-add-task-show-command.md`: pass
+  - `npx tsx src/cli/index.ts task show .agentloop/tasks/2026-06-09-add-task-show-command.md --json`: pass
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 18 files and 48 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.5.0.tgz`
+  - Tarball smoke: pass, packed `agentloop task show` returned Markdown and JSON content without writing `.agentloop/state.json`
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-task-show-command.md`: pass
+  - `agentloop task clear --json`: pass, removed `.agentloop/state.json`
+  - `agentloop handoff`: pass, wrote the handoff above
+- Product changes:
+  - Added `agentloop task show <path>` and `agentloop task show <path> --json`.
+  - Reused existing `.agentloop/tasks` path safety rules.
+  - Updated README, task/status docs, generated harness docs, and agent templates.
+- Worked well:
+  - The list/show/set sequence gives agents a local preflight loop without adding task management features.
+- Improve:
+  - Consider a future `task show --current` only if dogfooding shows path copying remains noisy.

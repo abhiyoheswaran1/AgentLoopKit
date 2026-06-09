@@ -9,6 +9,7 @@ Before changing code:
 - Read AGENTLOOP.md.
 - Check .agentloop/tasks/ for an active task contract.
 - Use `agentloop task list` to inspect available task contracts before choosing one.
+- Use `agentloop task show <path>` to read a task contract without changing active state.
 - Use `agentloop task set <path>` when the active task is ambiguous.
 - Run `agentloop status` when you need the current task, verification, dirty-file, and next-action state.
 - Follow the Specify, Constrain, Plan, Implement, Verify, Review, Handoff loop.

@@ -24,4 +24,4 @@ No LLM is required.
 
 Use `agentloop summarize` to preview the same deterministic summary without writing a file. `agentloop summarize --write` remains available for scripts that already use it.
 
-Use `agentloop task list` before handoff when the repo has several task contracts and you need to choose which one to pin.
+Use `agentloop task list` and `agentloop task show <path>` before handoff when the repo has several task contracts and you need to choose which one to pin.

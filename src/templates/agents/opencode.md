@@ -8,6 +8,7 @@ Before editing:
 - Read AGENTLOOP.md.
 - Check .agentloop/tasks/.
 - Run `agentloop task list` when current work is unclear.
+- Run `agentloop task show <path>` before implementing a selected task.
 
 Rules:
 

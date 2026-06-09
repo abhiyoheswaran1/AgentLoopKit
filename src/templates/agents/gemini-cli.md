@@ -9,6 +9,7 @@ Before editing:
 - Read .agentloop/harness/commands.md.
 - Check .agentloop/tasks/ for active work.
 - Run `agentloop task list` when active work is unclear.
+- Run `agentloop task show <path>` before implementing a selected task.
 
 Rules:
 

@@ -36,6 +36,8 @@ agentloop doctor --json
 agentloop create-task --title "Add settings page" --type feature
 agentloop task list
 agentloop task list --json
+agentloop task show .agentloop/tasks/2026-06-09-add-settings-page.md
+agentloop task show .agentloop/tasks/2026-06-09-add-settings-page.md --json
 agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task current --json
 agentloop task clear
@@ -450,6 +452,17 @@ Implemented:
 - `0.5.0` changelog entry for task discovery
 - launch, publishing, final handoff, backlog, and product-panel release records
 
+### Cycle 25: Task contract reading
+
+Decision: add a read-only task-show command so users and agents can inspect a selected task contract after listing it.
+
+Implemented:
+
+- `agentloop task show <path>`
+- `agentloop task show <path> --json`
+- path safety through the existing `.agentloop/tasks` resolver
+- docs and generated agent template updates
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -463,6 +476,7 @@ Strongest signals:
 - README readers need visual proof of the workflow before installing.
 - Agents and reviewers need one local command that shows current task, latest report, dirty files, and next action.
 - Agents need a deterministic way to list task contracts before choosing the active task.
+- Agents need a deterministic way to read a selected task contract without changing active state.
 
 ## Backlog
 

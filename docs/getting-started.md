@@ -32,6 +32,7 @@ Pin it as the active task when the repo has multiple contracts:
 
 ```bash
 npx agentloopkit task list
+npx agentloopkit task show .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit task set .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit task current
 ```

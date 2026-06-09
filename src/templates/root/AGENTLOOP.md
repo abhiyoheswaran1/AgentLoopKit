@@ -33,7 +33,7 @@ AgentLoopKit gives coding agents a repeatable engineering loop inside this repo.
 - Build: {{ buildCommand }}
 - Format: {{ formatCommand }}
 
-Use `agentloop task list` to inspect available task contracts. Use `agentloop task set <path>` to pin the active task when a repo has multiple contracts. Use `agentloop status` to inspect the active task, latest verification report, working tree state, and next suggested command.
+Use `agentloop task list` to inspect available task contracts. Use `agentloop task show <path>` to read one without changing active state. Use `agentloop task set <path>` to pin the active task when a repo has multiple contracts. Use `agentloop status` to inspect the active task, latest verification report, working tree state, and next suggested command.
 
 ## Autonomous Work
 

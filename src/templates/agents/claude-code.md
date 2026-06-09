@@ -8,6 +8,7 @@ Before editing:
 - Read harness files under .agentloop/harness/.
 - Check .agentloop/tasks/ for current work.
 - Run `agentloop task list` when current work is unclear.
+- Run `agentloop task show <path>` before implementing a selected task.
 
 Rules:
 

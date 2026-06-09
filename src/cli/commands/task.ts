@@ -1,7 +1,13 @@
 import { Command } from 'commander';
 import { loadAgentLoopConfig } from '../../core/config.js';
-import { clearActiveTask, getActiveTask, listTasks, setActiveTask } from '../../core/task-state.js';
-import type { ListedTask } from '../../core/task-state.js';
+import {
+  clearActiveTask,
+  getActiveTask,
+  listTasks,
+  readTaskContract,
+  setActiveTask,
+} from '../../core/task-state.js';
+import type { ListedTask, TaskContract } from '../../core/task-state.js';
 
 function printTask(
   task: Awaited<ReturnType<typeof getActiveTask>> | null,
@@ -39,6 +45,14 @@ function printTasks(tasks: ListedTask[], options: { json?: boolean }) {
   }
 }
 
+function printTaskContract(task: TaskContract, options: { json?: boolean }) {
+  if (options.json) {
+    console.log(JSON.stringify({ task }, null, 2));
+    return;
+  }
+  process.stdout.write(task.content);
+}
+
 export function taskCommand() {
   const command = new Command('task').description('List, set, inspect, or clear task contracts');
 
@@ -50,6 +64,17 @@ export function taskCommand() {
       const config = await loadAgentLoopConfig(process.cwd());
       const tasks = await listTasks({ cwd: process.cwd(), config });
       printTasks(tasks, options);
+    });
+
+  command
+    .command('show')
+    .argument('<path>', 'task contract path under .agentloop/tasks')
+    .option('--json', 'print machine-readable output')
+    .description('Show a task contract')
+    .action(async (taskPath: string, options: { json?: boolean }) => {
+      const config = await loadAgentLoopConfig(process.cwd());
+      const task = await readTaskContract({ cwd: process.cwd(), config, taskPath });
+      printTaskContract(task, options);
     });
 
   command

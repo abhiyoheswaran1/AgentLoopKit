@@ -34,9 +34,11 @@ Pin the active contract for long sessions:
 
 ```bash
 agentloop task list
+agentloop task show .agentloop/tasks/2026-06-09-fix-checkout-redirect.md
 agentloop task set .agentloop/tasks/2026-06-09-fix-checkout-redirect.md
 ```
 
 Use `agentloop task list --json` when an agent needs a machine-readable list of contracts before choosing the active task. The list command is read-only and does not create `.agentloop/state.json`.
+Use `agentloop task show --json` when an agent needs the selected contract content in a stable schema.
 
 Agents should use the contract as the boundary for implementation and review.

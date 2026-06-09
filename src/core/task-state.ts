@@ -20,6 +20,10 @@ export type ListedTask = ActiveTask & {
   modifiedAt: string;
 };
 
+export type TaskContract = ActiveTask & {
+  content: string;
+};
+
 function statePath(cwd: string, config: AgentLoopConfig) {
   return path.join(cwd, config.paths.agentloopDir, 'state.json');
 }
@@ -97,6 +101,20 @@ export async function readTaskMetadata(cwd: string, filePath: string): Promise<A
     path: toStoredPath(cwd, filePath),
     title: extractHeading(markdown, path.basename(filePath, '.md')),
     status: extractTaskStatus(markdown),
+  };
+}
+
+export async function readTaskContract(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  taskPath: string;
+}): Promise<TaskContract> {
+  const absolutePath = await resolveTaskPath({ ...options, strict: true });
+  if (!absolutePath) throw new AgentLoopError(`Task contract not found: ${options.taskPath}`);
+  const content = await readFile(absolutePath, 'utf8');
+  return {
+    ...(await readTaskMetadata(options.cwd, absolutePath)),
+    content,
   };
 }
 

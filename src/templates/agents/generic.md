@@ -8,6 +8,7 @@ Before editing:
 - Read AGENTLOOP.md.
 - Check .agentloop/tasks/.
 - Run `agentloop task list` when several task contracts exist.
+- Run `agentloop task show <path>` before implementing a selected task.
 
 Loop:
 

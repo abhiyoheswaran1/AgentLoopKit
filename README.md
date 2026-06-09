@@ -52,6 +52,7 @@ Run the CLI after install:
 npx agentloopkit doctor
 npx agentloopkit create-task --title "Add settings page" --type feature
 npx agentloopkit task list
+npx agentloopkit task show .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit task set .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit status
 npx agentloopkit verify
@@ -90,6 +91,7 @@ pnpm build
 | `agentloop doctor`              | Check setup health, commands, git state, and risk files |
 | `agentloop create-task`         | Create a task contract in `.agentloop/tasks/`           |
 | `agentloop task list`           | List task contracts and show the pinned active task     |
+| `agentloop task show <path>`    | Print a task contract without changing active state     |
 | `agentloop task set <path>`     | Pin the active task for status and handoffs             |
 | `agentloop task current`        | Print the pinned active task                            |
 | `agentloop task clear`          | Clear the active task pointer                           |
@@ -166,12 +168,14 @@ Pin the contract when more than one task exists:
 
 ```bash
 agentloop task list
+agentloop task show .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task current
 agentloop task clear
 ```
 
 `task list --json` gives agents a deterministic list with `path`, `title`, `status`, `active`, and `modifiedAt`. Listing tasks does not create or update `.agentloop/state.json`.
+`task show --json` returns the selected task metadata and Markdown content without changing active state.
 
 Each contract records:
 

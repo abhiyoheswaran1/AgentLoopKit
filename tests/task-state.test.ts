@@ -7,6 +7,7 @@ import {
   clearActiveTask,
   getActiveTaskPath,
   listTasks,
+  readTaskContract,
   setActiveTask,
 } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
@@ -86,6 +87,29 @@ describe('task state', () => {
     });
     expect(tasks[0]?.modifiedAt).toMatch(/T/);
   });
+
+  test('reads task contract content with metadata', async () => {
+    const { dir, config, taskPath } = await createTaskStateFixture();
+
+    const task = await readTaskContract({ cwd: dir, config, taskPath });
+
+    expect(task).toMatchObject({
+      path: '.agentloop/tasks/2026-06-09-demo.md',
+      title: 'Demo task',
+      status: 'proposed',
+    });
+    expect(task.content).toBe('# Demo task\n\n- Status: proposed\n');
+  });
+
+  test('rejects task contract reads outside the configured task directory', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const outsideTask = path.join(dir, 'notes.md');
+    await writeFile(outsideTask, '# Notes\n');
+
+    await expect(readTaskContract({ cwd: dir, config, taskPath: outsideTask })).rejects.toThrow(
+      'inside .agentloop/tasks',
+    );
+  });
 });
 
 describe('task command', () => {
@@ -149,6 +173,34 @@ describe('task command', () => {
       'Demo task',
     ]);
     expect(output.tasks.every((task: { active: boolean }) => task.active === false)).toBe(true);
+    await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
+  });
+
+  test('shows task contract content from the CLI without writing state', async () => {
+    const { dir } = await createTaskStateFixture();
+
+    const markdownResult = await execa(
+      tsxPath,
+      [cliPath, 'task', 'show', '.agentloop/tasks/2026-06-09-demo.md'],
+      { cwd: dir },
+    );
+
+    expect(markdownResult.stdout).toBe('# Demo task\n\n- Status: proposed');
+
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'task', 'show', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
+      { cwd: dir },
+    );
+
+    expect(JSON.parse(jsonResult.stdout)).toEqual({
+      task: {
+        path: '.agentloop/tasks/2026-06-09-demo.md',
+        title: 'Demo task',
+        status: 'proposed',
+        content: '# Demo task\n\n- Status: proposed\n',
+      },
+    });
     await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
   });
 });

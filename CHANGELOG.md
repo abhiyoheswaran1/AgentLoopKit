@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added `agentloop task show <path>` and `agentloop task show <path> --json` to read a selected task contract without changing active state
+- Updated docs and generated agent templates to use the `task list`, `task show`, `task set` sequence
+
 ## 0.5.0
 
 Task discovery GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:
