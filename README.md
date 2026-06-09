@@ -62,6 +62,7 @@ npx agentloopkit verify
 npx agentloopkit handoff
 npx agentloopkit check-gates
 npx agentloopkit check-gates --strict
+npx agentloopkit report
 npx agentloopkit task archive .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit install-agent codex
 npx agentloopkit install-agent all
@@ -69,7 +70,7 @@ npx agentloopkit completion zsh
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, task status, completion, verify, handoff, and task archive commands" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, task status, completion, verify, handoff, report, and task archive commands" width="100%">
 </p>
 
 The VHS demo runs the local built CLI so the command flow matches this repository even when npm is behind.
@@ -112,6 +113,7 @@ pnpm build
 | `agentloop verify`                      | Run configured checks and write a verification report                          |
 | `agentloop summarize`                   | Generate a deterministic PR or reviewer summary                                |
 | `agentloop handoff`                     | Write a reviewer handoff summary                                               |
+| `agentloop report`                      | Write a local static HTML evidence report                                      |
 | `agentloop install-agent codex`         | Add agent-specific instructions                                                |
 | `agentloop install-agent all`           | Add all bundled agent instruction files                                        |
 | `agentloop list-templates`              | List bundled templates                                                         |
@@ -286,6 +288,20 @@ Warnings keep exit code `0` by default. Use `--strict` in CI when warning gates 
 `doctor` checks setup health. `check-gates` checks whether the current work session has the evidence reviewers expect.
 
 See `docs/check-gates.md` for gate statuses and exit-code behavior.
+
+## HTML Reports
+
+`agentloop report` writes a local static HTML page from the current task contract, latest verification report, latest handoff, git status, diff stats, and deterministic review summary:
+
+```bash
+agentloop report
+agentloop report --json
+agentloop report --out .agentloop/reports/review.html
+```
+
+The command does not run tests, call an LLM, fetch assets, read `.env` contents, or send data anywhere. It writes one local file under `.agentloop/reports/` by default. Use it after `verify` and `handoff` when you want a browser-readable artifact for a PR or CI upload.
+
+See `docs/html-reports.md` for inputs, output paths, and safety behavior.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report screenshot showing command results and reviewer handoff sections" width="100%">

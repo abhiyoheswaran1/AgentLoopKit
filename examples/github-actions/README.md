@@ -48,6 +48,7 @@ jobs:
       - run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.15.1/agentloopkit-0.15.1.tgz
       - run: npx --no-install agentloop verify
       - run: npx --no-install agentloop handoff
+      - run: npx --no-install agentloop report
       - run: npx --no-install agentloop check-gates --strict
       - if: always()
         uses: actions/upload-artifact@v4
@@ -55,6 +56,7 @@ jobs:
           name: agentloop-evidence
           path: |
             .agentloop/reports/*.md
+            .agentloop/reports/*.html
             .agentloop/handoffs/*.md
 ```
 

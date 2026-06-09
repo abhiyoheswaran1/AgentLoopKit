@@ -59,3 +59,7 @@ Launch visuals live in `docs/assets/readme/` with source HTML and a VHS tape so 
 ## 2026-06-09: Config Schema URL Uses GitHub Until A Domain Exists
 
 Generated configs use the GitHub raw URL for `schema/agentloop.config.schema.json`. The package also ships the schema locally, and CLI validation uses local TypeScript/Zod rules. AgentLoopKit does not fetch the schema URL at runtime. A custom `agentloopkit.dev` schema URL can replace it after that domain serves the file.
+
+## 2026-06-10: HTML Reports Are Local Static Evidence
+
+`agentloop report` writes a static HTML file from existing local task, verification, handoff, git, and deterministic summary artifacts. It does not run project commands, call an LLM, fetch external assets, upload files, or read `.env` contents. The renderer escapes Markdown-derived and git-derived text and uses inline CSS instead of a Markdown parser or browser app.

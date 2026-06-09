@@ -59,6 +59,10 @@ Type "npx agentloop handoff"
 Enter
 Sleep 2s
 
+Type "npx agentloop report"
+Enter
+Sleep 1.5s
+
 Type "npx agentloop task status .agentloop/tasks/add-settings-page.md done"
 Enter
 Sleep 1s

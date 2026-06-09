@@ -24,6 +24,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - verification report generation
 - deterministic PR summary generation
 - deterministic PR summary change-area classification and review-focus hints
+- local static HTML evidence reports with `agentloop report`
 - verification reports with allowlisted CI context
 - local status command for active task, latest verification, dirty files, configured commands, and next action
 - local gate-check command for task, verification, handoff, harness, policy, and git evidence
@@ -59,6 +60,8 @@ agentloop status --json
 agentloop check-gates
 agentloop check-gates --json
 agentloop check-gates --strict
+agentloop report
+agentloop report --json
 agentloop verify
 agentloop verify --command "node smoke-test.js"
 agentloop handoff
@@ -1325,6 +1328,19 @@ Implemented:
 - Vitest coverage for the new summary output
 - README, PR-summary docs, changelog, roadmap, backlog, dogfood log, and README visual asset refresh
 
+### Cycle 65: Local HTML evidence report
+
+Decision: add `agentloop report` as a local static evidence artifact after verification and handoff, without building a dashboard or calling external services.
+
+Implemented:
+
+- `agentloop report` CLI command with `--task`, `--report`, `--handoff`, `--out`, and `--json`
+- static HTML renderer with escaped task, verification, handoff, git, diff, and deterministic summary content
+- compact JSON output that returns the report path, metadata, and source paths without printing the full HTML body
+- generated-handoff detection that ignores bundled handoff templates unless the user passes a path
+- Vitest coverage for escaping, repository output, and CLI JSON behavior
+- README, docs, generated harness templates, GitHub Actions recipe, changelog, roadmap, backlog, dogfood, final handoff, and README visual refresh
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1362,13 +1378,14 @@ Strongest signals:
 - Release readers need patch-level semver for trust polish instead of another minor version jump.
 - Public roadmap readers need shipped work and future work separated clearly after `v0.15.1`.
 - Reviewers need deterministic PR summaries to group changed files by review area without LLM calls.
+- Teams need one local HTML evidence artifact after task, verification, and handoff files exist.
 
 ## Backlog
 
 Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.15.1`.
-2. Static HTML report export.
+2. Generated badges for local reports.
 3. Policy pack customization.
 4. Template version and migration guidance.
 5. Optional schema-store submission after npm publishing is stable.
@@ -1542,13 +1559,13 @@ Title: I built a local-first engineering loop for coding agents
 1. Repair npm publishing for `0.15.1`: high usefulness, low repo effort, external npm setting required.
 2. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
 3. Add policy pack customization: medium commercial optionality, medium effort.
-4. Add local static HTML report: medium star potential, high effort, medium maintenance.
+4. Add generated evidence badges for local reports: medium star potential, low effort, low maintenance.
 5. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
 6. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
 7. Add generated security-review example: medium trust improvement, low effort.
 8. Add config migration helper for future schema versions: medium usefulness, medium effort.
 9. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
-10. Add static HTML verification report export after CLI gates stabilize: medium usefulness, medium effort.
+10. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
 11. Add release-status compaction so future handoffs stay shorter: medium maintainability, low effort.
 12. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
 13. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.

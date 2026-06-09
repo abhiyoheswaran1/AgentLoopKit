@@ -17,6 +17,7 @@ Rules:
 - Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
 - Use `agentloop task archive <path>` only after verification and handoff are complete.
 - Use `agentloop status` to inspect active task, latest report, dirty files, and next action.
+- Use `agentloop report` after verification and handoff when reviewers need one local HTML evidence artifact.
 - Run targeted checks while developing.
 - Run configured verification before claiming completion.
 - Dogfood projscan during implementation work in this repository.

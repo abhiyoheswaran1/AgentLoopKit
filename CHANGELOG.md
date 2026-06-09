@@ -4,6 +4,9 @@
 
 - Added deterministic PR summary change-area classification for source, tests, docs, CI, config, AgentLoop, risk-sensitive, and uncategorized paths
 - Added path-based review-focus hints to PR summaries without LLM calls or file-content inspection
+- Added `agentloop report` for local static HTML evidence reports built from task, verification, handoff, git, and deterministic summary artifacts
+- Kept `agentloop report --json` compact by returning the output path, metadata, and source paths without embedding the full HTML body
+- Made `agentloop report` ignore bundled handoff templates when looking for the latest generated handoff
 
 ## 0.15.1
 

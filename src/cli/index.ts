@@ -11,6 +11,7 @@ import { statusCommand } from './commands/status.js';
 import { taskCommand } from './commands/task.js';
 import { completionCommand } from './commands/completion.js';
 import { checkGatesCommand } from './commands/check-gates.js';
+import { reportCommand } from './commands/report.js';
 import { getPackageVersion } from '../core/version.js';
 
 const program = new Command();
@@ -28,6 +29,7 @@ program.addCommand(summarizeCommand());
 program.addCommand(handoffCommand());
 program.addCommand(statusCommand());
 program.addCommand(checkGatesCommand());
+program.addCommand(reportCommand());
 program.addCommand(taskCommand());
 program.addCommand(installAgentCommand());
 program.addCommand(listTemplatesCommand());

@@ -37,7 +37,13 @@ agentloop verify
 agentloop handoff
 ```
 
-7. Check review gates:
+7. Optional: write a local HTML evidence report:
+
+```bash
+agentloop report
+```
+
+8. Check review gates:
 
 ```bash
 agentloop check-gates
@@ -45,6 +51,7 @@ agentloop check-gates --strict
 ```
 
 `check-gates` inspects local evidence. It does not run tests or call an LLM.
+`report` reads local evidence and writes one static HTML file under `reports/`.
 Use `--strict` in CI when warning gates should fail.
 
 CI can either check committed AgentLoop evidence or generate reports and handoffs as build artifacts. Do not let CI commit generated files unless maintainers explicitly want that behavior.

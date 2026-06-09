@@ -82,6 +82,9 @@ jobs:
       - name: Write reviewer handoff
         run: npx --no-install agentloop handoff
 
+      - name: Write HTML evidence report
+        run: npx --no-install agentloop report
+
       - name: Check AgentLoop gates
         run: npx --no-install agentloop check-gates --strict
 
@@ -92,10 +95,11 @@ jobs:
           name: agentloop-evidence
           path: |
             .agentloop/reports/*.md
+            .agentloop/reports/*.html
             .agentloop/handoffs/*.md
 ```
 
-This workflow does not commit generated files. It uploads reports and handoffs as CI artifacts.
+This workflow does not commit generated files. It uploads reports, HTML reports, and handoffs as CI artifacts.
 
 The verification report includes a `CI Context` section when GitHub Actions creates it. Reviewers can see the workflow, event, ref, commit, run URL, and run attempt inside the Markdown artifact.
 
@@ -115,6 +119,7 @@ Run `agentloop init` and `agentloop create-task` before relying on CI gates.
 
 - `agentloop verify` exits non-zero when a configured command fails.
 - `agentloop handoff` writes a deterministic reviewer summary.
+- `agentloop report` writes a static HTML evidence artifact from local files.
 - `agentloop check-gates` exits non-zero when a required gate fails.
 - `agentloop check-gates --strict` also exits non-zero when any gate warns.
 

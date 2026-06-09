@@ -22,6 +22,7 @@ agentloop task set .agentloop/tasks/<task-file>.md
 agentloop status
 agentloop verify
 agentloop handoff
+agentloop report
 ```
 
 Use `npx projscan doctor --format markdown` during implementation work in this repository.

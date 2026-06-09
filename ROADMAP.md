@@ -11,6 +11,7 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - Verification reports with configured commands, custom commands, long-output excerpts, and CI context
 - Deterministic PR summaries and `agentloop handoff`
 - PR summary change-area classification and path-based review-focus hints
+- Local static HTML evidence reports with `agentloop report`
 - Local review-evidence gates with `agentloop check-gates` and `--strict`
 - Agent instruction installers, including `agentloop install-agent all`
 - Static bash, zsh, and fish completions
@@ -28,7 +29,6 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 ## Near Term
 
 - Repair npm publishing authorization.
-- Add local static HTML report export.
 - Add generated badges for local reports.
 - Add policy pack customization.
 - Add template version and migration guidance.

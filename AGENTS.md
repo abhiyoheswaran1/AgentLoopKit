@@ -14,6 +14,7 @@ Before changing code:
 - Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
 - Use `agentloop task archive <path>` only after verification and handoff are complete.
 - Run `agentloop status` when you need the current task, verification, dirty-file, and next-action state.
+- Run `agentloop report` after verification and handoff when a local HTML evidence artifact helps review.
 - Follow the Specify, Constrain, Plan, Implement, Verify, Review, Handoff loop.
 - Keep changes small and tied to the task contract.
 - Do not run destructive git or filesystem commands unless the user asks for them.

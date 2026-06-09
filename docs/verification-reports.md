@@ -47,3 +47,5 @@ When `agentloop verify` runs in GitHub Actions, the report includes an allowlist
 When `CI=true` is present outside GitHub Actions, the report records `Generic CI` without provider-specific fields.
 
 Local reports omit this section. AgentLoopKit does not read `.env` files and does not print arbitrary environment variables. It only reads a small allowlist of CI variables needed for report provenance.
+
+Use `agentloop report` after `agentloop verify` when you want a browser-readable local artifact that includes the latest verification report. The report command reads existing evidence only; it does not run tests or other project commands.

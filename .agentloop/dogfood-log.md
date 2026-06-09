@@ -2047,3 +2047,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-28-pr-summary.md`.
 - Improve:
   - Keep classification path-only until users need configurable categories.
+
+## 2026-06-10: Local HTML Evidence Report
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-static-html-report-export.md`
+- Product cycle: `.agentloop/research/interview-cycle-065.md`
+- Trigger:
+  - Task contracts, verification reports, and handoffs existed as separate Markdown files.
+  - Reviewers and CI users could benefit from one local HTML evidence artifact.
+- Product changes:
+  - Added `agentloop report`.
+  - Added a static HTML renderer with escaped local evidence.
+  - Added compact JSON output for agents and CI.
+  - Ignored bundled handoff templates when selecting the latest generated handoff.
+  - Updated README, docs, generated harness templates, GitHub Actions recipes, and README visual assets.
+- Dogfooding:
+  - Created and pinned this task with AgentLoopKit.
+  - Ran `agentloop report --json` against this repo and caught that JSON output was too noisy.
+  - Added a failing test for compact JSON output, then fixed the CLI.
+- Verification run:
+  - Focused red test for compact JSON output: failed because `html` was included.
+  - Focused green test: `npx pnpm@10.12.1 test tests/html-report.test.ts`: pass, 1 file and 3 tests.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 22 files and 80 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 374 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-00-46-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-47-pr-summary.md`.
+  - AgentLoop HTML report: `.agentloop/reports/2026-06-10-00-47-agentloop-report.html`.
+- Improve:
+  - Consider generated evidence badges after npm publishing is stable.

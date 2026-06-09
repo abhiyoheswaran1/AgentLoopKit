@@ -13,6 +13,7 @@ const topLevelCommands = [
   ['handoff', 'Write a reviewer handoff'],
   ['status', 'Show current loop state'],
   ['check-gates', 'Check review gate evidence'],
+  ['report', 'Write a local HTML evidence report'],
   ['task', 'List, inspect, update, or archive task contracts'],
   ['install-agent', 'Install agent-specific instructions'],
   ['list-templates', 'List bundled templates'],
