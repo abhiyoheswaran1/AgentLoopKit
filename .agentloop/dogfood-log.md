@@ -1063,3 +1063,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The checker validates local docs without network calls or new dependencies.
 - Improve:
   - Consider task status transitions next if scope remains small.
+
+## 2026-06-09: 0.8.0 Launch-Quality Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-8-0-launch-quality-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-034.md`
+- Verification report: `.agentloop/reports/2026-06-09-19-21-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-19-21-pr-summary.md`
+- Trigger:
+  - Monorepo guidance, actionable doctor warnings, and Markdown link checking landed after `v0.7.0`.
+  - Package metadata still reported `0.7.0`.
+- Verification completed:
+  - `npx tsx src/cli/index.ts version`: pass, reported `0.8.0`
+  - `npx prettier --check ...`: pass for release metadata files
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 19 files and 55 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 250 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.8.0.tgz`
+  - `npm publish --access public --dry-run`: pass
+  - Packed CLI smoke: pass, `agentloop version` reported `0.8.0` and `doctor --json` included package-specific verification guidance
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-8-0-launch-quality-release.md`: pass
+  - VHS README terminal render: pass for `agentloopkit-cli.gif` using the `0.8.0` tarball name
+- Product changes:
+  - Bumped package metadata to `0.8.0`.
+  - Moved unreleased launch-quality notes into the `0.8.0` changelog section.
+  - Updated README source note and VHS tape.
+  - Updated launch checklist, npm publishing docs, final handoff, backlog, and product-panel records.
+- Worked well:
+  - The release candidate keeps GitHub tarballs aligned with the current launch-quality source.
+- Improve:
+  - After the GitHub release, record CI, Publish workflow, local npm publish, and registry status.
