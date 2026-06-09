@@ -132,6 +132,21 @@ Latest local verification for the `0.3.0` handoff command release candidate:
 - `agentloop verify`: pass
 - `agentloop handoff --task .agentloop/tasks/2026-06-09-add-handoff-command-alias.md --json`: pass
 
+Latest local verification for the `0.3.0` repeated create-task flag fix:
+
+- Reproduction in a temp repo: only the last repeated constraint, non-goal, acceptance criterion, and verification command appeared.
+- Red test first: `npx pnpm@10.12.1 test tests/create-task.test.ts` failed because earlier repeated values were missing.
+- Focused green test: `npx pnpm@10.12.1 test tests/create-task.test.ts`: pass
+- `git diff --check`: pass
+- `npx pnpm@10.12.1 lint`: pass
+- `npx pnpm@10.12.1 typecheck`: pass
+- `npx pnpm@10.12.1 test`: pass, 17 files and 34 tests
+- `npx pnpm@10.12.1 build`: pass
+- `npx projscan doctor --format markdown`: A, 100/100
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.3.0.tgz`
+- Tarball smoke: pass, repeated create-task flags were preserved from the packed CLI
+- `npm publish --access public --dry-run`: pass
+
 ## How to package
 
 ```bash
@@ -273,8 +288,8 @@ Strongest signals:
 Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.3.0`.
-2. Fix repeated `create-task` option accumulation.
-3. Improve active task detection.
+2. Improve active task detection.
+3. Add non-interactive `create-task` flags for likely files and files not to touch.
 4. Better task status lifecycle.
 5. Monorepo project detection.
 
@@ -361,8 +376,8 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.3.0`: high usefulness, low repo effort, external npm setting required.
-2. Fix repeated `create-task` flags: medium usefulness, low effort, low maintenance.
-3. Improve active task detection: medium usefulness, medium effort, low maintenance.
+2. Improve active task detection: medium usefulness, medium effort, low maintenance.
+3. Add non-interactive `create-task` flags for likely files and files not to touch: medium usefulness, low effort, low maintenance.
 4. Add task status lifecycle: high usefulness, medium effort, medium maintenance.
 5. Improve monorepo detection: high usefulness, medium effort, medium maintenance.
 6. Add shell completions: medium usefulness, medium effort, low maintenance.

@@ -434,3 +434,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Fix repeated create-task option accumulation.
   - Improve active task detection beyond filename sorting.
+
+## 2026-06-09: Repeated create-task Flags
+
+- Task contract: `.agentloop/tasks/2026-06-09-fix-repeated-create-task-flags.md`
+- Product cycle: `.agentloop/research/interview-cycle-017.md`
+- Trigger:
+  - Cycle 16 dogfooding showed that repeated `create-task --constraint` style flags kept only the last value.
+  - The CLI help says these flags can repeat, so the generated contract contradicted the command contract.
+- Root cause:
+  - `create-task` used a custom Commander parser that accepted only the current value.
+  - Commander passes the previous aggregate as a second argument, but the parser ignored it.
+- Verification completed:
+  - Reproduction in a temp repo: only the last repeated constraint, non-goal, acceptance criterion, and verification command appeared.
+  - Red test first: `npx pnpm@10.12.1 test tests/create-task.test.ts` failed because earlier repeated values were missing.
+  - Focused green test: `npx pnpm@10.12.1 test tests/create-task.test.ts`: pass
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 17 files and 34 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.3.0.tgz`
+  - Tarball smoke: pass, repeated create-task flags were preserved from the packed CLI
+  - `npm publish --access public --dry-run`: pass
+- Product changes:
+  - Repeated `--constraint`, `--non-goal`, `--acceptance`, and `--verify-command` values now append.
+  - `agentloopkit@0.3.0` remains the next release candidate because npm publishing is still blocked by npm-side authorization.
+- Worked well: the fix stayed at the parser boundary and did not alter task contract Markdown.
+- Confusing: task contract creation does not yet support repeated likely-file or forbidden-file flags in non-interactive mode.
+- Improve:
+  - Add non-interactive flags for likely files and files not to touch.
+  - Improve active task detection beyond filename sorting.

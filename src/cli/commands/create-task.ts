@@ -4,13 +4,14 @@ import { TASK_TYPES } from '../../core/constants.js';
 import { loadAgentLoopConfig } from '../../core/config.js';
 import { createTaskContractFile, TaskType } from '../../core/task-contract.js';
 
-function lines(value: string | undefined) {
-  return value
+function lines(value: string | undefined, previous: string[]) {
+  const current = value
     ? value
         .split('\n')
         .map((line) => line.trim())
         .filter(Boolean)
     : [];
+  return [...previous, ...current];
 }
 
 async function collectInteractive(initial: { title?: string; type?: TaskType }) {
