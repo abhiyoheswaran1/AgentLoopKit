@@ -1979,3 +1979,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - projscan stayed green after release-doc and visual-asset changes.
 - Improve:
   - Record GitHub release and publish-workflow status after the release step.
+
+## 2026-06-10: 0.15.1 GitHub Release and npm Auth Result
+
+- Task contract: `.agentloop/tasks/2026-06-10-document-0-15-1-release-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-062.md`
+- Release: `v0.15.1`
+- GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.15.1
+- Attached asset: `agentloopkit-0.15.1.tgz`
+- Tarball SHA-256: `56b3ac5b212d24c2214e73a59c5e5fd08fe9f62a0e17956ec5c07cbad7672490`
+- CI:
+  - Push CI run `27239114873`: pass.
+  - Publish workflow run `27239176000`: package checks passed, then npm rejected `npm publish --access public` with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- npm registry proof:
+  - `npm view agentloopkit version`: `0.1.1`
+  - `npm view agentloopkit versions --json`: `0.1.0`, `0.1.1`
+- AgentLoop verification report: `.agentloop/reports/2026-06-10-00-14-verification-report.md`, overall status `pass`.
+- AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-14-pr-summary.md`.
+- Worked well:
+  - GitHub release notes include verification evidence and npm-pending language.
+  - The workflow failure remained scoped to npm authorization; package checks passed before publish.
+- Improve:
+  - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.15.1`.
+  - Do not cut another version for this same npm authorization blocker.

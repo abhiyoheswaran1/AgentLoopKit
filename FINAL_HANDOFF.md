@@ -109,6 +109,13 @@ Latest local verification:
   - AgentLoop verification report: `.agentloop/reports/2026-06-10-00-06-verification-report.md`, overall status `pass`.
   - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-08-pr-summary.md`.
 
+- `0.15.1` release-status verification:
+  - `npx pnpm@10.12.1 check:links`: pass, 363 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `git diff --check`: pass.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-00-14-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-14-pr-summary.md`.
+
 - Doctor risk-file details iteration:
   - Red doctor test: `npx pnpm@10.12.1 test tests/doctor.test.ts` failed because category-level `Risk files:` checks were missing.
   - Red safety test: `npx pnpm@10.12.1 test tests/safety.test.ts` failed because Markdown docs such as `docs/migration-guide.md` were treated as semantic risk files.
@@ -1265,6 +1272,18 @@ Implemented so far:
 - README screenshot sources updated from 74 tests to 76 tests
 - launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-candidate records
 
+### Cycle 62: 0.15.1 release status
+
+Decision: document `v0.15.1` as a public GitHub release and keep npm status explicit after the Publish workflow failed at authorization.
+
+Implemented:
+
+- GitHub release `v0.15.1` with attached `agentloopkit-0.15.1.tgz`
+- tarball SHA-256 `56b3ac5b212d24c2214e73a59c5e5fd08fe9f62a0e17956ec5c07cbad7672490`
+- Publish workflow run `27239176000` recorded as passing package checks and failing at npm publish with `E404`
+- npm registry proof still showing latest `0.1.1`
+- release-status task contract, product-panel cycle, launch checklist, npm publishing docs, dogfood log, and final handoff updates
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1313,8 +1332,7 @@ Top remaining items:
 
 ## Known limitations
 
-- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, and `v0.15.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.15.1` is prepared on `main`, but the GitHub release is not created yet.
+- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, `v0.15.0`, and `v0.15.1` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - npm may jump from `0.1.1` to `0.15.1` after authorization is repaired. Versions `0.2.0` through `0.15.0` were GitHub-only release candidates.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
@@ -1333,6 +1351,7 @@ Top remaining items:
 - The release-triggered GitHub Publish workflow for `v0.13.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.14.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.15.0` passed checks and failed at npm authorization with `E404`.
+- The release-triggered GitHub Publish workflow for `v0.15.1` passed checks and failed at npm authorization with `E404`.
 - Local `npm publish --access public` for `0.5.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.6.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.7.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
@@ -1423,8 +1442,8 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.15.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.15.0` to npm.
 - [x] Prepare `agentloopkit@0.15.1` trust-polish patch release candidate.
-- [ ] Publish GitHub release `v0.15.1` with npm-pending notes.
-- [ ] Run GitHub Publish workflow for `v0.15.1`.
+- [x] Publish GitHub release `v0.15.1` with npm-pending notes.
+- [x] Run GitHub Publish workflow for `v0.15.1`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.15.1` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
