@@ -68,9 +68,12 @@ export type DefaultConfigInput = {
   commands?: Partial<CommandConfig>;
 };
 
+const CONFIG_SCHEMA_URL =
+  'https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agentloop.config.schema.json';
+
 export function createDefaultConfig(input: DefaultConfigInput = {}): AgentLoopConfig {
   return {
-    $schema: 'https://agentloopkit.dev/schema/agentloop.config.schema.json',
+    $schema: CONFIG_SCHEMA_URL,
     version: 1,
     project: {
       name: input.name ?? '',

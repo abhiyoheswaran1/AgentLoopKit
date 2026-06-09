@@ -55,3 +55,7 @@ Launch visuals live in `docs/assets/readme/` with source HTML and a VHS tape so 
 ## 2026-06-09: Doctor Reports Risk Paths, Not Secrets
 
 `agentloop doctor` reports potential risk files by category with capped path examples. It keeps these findings as warnings, not failures. The scanner does not read file contents, inspect credentials, score risk, or claim secret detection.
+
+## 2026-06-09: Config Schema URL Uses GitHub Until A Domain Exists
+
+Generated configs use the GitHub raw URL for `schema/agentloop.config.schema.json`. The package also ships the schema locally, and CLI validation uses local TypeScript/Zod rules. AgentLoopKit does not fetch the schema URL at runtime. A custom `agentloopkit.dev` schema URL can replace it after that domain serves the file.

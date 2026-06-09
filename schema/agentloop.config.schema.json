@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://agentloopkit.dev/schema/agentloop.config.schema.json",
+  "$id": "https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agentloop.config.schema.json",
   "title": "AgentLoopKit Configuration",
   "type": "object",
   "additionalProperties": false,

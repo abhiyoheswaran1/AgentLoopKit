@@ -10,7 +10,9 @@ describe('config JSON schema', () => {
       required?: string[];
     };
 
-    expect(schema.$id).toBe('https://agentloopkit.dev/schema/agentloop.config.schema.json');
+    expect(schema.$id).toBe(
+      'https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agentloop.config.schema.json',
+    );
     expect(schema.required).toEqual(
       expect.arrayContaining(['version', 'project', 'paths', 'commands', 'safety', 'summary']),
     );

@@ -1915,3 +1915,32 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The live `doctor --json` smoke caught a noisy scanner edge case before commit.
 - Improve:
   - Consider adding a short `doctor` doc page if risk category heuristics need more examples.
+
+## 2026-06-09: Real Config Schema URL
+
+- Task contract: `.agentloop/tasks/2026-06-09-use-real-config-schema-url.md`
+- Product cycle: `.agentloop/research/interview-cycle-060.md`
+- Trigger:
+  - Generated configs and the packaged schema pointed at `https://agentloopkit.dev/schema/agentloop.config.schema.json`.
+  - The repo does not prove that the custom domain hosts the schema, while GitHub already hosts the schema file.
+- Verification completed:
+  - Red focused test: `npx pnpm@10.12.1 test tests/config.test.ts tests/schema.test.ts tests/init.test.ts` failed because defaults, generated config, and schema `$id` still used `agentloopkit.dev`.
+  - Focused green test: `npx pnpm@10.12.1 test tests/config.test.ts tests/schema.test.ts tests/init.test.ts` passed, 3 files and 6 tests.
+  - `git diff --check`: pass.
+  - Prettier check on touched files: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 76 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 353 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-use-real-config-schema-url.md --command "npx projscan doctor --format markdown"`: pass, wrote `.agentloop/reports/2026-06-09-23-52-verification-report.md`.
+  - `agentloop handoff --task .agentloop/tasks/2026-06-09-use-real-config-schema-url.md --report .agentloop/reports/2026-06-09-23-52-verification-report.md`: pass, wrote `.agentloop/handoffs/2026-06-09-23-52-pr-summary.md`.
+- Product changes:
+  - Default config, generated config template, repo config, and schema `$id` now use the GitHub raw schema URL.
+  - Docs explain that the CLI validates locally and does not fetch the schema URL at runtime.
+  - The package still ships `schema/agentloop.config.schema.json`.
+- Worked well:
+  - A small test set covered all places where the schema URL can drift.
+- Improve:
+  - Revisit a branded schema domain only after the domain actually serves the schema file.

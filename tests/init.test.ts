@@ -22,6 +22,9 @@ describe('init', () => {
 
     expect(result.created.some((file) => file.endsWith('.agentloop/loops/feature.md'))).toBe(true);
     expect(result.created.some((file) => file.endsWith('.agentloop/README.md'))).toBe(true);
+    expect(config).toContain(
+      '"$schema": "https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agentloop.config.schema.json"',
+    );
     expect(config).toContain('"name": "demo"');
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).resolves.toContain('Specify');
     await expect(readFile(path.join(dir, '.agentloop/README.md'), 'utf8')).resolves.toContain(

@@ -30,6 +30,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - template system for loops, gates, handoffs, agents, policies, tasks, and harness files
 - generated `.agentloop/README.md`
 - config validation and JSON schema
+- generated config schema URL aligned to the GitHub-hosted schema file
 - docs, examples, issue templates, PR template, CI, publish workflow
 - README launch visuals generated with Playwright and VHS
 - internal product panel, target personas, simulated interview cycles, backlog, and dogfood log
@@ -106,6 +107,20 @@ Latest local verification:
   - `npx projscan doctor --format markdown`: A, 100/100.
   - AgentLoop verification report: `.agentloop/reports/2026-06-09-23-44-verification-report.md`, overall status `pass`.
   - AgentLoop handoff: `.agentloop/handoffs/2026-06-09-23-45-pr-summary.md`.
+
+- Config schema URL trust iteration:
+  - Red focused test: `npx pnpm@10.12.1 test tests/config.test.ts tests/schema.test.ts tests/init.test.ts` failed because defaults, generated config, and schema `$id` still used `agentloopkit.dev`.
+  - Focused green test: `npx pnpm@10.12.1 test tests/config.test.ts tests/schema.test.ts tests/init.test.ts`: pass, 3 files and 6 tests.
+  - `git diff --check`: pass.
+  - Prettier check on touched files: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 76 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 353 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-09-23-52-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-09-23-52-pr-summary.md`.
 
 Earlier `0.15.0` release-candidate verification:
 
@@ -1208,6 +1223,19 @@ Implemented:
 - focused doctor and safety tests for category output and env-content privacy
 - README, getting-started docs, backlog, dogfood log, decisions, and final handoff updates
 
+### Cycle 60: config schema URL trust
+
+Decision: use the GitHub raw schema URL for generated config editor support until a dedicated schema domain exists.
+
+Implemented:
+
+- default config `$schema` updated to the GitHub raw schema URL
+- generated root config template updated to the same URL
+- repo `agentloop.config.json` updated to the same URL
+- packaged schema `$id` updated to the same URL
+- configuration docs and README clarify that CLI validation is local and does not fetch the schema URL at runtime
+- focused tests for defaults, init output, and schema metadata
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1241,6 +1269,7 @@ Strongest signals:
 - Reviewers need CI-generated verification reports to show workflow, event, ref, commit, and run URL.
 - Release readers need `0.15.0` metadata and visuals to match CI context in verification reports before the GitHub release.
 - Reviewers and agents need `doctor` to name risk categories instead of reporting only a total count.
+- First-run configs should not point at an unproven custom schema domain.
 
 ## Backlog
 
@@ -1248,9 +1277,9 @@ Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.15.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
-3. Config schema hosting.
-4. Static HTML report export.
-5. Policy pack customization.
+3. Static HTML report export.
+4. Policy pack customization.
+5. Optional schema-store submission after npm publishing is stable.
 
 ## Known limitations
 
@@ -1280,7 +1309,7 @@ Top remaining items:
 - Local `npm publish --access public` for `0.8.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.13.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must complete local browser/OTP authentication.
-- `agentloop.config.schema.json` URL is documented but not hosted on a website.
+- Generated configs use the GitHub raw schema URL for editor support; a branded schema domain is not configured yet.
 - Project detection is heuristic.
 - Monorepo support is warning and guidance only; AgentLoopKit does not infer package graphs or orchestrate workspace checks.
 - GitHub Actions recipes are documentation only; `agentloop init` does not install workflows.
@@ -1415,17 +1444,17 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.15.0`: high usefulness, low repo effort, external npm setting required.
-2. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-3. Add richer doctor risk-file details: medium usefulness, low effort.
-4. Add policy pack customization: medium commercial optionality, medium effort.
-5. Add local static HTML report: medium star potential, high effort, medium maintenance.
-6. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
-7. Add richer doctor risk-file details: medium usefulness, low effort.
-8. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
-9. Add generated security-review example: medium trust improvement, low effort.
-10. Add config migration helper for future schema versions: medium usefulness, medium effort.
-11. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
-12. Add static HTML verification report export after CLI gates stabilize: medium usefulness, medium effort.
-13. Add release-status compaction so future handoffs stay shorter: medium maintainability, low effort.
-14. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
+2. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
+3. Add policy pack customization: medium commercial optionality, medium effort.
+4. Add local static HTML report: medium star potential, high effort, medium maintenance.
+5. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+6. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
+7. Add generated security-review example: medium trust improvement, low effort.
+8. Add config migration helper for future schema versions: medium usefulness, medium effort.
+9. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
+10. Add static HTML verification report export after CLI gates stabilize: medium usefulness, medium effort.
+11. Add release-status compaction so future handoffs stay shorter: medium maintainability, low effort.
+12. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
+13. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
+14. Add doctor heuristics documentation page for risk-file categories: medium trust improvement, low effort.
 15. Add framework-specific example task contracts for Remix, SvelteKit, Django, and FastAPI: medium star potential, low effort.

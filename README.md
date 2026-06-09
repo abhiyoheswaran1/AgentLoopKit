@@ -163,7 +163,7 @@ agentloop.config.json
 
 `init` appends to an existing `AGENTS.md` instead of overwriting it.
 
-The package ships `schema/agentloop.config.schema.json` for editors and config validation.
+The package ships `schema/agentloop.config.schema.json` for editors and config validation. Generated configs use the GitHub raw schema URL for editor support; the CLI validates config locally and does not fetch that URL at runtime.
 
 See `docs/configuration.md` for config fields and schema notes.
 

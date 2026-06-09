@@ -11,6 +11,9 @@ describe('config', () => {
     });
 
     expect(config.version).toBe(1);
+    expect(config.$schema).toBe(
+      'https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agentloop.config.schema.json',
+    );
     expect(config.project.name).toBe('demo');
     expect(config.paths.agentloopDir).toBe('.agentloop');
     expect(config.commands.test).toBe('pnpm test');

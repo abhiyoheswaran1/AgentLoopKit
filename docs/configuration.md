@@ -8,6 +8,14 @@ The package ships a JSON schema:
 schema/agentloop.config.schema.json
 ```
 
+Generated configs use the GitHub raw URL for editor `$schema` support:
+
+```text
+https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agentloop.config.schema.json
+```
+
+The CLI validates config with its packaged TypeScript schema. It does not fetch this URL at runtime.
+
 The config controls:
 
 - project name, type, and package manager
