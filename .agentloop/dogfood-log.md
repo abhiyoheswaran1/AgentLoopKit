@@ -842,3 +842,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The tape hardcodes the current tarball name, so future version bumps should update the tape before rerendering.
 - Improve:
   - Consider a tiny asset-render script later if README screenshot regeneration becomes frequent.
+
+## 2026-06-09: 0.6.0 GitHub Release and npm Auth Result
+
+- Release: `v0.6.0`
+- Commit: `284cd2a2f1730213527370884d3efa1931ae9158`
+- GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.6.0
+- Attached asset: `agentloopkit-0.6.0.tgz`
+- CI run: `27220632864`
+- Publish workflow run: `27220705510`
+- npm registry check:
+  - latest: `0.1.1`
+  - versions: `0.1.0`, `0.1.1`
+- Verification completed:
+  - GitHub CI for `284cd2a`: pass
+  - GitHub release creation: pass
+  - GitHub Publish workflow package checks: pass
+  - GitHub Publish workflow final `npm publish`: failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`
+  - Local `npm whoami`: pass, reported `abhiyoheswaran`
+  - Local `npm publish --access public`: typecheck pass, Vitest pass with 18 files and 48 tests, build pass, then npm stopped at `EOTP`
+- Product changes:
+  - GitHub now has a public `v0.6.0` release with npm-pending notes.
+  - Launch checklist, npm publishing docs, and final handoff record the actual npm blocker.
+- Worked well:
+  - GitHub release and tarball distribution are available while npm auth remains blocked.
+- Improve:
+  - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.6.0`.
