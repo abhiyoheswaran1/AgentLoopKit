@@ -2239,8 +2239,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - AgentLoop badge: `.agentloop/reports/agentloop-verification.svg`.
   - `agentloop check-gates --strict --json`: pass.
   - Marked the task contract `done` and cleared active task state.
+  - GitHub CI run `27243118355`: pass.
+  - GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.17.0
+  - GitHub release asset: `agentloopkit-0.17.0.tgz`
+  - GitHub release tarball SHA-256: `8b7bb6ae9307e79cf97e20e405a1cef6a4aefcc48466d865758cc87f3439d49c`
+  - GitHub Publish workflow run `27243165066`: package checks passed, then npm rejected `npm publish --access public` with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+  - npm registry proof after release: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
 - Worked well:
   - Policy lookup stayed read-only and local.
   - The command exposes generated guidance without claiming compliance or building a policy engine.
 - Improve:
   - After verification, decide whether to publish a `v0.17.0` GitHub release and record npm auth status without claiming npm availability.
+
+## 2026-06-10: 0.17.0 GitHub Release And npm Auth Result
+
+- Task contract: `.agentloop/tasks/2026-06-10-record-0-17-0-release-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-070.md`
+- Release:
+  - GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.17.0
+  - Attached asset: `agentloopkit-0.17.0.tgz`
+  - SHA-256: `8b7bb6ae9307e79cf97e20e405a1cef6a4aefcc48466d865758cc87f3439d49c`
+- Publish status:
+  - CI run `27243118355`: pass.
+  - Publish workflow run `27243165066`: package checks passed, then npm rejected `npm publish --access public` with `E404`.
+  - npm registry proof: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
+- Verification run:
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 check:links`: pass, 397 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-01-48-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-01-48-pr-summary.md`.
+- Worked well:
+  - Release notes and docs separate GitHub tarball availability from npm availability.
+- Improve:
+  - Complete npm browser/OTP auth or trusted publishing before claiming `npx agentloopkit@0.17.0` support.

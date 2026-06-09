@@ -47,10 +47,12 @@ Short version:
 
 - npm previously served `agentloopkit@0.1.1` while GitHub release candidates from `v0.2.0` through `v0.15.1` were public.
 - GitHub release `v0.16.0` is public with attached `agentloopkit-0.16.0.tgz`.
-- `0.17.0` is the next catch-up release for current source, including `agentloop policy`.
+- GitHub release `v0.17.0` is public with attached `agentloopkit-0.17.0.tgz`.
+- `0.17.0` is the current catch-up release for current source, including `agentloop policy`.
 - Do not publish `0.16.0` from current `main`. `main` now contains behavior that was not in the `v0.16.0` release.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped with `EOTP` because browser or one-time-password authentication is required.
 - GitHub Publish workflow run `27241996432` for `v0.16.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- GitHub Publish workflow run `27243165066` for `v0.17.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - npm latest remains `agentloopkit@0.1.1` until that authentication completes.
 - Do not publish `0.15.1` to npm now. `main` has moved past that tag.
 - After the current package line lands on npm, resume normal semver publishing. Do not keep creating higher versions just because npm authorization was blocked.
@@ -136,6 +138,9 @@ Historical publishing log:
 - Local `npm publish --access public` for `0.16.0` reached npm publish and stopped at `EOTP`.
 - GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.16.0`.
 - GitHub release tarball SHA-256: `687dac923ee3976e4975641a20844ece4ce41c2123794423c46cd72091f8cb18`.
+- `agentloopkit@0.17.0` passed source version, built version, lint, typecheck, Vitest, Markdown link checks, build, projscan, `npm pack`, `npm publish --access public --dry-run`, packed-tarball smoke testing, and CI.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.17.0`.
+- GitHub release tarball SHA-256: `8b7bb6ae9307e79cf97e20e405a1cef6a4aefcc48466d865758cc87f3439d49c`.
 
 Publish the current prepared release to npm from its matching release commit after browser/OTP authentication completes. Do not backfill old npm versions with newer source.
 

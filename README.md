@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Current source targets `0.17.0`. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.16.0` carry earlier source. `0.17.0` adds read-only policy inspection and should be the next catch-up release after package authentication is fixed.
+Current source targets `0.17.0`. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.17.0` carry current source snapshots. `0.17.0` adds read-only policy inspection and is available as a GitHub release tarball until package authentication is fixed.
 
 Run the CLI after install:
 
@@ -427,7 +427,7 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. `0.17.0` is the next catch-up release for the current source. Earlier GitHub-only release candidates remain public, and npm authentication still needs browser/OTP completion or trusted-publishing repair.
+AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.17.0` is public with a tarball asset. The release-triggered Publish workflow passed package checks and failed at npm authorization, so npm still needs browser/OTP completion or trusted-publishing repair.
 
 The repository includes a GitHub Actions publish workflow for npm trusted publishing after the package is configured on npm. The workflow runs checks before `npm publish` and skips publish when the version already exists.
 
