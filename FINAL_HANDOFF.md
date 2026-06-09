@@ -242,6 +242,8 @@ Latest local verification for the `0.4.0` active task release candidate:
 - `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-4-0-active-task-release.md`: pass, wrote `.agentloop/reports/2026-06-09-17-33-verification-report.md`
 - `agentloop handoff --json`: pass, wrote `.agentloop/handoffs/2026-06-09-17-33-pr-summary.md`
 - `agentloop task clear --json`: pass, removed `.agentloop/state.json`
+- GitHub release `v0.4.0`: created with npm-pending notes and attached `agentloopkit-0.4.0.tgz`
+- GitHub Publish workflow run `27217477927` for `v0.4.0`: passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`; npm rejected the final publish with `E404`
 
 ## How to package
 
@@ -391,11 +393,12 @@ Top remaining items:
 
 ## Known limitations
 
-- GitHub releases `v0.2.0`, `v0.2.1`, and `v0.3.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.4.0` is prepared on `main` for active task lifecycle work, but it is not on npm yet.
+- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, and `v0.4.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.4.0` is the latest GitHub release, but it is not on npm yet.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
 - The stale manual GitHub Publish workflow for `0.3.0` targeted an older commit and was cancelled after the release workflow ran.
 - The release-triggered GitHub Publish workflow for `v0.3.0` passed checks and failed at npm authorization with `E404`.
+- The release-triggered GitHub Publish workflow for `v0.4.0` passed checks and failed at npm authorization with `E404`.
 - npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must complete local browser/OTP authentication.
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
@@ -426,7 +429,8 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.3.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.3.0` to npm.
 - [x] Prepare `agentloopkit@0.4.0` active task release candidate.
-- [ ] Publish GitHub release `v0.4.0` with npm-pending notes.
+- [x] Publish GitHub release `v0.4.0` with npm-pending notes.
+- [x] Run GitHub Publish workflow for `v0.4.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.4.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.

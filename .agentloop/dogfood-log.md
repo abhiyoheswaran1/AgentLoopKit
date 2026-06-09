@@ -644,6 +644,8 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-4-0-active-task-release.md`: pass
   - `agentloop handoff --json`: pass, wrote the handoff above and used the pinned `0.4.0` task
   - `agentloop task clear --json`: pass, removed `.agentloop/state.json`
+  - GitHub release `v0.4.0`: created with attached `agentloopkit-0.4.0.tgz`
+  - GitHub Publish workflow `27217477927`: package checks passed, final `npm publish` failed with `E404`
 - Product changes:
   - Bumped package metadata to `0.4.0`.
   - Moved active task lifecycle changelog notes into `0.4.0`.
@@ -654,5 +656,5 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Confusing:
   - npm latest remains `0.1.1` until npm trusted publishing or local browser/OTP authentication succeeds.
 - Improve:
-  - Create GitHub `v0.4.0` only after CI passes on the release-prep commit.
-  - After the release workflow runs, update docs with the actual npm publish result.
+  - Configure npm trusted publishing or complete local browser/OTP publish before creating another npm-aligned release.
+  - Keep future release notes explicit about npm availability until `npm view agentloopkit version` proves the publish.
