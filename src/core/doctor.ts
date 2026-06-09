@@ -20,6 +20,9 @@ export type DoctorResult = {
   markdown: string;
 };
 
+const MONOREPO_VERIFICATION_GUIDANCE =
+  'Root checks may not cover every package; add package-specific verification commands to the task contract, such as pnpm --filter <package> test, npm --workspace <package> test, or cd packages/<name> && npm test. AgentLoopKit does not run workspace commands automatically.';
+
 function check(name: string, status: DoctorCheck['status'], message: string): DoctorCheck {
   return { name, status, message };
 }
@@ -87,7 +90,7 @@ export async function runDoctor(options: { cwd: string }): Promise<DoctorResult>
       'Monorepo',
       monorepo.detected ? 'warn' : 'pass',
       monorepo.detected
-        ? `workspace markers detected: ${monorepo.markers.join(', ')}`
+        ? `workspace markers detected: ${monorepo.markers.join(', ')}. ${MONOREPO_VERIFICATION_GUIDANCE}`
         : 'not detected',
     ),
   );

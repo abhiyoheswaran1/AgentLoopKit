@@ -204,7 +204,7 @@ Each contract records:
 
 It does not hide failures. If long logs are truncated, the report keeps the first and last output so the final error stays visible. If no commands are configured, it writes a report saying nothing was verified.
 
-In monorepos, `doctor` warns on common workspace markers. Add package-specific checks to the task contract when root commands do not cover the touched package, for example `pnpm --filter web test` or `npm --workspace api test`. AgentLoopKit records and runs configured commands; it does not infer package graphs or run workspace commands automatically.
+In monorepos, `doctor` warns on common workspace markers and suggests package-specific verification commands. Add package checks to the task contract when root commands do not cover the touched package, for example `pnpm --filter web test` or `npm --workspace api test`. AgentLoopKit records and runs configured commands; it does not infer package graphs or run workspace commands automatically.
 
 ## Status
 

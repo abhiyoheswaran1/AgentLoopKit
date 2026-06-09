@@ -47,15 +47,15 @@ describe('doctor', () => {
 
     const result = await runDoctor({ cwd: dir });
     const monorepoCheck = result.checks.find((check) => check.name === 'Monorepo');
+    const expectedMessage =
+      'workspace markers detected: pnpm-workspace.yaml, turbo.json. Root checks may not cover every package; add package-specific verification commands to the task contract, such as pnpm --filter <package> test, npm --workspace <package> test, or cd packages/<name> && npm test. AgentLoopKit does not run workspace commands automatically.';
 
     expect(result.serious).toHaveLength(0);
     expect(monorepoCheck).toEqual({
       name: 'Monorepo',
       status: 'warn',
-      message: 'workspace markers detected: pnpm-workspace.yaml, turbo.json',
+      message: expectedMessage,
     });
-    expect(result.markdown).toContain(
-      '[warn] Monorepo: workspace markers detected: pnpm-workspace.yaml, turbo.json',
-    );
+    expect(result.markdown).toContain(`[warn] Monorepo: ${expectedMessage}`);
   });
 });

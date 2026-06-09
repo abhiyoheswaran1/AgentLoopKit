@@ -15,7 +15,7 @@ Then check the setup:
 npx agentloopkit doctor
 ```
 
-`doctor` detects common monorepo markers such as `pnpm-workspace.yaml`, package `workspaces`, Turbo, Nx, Lerna, and Rush config files. It reports them as warnings so you can confirm whether root-level verification commands are enough for the task.
+`doctor` detects common monorepo markers such as `pnpm-workspace.yaml`, package `workspaces`, Turbo, Nx, Lerna, and Rush config files. It reports them as warnings and suggests package-specific verification commands so you can confirm whether root-level checks are enough for the task.
 
 In monorepos, root checks do not always prove that one package was tested. Add package-specific commands to the task contract when the change lives under one workspace:
 

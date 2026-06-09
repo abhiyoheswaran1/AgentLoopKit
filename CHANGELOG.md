@@ -4,6 +4,7 @@
 
 - Added generated monorepo verification guidance to `.agentloop/harness/commands.md`, `.agentloop/README.md`, and `.agentloop/tasks/README.md`
 - Updated docs to explain root checks versus package-level checks without claiming workspace orchestration support
+- Updated the `doctor` monorepo warning with package-specific verification command examples
 
 ## 0.7.0
 

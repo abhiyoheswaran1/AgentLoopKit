@@ -3,7 +3,6 @@
 ## Near Term
 
 - Configure npm trusted publishing for GitHub Actions.
-- Add package-specific verification command suggestions to `doctor`.
 - Add task status transitions.
 - Add Markdown link checking for docs.
 - Add optional shell completion.

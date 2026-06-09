@@ -112,6 +112,22 @@ Latest local verification for the monorepo guidance iteration:
 - Playwright README screenshot render: pass for hero and verification PNGs.
 - VHS README terminal render: pass for `agentloopkit-cli.gif`.
 
+Latest local verification for the monorepo doctor suggestions iteration:
+
+- Red test first: `npx pnpm@10.12.1 test tests/doctor.test.ts` failed because the Monorepo check message only listed markers.
+- Focused green test: `npx pnpm@10.12.1 test tests/doctor.test.ts`: pass, 1 file and 3 tests.
+- `npx prettier --check ...`: pass after formatting backlog and task contract.
+- `git diff --check`: pass.
+- `npx pnpm@10.12.1 lint`: pass.
+- `npx pnpm@10.12.1 typecheck`: pass.
+- `npx pnpm@10.12.1 test`: pass, 18 files and 51 tests.
+- `npx pnpm@10.12.1 build`: pass.
+- `npx projscan doctor --format markdown`: A, 100/100.
+- Built CLI doctor JSON smoke: pass, Monorepo warning includes package-specific verification guidance.
+- `npx pnpm@10.12.1 pack`: pass.
+- Packed CLI doctor JSON smoke: pass.
+- `agentloop verify --task .agentloop/tasks/2026-06-09-add-monorepo-doctor-verification-suggestions.md`: pass.
+
 Latest local verification for `agentloop status`:
 
 - Red tests first: `tests/status.test.ts` and `tests/version.test.ts` failed before implementation.
@@ -594,6 +610,17 @@ Implemented:
 - README and getting-started docs that state AgentLoopKit does not infer package graphs or run workspace commands automatically
 - Vitest coverage for generated guidance
 
+### Cycle 32: monorepo doctor verification suggestions
+
+Decision: make the Monorepo doctor warning actionable while preserving explicit command execution.
+
+Implemented:
+
+- Monorepo doctor warning now suggests package-specific verification commands
+- Doctor JSON shape remains the same; only the message changed
+- README and getting-started docs mention the more actionable warning
+- Vitest coverage for the displayed warning
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -615,8 +642,8 @@ Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.7.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
-3. Add package-specific verification command suggestions to `doctor`.
-4. Markdown link checking for docs.
+3. Markdown link checking for docs.
+4. Task status transitions.
 5. Shell completions.
 
 ## Known limitations
@@ -735,8 +762,8 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.7.0`: high usefulness, low repo effort, external npm setting required.
-2. Add package-specific verification command suggestions to `doctor`: high usefulness, low effort, low maintenance.
-3. Add markdown link checks: medium usefulness, low effort, low maintenance.
+2. Add markdown link checks: medium usefulness, low effort, low maintenance.
+3. Add task status transitions: medium usefulness, medium effort.
 4. Add shell completions: medium usefulness, medium effort, low maintenance.
 5. Add task archive command: medium usefulness, medium effort, low maintenance.
 6. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
@@ -747,5 +774,5 @@ Title: I built a local-first engineering loop for coding agents
 11. Add local static HTML report: medium star potential, high effort, medium maintenance.
 12. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
 13. Add docs link checker workflow: medium trust improvement, low effort.
-14. Add task status transitions: medium usefulness, medium effort.
+14. Add richer doctor risk-file details: medium usefulness, low effort.
 15. Add team/cloud roadmap only after open-source traction: high commercial optionality, high effort, high maintenance.

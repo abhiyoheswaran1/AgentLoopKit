@@ -997,3 +997,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - A smoke command initially used a nonexistent `--cwd` flag; running the built CLI from inside the temp directory matched actual CLI behavior.
 - Improve:
   - Consider adding package-specific command suggestions to `doctor` later while keeping command execution explicit.
+
+## 2026-06-09: Monorepo Doctor Verification Suggestions
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-monorepo-doctor-verification-suggestions.md`
+- Product cycle: `.agentloop/research/interview-cycle-032.md`
+- Verification report: `.agentloop/reports/2026-06-09-19-07-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-19-08-pr-summary.md`
+- Trigger:
+  - Generated monorepo guidance landed, but `agentloop doctor` itself still only named workspace markers.
+  - Product panel chose a message-only improvement over a workspace runner.
+- Red test:
+  - `npx pnpm@10.12.1 test tests/doctor.test.ts` failed because the Monorepo check message did not mention package-specific verification commands.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/doctor.test.ts`: pass, 1 file and 3 tests
+  - `npx prettier --check ...`: pass after formatting backlog and task contract
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 18 files and 51 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - Built CLI doctor JSON smoke: pass, Monorepo warning includes package-specific verification guidance
+  - `npx pnpm@10.12.1 pack`: pass
+  - Packed CLI doctor JSON smoke: pass
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-monorepo-doctor-verification-suggestions.md`: pass
+- Product changes:
+  - The Monorepo doctor warning now tells users to add package-specific verification commands to the task contract.
+  - The warning includes `pnpm --filter`, `npm --workspace`, and package-local examples.
+  - JSON output keeps the same structure.
+- Worked well:
+  - The feature makes `doctor` more actionable without executing new commands.
+- Improve:
+  - Consider markdown link checking next; it improves launch trust without adding product scope.
