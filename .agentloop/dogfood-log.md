@@ -134,6 +134,15 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
   - `npx pnpm@10.12.1 build`: pass
   - `npx projscan doctor --format markdown`: A, 100/100
+  - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-15-30-verification-report.md`
+  - `agentloop summarize --write`: pass, wrote `.agentloop/handoffs/2026-06-09-15-30-pr-summary.md`
+- Verification completed:
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
   - `agentloop verify`: pass, wrote `.agentloop/reports/2026-06-09-15-08-verification-report.md`
   - `agentloop summarize --write`: pass, wrote `.agentloop/handoffs/2026-06-09-15-09-pr-summary.md`
 - Product changes:
@@ -178,3 +187,24 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Confusing: npm returns a 404 for an authorization/trusted-publisher problem.
 - Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
 - Improve: configure npm trusted publishing on npmjs.com, then rerun the Publish workflow.
+
+## 2026-06-09: CI Node 24 Runtime Opt-In
+
+- Task contract: `.agentloop/tasks/2026-06-09-opt-ci-actions-into-node-24-runtime.md`
+- Product cycle: `.agentloop/research/interview-cycle-010.md`
+- Trigger:
+  - `main` CI passed after contributor-template polish.
+  - GitHub warned that JavaScript actions were running on deprecated Node.js 20.
+- Verification planned:
+  - `git diff --check`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+- Product changes:
+  - CI workflow now sets `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true`.
+- Worked well: the fix is workflow-only and does not alter the npm package artifact.
+- Confusing: GitHub's warning points at action runtime, not the project's `node-version`.
+- Run-specific verification and handoff files were generated for dogfooding and kept out of the source commit because they include local state.
+- Improve: consider upgrading action major versions when Node 24-native versions are available.
