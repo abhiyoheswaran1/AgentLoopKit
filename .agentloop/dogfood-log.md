@@ -936,3 +936,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release candidate keeps the new doctor behavior separate from the already-published `v0.6.0` GitHub release.
 - Improve:
   - After the GitHub release, record the Publish workflow result and npm registry state.
+
+## 2026-06-09: 0.7.0 GitHub Release and npm Auth Result
+
+- Release: `v0.7.0`
+- Commit: `512ef6b3ccb7a6d982ecac40927ba6638ce88373`
+- GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.7.0
+- Attached asset: `agentloopkit-0.7.0.tgz`
+- CI run: `27221802324`
+- Publish workflow run: `27221868983`
+- npm registry check:
+  - latest: `0.1.1`
+  - versions: `0.1.0`, `0.1.1`
+- Verification completed:
+  - GitHub CI for `512ef6b`: pass
+  - GitHub release creation: pass
+  - GitHub Publish workflow package checks: pass
+  - GitHub Publish workflow final `npm publish`: failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`
+  - Local `npm whoami`: pass, reported `abhiyoheswaran`
+  - Local `npm publish --access public`: typecheck pass, Vitest pass with 18 files and 51 tests, build pass, then npm stopped at `EOTP`
+- Product changes:
+  - GitHub now has a public `v0.7.0` release with npm-pending notes.
+  - Launch checklist, npm publishing docs, final handoff, backlog, and release notes record the actual npm blocker.
+- Worked well:
+  - The release tarball is available from GitHub while npm auth remains blocked.
+- Improve:
+  - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.7.0`.
