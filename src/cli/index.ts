@@ -7,19 +7,22 @@ import { summarizeCommand } from './commands/summarize.js';
 import { installAgentCommand } from './commands/install-agent.js';
 import { listTemplatesCommand } from './commands/list-templates.js';
 import { versionCommand } from './commands/version.js';
+import { statusCommand } from './commands/status.js';
+import { getPackageVersion } from '../core/version.js';
 
 const program = new Command();
 
 program
   .name('agentloop')
   .description('A drop-in engineering loop for coding agents.')
-  .version('0.1.0', '-V, --version', 'print CLI version');
+  .version(getPackageVersion(), '-V, --version', 'print CLI version');
 
 program.addCommand(initCommand());
 program.addCommand(doctorCommand());
 program.addCommand(createTaskCommand());
 program.addCommand(verifyCommand());
 program.addCommand(summarizeCommand());
+program.addCommand(statusCommand());
 program.addCommand(installAgentCommand());
 program.addCommand(listTemplatesCommand());
 program.addCommand(versionCommand());

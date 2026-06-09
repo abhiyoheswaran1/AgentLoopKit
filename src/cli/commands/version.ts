@@ -1,7 +1,8 @@
 import { Command } from 'commander';
+import { getPackageVersion } from '../../core/version.js';
 
 export function versionCommand() {
   return new Command('version').description('Print CLI version').action(() => {
-    console.log('0.1.0');
+    console.log(getPackageVersion());
   });
 }

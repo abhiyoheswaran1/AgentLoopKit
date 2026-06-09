@@ -8,6 +8,7 @@ Before changing code:
 
 - Read AGENTLOOP.md.
 - Check .agentloop/tasks/ for an active task contract.
+- Run `agentloop status` when you need the current task, verification, dirty-file, and next-action state.
 - Follow the Specify, Constrain, Plan, Implement, Verify, Review, Handoff loop.
 - Keep changes small and tied to the task contract.
 - Do not run destructive git or filesystem commands unless the user asks for them.

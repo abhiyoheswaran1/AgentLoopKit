@@ -32,6 +32,8 @@ AgentLoopKit gives coding agents a repeatable engineering loop inside this repo.
 - Build: {{ buildCommand }}
 - Format: {{ formatCommand }}
 
+Use `agentloop status` to inspect the active task, latest verification report, working tree state, and next suggested command.
+
 ## Autonomous Work
 
 Agents may work autonomously inside the task contract. They should stop and ask before changing protected areas, adding dependencies, introducing breaking public APIs, or taking destructive actions.

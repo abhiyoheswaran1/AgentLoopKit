@@ -9,15 +9,17 @@ Use this before publishing AgentLoopKit.
 - [ ] README renders cleanly on GitHub after push.
 - [ ] CI is passing.
 - [x] `v0.1.0` tag exists.
-- [x] GitHub release notes are reviewed.
-- [x] Draft release is prepared with the release tarball.
+- [x] `v0.1.1` tag exists.
+- [x] GitHub release notes are reviewed for `v0.1.1`.
+- [x] GitHub release `v0.1.1` is published.
 - [ ] Good-first-issue labels are created.
 
 ## npm
 
 - [x] Package `agentloopkit@0.1.0` is published.
-- [x] Package `agentloopkit@0.1.1` is prepared.
-- [ ] Package `agentloopkit@0.1.1` is published.
+- [x] Package `agentloopkit@0.1.1` is published.
+- [x] Package `agentloopkit@0.2.0` is prepared.
+- [ ] Package `agentloopkit@0.2.0` is published.
 - [ ] npm trusted publishing is configured for this repository.
 - [x] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -41,6 +43,7 @@ npx projscan doctor --format markdown
 npx --yes --package ./agentloopkit-0.1.0.tgz agentloop version
 npx --yes --package ./agentloopkit-0.1.0.tgz agentloop init --dry-run --json
 npx --yes --package ./agentloopkit-0.1.1.tgz agentloop version
+npx --yes --package ./agentloopkit-0.2.0.tgz agentloop status --json
 ```
 
 ## Publish

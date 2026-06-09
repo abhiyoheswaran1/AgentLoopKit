@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0
+
+Status command:
+
+- Added `agentloop status` for active task, latest verification report, dirty files, configured commands, and next action
+- Added `agentloop status --json` for machine-readable automation
+- Fixed `agentloop version` and `agentloop --version` to read from `package.json`
+- Added Vitest coverage for status and version behavior
+
 ## 0.1.1
 
 README and release polish:

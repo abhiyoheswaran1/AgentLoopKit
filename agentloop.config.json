@@ -14,11 +14,11 @@
     "handoffsDir": ".agentloop/handoffs"
   },
   "commands": {
-    "test": "pnpm run test",
-    "lint": "pnpm run lint",
-    "typecheck": "pnpm run typecheck",
-    "build": "pnpm run build",
-    "format": "pnpm run format"
+    "test": "npx pnpm@10.12.1 test",
+    "lint": "npx pnpm@10.12.1 lint",
+    "typecheck": "npx pnpm@10.12.1 typecheck",
+    "build": "npx pnpm@10.12.1 build",
+    "format": "npx pnpm@10.12.1 format"
   },
   "safety": {
     "requireCleanWorkingTree": false,

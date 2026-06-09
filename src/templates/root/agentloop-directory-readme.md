@@ -12,13 +12,19 @@ This directory contains repo-local engineering loop artifacts for coding agents 
 agentloop create-task --title "Describe the next focused change" --type feature
 ```
 
-4. Run verification when work is ready:
+4. Check current loop state:
+
+```bash
+agentloop status
+```
+
+5. Run verification when work is ready:
 
 ```bash
 agentloop verify
 ```
 
-5. Generate a reviewer handoff:
+6. Generate a reviewer handoff:
 
 ```bash
 agentloop summarize --write

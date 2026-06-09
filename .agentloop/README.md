@@ -17,6 +17,7 @@ This directory contains AgentLoopKit's own repo-local engineering loop artifacts
 
 ```bash
 agentloop create-task --title "Describe the next focused change" --type feature
+agentloop status
 agentloop verify
 agentloop summarize --write
 ```

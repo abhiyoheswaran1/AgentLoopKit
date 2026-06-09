@@ -49,6 +49,7 @@ Run the CLI after install:
 ```bash
 npx agentloopkit doctor
 npx agentloopkit create-task --title "Add settings page" --type feature
+npx agentloopkit status
 npx agentloopkit verify
 npx agentloopkit summarize --write
 npx agentloopkit install-agent codex
@@ -84,6 +85,7 @@ pnpm build
 | `agentloop init --dry-run`      | Preview generated files without writing them            |
 | `agentloop doctor`              | Check setup health, commands, git state, and risk files |
 | `agentloop create-task`         | Create a task contract in `.agentloop/tasks/`           |
+| `agentloop status`              | Show active task, latest report, dirty files, next step |
 | `agentloop verify`              | Run configured checks and write a verification report   |
 | `agentloop summarize`           | Generate a deterministic PR or reviewer summary         |
 | `agentloop install-agent codex` | Add agent-specific instructions                         |
@@ -166,6 +168,24 @@ Each contract records:
 ```
 
 It does not hide failures. If no commands are configured, it writes a report saying nothing was verified.
+
+## Status
+
+`agentloop status` gives agents and humans a quick local readout:
+
+- active task contract
+- latest verification report
+- working tree state
+- configured and missing commands
+- next suggested command
+
+Use JSON output in scripts:
+
+```bash
+agentloop status --json
+```
+
+See `docs/status.md` for output fields and next-action rules.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report screenshot showing command results and reviewer handoff sections" width="100%">

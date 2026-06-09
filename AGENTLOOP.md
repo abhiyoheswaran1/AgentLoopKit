@@ -26,11 +26,13 @@ AgentLoopKit gives coding agents a repeatable engineering loop inside this repo.
 
 - Package manager: pnpm
 - Project type: typescript-package
-- Test: pnpm run test
-- Lint: pnpm run lint
-- Typecheck: pnpm run typecheck
-- Build: pnpm run build
-- Format: pnpm run format
+- Test: npx pnpm@10.12.1 test
+- Lint: npx pnpm@10.12.1 lint
+- Typecheck: npx pnpm@10.12.1 typecheck
+- Build: npx pnpm@10.12.1 build
+- Format: npx pnpm@10.12.1 format
+
+Use `agentloop status` to inspect the active task, latest verification report, working tree state, and next suggested command.
 
 ## Autonomous Work
 

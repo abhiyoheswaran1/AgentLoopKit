@@ -16,6 +16,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - task contract generation
 - verification report generation
 - deterministic PR summary generation
+- local status command for active task, latest verification, dirty files, configured commands, and next action
 - agent instruction installation, including `install-agent all`
 - template system for loops, gates, handoffs, agents, policies, tasks, and harness files
 - generated `.agentloop/README.md`
@@ -31,6 +32,8 @@ agentloop init --dry-run
 agentloop doctor
 agentloop doctor --json
 agentloop create-task --title "Add settings page" --type feature
+agentloop status
+agentloop status --json
 agentloop verify
 agentloop verify --command "node smoke-test.js"
 agentloop summarize --write
@@ -80,14 +83,28 @@ Latest local verification for the `0.1.1` README visual release candidate:
 - `npx pnpm@10.12.1 pack`: pass
 - `npm publish --access public --dry-run`: pass
 - `0.1.1` tarball smoke: pass
-- `npm publish --access public`: blocked by npm `EOTP`
+- `npm publish --access public`: completed after maintainer browser/OTP authentication
+
+Latest local verification for `agentloop status`:
+
+- Red tests first: `tests/status.test.ts` and `tests/version.test.ts` failed before implementation.
+- Focused green tests: `npx pnpm@10.12.1 test tests/status.test.ts tests/version.test.ts` passed, 2 files and 3 tests.
+- `npx pnpm@10.12.1 lint`: pass
+- `npx pnpm@10.12.1 typecheck`: pass
+- `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
+- `npx pnpm@10.12.1 build`: pass
+- `npx projscan doctor --format markdown`: A, 100/100
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.2.0.tgz`
+- `npm publish --access public --dry-run`: pass
+- `0.2.0` tarball smoke: pass
+- `agentloop verify`: pass after this repo's config was aligned to `npx pnpm@10.12.1`
 
 ## How to package
 
 ```bash
 npx pnpm@10.12.1 build
 npx pnpm@10.12.1 pack
-npx --yes --package ./agentloopkit-0.1.1.tgz agentloop version
+npx --yes --package ./agentloopkit-0.2.0.tgz agentloop version
 ```
 
 ## How to publish to npm
@@ -176,6 +193,17 @@ Implemented:
 - `0.1.1` release candidate and changelog entry
 - publish workflow guard for already-published versions
 
+### Cycle 5: Status command
+
+Decision: add a read-only status command instead of a dashboard.
+
+Implemented:
+
+- `agentloop status`
+- `agentloop status --json`
+- package-version-based `agentloop version`
+- Vitest coverage for status and version behavior
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -187,21 +215,22 @@ Strongest signals:
 - Security-sensitive users care about no telemetry, no postinstall scripts, provenance, and transparent file writes.
 - Skeptical developers need deterministic outputs and practical review value.
 - README readers need visual proof of the workflow before installing.
+- Agents and reviewers need one local command that shows current task, latest report, dirty files, and next action.
 
 ## Backlog
 
 Top remaining items:
 
-1. `agentloop status`: active task, latest verification report, dirty files, and next action.
-2. Better failed-command excerpts in verification reports.
-3. Good-first-issue guidance and repo labels.
-4. Better task status lifecycle.
-5. Monorepo project detection.
+1. Better failed-command excerpts in verification reports.
+2. Good-first-issue guidance and repo labels.
+3. Better task status lifecycle.
+4. Monorepo project detection.
+5. Markdown link checking for docs.
 
 ## Known limitations
 
 - npm trusted publishing still needs to be configured for future releases.
-- `agentloopkit@0.1.1` is prepared but needs npm browser/OTP authentication before publish.
+- `agentloopkit@0.2.0` needs final package verification and npm publish.
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
 - Third-party agent config files are not created unless conventions are safe and known.
@@ -218,9 +247,11 @@ Top remaining items:
 - [x] Add publish workflow.
 - [x] Publish `agentloopkit@0.1.0` to npm.
 - [x] Prepare `agentloopkit@0.1.1` README visual release.
-- [ ] Publish `agentloopkit@0.1.1` to npm.
+- [x] Publish `agentloopkit@0.1.1` to npm.
+- [x] Publish GitHub release `v0.1.1`.
+- [ ] Prepare `agentloopkit@0.2.0` status release.
+- [ ] Publish `agentloopkit@0.2.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
-- [ ] Publish GitHub release.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [ ] Add GitHub repo description.
 - [ ] Add initial good-first-issue labels.

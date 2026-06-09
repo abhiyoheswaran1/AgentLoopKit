@@ -10,6 +10,7 @@ Detected during AgentLoopKit init:
 
 Rules:
 
+- Use `agentloop status` to inspect active task, latest report, dirty files, and next action.
 - Run targeted checks while developing.
 - Run configured verification before claiming completion.
 - If a command fails, report the failure and fix it when reasonable.

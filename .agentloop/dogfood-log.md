@@ -80,3 +80,38 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Worked well: Playwright screenshots communicate the task, verification, and handoff artifacts faster than prose.
 - Confusing: npm `0.1.0` was already live, so README asset polish should ship as a patch release rather than rewriting the first npm release.
 - Improve: add a dedicated `agentloop status` command so future demos can show active task, latest report, and next action in one screen.
+
+## 2026-06-09: Status Command
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-status-command.md`
+- Product cycle: `.agentloop/research/interview-cycle-005.md`
+- Verification planned:
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+  - `npx pnpm@10.12.1 pack`
+  - `npm publish --access public --dry-run`
+- Verification completed:
+  - Red tests first: `tests/status.test.ts` and `tests/version.test.ts` failed before implementation.
+  - Focused green tests: `npx pnpm@10.12.1 test tests/status.test.ts tests/version.test.ts`: pass, 2 files and 3 tests
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 29 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.2.0.tgz`
+  - `npm publish --access public --dry-run`: pass
+  - `0.2.0` tarball smoke: pass, `agentloop status --json` and `agentloop version`
+  - `agentloop status --json` on this repo: pass, detected active task and suggested `agentloop verify`
+  - `agentloop verify`: first failed because repo config used unavailable global `pnpm`; passed after config changed to `npx pnpm@10.12.1`
+  - `agentloop status --json` after verification: pass, detected latest report status `pass` and suggested `agentloop summarize --write`
+- Product changes:
+  - Added `agentloop status` and `agentloop status --json`.
+  - Fixed version output to read `package.json`.
+  - Added Vitest coverage before implementation.
+  - Updated this repo's AgentLoopKit config to use `npx pnpm@10.12.1` so dogfooded verification matches the actual project commands.
+- Worked well: red tests caught both the missing command and stale version output.
+- Confusing: latest task/report detection is intentionally file-based; future task status lifecycle work can make this more explicit.
+- Improve: add richer task status transitions after this release.

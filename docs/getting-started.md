@@ -21,6 +21,13 @@ Create a task:
 npx agentloopkit create-task --type feature --title "Add settings page"
 ```
 
+Check the current loop state:
+
+```bash
+npx agentloopkit status
+npx agentloopkit status --json
+```
+
 Ask your coding agent to read:
 
 - `AGENTS.md`
@@ -31,5 +38,6 @@ After implementation:
 
 ```bash
 npx agentloopkit verify
+npx agentloopkit status
 npx agentloopkit summarize --write
 ```
