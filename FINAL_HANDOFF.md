@@ -14,6 +14,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - repo init flow with `--dry-run` and JSON output
 - doctor checks with JSON output
 - task contract generation
+- task contract creation with JSON output for agents and scripts
 - active task pinning with `.agentloop/state.json`
 - read-only task contract listing with active-task markers
 - explicit task status transitions in Markdown task contracts
@@ -100,6 +101,20 @@ Latest local verification for the `0.11.0` release candidate:
 - Packed CLI smoke: pass, `agentloop version` reported `0.11.0`, `task archive` moved a smoke task into `.agentloop/tasks/archive/`, `task list --json` returned no active tasks, and `task current --json` returned `null`.
 - npm registry proof before release: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
 - `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-11-0-task-archive-release.md`: pass.
+
+Latest local verification for `create-task --json`:
+
+- Red test first: `npx pnpm@10.12.1 test tests/create-task.test.ts` failed because `create-task` rejected `--json`.
+- Focused green test: `npx pnpm@10.12.1 test tests/create-task.test.ts`: pass, 1 file and 3 tests.
+- `git diff --check`: pass.
+- `npx pnpm@10.12.1 lint`: pass.
+- `npx pnpm@10.12.1 typecheck`: pass.
+- `npx pnpm@10.12.1 test`: pass, 20 files and 68 tests.
+- `npx pnpm@10.12.1 check:links`: pass, 289 Markdown files checked.
+- `npx pnpm@10.12.1 build`: pass.
+- `npx projscan doctor --format markdown`: A, 100/100.
+- Built CLI smoke: pass, `create-task --json` returned `task.path` and `task.markdown`.
+- `agentloop verify --task .agentloop/tasks/2026-06-09-add-create-task-json-output.md`: pass.
 
 Latest local verification for task archiving:
 
@@ -912,6 +927,17 @@ Implemented:
 - release notes updated with Publish workflow `E404` and npm registry state
 - launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
 
+### Cycle 45: create-task JSON output
+
+Decision: add opt-in JSON output to `create-task` because agents should not parse the human success line.
+
+Implemented:
+
+- `agentloop create-task --json`
+- JSON output containing the created task path and Markdown content
+- unchanged default text output
+- README, getting-started, task-contract docs, and generated task README guidance
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -930,16 +956,17 @@ Strongest signals:
 - Repeat CLI users need completions for the growing command surface, but security-sensitive users want inspectable scripts rather than dotfile installers.
 - Repeat users need a way to move finished task contracts out of the active list without deleting Markdown history.
 - Release readers need the README visuals and changelog to match the newest source command before a GitHub release is cut.
+- Agents need `create-task` to return machine-readable output like the rest of the task lifecycle commands.
 
 ## Backlog
 
 Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.11.0`.
-2. Prepare the next npm-publishable release after trusted publishing is repaired.
-3. Config schema hosting.
-4. `agentloop check-gates`.
-5. Add a clearer `create-task --json` follow-up if CLI consistency becomes a priority.
+2. Prepare a `0.12.0` release candidate for `create-task --json`.
+3. Prepare the next npm-publishable release after trusted publishing is repaired.
+4. Config schema hosting.
+5. `agentloop check-gates`.
 
 ## Known limitations
 
@@ -1080,9 +1107,9 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.11.0`: high usefulness, low repo effort, external npm setting required.
-2. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
-3. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-4. Add `create-task --json`: medium usefulness, low effort, low maintenance.
+2. Prepare `0.12.0` release for `create-task --json`: high usefulness, low effort, low maintenance.
+3. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
+4. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
 5. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
 6. Add GitHub Actions usage recipes for `verify` and `handoff`: medium usefulness, low effort.
 7. Add CI import notes to verification reports: medium usefulness, medium effort.

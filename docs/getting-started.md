@@ -40,6 +40,8 @@ npx agentloopkit create-task --type feature --title "Add settings page" \
   --rollback "Remove the settings route"
 ```
 
+Use `--json` when an agent or script needs the created task path and Markdown content.
+
 Pin it as the active task when the repo has multiple contracts:
 
 ```bash

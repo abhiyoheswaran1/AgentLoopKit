@@ -106,11 +106,17 @@ export function createTaskCommand() {
     .option('--non-goal <text>', 'non-goal; repeat or use newlines', lines, [])
     .option('--assumption <text>', 'assumption; repeat or use newlines', lines, [])
     .option('--likely-file <path>', 'likely file or area; repeat or use newlines', lines, [])
-    .option('--forbidden-file <path>', 'file or area not to touch; repeat or use newlines', lines, [])
+    .option(
+      '--forbidden-file <path>',
+      'file or area not to touch; repeat or use newlines',
+      lines,
+      [],
+    )
     .option('--acceptance <text>', 'acceptance criterion; repeat or use newlines', lines, [])
     .option('--verify-command <command>', 'verification command; repeat or use newlines', lines, [])
     .option('--verification <command>', 'verification command; repeat or use newlines', lines, [])
     .option('--rollback <text>', 'rollback notes')
+    .option('--json', 'print machine-readable output')
     .action(async (options: Record<string, unknown>) => {
       const type =
         typeof options.type === 'string' && TASK_TYPES.includes(options.type as TaskType)
@@ -141,6 +147,10 @@ export function createTaskCommand() {
         input,
         out: typeof options.out === 'string' ? options.out : undefined,
       });
+      if (options.json) {
+        console.log(JSON.stringify({ task: result }, null, 2));
+        return;
+      }
       console.log(`Task contract created: ${result.path}`);
     });
 }

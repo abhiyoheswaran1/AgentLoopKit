@@ -1426,3 +1426,34 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release tarball is available from GitHub while npm auth remains blocked.
 - Improve:
   - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.11.0`.
+
+## 2026-06-09: create-task JSON Output
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-create-task-json-output.md`
+- Product cycle: `.agentloop/research/interview-cycle-045.md`
+- Verification report: `.agentloop/reports/2026-06-09-21-19-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-21-24-pr-summary.md`
+- Trigger:
+  - Dogfooding tried `agentloop create-task --json` during release automation and the command rejected the option.
+  - Nearby task commands already support JSON output.
+- Red test:
+  - `npx pnpm@10.12.1 test tests/create-task.test.ts` failed because `create-task` rejected `--json`.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/create-task.test.ts`: pass, 1 file and 3 tests
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 20 files and 68 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 289 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - Built CLI smoke: pass, `create-task --json` returned `task.path` and `task.markdown`
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-create-task-json-output.md`: pass
+- Product changes:
+  - Added `agentloop create-task --json`.
+  - Kept default text output unchanged.
+  - Updated README, task-contract docs, getting-started docs, and generated task README guidance.
+- Worked well:
+  - The change removes brittle parsing for agents without changing task storage.
+- Improve:
+  - Package this in the next release candidate because `v0.11.0` already points at task archiving.

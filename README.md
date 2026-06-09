@@ -206,6 +206,7 @@ agentloop task clear
 ```
 
 `task list --json` gives agents a deterministic list with `path`, `title`, `status`, `active`, and `modifiedAt`. Listing tasks does not create or update `.agentloop/state.json`.
+`create-task --json` returns the created task path and Markdown content so agents do not need to parse the human success line.
 `task show --json` returns the selected task metadata and Markdown content without changing active state.
 `task status --json` updates only the `- Status:` line. Supported values are `proposed`, `in-progress`, `blocked`, `review`, and `done`. Status is not verification evidence; run `agentloop verify` before claiming completion.
 `task archive --json` moves one named Markdown contract into `.agentloop/tasks/archive/`, refuses to overwrite an existing archive file, and clears the active task pointer when it archives the active task. Archive after verification and handoff, not as a substitute for either.

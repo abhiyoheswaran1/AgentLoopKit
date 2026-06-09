@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile } from 'node:fs/promises';
+import { readFile, realpath } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -114,11 +114,49 @@ describe('create-task command', () => {
     );
 
     const markdown = await readFile(path.join(dir, '.agentloop/tasks/npm-otp-blocker.md'), 'utf8');
-    expect(markdown).toContain('Local npm publish passed checks but stopped at EOTP authentication.');
+    expect(markdown).toContain(
+      'Local npm publish passed checks but stopped at EOTP authentication.',
+    );
     expect(markdown).toContain('Release docs explain the safe publish paths.');
     expect(markdown).toContain('- No OTP is available to the CLI session.');
     expect(markdown).toContain('- git diff --check');
     expect(markdown).toContain('- pnpm test');
     expect(markdown).toContain('Revert the docs-only update.');
+  });
+
+  test('prints created task details as JSON when requested', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+    const resolvedDir = await realpath(dir);
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'JSON output',
+        '--type',
+        'feature',
+        '--out',
+        '.agentloop/tasks/json-output.md',
+        '--acceptance',
+        'JSON includes the created path',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+
+    expect(JSON.parse(result.stdout)).toEqual({
+      task: {
+        path: path.join(resolvedDir, '.agentloop/tasks/json-output.md'),
+        markdown: expect.stringContaining('# JSON output'),
+      },
+    });
+    expect(result.stdout).not.toContain('Task contract created:');
   });
 });
