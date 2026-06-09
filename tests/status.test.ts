@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -95,5 +95,27 @@ describe('status command', () => {
     expect(status.nextAction.reason).toContain('failed');
     expect(markdownResult.stdout).toContain('Latest verification: fail');
     expect(markdownResult.stdout).toContain('Run `agentloop verify`.');
+  });
+
+  test('uses modified time instead of filename sort for the active task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    const olderPath = path.join(dir, '.agentloop/tasks/2026-06-09-z-old-task.md');
+    const newerPath = path.join(dir, '.agentloop/tasks/2026-06-09-a-new-task.md');
+    await writeFile(olderPath, '# Older task\n\n- Status: proposed\n');
+    await writeFile(newerPath, '# Newer task\n\n- Status: in progress\n');
+    await utimes(olderPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
+    await utimes(newerPath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const status = JSON.parse(result.stdout);
+    expect(status.activeTask.title).toBe('Newer task');
+    expect(status.activeTask.path).toContain('2026-06-09-a-new-task.md');
   });
 });

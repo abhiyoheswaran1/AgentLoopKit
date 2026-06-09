@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readdir, readFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { DEFAULT_COMMAND_KEYS } from './constants.js';
 import {
@@ -10,7 +10,7 @@ import {
   parseGitStatus,
   GitFileStatus,
 } from './git.js';
-import { pathExists } from './file-system.js';
+import { latestMarkdownFile } from './artifacts.js';
 
 export type StatusArtifact = {
   path: string;
@@ -60,19 +60,6 @@ function extractTaskStatus(markdown: string) {
 
 function extractOverallStatus(markdown: string) {
   return markdown.match(/Overall status:\s*([a-z-]+)/i)?.[1]?.trim() || 'unknown';
-}
-
-async function latestMarkdownFile(dir: string) {
-  if (!(await pathExists(dir))) return undefined;
-  const entries = (await readdir(dir, { withFileTypes: true }))
-    .filter(
-      (entry) =>
-        entry.isFile() && entry.name.endsWith('.md') && entry.name.toLowerCase() !== 'readme.md',
-    )
-    .map((entry) => entry.name)
-    .sort();
-  const latest = entries.at(-1);
-  return latest ? path.join(dir, latest) : undefined;
 }
 
 async function readTask(

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, utimes, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { generatePrSummary, summarizeRepository } from '../src/core/pr-summary.js';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -48,5 +48,22 @@ describe('PR summary generation', () => {
     const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
 
     expect(summary.markdown).toContain('Overall status: pass');
+  });
+
+  test('uses modified time instead of filename sort for the latest task context', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    const olderPath = path.join(dir, '.agentloop/tasks/2026-06-09-z-old-task.md');
+    const newerPath = path.join(dir, '.agentloop/tasks/2026-06-09-a-new-task.md');
+    await writeFile(olderPath, '# Older task\n');
+    await writeFile(newerPath, '# Newer task\n');
+    await utimes(olderPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
+    await utimes(newerPath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
+
+    const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
+
+    expect(summary.markdown).toContain('Task context: Newer task');
   });
 });

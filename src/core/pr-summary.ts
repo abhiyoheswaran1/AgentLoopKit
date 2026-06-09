@@ -1,9 +1,10 @@
 import path from 'node:path';
-import { readdir, readFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
 import { getGitDiffStat, getGitStatus, parseGitStatus, GitFileStatus } from './git.js';
 import { pathExists, writeTextFile } from './file-system.js';
+import { latestMarkdownFile } from './artifacts.js';
 
 export type PrSummaryInput = {
   timestamp: string;
@@ -77,19 +78,6 @@ ${input.diffStat?.trim() || 'No diff stats available.'}
 `;
 
   return { markdown };
-}
-
-async function latestMarkdownFile(dir: string) {
-  if (!(await pathExists(dir))) return undefined;
-  const entries = (await readdir(dir, { withFileTypes: true }))
-    .filter(
-      (entry) =>
-        entry.isFile() && entry.name.endsWith('.md') && entry.name.toLowerCase() !== 'readme.md',
-    )
-    .map((entry) => entry.name)
-    .sort();
-  const latest = entries.at(-1);
-  return latest ? path.join(dir, latest) : undefined;
 }
 
 export async function summarizeRepository(options: {

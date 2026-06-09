@@ -158,6 +158,19 @@ Latest CI recovery for the `0.3.0` repeated create-task flag fix:
 - `npx pnpm@10.12.1 build`: pass
 - `npx projscan doctor --format markdown`: A, 100/100
 
+Latest local verification for the `0.3.0` active task detection fix:
+
+- Red tests first: `npx pnpm@10.12.1 test tests/status.test.ts tests/pr-summary.test.ts` failed because older alphabetically later task files were selected.
+- Focused green tests: `npx pnpm@10.12.1 test tests/status.test.ts tests/pr-summary.test.ts`: pass, 2 files and 7 tests
+- `git diff --check`: pass
+- `npx pnpm@10.12.1 lint`: pass
+- `npx pnpm@10.12.1 typecheck`: pass
+- `npx pnpm@10.12.1 test`: pass, 17 files and 36 tests
+- `npx pnpm@10.12.1 build`: pass
+- `npx projscan doctor --format markdown`: A, 100/100
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.3.0.tgz`
+- Tarball smoke: pass, packed `agentloop status --json` selected the newer modified task
+
 ## How to package
 
 ```bash
@@ -299,10 +312,10 @@ Strongest signals:
 Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.3.0`.
-2. Improve active task detection.
-3. Add non-interactive `create-task` flags for likely files and files not to touch.
-4. Better task status lifecycle.
-5. Monorepo project detection.
+2. Add non-interactive `create-task` flags for likely files and files not to touch.
+3. Better task status lifecycle.
+4. Monorepo project detection.
+5. Markdown link checking for docs.
 
 ## Known limitations
 
@@ -387,10 +400,10 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.3.0`: high usefulness, low repo effort, external npm setting required.
-2. Improve active task detection: medium usefulness, medium effort, low maintenance.
-3. Add non-interactive `create-task` flags for likely files and files not to touch: medium usefulness, low effort, low maintenance.
-4. Add task status lifecycle: high usefulness, medium effort, medium maintenance.
-5. Improve monorepo detection: high usefulness, medium effort, medium maintenance.
+2. Add non-interactive `create-task` flags for likely files and files not to touch: medium usefulness, low effort, low maintenance.
+3. Add task status lifecycle: high usefulness, medium effort, medium maintenance.
+4. Improve monorepo detection: high usefulness, medium effort, medium maintenance.
+5. Add markdown link checks: medium usefulness, low effort, low maintenance.
 6. Add shell completions: medium usefulness, medium effort, low maintenance.
 7. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
 8. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.

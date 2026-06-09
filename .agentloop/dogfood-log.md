@@ -489,3 +489,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - CLI tests now run the repo-local `node_modules/.bin/tsx` binary instead of `npx tsx`.
 - Worked well: the CI failure exposed a test harness dependency on networked `npx` behavior.
 - Improve: add a small shared `runCli` helper for future CLI tests.
+
+## 2026-06-09: Active Task Detection
+
+- Task contract: `.agentloop/tasks/2026-06-09-improve-active-task-detection.md`
+- Product cycle: `.agentloop/research/interview-cycle-018.md`
+- Trigger:
+  - Cycle 16 dogfooding showed `agentloop handoff` could select an older same-day task by filename order.
+  - `status` and PR summaries used duplicated filename-sort helpers.
+- Verification completed:
+  - Red tests first: `npx pnpm@10.12.1 test tests/status.test.ts tests/pr-summary.test.ts` failed because older alphabetically later task files were selected.
+  - Focused green tests: `npx pnpm@10.12.1 test tests/status.test.ts tests/pr-summary.test.ts`: pass, 2 files and 7 tests
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 17 files and 36 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.3.0.tgz`
+  - Tarball smoke: pass, packed `agentloop status --json` selected the newer modified task
+- Product changes:
+  - Added a shared latest Markdown artifact selector.
+  - `agentloop status` and deterministic handoffs now choose newest modified Markdown artifacts and ignore `README.md`.
+  - Filename order remains the tie-breaker when mtimes match.
+- Worked well: the fix removed duplicate latest-file logic without adding task state.
+- Improve: add explicit task lifecycle later so "active" can be user-controlled instead of inferred.
