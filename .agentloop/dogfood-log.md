@@ -337,3 +337,40 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Worked well: the change improves release trust without changing package contents.
 - Confusing: npm reports authorization problems as 404 errors in more than one path.
 - Improve: configure npm trusted publishing on npmjs.com, then rerun the Publish workflow.
+
+## 2026-06-09: 0.2.1 Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-2-1-release-candidate.md`
+- Product cycle: `.agentloop/research/interview-cycle-014.md`
+- Trigger:
+  - PR #1 and PR #2 changed package behavior after the public `v0.2.0` GitHub tag.
+  - npm latest remains `agentloopkit@0.1.1`.
+- Verification planned:
+  - `git diff --check`
+  - `npx pnpm@10.12.1 lint`
+  - `npx pnpm@10.12.1 typecheck`
+  - `npx pnpm@10.12.1 test`
+  - `npx pnpm@10.12.1 build`
+  - `npx projscan doctor --format markdown`
+  - `npx pnpm@10.12.1 pack`
+  - `npm publish --access public --dry-run`
+  - tarball smoke tests
+- Verification completed:
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 31 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.2.1.tgz`
+  - `npm publish --access public --dry-run`: pass
+  - Initial tarball smoke with default npm `test`: fail, because `npm init` creates a failing placeholder test script.
+  - Corrected tarball smoke with `--no-test --no-lint --no-typecheck --no-build --command "node -e ..."`: pass
+  - `npx --yes --package ./agentloopkit-0.2.1.tgz agentloop version`: pass, reported `0.2.1`
+- Product changes:
+  - Package version is prepared as `0.2.1`.
+  - Changelog documents verification excerpt and failed-status safety fixes.
+  - Launch checklist and handoff identify `0.2.1` as prepared, not published.
+- Worked well: the tarball proved version, status, and custom verification behavior without publishing.
+- Confusing: `agentloop verify --command` still runs configured checks unless disabled with flags.
+- Improve: publish only after npm trusted publishing is configured or local browser authentication succeeds.

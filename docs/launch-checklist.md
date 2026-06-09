@@ -20,6 +20,8 @@ Use this before publishing AgentLoopKit.
 - [x] Package `agentloopkit@0.1.1` is published.
 - [x] Package `agentloopkit@0.2.0` is prepared.
 - [ ] Package `agentloopkit@0.2.0` is published.
+- [x] Package `agentloopkit@0.2.1` is prepared.
+- [ ] Package `agentloopkit@0.2.1` is published.
 - [ ] npm trusted publishing is configured for this repository.
 - [x] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -44,6 +46,8 @@ npx --yes --package ./agentloopkit-0.1.0.tgz agentloop version
 npx --yes --package ./agentloopkit-0.1.0.tgz agentloop init --dry-run --json
 npx --yes --package ./agentloopkit-0.1.1.tgz agentloop version
 npx --yes --package ./agentloopkit-0.2.0.tgz agentloop status --json
+npx --yes --package ./agentloopkit-0.2.1.tgz agentloop version
+npx --yes --package ./agentloopkit-0.2.1.tgz agentloop status --json
 ```
 
 ## Publish
@@ -64,4 +68,5 @@ Current recovery note:
 
 - GitHub release `v0.2.0` is public.
 - npm still reports `agentloopkit@0.1.1` as latest.
-- Publish `0.2.0` from the `v0.2.0` tag after npm trusted publishing is configured, or bump and release a later version.
+- `agentloopkit@0.2.1` is the next prepared release candidate after the merged verification/status safety fixes.
+- Publish `0.2.1` only after npm trusted publishing is configured or local browser authentication succeeds.

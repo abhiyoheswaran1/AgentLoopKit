@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.1
+
+Review-safety release candidate:
+
+- Verification reports now preserve the beginning and ending output when a command log is truncated
+- Truncated command output includes a clear marker with the original output length
+- `agentloop status` now points back to `agentloop verify` when the latest verification report failed
+- Added release recovery docs for the `v0.2.0` GitHub/npm split
+- Added GitHub contributor labels and good-first-issue guidance
+
 ## 0.2.0
 
 Status command:
