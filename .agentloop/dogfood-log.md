@@ -1790,8 +1790,8 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 
 - Task contract: `.agentloop/tasks/2026-06-09-add-ci-context-to-verification-reports.md`
 - Product cycle: `.agentloop/research/interview-cycle-056.md`
-- Verification report: `.agentloop/reports/2026-06-09-23-13-verification-report.md`
-- Handoff: `.agentloop/handoffs/2026-06-09-23-13-pr-summary.md`
+- Verification report: `.agentloop/reports/2026-06-09-23-16-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-23-16-pr-summary.md`
 - Trigger:
   - CI-generated verification reports did not show which workflow run created them.
   - Product panel chose allowlisted report provenance instead of a dashboard, workflow installer, or environment dump.
@@ -1805,6 +1805,9 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npx pnpm@10.12.1 check:links`: pass, 337 Markdown files checked
   - `npx pnpm@10.12.1 build`: pass
   - `npx projscan doctor --format markdown`: first flagged a secret-looking test fixture key, then passed after the fixture was renamed
+  - GitHub CI run `27236246488`: failed because the local-report omission test inherited real GitHub Actions environment variables.
+  - Simulated GitHub Actions focused test after isolation fix: pass, 1 file and 6 tests.
+  - Full verification after isolation fix: lint, typecheck, test, check:links, build, and projscan passed.
   - `agentloop verify --task .agentloop/tasks/2026-06-09-add-ci-context-to-verification-reports.md`: pass
   - `agentloop handoff --task .agentloop/tasks/2026-06-09-add-ci-context-to-verification-reports.md`: pass
 - Product changes:
@@ -1816,5 +1819,6 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Projscan caught a misleading test fixture name before commit.
 - Confusing:
   - The first active-task output showed `proposed` because status changed immediately after pinning. Future docs could recommend changing status before pinning when both commands run together.
+  - CI env can leak into tests unless local-mode tests pass `env: {}` explicitly.
 - Improve:
   - Prepare the next release candidate after npm publishing is repaired or after the next feature batch.

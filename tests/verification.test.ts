@@ -50,7 +50,12 @@ describe('verification', () => {
     tempDirs.push(dir);
     const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
 
-    const result = await runVerification({ cwd: dir, config, reportTimestamp: '2026-06-09-12-31' });
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-09-12-31',
+      env: {},
+    });
 
     expect(result.overallStatus).toBe('not-run');
     expect(result.markdown).toContain('No verification commands were configured');
