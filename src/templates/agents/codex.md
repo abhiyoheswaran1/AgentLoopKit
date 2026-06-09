@@ -1,0 +1,27 @@
+# Codex Agent Instructions
+
+Use the AgentLoopKit harness in this repo.
+
+Before editing:
+
+- Read AGENTS.md.
+- Read AGENTLOOP.md.
+- Check .agentloop/tasks/ for the active task contract.
+- Review .agentloop/harness/commands.md.
+
+Work loop:
+
+- Specify the requested outcome.
+- Constrain protected areas.
+- Plan a focused diff.
+- Implement only the scoped change.
+- Verify with configured commands.
+- Review git diff.
+- Handoff with verification evidence.
+
+Codex-specific expectations:
+
+- Keep changes small.
+- Update DECISIONS.md when architecture changes.
+- Do not claim success without verification evidence.
+- Do not run destructive commands unless explicitly requested.

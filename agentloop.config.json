@@ -1,0 +1,37 @@
+{
+  "$schema": "https://agentloopkit.dev/schema/agentloop.config.schema.json",
+  "version": 1,
+  "project": {
+    "name": "agentloopkit",
+    "type": "typescript-package",
+    "packageManager": "pnpm"
+  },
+  "paths": {
+    "root": ".",
+    "agentloopDir": ".agentloop",
+    "tasksDir": ".agentloop/tasks",
+    "reportsDir": ".agentloop/reports",
+    "handoffsDir": ".agentloop/handoffs"
+  },
+  "commands": {
+    "test": "pnpm run test",
+    "lint": "pnpm run lint",
+    "typecheck": "pnpm run typecheck",
+    "build": "pnpm run build",
+    "format": "pnpm run format"
+  },
+  "safety": {
+    "requireCleanWorkingTree": false,
+    "warnOnDirtyWorkingTree": true,
+    "protectEnvFiles": true,
+    "protectMigrations": true,
+    "protectLockfiles": false
+  },
+  "summary": {
+    "includeDiffStats": true,
+    "includeChangedFiles": true,
+    "includeVerification": true,
+    "includeRisks": true,
+    "includeRollback": true
+  }
+}
