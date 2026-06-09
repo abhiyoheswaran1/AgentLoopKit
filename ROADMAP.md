@@ -4,7 +4,6 @@
 
 - Configure npm trusted publishing for GitHub Actions.
 - Add task status transitions.
-- Add Markdown link checking for docs.
 - Add optional shell completion.
 
 ## Later

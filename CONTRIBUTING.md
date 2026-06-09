@@ -8,6 +8,7 @@ Thanks for improving AgentLoopKit.
 pnpm install
 pnpm test
 pnpm typecheck
+pnpm check:links
 pnpm build
 npx projscan doctor --format markdown
 ```
@@ -71,5 +72,6 @@ Run:
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm check:links
 pnpm build
 ```

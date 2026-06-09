@@ -64,6 +64,7 @@ Use this before publishing AgentLoopKit.
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm check:links
 pnpm build
 pnpm pack
 npx projscan doctor --format markdown

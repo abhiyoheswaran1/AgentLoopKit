@@ -68,6 +68,7 @@ npx tsx src/cli/index.ts init --dry-run
 npx pnpm@10.12.1 lint
 npx pnpm@10.12.1 typecheck
 npx pnpm@10.12.1 test
+npx pnpm@10.12.1 check:links
 npx pnpm@10.12.1 build
 npx projscan doctor --format markdown
 ```
@@ -127,6 +128,21 @@ Latest local verification for the monorepo doctor suggestions iteration:
 - `npx pnpm@10.12.1 pack`: pass.
 - Packed CLI doctor JSON smoke: pass.
 - `agentloop verify --task .agentloop/tasks/2026-06-09-add-monorepo-doctor-verification-suggestions.md`: pass.
+
+Latest local verification for the markdown link checking iteration:
+
+- Red test first: `npx pnpm@10.12.1 test tests/markdown-links.test.ts` failed because `src/core/markdown-links.ts` did not exist.
+- Focused green test: `npx pnpm@10.12.1 test tests/markdown-links.test.ts`: pass, 1 file and 4 tests.
+- `npx prettier --check ...`: pass after formatting new files.
+- `git diff --check`: pass.
+- `npx pnpm@10.12.1 lint`: pass.
+- `npx pnpm@10.12.1 typecheck`: pass.
+- `npx pnpm@10.12.1 test`: pass, 19 files and 55 tests.
+- `npx pnpm@10.12.1 check:links`: pass, 246 Markdown files checked.
+- `npx pnpm@10.12.1 build`: pass.
+- `npx projscan doctor --format markdown`: A, 100/100.
+- `npx pnpm@10.12.1 pack`: pass.
+- `agentloop verify --task .agentloop/tasks/2026-06-09-add-markdown-link-checking.md`: pass.
 
 Latest local verification for `agentloop status`:
 
@@ -621,6 +637,18 @@ Implemented:
 - README and getting-started docs mention the more actionable warning
 - Vitest coverage for the displayed warning
 
+### Cycle 33: markdown link checking
+
+Decision: add a local docs trust check without network crawling.
+
+Implemented:
+
+- dependency-free local Markdown link checker
+- Vitest coverage for missing local links, anchors, external links, fenced code, and ignored directories
+- `pnpm check:links`
+- CI step for Markdown link checking
+- contributor and launch checklist updates
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -642,9 +670,9 @@ Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.7.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
-3. Markdown link checking for docs.
-4. Task status transitions.
-5. Shell completions.
+3. Task status transitions.
+4. Shell completions.
+5. Config schema hosting.
 
 ## Known limitations
 
@@ -762,17 +790,17 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.7.0`: high usefulness, low repo effort, external npm setting required.
-2. Add markdown link checks: medium usefulness, low effort, low maintenance.
-3. Add task status transitions: medium usefulness, medium effort.
-4. Add shell completions: medium usefulness, medium effort, low maintenance.
-5. Add task archive command: medium usefulness, medium effort, low maintenance.
-6. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
-7. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-8. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
-9. Add CI import notes to verification reports: medium usefulness, medium effort.
-10. Add policy pack customization: medium commercial optionality, medium effort.
-11. Add local static HTML report: medium star potential, high effort, medium maintenance.
-12. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
-13. Add docs link checker workflow: medium trust improvement, low effort.
-14. Add richer doctor risk-file details: medium usefulness, low effort.
+2. Add task status transitions: medium usefulness, medium effort.
+3. Add shell completions: medium usefulness, medium effort, low maintenance.
+4. Add task archive command: medium usefulness, medium effort, low maintenance.
+5. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
+6. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
+7. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
+8. Add CI import notes to verification reports: medium usefulness, medium effort.
+9. Add policy pack customization: medium commercial optionality, medium effort.
+10. Add local static HTML report: medium star potential, high effort, medium maintenance.
+11. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+12. Add richer doctor risk-file details: medium usefulness, low effort.
+13. Add package recipe examples for monorepos: medium usefulness, low effort.
+14. Add generated security-review example: medium trust improvement, low effort.
 15. Add team/cloud roadmap only after open-source traction: high commercial optionality, high effort, high maintenance.

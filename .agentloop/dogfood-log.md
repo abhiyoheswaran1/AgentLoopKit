@@ -1030,3 +1030,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The feature makes `doctor` more actionable without executing new commands.
 - Improve:
   - Consider markdown link checking next; it improves launch trust without adding product scope.
+
+## 2026-06-09: Markdown Link Checking
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-markdown-link-checking.md`
+- Product cycle: `.agentloop/research/interview-cycle-033.md`
+- Verification report: `.agentloop/reports/2026-06-09-19-14-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-19-14-pr-summary.md`
+- Trigger:
+  - The README, docs, examples, and internal agent-loop artifacts now form a large launch surface.
+  - CI did not catch broken local Markdown links.
+- Red test:
+  - `npx pnpm@10.12.1 test tests/markdown-links.test.ts` failed because `src/core/markdown-links.ts` did not exist.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/markdown-links.test.ts`: pass, 1 file and 4 tests
+  - `npx prettier --check ...`: pass after formatting new files
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 19 files and 55 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 246 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-markdown-link-checking.md`: pass
+- Product changes:
+  - Added a dependency-free local Markdown link checker.
+  - Added `pnpm check:links`.
+  - Added CI coverage for local Markdown links.
+  - Updated contributor and launch checklists.
+- Worked well:
+  - The checker validates local docs without network calls or new dependencies.
+- Improve:
+  - Consider task status transitions next if scope remains small.
