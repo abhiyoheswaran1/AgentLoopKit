@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.11.0
+
+Task archive GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:
+
+- Added `agentloop task archive <path>` to move one named task contract into `.agentloop/tasks/archive/`
+- Archive refuses to overwrite an existing archived task file
+- Archiving the active task clears the active task pointer
+- Normal `agentloop task list` output excludes archived task contracts
+- Updated README, getting-started docs, task docs, generated harness guidance, shell completions, and README visual assets for the archive workflow
+
 ## 0.10.0
 
 Shell completions GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:

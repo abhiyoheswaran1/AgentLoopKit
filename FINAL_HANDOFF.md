@@ -82,6 +82,25 @@ npx pnpm@10.12.1 build
 npx projscan doctor --format markdown
 ```
 
+Latest local verification for the `0.11.0` release candidate:
+
+- `npx tsx src/cli/index.ts version`: pass, reported `0.11.0`.
+- `node dist/cli/index.js version`: pass, reported `0.11.0`.
+- Playwright README screenshot render: pass for `agentloopkit-showcase.png` and `agentloopkit-verification.png`.
+- VHS README terminal render: pass for `agentloopkit-cli.gif` using the `0.11.0` tarball name and showing task archive after handoff.
+- `git diff --check`: pass.
+- `npx pnpm@10.12.1 lint`: pass.
+- `npx pnpm@10.12.1 typecheck`: pass.
+- `npx pnpm@10.12.1 test`: pass, 20 files and 67 tests.
+- `npx pnpm@10.12.1 check:links`: pass, 283 Markdown files checked.
+- `npx pnpm@10.12.1 build`: pass.
+- `npx projscan doctor --format markdown`: A, 100/100.
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.11.0.tgz`.
+- `npm publish --access public --dry-run`: pass.
+- Packed CLI smoke: pass, `agentloop version` reported `0.11.0`, `task archive` moved a smoke task into `.agentloop/tasks/archive/`, `task list --json` returned no active tasks, and `task current --json` returned `null`.
+- npm registry proof before release: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
+- `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-11-0-task-archive-release.md`: pass.
+
 Latest local verification for task archiving:
 
 - Red test first: `npx pnpm@10.12.1 test tests/task-state.test.ts` failed because `archiveTask` did not exist and `agentloop task archive` was unknown.
@@ -870,6 +889,19 @@ Implemented:
 - task list behavior that excludes archived tasks by default
 - README, docs, shell completions, harness, and generated agent guidance
 
+### Cycle 43: 0.11.0 release candidate
+
+Decision: package task archiving as `0.11.0` because `v0.10.0` already points at the shell-completion release.
+
+Implemented:
+
+- package metadata bump to `0.11.0`
+- `0.11.0` changelog entry for task archiving
+- README source note and quick command flow update
+- VHS tape update to use `agentloopkit-0.11.0.tgz` and show `agentloop task archive`
+- Playwright screenshot refresh for current test counts and archive workflow
+- launch, publishing, final handoff, backlog, and product-panel release records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -887,13 +919,14 @@ Strongest signals:
 - Agents need a safe status command so task contracts move through the loop without hand-editing Markdown.
 - Repeat CLI users need completions for the growing command surface, but security-sensitive users want inspectable scripts rather than dotfile installers.
 - Repeat users need a way to move finished task contracts out of the active list without deleting Markdown history.
+- Release readers need the README visuals and changelog to match the newest source command before a GitHub release is cut.
 
 ## Backlog
 
 Top remaining items:
 
-1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.10.0`.
-2. Prepare `0.11.0` release metadata for task archiving.
+1. Publish GitHub release `v0.11.0` with npm-pending notes and tarball asset.
+2. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.11.0`.
 3. Prepare the next npm-publishable release after trusted publishing is repaired.
 4. Config schema hosting.
 5. `agentloop check-gates`.
@@ -901,6 +934,7 @@ Top remaining items:
 ## Known limitations
 
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, and `v0.10.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.11.0` is prepared on `main`, but no GitHub release or npm publish has been completed yet.
 - `agentloopkit@0.10.0` is the latest GitHub release, but it is not on npm yet.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
@@ -980,6 +1014,9 @@ Top remaining items:
 - [x] Publish GitHub release `v0.10.0` with npm-pending notes.
 - [x] Run GitHub Publish workflow for `v0.10.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.10.0` to npm.
+- [x] Prepare `agentloopkit@0.11.0` task-archive release candidate.
+- [ ] Publish GitHub release `v0.11.0` with npm-pending notes.
+- [ ] Publish `agentloopkit@0.11.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
@@ -1031,8 +1068,8 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Repair npm publishing for `0.10.0`: high usefulness, low repo effort, external npm setting required.
-2. Prepare `0.11.0` release for task archiving: high usefulness, low effort, low maintenance.
+1. Publish GitHub release `v0.11.0`: high usefulness, low repo effort, low maintenance.
+2. Repair npm publishing for `0.11.0`: high usefulness, low repo effort, external npm setting required.
 3. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
 4. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
 5. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.

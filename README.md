@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Source on `main` documents `0.10.0`. npm currently serves `0.1.1` while publishing auth for later release candidates is being repaired. GitHub release tarballs contain the newer source commands.
+Source on `main` documents `0.11.0`. npm currently serves `0.1.1` while publishing auth for later release candidates is being repaired. GitHub release tarballs contain the newer source commands.
 
 Run the CLI after install:
 
@@ -60,13 +60,14 @@ npx agentloopkit task status .agentloop/tasks/2026-06-09-add-settings-page.md in
 npx agentloopkit status
 npx agentloopkit verify
 npx agentloopkit handoff
+npx agentloopkit task archive .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit install-agent codex
 npx agentloopkit install-agent all
 npx agentloopkit completion zsh
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, task status, completion, verify, and handoff commands" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, task status, completion, verify, handoff, and task archive commands" width="100%">
 </p>
 
 The VHS demo runs the local built CLI so the command flow matches this repository even when npm is behind.

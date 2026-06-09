@@ -1358,3 +1358,40 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The command improves task hygiene without adding a database or deleting history.
 - Improve:
   - Prepare a new release candidate after this feature, because `v0.10.0` already points at shell completions.
+
+## 2026-06-09: 0.11.0 Task Archive Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-11-0-task-archive-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-043.md`
+- Verification report: `.agentloop/reports/2026-06-09-20-53-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-20-55-pr-summary.md`
+- Trigger:
+  - `agentloop task archive <path>` landed on `main` after the `v0.10.0` release.
+  - Package metadata, changelog, README status, and visual assets needed to match the task archive workflow.
+- Verification completed:
+  - `npx tsx src/cli/index.ts version`: pass, reported `0.11.0`
+  - `node dist/cli/index.js version`: pass, reported `0.11.0`
+  - Playwright README screenshot render: pass for `agentloopkit-showcase.png` and `agentloopkit-verification.png`
+  - VHS README terminal render: pass for `agentloopkit-cli.gif` using the `0.11.0` tarball name and showing `agentloop task archive`
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 20 files and 67 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 283 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.11.0.tgz`
+  - `npm publish --access public --dry-run`: pass
+  - Packed CLI smoke: pass, `agentloop version` reported `0.11.0`, `task archive` moved a smoke task, `task list --json` returned no active tasks, and `task current --json` returned null
+  - npm registry proof: latest `0.1.1`, versions `0.1.0` and `0.1.1`
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-11-0-task-archive-release.md`: pass
+- Product changes:
+  - Bumped package metadata to `0.11.0`.
+  - Added a `0.11.0` changelog entry.
+  - Updated README source note, command flow, and visual alt text.
+  - Refreshed Playwright screenshots and VHS GIF.
+  - Updated launch checklist, npm publishing docs, final handoff, backlog, and product-panel records.
+- Worked well:
+  - The release candidate keeps the task archive workflow visible in README assets without adding new scope.
+- Improve:
+  - After the GitHub release, record CI, Publish workflow, npm registry state, and tarball digest.
