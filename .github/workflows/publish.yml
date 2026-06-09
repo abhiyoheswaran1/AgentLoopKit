@@ -1,12 +1,16 @@
 name: Publish
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 
 permissions:
   contents: read
   id-token: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   npm:
@@ -42,5 +46,5 @@ jobs:
             echo "$package_name@$package_version is not published yet."
             echo "published=false" >> "$GITHUB_OUTPUT"
           fi
-      - run: npm publish
+      - run: npm publish --access public
         if: steps.npm-version.outputs.published == 'false'

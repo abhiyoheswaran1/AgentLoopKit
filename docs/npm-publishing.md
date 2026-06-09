@@ -55,12 +55,18 @@ Trusted publisher settings:
 
 npm trusted publishing requires npm CLI `11.5.1` or newer and Node.js `22.14.0` or newer. The publish workflow uses Node.js 24 and updates npm before publishing.
 
+The publish workflow can also be run manually from GitHub Actions after npm trusted publishing is configured. It checks whether the current `package.json` version already exists and skips publishing when npm already has that version.
+
+If GitHub Actions reaches `npm publish` and npm returns `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`, check npm package permissions and trusted publisher settings. That error means npm did not authorize the workflow to publish the package.
+
 Manual fallback:
 
 ```bash
 npm login
 npm publish --access public
 ```
+
+Use browser or OTP authentication locally when npm asks for it. Do not paste npm OTPs or tokens into issues, PRs, chat logs, or release notes.
 
 Trusted publishing creates provenance from GitHub Actions. Local fallback publishes do not create GitHub Actions provenance.
 
