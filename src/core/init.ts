@@ -17,11 +17,16 @@ export type InitResult = {
   created: string[];
   updated: string[];
   skipped: string[];
+  dryRun: boolean;
 };
 
 async function writeGeneratedFile(filePath: string, content: string, result: InitResult) {
   if (await pathExists(filePath)) {
     result.skipped.push(filePath);
+    return;
+  }
+  if (result.dryRun) {
+    result.created.push(filePath);
     return;
   }
   await writeTextFile(filePath, content);
@@ -52,6 +57,10 @@ async function upsertAgentsFile(cwd: string, content: string, result: InitResult
   const existing = await readTextIfExists(filePath);
   const marker = '<!-- agentloopkit:start -->';
   if (!existing) {
+    if (result.dryRun) {
+      result.created.push(filePath);
+      return;
+    }
     await writeTextFile(filePath, content);
     result.created.push(filePath);
     return;
@@ -63,12 +72,24 @@ async function upsertAgentsFile(cwd: string, content: string, result: InitResult
   const section = content
     .replace(/^# AGENTS\s*/i, '## AgentLoopKit\n\n')
     .replace('<!-- agentloopkit:start -->', marker);
+  if (result.dryRun) {
+    result.updated.push(filePath);
+    return;
+  }
   await writeTextFile(filePath, `${existing.trimEnd()}\n\n${section.trim()}\n`);
   result.updated.push(filePath);
 }
 
-export async function initializeAgentLoop(options: { cwd: string }): Promise<InitResult> {
-  const result: InitResult = { created: [], updated: [], skipped: [] };
+export async function initializeAgentLoop(options: {
+  cwd: string;
+  dryRun?: boolean;
+}): Promise<InitResult> {
+  const result: InitResult = {
+    created: [],
+    updated: [],
+    skipped: [],
+    dryRun: Boolean(options.dryRun),
+  };
   const cwd = options.cwd;
   const packageManager = await detectPackageManager(cwd);
   const projectType = await detectProjectType(cwd);
@@ -118,6 +139,8 @@ export async function initializeAgentLoop(options: { cwd: string }): Promise<Ini
   const configPath = path.join(cwd, CONFIG_FILE);
   if (await pathExists(configPath)) {
     result.skipped.push(configPath);
+  } else if (result.dryRun) {
+    result.created.push(configPath);
   } else {
     await writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
     result.created.push(configPath);

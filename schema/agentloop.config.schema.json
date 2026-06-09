@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentloopkit.dev/schema/agentloop.config.schema.json",
+  "title": "AgentLoopKit Configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "project", "paths", "commands", "safety", "summary"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "const": 1
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "packageManager"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "nextjs",
+            "react-vite",
+            "node",
+            "typescript-package",
+            "python",
+            "docs-only",
+            "generic"
+          ]
+        },
+        "packageManager": {
+          "type": "string",
+          "enum": ["pnpm", "npm", "yarn", "bun"]
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root", "agentloopDir", "tasksDir", "reportsDir", "handoffsDir"],
+      "properties": {
+        "root": {
+          "type": "string"
+        },
+        "agentloopDir": {
+          "type": "string"
+        },
+        "tasksDir": {
+          "type": "string"
+        },
+        "reportsDir": {
+          "type": "string"
+        },
+        "handoffsDir": {
+          "type": "string"
+        }
+      }
+    },
+    "commands": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["test", "lint", "typecheck", "build", "format"],
+      "properties": {
+        "test": {
+          "type": "string"
+        },
+        "lint": {
+          "type": "string"
+        },
+        "typecheck": {
+          "type": "string"
+        },
+        "build": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requireCleanWorkingTree",
+        "warnOnDirtyWorkingTree",
+        "protectEnvFiles",
+        "protectMigrations",
+        "protectLockfiles"
+      ],
+      "properties": {
+        "requireCleanWorkingTree": {
+          "type": "boolean"
+        },
+        "warnOnDirtyWorkingTree": {
+          "type": "boolean"
+        },
+        "protectEnvFiles": {
+          "type": "boolean"
+        },
+        "protectMigrations": {
+          "type": "boolean"
+        },
+        "protectLockfiles": {
+          "type": "boolean"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "includeDiffStats",
+        "includeChangedFiles",
+        "includeVerification",
+        "includeRisks",
+        "includeRollback"
+      ],
+      "properties": {
+        "includeDiffStats": {
+          "type": "boolean"
+        },
+        "includeChangedFiles": {
+          "type": "boolean"
+        },
+        "includeVerification": {
+          "type": "boolean"
+        },
+        "includeRisks": {
+          "type": "boolean"
+        },
+        "includeRollback": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

@@ -3,7 +3,6 @@
 ## Near Term
 
 - Publish npm package under `agentloopkit`.
-- Add JSON schema for `agentloop.config.json`.
 - Add richer doctor checks for monorepos.
 - Add task status transitions.
 - Add Markdown link checking for docs.

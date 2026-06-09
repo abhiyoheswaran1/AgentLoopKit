@@ -10,3 +10,9 @@ Initial MVP:
 - Deterministic verification reports and PR summaries
 - Vitest coverage for core behavior
 - GitHub Actions CI
+
+Follow-up launch polish:
+
+- Added `agentloop init --dry-run`
+- Added `schema/agentloop.config.schema.json`
+- Included the schema in npm package contents

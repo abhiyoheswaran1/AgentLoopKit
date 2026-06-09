@@ -3,8 +3,11 @@
 Run AgentLoopKit inside an existing repository:
 
 ```bash
+npx agentloopkit init --dry-run
 npx agentloopkit init
 ```
+
+Use `--dry-run` first when you want to see the planned file changes without writing them.
 
 Then check the setup:
 

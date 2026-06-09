@@ -37,6 +37,7 @@ Use it with `npx` inside an existing repository:
 
 ```bash
 npx agentloopkit init
+npx agentloopkit init --dry-run
 ```
 
 Run the CLI after install:
@@ -71,6 +72,7 @@ pnpm build
 | Command                         | Purpose                                                 |
 | ------------------------------- | ------------------------------------------------------- |
 | `agentloop init`                | Generate the repo harness and config                    |
+| `agentloop init --dry-run`      | Preview generated files without writing them            |
 | `agentloop doctor`              | Check setup health, commands, git state, and risk files |
 | `agentloop create-task`         | Create a task contract in `.agentloop/tasks/`           |
 | `agentloop verify`              | Run configured checks and write a verification report   |
@@ -104,6 +106,10 @@ agentloop.config.json
 ```
 
 `init` appends to an existing `AGENTS.md` instead of overwriting it.
+
+The package ships `schema/agentloop.config.schema.json` for editors and config validation.
+
+See `docs/configuration.md` for config fields and schema notes.
 
 ## Agent Usage
 

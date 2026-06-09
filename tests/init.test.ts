@@ -36,4 +36,17 @@ describe('init', () => {
     expect(agents).toContain('Do not remove.');
     expect(agents).toContain('AgentLoopKit');
   });
+
+  test('dry-run reports planned files without writing them', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    const result = await initializeAgentLoop({ cwd: dir, dryRun: true });
+
+    expect(result.created.some((file) => file.endsWith('AGENTLOOP.md'))).toBe(true);
+    await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
+    await expect(
+      readFile(path.join(dir, '.agentloop/harness/repo-map.md'), 'utf8'),
+    ).rejects.toThrow();
+  });
 });

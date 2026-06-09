@@ -41,11 +41,12 @@ Use provenance when publishing from a supported CI environment. If publishing lo
 The npm package includes:
 
 - `dist`
+- `schema`
 - `README.md`
 - `LICENSE`
 - `package.json`
 
-The built CLI copies templates into `dist/templates`.
+The built CLI copies templates into `dist/templates` and the config schema into `dist/schema`.
 
 ## npx Usage
 
