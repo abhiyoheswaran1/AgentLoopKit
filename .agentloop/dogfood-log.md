@@ -2143,6 +2143,8 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npx projscan doctor --format markdown`: A, 100/100.
   - `npm pack --dry-run`: pass, previewed `agentloopkit@0.16.0`.
   - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - `npm publish --access public`: package checks passed, then npm stopped with `EOTP` for browser/OTP authentication.
+  - npm registry proof after the publish attempt: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
   - Packed tarball smoke: first assertion used the wrong `doctor --json` shape; corrected smoke test passed with `agentloop version` reporting `0.16.0`, `init --json` creating files, `doctor --json` returning no serious errors, and `badge --json` writing a missing-verification badge.
   - AgentLoop verification report: `.agentloop/reports/2026-06-10-01-10-verification-report.md`, overall status `pass`.
   - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-01-11-pr-summary.md`.

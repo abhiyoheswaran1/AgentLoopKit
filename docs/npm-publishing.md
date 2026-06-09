@@ -47,6 +47,8 @@ Short version:
 
 - npm previously served `agentloopkit@0.1.1` while GitHub release candidates from `v0.2.0` through `v0.15.1` were public.
 - `0.16.0` is the catch-up release for current source, including `agentloop badge`.
+- Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped with `EOTP` because browser or one-time-password authentication is required.
+- npm latest remains `agentloopkit@0.1.1` until that authentication completes.
 - Do not publish `0.15.1` to npm now. `main` has moved past that tag.
 - After `0.16.0` lands on npm, resume normal semver publishing. Do not keep creating higher versions just because npm authorization was blocked.
 
@@ -127,8 +129,11 @@ Historical publishing log:
 - GitHub Publish workflow run `27239176000` for `v0.15.1` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - npm registry proof after the `v0.15.1` release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 - npm should jump from `0.1.1` to `0.16.0` for the catch-up release because `v0.2.0` through `v0.15.1` are already public GitHub releases and current source includes new badge behavior.
+- `agentloopkit@0.16.0` passed source version, built version, lint, typecheck, Vitest, Markdown link checks, build, projscan, `npm pack --dry-run`, `npm publish --access public --dry-run`, and packed-tarball smoke testing.
+- Local `npm publish --access public` for `0.16.0` reached npm publish and stopped at `EOTP`.
+- Local tarball SHA-256: `7af5e8ab8871add83c9628662b6bb5d7b9f45c4a85f6ad29b7e73b589460f313`.
 
-Publish `0.16.0` to npm from the matching release commit. Do not backfill old npm versions with newer source.
+Publish `0.16.0` to npm from the matching release commit after browser/OTP authentication completes. Do not backfill old npm versions with newer source.
 
 Preferred release path after the first publish:
 

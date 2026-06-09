@@ -6,12 +6,12 @@ AgentLoopKit does not install workflows into user repositories. Copy a recipe in
 
 ## npm Status
 
-`0.16.0` is the npm catch-up release for the current AgentLoopKit source, including `agentloop badge`.
+`0.16.0` is the catch-up release for the current AgentLoopKit source, including `agentloop badge`. npm still serves `0.1.1` until browser/OTP authentication completes.
 
-Use npm in CI:
+Until npm catches up, pin the GitHub release tarball in CI:
 
 ```bash
-npm install --no-save agentloopkit@0.16.0
+npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.16.0/agentloopkit-0.16.0.tgz
 npx --no-install agentloop check-gates --strict
 ```
 
@@ -36,7 +36,7 @@ jobs:
           node-version: 24
 
       - name: Install AgentLoopKit
-        run: npm install --no-save agentloopkit@0.16.0
+        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.16.0/agentloopkit-0.16.0.tgz
 
       - name: Check AgentLoop evidence
         run: npx --no-install agentloop check-gates --strict
@@ -68,7 +68,7 @@ jobs:
         run: npm ci
 
       - name: Install AgentLoopKit
-        run: npm install --no-save agentloopkit@0.16.0
+        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.16.0/agentloopkit-0.16.0.tgz
 
       - name: Run AgentLoop verification
         run: npx --no-install agentloop verify

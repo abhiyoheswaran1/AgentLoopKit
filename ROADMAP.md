@@ -24,12 +24,12 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 
 - Configure npm trusted publishing for GitHub Actions.
 - npm previously lagged at `agentloopkit@0.1.1` while GitHub release candidates reached `v0.15.1`.
-- The next release should publish current source as `0.16.0`, including `agentloop badge`.
+- Local `npm publish --access public` for `0.16.0` passed package checks and stopped at npm OTP/browser authentication.
 - After `0.16.0` lands on npm, normal semver releases resume.
 
 ## Near Term
 
-- Publish the `0.16.0` npm catch-up release and matching GitHub release.
+- Complete npm browser/OTP authentication for the `0.16.0` catch-up release.
 - Add policy pack customization.
 - Add template version and migration guidance.
 - Improve contributor issue examples and good-first tasks.

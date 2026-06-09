@@ -1415,7 +1415,7 @@ Strongest signals:
 
 Top remaining items:
 
-1. Publish `agentloopkit@0.16.0` from the matching release commit and create GitHub release `v0.16.0`.
+1. Complete npm browser/OTP authentication for `agentloopkit@0.16.0`.
 2. Policy pack customization.
 3. Template version and migration guidance.
 4. Optional schema-store submission after npm publishing is stable.
@@ -1426,6 +1426,7 @@ Top remaining items:
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, `v0.15.0`, and `v0.15.1` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - npm should jump from `0.1.1` to `0.16.0` for the catch-up release because current source now includes `agentloop badge` after the `v0.15.1` tag.
 - Do not publish `0.15.1` to npm with newer source. Publish `0.16.0` from the matching release commit.
+- Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP` for browser/OTP authentication.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -1540,6 +1541,7 @@ Top remaining items:
 - [x] Prepare `agentloopkit@0.16.0` badge release candidate.
 - [ ] Publish GitHub release `v0.16.0` with badge release notes.
 - [ ] Publish `agentloopkit@0.16.0` to npm.
+- [x] Try local `npm publish --access public` for `0.16.0`; package checks passed, npm required browser/OTP authentication.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
@@ -1591,7 +1593,7 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Publish `0.16.0` to npm and GitHub from the matching release commit: high usefulness, low repo effort, current launch blocker.
+1. Complete browser/OTP npm publish for `0.16.0`: high usefulness, low repo effort, external auth required.
 2. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
 3. Add policy pack customization: medium commercial optionality, medium effort.
 4. Add policy pack customization: medium star potential, medium effort, medium maintenance.

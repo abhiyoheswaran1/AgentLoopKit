@@ -102,6 +102,7 @@ Use this before publishing AgentLoopKit.
 - [ ] Local `agentloopkit@0.15.1` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
 - [x] Package `agentloopkit@0.16.0` is being prepared on `main` for the badge release.
 - [ ] Package `agentloopkit@0.16.0` is published.
+- [x] Try local `npm publish --access public` for `0.16.0`; package checks passed, npm required browser/OTP authentication.
 - [ ] Local `agentloopkit@0.16.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
 - [ ] npm trusted publishing is configured for this repository.
 - [x] `npm whoami` works for manual fallback.
@@ -225,3 +226,4 @@ Current recovery note:
 - GitHub Publish workflow for `v0.15.1` passed package checks and failed at npm authorization with `E404`.
 - npm should jump from `0.1.1` to `0.16.0` for the catch-up release because `main` now includes badge behavior after `v0.15.1`.
 - Do not publish `0.15.1` to npm with newer source. Publish `0.16.0` from the matching release commit.
+- Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP`.
