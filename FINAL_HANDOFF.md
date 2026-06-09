@@ -70,22 +70,34 @@ Latest local verification for the product-panel iteration:
 - AgentLoopKit `verify`: pass
 - AgentLoopKit `summarize --write`: pass
 
+Latest local verification for the `0.1.1` README visual release candidate:
+
+- `npx pnpm@10.12.1 lint`: pass
+- `npx pnpm@10.12.1 typecheck`: pass
+- `npx pnpm@10.12.1 test`: pass, 13 files and 26 tests
+- `npx pnpm@10.12.1 build`: pass
+- `npx projscan doctor --format markdown`: A, 100/100
+- `npx pnpm@10.12.1 pack`: pass
+- `npm publish --access public --dry-run`: pass
+- `0.1.1` tarball smoke: pass
+- `npm publish --access public`: blocked by npm `EOTP`
+
 ## How to package
 
 ```bash
 npx pnpm@10.12.1 build
 npx pnpm@10.12.1 pack
-npx --yes --package ./agentloopkit-0.1.0.tgz agentloop version
+npx --yes --package ./agentloopkit-0.1.1.tgz agentloop version
 ```
 
 ## How to publish to npm
 
-Preferred path:
+Preferred path after `0.1.0`:
 
-1. Publish `agentloopkit@0.1.0` manually once.
-2. Configure npm trusted publishing for this GitHub repository.
-3. Publish future GitHub releases.
-4. Let `.github/workflows/publish.yml` run checks and `npm publish` through OIDC.
+1. Configure npm trusted publishing for this GitHub repository.
+2. Publish future GitHub releases.
+3. Let `.github/workflows/publish.yml` run checks and `npm publish` through OIDC.
+4. If a version already exists on npm, the workflow skips the publish step.
 
 Manual fallback:
 
@@ -95,7 +107,7 @@ npm whoami
 npm publish --access public
 ```
 
-The first manual publish may require an npm OTP. Do not publish from an unauthenticated local machine.
+The first manual publish for `agentloopkit@0.1.0` was completed with npm browser/OTP authentication.
 
 ## How users install it
 
@@ -152,6 +164,18 @@ Implemented:
 - README publishing status
 - changelog and roadmap updates
 
+### Cycle 4: README launch visuals
+
+Decision: add README-native visuals generated with Playwright and VHS, then ship a patch release instead of mutating `0.1.0`.
+
+Implemented:
+
+- Playwright-rendered workflow and verification screenshots
+- VHS terminal GIF of the published CLI flow
+- README image embeds with npm-safe raw GitHub URLs
+- `0.1.1` release candidate and changelog entry
+- publish workflow guard for already-published versions
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -162,6 +186,7 @@ Strongest signals:
 - Multi-agent users want one command for common agent instructions.
 - Security-sensitive users care about no telemetry, no postinstall scripts, provenance, and transparent file writes.
 - Skeptical developers need deterministic outputs and practical review value.
+- README readers need visual proof of the workflow before installing.
 
 ## Backlog
 
@@ -175,7 +200,8 @@ Top remaining items:
 
 ## Known limitations
 
-- npm package is not published yet.
+- npm trusted publishing still needs to be configured for future releases.
+- `agentloopkit@0.1.1` is prepared but needs npm browser/OTP authentication before publish.
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
 - Third-party agent config files are not created unless conventions are safe and known.
@@ -190,10 +216,12 @@ Top remaining items:
 - [x] Attach packed tarball to draft release.
 - [x] Add CI.
 - [x] Add publish workflow.
-- [ ] Publish `agentloopkit@0.1.0` to npm.
+- [x] Publish `agentloopkit@0.1.0` to npm.
+- [x] Prepare `agentloopkit@0.1.1` README visual release.
+- [ ] Publish `agentloopkit@0.1.1` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [ ] Publish GitHub release.
-- [ ] Confirm npm package install with `npx agentloopkit init`.
+- [x] Confirm npm package install with `npx agentloopkit version`.
 - [ ] Add GitHub repo description.
 - [ ] Add initial good-first-issue labels.
 - [ ] Announce launch.

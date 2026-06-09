@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.1
+
+README and release polish:
+
+- Added README hero and verification screenshots rendered with Playwright
+- Added a VHS terminal demo for the published npm CLI
+- Updated README publishing status now that `agentloopkit` is live on npm
+- Added a publish workflow guard that skips npm publish when the package version already exists
+- Updated launch checklist and final handoff status
+
 ## 0.1.0
 
 Initial MVP:

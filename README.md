@@ -6,6 +6,10 @@ Your coding agent can already write code. AgentLoopKit helps it work like a disc
 
 Vibe coding produces code. Agentic engineering produces auditable work.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-showcase.png" alt="AgentLoopKit workflow showing task contracts, verification reports, and handoff artifacts" width="100%">
+</p>
+
 ## What It Is
 
 AgentLoopKit is a repo-level toolkit for developers using Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and other coding agents.
@@ -50,6 +54,10 @@ npx agentloopkit summarize --write
 npx agentloopkit install-agent codex
 npx agentloopkit install-agent all
 ```
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, doctor, create-task, and summarize" width="100%">
+</p>
 
 Pinned team usage:
 
@@ -159,6 +167,10 @@ Each contract records:
 
 It does not hide failures. If no commands are configured, it writes a report saying nothing was verified.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report screenshot showing command results and reviewer handoff sections" width="100%">
+</p>
+
 ## PR Summaries
 
 `agentloop summarize` uses deterministic inputs:
@@ -227,7 +239,9 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-The repository includes a GitHub Actions publish workflow for npm trusted publishing. Configure the package on npm, publish a GitHub release, and the workflow will run checks before `npm publish --provenance`.
+AgentLoopKit is published on npm as `agentloopkit`.
+
+The repository includes a GitHub Actions publish workflow for npm trusted publishing after the package is configured on npm. The workflow runs checks before `npm publish` and skips publish when the version already exists.
 
 See `docs/launch-checklist.md` before publishing.
 

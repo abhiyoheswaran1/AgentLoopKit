@@ -1,0 +1,20 @@
+# README Assets
+
+These files generate the screenshots and terminal animation used in the root README.
+
+Regenerate the terminal GIF:
+
+```bash
+vhs docs/assets/readme/agentloopkit-cli.tape
+```
+
+Run VHS from the repository root. The tape starts in a clean temp repository before the visible AgentLoopKit commands begin.
+
+Regenerate the Playwright screenshots:
+
+```bash
+npx playwright screenshot --viewport-size=1440,960 "file://$(pwd | sed 's/ /%20/g')/docs/assets/readme/showcase.html" docs/assets/readme/agentloopkit-showcase.png
+npx playwright screenshot --viewport-size=1440,960 "file://$(pwd | sed 's/ /%20/g')/docs/assets/readme/verification.html" docs/assets/readme/agentloopkit-verification.png
+```
+
+Do not edit the generated PNG or GIF files by hand.

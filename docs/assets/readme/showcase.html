@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AgentLoopKit Workflow</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: oklch(23% 0.032 142);
+        --muted: oklch(47% 0.025 142);
+        --paper: oklch(96% 0.018 120);
+        --surface: oklch(98% 0.012 120);
+        --line: oklch(84% 0.024 118);
+        --green: oklch(51% 0.11 145);
+        --blue: oklch(47% 0.08 236);
+        --rust: oklch(54% 0.12 42);
+        --terminal: oklch(19% 0.02 145);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at 12% 0%, oklch(89% 0.04 143), transparent 28%),
+          linear-gradient(135deg, oklch(96% 0.016 112), oklch(92% 0.022 76));
+        color: var(--ink);
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+      }
+
+      .canvas {
+        width: 1440px;
+        height: 960px;
+        padding: 72px 82px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 58px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-weight: 800;
+        letter-spacing: 0;
+        font-size: 24px;
+      }
+
+      .mark {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--terminal);
+        color: oklch(93% 0.03 145);
+        display: grid;
+        place-items: center;
+        font:
+          800 20px/1 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+        box-shadow: 0 16px 40px oklch(24% 0.03 145 / 16%);
+      }
+
+      .badge {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 9px 15px;
+        color: var(--muted);
+        font-size: 15px;
+        background: oklch(99% 0.006 120 / 70%);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 0.86fr 1.14fr;
+        gap: 54px;
+        align-items: start;
+      }
+
+      h1 {
+        font-size: 74px;
+        line-height: 0.96;
+        margin: 0 0 24px;
+        letter-spacing: 0;
+        max-width: 620px;
+      }
+
+      .lede {
+        margin: 0 0 34px;
+        max-width: 560px;
+        font-size: 22px;
+        line-height: 1.42;
+        color: var(--muted);
+      }
+
+      .command {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 22px;
+        background: var(--terminal);
+        color: oklch(94% 0.03 142);
+        border-radius: 14px;
+        font:
+          700 20px/1.2 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+        box-shadow: 0 22px 45px oklch(24% 0.03 145 / 18%);
+      }
+
+      .prompt {
+        color: oklch(76% 0.12 145);
+      }
+
+      .proof {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 42px;
+        max-width: 590px;
+      }
+
+      .proof div {
+        border-top: 1px solid var(--line);
+        padding-top: 16px;
+      }
+
+      .proof strong {
+        display: block;
+        font-size: 28px;
+        margin-bottom: 5px;
+      }
+
+      .proof span {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.35;
+      }
+
+      .loop {
+        position: relative;
+        padding: 28px;
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        background: oklch(99% 0.008 112 / 84%);
+        box-shadow: 0 32px 90px oklch(35% 0.04 120 / 16%);
+      }
+
+      .loop-title {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+
+      .loop-title h2 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .loop-title span {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 28px;
+      }
+
+      .step {
+        min-height: 86px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--surface);
+        padding: 12px;
+      }
+
+      .step b {
+        display: block;
+        color: var(--green);
+        font-size: 13px;
+        margin-bottom: 10px;
+      }
+
+      .step span {
+        display: block;
+        font-weight: 760;
+        font-size: 14px;
+        line-height: 1.15;
+      }
+
+      .artifact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .artifact {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--surface);
+        min-height: 196px;
+        padding: 20px;
+      }
+
+      .artifact h3 {
+        margin: 0 0 16px;
+        font-size: 16px;
+      }
+
+      .artifact ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .artifact li {
+        display: flex;
+        gap: 9px;
+        align-items: flex-start;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        margin-top: 6px;
+        border-radius: 99px;
+        background: var(--green);
+        flex: 0 0 auto;
+      }
+
+      .terminal {
+        grid-column: 1 / -1;
+        background: var(--terminal);
+        border-radius: 20px;
+        color: oklch(88% 0.02 145);
+        padding: 22px;
+        font:
+          15px/1.55 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+        box-shadow: inset 0 0 0 1px oklch(70% 0.03 145 / 14%);
+      }
+
+      .terminal .green {
+        color: oklch(79% 0.14 145);
+      }
+
+      .terminal .blue {
+        color: oklch(78% 0.1 236);
+      }
+
+      .footer {
+        position: absolute;
+        left: 82px;
+        right: 82px;
+        bottom: 44px;
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="canvas" aria-label="AgentLoopKit workflow overview">
+      <div class="topline">
+        <div class="brand">
+          <div class="mark">AL</div>
+          AgentLoopKit
+        </div>
+        <div class="badge">npm package: agentloopkit · CLI: agentloop</div>
+      </div>
+
+      <section class="grid">
+        <div>
+          <h1>Give coding agents an engineering loop.</h1>
+          <p class="lede">
+            AgentLoopKit drops task contracts, safety policies, verification evidence, and reviewer
+            handoffs into any repo.
+          </p>
+          <div class="command"><span class="prompt">$</span> npx agentloopkit init</div>
+          <div class="proof">
+            <div>
+              <strong>50</strong><span>repo-local harness files generated on first run</span>
+            </div>
+            <div>
+              <strong>0</strong
+              ><span>cloud services, API keys, telemetry, or postinstall scripts</span>
+            </div>
+            <div><strong>7</strong><span>steps from task contract to reviewer handoff</span></div>
+          </div>
+        </div>
+
+        <div class="loop">
+          <div class="loop-title">
+            <h2>Specify → Handoff</h2>
+            <span>deterministic, local, reviewable</span>
+          </div>
+          <div class="steps">
+            <div class="step"><b>01</b><span>Specify</span></div>
+            <div class="step"><b>02</b><span>Constrain</span></div>
+            <div class="step"><b>03</b><span>Plan</span></div>
+            <div class="step"><b>04</b><span>Implement</span></div>
+            <div class="step"><b>05</b><span>Verify</span></div>
+            <div class="step"><b>06</b><span>Review</span></div>
+            <div class="step"><b>07</b><span>Handoff</span></div>
+          </div>
+
+          <div class="artifact-grid">
+            <div class="artifact">
+              <h3>.agentloop/tasks/add-settings-page.md</h3>
+              <ul>
+                <li>
+                  <span class="dot"></span><span>Desired outcome, non-goals, likely files</span>
+                </li>
+                <li>
+                  <span class="dot"></span
+                  ><span>Acceptance criteria and verification commands</span>
+                </li>
+                <li>
+                  <span class="dot"></span><span>Rollback notes before code changes start</span>
+                </li>
+              </ul>
+            </div>
+            <div class="artifact">
+              <h3>.agentloop/reports/verification-report.md</h3>
+              <ul>
+                <li>
+                  <span class="dot"></span><span>Commands run with exit codes and excerpts</span>
+                </li>
+                <li>
+                  <span class="dot"></span><span>Git branch, commit, and working tree state</span>
+                </li>
+                <li>
+                  <span class="dot"></span><span>Honest list of checks that did not run</span>
+                </li>
+              </ul>
+            </div>
+            <div class="terminal">
+              <span class="green">PASS</span> npm test<br />
+              <span class="green">PASS</span> npm run typecheck<br />
+              <span class="green">PASS</span> npm run build<br />
+              <span class="blue">WRITE</span> .agentloop/handoffs/2026-06-09-14-22-pr-summary.md
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">
+        <span
+          >Works with Codex, Claude Code, Cursor, OpenCode, Gemini CLI, Copilot CLI, and generic
+          agents.</span
+        >
+        <span>No LLM required.</span>
+      </div>
+    </main>
+  </body>
+</html>

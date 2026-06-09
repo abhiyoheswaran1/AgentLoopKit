@@ -19,3 +19,11 @@ This repo used Superpowers-style discipline during implementation. AgentLoopKit 
 ## 2026-06-09: Dogfood projscan In This Repo
 
 Implementation work in this repository runs `projscan` as a repo health check. AgentLoopKit does not require projscan for end users, and generated templates do not add that requirement to other repositories.
+
+## 2026-06-09: Use README-Native Launch Visuals
+
+Launch visuals live in `docs/assets/readme/` with source HTML and a VHS tape so maintainers can regenerate them locally. The README references raw GitHub asset URLs so npm can render images without adding screenshot files to the package tarball.
+
+## 2026-06-09: Patch Release For README Polish
+
+`agentloopkit@0.1.0` was published before README visuals landed. README image polish, release workflow safety, and launch docs ship as `0.1.1` instead of mutating the first npm release.

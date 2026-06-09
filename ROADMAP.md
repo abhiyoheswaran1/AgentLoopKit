@@ -2,10 +2,10 @@
 
 ## Near Term
 
-- Publish npm package under `agentloopkit`.
 - Configure npm trusted publishing for GitHub Actions.
 - Add richer doctor checks for monorepos.
 - Add task status transitions.
+- Add `agentloop status` for active task, latest report, dirty files, and next action.
 - Add Markdown link checking for docs.
 - Add optional shell completion.
 
