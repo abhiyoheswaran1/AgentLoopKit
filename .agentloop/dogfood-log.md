@@ -374,3 +374,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Worked well: the tarball proved version, status, and custom verification behavior without publishing.
 - Confusing: `agentloop verify --command` still runs configured checks unless disabled with flags.
 - Improve: publish only after npm trusted publishing is configured or local browser authentication succeeds.
+
+## 2026-06-09: 0.2.1 GitHub Release And npm Publish Check
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-2-1-release-candidate.md`
+- Product cycle: `.agentloop/research/interview-cycle-015.md`
+- Trigger:
+  - Maintainer requested a GitHub release after the local `0.2.1` release candidate was prepared.
+  - Local `npm publish --access public` browser-auth retry failed at npm's auth completion endpoint.
+- Verification completed before release:
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 15 files and 31 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+- Release actions:
+  - Created GitHub release `v0.2.1`.
+  - Updated the public release notes after the publish workflow result to state that npm latest remains `0.1.1`.
+  - Watched Publish workflow run `27212907210`.
+- Publish workflow result:
+  - GitHub Actions passed install, lint, typecheck, tests, build, and `prepublishOnly`.
+  - `npm publish --access public` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+  - `npm view agentloopkit version versions --json` still reports latest `0.1.1` with versions `0.1.0` and `0.1.1`.
+- Worked well: release notes now tell the truth about GitHub release status versus npm availability.
+- Confusing: npm uses 404 wording for a permission/trusted-publisher failure.
+- Improve: configure npm trusted publishing on npmjs.com for owner `abhiyoheswaran1`, repository `AgentLoopKit`, workflow `publish.yml`, allowed action `npm publish`.

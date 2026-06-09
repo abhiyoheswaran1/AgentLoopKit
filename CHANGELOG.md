@@ -2,7 +2,7 @@
 
 ## 0.2.1
 
-Review-safety release candidate:
+Review-safety GitHub release. npm publish is pending trusted-publishing or local-auth repair:
 
 - Verification reports now preserve the beginning and ending output when a command log is truncated
 - Truncated command output includes a clear marker with the original output length
