@@ -97,4 +97,52 @@ describe('check-gates command', () => {
     expect(humanResult.stdout).toContain('[fail] Task contract');
     expect(humanResult.stdout).toContain('Run `agentloop create-task`.');
   });
+
+  test('strict mode treats warning-only gates as failures without changing default behavior', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+      '# Demo task\n\n- Status: in-progress\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa(
+      'git',
+      ['-c', 'user.email=test@example.com', '-c', 'user.name=Test User', 'commit', '-m', 'init'],
+      { cwd: dir },
+    );
+
+    const defaultResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const strictResult = await execa(tsxPath, [cliPath, 'check-gates', '--strict', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(defaultResult.exitCode).toBe(0);
+    const defaultOutput = JSON.parse(defaultResult.stdout);
+    expect(defaultOutput.overallStatus).toBe('warn');
+    expect(defaultOutput.strict).toBe(false);
+    expect(defaultOutput.gates).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: 'git-context', status: 'warn' })]),
+    );
+
+    expect(strictResult.exitCode).toBe(1);
+    const strictOutput = JSON.parse(strictResult.stdout);
+    expect(strictOutput.overallStatus).toBe('fail');
+    expect(strictOutput.strict).toBe(true);
+    expect(strictOutput.gates).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: 'git-context', status: 'warn' })]),
+    );
+  });
 });

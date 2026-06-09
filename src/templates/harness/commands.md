@@ -17,6 +17,7 @@ Rules:
 - Use `agentloop task archive <path>` only after verification and handoff are complete.
 - Use `agentloop status` to inspect active task, latest report, dirty files, and next action.
 - Use `agentloop check-gates` to check task, verification, handoff, harness, policy, and git evidence before review.
+- Use `agentloop check-gates --strict` in CI when warning gates should fail.
 - Run targeted checks while developing.
 - Run configured verification before claiming completion.
 - If a command fails, report the failure and fix it when reasonable.

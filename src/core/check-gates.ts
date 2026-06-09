@@ -17,6 +17,7 @@ export type GateCheck = {
 };
 
 export type CheckGatesResult = {
+  strict: boolean;
   overallStatus: GateStatus;
   gates: GateCheck[];
   git: {
@@ -91,8 +92,9 @@ function gate(id: string, name: string, status: GateStatus, message: string, fil
   return { id, name, status, message, ...(filePath ? { path: filePath } : {}) };
 }
 
-function overallStatus(gates: GateCheck[]): GateStatus {
+function overallStatus(gates: GateCheck[], strict: boolean): GateStatus {
   if (gates.some((item) => item.status === 'fail')) return 'fail';
+  if (strict && gates.some((item) => item.status === 'warn')) return 'fail';
   if (gates.some((item) => item.status === 'warn')) return 'warn';
   return 'pass';
 }
@@ -139,6 +141,7 @@ function renderMarkdown(result: Omit<CheckGatesResult, 'markdown'>) {
   return `# AgentLoopKit Gates
 
 - Overall status: ${result.overallStatus}
+- Strict mode: ${result.strict ? 'enabled (warnings fail)' : 'disabled'}
 - Git: ${gitLine}
 - Changed files: ${result.git.changedFileCount}
 
@@ -157,7 +160,9 @@ ${result.nextAction.reason}
 export async function checkGates(options: {
   cwd: string;
   config: AgentLoopConfig;
+  strict?: boolean;
 }): Promise<CheckGatesResult> {
+  const strict = options.strict ?? false;
   const taskPath =
     (await getActiveTaskPath(options)) ??
     (await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir)));
@@ -259,7 +264,8 @@ export async function checkGates(options: {
   );
 
   const withoutMarkdown = {
-    overallStatus: overallStatus(gates),
+    strict,
+    overallStatus: overallStatus(gates, strict),
     gates,
     git: {
       isRepository: inGit,

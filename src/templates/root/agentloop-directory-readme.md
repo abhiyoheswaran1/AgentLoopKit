@@ -41,9 +41,11 @@ agentloop handoff
 
 ```bash
 agentloop check-gates
+agentloop check-gates --strict
 ```
 
 `check-gates` inspects local evidence. It does not run tests or call an LLM.
+Use `--strict` in CI when warning gates should fail.
 
 ## Directories
 

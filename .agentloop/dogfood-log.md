@@ -1626,3 +1626,34 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release tarball is available from GitHub while npm auth remains blocked.
 - Improve:
   - Complete local browser/OTP auth for `0.13.0`, or configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`.
+
+## 2026-06-09: check-gates Strict Mode
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-check-gates-strict-mode.md`
+- Product cycle: `.agentloop/research/interview-cycle-051.md`
+- Verification report: `.agentloop/reports/2026-06-09-22-27-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-22-28-pr-summary.md`
+- Trigger:
+  - CI users could run `check-gates`, but warning-only results still exited `0`.
+  - Product panel chose a one-flag strict mode instead of a policy DSL.
+- Red test:
+  - `npx pnpm@10.12.1 test tests/check-gates.test.ts` failed because JSON had no `strict` field and strict behavior did not exist.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/check-gates.test.ts`: pass, 1 file and 3 tests
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 check:links`: pass, 314 Markdown files checked
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 71 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - Built CLI smoke: pass, default warning exited `0`; strict warning exited `1`; JSON recorded `strict`
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-check-gates-strict-mode.md`: pass
+- Product changes:
+  - Added `agentloop check-gates --strict`.
+  - Preserved default warning behavior.
+  - Added `strict` to JSON output and strict-mode text to Markdown output.
+  - Updated README, getting-started docs, gate-check docs, generated harness guidance, backlog, and final handoff.
+- Worked well:
+  - Strict mode gives CI a deterministic failure path without changing local defaults.
+- Improve:
+  - Add GitHub Actions recipes for `agentloop verify`, `agentloop handoff`, and `agentloop check-gates --strict` in a later cycle.

@@ -54,6 +54,7 @@ agentloop status
 agentloop status --json
 agentloop check-gates
 agentloop check-gates --json
+agentloop check-gates --strict
 agentloop verify
 agentloop verify --command "node smoke-test.js"
 agentloop handoff
@@ -1038,6 +1039,18 @@ Implemented:
 - release notes updated with the npm version-jump explanation and exact `E404` failure
 - launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
 
+### Cycle 51: check-gates strict mode
+
+Decision: add `agentloop check-gates --strict` so CI users can fail on warning-level gates without parsing JSON.
+
+Implemented:
+
+- strict mode in the check-gates core and CLI
+- JSON output with `strict: true` or `strict: false`
+- Markdown output that names strict mode
+- Vitest coverage for default warning behavior and strict warning failure
+- README, getting-started docs, gate-check docs, and generated harness guidance
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1061,6 +1074,7 @@ Strongest signals:
 - Agents and reviewers need one deterministic command that checks review evidence without running tests.
 - Release readers need `0.13.0` metadata and visuals to match `check-gates` before the GitHub release.
 - Release readers need a plain explanation that npm may jump from `0.1.1` to `0.13.0` because intermediate versions were GitHub-only while npm publish was blocked.
+- CI users need `check-gates` to fail on warnings without changing the default local command behavior.
 
 ## Backlog
 
@@ -1236,4 +1250,4 @@ Title: I built a local-first engineering loop for coding agents
 12. Add config migration helper for future schema versions: medium usefulness, medium effort.
 13. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
 14. Add static HTML verification report export after CLI gates stabilize: medium usefulness, medium effort.
-15. Add optional `--strict` mode for `check-gates` warnings after users try the default behavior.
+15. Add a `check-gates` CI recipe once npm publishing is repaired.

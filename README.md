@@ -107,6 +107,7 @@ pnpm build
 | `agentloop task clear`                  | Clear the active task pointer                                             |
 | `agentloop status`                      | Show active task, latest report, dirty files, next step                   |
 | `agentloop check-gates`                 | Check task, verification, handoff, harness, policy, and git evidence      |
+| `agentloop check-gates --strict`        | Treat warning gates as failures for CI                                    |
 | `agentloop verify`                      | Run configured checks and write a verification report                     |
 | `agentloop summarize`                   | Generate a deterministic PR or reviewer summary                           |
 | `agentloop handoff`                     | Write a reviewer handoff summary                                          |
@@ -272,7 +273,10 @@ Use JSON output in scripts:
 
 ```bash
 agentloop check-gates --json
+agentloop check-gates --strict
 ```
+
+Warnings keep exit code `0` by default. Use `--strict` in CI when warning gates should fail the command.
 
 `doctor` checks setup health. `check-gates` checks whether the current work session has the evidence reviewers expect.
 
