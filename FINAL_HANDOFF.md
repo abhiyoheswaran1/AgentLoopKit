@@ -269,7 +269,7 @@ Top remaining items:
 - [ ] Publish `agentloopkit@0.2.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
-- [ ] Add GitHub repo description.
+- [x] Add GitHub repo description and discovery topics.
 - [x] Add initial good-first-issue labels.
 - [ ] Announce launch.
 
