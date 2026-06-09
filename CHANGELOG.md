@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.13.0
+
+check-gates GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:
+
+- Added `agentloop check-gates` to check review-evidence readiness without running tests
+- Added `agentloop check-gates --json` for deterministic agent and CI usage
+- Checks task contract, verification report, handoff summary, repo harness, safety policies, and git context
+- Added Vitest coverage for ready and missing-evidence paths
+- Updated README, getting-started docs, gate-check docs, generated harness guidance, shell completions, agent templates, and README visual assets
+
 ## 0.12.0
 
 create-task JSON output GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:

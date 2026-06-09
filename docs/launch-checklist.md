@@ -24,6 +24,7 @@ Use this before publishing AgentLoopKit.
 - [x] GitHub release `v0.10.0` is published with npm-pending notes.
 - [x] GitHub release `v0.11.0` is published with npm-pending notes.
 - [x] GitHub release `v0.12.0` is published with npm-pending notes.
+- [ ] GitHub release `v0.13.0` is published with npm-pending notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -78,6 +79,10 @@ Use this before publishing AgentLoopKit.
 - [x] Publish workflow for `v0.12.0` passed checks and failed at npm authorization.
 - [ ] Package `agentloopkit@0.12.0` is published.
 - [ ] Local `agentloopkit@0.12.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
+- [x] Package `agentloopkit@0.13.0` is prepared locally.
+- [ ] Publish workflow for `v0.13.0` has run.
+- [ ] Package `agentloopkit@0.13.0` is published.
+- [ ] Local `agentloopkit@0.13.0` publish completes browser/OTP authentication, or GitHub trusted publishing completes.
 - [ ] npm trusted publishing is configured for this repository.
 - [x] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -114,6 +119,7 @@ npx --yes --package ./agentloopkit-0.9.0.tgz agentloop task status .agentloop/ta
 npx --yes --package ./agentloopkit-0.10.0.tgz agentloop completion zsh
 npx --yes --package ./agentloopkit-0.11.0.tgz agentloop task archive .agentloop/tasks/smoke-task.md
 npx --yes --package ./agentloopkit-0.12.0.tgz agentloop create-task --title smoke-json --type feature --out .agentloop/tasks/smoke-json.md --json
+npx --yes --package ./agentloopkit-0.13.0.tgz agentloop check-gates --json
 ```
 
 ## Publish
@@ -144,6 +150,7 @@ Current recovery note:
 - GitHub release `v0.10.0` is public with attached `agentloopkit-0.10.0.tgz`.
 - GitHub release `v0.11.0` is public with attached `agentloopkit-0.11.0.tgz`.
 - GitHub release `v0.12.0` is public with attached `agentloopkit-0.12.0.tgz`.
+- `agentloopkit@0.13.0` is prepared locally for `agentloop check-gates`.
 - npm still reports `agentloopkit@0.1.1` as latest.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.3.0` is now prepared on `main` after the handoff command, create-task flag, latest artifact selection, and create-task alias work.
@@ -175,3 +182,6 @@ Current recovery note:
 - `agentloopkit@0.12.0` is now prepared on `main` for `create-task --json`.
 - GitHub Publish workflow for `v0.12.0` passed package checks and failed at npm authorization with `E404`.
 - Publish `0.12.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.
+- `agentloopkit@0.13.0` is prepared locally for `agentloop check-gates`.
+- Local `0.13.0` checks passed: `npm publish --access public --dry-run`, packed-tarball smoke test, and npm registry proof that latest remains `0.1.1`.
+- Publish `0.13.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.

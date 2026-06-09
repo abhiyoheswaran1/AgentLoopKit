@@ -86,6 +86,25 @@ npx pnpm@10.12.1 build
 npx projscan doctor --format markdown
 ```
 
+Latest local verification for the `0.13.0` release candidate:
+
+- `npx tsx src/cli/index.ts version`: pass, reported `0.13.0`.
+- `node dist/cli/index.js version`: pass, reported `0.13.0`.
+- Playwright README screenshot render: pass for `agentloopkit-showcase.png` and `agentloopkit-verification.png`.
+- VHS README terminal render: pass for `agentloopkit-cli.gif` using the `0.13.0` tarball name and showing `check-gates`.
+- `git diff --check`: pass.
+- `npx pnpm@10.12.1 lint`: pass.
+- `npx pnpm@10.12.1 typecheck`: pass.
+- `npx pnpm@10.12.1 test`: pass, 21 files and 70 tests.
+- `npx pnpm@10.12.1 check:links`: pass, 306 Markdown files checked.
+- `npx pnpm@10.12.1 build`: pass.
+- `npx projscan doctor --format markdown`: A, 100/100.
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.13.0.tgz`.
+- `npm publish --access public --dry-run`: pass.
+- Packed CLI smoke: pass, `agentloop version` reported `0.13.0`, missing gate evidence returned `agentloop create-task`, and task plus verification plus handoff made `check-gates` pass.
+- Tarball SHA-256 before release: `2c04fd3eba66fe662fb6fe97037b3950099d228b3759d2b418dcb57debef7e18`.
+- npm registry proof before release: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
+
 Latest local verification for the `0.12.0` release candidate:
 
 - `npx tsx src/cli/index.ts version`: pass, reported `0.12.0`.
@@ -988,9 +1007,23 @@ Decision: add a local review-evidence checker instead of a policy engine.
 Implemented:
 
 - `agentloop check-gates`
+- human and JSON output for task, verification, handoff, harness, policy, and git gates
 - `agentloop check-gates --json`
 - gate checks for task contract, verification report, handoff summary, repo harness, safety policies, and git context
+- generated agent and harness guidance updates
 - README, getting-started docs, dedicated gate-check docs, generated harness guidance, and agent templates
+
+### Cycle 49: 0.13.0 release candidate
+
+Decision: package `check-gates` as `0.13.0` because it gives agents one deterministic review-readiness command before handoff.
+
+Implemented:
+
+- package metadata bump to `0.13.0`
+- `0.13.0` changelog entry for `check-gates`
+- Playwright screenshot refresh showing 70 tests and `check-gates`
+- VHS tape update to use `agentloopkit-0.13.0.tgz` and show `check-gates`
+- launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-candidate records
 
 ## User persona feedback summary
 
@@ -1013,12 +1046,13 @@ Strongest signals:
 - Agents need `create-task` to return machine-readable output like the rest of the task lifecycle commands.
 - Release readers need `0.12.0` metadata and visuals to match `create-task --json` before the GitHub release.
 - Agents and reviewers need one deterministic command that checks review evidence without running tests.
+- Release readers need `0.13.0` metadata and visuals to match `check-gates` before the GitHub release.
 
 ## Backlog
 
 Top remaining items:
 
-1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.12.0`.
+1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.13.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
 3. Config schema hosting.
 4. Static HTML report export.
@@ -1027,6 +1061,7 @@ Top remaining items:
 
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, and `v0.12.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - `agentloopkit@0.12.0` is the latest GitHub release, but it is not on npm yet.
+- `agentloopkit@0.13.0` is prepared locally for `check-gates`, but it is not a GitHub release or npm version yet.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -1115,6 +1150,10 @@ Top remaining items:
 - [x] Publish GitHub release `v0.12.0` with npm-pending notes.
 - [x] Run GitHub Publish workflow for `v0.12.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.12.0` to npm.
+- [x] Prepare `agentloopkit@0.13.0` check-gates release candidate.
+- [ ] Publish GitHub release `v0.13.0` with npm-pending notes.
+- [ ] Run GitHub Publish workflow for `v0.13.0`.
+- [ ] Publish `agentloopkit@0.13.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
@@ -1166,7 +1205,7 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Repair npm publishing for `0.12.0`: high usefulness, low repo effort, external npm setting required.
+1. Repair npm publishing for `0.13.0`: high usefulness, low repo effort, external npm setting required.
 2. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
 3. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
 4. Add GitHub Actions usage recipes for `verify`, `handoff`, and `check-gates`: medium usefulness, low effort.

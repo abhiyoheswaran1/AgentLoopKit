@@ -1557,3 +1557,39 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The command gives review readiness without turning AgentLoopKit into a policy engine.
 - Improve:
   - Consider `--strict` later if users want warnings to fail in CI.
+
+## 2026-06-09: 0.13.0 Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-13-0-check-gates-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-049.md`
+- Verification report: `.agentloop/reports/2026-06-09-22-04-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-22-06-pr-summary.md`
+- Trigger:
+  - `check-gates` is implemented on `main`, but package metadata, README visuals, and release docs still pointed at `0.12.0`.
+  - README screenshots showed 68 tests while the suite now has 70.
+- Verification completed:
+  - Source CLI version: `npx tsx src/cli/index.ts version`: pass, reported `0.13.0`
+  - Built CLI version: `node dist/cli/index.js version`: pass, reported `0.13.0`
+  - Playwright README screenshot render: pass for `agentloopkit-showcase.png` and `agentloopkit-verification.png`
+  - VHS README terminal render: pass for `agentloopkit-cli.gif` using the `0.13.0` tarball name and showing `check-gates`
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 70 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 306 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.13.0.tgz`
+  - `npm publish --access public --dry-run`: pass
+  - Packed CLI smoke: pass, `agentloop version` reported `0.13.0`, missing evidence returned `agentloop create-task`, and task plus verification plus handoff made `check-gates` pass
+  - npm registry proof: latest `0.1.1`, versions `0.1.0` and `0.1.1`
+- Tarball SHA-256: `2c04fd3eba66fe662fb6fe97037b3950099d228b3759d2b418dcb57debef7e18`
+- Product changes:
+  - Bumped package metadata to `0.13.0`.
+  - Added a `0.13.0` changelog entry.
+  - Refreshed README source note, screenshots, and VHS terminal demo for `check-gates`.
+  - Updated launch checklist, npm publishing docs, final handoff, backlog, and product-panel records.
+- Worked well:
+  - The packed artifact proves both `check-gates` failure and pass paths in a fresh repo.
+- Improve:
+  - After the GitHub release, record CI, Publish workflow, npm registry state, and release asset digest.
