@@ -33,7 +33,7 @@ AgentLoopKit gives coding agents a repeatable engineering loop inside this repo.
 - Build: npx pnpm@10.12.1 build
 - Format: npx pnpm@10.12.1 format
 
-Use `agentloop task list` to inspect available task contracts. Use `agentloop task show <path>` to read one without changing active state. Use `agentloop task set <path>` to pin the active task when a repo has multiple contracts. Use `agentloop task status <path> <status>` to update the task contract state. Use `agentloop status` to inspect the active task, latest verification report, working tree state, and next suggested command.
+Use `agentloop task list` to inspect available task contracts. Use `agentloop task show <path>` to read one without changing active state. Use `agentloop task set <path>` to pin the active task when a repo has multiple contracts. Use `agentloop task status <path> <status>` to update the task contract state. Use `agentloop task archive <path>` after verification and handoff to move a finished contract into `.agentloop/tasks/archive/` without deleting it. Use `agentloop status` to inspect the active task, latest verification report, working tree state, and next suggested command.
 
 ## Autonomous Work
 

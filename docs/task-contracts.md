@@ -37,10 +37,12 @@ agentloop task list
 agentloop task show .agentloop/tasks/2026-06-09-fix-checkout-redirect.md
 agentloop task set .agentloop/tasks/2026-06-09-fix-checkout-redirect.md
 agentloop task status .agentloop/tasks/2026-06-09-fix-checkout-redirect.md in-progress
+agentloop task archive .agentloop/tasks/2026-06-09-fix-checkout-redirect.md
 ```
 
 Use `agentloop task list --json` when an agent needs a machine-readable list of contracts before choosing the active task. The list command is read-only and does not create `.agentloop/state.json`.
 Use `agentloop task show --json` when an agent needs the selected contract content in a stable schema.
 Use `agentloop task status --json` when an agent needs to update the contract state without hand-editing Markdown. Supported statuses are `proposed`, `in-progress`, `blocked`, `review`, and `done`.
+Use `agentloop task archive --json` after verification and handoff when a finished contract should leave the normal task list but remain available as Markdown history.
 
 Agents should use the contract as the boundary for implementation and review.

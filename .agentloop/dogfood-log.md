@@ -1324,3 +1324,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release tarball is available from GitHub while npm auth remains blocked.
 - Improve:
   - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.10.0`.
+
+## 2026-06-09: Task Archive Command
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-task-archive-command.md`
+- Product cycle: `.agentloop/research/interview-cycle-042.md`
+- Verification report: `.agentloop/reports/2026-06-09-20-40-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-20-41-pr-summary.md`
+- Trigger:
+  - Completed task contracts stayed in `.agentloop/tasks/` and continued to appear in normal task lists.
+  - The product panel chose a single-file archive command over a task database, dashboard, bulk action, or delete command.
+- Red tests:
+  - `npx pnpm@10.12.1 test tests/task-state.test.ts` failed because `archiveTask` did not exist and `agentloop task archive` was unknown.
+  - `npx pnpm@10.12.1 test tests/completion.test.ts` failed because task completions did not include `archive`.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/task-state.test.ts`: pass, 1 file and 14 tests
+  - Focused completion test: `npx pnpm@10.12.1 test tests/completion.test.ts`: pass, 1 file and 6 tests
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 20 files and 67 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 279 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - Built CLI smoke: pass, archived a temp task, removed it from list output, and cleared active state
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-task-archive-command.md`: pass
+- Product changes:
+  - Added `agentloop task archive <path>`.
+  - Added a core archive helper that preserves Markdown content, refuses destination collisions, and clears stale active state when needed.
+  - Kept normal `task list` focused by moving archived files under `.agentloop/tasks/archive/`.
+  - Updated shell completions, README, docs, harness files, and agent templates.
+- Worked well:
+  - The command improves task hygiene without adding a database or deleting history.
+- Improve:
+  - Prepare a new release candidate after this feature, because `v0.10.0` already points at shell completions.

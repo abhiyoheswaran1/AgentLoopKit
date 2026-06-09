@@ -12,7 +12,7 @@ const topLevelCommands = [
   ['summarize', 'Preview a reviewer summary'],
   ['handoff', 'Write a reviewer handoff'],
   ['status', 'Show current loop state'],
-  ['task', 'List, set, inspect, or update task contracts'],
+  ['task', 'List, inspect, update, or archive task contracts'],
   ['install-agent', 'Install agent-specific instructions'],
   ['list-templates', 'List bundled templates'],
   ['completion', 'Print shell completion scripts'],
@@ -24,6 +24,7 @@ const taskCommandSpecs = [
   ['show', 'Show a task contract'],
   ['set', 'Set the active task contract'],
   ['status', 'Update a task contract status'],
+  ['archive', 'Archive a task contract'],
   ['current', 'Print the active task contract'],
   ['clear', 'Clear the active task pointer'],
 ] as const;

@@ -4,6 +4,7 @@ import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import {
+  archiveTask,
   clearActiveTask,
   getActiveTaskPath,
   listTasks,
@@ -124,6 +125,39 @@ describe('task state', () => {
     expect(await readFile(taskPath, 'utf8')).toBe(
       '# Demo task\n\n- Status: in-progress\n\n## Notes\nKeep this body intact.\n',
     );
+  });
+
+  test('archives a task contract and clears active state when it was active', async () => {
+    const { dir, config, taskPath } = await createTaskStateFixture();
+    await setActiveTask({ cwd: dir, config, taskPath });
+
+    const archived = await archiveTask({ cwd: dir, config, taskPath });
+
+    expect(archived).toEqual({
+      previousPath: '.agentloop/tasks/2026-06-09-demo.md',
+      path: '.agentloop/tasks/archive/2026-06-09-demo.md',
+      title: 'Demo task',
+      status: 'proposed',
+    });
+    await expect(stat(taskPath)).rejects.toThrow();
+    expect(
+      await readFile(path.join(dir, '.agentloop/tasks/archive/2026-06-09-demo.md'), 'utf8'),
+    ).toBe('# Demo task\n\n- Status: proposed\n');
+    expect(await listTasks({ cwd: dir, config })).toEqual([]);
+    expect(await getActiveTaskPath({ cwd: dir, config })).toBeUndefined();
+  });
+
+  test('refuses to overwrite an archived task contract', async () => {
+    const { dir, config, taskPath } = await createTaskStateFixture();
+    const archivePath = path.join(dir, '.agentloop/tasks/archive/2026-06-09-demo.md');
+    await mkdir(path.dirname(archivePath), { recursive: true });
+    await writeFile(archivePath, '# Existing archive\n');
+
+    await expect(archiveTask({ cwd: dir, config, taskPath })).rejects.toThrow(
+      'Archived task already exists',
+    );
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: proposed\n');
+    expect(await readFile(archivePath, 'utf8')).toBe('# Existing archive\n');
   });
 
   test('rejects unsupported task statuses', async () => {
@@ -256,5 +290,34 @@ describe('task command', () => {
       },
     });
     expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: review\n');
+  });
+
+  test('archives a task contract from the CLI', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+    await execa(tsxPath, [cliPath, 'task', 'set', '.agentloop/tasks/2026-06-09-demo.md'], {
+      cwd: dir,
+    });
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'archive', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
+      { cwd: dir },
+    );
+
+    expect(JSON.parse(result.stdout)).toEqual({
+      task: {
+        previousPath: '.agentloop/tasks/2026-06-09-demo.md',
+        path: '.agentloop/tasks/archive/2026-06-09-demo.md',
+        title: 'Demo task',
+        status: 'proposed',
+      },
+    });
+    await expect(stat(taskPath)).rejects.toThrow();
+    const listResult = await execa(tsxPath, [cliPath, 'task', 'list', '--json'], { cwd: dir });
+    expect(JSON.parse(listResult.stdout)).toEqual({ tasks: [] });
+    const currentResult = await execa(tsxPath, [cliPath, 'task', 'current', '--json'], {
+      cwd: dir,
+    });
+    expect(JSON.parse(currentResult.stdout)).toEqual({ activeTask: null });
   });
 });

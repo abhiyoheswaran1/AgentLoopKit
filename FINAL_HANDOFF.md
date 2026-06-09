@@ -17,6 +17,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - active task pinning with `.agentloop/state.json`
 - read-only task contract listing with active-task markers
 - explicit task status transitions in Markdown task contracts
+- task contract archiving into `.agentloop/tasks/archive/`
 - static bash, zsh, and fish shell completion scripts
 - verification report generation
 - deterministic PR summary generation
@@ -44,6 +45,7 @@ agentloop task show .agentloop/tasks/2026-06-09-add-settings-page.md --json
 agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task status .agentloop/tasks/2026-06-09-add-settings-page.md in-progress
 agentloop task status .agentloop/tasks/2026-06-09-add-settings-page.md review --json
+agentloop task archive .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task current --json
 agentloop task clear
 agentloop status
@@ -79,6 +81,22 @@ npx pnpm@10.12.1 check:links
 npx pnpm@10.12.1 build
 npx projscan doctor --format markdown
 ```
+
+Latest local verification for task archiving:
+
+- Red test first: `npx pnpm@10.12.1 test tests/task-state.test.ts` failed because `archiveTask` did not exist and `agentloop task archive` was unknown.
+- Red completion test: `npx pnpm@10.12.1 test tests/completion.test.ts` failed because task completions did not include `archive`.
+- Focused green test: `npx pnpm@10.12.1 test tests/task-state.test.ts`: pass, 1 file and 14 tests.
+- Focused completion test: `npx pnpm@10.12.1 test tests/completion.test.ts`: pass, 1 file and 6 tests.
+- `git diff --check`: pass.
+- `npx pnpm@10.12.1 lint`: pass.
+- `npx pnpm@10.12.1 typecheck`: pass.
+- `npx pnpm@10.12.1 test`: pass, 20 files and 67 tests.
+- `npx pnpm@10.12.1 check:links`: pass, 279 Markdown files checked.
+- `npx pnpm@10.12.1 build`: pass.
+- `npx projscan doctor --format markdown`: A, 100/100.
+- Built CLI smoke: pass, archived a temp task, removed it from list output, and cleared active state.
+- `agentloop verify --task .agentloop/tasks/2026-06-09-add-task-archive-command.md`: pass.
 
 Latest local verification for the `0.10.0` release candidate:
 
@@ -839,6 +857,19 @@ Implemented:
 - release notes updated with Publish workflow `E404` and npm registry state
 - launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
 
+### Cycle 42: task archive command
+
+Decision: add a single-task archive command instead of a task database, bulk move, restore flow, or dashboard.
+
+Implemented:
+
+- `agentloop task archive <path>`
+- file move into `.agentloop/tasks/archive/`
+- collision refusal for existing archive files
+- active task pointer clearing when the archived task was active
+- task list behavior that excludes archived tasks by default
+- README, docs, shell completions, harness, and generated agent guidance
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -855,15 +886,16 @@ Strongest signals:
 - Agents need a deterministic way to read a selected task contract without changing active state.
 - Agents need a safe status command so task contracts move through the loop without hand-editing Markdown.
 - Repeat CLI users need completions for the growing command surface, but security-sensitive users want inspectable scripts rather than dotfile installers.
+- Repeat users need a way to move finished task contracts out of the active list without deleting Markdown history.
 
 ## Backlog
 
 Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.10.0`.
-2. Prepare the next npm-publishable release after trusted publishing is repaired.
-3. Config schema hosting.
-4. Task archive command.
+2. Prepare `0.11.0` release metadata for task archiving.
+3. Prepare the next npm-publishable release after trusted publishing is repaired.
+4. Config schema hosting.
 5. `agentloop check-gates`.
 
 ## Known limitations
@@ -1000,7 +1032,7 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.10.0`: high usefulness, low repo effort, external npm setting required.
-2. Add task archive command: medium usefulness, medium effort, low maintenance.
+2. Prepare `0.11.0` release for task archiving: high usefulness, low effort, low maintenance.
 3. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
 4. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
 5. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.

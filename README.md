@@ -100,6 +100,7 @@ pnpm build
 | `agentloop task show <path>`            | Print a task contract without changing active state                       |
 | `agentloop task set <path>`             | Pin the active task for status and handoffs                               |
 | `agentloop task status <path> <status>` | Update a task contract status line                                        |
+| `agentloop task archive <path>`         | Move a task contract into `.agentloop/tasks/archive/`                     |
 | `agentloop task current`                | Print the pinned active task                                              |
 | `agentloop task clear`                  | Clear the active task pointer                                             |
 | `agentloop status`                      | Show active task, latest report, dirty files, next step                   |
@@ -198,6 +199,7 @@ agentloop task list
 agentloop task show .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task status .agentloop/tasks/2026-06-09-add-settings-page.md in-progress
+agentloop task archive .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task current
 agentloop task clear
 ```
@@ -205,6 +207,7 @@ agentloop task clear
 `task list --json` gives agents a deterministic list with `path`, `title`, `status`, `active`, and `modifiedAt`. Listing tasks does not create or update `.agentloop/state.json`.
 `task show --json` returns the selected task metadata and Markdown content without changing active state.
 `task status --json` updates only the `- Status:` line. Supported values are `proposed`, `in-progress`, `blocked`, `review`, and `done`. Status is not verification evidence; run `agentloop verify` before claiming completion.
+`task archive --json` moves one named Markdown contract into `.agentloop/tasks/archive/`, refuses to overwrite an existing archive file, and clears the active task pointer when it archives the active task. Archive after verification and handoff, not as a substitute for either.
 
 Each contract records:
 

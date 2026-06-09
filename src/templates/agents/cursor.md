@@ -9,6 +9,7 @@ Before editing:
 - Run `agentloop task list` when several task contracts exist.
 - Run `agentloop task show <path>` before implementing a selected task.
 - Run `agentloop task status <path> in-progress` when implementation starts.
+- Run `agentloop task archive <path>` only after verification and handoff are complete.
 - Keep diffs focused on acceptance criteria.
 
 Verification:

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readdir, readFile, rm, stat } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rename, rm, stat } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { AgentLoopError } from './errors.js';
 import { pathExists, writeTextFile } from './file-system.js';
@@ -24,6 +24,10 @@ export type TaskContract = ActiveTask & {
   content: string;
 };
 
+export type ArchivedTask = ActiveTask & {
+  previousPath: string;
+};
+
 export const TASK_STATUSES = ['proposed', 'in-progress', 'blocked', 'review', 'done'] as const;
 
 export type TaskStatus = (typeof TASK_STATUSES)[number];
@@ -39,6 +43,10 @@ function toStoredPath(cwd: string, absolutePath: string) {
 function isInside(parent: string, child: string) {
   const relative = path.relative(parent, child);
   return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+function tasksRoot(cwd: string, config: AgentLoopConfig) {
+  return path.resolve(cwd, config.paths.tasksDir);
 }
 
 async function readState(cwd: string, config: AgentLoopConfig): Promise<TaskState> {
@@ -72,10 +80,10 @@ async function resolveTaskPath(options: {
   const absolutePath = path.isAbsolute(options.taskPath)
     ? path.resolve(options.taskPath)
     : path.resolve(options.cwd, options.taskPath);
-  const tasksRoot = path.resolve(options.cwd, options.config.paths.tasksDir);
+  const root = tasksRoot(options.cwd, options.config);
   const displayRoot = options.config.paths.tasksDir;
 
-  if (!isInside(tasksRoot, absolutePath)) {
+  if (!isInside(root, absolutePath)) {
     if (!options.strict) return undefined;
     throw new AgentLoopError(`Active task must be inside ${displayRoot}.`);
   }
@@ -161,6 +169,41 @@ export async function updateTaskStatus(options: {
   return readTaskMetadata(options.cwd, absolutePath);
 }
 
+export async function archiveTask(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  taskPath: string;
+}): Promise<ArchivedTask> {
+  const absolutePath = await resolveTaskPath({ ...options, strict: true });
+  if (!absolutePath) throw new AgentLoopError(`Task contract not found: ${options.taskPath}`);
+
+  const root = tasksRoot(options.cwd, options.config);
+  const archiveRoot = path.join(root, 'archive');
+  if (path.dirname(absolutePath) === archiveRoot) {
+    throw new AgentLoopError(`Task contract is already archived: ${options.taskPath}`);
+  }
+
+  const destinationPath = path.join(archiveRoot, path.basename(absolutePath));
+  if (await pathExists(destinationPath)) {
+    throw new AgentLoopError(
+      `Archived task already exists: ${toStoredPath(options.cwd, destinationPath)}`,
+    );
+  }
+
+  const previousPath = toStoredPath(options.cwd, absolutePath);
+  const activeTaskPath = await getActiveTaskPath(options);
+  await mkdir(archiveRoot, { recursive: true });
+  await rename(absolutePath, destinationPath);
+  if (activeTaskPath === absolutePath) {
+    await clearActiveTask(options);
+  }
+
+  return {
+    ...(await readTaskMetadata(options.cwd, destinationPath)),
+    previousPath,
+  };
+}
+
 export async function getActiveTaskPath(options: { cwd: string; config: AgentLoopConfig }) {
   const state = await readState(options.cwd, options.config);
   if (!state.activeTaskPath) return undefined;
@@ -185,8 +228,8 @@ export async function listTasks(options: {
   cwd: string;
   config: AgentLoopConfig;
 }): Promise<ListedTask[]> {
-  const tasksRoot = path.resolve(options.cwd, options.config.paths.tasksDir);
-  const entries = await readdir(tasksRoot, { withFileTypes: true }).catch(() => []);
+  const root = tasksRoot(options.cwd, options.config);
+  const entries = await readdir(root, { withFileTypes: true }).catch(() => []);
   const activeTaskPath = await getActiveTaskPath(options);
 
   const tasks = await Promise.all(
@@ -194,7 +237,7 @@ export async function listTasks(options: {
       .filter((entry) => entry.isFile())
       .filter((entry) => entry.name.endsWith('.md') && entry.name !== 'README.md')
       .map(async (entry) => {
-        const filePath = path.join(tasksRoot, entry.name);
+        const filePath = path.join(root, entry.name);
         const [metadata, fileStat] = await Promise.all([
           readTaskMetadata(options.cwd, filePath),
           stat(filePath),

@@ -11,7 +11,7 @@ describe('completion scripts', () => {
     const script = renderCompletionScript('zsh');
 
     expect(script).toContain('#compdef agentloop agentloopkit');
-    expect(script).toContain('task:List, set, inspect, or update task contracts');
+    expect(script).toContain('task:List, inspect, update, or archive task contracts');
     expect(script).toContain('status:Update a task contract status');
     expect(script).toContain('in-progress');
     expect(script).toContain('claude-code');
@@ -23,7 +23,7 @@ describe('completion scripts', () => {
 
     expect(script).toContain('_agentloop_completion()');
     expect(script).toContain('COMPREPLY');
-    expect(script).toContain('list show set status current clear');
+    expect(script).toContain('list show set status archive current clear');
     expect(script).toContain(
       'codex claude-code cursor opencode gemini-cli github-copilot-cli generic all',
     );

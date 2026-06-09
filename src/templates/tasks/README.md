@@ -25,8 +25,10 @@ agentloop task list
 agentloop task show .agentloop/tasks/<task-file>.md
 agentloop task set .agentloop/tasks/<task-file>.md
 agentloop task status .agentloop/tasks/<task-file>.md in-progress
+agentloop task archive .agentloop/tasks/<task-file>.md
 ```
 
 `agentloop task list --json` is safe for agents and scripts. It reads task files and does not create or update `.agentloop/state.json`.
 `agentloop task show --json` returns one task contract's metadata and Markdown content without changing active state.
 `agentloop task status --json` updates only the task contract's `- Status:` line. Supported statuses are `proposed`, `in-progress`, `blocked`, `review`, and `done`.
+`agentloop task archive --json` moves one named task contract into `.agentloop/tasks/archive/` after verification and handoff. It preserves the Markdown file and refuses to overwrite an existing archive file.

@@ -12,6 +12,7 @@ Before changing code:
 - Use `agentloop task show <path>` to read a task contract without changing active state.
 - Use `agentloop task set <path>` when the active task is ambiguous.
 - Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
+- Use `agentloop task archive <path>` only after verification and handoff are complete.
 - Run `agentloop status` when you need the current task, verification, dirty-file, and next-action state.
 - Follow the Specify, Constrain, Plan, Implement, Verify, Review, Handoff loop.
 - Keep changes small and tied to the task contract.

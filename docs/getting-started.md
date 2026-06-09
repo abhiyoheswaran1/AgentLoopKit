@@ -51,6 +51,7 @@ npx agentloopkit task current
 ```
 
 Use `task status` to keep the task contract current during the loop. Supported statuses are `proposed`, `in-progress`, `blocked`, `review`, and `done`.
+After verification and handoff, use `npx agentloopkit task archive <path>` to move a finished contract into `.agentloop/tasks/archive/` without deleting it.
 
 Check the current loop state:
 

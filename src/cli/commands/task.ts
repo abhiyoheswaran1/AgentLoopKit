@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { loadAgentLoopConfig } from '../../core/config.js';
 import {
+  archiveTask,
   clearActiveTask,
   getActiveTask,
   listTasks,
@@ -8,7 +9,7 @@ import {
   setActiveTask,
   updateTaskStatus,
 } from '../../core/task-state.js';
-import type { ActiveTask, ListedTask, TaskContract } from '../../core/task-state.js';
+import type { ActiveTask, ArchivedTask, ListedTask, TaskContract } from '../../core/task-state.js';
 
 function printTask(
   task: Awaited<ReturnType<typeof getActiveTask>> | null,
@@ -63,8 +64,19 @@ function printUpdatedTask(task: ActiveTask, options: { json?: boolean }) {
   console.log(task.path);
 }
 
+function printArchivedTask(task: ArchivedTask, options: { json?: boolean }) {
+  if (options.json) {
+    console.log(JSON.stringify({ task }, null, 2));
+    return;
+  }
+  console.log(`Archived task: ${task.title} (${task.status})`);
+  console.log(`${task.previousPath} -> ${task.path}`);
+}
+
 export function taskCommand() {
-  const command = new Command('task').description('List, set, inspect, or clear task contracts');
+  const command = new Command('task').description(
+    'List, inspect, update, or archive task contracts',
+  );
 
   command
     .command('list')
@@ -108,6 +120,17 @@ export function taskCommand() {
       const config = await loadAgentLoopConfig(process.cwd());
       const task = await updateTaskStatus({ cwd: process.cwd(), config, taskPath, status });
       printUpdatedTask(task, options);
+    });
+
+  command
+    .command('archive')
+    .argument('<path>', 'task contract path under .agentloop/tasks')
+    .option('--json', 'print machine-readable output')
+    .description('Archive a task contract')
+    .action(async (taskPath: string, options: { json?: boolean }) => {
+      const config = await loadAgentLoopConfig(process.cwd());
+      const task = await archiveTask({ cwd: process.cwd(), config, taskPath });
+      printArchivedTask(task, options);
     });
 
   command
