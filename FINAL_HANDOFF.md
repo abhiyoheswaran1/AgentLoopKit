@@ -151,10 +151,10 @@ Latest local verification for shell completions:
 
 Latest release status:
 
-- GitHub release `v0.10.0`: public, tarball attached.
-- GitHub release URL: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.10.0
-- Tarball SHA-256: `c5966164b6c32e781c87ad180f994dfb50e3a2459b043d271d766c2aa424228f`.
-- Publish workflow run `27226815977`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- GitHub release `v0.11.0`: public, tarball attached.
+- GitHub release URL: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.11.0
+- Tarball SHA-256: `3d9d312e8e824cce5a4d961388d64782254800532e442a2486a1273555690677`.
+- Publish workflow run `27228991068`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - npm registry proof after release: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
 
 Latest local verification for the `0.9.0` release candidate:
@@ -902,6 +902,16 @@ Implemented:
 - Playwright screenshot refresh for current test counts and archive workflow
 - launch, publishing, final handoff, backlog, and product-panel release records
 
+### Cycle 44: 0.11.0 release status
+
+Decision: publish the GitHub release and record the npm authorization blocker without implying npm availability.
+
+Implemented:
+
+- public GitHub release `v0.11.0` with attached `agentloopkit-0.11.0.tgz`
+- release notes updated with Publish workflow `E404` and npm registry state
+- launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -925,17 +935,16 @@ Strongest signals:
 
 Top remaining items:
 
-1. Publish GitHub release `v0.11.0` with npm-pending notes and tarball asset.
-2. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.11.0`.
-3. Prepare the next npm-publishable release after trusted publishing is repaired.
-4. Config schema hosting.
-5. `agentloop check-gates`.
+1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.11.0`.
+2. Prepare the next npm-publishable release after trusted publishing is repaired.
+3. Config schema hosting.
+4. `agentloop check-gates`.
+5. Add a clearer `create-task --json` follow-up if CLI consistency becomes a priority.
 
 ## Known limitations
 
-- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, and `v0.10.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.11.0` is prepared on `main`, but no GitHub release or npm publish has been completed yet.
-- `agentloopkit@0.10.0` is the latest GitHub release, but it is not on npm yet.
+- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, and `v0.11.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.11.0` is the latest GitHub release, but it is not on npm yet.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -948,6 +957,7 @@ Top remaining items:
 - The release-triggered GitHub Publish workflow for `v0.8.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.9.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.10.0` passed checks and failed at npm authorization with `E404`.
+- The release-triggered GitHub Publish workflow for `v0.11.0` passed checks and failed at npm authorization with `E404`.
 - Local `npm publish --access public` for `0.5.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.6.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.7.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
@@ -1015,7 +1025,8 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.10.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.10.0` to npm.
 - [x] Prepare `agentloopkit@0.11.0` task-archive release candidate.
-- [ ] Publish GitHub release `v0.11.0` with npm-pending notes.
+- [x] Publish GitHub release `v0.11.0` with npm-pending notes.
+- [x] Run GitHub Publish workflow for `v0.11.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.11.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
@@ -1068,10 +1079,10 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Publish GitHub release `v0.11.0`: high usefulness, low repo effort, low maintenance.
-2. Repair npm publishing for `0.11.0`: high usefulness, low repo effort, external npm setting required.
-3. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
-4. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
+1. Repair npm publishing for `0.11.0`: high usefulness, low repo effort, external npm setting required.
+2. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
+3. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
+4. Add `create-task --json`: medium usefulness, low effort, low maintenance.
 5. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
 6. Add GitHub Actions usage recipes for `verify` and `handoff`: medium usefulness, low effort.
 7. Add CI import notes to verification reports: medium usefulness, medium effort.

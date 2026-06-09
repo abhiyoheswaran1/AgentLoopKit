@@ -1395,3 +1395,34 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release candidate keeps the task archive workflow visible in README assets without adding new scope.
 - Improve:
   - After the GitHub release, record CI, Publish workflow, npm registry state, and tarball digest.
+
+## 2026-06-09: 0.11.0 GitHub Release and npm Auth Result
+
+- Task contract: `.agentloop/tasks/2026-06-09-document-0-11-0-release-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-044.md`
+- Verification report: `.agentloop/reports/2026-06-09-21-06-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-21-07-pr-summary.md`
+- Release: `v0.11.0`
+- Commit: `caf98b012ccfa26930c59934e6d5e4104f5bdc7d`
+- GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.11.0
+- Attached asset: `agentloopkit-0.11.0.tgz`
+- Tarball SHA-256: `3d9d312e8e824cce5a4d961388d64782254800532e442a2486a1273555690677`
+- CI run: `27228808126`
+- Publish workflow run: `27228991068`
+- npm registry check:
+  - latest: `0.1.1`
+  - versions: `0.1.0`, `0.1.1`
+- Verification completed:
+  - GitHub CI for `caf98b0`: pass
+  - GitHub release creation: pass
+  - GitHub release asset upload: pass, digest matches local SHA-256
+  - GitHub Publish workflow package checks: pass
+  - GitHub Publish workflow final `npm publish`: failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`
+  - npm registry check: pass, latest remains `0.1.1`
+- Product changes:
+  - GitHub now has a public `v0.11.0` release with npm-pending notes.
+  - Launch checklist, npm publishing docs, final handoff, backlog, and release notes record the actual npm blocker.
+- Worked well:
+  - The release tarball is available from GitHub while npm auth remains blocked.
+- Improve:
+  - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.11.0`.
