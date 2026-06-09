@@ -1785,3 +1785,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Recipes make task contracts more concrete without changing CLI behavior.
 - Improve:
   - Add more framework recipes later for Remix, SvelteKit, Django, and FastAPI.
+
+## 2026-06-09: CI Context In Verification Reports
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-ci-context-to-verification-reports.md`
+- Product cycle: `.agentloop/research/interview-cycle-056.md`
+- Verification report: `.agentloop/reports/2026-06-09-23-13-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-23-13-pr-summary.md`
+- Trigger:
+  - CI-generated verification reports did not show which workflow run created them.
+  - Product panel chose allowlisted report provenance instead of a dashboard, workflow installer, or environment dump.
+- Verification completed:
+  - Red tests first: `npx pnpm@10.12.1 test tests/verification.test.ts` failed because reports lacked `CI Context`.
+  - Focused green test: `npx pnpm@10.12.1 test tests/verification.test.ts`: pass, 1 file and 6 tests.
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 74 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 337 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: first flagged a secret-looking test fixture key, then passed after the fixture was renamed
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-ci-context-to-verification-reports.md`: pass
+  - `agentloop handoff --task .agentloop/tasks/2026-06-09-add-ci-context-to-verification-reports.md`: pass
+- Product changes:
+  - Verification reports now include allowlisted GitHub Actions provenance when run in GitHub Actions.
+  - Generic `CI=true` runs now record `Generic CI`.
+  - Local reports omit CI metadata.
+  - Docs explain that AgentLoopKit does not read `.env` files or print arbitrary environment variables.
+- Worked well:
+  - Projscan caught a misleading test fixture name before commit.
+- Confusing:
+  - The first active-task output showed `proposed` because status changed immediately after pinning. Future docs could recommend changing status before pinning when both commands run together.
+- Improve:
+  - Prepare the next release candidate after npm publishing is repaired or after the next feature batch.

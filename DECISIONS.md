@@ -47,3 +47,7 @@ Launch visuals live in `docs/assets/readme/` with source HTML and a VHS tape so 
 ## 2026-06-09: Active Task State Is Transparent
 
 `agentloop task set` stores the active task pointer in `.agentloop/state.json`. The file contains only a version and a relative task path. `status` and handoff summaries use that pointer when it references an existing Markdown task inside `.agentloop/tasks/`; otherwise they fall back to the newest task contract. This keeps task lifecycle local and auditable without adding a database, daemon, or hosted service.
+
+## 2026-06-09: Verification Reports Use Allowlisted CI Context
+
+`agentloop verify` may include CI provenance in generated reports, but only from a small allowlist of CI variables. GitHub Actions reports can include workflow, event, ref, commit, run URL, and run attempt. Generic CI reports only identify `Generic CI`. AgentLoopKit does not read `.env` files, print arbitrary environment variables, call CI APIs, or upload artifacts.

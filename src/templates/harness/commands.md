@@ -27,6 +27,8 @@ Rules:
 
 Use `agentloop check-gates --strict` in CI after task, verification, and handoff evidence exists. If CI generates reports and handoffs, upload `.agentloop/reports/*.md` and `.agentloop/handoffs/*.md` as build artifacts instead of committing them automatically.
 
+When `agentloop verify` runs in GitHub Actions, the verification report records allowlisted CI provenance fields such as workflow, event, ref, commit, run URL, and run attempt. It does not dump arbitrary environment variables.
+
 `check-gates` checks evidence. It does not prove the code is correct and does not replace review.
 
 ## Monorepos

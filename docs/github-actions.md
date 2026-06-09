@@ -97,6 +97,8 @@ jobs:
 
 This workflow does not commit generated files. It uploads reports and handoffs as CI artifacts.
 
+The verification report includes a `CI Context` section when GitHub Actions creates it. Reviewers can see the workflow, event, ref, commit, run URL, and run attempt inside the Markdown artifact.
+
 ## Required Repository Files
 
 Both recipes expect the repository to contain:
@@ -143,5 +145,6 @@ npx --no-install agentloop check-gates --strict
 
 - Do not upload `.env` files.
 - Do not print secret values.
+- `agentloop verify` does not dump arbitrary environment variables. It only records allowlisted CI provenance fields.
 - Do not grant write permissions unless another workflow step needs them.
 - Do not let CI commit generated reports unless maintainers explicitly want that behavior.

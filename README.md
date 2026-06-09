@@ -238,6 +238,8 @@ Each contract records:
 
 It does not hide failures. If long logs are truncated, the report keeps the first and last output so the final error stays visible. If no commands are configured, it writes a report saying nothing was verified.
 
+When `agentloop verify` runs in GitHub Actions, the report records the workflow, event, ref, commit, run URL, and run attempt. Local reports stay quiet. AgentLoopKit does not read `.env` files or print arbitrary environment variables.
+
 In monorepos, `doctor` warns on common workspace markers and suggests package-specific verification commands. Add package checks to the task contract when root commands do not cover the touched package, for example `pnpm --filter web test` or `npm --workspace api test`. AgentLoopKit records and runs configured commands; it does not infer package graphs or run workspace commands automatically.
 
 ## Status
@@ -290,6 +292,8 @@ See `docs/check-gates.md` for gate statuses and exit-code behavior.
 ## GitHub Actions
 
 Use `agentloop check-gates --strict` as a review-evidence gate in pull request CI. Use `agentloop verify` and `agentloop handoff` in CI when you want reports and handoffs uploaded as build artifacts.
+
+CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
 See `docs/github-actions.md` and `examples/github-actions/` for copy-pasteable workflows. Because npm latest is still `0.1.1`, the examples pin the `v0.14.0` GitHub tarball. Switch them to normal npm usage after npm publishing catches up.
 

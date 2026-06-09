@@ -1118,6 +1118,18 @@ Implemented:
 - copy-pasteable task contract examples and verification commands
 - explicit reminder that root monorepo checks do not prove package-level coverage unless the repo documents that behavior
 
+### Cycle 56: CI context in verification reports
+
+Decision: add safe CI provenance to verification reports without adding a dashboard, workflow installer, or environment dump.
+
+Implemented:
+
+- GitHub Actions `CI Context` section in `agentloop verify` reports
+- generic `CI=true` fallback that records `Generic CI`
+- allowlisted CI variable handling with no `.env` reads and no arbitrary environment output
+- tests for GitHub Actions metadata, generic CI metadata, and local-report omission
+- README, verification docs, GitHub Actions docs, examples, and generated harness guidance
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1148,6 +1160,7 @@ Strongest signals:
 - Maintainers need those recipes to avoid branch mutation, hidden uploads, and stale npm claims.
 - Developers need stack-specific starter commands before task contracts feel concrete.
 - Platform users need monorepo recipes that separate root checks from package checks.
+- Reviewers need CI-generated verification reports to show workflow, event, ref, commit, and run URL.
 
 ## Backlog
 
@@ -1157,7 +1170,7 @@ Top remaining items:
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
 3. Config schema hosting.
 4. Static HTML report export.
-5. CI import notes in verification reports.
+5. Richer doctor risk-file details.
 
 ## Known limitations
 
@@ -1318,7 +1331,7 @@ Title: I built a local-first engineering loop for coding agents
 
 1. Repair npm publishing for `0.14.0`: high usefulness, low repo effort, external npm setting required.
 2. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-3. Add CI import notes to verification reports: medium usefulness, medium effort.
+3. Prepare the next release candidate after CI context lands: high usefulness, low effort.
 4. Add policy pack customization: medium commercial optionality, medium effort.
 5. Add local static HTML report: medium star potential, high effort, medium maintenance.
 6. Add generated release-note handoff: medium usefulness, low effort, low maintenance.

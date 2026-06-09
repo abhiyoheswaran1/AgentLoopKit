@@ -31,3 +31,19 @@ agentloop verify --json
 Failures stay visible. The command exits non-zero when verification fails.
 
 Long command output is shortened in the report. AgentLoopKit keeps the beginning and ending output with a truncation marker, so setup context and final error lines remain visible without committing huge logs.
+
+## CI Context
+
+When `agentloop verify` runs in GitHub Actions, the report includes an allowlisted `CI Context` section:
+
+- provider
+- workflow
+- event
+- ref
+- commit
+- run URL
+- run attempt
+
+When `CI=true` is present outside GitHub Actions, the report records `Generic CI` without provider-specific fields.
+
+Local reports omit this section. AgentLoopKit does not read `.env` files and does not print arbitrary environment variables. It only reads a small allowlist of CI variables needed for report provenance.

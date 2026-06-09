@@ -49,6 +49,8 @@ Use `--strict` in CI when warning gates should fail.
 
 CI can either check committed AgentLoop evidence or generate reports and handoffs as build artifacts. Do not let CI commit generated files unless maintainers explicitly want that behavior.
 
+When GitHub Actions runs `agentloop verify`, the report records allowlisted CI provenance fields such as workflow, event, ref, commit, run URL, and run attempt. AgentLoopKit does not print arbitrary environment variables.
+
 ## Directories
 
 - `loops/`: task-specific workflows

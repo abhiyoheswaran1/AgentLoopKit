@@ -15,11 +15,23 @@ export type VerificationCommandResult = {
   output: string;
 };
 
+export type VerificationCiContext = {
+  provider: 'github-actions' | 'generic-ci';
+  providerName: string;
+  workflow?: string;
+  event?: string;
+  ref?: string;
+  commit?: string;
+  runUrl?: string;
+  runAttempt?: string;
+};
+
 export type VerificationOptions = {
   cwd: string;
   config: AgentLoopConfig;
   reportTimestamp?: string;
   nowIso?: string;
+  env?: NodeJS.ProcessEnv;
   skip?: Partial<Record<'test' | 'lint' | 'typecheck' | 'build', boolean>>;
   customCommands?: string[];
 };
@@ -28,6 +40,7 @@ export type VerificationResult = {
   overallStatus: 'pass' | 'fail' | 'not-run';
   commands: VerificationCommandResult[];
   notRun: string[];
+  ciContext?: VerificationCiContext;
   markdown: string;
   reportPath: string;
 };
@@ -65,9 +78,75 @@ function commandEntries(config: AgentLoopConfig, options: VerificationOptions) {
   return active;
 }
 
+function singleLine(value: string | undefined, limit = 300) {
+  const clean = value?.replace(/\s+/g, ' ').trim();
+  if (!clean) return undefined;
+  return clean.length > limit ? `${clean.slice(0, limit)}...` : clean;
+}
+
+function withoutTrailingSlash(value: string) {
+  return value.replace(/\/+$/, '');
+}
+
+function isEnabledCi(value: string | undefined) {
+  const clean = value?.trim().toLowerCase();
+  return clean === 'true' || clean === '1';
+}
+
+export function detectCiContext(env: NodeJS.ProcessEnv): VerificationCiContext | undefined {
+  if (env.GITHUB_ACTIONS === 'true') {
+    const serverUrl = withoutTrailingSlash(
+      singleLine(env.GITHUB_SERVER_URL) ?? 'https://github.com',
+    );
+    const repository = singleLine(env.GITHUB_REPOSITORY);
+    const runId = singleLine(env.GITHUB_RUN_ID);
+    const runUrl =
+      repository && runId ? `${serverUrl}/${repository}/actions/runs/${runId}` : undefined;
+
+    return {
+      provider: 'github-actions',
+      providerName: 'GitHub Actions',
+      workflow: singleLine(env.GITHUB_WORKFLOW),
+      event: singleLine(env.GITHUB_EVENT_NAME),
+      ref: singleLine(env.GITHUB_REF),
+      commit: singleLine(env.GITHUB_SHA),
+      runUrl,
+      runAttempt: singleLine(env.GITHUB_RUN_ATTEMPT),
+    };
+  }
+
+  if (isEnabledCi(env.CI)) {
+    return {
+      provider: 'generic-ci',
+      providerName: 'Generic CI',
+    };
+  }
+
+  return undefined;
+}
+
+function renderCiContext(ciContext: VerificationCiContext | undefined) {
+  if (!ciContext) return '';
+
+  const lines = [`- Provider: ${ciContext.providerName}`];
+  if (ciContext.workflow) lines.push(`- Workflow: ${ciContext.workflow}`);
+  if (ciContext.event) lines.push(`- Event: ${ciContext.event}`);
+  if (ciContext.ref) lines.push(`- Ref: ${ciContext.ref}`);
+  if (ciContext.commit) lines.push(`- Commit: ${ciContext.commit}`);
+  if (ciContext.runUrl) lines.push(`- Run URL: ${ciContext.runUrl}`);
+  if (ciContext.runAttempt) lines.push(`- Run attempt: ${ciContext.runAttempt}`);
+
+  return `## CI Context
+${lines.join('\n')}
+
+`;
+}
+
 export async function runVerification(options: VerificationOptions): Promise<VerificationResult> {
   const timestamp = options.reportTimestamp ?? formatTimestamp();
   const nowIso = options.nowIso ?? new Date().toISOString();
+  const env = options.env ?? process.env;
+  const ciContext = detectCiContext(env);
   const commands = commandEntries(options.config, options);
   const notRun = [
     ...(['test', 'lint', 'typecheck', 'build'] as const).filter((key) => {
@@ -83,7 +162,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
       shell: true,
       all: true,
       reject: false,
-      env: { ...process.env, FORCE_COLOR: '0' },
+      env: { ...env, FORCE_COLOR: '0' },
     });
     results.push({
       key,
@@ -114,6 +193,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
 - Working tree: ${status.trim() ? 'dirty' : 'clean or unavailable'}
 - Overall status: ${overallStatus}
 
+${renderCiContext(ciContext)}
 ## Commands Run
 ${
   results.length === 0
@@ -146,5 +226,5 @@ ${
 `;
 
   await writeTextFile(reportPath, markdown);
-  return { overallStatus, commands: results, notRun, markdown, reportPath };
+  return { overallStatus, commands: results, notRun, ciContext, markdown, reportPath };
 }
