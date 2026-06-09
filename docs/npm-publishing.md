@@ -51,7 +51,7 @@ As of June 9, 2026:
 - GitHub release `v0.6.0` is public with a tarball asset.
 - GitHub release `v0.7.0` is public with a tarball asset.
 - GitHub release `v0.8.0` is public with a tarball asset.
-- `agentloopkit@0.9.0` is prepared on `main` for task status transitions.
+- GitHub release `v0.9.0` is public with a tarball asset.
 - npm latest is still `agentloopkit@0.1.1`.
 - `agentloopkit@0.2.0` passed local preflight, `npm publish --dry-run`, tarball smoke testing, and the GitHub publish workflow's install, lint, typecheck, test, and build steps.
 - GitHub Actions reached `npm publish`, then npm rejected the workflow because the package does not have a matching trusted publisher configuration.
@@ -75,6 +75,9 @@ As of June 9, 2026:
 - `agentloopkit@0.8.0` is prepared on `main` after monorepo guidance, actionable doctor warnings, and Markdown link checking were added.
 - GitHub Publish workflow run `27223669061` for `v0.8.0` passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - A local `npm publish --access public` attempt for `0.8.0` passed typecheck, Vitest, and build through `prepublishOnly`, then npm stopped at `EOTP` because the account requires browser or one-time-password authentication.
+- `agentloopkit@0.9.0` is prepared on `main` after task status transitions were added.
+- GitHub Publish workflow run `27225348061` for `v0.9.0` passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- npm registry proof after the release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 
 Publish `0.9.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.
 

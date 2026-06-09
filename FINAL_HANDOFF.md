@@ -78,6 +78,13 @@ npx projscan doctor --format markdown
 
 Latest local verification for the product-panel iteration:
 
+- GitHub release `v0.9.0`: public, tarball attached.
+- Publish workflow run `27225348061`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- npm registry proof after release: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
+- Status-doc verification: `git diff --check` pass, `npx pnpm@10.12.1 check:links` pass with 263 Markdown files, `agentloop verify --task .agentloop/tasks/2026-06-09-document-0-9-0-release-status.md` pass.
+
+Latest local verification for the `0.9.0` release candidate:
+
 - `npx tsx src/cli/index.ts version`: pass, reported `0.9.0`.
 - `git diff --check`: pass.
 - `npx pnpm@10.12.1 lint`: pass.
@@ -474,14 +481,15 @@ Current publish gap:
 
 - GitHub release `v0.2.0` is public.
 - GitHub release `v0.2.1` is public.
-- GitHub releases `v0.3.0`, `v0.4.0`, `v0.5.0`, and `v0.6.0` are public with tarball assets.
+- GitHub releases `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, and `v0.9.0` are public with tarball assets.
 - npm latest is still `0.1.1`.
 - The `v0.2.0` publish workflow passed install, lint, typecheck, test, and build, then npm rejected `npm publish` because trusted publishing is not configured for this package/workflow.
 - A local `npm publish --access public` retry reached npm browser authentication, then failed at npm's auth completion endpoint.
 - The `v0.2.1` publish workflow passed install, lint, typecheck, tests, build, and `prepublishOnly`, then npm rejected `npm publish` with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - The `v0.6.0` publish workflow passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - Local `npm publish --access public` for `0.6.0` passed typecheck, Vitest, and build through `prepublishOnly`, then npm stopped at `EOTP`.
-- Package-content changes after the `v0.8.0` tag are prepared on `main` as `agentloopkit@0.9.0`, but are not on npm yet.
+- `v0.9.0` Publish workflow run `27225348061` passed package checks and failed at npm authorization with `E404`.
+- npm registry proof after `v0.9.0` still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 - Do not paste npm OTPs or tokens into chat, issues, PRs, or release notes.
 
 ## How users install it
@@ -749,6 +757,16 @@ Implemented:
 - VHS tape update to use `agentloopkit-0.9.0.tgz`
 - launch, publishing, final handoff, backlog, and product-panel release records
 
+### Cycle 38: 0.9.0 release status
+
+Decision: publish the GitHub release and record the npm authorization blocker without implying npm availability.
+
+Implemented:
+
+- public GitHub release `v0.9.0` with attached `agentloopkit-0.9.0.tgz`
+- release notes updated with Publish workflow `E404` and npm registry state
+- launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -777,9 +795,9 @@ Top remaining items:
 
 ## Known limitations
 
-- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, and `v0.8.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.9.0` is prepared on `main`, but not released or published yet.
-- `agentloopkit@0.8.0` is the latest GitHub release, but it is not on npm yet.
+- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, and `v0.9.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.9.0` is the latest GitHub release, but it is not on npm yet.
+- `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
 - The stale manual GitHub Publish workflow for `0.3.0` targeted an older commit and was cancelled after the release workflow ran.
@@ -789,6 +807,7 @@ Top remaining items:
 - The release-triggered GitHub Publish workflow for `v0.6.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.7.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.8.0` passed checks and failed at npm authorization with `E404`.
+- The release-triggered GitHub Publish workflow for `v0.9.0` passed checks and failed at npm authorization with `E404`.
 - Local `npm publish --access public` for `0.5.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.6.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.7.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
@@ -848,8 +867,8 @@ Top remaining items:
 - [x] Try local `npm publish --access public` for `0.8.0`; package checks passed, npm required browser/OTP authentication.
 - [ ] Publish `agentloopkit@0.8.0` to npm.
 - [x] Prepare `agentloopkit@0.9.0` task-status release candidate.
-- [ ] Publish GitHub release `v0.9.0` with npm-pending notes.
-- [ ] Run GitHub Publish workflow for `v0.9.0` and record result.
+- [x] Publish GitHub release `v0.9.0` with npm-pending notes.
+- [x] Run GitHub Publish workflow for `v0.9.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.9.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.

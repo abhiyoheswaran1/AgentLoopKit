@@ -1193,3 +1193,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Separating the feature commit from the release commit kept history easier to audit.
 - Improve:
   - After the GitHub release, record CI, Publish workflow, local npm publish, and registry status.
+
+## 2026-06-09: 0.9.0 GitHub Release and npm Auth Result
+
+- Task contract: `.agentloop/tasks/2026-06-09-document-0-9-0-release-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-038.md`
+- Verification report: `.agentloop/reports/2026-06-09-19-58-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-19-58-pr-summary.md`
+- Release: `v0.9.0`
+- Commit: `0bcd98988f10dbdb05a086c2af2582a90a125664`
+- GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.9.0
+- Attached asset: `agentloopkit-0.9.0.tgz`
+- Tarball SHA-256: `698e76183afd614ee310f9ff4538a9832b3206edce5bb124b54c20a2a37bf6e1`
+- CI run: `27225285803`
+- Publish workflow run: `27225348061`
+- npm registry check:
+  - latest: `0.1.1`
+  - versions: `0.1.0`, `0.1.1`
+- Verification completed:
+  - GitHub CI for `0bcd989`: pass
+  - GitHub release creation: pass
+  - GitHub Publish workflow package checks: pass
+  - GitHub Publish workflow final `npm publish`: failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`
+  - npm registry check: pass, latest remains `0.1.1`
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 check:links`: pass, 263 Markdown files checked
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-document-0-9-0-release-status.md`: pass
+- Product changes:
+  - GitHub now has a public `v0.9.0` release with npm-pending notes.
+  - Launch checklist, npm publishing docs, final handoff, backlog, and release notes record the actual npm blocker.
+- Worked well:
+  - The release tarball is available from GitHub while npm auth remains blocked.
+- Improve:
+  - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.9.0`.
