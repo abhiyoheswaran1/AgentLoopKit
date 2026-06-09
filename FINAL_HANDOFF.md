@@ -286,6 +286,22 @@ Latest local verification for the `0.5.0` task-list release candidate:
 - `agentloop handoff`: pass, wrote `.agentloop/handoffs/2026-06-09-17-54-pr-summary.md`
 - `agentloop task clear --json`: pass, removed `.agentloop/state.json`
 
+Latest local verification for the `0.6.0` task-show release candidate:
+
+- `npx tsx src/cli/index.ts version`: pass, reported `0.6.0`
+- `git diff --check`: pass
+- `npx pnpm@10.12.1 lint`: pass
+- `npx pnpm@10.12.1 typecheck`: pass
+- `npx pnpm@10.12.1 test`: pass, 18 files and 48 tests
+- `npx pnpm@10.12.1 build`: pass
+- `npx projscan doctor --format markdown`: A, 100/100
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.6.0.tgz`
+- Tarball smoke: pass, packed `agentloop version` reported `0.6.0` and `agentloop task show` behaved as expected
+- `npm publish --access public --dry-run`: pass
+- `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-6-0-task-show-release.md`: pass, wrote `.agentloop/reports/2026-06-09-18-15-verification-report.md`
+- `agentloop handoff`: pass, wrote `.agentloop/handoffs/2026-06-09-18-15-pr-summary.md`
+- `agentloop task clear --json`: pass, removed `.agentloop/state.json`
+
 ## How to package
 
 ```bash
@@ -328,7 +344,7 @@ Current publish gap:
 - The `v0.2.0` publish workflow passed install, lint, typecheck, test, and build, then npm rejected `npm publish` because trusted publishing is not configured for this package/workflow.
 - A local `npm publish --access public` retry reached npm browser authentication, then failed at npm's auth completion endpoint.
 - The `v0.2.1` publish workflow passed install, lint, typecheck, tests, build, and `prepublishOnly`, then npm rejected `npm publish` with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
-- Package-content changes after the `v0.4.0` tag are prepared on `main` as `agentloopkit@0.5.0`, but are not on npm yet.
+- Package-content changes after the `v0.5.0` tag are prepared on `main` as `agentloopkit@0.6.0`, but are not on npm yet.
 - Do not paste npm OTPs or tokens into chat, issues, PRs, or release notes.
 
 ## How users install it
@@ -463,6 +479,16 @@ Implemented:
 - path safety through the existing `.agentloop/tasks` resolver
 - docs and generated agent template updates
 
+### Cycle 26: 0.6.0 release candidate
+
+Decision: move task-show behavior into a new release candidate because `v0.5.0` already points at the task-list release.
+
+Implemented:
+
+- package metadata bump to `0.6.0`
+- `0.6.0` changelog entry for task reading
+- launch, publishing, final handoff, backlog, and product-panel release records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -482,7 +508,7 @@ Strongest signals:
 
 Top remaining items:
 
-1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.5.0`.
+1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.6.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
 3. Monorepo project detection.
 4. Markdown link checking for docs.
@@ -491,6 +517,7 @@ Top remaining items:
 ## Known limitations
 
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, and `v0.5.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.6.0` is prepared on `main`, but its GitHub release and npm publish still need to complete.
 - `agentloopkit@0.5.0` is the latest GitHub release, but it is not on npm yet.
 - `agentloopkit@0.4.0` is also not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -537,6 +564,9 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.5.0`; package checks passed, npm authorization failed.
 - [x] Try local `npm publish --access public` for `0.5.0`; package checks passed, npm required browser/OTP authentication.
 - [ ] Publish `agentloopkit@0.5.0` to npm.
+- [x] Prepare `agentloopkit@0.6.0` task-show release candidate.
+- [ ] Publish GitHub release `v0.6.0` with npm-pending notes.
+- [ ] Publish `agentloopkit@0.6.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
@@ -588,7 +618,7 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Repair npm publishing for `0.5.0`: high usefulness, low repo effort, external npm setting required.
+1. Repair npm publishing for `0.6.0`: high usefulness, low repo effort, external npm setting required.
 2. Improve monorepo detection: high usefulness, medium effort, medium maintenance.
 3. Add markdown link checks: medium usefulness, low effort, low maintenance.
 4. Add shell completions: medium usefulness, medium effort, low maintenance.

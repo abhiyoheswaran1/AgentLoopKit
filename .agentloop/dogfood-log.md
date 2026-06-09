@@ -773,3 +773,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The list/show/set sequence gives agents a local preflight loop without adding task management features.
 - Improve:
   - Consider a future `task show --current` only if dogfooding shows path copying remains noisy.
+
+## 2026-06-09: 0.6.0 Task Show Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-6-0-task-show-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-026.md`
+- Verification report: `.agentloop/reports/2026-06-09-18-15-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-18-15-pr-summary.md`
+- Trigger:
+  - `agentloop task show` landed on `main` after the `v0.5.0` tag.
+  - Package metadata still reported `0.5.0`, which would make release artifacts ambiguous.
+- Verification completed:
+  - `npx tsx src/cli/index.ts version`: pass, reported `0.6.0`
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 18 files and 48 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.6.0.tgz`
+  - Tarball smoke: pass, packed `agentloop version` reported `0.6.0` and `agentloop task show` behaved as expected
+  - `npm publish --access public --dry-run`: pass
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-6-0-task-show-release.md`: pass
+  - `agentloop task clear --json`: pass, removed `.agentloop/state.json`
+  - `agentloop handoff`: pass, wrote the handoff above
+- Product changes:
+  - Bumped package metadata to `0.6.0`.
+  - Moved task-show changelog notes into `0.6.0`.
+  - Updated README, launch checklist, npm publishing docs, final handoff, backlog, and product-panel records.
+- Worked well:
+  - The release candidate keeps tag, source, package metadata, and tarball contents aligned.
+- Improve:
+  - After the GitHub release, record the publish workflow result and npm registry state.
