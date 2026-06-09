@@ -104,7 +104,11 @@ As of June 9, 2026:
 - GitHub Publish workflow run `27234726013` for `v0.14.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - npm registry proof after the `v0.14.0` release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 - `agentloopkit@0.15.0` is prepared on `main` after CI context was added to verification reports.
-- npm registry proof before the `v0.15.0` GitHub release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
+- GitHub release `v0.15.0` is public with attached `agentloopkit-0.15.0.tgz`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.15.0`.
+- Tarball SHA-256: `e92f28382d16cccbebd027bbbcb5324f60de088e49bb611482b1e205f673f965`.
+- GitHub Publish workflow run `27237034367` for `v0.15.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- npm registry proof after the `v0.15.0` release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 - npm may jump from `0.1.1` to `0.15.0` after authorization is repaired. Versions `0.2.0` through `0.14.0` were GitHub-only release candidates during the npm publishing blocker.
 
 Publish `0.15.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.

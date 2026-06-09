@@ -1858,3 +1858,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Packed-tarball smoke tested both the normal init/verify path and the new CI-context path.
 - Improve:
   - After the GitHub release is created, record the Publish workflow result and npm registry proof without claiming npm availability.
+
+## 2026-06-09: 0.15.0 GitHub Release and npm Auth Result
+
+- Task contract: `.agentloop/tasks/2026-06-09-document-0-15-0-release-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-058.md`
+- Release: `v0.15.0`
+- GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.15.0
+- Attached asset: `agentloopkit-0.15.0.tgz`
+- Tarball SHA-256: `e92f28382d16cccbebd027bbbcb5324f60de088e49bb611482b1e205f673f965`
+- Publish workflow: `27237034367`
+- npm registry proof after release:
+  - latest: `0.1.1`
+  - versions: `0.1.0`, `0.1.1`
+- Verification completed:
+  - GitHub CI run `27236965749`: passed for commit `6e6b0cf`
+  - Publish workflow run `27237034367`: install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly` passed
+  - Final publish step failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`
+- Product changes:
+  - GitHub now has a public `v0.15.0` release with npm-pending notes.
+  - Release notes include the tarball SHA, local checks, CI run, and npm-pending status.
+  - Docs record that npm may jump from `0.1.1` to `0.15.0` after authorization is repaired.
+- Worked well:
+  - The release artifact gives CI users a current tarball while npm remains behind.
+- Improve:
+  - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.15.0`.

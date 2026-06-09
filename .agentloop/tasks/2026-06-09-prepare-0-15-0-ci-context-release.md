@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 CI context for verification reports is on main, but package metadata, release docs, and GitHub tarball references still point at 0.14.0.

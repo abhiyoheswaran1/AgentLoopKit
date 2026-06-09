@@ -1164,6 +1164,18 @@ Implemented:
 - Playwright screenshot refresh with the current 74-test count
 - launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-candidate records
 
+### Cycle 58: 0.15.0 release status
+
+Decision: document `v0.15.0` as a public GitHub release and keep npm status explicit after the publish workflow failed at authorization.
+
+Implemented:
+
+- GitHub release `v0.15.0` with attached `agentloopkit-0.15.0.tgz`
+- release notes with tarball SHA, local verification, CI run, and npm-pending status
+- Publish workflow result for run `27237034367`: package checks passed, final `npm publish` failed with `E404`
+- npm registry proof after release: latest `0.1.1`, versions `0.1.0` and `0.1.1`
+- launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-status records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1209,8 +1221,8 @@ Top remaining items:
 
 ## Known limitations
 
-- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, and `v0.14.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.15.0` is prepared locally but does not have a GitHub release or npm publish yet.
+- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, and `v0.15.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- `agentloopkit@0.15.0` is the latest GitHub release, but it is not on npm yet.
 - npm may jump from `0.1.1` to `0.15.0` after authorization is repaired. Versions `0.2.0` through `0.14.0` were GitHub-only release candidates.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
@@ -1228,6 +1240,7 @@ Top remaining items:
 - The release-triggered GitHub Publish workflow for `v0.12.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.13.0` passed checks and failed at npm authorization with `E404`.
 - The release-triggered GitHub Publish workflow for `v0.14.0` passed checks and failed at npm authorization with `E404`.
+- The release-triggered GitHub Publish workflow for `v0.15.0` passed checks and failed at npm authorization with `E404`.
 - Local `npm publish --access public` for `0.5.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.6.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.7.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
@@ -1314,8 +1327,8 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.14.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.14.0` to npm.
 - [x] Prepare `agentloopkit@0.15.0` CI-context release candidate.
-- [ ] Publish GitHub release `v0.15.0` with npm-pending notes.
-- [ ] Run GitHub Publish workflow for `v0.15.0`.
+- [x] Publish GitHub release `v0.15.0` with npm-pending notes.
+- [x] Run GitHub Publish workflow for `v0.15.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.15.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
@@ -1370,7 +1383,7 @@ Title: I built a local-first engineering loop for coding agents
 
 1. Repair npm publishing for `0.15.0`: high usefulness, low repo effort, external npm setting required.
 2. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-3. Publish GitHub release `v0.15.0` after release-candidate CI passes: high usefulness, low effort.
+3. Add richer doctor risk-file details: medium usefulness, low effort.
 4. Add policy pack customization: medium commercial optionality, medium effort.
 5. Add local static HTML report: medium star potential, high effort, medium maintenance.
 6. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
