@@ -8,6 +8,7 @@ import { makeTempDir, removeTempDir } from './helpers.js';
 let tempDirs: string[] = [];
 
 const cliPath = path.resolve('src/cli/index.ts');
+const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 describe('status command', () => {
   afterEach(async () => {
@@ -35,7 +36,7 @@ describe('status command', () => {
       '# Verification Report\n\nOverall status: pass\n',
     );
 
-    const result = await execa('npx', ['tsx', cliPath, 'status', '--json'], {
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
       cwd: dir,
       reject: false,
     });
@@ -56,7 +57,7 @@ describe('status command', () => {
     tempDirs.push(dir);
     await initializeAgentLoop({ cwd: dir });
 
-    const result = await execa('npx', ['tsx', cliPath, 'status'], { cwd: dir, reject: false });
+    const result = await execa(tsxPath, [cliPath, 'status'], { cwd: dir, reject: false });
 
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('# AgentLoopKit Status');
@@ -78,11 +79,11 @@ describe('status command', () => {
       '# Verification Report\n\nOverall status: fail\n',
     );
 
-    const jsonResult = await execa('npx', ['tsx', cliPath, 'status', '--json'], {
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
       cwd: dir,
       reject: false,
     });
-    const markdownResult = await execa('npx', ['tsx', cliPath, 'status'], {
+    const markdownResult = await execa(tsxPath, [cliPath, 'status'], {
       cwd: dir,
       reject: false,
     });

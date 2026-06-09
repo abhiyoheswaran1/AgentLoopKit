@@ -4,6 +4,7 @@ import { execa } from 'execa';
 import { describe, expect, test } from 'vitest';
 
 const cliPath = path.resolve('src/cli/index.ts');
+const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 describe('version command', () => {
   test('prints the package version', async () => {
@@ -11,7 +12,7 @@ describe('version command', () => {
       version: string;
     };
 
-    const result = await execa('npx', ['tsx', cliPath, 'version']);
+    const result = await execa(tsxPath, [cliPath, 'version']);
 
     expect(result.stdout.trim()).toBe(packageJson.version);
   });

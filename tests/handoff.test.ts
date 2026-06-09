@@ -7,6 +7,7 @@ import { createDefaultConfig } from '../src/core/config.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
+const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 let tempDirs: string[] = [];
 
@@ -34,7 +35,7 @@ describe('handoff command', () => {
   test('writes a reviewer handoff by default and reports the path as JSON', async () => {
     const dir = await createSummaryFixture();
 
-    const result = await execa('npx', ['tsx', cliPath, 'handoff', '--json'], { cwd: dir });
+    const result = await execa(tsxPath, [cliPath, 'handoff', '--json'], { cwd: dir });
 
     const output = JSON.parse(result.stdout);
     expect(output.markdown).toContain('# PR Summary');
@@ -45,7 +46,7 @@ describe('handoff command', () => {
   test('keeps summarize read-only unless write is requested', async () => {
     const dir = await createSummaryFixture();
 
-    const result = await execa('npx', ['tsx', cliPath, 'summarize', '--json'], { cwd: dir });
+    const result = await execa(tsxPath, [cliPath, 'summarize', '--json'], { cwd: dir });
 
     const output = JSON.parse(result.stdout);
     expect(output.outPath).toContain('.agentloop/handoffs');

@@ -6,6 +6,7 @@ import { createDefaultConfig } from '../src/core/config.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
+const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 let tempDirs: string[] = [];
 
@@ -24,9 +25,8 @@ describe('create-task command', () => {
     );
 
     await execa(
-      'npx',
+      tsxPath,
       [
-        'tsx',
         cliPath,
         'create-task',
         '--title',

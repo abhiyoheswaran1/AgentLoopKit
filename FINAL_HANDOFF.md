@@ -147,6 +147,17 @@ Latest local verification for the `0.3.0` repeated create-task flag fix:
 - Tarball smoke: pass, repeated create-task flags were preserved from the packed CLI
 - `npm publish --access public --dry-run`: pass
 
+Latest CI recovery for the `0.3.0` repeated create-task flag fix:
+
+- GitHub CI run `27214329125` failed because CLI tests ran `npx tsx` from temp directories and npm tried to install `tsx` during tests.
+- Focused local recovery test: `npx pnpm@10.12.1 test tests/create-task.test.ts tests/handoff.test.ts tests/status.test.ts tests/version.test.ts`: pass, 4 files and 7 tests
+- `git diff --check`: pass
+- `npx pnpm@10.12.1 lint`: pass
+- `npx pnpm@10.12.1 typecheck`: pass
+- `npx pnpm@10.12.1 test`: pass, 17 files and 34 tests
+- `npx pnpm@10.12.1 build`: pass
+- `npx projscan doctor --format markdown`: A, 100/100
+
 ## How to package
 
 ```bash

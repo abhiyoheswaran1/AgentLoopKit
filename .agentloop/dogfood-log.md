@@ -466,3 +466,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Add non-interactive flags for likely files and files not to touch.
   - Improve active task detection beyond filename sorting.
+
+## 2026-06-09: CI CLI Test Harness Fix
+
+- Task contract: `.agentloop/tasks/2026-06-09-fix-repeated-create-task-flags.md`
+- Trigger:
+  - GitHub CI run `27214329125` failed after commit `36d41f2`.
+  - Product tests passed locally, but CI failed when CLI tests invoked `npx tsx` from temp directories.
+- Root cause:
+  - Tests ran `npx tsx ...` with `cwd` set to temp repos.
+  - npm treated those temp repos as package roots and tried to install `tsx` during tests.
+  - Concurrent installs hit a cache/esbuild file error in CI.
+- Verification completed:
+  - Focused CLI tests after fix: `npx pnpm@10.12.1 test tests/create-task.test.ts tests/handoff.test.ts tests/status.test.ts tests/version.test.ts`: pass, 4 files and 7 tests
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 17 files and 34 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+- Product changes:
+  - CLI tests now run the repo-local `node_modules/.bin/tsx` binary instead of `npx tsx`.
+- Worked well: the CI failure exposed a test harness dependency on networked `npx` behavior.
+- Improve: add a small shared `runCli` helper for future CLI tests.
