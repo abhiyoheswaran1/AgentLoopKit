@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.15.1
+
+Trust-polish GitHub patch release candidate. npm publish is pending trusted-publishing or local-auth repair:
+
+- Added category-level `agentloop doctor` risk-file warnings with capped path examples
+- Kept risk-file findings warning-only and path-only
+- Reduced noisy risk-file false positives from Markdown docs and templates
+- Replaced the unproven custom config schema URL with the GitHub raw schema URL
+- Clarified that CLI config validation is local and does not fetch the schema URL at runtime
+- Updated README, configuration docs, product-panel records, and release handoff notes
+
 ## 0.15.0
 
 CI-context GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:

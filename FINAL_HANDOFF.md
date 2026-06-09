@@ -92,6 +92,23 @@ npx projscan doctor --format markdown
 
 Latest local verification:
 
+- `0.15.1` release-candidate verification:
+  - `npx tsx src/cli/index.ts version`: pass, reported `0.15.1`.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 76 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 359 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `node dist/cli/index.js version`: pass, reported `0.15.1`.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.15.1.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: pass, `agentloop version` reported `0.15.1`, `init --json` created files, `doctor --json` accepted the generated setup, and generated config used the GitHub raw schema URL.
+  - npm registry proof: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-00-06-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-08-pr-summary.md`.
+
 - Doctor risk-file details iteration:
   - Red doctor test: `npx pnpm@10.12.1 test tests/doctor.test.ts` failed because category-level `Risk files:` checks were missing.
   - Red safety test: `npx pnpm@10.12.1 test tests/safety.test.ts` failed because Markdown docs such as `docs/migration-guide.md` were treated as semantic risk files.
@@ -1236,6 +1253,18 @@ Implemented:
 - configuration docs and README clarify that CLI validation is local and does not fetch the schema URL at runtime
 - focused tests for defaults, init output, and schema metadata
 
+### Cycle 61: 0.15.1 patch release candidate
+
+Decision: package doctor risk-file details and config schema URL trust as `0.15.1`, a patch release, because the changes improve launch trust without adding a new command or breaking behavior.
+
+Implemented so far:
+
+- package metadata bump to `0.15.1`
+- `0.15.1` changelog entry for doctor risk details and schema URL trust
+- README, GitHub Actions docs, examples, and VHS source updated to pin the `v0.15.1` tarball while npm remains behind
+- README screenshot sources updated from 74 tests to 76 tests
+- launch checklist, npm publishing docs, final handoff, backlog, and dogfood release-candidate records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1270,12 +1299,13 @@ Strongest signals:
 - Release readers need `0.15.0` metadata and visuals to match CI context in verification reports before the GitHub release.
 - Reviewers and agents need `doctor` to name risk categories instead of reporting only a total count.
 - First-run configs should not point at an unproven custom schema domain.
+- Release readers need patch-level semver for trust polish instead of another minor version jump.
 
 ## Backlog
 
 Top remaining items:
 
-1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.15.0`.
+1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.15.1`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
 3. Static HTML report export.
 4. Policy pack customization.
@@ -1284,8 +1314,8 @@ Top remaining items:
 ## Known limitations
 
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, and `v0.15.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- `agentloopkit@0.15.0` is the latest GitHub release, but it is not on npm yet.
-- npm may jump from `0.1.1` to `0.15.0` after authorization is repaired. Versions `0.2.0` through `0.14.0` were GitHub-only release candidates.
+- `agentloopkit@0.15.1` is prepared on `main`, but the GitHub release is not created yet.
+- npm may jump from `0.1.1` to `0.15.1` after authorization is repaired. Versions `0.2.0` through `0.15.0` were GitHub-only release candidates.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -1392,6 +1422,10 @@ Top remaining items:
 - [x] Publish GitHub release `v0.15.0` with npm-pending notes.
 - [x] Run GitHub Publish workflow for `v0.15.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.15.0` to npm.
+- [x] Prepare `agentloopkit@0.15.1` trust-polish patch release candidate.
+- [ ] Publish GitHub release `v0.15.1` with npm-pending notes.
+- [ ] Run GitHub Publish workflow for `v0.15.1`.
+- [ ] Publish `agentloopkit@0.15.1` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
@@ -1443,7 +1477,7 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Repair npm publishing for `0.15.0`: high usefulness, low repo effort, external npm setting required.
+1. Repair npm publishing for `0.15.1`: high usefulness, low repo effort, external npm setting required.
 2. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
 3. Add policy pack customization: medium commercial optionality, medium effort.
 4. Add local static HTML report: medium star potential, high effort, medium maintenance.

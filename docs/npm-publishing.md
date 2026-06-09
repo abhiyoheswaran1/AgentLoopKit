@@ -39,9 +39,18 @@ npm publish --access public
 
 The first publish creates the npm package. That step may require an OTP, depending on the npm account's security settings.
 
-## Current `0.15.0` Publishing State
+## Current `0.15.1` Publishing State
 
-As of June 9, 2026:
+As of June 10, 2026:
+
+Short version:
+
+- npm latest is still `agentloopkit@0.1.1`.
+- `agentloopkit@0.15.1` is the next patch release candidate.
+- The next successful npm publish may jump from `0.1.1` to `0.15.1` because versions `0.2.0` through `0.15.0` were GitHub-only release candidates during the npm publishing blocker.
+- After npm catches up, resume normal semver publishing. Do not keep creating higher versions just because npm authorization is blocked.
+
+Historical publishing log:
 
 - GitHub release `v0.2.0` is public.
 - GitHub release `v0.2.1` is public.
@@ -58,6 +67,8 @@ As of June 9, 2026:
 - GitHub release `v0.13.0` is public with a tarball asset.
 - GitHub release `v0.14.0` is public with a tarball asset.
 - `agentloopkit@0.14.0` is prepared on `main` after `agentloop check-gates --strict` was added.
+- GitHub release `v0.15.0` is public with a tarball asset.
+- `agentloopkit@0.15.1` is prepared on `main` after doctor risk-file detail reporting and config schema URL trust fixes.
 - npm latest is still `agentloopkit@0.1.1`.
 - `agentloopkit@0.2.0` passed local preflight, `npm publish --dry-run`, tarball smoke testing, and the GitHub publish workflow's install, lint, typecheck, test, and build steps.
 - GitHub Actions reached `npm publish`, then npm rejected the workflow because the package does not have a matching trusted publisher configuration.
@@ -109,9 +120,10 @@ As of June 9, 2026:
 - Tarball SHA-256: `e92f28382d16cccbebd027bbbcb5324f60de088e49bb611482b1e205f673f965`.
 - GitHub Publish workflow run `27237034367` for `v0.15.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - npm registry proof after the `v0.15.0` release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
-- npm may jump from `0.1.1` to `0.15.0` after authorization is repaired. Versions `0.2.0` through `0.14.0` were GitHub-only release candidates during the npm publishing blocker.
+- `agentloopkit@0.15.1` is prepared on `main` after doctor risk-file detail reporting and the GitHub raw config schema URL were added.
+- npm may jump from `0.1.1` to `0.15.1` after authorization is repaired. Versions `0.2.0` through `0.15.0` were GitHub-only release candidates during the npm publishing blocker.
 
-Publish `0.15.0` to npm only after npm trusted publishing is configured or local browser authentication succeeds.
+Publish `0.15.1` to npm only after npm trusted publishing is configured or local browser authentication succeeds.
 
 Preferred release path after the first publish:
 
@@ -163,7 +175,7 @@ npm view agentloopkit version
 npm view agentloopkit versions --json
 ```
 
-For `v0.15.0`, the expected successful result is latest `0.15.0` and a versions list containing `0.15.0`.
+For `v0.15.1`, the expected successful result is latest `0.15.1` and a versions list containing `0.15.1`.
 
 ## Package Contents
 

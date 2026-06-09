@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Source on `main` targets `0.15.0`. npm currently serves `0.1.1`; GitHub release candidates from `0.2.0` onward were produced while npm publishing auth was blocked. The next successful npm publish may jump to `0.15.0`, then normal semver releases resume.
+Source on `main` targets `0.15.1`. npm currently serves `0.1.1`; GitHub release candidates from `0.2.0` onward were produced while npm publishing auth was blocked. The next successful npm publish may jump to `0.15.1`, then normal semver releases resume.
 
 Run the CLI after install:
 
@@ -297,7 +297,7 @@ Use `agentloop check-gates --strict` as a review-evidence gate in pull request C
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
-See `docs/github-actions.md` and `examples/github-actions/` for copy-pasteable workflows. Because npm latest is still `0.1.1`, the examples pin the `v0.15.0` GitHub tarball. Switch them to normal npm usage after npm publishing catches up.
+See `docs/github-actions.md` and `examples/github-actions/` for copy-pasteable workflows. Because npm latest is still `0.1.1`, the examples pin the `v0.15.1` GitHub tarball. Switch them to normal npm usage after npm publishing catches up.
 
 ## PR Summaries
 

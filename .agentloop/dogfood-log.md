@@ -1944,3 +1944,38 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - A small test set covered all places where the schema URL can drift.
 - Improve:
   - Revisit a branded schema domain only after the domain actually serves the schema file.
+
+## 2026-06-10: 0.15.1 Patch Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-15-1-trust-polish-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-061.md`
+- Trigger:
+  - Doctor risk-file detail reporting and real config schema URL fixes are on `main`.
+  - Package metadata and GitHub tarball pins still pointed at `0.15.0`.
+  - Product panel chose `0.15.1` instead of `0.16.0` because this is patch-level trust polish.
+- Verification run:
+  - `npx tsx src/cli/index.ts version`: pass, reported `0.15.1`.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 76 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 359 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `node dist/cli/index.js version`: pass, reported `0.15.1`.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.15.1.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke test: pass, `agentloop version` reported `0.15.1`, `init --json` created files, `doctor --json` accepted the generated setup, and generated config used the GitHub raw schema URL.
+  - npm registry proof: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-00-06-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-08-pr-summary.md`.
+- Product changes:
+  - Bump package metadata to `0.15.1`.
+  - Add a `0.15.1` changelog entry.
+  - Update current GitHub tarball pins from `v0.15.0` to `v0.15.1`.
+  - Keep npm availability status explicit until registry proof changes.
+- Worked well:
+  - `init --json` made the packed-package smoke test fully noninteractive.
+  - projscan stayed green after release-doc and visual-asset changes.
+- Improve:
+  - Record GitHub release and publish-workflow status after the release step.
