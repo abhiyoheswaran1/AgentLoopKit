@@ -82,20 +82,20 @@ npx --yes --package ./agentloopkit-0.1.0.tgz agentloop version
 
 Preferred path:
 
-1. Confirm the npm package name `agentloopkit`.
+1. Publish `agentloopkit@0.1.0` manually once.
 2. Configure npm trusted publishing for this GitHub repository.
-3. Publish the GitHub `v0.1.0` release.
-4. Let `.github/workflows/publish.yml` run checks and `npm publish --provenance`.
+3. Publish future GitHub releases.
+4. Let `.github/workflows/publish.yml` run checks and `npm publish` through OIDC.
 
 Manual fallback:
 
 ```bash
 npm login
 npm whoami
-npm publish --provenance
+npm publish --access public
 ```
 
-Do not publish automatically from an unauthenticated local machine.
+The first manual publish may require an npm OTP. Do not publish from an unauthenticated local machine.
 
 ## How users install it
 
@@ -190,7 +190,8 @@ Top remaining items:
 - [x] Attach packed tarball to draft release.
 - [x] Add CI.
 - [x] Add publish workflow.
-- [ ] Configure npm trusted publishing.
+- [ ] Publish `agentloopkit@0.1.0` to npm.
+- [ ] Configure npm trusted publishing for future releases.
 - [ ] Publish GitHub release.
 - [ ] Confirm npm package install with `npx agentloopkit init`.
 - [ ] Add GitHub repo description.

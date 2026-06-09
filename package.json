@@ -28,6 +28,14 @@
     "cli"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhiyoheswaran1/AgentLoopKit.git"
+  },
+  "homepage": "https://github.com/abhiyoheswaran1/AgentLoopKit#readme",
+  "bugs": {
+    "url": "https://github.com/abhiyoheswaran1/AgentLoopKit/issues"
+  },
   "engines": {
     "node": ">=20"
   },
@@ -40,7 +48,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm build"
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
     "commander": "^14.0.2",

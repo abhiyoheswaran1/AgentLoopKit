@@ -29,20 +29,40 @@ pnpm version patch
 
 ## Publish
 
-Preferred release path:
+First publish:
+
+```bash
+npm login
+npm whoami
+npm publish --access public
+```
+
+The first publish creates the npm package. That step may require an OTP, depending on the npm account's security settings.
+
+Preferred release path after the first publish:
 
 1. Configure npm trusted publishing for this GitHub repository.
 2. Publish the GitHub release.
-3. Let `.github/workflows/publish.yml` run `npm publish --provenance`.
+3. Let `.github/workflows/publish.yml` run `npm publish` through OIDC.
+
+Trusted publisher settings:
+
+- Organization/user: `abhiyoheswaran1`
+- Repository: `AgentLoopKit`
+- Workflow filename: `publish.yml`
+- Environment name: leave blank unless a GitHub environment is added
+- Allowed action: `npm publish`
+
+npm trusted publishing requires npm CLI `11.5.1` or newer and Node.js `22.14.0` or newer. The publish workflow uses Node.js 24 and updates npm before publishing.
 
 Manual fallback:
 
 ```bash
 npm login
-npm publish --provenance
+npm publish --access public
 ```
 
-Use provenance when publishing from a supported CI environment. If publishing locally, document that provenance was not used.
+Trusted publishing creates provenance from GitHub Actions. Local fallback publishes do not create GitHub Actions provenance.
 
 This machine is not logged in to npm until `npm whoami` succeeds.
 
