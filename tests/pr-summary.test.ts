@@ -32,6 +32,52 @@ describe('PR summary generation', () => {
     expect(summary.markdown).toContain('2 files changed');
   });
 
+  test('classifies changed files by review area and adds focus hints', () => {
+    const summary = generatePrSummary({
+      timestamp: '2026-06-10-00-30',
+      status: '',
+      changedFiles: [
+        { status: 'M', path: 'src/core/pr-summary.ts' },
+        { status: 'M', path: 'tests/pr-summary.test.ts' },
+        { status: 'M', path: 'README.md' },
+        { status: 'M', path: '.github/workflows/ci.yml' },
+        { status: 'M', path: 'package.json' },
+        { status: 'A', path: '.agentloop/tasks/2026-06-10-demo.md' },
+        { status: 'A', path: 'db/migrations/001-create-users.sql' },
+      ],
+      taskMarkdown: '# Improve PR summary reviewability',
+      verificationMarkdown: '# Verification Report\n\nOverall status: pass',
+      diffStat: '7 files changed',
+    });
+
+    expect(summary.markdown).toContain('## Change Areas');
+    expect(summary.markdown).toContain('### Source');
+    expect(summary.markdown).toContain('- M `src/core/pr-summary.ts`');
+    expect(summary.markdown).toContain('### Tests');
+    expect(summary.markdown).toContain('- M `tests/pr-summary.test.ts`');
+    expect(summary.markdown).toContain('### Documentation');
+    expect(summary.markdown).toContain('- M `README.md`');
+    expect(summary.markdown).toContain('### CI / Automation');
+    expect(summary.markdown).toContain('- M `.github/workflows/ci.yml`');
+    expect(summary.markdown).toContain('### Config / Package');
+    expect(summary.markdown).toContain('- M `package.json`');
+    expect(summary.markdown).toContain('### AgentLoop');
+    expect(summary.markdown).toContain('- A `.agentloop/tasks/2026-06-10-demo.md`');
+    expect(summary.markdown).toContain('### Risk-Sensitive');
+    expect(summary.markdown).toContain('- A `db/migrations/001-create-users.sql`');
+    expect(summary.markdown).toContain('## Review Focus');
+    expect(summary.markdown).toContain(
+      '- Review source changes for behavior and public API impact.',
+    );
+    expect(summary.markdown).toContain('- Check tests cover the changed behavior.');
+    expect(summary.markdown).toContain(
+      '- Review CI or automation changes for permissions and secret handling.',
+    );
+    expect(summary.markdown).toContain(
+      '- Review risk-sensitive paths such as migrations, auth, security, billing, env, deployment, and lockfiles with extra care.',
+    );
+  });
+
   test('uses latest timestamped verification report instead of reports README', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -80,7 +126,10 @@ describe('PR summary generation', () => {
     await utimes(newerPath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
-      JSON.stringify({ version: 1, activeTaskPath: '.agentloop/tasks/2026-06-09-explicit-task.md' }),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-09-explicit-task.md',
+      }),
     );
 
     const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });

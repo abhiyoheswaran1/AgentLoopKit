@@ -309,6 +309,8 @@ See `docs/github-actions.md` and `examples/github-actions/` for copy-pasteable w
 - latest verification report
 - config settings
 
+The summary groups changed files into review areas such as source, tests, docs, CI, config, AgentLoop artifacts, and risk-sensitive paths. It adds review-focus hints from file paths only.
+
 It does not call an LLM.
 
 Use `agentloop summarize` to preview the same output without writing a handoff file. `agentloop summarize --write` remains available for scripts.

@@ -14,6 +14,15 @@ The summary uses deterministic inputs:
 - latest verification report
 - config
 
+It includes:
+
+- changed files
+- change areas grouped by path, such as source, tests, docs, CI, config, AgentLoop, and risk-sensitive files
+- review-focus hints based on those path groups
+- verification status
+- rollback notes
+- reviewer checklist
+
 It writes:
 
 ```text
@@ -21,6 +30,8 @@ It writes:
 ```
 
 No LLM is required.
+
+AgentLoopKit classifies files by path only. It does not read file contents, `.env` contents, or credentials to create change-area hints.
 
 Use `agentloop summarize` to preview the same deterministic summary without writing a file. `agentloop summarize --write` remains available for scripts that already use it.
 

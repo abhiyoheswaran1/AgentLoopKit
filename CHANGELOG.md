@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added deterministic PR summary change-area classification for source, tests, docs, CI, config, AgentLoop, risk-sensitive, and uncategorized paths
+- Added path-based review-focus hints to PR summaries without LLM calls or file-content inspection
+
 ## 0.15.1
 
 Trust-polish GitHub patch release candidate. npm publish is pending trusted-publishing or local-auth repair:

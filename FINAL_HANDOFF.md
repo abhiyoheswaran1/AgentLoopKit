@@ -23,6 +23,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - static bash, zsh, and fish shell completion scripts
 - verification report generation
 - deterministic PR summary generation
+- deterministic PR summary change-area classification and review-focus hints
 - verification reports with allowlisted CI context
 - local status command for active task, latest verification, dirty files, configured commands, and next action
 - local gate-check command for task, verification, handoff, harness, policy, and git evidence
@@ -122,6 +123,18 @@ Latest local verification:
   - `git diff --check`: pass.
   - AgentLoop verification report: `.agentloop/reports/2026-06-10-00-19-verification-report.md`, overall status `pass`.
   - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-19-pr-summary.md`.
+
+- PR summary change-area verification:
+  - Red focused test: `npx pnpm@10.12.1 test tests/pr-summary.test.ts` failed because `## Change Areas` was missing.
+  - Focused green test: `npx pnpm@10.12.1 test tests/pr-summary.test.ts`: pass, 1 file and 5 tests.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 77 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 371 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx pnpm@10.12.1 build`: pass.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-00-27-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-28-pr-summary.md`.
 
 - Doctor risk-file details iteration:
   - Red doctor test: `npx pnpm@10.12.1 test tests/doctor.test.ts` failed because category-level `Risk files:` checks were missing.
@@ -1301,6 +1314,17 @@ Implemented:
 - README publishing status now states that npm currently serves `0.1.1` while GitHub release `v0.15.1` is current
 - backlog, dogfood log, task contract, and product-panel cycle records
 
+### Cycle 64: PR summary change areas
+
+Decision: add deterministic path-based change-area classification to PR summaries so reviewers can see the shape of a diff faster without an LLM or file-content inspection.
+
+Implemented:
+
+- `## Change Areas` section grouped by source, tests, docs, CI, config/package, AgentLoop, risk-sensitive, and other paths
+- `## Review Focus` section with deterministic reviewer hints based on those path groups
+- Vitest coverage for the new summary output
+- README, PR-summary docs, changelog, roadmap, backlog, dogfood log, and README visual asset refresh
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1337,15 +1361,16 @@ Strongest signals:
 - First-run configs should not point at an unproven custom schema domain.
 - Release readers need patch-level semver for trust polish instead of another minor version jump.
 - Public roadmap readers need shipped work and future work separated clearly after `v0.15.1`.
+- Reviewers need deterministic PR summaries to group changed files by review area without LLM calls.
 
 ## Backlog
 
 Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.15.1`.
-2. Add richer git diff classification for PR summaries.
-3. Static HTML report export.
-4. Policy pack customization.
+2. Static HTML report export.
+3. Policy pack customization.
+4. Template version and migration guidance.
 5. Optional schema-store submission after npm publishing is stable.
 
 ## Known limitations

@@ -16,10 +16,129 @@ export type PrSummaryInput = {
   diffStat?: string;
 };
 
+type ChangeArea = {
+  key: string;
+  title: string;
+  files: GitFileStatus[];
+};
+
+const CHANGE_AREAS: Array<{ key: string; title: string; matches: (filePath: string) => boolean }> =
+  [
+    {
+      key: 'risk',
+      title: 'Risk-Sensitive',
+      matches: (filePath) =>
+        /(^|\/)(migrations?|migration|auth|security|billing|deploy|deployment)(\/|\.|-|_|$)/.test(
+          filePath,
+        ) ||
+        /(^|\/)\.env(\.|$)/.test(filePath) ||
+        /(^|\/)(package-lock\.json|pnpm-lock\.yaml|yarn\.lock|bun\.lockb?|Cargo\.lock|poetry\.lock)$/.test(
+          filePath,
+        ),
+    },
+    { key: 'source', title: 'Source', matches: (filePath) => /^src\//.test(filePath) },
+    {
+      key: 'tests',
+      title: 'Tests',
+      matches: (filePath) =>
+        /(^|\/)(tests?|__tests__)\//.test(filePath) ||
+        /\.(test|spec)\.[cm]?[jt]sx?$/.test(filePath),
+    },
+    {
+      key: 'agentloop',
+      title: 'AgentLoop',
+      matches: (filePath) =>
+        /^\.agentloop\//.test(filePath) ||
+        /(^|\/)(AGENTS\.md|AGENTLOOP\.md|agentloop\.config\.json)$/.test(filePath),
+    },
+    {
+      key: 'docs',
+      title: 'Documentation',
+      matches: (filePath) =>
+        /(^|\/)docs\//.test(filePath) ||
+        /(^|\/)(README|CHANGELOG|CONTRIBUTING|CODE_OF_CONDUCT|SECURITY|ROADMAP|DECISIONS)\.md$/i.test(
+          filePath,
+        ) ||
+        /\.mdx?$/.test(filePath),
+    },
+    {
+      key: 'ci',
+      title: 'CI / Automation',
+      matches: (filePath) =>
+        /^\.github\//.test(filePath) ||
+        /^scripts\//.test(filePath) ||
+        /(^|\/)(Dockerfile|Makefile)$/.test(filePath),
+    },
+    {
+      key: 'config',
+      title: 'Config / Package',
+      matches: (filePath) =>
+        /(^|\/)(package\.json|tsconfig\.json|tsup\.config\.ts|vitest\.config\.ts|eslint\.config\.js|prettier\.config\.[cm]?js|pnpm-workspace\.yaml)$/.test(
+          filePath,
+        ) || /^schema\//.test(filePath),
+    },
+  ];
+
 function extractLine(markdown: string | undefined, pattern: RegExp, fallback: string) {
   if (!markdown) return fallback;
   const match = markdown.match(pattern);
   return match?.[1]?.trim() || fallback;
+}
+
+function classifyChangedFiles(changedFiles: GitFileStatus[]) {
+  const areas: ChangeArea[] = CHANGE_AREAS.map((area) => ({
+    key: area.key,
+    title: area.title,
+    files: [],
+  }));
+  const other: ChangeArea = { key: 'other', title: 'Other', files: [] };
+
+  for (const file of changedFiles) {
+    const normalizedPath = file.path.replace(/\\/g, '/');
+    const areaIndex = CHANGE_AREAS.findIndex((area) => area.matches(normalizedPath));
+    if (areaIndex === -1) other.files.push(file);
+    else areas[areaIndex]?.files.push(file);
+  }
+
+  return [...areas.filter((area) => area.files.length), ...(other.files.length ? [other] : [])];
+}
+
+function renderChangeAreas(changedFiles: GitFileStatus[]) {
+  if (!changedFiles.length) return '- No changed files detected.';
+
+  const areas = classifyChangedFiles(changedFiles);
+  return areas
+    .map((area) => {
+      return `### ${area.title}
+${area.files.map((file) => `- ${file.status} \`${file.path}\``).join('\n')}`;
+    })
+    .join('\n\n');
+}
+
+function renderReviewFocus(changedFiles: GitFileStatus[]) {
+  if (!changedFiles.length) return '- No changed files detected.';
+
+  const keys = new Set(classifyChangedFiles(changedFiles).map((area) => area.key));
+  const lines: string[] = [];
+
+  if (keys.has('source')) lines.push('- Review source changes for behavior and public API impact.');
+  if (keys.has('tests')) lines.push('- Check tests cover the changed behavior.');
+  if (keys.has('docs')) lines.push('- Check docs match the implemented command behavior.');
+  if (keys.has('ci'))
+    lines.push('- Review CI or automation changes for permissions and secret handling.');
+  if (keys.has('config'))
+    lines.push('- Review package and config changes for install, build, and publish impact.');
+  if (keys.has('agentloop'))
+    lines.push(
+      '- Review AgentLoop artifacts for accurate task, verification, and handoff evidence.',
+    );
+  if (keys.has('risk'))
+    lines.push(
+      '- Review risk-sensitive paths such as migrations, auth, security, billing, env, deployment, and lockfiles with extra care.',
+    );
+  if (keys.has('other')) lines.push('- Review uncategorized files for ownership and scope.');
+
+  return lines.join('\n');
 }
 
 export function generatePrSummary(input: PrSummaryInput) {
@@ -50,11 +169,17 @@ ${
     : '- No changed files detected.'
 }
 
+## Change Areas
+${renderChangeAreas(input.changedFiles)}
+
 ## Diff Stats
 ${input.diffStat?.trim() || 'No diff stats available.'}
 
 ## Behaviour Changed
 - Review changed files and task contract to confirm intended behavior.
+
+## Review Focus
+${renderReviewFocus(input.changedFiles)}
 
 ## Verification Performed
 - ${verificationLine}

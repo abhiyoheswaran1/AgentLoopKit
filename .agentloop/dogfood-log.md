@@ -2021,3 +2021,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-19-pr-summary.md`.
 - Improve:
   - Keep public docs aligned after future releases without cutting extra versions for docs-only release-status changes.
+
+## 2026-06-10: PR Summary Change Areas
+
+- Task contract: `.agentloop/tasks/2026-06-10-classify-pr-summary-change-areas.md`
+- Product cycle: `.agentloop/research/interview-cycle-064.md`
+- Trigger:
+  - PR summaries listed changed files but did not group them by reviewer concern.
+  - Reviewers still had to infer source, tests, docs, CI, config, AgentLoop artifacts, and risk-sensitive paths.
+- Product changes:
+  - Added deterministic `Change Areas` grouping and `Review Focus` hints to PR summaries.
+  - Updated PR-summary docs and README copy for path-only classification.
+  - Added an `Unreleased` changelog entry.
+  - Refreshed README VHS and Playwright assets after the handoff output and test count changed.
+- Verification run:
+  - Red focused test: `npx pnpm@10.12.1 test tests/pr-summary.test.ts` failed because `## Change Areas` was missing.
+  - Focused green test: `npx pnpm@10.12.1 test tests/pr-summary.test.ts`: pass, 1 file and 5 tests.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 21 files and 77 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 371 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx pnpm@10.12.1 build`: pass.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-00-27-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-28-pr-summary.md`.
+- Improve:
+  - Keep classification path-only until users need configurable categories.
