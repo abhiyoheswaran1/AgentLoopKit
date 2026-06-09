@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
 
-Active task lifecycle:
+Active task lifecycle GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:
 
 - Added `agentloop task set <path>` to pin the active task contract
 - Added `agentloop task current` and `agentloop task clear`

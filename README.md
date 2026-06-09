@@ -44,7 +44,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Current source on `main` documents `0.3.0`. npm latest is still `0.1.1` until trusted publishing or local npm authentication is repaired.
+Current source on `main` documents `0.4.0`. npm latest is still `0.1.1` until trusted publishing or local npm authentication is repaired.
 
 Run the CLI after install:
 

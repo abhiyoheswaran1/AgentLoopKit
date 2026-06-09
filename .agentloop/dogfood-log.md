@@ -619,3 +619,40 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Add a release-prep task for `0.4.0` after npm trusted publishing is configured or local browser/OTP publish works.
   - Consider `agentloop task current` in agent install guidance after more dogfooding.
+
+## 2026-06-09: 0.4.0 Active Task Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-09-prepare-0-4-0-active-task-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-022.md`
+- Verification report: `.agentloop/reports/2026-06-09-17-33-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-17-33-pr-summary.md`
+- Trigger:
+  - `main` contained the active task command after GitHub release `v0.3.0`.
+  - Package metadata still needed to move to a new release candidate before another GitHub release.
+- Verification completed:
+  - `npx tsx src/cli/index.ts task set .agentloop/tasks/2026-06-09-prepare-0-4-0-active-task-release.md --json`: pass
+  - `npx tsx src/cli/index.ts version`: pass, reported `0.4.0`
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 18 files and 43 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.4.0.tgz`
+  - Tarball smoke: pass, packed `agentloop version` reported `0.4.0` and `agentloop task set/clear` worked
+  - `npm publish --access public --dry-run`: pass
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-prepare-0-4-0-active-task-release.md`: pass
+  - `agentloop handoff --json`: pass, wrote the handoff above and used the pinned `0.4.0` task
+  - `agentloop task clear --json`: pass, removed `.agentloop/state.json`
+- Product changes:
+  - Bumped package metadata to `0.4.0`.
+  - Moved active task lifecycle changelog notes into `0.4.0`.
+  - Updated README, npm publishing docs, launch checklist, final handoff, backlog, and product-panel records.
+- Worked well:
+  - Release prep stayed metadata-only and did not change product behavior.
+  - `agentloop task set` made dogfood verification and handoff cite the intended release task.
+- Confusing:
+  - npm latest remains `0.1.1` until npm trusted publishing or local browser/OTP authentication succeeds.
+- Improve:
+  - Create GitHub `v0.4.0` only after CI passes on the release-prep commit.
+  - After the release workflow runs, update docs with the actual npm publish result.
