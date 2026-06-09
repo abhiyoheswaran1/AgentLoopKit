@@ -2,7 +2,10 @@ import path from 'node:path';
 import { readFile, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir } from './helpers.js';
-import { installAgentInstructions } from '../src/core/agent-installation.js';
+import {
+  installAgentInstructions,
+  installAllAgentInstructions,
+} from '../src/core/agent-installation.js';
 
 let tempDirs: string[] = [];
 
@@ -26,5 +29,23 @@ describe('agent installation', () => {
     expect(agentsMd).toContain('AgentLoopKit');
     expect(codexMd).toContain('Codex');
     expect(codexMd).toContain('verification evidence');
+  });
+
+  test('installs all bundled agent instruction files', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    const result = await installAllAgentInstructions({ cwd: dir });
+    const agentsMd = await readFile(path.join(dir, 'AGENTS.md'), 'utf8');
+
+    expect(result).toHaveLength(7);
+    await expect(readFile(path.join(dir, '.agentloop/agents/codex.md'), 'utf8')).resolves.toContain(
+      'Codex',
+    );
+    await expect(
+      readFile(path.join(dir, '.agentloop/agents/claude-code.md'), 'utf8'),
+    ).resolves.toContain('Claude Code');
+    expect(agentsMd).toContain('.agentloop/agents/codex.md');
+    expect(agentsMd).toContain('.agentloop/agents/generic.md');
   });
 });

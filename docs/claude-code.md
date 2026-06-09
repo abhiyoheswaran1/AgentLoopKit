@@ -6,6 +6,12 @@ Install Claude Code guidance:
 agentloop install-agent claude-code
 ```
 
+Multi-agent repos can install every bundled guidance file:
+
+```bash
+agentloop install-agent all
+```
+
 Claude Code should use:
 
 - task contracts in `.agentloop/tasks/`

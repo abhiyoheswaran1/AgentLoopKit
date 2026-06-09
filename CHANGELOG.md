@@ -16,3 +16,8 @@ Follow-up launch polish:
 - Added `agentloop init --dry-run`
 - Added `schema/agentloop.config.schema.json`
 - Included the schema in npm package contents
+- Added GitHub Actions workflow for npm trusted publishing
+- Added generated `.agentloop/README.md`
+- Added `agentloop install-agent all`
+- Added internal product panel, personas, simulated review cycles, backlog, dogfood log, and final handoff
+- Added launch checklist

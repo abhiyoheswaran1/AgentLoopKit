@@ -21,8 +21,12 @@ describe('init', () => {
     const config = await readFile(path.join(dir, 'agentloop.config.json'), 'utf8');
 
     expect(result.created.some((file) => file.endsWith('.agentloop/loops/feature.md'))).toBe(true);
+    expect(result.created.some((file) => file.endsWith('.agentloop/README.md'))).toBe(true);
     expect(config).toContain('"name": "demo"');
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).resolves.toContain('Specify');
+    await expect(readFile(path.join(dir, '.agentloop/README.md'), 'utf8')).resolves.toContain(
+      'agentloop create-task',
+    );
   });
 
   test('safely appends to an existing AGENTS.md', async () => {
@@ -44,9 +48,11 @@ describe('init', () => {
     const result = await initializeAgentLoop({ cwd: dir, dryRun: true });
 
     expect(result.created.some((file) => file.endsWith('AGENTLOOP.md'))).toBe(true);
+    expect(result.created.some((file) => file.endsWith('.agentloop/README.md'))).toBe(true);
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
     await expect(
       readFile(path.join(dir, '.agentloop/harness/repo-map.md'), 'utf8'),
     ).rejects.toThrow();
+    await expect(readFile(path.join(dir, '.agentloop/README.md'), 'utf8')).rejects.toThrow();
   });
 });

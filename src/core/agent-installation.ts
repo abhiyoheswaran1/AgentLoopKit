@@ -48,3 +48,11 @@ ${marker}
 
   return { agentFilePath, agentsPath };
 }
+
+export async function installAllAgentInstructions(options: { cwd: string }) {
+  const results = [];
+  for (const agent of SUPPORTED_AGENTS) {
+    results.push(await installAgentInstructions({ cwd: options.cwd, agent }));
+  }
+  return results;
+}

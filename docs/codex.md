@@ -6,6 +6,12 @@ Install Codex-specific repo instructions:
 agentloop install-agent codex
 ```
 
+To install all bundled agent instruction files:
+
+```bash
+agentloop install-agent all
+```
+
 Codex should:
 
 - read `AGENTS.md`

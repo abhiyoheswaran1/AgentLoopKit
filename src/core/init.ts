@@ -118,6 +118,11 @@ export async function initializeAgentLoop(options: {
   }
 
   await writeGeneratedFile(
+    path.join(cwd, AGENTLOOP_DIR, 'README.md'),
+    await readTemplate('root/agentloop-directory-readme.md', values),
+    result,
+  );
+  await writeGeneratedFile(
     path.join(cwd, AGENTLOOP_DIR, 'tasks', 'README.md'),
     await readTemplate('tasks/README.md', values),
     result,

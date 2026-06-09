@@ -29,12 +29,22 @@ pnpm version patch
 
 ## Publish
 
+Preferred release path:
+
+1. Configure npm trusted publishing for this GitHub repository.
+2. Publish the GitHub release.
+3. Let `.github/workflows/publish.yml` run `npm publish --provenance`.
+
+Manual fallback:
+
 ```bash
 npm login
 npm publish --provenance
 ```
 
 Use provenance when publishing from a supported CI environment. If publishing locally, document that provenance was not used.
+
+This machine is not logged in to npm until `npm whoami` succeeds.
 
 ## Package Contents
 

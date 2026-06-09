@@ -48,6 +48,7 @@ npx agentloopkit create-task --title "Add settings page" --type feature
 npx agentloopkit verify
 npx agentloopkit summarize --write
 npx agentloopkit install-agent codex
+npx agentloopkit install-agent all
 ```
 
 Pinned team usage:
@@ -78,6 +79,7 @@ pnpm build
 | `agentloop verify`              | Run configured checks and write a verification report   |
 | `agentloop summarize`           | Generate a deterministic PR or reviewer summary         |
 | `agentloop install-agent codex` | Add agent-specific instructions                         |
+| `agentloop install-agent all`   | Add all bundled agent instruction files                 |
 | `agentloop list-templates`      | List bundled templates                                  |
 | `agentloop version`             | Print the CLI version                                   |
 
@@ -222,6 +224,12 @@ See `examples/` for sample generated harnesses:
 ## Roadmap
 
 See `ROADMAP.md`.
+
+## Publishing Status
+
+The repository includes a GitHub Actions publish workflow for npm trusted publishing. Configure the package on npm, publish a GitHub release, and the workflow will run checks before `npm publish --provenance`.
+
+See `docs/launch-checklist.md` before publishing.
 
 ## Contributing
 
