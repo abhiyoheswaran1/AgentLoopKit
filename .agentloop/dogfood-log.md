@@ -962,3 +962,38 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release tarball is available from GitHub while npm auth remains blocked.
 - Improve:
   - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.7.0`.
+
+## 2026-06-09: Per-Package Monorepo Verification Guidance
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-per-package-monorepo-verification-guidance.md`
+- Product cycle: `.agentloop/research/interview-cycle-031.md`
+- Verification report: `.agentloop/reports/2026-06-09-18-59-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-19-02-pr-summary.md`
+- Trigger:
+  - `agentloop doctor` now warns on monorepo markers, but generated harness docs did not tell agents how to handle package-level checks.
+  - Product panel chose guidance over workspace orchestration.
+- Red test:
+  - `npx pnpm@10.12.1 test tests/init.test.ts` failed because generated templates did not mention package-specific verification.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/init.test.ts`: pass, 1 file and 3 tests
+  - `npx prettier --check ...`: pass for edited Markdown, templates, and test file
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 18 files and 51 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - Built CLI temp init smoke: pass, generated harness files include package-specific verification guidance
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-per-package-monorepo-verification-guidance.md`: pass
+  - Playwright README screenshot render: pass for hero and verification PNGs
+  - VHS README terminal render: pass for `agentloopkit-cli.gif`
+- Product changes:
+  - Generated harness commands now warn agents not to treat root checks as full monorepo proof.
+  - Generated workspace README and task README include package-level command examples.
+  - README and getting-started docs state that AgentLoopKit does not infer package graphs or run workspace commands automatically.
+- Worked well:
+  - The change improves monorepo trust without adding a workspace runner, dependency, or config schema change.
+- Confusing:
+  - A smoke command initially used a nonexistent `--cwd` flag; running the built CLI from inside the temp directory matched actual CLI behavior.
+- Improve:
+  - Consider adding package-specific command suggestions to `doctor` later while keeping command execution explicit.

@@ -96,6 +96,22 @@ Latest local verification for the `0.1.1` README visual release candidate:
 - `0.1.1` tarball smoke: pass
 - `npm publish --access public`: completed after maintainer browser/OTP authentication
 
+Latest local verification for the monorepo guidance iteration:
+
+- Red test first: `npx pnpm@10.12.1 test tests/init.test.ts` failed because generated templates did not mention package-specific verification.
+- Focused green test: `npx pnpm@10.12.1 test tests/init.test.ts`: pass, 1 file and 3 tests.
+- `npx prettier --check ...`: pass for edited Markdown, templates, and test file.
+- `git diff --check`: pass.
+- `npx pnpm@10.12.1 lint`: pass.
+- `npx pnpm@10.12.1 typecheck`: pass.
+- `npx pnpm@10.12.1 test`: pass, 18 files and 51 tests.
+- `npx pnpm@10.12.1 build`: pass.
+- `npx projscan doctor --format markdown`: A, 100/100.
+- Built CLI temp init smoke: pass, generated harness files include package-specific verification guidance.
+- `agentloop verify --task .agentloop/tasks/2026-06-09-add-per-package-monorepo-verification-guidance.md`: pass.
+- Playwright README screenshot render: pass for hero and verification PNGs.
+- VHS README terminal render: pass for `agentloopkit-cli.gif`.
+
 Latest local verification for `agentloop status`:
 
 - Red tests first: `tests/status.test.ts` and `tests/version.test.ts` failed before implementation.
@@ -566,6 +582,18 @@ Implemented:
 - release notes updated with Publish workflow and local npm auth results
 - launch, publishing, final handoff, backlog, and dogfood release-status records
 
+### Cycle 31: per-package monorepo verification guidance
+
+Decision: add guidance to generated files and docs, not a workspace runner.
+
+Implemented:
+
+- generated `.agentloop/harness/commands.md` guidance for root versus package-level checks
+- generated `.agentloop/README.md` monorepo notes with package-check examples
+- generated `.agentloop/tasks/README.md` guidance for package-specific verification commands
+- README and getting-started docs that state AgentLoopKit does not infer package graphs or run workspace commands automatically
+- Vitest coverage for generated guidance
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -587,7 +615,7 @@ Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.7.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
-3. Add per-package verification guidance for monorepos.
+3. Add package-specific verification command suggestions to `doctor`.
 4. Markdown link checking for docs.
 5. Shell completions.
 
@@ -609,6 +637,7 @@ Top remaining items:
 - npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must complete local browser/OTP authentication.
 - `agentloop.config.schema.json` URL is documented but not hosted on a website.
 - Project detection is heuristic.
+- Monorepo support is warning and guidance only; AgentLoopKit does not infer package graphs or orchestrate workspace checks.
 - Third-party agent config files are not created unless conventions are safe and known.
 - PR summaries are deterministic and do not infer semantic intent from code.
 - No cloud dashboard, shared history, team accounts, or telemetry.
@@ -706,17 +735,17 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.7.0`: high usefulness, low repo effort, external npm setting required.
-2. Add per-package verification guidance for monorepos: high usefulness, low effort, low maintenance.
+2. Add package-specific verification command suggestions to `doctor`: high usefulness, low effort, low maintenance.
 3. Add markdown link checks: medium usefulness, low effort, low maintenance.
 4. Add shell completions: medium usefulness, medium effort, low maintenance.
-5. Add `agentloop task show <path>`: medium usefulness, low effort, low maintenance.
-6. Add task archive command: medium usefulness, medium effort, low maintenance.
-7. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
-8. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
-9. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
-10. Add CI import notes to verification reports: medium usefulness, medium effort.
-11. Add policy pack customization: medium commercial optionality, medium effort.
-12. Add local static HTML report: medium star potential, high effort, medium maintenance.
-13. Add task archive/list command: medium usefulness, medium effort, low maintenance.
-14. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+5. Add task archive command: medium usefulness, medium effort, low maintenance.
+6. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.
+7. Add config schema hosting: high trust improvement, low implementation in repo, external hosting needed.
+8. Add stack-specific starter recipes: high star potential, medium effort, medium maintenance.
+9. Add CI import notes to verification reports: medium usefulness, medium effort.
+10. Add policy pack customization: medium commercial optionality, medium effort.
+11. Add local static HTML report: medium star potential, high effort, medium maintenance.
+12. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+13. Add docs link checker workflow: medium trust improvement, low effort.
+14. Add task status transitions: medium usefulness, medium effort.
 15. Add team/cloud roadmap only after open-source traction: high commercial optionality, high effort, high maintenance.

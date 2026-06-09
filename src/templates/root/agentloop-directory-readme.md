@@ -43,3 +43,17 @@ agentloop handoff
 - `handoffs/`: PR summaries and reviewer briefs
 - `agents/`: agent-specific instructions
 - `harness/`: repo working agreement and commands
+
+## Monorepo Notes
+
+When this repository has workspace markers, use both root and package-level checks as needed. Put package-specific verification commands in the task contract so agents and reviewers can see what the change requires.
+
+Examples:
+
+```bash
+pnpm --filter <package> test
+npm --workspace <package> test
+cd packages/<name> && npm test
+```
+
+Root checks are useful when they cover the touched package. If they do not, say what was not verified in the handoff.

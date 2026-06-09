@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added generated monorepo verification guidance to `.agentloop/harness/commands.md`, `.agentloop/README.md`, and `.agentloop/tasks/README.md`
+- Updated docs to explain root checks versus package-level checks without claiming workspace orchestration support
+
 ## 0.7.0
 
 Monorepo doctor awareness GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:

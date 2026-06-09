@@ -18,3 +18,13 @@ Rules:
 - Run configured verification before claiming completion.
 - If a command fails, report the failure and fix it when reasonable.
 - If a command is not configured, say so in the handoff.
+
+## Monorepos
+
+If `agentloop doctor` reports workspace or monorepo markers, treat root commands as coverage clues, not proof that every package was checked.
+
+- Add package-specific verification commands to the task contract when a change is scoped to one package.
+- Prefer the repo's existing command style, such as `pnpm --filter <package> test`, `npm --workspace <package> test`, or a package-local command.
+- Run root checks when they cover the touched area.
+- In the handoff, separate root checks, package-level checks, and checks that were not run.
+- Do not claim full monorepo verification from a root-only command unless the repo documentation says that command covers all affected packages.

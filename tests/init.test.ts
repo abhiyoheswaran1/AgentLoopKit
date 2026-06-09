@@ -27,6 +27,15 @@ describe('init', () => {
     await expect(readFile(path.join(dir, '.agentloop/README.md'), 'utf8')).resolves.toContain(
       'agentloop create-task',
     );
+    await expect(
+      readFile(path.join(dir, '.agentloop/harness/commands.md'), 'utf8'),
+    ).resolves.toContain('package-specific verification');
+    await expect(readFile(path.join(dir, '.agentloop/README.md'), 'utf8')).resolves.toContain(
+      'root and package-level checks',
+    );
+    await expect(readFile(path.join(dir, '.agentloop/tasks/README.md'), 'utf8')).resolves.toContain(
+      'package-specific verification commands',
+    );
   });
 
   test('safely appends to an existing AGENTS.md', async () => {

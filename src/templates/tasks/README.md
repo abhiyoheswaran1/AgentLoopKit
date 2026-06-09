@@ -16,6 +16,8 @@ agentloop create-task --type feature --title "Add settings page" \
 
 Task contracts turn fuzzy requests into scoped engineering work. A good contract names the desired outcome, constraints, non-goals, likely files, files not to touch, acceptance criteria, verification commands, and rollback notes.
 
+In monorepos, include package-specific verification commands when root commands do not prove the touched package. Examples include `pnpm --filter <package> test`, `npm --workspace <package> test`, or a package-local command from inside `packages/<name>`.
+
 When several task contracts exist, pin the one in progress:
 
 ```bash
