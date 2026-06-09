@@ -91,6 +91,8 @@ export function createTaskCommand() {
     .option('--outcome <text>', 'desired outcome')
     .option('--constraint <text>', 'constraint; repeat or use newlines', lines, [])
     .option('--non-goal <text>', 'non-goal; repeat or use newlines', lines, [])
+    .option('--likely-file <path>', 'likely file or area; repeat or use newlines', lines, [])
+    .option('--forbidden-file <path>', 'file or area not to touch; repeat or use newlines', lines, [])
     .option('--acceptance <text>', 'acceptance criterion; repeat or use newlines', lines, [])
     .option('--verify-command <command>', 'verification command; repeat or use newlines', lines, [])
     .action(async (options: Record<string, unknown>) => {
@@ -109,6 +111,8 @@ export function createTaskCommand() {
               desiredOutcome: String(options.outcome ?? ''),
               constraints: options.constraint as string[],
               nonGoals: options.nonGoal as string[],
+              likelyFiles: options.likelyFile as string[],
+              forbiddenFiles: options.forbiddenFile as string[],
               acceptanceCriteria: options.acceptance as string[],
               verificationCommands: options.verifyCommand as string[],
             }

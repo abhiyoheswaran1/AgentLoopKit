@@ -8,6 +8,7 @@ Handoff command release candidate. npm publish is pending trusted-publishing or 
 - Kept `agentloop summarize` read-only unless `--write` is passed
 - Updated `agentloop status` to suggest `agentloop handoff` when task and verification evidence exist
 - Fixed repeated non-interactive `create-task` flags so all values are preserved
+- Added `create-task --likely-file` and `--forbidden-file` for non-interactive task scoping
 - Updated latest task/report detection to prefer newest modified Markdown files instead of filename order
 - Updated first-run docs, generated workspace README guidance, and PR summary docs
 

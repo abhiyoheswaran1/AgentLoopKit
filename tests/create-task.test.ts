@@ -43,6 +43,14 @@ describe('create-task command', () => {
         'No prompt redesign',
         '--non-goal',
         'No task database',
+        '--likely-file',
+        'src/cli/commands/create-task.ts',
+        '--likely-file',
+        'tests/create-task.test.ts',
+        '--forbidden-file',
+        'package.json',
+        '--forbidden-file',
+        'pnpm-lock.yaml',
         '--acceptance',
         'First criterion is preserved',
         '--acceptance',
@@ -60,6 +68,10 @@ describe('create-task command', () => {
     expect(markdown).toContain('- Do not add dependencies');
     expect(markdown).toContain('- No prompt redesign');
     expect(markdown).toContain('- No task database');
+    expect(markdown).toContain('- src/cli/commands/create-task.ts');
+    expect(markdown).toContain('- tests/create-task.test.ts');
+    expect(markdown).toContain('- package.json');
+    expect(markdown).toContain('- pnpm-lock.yaml');
     expect(markdown).toContain('- First criterion is preserved');
     expect(markdown).toContain('- Second criterion is preserved');
     expect(markdown).toContain('- pnpm test');

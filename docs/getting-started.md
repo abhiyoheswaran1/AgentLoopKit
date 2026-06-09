@@ -18,7 +18,9 @@ npx agentloopkit doctor
 Create a task:
 
 ```bash
-npx agentloopkit create-task --type feature --title "Add settings page"
+npx agentloopkit create-task --type feature --title "Add settings page" \
+  --likely-file src/settings \
+  --forbidden-file migrations/
 ```
 
 Check the current loop state:

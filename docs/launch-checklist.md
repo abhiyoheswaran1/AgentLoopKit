@@ -76,5 +76,5 @@ Current recovery note:
 - GitHub release `v0.2.1` is public.
 - npm still reports `agentloopkit@0.1.1` as latest.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
-- `agentloopkit@0.3.0` is now prepared on `main` after the handoff-command work and repeated create-task flag fix.
+- `agentloopkit@0.3.0` is now prepared on `main` after the handoff command, create-task flag, and latest artifact selection work.
 - Publish `0.3.0` only after npm trusted publishing is configured or local browser authentication succeeds.

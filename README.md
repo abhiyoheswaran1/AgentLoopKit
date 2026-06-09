@@ -146,7 +146,9 @@ AgentLoopKit only writes safe repo-local Markdown instructions when exact third-
 Create a contract before a coding session:
 
 ```bash
-agentloop create-task --type feature --title "Add settings page"
+agentloop create-task --type feature --title "Add settings page" \
+  --likely-file src/settings \
+  --forbidden-file migrations/
 ```
 
 Each contract records:

@@ -514,3 +514,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Filename order remains the tie-breaker when mtimes match.
 - Worked well: the fix removed duplicate latest-file logic without adding task state.
 - Improve: add explicit task lifecycle later so "active" can be user-controlled instead of inferred.
+
+## 2026-06-09: create-task Area Flags
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-create-task-area-flags.md`
+- Product cycle: `.agentloop/research/interview-cycle-019.md`
+- Trigger:
+  - Non-interactive task creation could not fill likely files or files not to touch.
+  - Those fields are core scoping fields in task contracts.
+- Verification completed:
+  - Red test first: `npx pnpm@10.12.1 test tests/create-task.test.ts` failed with `unknown option '--likely-file'`.
+  - Focused green test: `npx pnpm@10.12.1 test tests/create-task.test.ts`: pass
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 17 files and 36 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.3.0.tgz`
+  - Tarball smoke: pass, packed `create-task` wrote repeated likely and forbidden file entries
+  - `npm publish --access public --dry-run`: pass
+- Product changes:
+  - Added repeatable `create-task --likely-file`.
+  - Added repeatable `create-task --forbidden-file`.
+  - Updated README, getting-started docs, and task-contract docs.
+- Worked well: the core task renderer already supported the fields, so the fix stayed in the CLI surface.
+- Improve: task lifecycle remains the next higher-value product item after npm publishing repair.
