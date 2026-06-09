@@ -9,6 +9,7 @@ import {
   listTasks,
   readTaskContract,
   setActiveTask,
+  updateTaskStatus,
 } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -101,6 +102,43 @@ describe('task state', () => {
     expect(task.content).toBe('# Demo task\n\n- Status: proposed\n');
   });
 
+  test('updates only the status line in a task contract', async () => {
+    const { dir, config, taskPath } = await createTaskStateFixture();
+    await writeFile(
+      taskPath,
+      '# Demo task\n\n- Status: proposed\n\n## Notes\nKeep this body intact.\n',
+    );
+
+    const task = await updateTaskStatus({
+      cwd: dir,
+      config,
+      taskPath,
+      status: 'in-progress',
+    });
+
+    expect(task).toMatchObject({
+      path: '.agentloop/tasks/2026-06-09-demo.md',
+      title: 'Demo task',
+      status: 'in-progress',
+    });
+    expect(await readFile(taskPath, 'utf8')).toBe(
+      '# Demo task\n\n- Status: in-progress\n\n## Notes\nKeep this body intact.\n',
+    );
+  });
+
+  test('rejects unsupported task statuses', async () => {
+    const { dir, config, taskPath } = await createTaskStateFixture();
+
+    await expect(
+      updateTaskStatus({
+        cwd: dir,
+        config,
+        taskPath,
+        status: 'waiting',
+      }),
+    ).rejects.toThrow('Unsupported task status');
+  });
+
   test('rejects task contract reads outside the configured task directory', async () => {
     const { dir, config } = await createTaskStateFixture();
     const outsideTask = path.join(dir, 'notes.md');
@@ -157,10 +195,7 @@ describe('task command', () => {
     const { dir } = await createTaskStateFixture();
     const demoTask = path.join(dir, '.agentloop/tasks/2026-06-09-demo.md');
     const secondTask = path.join(dir, '.agentloop/tasks/2026-06-09-second.md');
-    await writeFile(
-      secondTask,
-      '# Second task\n\n- Status: in progress\n',
-    );
+    await writeFile(secondTask, '# Second task\n\n- Status: in progress\n');
     await utimes(demoTask, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
     await utimes(secondTask, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
 
@@ -202,5 +237,24 @@ describe('task command', () => {
       },
     });
     await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
+  });
+
+  test('updates task status from the CLI', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'status', '.agentloop/tasks/2026-06-09-demo.md', 'review', '--json'],
+      { cwd: dir },
+    );
+
+    expect(JSON.parse(result.stdout)).toEqual({
+      task: {
+        path: '.agentloop/tasks/2026-06-09-demo.md',
+        title: 'Demo task',
+        status: 'review',
+      },
+    });
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: review\n');
   });
 });

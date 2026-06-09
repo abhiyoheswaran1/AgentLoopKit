@@ -24,7 +24,9 @@ When several task contracts exist, pin the one in progress:
 agentloop task list
 agentloop task show .agentloop/tasks/<task-file>.md
 agentloop task set .agentloop/tasks/<task-file>.md
+agentloop task status .agentloop/tasks/<task-file>.md in-progress
 ```
 
 `agentloop task list --json` is safe for agents and scripts. It reads task files and does not create or update `.agentloop/state.json`.
 `agentloop task show --json` returns one task contract's metadata and Markdown content without changing active state.
+`agentloop task status --json` updates only the task contract's `- Status:` line. Supported statuses are `proposed`, `in-progress`, `blocked`, `review`, and `done`.

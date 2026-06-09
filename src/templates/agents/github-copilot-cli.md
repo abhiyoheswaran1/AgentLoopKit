@@ -9,6 +9,7 @@ Before editing:
 - Check task contracts in .agentloop/tasks/.
 - Run `agentloop task list` when current work is unclear.
 - Run `agentloop task show <path>` before implementing a selected task.
+- Run `agentloop task status <path> in-progress` when implementation starts.
 
 Rules:
 

@@ -46,8 +46,11 @@ Pin it as the active task when the repo has multiple contracts:
 npx agentloopkit task list
 npx agentloopkit task show .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit task set .agentloop/tasks/2026-06-09-add-settings-page.md
+npx agentloopkit task status .agentloop/tasks/2026-06-09-add-settings-page.md in-progress
 npx agentloopkit task current
 ```
+
+Use `task status` to keep the task contract current during the loop. Supported statuses are `proposed`, `in-progress`, `blocked`, `review`, and `done`.
 
 Check the current loop state:
 

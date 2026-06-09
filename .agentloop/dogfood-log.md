@@ -1123,3 +1123,39 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release tarball is available from GitHub while npm auth remains blocked.
 - Improve:
   - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.8.0`.
+
+## 2026-06-09: Task Status Transitions
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-task-status-transitions.md`
+- Product cycle: `.agentloop/research/interview-cycle-036.md`
+- Verification report: `.agentloop/reports/2026-06-09-19-40-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-19-41-pr-summary.md`
+- Trigger:
+  - Agents can pin, list, and read task contracts, but status still required hand-editing Markdown.
+  - The product panel wanted a lifecycle command without a task database or dashboard.
+- Red test:
+  - `npx pnpm@10.12.1 test tests/task-state.test.ts` failed because `updateTaskStatus` did not exist and `agentloop task status` was unknown.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/task-state.test.ts`: pass, 1 file and 11 tests
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 19 files and 58 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 255 Markdown files checked
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.8.0.tgz`
+  - Packed CLI smoke: pass, `agentloop task status` updated a temp task to `done`
+  - Playwright README screenshot render: pass for hero and verification PNGs
+  - VHS README terminal render: pass for `agentloopkit-cli.gif` with the new status command
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-task-status-transitions.md`: pass
+- Product changes:
+  - Added `agentloop task status <path> <status>`.
+  - Added a fixed status set: `proposed`, `in-progress`, `blocked`, `review`, and `done`.
+  - Added JSON output for status updates.
+  - Updated README, docs, generated harness files, and agent templates.
+  - Refreshed README Playwright screenshots and VHS GIF.
+- Worked well:
+  - The new command lets agents keep task state current without adding hidden state beyond the existing active-task pointer.
+- Improve:
+  - Prepare a new release candidate after this feature, because `v0.8.0` already points at the previous launch-quality release.

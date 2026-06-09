@@ -13,6 +13,7 @@ agentloop create-task --title "Describe the next focused change" --type feature
 agentloop task list
 agentloop task show .agentloop/tasks/<task-file>.md
 agentloop task set .agentloop/tasks/<task-file>.md
+agentloop task status .agentloop/tasks/<task-file>.md in-progress
 ```
 
 4. Check current loop state:

@@ -24,6 +24,10 @@ export type TaskContract = ActiveTask & {
   content: string;
 };
 
+export const TASK_STATUSES = ['proposed', 'in-progress', 'blocked', 'review', 'done'] as const;
+
+export type TaskStatus = (typeof TASK_STATUSES)[number];
+
 function statePath(cwd: string, config: AgentLoopConfig) {
   return path.join(cwd, config.paths.agentloopDir, 'state.json');
 }
@@ -95,6 +99,14 @@ function extractTaskStatus(markdown: string) {
   return markdown.match(/^- Status:\s*(.+)$/im)?.[1]?.trim() || 'unknown';
 }
 
+function parseTaskStatus(status: string): TaskStatus {
+  const clean = status.trim().toLowerCase();
+  if ((TASK_STATUSES as readonly string[]).includes(clean)) return clean as TaskStatus;
+  throw new AgentLoopError(
+    `Unsupported task status "${status}". Use one of: ${TASK_STATUSES.join(', ')}.`,
+  );
+}
+
 export async function readTaskMetadata(cwd: string, filePath: string): Promise<ActiveTask> {
   const markdown = await readFile(filePath, 'utf8');
   return {
@@ -127,6 +139,25 @@ export async function setActiveTask(options: {
   if (!absolutePath) throw new AgentLoopError(`Task contract not found: ${options.taskPath}`);
   const activeTaskPath = toStoredPath(options.cwd, absolutePath);
   await writeState(options.cwd, options.config, { version: 1, activeTaskPath });
+  return readTaskMetadata(options.cwd, absolutePath);
+}
+
+export async function updateTaskStatus(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  taskPath: string;
+  status: string;
+}) {
+  const absolutePath = await resolveTaskPath({ ...options, strict: true });
+  if (!absolutePath) throw new AgentLoopError(`Task contract not found: ${options.taskPath}`);
+  const status = parseTaskStatus(options.status);
+  const content = await readFile(absolutePath, 'utf8');
+
+  if (!/^- Status:\s*.+$/im.test(content)) {
+    throw new AgentLoopError(`Task contract does not contain a Status line: ${options.taskPath}`);
+  }
+
+  await writeTextFile(absolutePath, content.replace(/^(- Status:\s*).+$/im, `$1${status}`));
   return readTaskMetadata(options.cwd, absolutePath);
 }
 

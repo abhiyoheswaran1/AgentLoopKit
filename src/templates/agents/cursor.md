@@ -8,6 +8,7 @@ Before editing:
 - Use the active task contract when present.
 - Run `agentloop task list` when several task contracts exist.
 - Run `agentloop task show <path>` before implementing a selected task.
+- Run `agentloop task status <path> in-progress` when implementation starts.
 - Keep diffs focused on acceptance criteria.
 
 Verification:

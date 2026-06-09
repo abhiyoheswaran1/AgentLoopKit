@@ -11,7 +11,10 @@ Detected during AgentLoopKit init:
 
 Rules:
 
+- Use `agentloop task list` to inspect task contracts before pinning one.
+- Use `agentloop task show <path>` to read a task contract without changing active state.
 - Use `agentloop task set <path>` when the active task is ambiguous.
+- Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
 - Use `agentloop status` to inspect active task, latest report, dirty files, and next action.
 - Run targeted checks while developing.
 - Run configured verification before claiming completion.

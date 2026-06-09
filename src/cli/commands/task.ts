@@ -6,8 +6,9 @@ import {
   listTasks,
   readTaskContract,
   setActiveTask,
+  updateTaskStatus,
 } from '../../core/task-state.js';
-import type { ListedTask, TaskContract } from '../../core/task-state.js';
+import type { ActiveTask, ListedTask, TaskContract } from '../../core/task-state.js';
 
 function printTask(
   task: Awaited<ReturnType<typeof getActiveTask>> | null,
@@ -53,6 +54,15 @@ function printTaskContract(task: TaskContract, options: { json?: boolean }) {
   process.stdout.write(task.content);
 }
 
+function printUpdatedTask(task: ActiveTask, options: { json?: boolean }) {
+  if (options.json) {
+    console.log(JSON.stringify({ task }, null, 2));
+    return;
+  }
+  console.log(`Updated task status: ${task.title} (${task.status})`);
+  console.log(task.path);
+}
+
 export function taskCommand() {
   const command = new Command('task').description('List, set, inspect, or clear task contracts');
 
@@ -86,6 +96,18 @@ export function taskCommand() {
       const config = await loadAgentLoopConfig(process.cwd());
       const activeTask = await setActiveTask({ cwd: process.cwd(), config, taskPath });
       printTask(activeTask, options);
+    });
+
+  command
+    .command('status')
+    .argument('<path>', 'task contract path under .agentloop/tasks')
+    .argument('<status>', 'one of: proposed, in-progress, blocked, review, done')
+    .option('--json', 'print machine-readable output')
+    .description('Update a task contract status')
+    .action(async (taskPath: string, status: string, options: { json?: boolean }) => {
+      const config = await loadAgentLoopConfig(process.cwd());
+      const task = await updateTaskStatus({ cwd: process.cwd(), config, taskPath, status });
+      printUpdatedTask(task, options);
     });
 
   command

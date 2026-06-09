@@ -16,6 +16,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - task contract generation
 - active task pinning with `.agentloop/state.json`
 - read-only task contract listing with active-task markers
+- explicit task status transitions in Markdown task contracts
 - verification report generation
 - deterministic PR summary generation
 - local status command for active task, latest verification, dirty files, configured commands, and next action
@@ -40,6 +41,8 @@ agentloop task list --json
 agentloop task show .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task show .agentloop/tasks/2026-06-09-add-settings-page.md --json
 agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
+agentloop task status .agentloop/tasks/2026-06-09-add-settings-page.md in-progress
+agentloop task status .agentloop/tasks/2026-06-09-add-settings-page.md review --json
 agentloop task current --json
 agentloop task clear
 agentloop status
@@ -74,6 +77,23 @@ npx projscan doctor --format markdown
 ```
 
 Latest local verification for the product-panel iteration:
+
+- Red test first: `npx pnpm@10.12.1 test tests/task-state.test.ts` failed because `updateTaskStatus` did not exist and `agentloop task status` was unknown.
+- Focused green test: `npx pnpm@10.12.1 test tests/task-state.test.ts`: pass, 1 file and 11 tests.
+- `git diff --check`: pass.
+- `npx pnpm@10.12.1 lint`: pass.
+- `npx pnpm@10.12.1 typecheck`: pass.
+- `npx pnpm@10.12.1 test`: pass, 19 files and 58 tests.
+- `npx pnpm@10.12.1 check:links`: pass, 255 Markdown files checked.
+- `npx pnpm@10.12.1 build`: pass.
+- `npx projscan doctor --format markdown`: A, 100/100.
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.8.0.tgz`.
+- Packed CLI smoke: pass, `agentloop task status` updated a temp task to `done`.
+- Playwright README screenshot render: pass for hero and verification PNGs.
+- VHS README terminal render: pass for `agentloopkit-cli.gif` with the new status command.
+- `agentloop verify --task .agentloop/tasks/2026-06-09-add-task-status-transitions.md`: pass.
+
+Earlier product-panel MVP verification:
 
 - lint: pass
 - typecheck: pass
@@ -688,6 +708,18 @@ Implemented:
 - release notes updated with Publish workflow and local npm auth results
 - launch, publishing, final handoff, backlog, and dogfood release-status records
 
+### Cycle 36: task status transitions
+
+Decision: add a narrow task status command that edits Markdown task contracts instead of adding a task database.
+
+Implemented:
+
+- `agentloop task status <path> <status>`
+- JSON output for status updates
+- fixed status set: `proposed`, `in-progress`, `blocked`, `review`, and `done`
+- generated agent, harness, README, and getting-started guidance
+- refreshed README screenshots and VHS terminal demo
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -702,6 +734,7 @@ Strongest signals:
 - Agents and reviewers need one local command that shows current task, latest report, dirty files, and next action.
 - Agents need a deterministic way to list task contracts before choosing the active task.
 - Agents need a deterministic way to read a selected task contract without changing active state.
+- Agents need a safe status command so task contracts move through the loop without hand-editing Markdown.
 
 ## Backlog
 
@@ -709,9 +742,9 @@ Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.8.0`.
 2. Prepare the next npm-publishable release after trusted publishing is repaired.
-3. Task status transitions.
-4. Shell completions.
-5. Config schema hosting.
+3. Shell completions.
+4. Config schema hosting.
+5. Task archive command.
 
 ## Known limitations
 
@@ -836,7 +869,7 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Repair npm publishing for `0.8.0`: high usefulness, low repo effort, external npm setting required.
-2. Add task status transitions: medium usefulness, medium effort.
+2. Prepare the next GitHub release after task status transitions: high usefulness, low effort.
 3. Add shell completions: medium usefulness, medium effort, low maintenance.
 4. Add task archive command: medium usefulness, medium effort, low maintenance.
 5. Add `agentloop check-gates`: medium usefulness, medium effort, medium maintenance.

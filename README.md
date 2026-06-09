@@ -56,6 +56,7 @@ npx agentloopkit create-task --title "Add settings page" --type feature
 npx agentloopkit task list
 npx agentloopkit task show .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit task set .agentloop/tasks/2026-06-09-add-settings-page.md
+npx agentloopkit task status .agentloop/tasks/2026-06-09-add-settings-page.md in-progress
 npx agentloopkit status
 npx agentloopkit verify
 npx agentloopkit handoff
@@ -64,7 +65,7 @@ npx agentloopkit install-agent all
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, verify, and handoff commands" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, task status, verify, and handoff commands" width="100%">
 </p>
 
 The VHS demo runs the local built CLI so the command flow matches this repository even when npm is behind.
@@ -88,25 +89,26 @@ pnpm build
 
 ## CLI Commands
 
-| Command                         | Purpose                                                                   |
-| ------------------------------- | ------------------------------------------------------------------------- |
-| `agentloop init`                | Generate the repo harness and config                                      |
-| `agentloop init --dry-run`      | Preview generated files without writing them                              |
-| `agentloop doctor`              | Check setup health, commands, git state, monorepo markers, and risk files |
-| `agentloop create-task`         | Create a task contract in `.agentloop/tasks/`                             |
-| `agentloop task list`           | List task contracts and show the pinned active task                       |
-| `agentloop task show <path>`    | Print a task contract without changing active state                       |
-| `agentloop task set <path>`     | Pin the active task for status and handoffs                               |
-| `agentloop task current`        | Print the pinned active task                                              |
-| `agentloop task clear`          | Clear the active task pointer                                             |
-| `agentloop status`              | Show active task, latest report, dirty files, next step                   |
-| `agentloop verify`              | Run configured checks and write a verification report                     |
-| `agentloop summarize`           | Generate a deterministic PR or reviewer summary                           |
-| `agentloop handoff`             | Write a reviewer handoff summary                                          |
-| `agentloop install-agent codex` | Add agent-specific instructions                                           |
-| `agentloop install-agent all`   | Add all bundled agent instruction files                                   |
-| `agentloop list-templates`      | List bundled templates                                                    |
-| `agentloop version`             | Print the CLI version                                                     |
+| Command                                 | Purpose                                                                   |
+| --------------------------------------- | ------------------------------------------------------------------------- |
+| `agentloop init`                        | Generate the repo harness and config                                      |
+| `agentloop init --dry-run`              | Preview generated files without writing them                              |
+| `agentloop doctor`                      | Check setup health, commands, git state, monorepo markers, and risk files |
+| `agentloop create-task`                 | Create a task contract in `.agentloop/tasks/`                             |
+| `agentloop task list`                   | List task contracts and show the pinned active task                       |
+| `agentloop task show <path>`            | Print a task contract without changing active state                       |
+| `agentloop task set <path>`             | Pin the active task for status and handoffs                               |
+| `agentloop task status <path> <status>` | Update a task contract status line                                        |
+| `agentloop task current`                | Print the pinned active task                                              |
+| `agentloop task clear`                  | Clear the active task pointer                                             |
+| `agentloop status`                      | Show active task, latest report, dirty files, next step                   |
+| `agentloop verify`                      | Run configured checks and write a verification report                     |
+| `agentloop summarize`                   | Generate a deterministic PR or reviewer summary                           |
+| `agentloop handoff`                     | Write a reviewer handoff summary                                          |
+| `agentloop install-agent codex`         | Add agent-specific instructions                                           |
+| `agentloop install-agent all`           | Add all bundled agent instruction files                                   |
+| `agentloop list-templates`              | List bundled templates                                                    |
+| `agentloop version`                     | Print the CLI version                                                     |
 
 The package exposes two binaries:
 
@@ -174,12 +176,14 @@ Pin the contract when more than one task exists:
 agentloop task list
 agentloop task show .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
+agentloop task status .agentloop/tasks/2026-06-09-add-settings-page.md in-progress
 agentloop task current
 agentloop task clear
 ```
 
 `task list --json` gives agents a deterministic list with `path`, `title`, `status`, `active`, and `modifiedAt`. Listing tasks does not create or update `.agentloop/state.json`.
 `task show --json` returns the selected task metadata and Markdown content without changing active state.
+`task status --json` updates only the `- Status:` line. Supported values are `proposed`, `in-progress`, `blocked`, `review`, and `done`. Status is not verification evidence; run `agentloop verify` before claiming completion.
 
 Each contract records:
 

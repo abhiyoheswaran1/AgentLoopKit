@@ -9,6 +9,7 @@ Before editing:
 - Check .agentloop/tasks/ for the active task contract.
 - Run `agentloop task list` when the active task is unclear.
 - Run `agentloop task show <path>` before implementing a selected task.
+- Run `agentloop task status <path> in-progress` when implementation starts.
 - Review .agentloop/harness/commands.md.
 
 Work loop:

@@ -43,6 +43,10 @@ Type "npx agentloop task set .agentloop/tasks/add-settings-page.md"
 Enter
 Sleep 1s
 
+Type "npx agentloop task status .agentloop/tasks/add-settings-page.md in-progress"
+Enter
+Sleep 1s
+
 Type "npx agentloop verify --no-lint"
 Enter
 Sleep 2s
