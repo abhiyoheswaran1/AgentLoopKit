@@ -116,6 +116,13 @@ Latest local verification:
   - AgentLoop verification report: `.agentloop/reports/2026-06-10-00-14-verification-report.md`, overall status `pass`.
   - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-14-pr-summary.md`.
 
+- Public roadmap refresh verification:
+  - `npx pnpm@10.12.1 check:links`: pass, 367 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `git diff --check`: pass.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-00-19-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-19-pr-summary.md`.
+
 - Doctor risk-file details iteration:
   - Red doctor test: `npx pnpm@10.12.1 test tests/doctor.test.ts` failed because category-level `Risk files:` checks were missing.
   - Red safety test: `npx pnpm@10.12.1 test tests/safety.test.ts` failed because Markdown docs such as `docs/migration-guide.md` were treated as semantic risk files.
@@ -1284,6 +1291,16 @@ Implemented:
 - npm registry proof still showing latest `0.1.1`
 - release-status task contract, product-panel cycle, launch checklist, npm publishing docs, dogfood log, and final handoff updates
 
+### Cycle 63: Public roadmap refresh
+
+Decision: refresh the public roadmap because it still listed shipped task status transitions and shell completion as future work after `v0.15.1`.
+
+Implemented:
+
+- `ROADMAP.md` now separates shipped capabilities, current npm blocker, near-term local-first improvements, later options, and non-goals
+- README publishing status now states that npm currently serves `0.1.1` while GitHub release `v0.15.1` is current
+- backlog, dogfood log, task contract, and product-panel cycle records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1319,13 +1336,14 @@ Strongest signals:
 - Reviewers and agents need `doctor` to name risk categories instead of reporting only a total count.
 - First-run configs should not point at an unproven custom schema domain.
 - Release readers need patch-level semver for trust polish instead of another minor version jump.
+- Public roadmap readers need shipped work and future work separated clearly after `v0.15.1`.
 
 ## Backlog
 
 Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.15.1`.
-2. Prepare the next npm-publishable release after trusted publishing is repaired.
+2. Add richer git diff classification for PR summaries.
 3. Static HTML report export.
 4. Policy pack customization.
 5. Optional schema-store submission after npm publishing is stable.

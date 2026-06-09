@@ -2002,3 +2002,22 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Configure npm trusted publishing for `abhiyoheswaran1/AgentLoopKit` and workflow `publish.yml`, or complete local browser/OTP auth for `0.15.1`.
   - Do not cut another version for this same npm authorization blocker.
+
+## 2026-06-10: Public Roadmap Refresh
+
+- Task contract: `.agentloop/tasks/2026-06-10-refresh-public-roadmap-after-0-15-1.md`
+- Product cycle: `.agentloop/research/interview-cycle-063.md`
+- Trigger:
+  - `ROADMAP.md` still listed task status transitions and shell completion as future work after both had shipped.
+  - README publishing status did not state that npm is still behind the latest GitHub release.
+- Product changes:
+  - Rewrote `ROADMAP.md` around shipped work, current npm blocker, near-term local-first improvements, later options, and non-goals.
+  - Updated README publishing status to say npm currently serves `0.1.1` while GitHub release `v0.15.1` is current.
+- Verification run:
+  - `npx pnpm@10.12.1 check:links`: pass, 367 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `git diff --check`: pass.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-00-19-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-00-19-pr-summary.md`.
+- Improve:
+  - Keep public docs aligned after future releases without cutting extra versions for docs-only release-status changes.

@@ -372,7 +372,7 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-AgentLoopKit is published on npm as `agentloopkit`.
+AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1` while GitHub release `v0.15.1` is the latest source release. The next successful npm publish may jump from `0.1.1` to `0.15.1`, then normal semver releases resume.
 
 The repository includes a GitHub Actions publish workflow for npm trusted publishing after the package is configured on npm. The workflow runs checks before `npm publish` and skips publish when the version already exists.
 
