@@ -167,7 +167,7 @@ Each contract records:
 .agentloop/reports/YYYY-MM-DD-HH-mm-verification-report.md
 ```
 
-It does not hide failures. If no commands are configured, it writes a report saying nothing was verified.
+It does not hide failures. If long logs are truncated, the report keeps the first and last output so the final error stays visible. If no commands are configured, it writes a report saying nothing was verified.
 
 ## Status
 
