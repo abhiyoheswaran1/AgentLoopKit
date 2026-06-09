@@ -15,6 +15,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - doctor checks with JSON output
 - task contract generation
 - active task pinning with `.agentloop/state.json`
+- read-only task contract listing with active-task markers
 - verification report generation
 - deterministic PR summary generation
 - local status command for active task, latest verification, dirty files, configured commands, and next action
@@ -33,6 +34,8 @@ agentloop init --dry-run
 agentloop doctor
 agentloop doctor --json
 agentloop create-task --title "Add settings page" --type feature
+agentloop task list
+agentloop task list --json
 agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task current --json
 agentloop task clear
@@ -245,6 +248,26 @@ Latest local verification for the `0.4.0` active task release candidate:
 - GitHub release `v0.4.0`: created with npm-pending notes and attached `agentloopkit-0.4.0.tgz`
 - GitHub Publish workflow run `27217477927` for `v0.4.0`: passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`; npm rejected the final publish with `E404`
 
+Latest local verification for the unreleased task-list command:
+
+- Red test first: `npx pnpm@10.12.1 test tests/task-state.test.ts` failed because `listTasks` did not exist and `agentloop task list` was an unknown command.
+- Focused green test: `npx pnpm@10.12.1 test tests/task-state.test.ts`: pass, 1 file and 5 tests
+- `npx tsx src/cli/index.ts task list --json`: pass, listed task contracts without creating `.agentloop/state.json`
+- `npx tsx src/cli/index.ts task set .agentloop/tasks/2026-06-09-add-task-list-command.md --json`: pass
+- `npx tsx src/cli/index.ts task list`: pass, showed the active task first
+- `git diff --check`: pass
+- `npx pnpm@10.12.1 lint`: pass
+- `npx pnpm@10.12.1 typecheck`: pass
+- `npx pnpm@10.12.1 test`: pass, 18 files and 45 tests
+- `npx pnpm@10.12.1 build`: pass
+- `npx projscan doctor --format markdown`: A, 100/100
+- `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.4.0.tgz`
+- Tarball smoke: pass, packed `init`, `create-task`, `task list`, `task set`, and `task clear` behaved as expected in a fresh repo
+- `npm publish --access public --dry-run`: pass
+- `agentloop verify --task .agentloop/tasks/2026-06-09-add-task-list-command.md`: pass, wrote `.agentloop/reports/2026-06-09-17-46-verification-report.md`
+- `agentloop handoff`: pass, wrote `.agentloop/handoffs/2026-06-09-17-47-pr-summary.md`
+- `agentloop task clear --json`: pass, removed `.agentloop/state.json`
+
 ## How to package
 
 ```bash
@@ -368,6 +391,39 @@ Implemented:
 - package-version-based `agentloop version`
 - Vitest coverage for status and version behavior
 
+### Cycle 21: Active task lifecycle
+
+Decision: add a transparent repo-local active task pointer instead of relying only on newest-file inference.
+
+Implemented:
+
+- `agentloop task set <path>`
+- `agentloop task current`
+- `agentloop task clear`
+- `.agentloop/state.json` read/write/clear behavior
+- status and handoff preference for the pinned task
+
+### Cycle 22: 0.4.0 release candidate
+
+Decision: prepare a GitHub release for the active task lifecycle while keeping npm availability notes explicit.
+
+Implemented:
+
+- package metadata bump to `0.4.0`
+- `v0.4.0` GitHub release with attached tarball
+- release-status docs for the npm authorization failure
+
+### Cycle 23: Task discovery
+
+Decision: add a read-only task-list command so users and agents can inspect task contracts before pinning one.
+
+Implemented:
+
+- `agentloop task list`
+- `agentloop task list --json`
+- active-task markers, status, title, path, and modification time output
+- docs and generated agent template updates
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -380,13 +436,14 @@ Strongest signals:
 - Skeptical developers need deterministic outputs and practical review value.
 - README readers need visual proof of the workflow before installing.
 - Agents and reviewers need one local command that shows current task, latest report, dirty files, and next action.
+- Agents need a deterministic way to list task contracts before choosing the active task.
 
 ## Backlog
 
 Top remaining items:
 
 1. Repair npm trusted-publishing or local-auth publishing for `agentloopkit@0.4.0`.
-2. Publish GitHub release `v0.4.0` after local and CI verification.
+2. Prepare the next npm-publishable release after trusted publishing is repaired.
 3. Monorepo project detection.
 4. Markdown link checking for docs.
 5. Shell completions.

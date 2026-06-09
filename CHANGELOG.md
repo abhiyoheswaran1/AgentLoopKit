@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added `agentloop task list` and `agentloop task list --json` to inspect task contracts before pinning one
+- Updated agent and harness templates to guide agents toward task discovery before active-task selection
+
 ## 0.4.0
 
 Active task lifecycle GitHub release candidate. npm publish is pending trusted-publishing or local-auth repair:

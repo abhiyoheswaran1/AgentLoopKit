@@ -8,6 +8,7 @@ Before editing:
 - Read AGENTLOOP.md.
 - Read .agentloop/harness/commands.md.
 - Check .agentloop/tasks/ for active work.
+- Run `agentloop task list` when active work is unclear.
 
 Rules:
 

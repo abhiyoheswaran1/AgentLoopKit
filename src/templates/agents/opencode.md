@@ -7,6 +7,7 @@ Before editing:
 - Read AGENTS.md.
 - Read AGENTLOOP.md.
 - Check .agentloop/tasks/.
+- Run `agentloop task list` when current work is unclear.
 
 Rules:
 

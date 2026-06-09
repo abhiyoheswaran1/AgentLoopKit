@@ -6,6 +6,7 @@ Before editing:
 
 - Read AGENTS.md and AGENTLOOP.md.
 - Use the active task contract when present.
+- Run `agentloop task list` when several task contracts exist.
 - Keep diffs focused on acceptance criteria.
 
 Verification:

@@ -658,3 +658,44 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Configure npm trusted publishing or complete local browser/OTP publish before creating another npm-aligned release.
   - Keep future release notes explicit about npm availability until `npm view agentloopkit version` proves the publish.
+
+## 2026-06-09: Task List Command
+
+- Task contract: `.agentloop/tasks/2026-06-09-add-task-list-command.md`
+- Product cycle: `.agentloop/research/interview-cycle-023.md`
+- Verification report: `.agentloop/reports/2026-06-09-17-46-verification-report.md`
+- Handoff: `.agentloop/handoffs/2026-06-09-17-47-pr-summary.md`
+- Trigger:
+  - Users could pin an active task, but they had no first-class command to inspect task contracts before choosing one.
+  - Product-panel Cycle 23 kept the scope to read-only discovery instead of task-board features.
+- Red tests:
+  - `npx pnpm@10.12.1 test tests/task-state.test.ts` failed because `listTasks` was missing and `agentloop task list` was an unknown command.
+- Verification completed:
+  - Focused green test: `npx pnpm@10.12.1 test tests/task-state.test.ts`: pass, 1 file and 5 tests
+  - `npx tsx src/cli/index.ts task list --json`: pass, listed task contracts without creating `.agentloop/state.json`
+  - `npx tsx src/cli/index.ts task set .agentloop/tasks/2026-06-09-add-task-list-command.md --json`: pass
+  - `npx tsx src/cli/index.ts task list`: pass, showed the active task first
+  - `git diff --check`: pass
+  - `npx pnpm@10.12.1 lint`: pass
+  - `npx pnpm@10.12.1 typecheck`: pass
+  - `npx pnpm@10.12.1 test`: pass, 18 files and 45 tests
+  - `npx pnpm@10.12.1 build`: pass
+  - `npx projscan doctor --format markdown`: A, 100/100
+  - `npx pnpm@10.12.1 pack`: pass, produced `agentloopkit-0.4.0.tgz`
+  - Tarball smoke: pass, packed `init`, `create-task`, `task list`, `task set`, and `task clear` behaved as expected in a fresh repo
+  - `npm publish --access public --dry-run`: pass
+  - `agentloop verify --task .agentloop/tasks/2026-06-09-add-task-list-command.md`: pass
+  - `agentloop handoff`: pass, wrote the handoff above
+  - `agentloop task clear --json`: pass, removed `.agentloop/state.json`
+- Product changes:
+  - Added `agentloop task list` and `agentloop task list --json`.
+  - Listed Markdown task contracts except `README.md`.
+  - Marked active tasks and sorted active first, then newest modified task.
+  - Updated README, task/status docs, generated harness docs, and agent templates.
+- Worked well:
+  - The command made task discovery deterministic without adding project management state.
+  - Dogfooding caught the need to regenerate the handoff after clearing temporary active-task state.
+- Confusing:
+  - Sorting by modification time works for local task discovery, but future archive/status lifecycle work may need stronger filtering.
+- Improve:
+  - Consider a read-only `task show <path>` before adding any richer lifecycle state.

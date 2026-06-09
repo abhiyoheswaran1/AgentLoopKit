@@ -7,6 +7,7 @@ Before editing:
 - Read AGENTS.md and AGENTLOOP.md.
 - Read harness files under .agentloop/harness/.
 - Check .agentloop/tasks/ for current work.
+- Run `agentloop task list` when current work is unclear.
 
 Rules:
 

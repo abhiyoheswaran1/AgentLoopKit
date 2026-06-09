@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile, rm, stat } from 'node:fs/promises';
+import { readdir, readFile, rm, stat } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { AgentLoopError } from './errors.js';
 import { pathExists, writeTextFile } from './file-system.js';
@@ -13,6 +13,11 @@ export type ActiveTask = {
   path: string;
   title: string;
   status: string;
+};
+
+export type ListedTask = ActiveTask & {
+  active: boolean;
+  modifiedAt: string;
 };
 
 function statePath(cwd: string, config: AgentLoopConfig) {
@@ -125,4 +130,46 @@ export async function getActiveTask(options: { cwd: string; config: AgentLoopCon
 
 export async function clearActiveTask(options: { cwd: string; config: AgentLoopConfig }) {
   await rm(statePath(options.cwd, options.config), { force: true });
+}
+
+export async function listTasks(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+}): Promise<ListedTask[]> {
+  const tasksRoot = path.resolve(options.cwd, options.config.paths.tasksDir);
+  const entries = await readdir(tasksRoot, { withFileTypes: true }).catch(() => []);
+  const activeTaskPath = await getActiveTaskPath(options);
+
+  const tasks = await Promise.all(
+    entries
+      .filter((entry) => entry.isFile())
+      .filter((entry) => entry.name.endsWith('.md') && entry.name !== 'README.md')
+      .map(async (entry) => {
+        const filePath = path.join(tasksRoot, entry.name);
+        const [metadata, fileStat] = await Promise.all([
+          readTaskMetadata(options.cwd, filePath),
+          stat(filePath),
+        ]);
+        return {
+          ...metadata,
+          active: activeTaskPath === filePath,
+          modifiedAt: fileStat.mtime.toISOString(),
+          modifiedMs: fileStat.mtimeMs,
+        };
+      }),
+  );
+
+  return tasks
+    .sort((left, right) => {
+      if (left.active !== right.active) return left.active ? -1 : 1;
+      if (left.modifiedMs !== right.modifiedMs) return right.modifiedMs - left.modifiedMs;
+      return left.path.localeCompare(right.path);
+    })
+    .map((task) => ({
+      path: task.path,
+      title: task.title,
+      status: task.status,
+      active: task.active,
+      modifiedAt: task.modifiedAt,
+    }));
 }

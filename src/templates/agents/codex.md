@@ -7,6 +7,7 @@ Before editing:
 - Read AGENTS.md.
 - Read AGENTLOOP.md.
 - Check .agentloop/tasks/ for the active task contract.
+- Run `agentloop task list` when the active task is unclear.
 - Review .agentloop/harness/commands.md.
 
 Work loop:

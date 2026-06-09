@@ -51,6 +51,7 @@ Run the CLI after install:
 ```bash
 npx agentloopkit doctor
 npx agentloopkit create-task --title "Add settings page" --type feature
+npx agentloopkit task list
 npx agentloopkit task set .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit status
 npx agentloopkit verify
@@ -88,7 +89,10 @@ pnpm build
 | `agentloop init --dry-run`      | Preview generated files without writing them            |
 | `agentloop doctor`              | Check setup health, commands, git state, and risk files |
 | `agentloop create-task`         | Create a task contract in `.agentloop/tasks/`           |
+| `agentloop task list`           | List task contracts and show the pinned active task     |
 | `agentloop task set <path>`     | Pin the active task for status and handoffs             |
+| `agentloop task current`        | Print the pinned active task                            |
+| `agentloop task clear`          | Clear the active task pointer                           |
 | `agentloop status`              | Show active task, latest report, dirty files, next step |
 | `agentloop verify`              | Run configured checks and write a verification report   |
 | `agentloop summarize`           | Generate a deterministic PR or reviewer summary         |
@@ -161,10 +165,13 @@ agentloop create-task --type feature --title "Add settings page" \
 Pin the contract when more than one task exists:
 
 ```bash
+agentloop task list
 agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task current
 agentloop task clear
 ```
+
+`task list --json` gives agents a deterministic list with `path`, `title`, `status`, `active`, and `modifiedAt`. Listing tasks does not create or update `.agentloop/state.json`.
 
 Each contract records:
 
@@ -194,6 +201,7 @@ It does not hide failures. If long logs are truncated, the report keeps the firs
 `agentloop status` gives agents and humans a quick local readout:
 
 - active task contract, using `agentloop task set` when present
+- newest task contract when no active task is pinned
 - latest verification report
 - working tree state
 - configured and missing commands

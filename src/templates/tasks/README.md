@@ -19,5 +19,8 @@ Task contracts turn fuzzy requests into scoped engineering work. A good contract
 When several task contracts exist, pin the one in progress:
 
 ```bash
+agentloop task list
 agentloop task set .agentloop/tasks/<task-file>.md
 ```
+
+`agentloop task list --json` is safe for agents and scripts. It reads task files and does not create or update `.agentloop/state.json`.

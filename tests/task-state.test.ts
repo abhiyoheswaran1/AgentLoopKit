@@ -1,11 +1,12 @@
 import path from 'node:path';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import {
   clearActiveTask,
   getActiveTaskPath,
+  listTasks,
   setActiveTask,
 } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
@@ -59,6 +60,32 @@ describe('task state', () => {
       'inside .agentloop/tasks',
     );
   });
+
+  test('lists task contracts with active task first', async () => {
+    const { dir, config, taskPath } = await createTaskStateFixture();
+    const secondTask = path.join(dir, '.agentloop/tasks/2026-06-09-second.md');
+    const readme = path.join(dir, '.agentloop/tasks/README.md');
+    await writeFile(secondTask, '# Second task\n\n- Status: in progress\n');
+    await writeFile(readme, '# Task contracts\n');
+    await setActiveTask({ cwd: dir, config, taskPath });
+
+    const tasks = await listTasks({ cwd: dir, config });
+
+    expect(tasks).toHaveLength(2);
+    expect(tasks[0]).toMatchObject({
+      path: '.agentloop/tasks/2026-06-09-demo.md',
+      title: 'Demo task',
+      status: 'proposed',
+      active: true,
+    });
+    expect(tasks[1]).toMatchObject({
+      path: '.agentloop/tasks/2026-06-09-second.md',
+      title: 'Second task',
+      status: 'in progress',
+      active: false,
+    });
+    expect(tasks[0]?.modifiedAt).toMatch(/T/);
+  });
 });
 
 describe('task command', () => {
@@ -100,5 +127,24 @@ describe('task command', () => {
       cwd: dir,
     });
     expect(JSON.parse(emptyResult.stdout)).toEqual({ activeTask: null });
+  });
+
+  test('lists task contracts from the CLI without writing state', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-second.md'),
+      '# Second task\n\n- Status: in progress\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'list', '--json'], { cwd: dir });
+
+    const output = JSON.parse(result.stdout);
+    expect(output.tasks).toHaveLength(2);
+    expect(output.tasks.map((task: { title: string }) => task.title)).toEqual([
+      'Second task',
+      'Demo task',
+    ]);
+    expect(output.tasks.every((task: { active: boolean }) => task.active === false)).toBe(true);
+    await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
   });
 });

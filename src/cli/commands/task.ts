@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { loadAgentLoopConfig } from '../../core/config.js';
-import { clearActiveTask, getActiveTask, setActiveTask } from '../../core/task-state.js';
+import { clearActiveTask, getActiveTask, listTasks, setActiveTask } from '../../core/task-state.js';
+import type { ListedTask } from '../../core/task-state.js';
 
 function printTask(
   task: Awaited<ReturnType<typeof getActiveTask>> | null,
@@ -19,8 +20,37 @@ function printTask(
   console.log(task.path);
 }
 
+function printTasks(tasks: ListedTask[], options: { json?: boolean }) {
+  if (options.json) {
+    console.log(JSON.stringify({ tasks }, null, 2));
+    return;
+  }
+  if (tasks.length === 0) {
+    console.log('No task contracts found.');
+    console.log('Run `agentloop create-task --title "Your task"` to create one.');
+    return;
+  }
+  console.log('Task contracts:');
+  for (const task of tasks) {
+    const marker = task.active ? '*' : '-';
+    const activeLabel = task.active ? ' active' : '';
+    console.log(`${marker} ${task.title} (${task.status})${activeLabel}`);
+    console.log(`  ${task.path}`);
+  }
+}
+
 export function taskCommand() {
-  const command = new Command('task').description('Set, inspect, or clear the active task');
+  const command = new Command('task').description('List, set, inspect, or clear task contracts');
+
+  command
+    .command('list')
+    .option('--json', 'print machine-readable output')
+    .description('List task contracts')
+    .action(async (options: { json?: boolean }) => {
+      const config = await loadAgentLoopConfig(process.cwd());
+      const tasks = await listTasks({ cwd: process.cwd(), config });
+      printTasks(tasks, options);
+    });
 
   command
     .command('set')
