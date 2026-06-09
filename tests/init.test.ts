@@ -19,9 +19,16 @@ describe('init', () => {
 
     const result = await initializeAgentLoop({ cwd: dir });
     const config = await readFile(path.join(dir, 'agentloop.config.json'), 'utf8');
+    const manifest = JSON.parse(await readFile(path.join(dir, '.agentloop/manifest.json'), 'utf8'));
 
     expect(result.created.some((file) => file.endsWith('.agentloop/loops/feature.md'))).toBe(true);
     expect(result.created.some((file) => file.endsWith('.agentloop/README.md'))).toBe(true);
+    expect(result.created.some((file) => file.endsWith('.agentloop/manifest.json'))).toBe(true);
+    expect(manifest).toMatchObject({
+      version: 1,
+      templateVersion: 1,
+      generatedBy: 'agentloopkit',
+    });
     expect(config).toContain(
       '"$schema": "https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agentloop.config.schema.json"',
     );
@@ -61,7 +68,9 @@ describe('init', () => {
 
     expect(result.created.some((file) => file.endsWith('AGENTLOOP.md'))).toBe(true);
     expect(result.created.some((file) => file.endsWith('.agentloop/README.md'))).toBe(true);
+    expect(result.created.some((file) => file.endsWith('.agentloop/manifest.json'))).toBe(true);
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
+    await expect(readFile(path.join(dir, '.agentloop/manifest.json'), 'utf8')).rejects.toThrow();
     await expect(
       readFile(path.join(dir, '.agentloop/harness/repo-map.md'), 'utf8'),
     ).rejects.toThrow();

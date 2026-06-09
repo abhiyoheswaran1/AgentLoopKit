@@ -2,6 +2,8 @@
 
 This directory contains repo-local engineering loop artifacts for coding agents and reviewers.
 
+`manifest.json` records the AgentLoopKit template generation used to create this harness. `agentloop doctor` reads it and warns when the local harness is missing template metadata, older than the current CLI, invalid, or newer than the CLI supports.
+
 ## Start Here
 
 1. Read `../AGENTS.md`.
@@ -69,6 +71,7 @@ When GitHub Actions runs `agentloop verify`, the report records allowlisted CI p
 ## Directories
 
 - `loops/`: task-specific workflows
+- `manifest.json`: generated template version metadata
 - `gates/`: pass/fail checklists
 - `policies/`: safety rules
 - `tasks/`: task contracts

@@ -71,3 +71,7 @@ Generated configs use the GitHub raw URL for `schema/agentloop.config.schema.jso
 ## 2026-06-10: Use 0.16.0 For npm Catch-Up
 
 GitHub already has public releases from `v0.2.0` through `v0.15.1`, and `main` now contains badge behavior that is not in `v0.15.1`. The next npm catch-up release must use a new version, `0.16.0`, so npm package contents, the GitHub tag, and release notes describe the same source. Do not backfill old npm versions with newer code, and do not keep creating higher versions only because npm authorization was previously blocked.
+
+## 2026-06-10: Template Versioning Uses A Local Manifest
+
+Generated harness provenance lives in `.agentloop/manifest.json`, not in `agentloop.config.json`. The manifest records the generated template version and generator name without changing config validation for existing users. `doctor` can warn about missing, invalid, old, or newer manifests, but AgentLoopKit does not automatically rewrite edited harness files.

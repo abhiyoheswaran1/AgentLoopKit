@@ -1371,6 +1371,19 @@ Planned:
 - VHS source updated to use the `0.16.0` tarball
 - npm publish and GitHub release only after verification, pack, smoke test, and CI pass
 
+### Cycle 68: Template version guidance
+
+Decision: add a local `.agentloop/manifest.json` and `doctor` checks for template provenance. This gives agents and maintainers a warning when generated harness metadata is missing, stale, invalid, or newer than the installed CLI without building an automatic migration engine.
+
+Implemented:
+
+- `.agentloop/manifest.json` generation during `agentloop init`
+- current template version constants
+- `agentloop doctor` warning-only manifest checks
+- manual migration guidance in `docs/template-migrations.md`
+- README, getting-started, configuration, generated workspace README, roadmap, changelog, backlog, and dogfood updates
+- Vitest coverage for init manifest generation and doctor manifest checks
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1386,6 +1399,7 @@ Strongest signals:
 - Agents need a deterministic way to list task contracts before choosing the active task.
 - Agents need a deterministic way to read a selected task contract without changing active state.
 - Agents need a safe status command so task contracts move through the loop without hand-editing Markdown.
+- Agents and maintainers need a local marker for generated template provenance before comparing or refreshing harness files.
 - Repeat CLI users need completions for the growing command surface, but security-sensitive users want inspectable scripts rather than dotfile installers.
 - Repeat users need a way to move finished task contracts out of the active list without deleting Markdown history.
 - Release readers need the README visuals and changelog to match the newest source command before a GitHub release is cut.
@@ -1417,9 +1431,9 @@ Top remaining items:
 
 1. Complete npm browser/OTP authentication for `agentloopkit@0.16.0`.
 2. Policy pack customization.
-3. Template version and migration guidance.
-4. Optional schema-store submission after npm publishing is stable.
-5. CI summary import.
+3. Optional schema-store submission after npm publishing is stable.
+4. CI summary import.
+5. Improve contributor issue examples and good-first tasks.
 
 ## Known limitations
 

@@ -16,6 +16,8 @@ https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agent
 
 The CLI validates config with its packaged TypeScript schema. It does not fetch this URL at runtime.
 
+Generated template provenance lives in `.agentloop/manifest.json`, not in `agentloop.config.json`. This keeps existing configs valid when generated harness templates evolve.
+
 The config controls:
 
 - project name, type, and package manager
@@ -36,4 +38,4 @@ Then initialize:
 agentloop init
 ```
 
-`doctor` validates `agentloop.config.json` with the same rules used by the CLI.
+`doctor` validates `agentloop.config.json` with the same rules used by the CLI. It also checks `.agentloop/manifest.json` and points stale or missing template metadata to `template-migrations.md`.

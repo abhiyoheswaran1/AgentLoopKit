@@ -2158,3 +2158,39 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npm publish --dry-run` proved package contents and prepublish checks before the real registry publish.
 - Improve:
   - After npm and GitHub release steps, record registry proof, release URL, CI result, and tarball digest.
+
+## 2026-06-10: Template Version Guidance
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-template-version-guidance.md`
+- Product cycle: `.agentloop/research/interview-cycle-068.md`
+- Trigger:
+  - Generated AgentLoop harnesses had no local marker showing which template generation created them.
+  - Future template changes need a warning path that does not overwrite edited repo guidance.
+- Product changes:
+  - Added `.agentloop/manifest.json` generation during `agentloop init`.
+  - Added current template version constants.
+  - Added `agentloop doctor` warning-only checks for current, missing, stale, invalid, and newer template manifests.
+  - Added `docs/template-migrations.md`.
+  - Updated README, getting-started docs, configuration docs, generated workspace README, roadmap, changelog, decisions, final handoff, and backlog.
+- Dogfooding:
+  - Added `.agentloop/manifest.json` to this repo's own harness.
+  - Ran `npx tsx src/cli/index.ts doctor --json` and verified `Template manifest` returned `pass` with `template version 1 is current`.
+  - Marked the task contract `done` and cleared active task state.
+- Verification run:
+  - Focused red test: `npx pnpm@10.12.1 test tests/init.test.ts tests/doctor.test.ts` failed before manifest generation and doctor checks existed.
+  - Focused green test: `npx pnpm@10.12.1 test tests/init.test.ts tests/doctor.test.ts`: pass, 2 files and 9 tests.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 23 files and 85 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 388 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-01-25-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-01-25-pr-summary.md`.
+  - AgentLoop HTML report: `.agentloop/reports/2026-06-10-01-25-agentloop-report.html`.
+- Worked well:
+  - The manifest adds provenance without touching `agentloop.config.json`.
+  - `doctor` keeps template metadata problems as warnings, so old repos are not broken.
+- Improve:
+  - Policy pack customization can build on this provenance later, but it should remain explicit and reviewable.

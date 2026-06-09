@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added `.agentloop/manifest.json` during init to record generated template provenance
+- Added `agentloop doctor` template manifest checks for current, missing, stale, invalid, and newer generated harness metadata
+- Added manual template migration guidance without changing config validation or overwriting edited harness files
+
 ## 0.16.0
 
 Local evidence badge and reviewer-artifact release. This is the npm catch-up release after GitHub-only release candidates from `0.2.0` through `0.15.1`:

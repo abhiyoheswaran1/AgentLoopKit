@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { CONFIG_FILE } from './constants.js';
+import { AGENTLOOP_MANIFEST_FILE, CONFIG_FILE, CURRENT_TEMPLATE_VERSION } from './constants.js';
 import { loadAgentLoopConfig } from './config.js';
 import { pathExists, readTextIfExists } from './file-system.js';
 import { commandExists, getGitStatus, isInsideGitRepo } from './git.js';
@@ -23,6 +23,12 @@ export type DoctorResult = {
 const MONOREPO_VERIFICATION_GUIDANCE =
   'Root checks may not cover every package; add package-specific verification commands to the task contract, such as pnpm --filter <package> test, npm --workspace <package> test, or cd packages/<name> && npm test. AgentLoopKit does not run workspace commands automatically.';
 
+const MISSING_MANIFEST_MESSAGE =
+  'missing .agentloop/manifest.json; run agentloop init with the current CLI to add missing files without overwriting existing harness files';
+
+const INVALID_MANIFEST_MESSAGE =
+  'invalid .agentloop/manifest.json; review docs/template-migrations.md and recreate the manifest with agentloop init if needed';
+
 function check(name: string, status: DoctorCheck['status'], message: string): DoctorCheck {
   return { name, status, message };
 }
@@ -41,6 +47,50 @@ function formatRiskFiles(files: string[]) {
   const preview = files.slice(0, 3).join(', ');
   const remaining = files.length - 3;
   return `${files.length} detected: ${preview}${remaining > 0 ? ` (+${remaining} more)` : ''}`;
+}
+
+async function checkTemplateManifest(cwd: string): Promise<DoctorCheck> {
+  const manifest = await readTextIfExists(path.join(cwd, AGENTLOOP_MANIFEST_FILE));
+  if (!manifest) return check('Template manifest', 'warn', MISSING_MANIFEST_MESSAGE);
+
+  try {
+    const parsed = JSON.parse(manifest) as {
+      version?: unknown;
+      templateVersion?: unknown;
+      generatedBy?: unknown;
+    };
+    if (
+      parsed.version !== 1 ||
+      typeof parsed.templateVersion !== 'number' ||
+      parsed.generatedBy !== 'agentloopkit'
+    ) {
+      return check('Template manifest', 'warn', INVALID_MANIFEST_MESSAGE);
+    }
+
+    if (parsed.templateVersion < CURRENT_TEMPLATE_VERSION) {
+      return check(
+        'Template manifest',
+        'warn',
+        `template version ${parsed.templateVersion} is older than current version ${CURRENT_TEMPLATE_VERSION}; review docs/template-migrations.md and rerun agentloop init to add missing files`,
+      );
+    }
+
+    if (parsed.templateVersion > CURRENT_TEMPLATE_VERSION) {
+      return check(
+        'Template manifest',
+        'warn',
+        `template version ${parsed.templateVersion} is newer than this CLI supports; upgrade AgentLoopKit before changing generated harness files`,
+      );
+    }
+
+    return check(
+      'Template manifest',
+      'pass',
+      `template version ${CURRENT_TEMPLATE_VERSION} is current`,
+    );
+  } catch {
+    return check('Template manifest', 'warn', INVALID_MANIFEST_MESSAGE);
+  }
 }
 
 export async function runDoctor(options: { cwd: string }): Promise<DoctorResult> {
@@ -78,6 +128,7 @@ export async function runDoctor(options: { cwd: string }): Promise<DoctorResult>
     const exists = await pathExists(path.join(cwd, file));
     checks.push(check(file, exists ? 'pass' : 'warn', exists ? 'found' : 'missing'));
   }
+  checks.push(await checkTemplateManifest(cwd));
 
   try {
     await loadAgentLoopConfig(cwd);

@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgentLoopKit Report - agentloopkit</title>
+  <style>
+    :root { color-scheme: light; --ink: oklch(22% 0.026 245); --muted: oklch(48% 0.023 245); --line: oklch(84% 0.018 245); --panel: oklch(97% 0.009 245); --paper: oklch(99% 0.006 245); --accent: oklch(49% 0.09 183); --warn-ink: oklch(42% 0.12 52); --warn-bg: oklch(96% 0.035 72); --terminal: oklch(19% 0.024 245); --terminal-ink: oklch(91% 0.014 245); }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: var(--paper); line-height: 1.55; }
+    main { max-width: 1040px; margin: 0 auto; padding: 44px 24px 56px; }
+    header { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 28px; }
+    .eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; letter-spacing: 0; text-transform: uppercase; }
+    h1 { margin: 8px 0 12px; font-size: clamp(32px, 5vw, 54px); line-height: 1.03; letter-spacing: 0; }
+    h2 { margin: 0 0 12px; font-size: 21px; letter-spacing: 0; }
+    section { border-top: 1px solid var(--line); padding: 24px 0; }
+    .summary { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-top: 18px; }
+    .metric { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+    .metric span { display: block; color: var(--muted); font-size: 13px; }
+    .metric strong { display: block; margin-top: 5px; font-size: 16px; overflow-wrap: anywhere; }
+    ul.sources { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+    ul.sources li { display: grid; gap: 4px; }
+    .muted { color: var(--muted); }
+    .safety { border: 1px solid oklch(78% 0.08 62); color: var(--warn-ink); background: var(--warn-bg); padding: 14px 16px; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+    th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 10px 12px; vertical-align: top; }
+    th { background: var(--panel); font-size: 13px; color: var(--muted); }
+    tr:last-child td { border-bottom: 0; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 0.92em; overflow-wrap: anywhere; }
+    pre { margin: 0; padding: 16px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--terminal); color: var(--terminal-ink); font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="eyebrow">AgentLoopKit local evidence report</div>
+      <h1>Add template version guidance</h1>
+      <p class="muted">Generated 2026-06-09T23:25:59.793Z from local repository artifacts. No LLM, network call, telemetry, or command execution is required to render this report.</p>
+      <div class="summary">
+        <div class="metric"><span>Repository</span><strong>agentloopkit</strong></div>
+        <div class="metric"><span>Branch</span><strong>main</strong></div>
+        <div class="metric"><span>Commit</span><strong>33be847</strong></div>
+        <div class="metric"><span>Working tree</span><strong>dirty</strong></div>
+        <div class="metric"><span>Verification</span><strong>pass</strong></div>
+        <div class="metric"><span>Changed files</span><strong>23</strong></div>
+      </div>
+    </header>
+
+    <section>
+      <h2>Source Artifacts</h2>
+      <ul class="sources">
+        <li><span>Task contract</span><code>.agentloop/tasks/2026-06-10-add-template-version-guidance.md</code></li>
+        <li><span>Verification report</span><code>.agentloop/reports/2026-06-10-01-25-verification-report.md</code></li>
+        <li><span>Handoff summary</span><code>.agentloop/handoffs/2026-06-10-01-25-pr-summary.md</code></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Changed Files</h2>
+      <table>
+  <thead><tr><th>Status</th><th>Path</th></tr></thead>
+  <tbody>
+    <tr><td><code>M</code></td><td><code>.agentloop/README.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>.agentloop/backlog.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>.agentloop/dogfood-log.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>CHANGELOG.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>DECISIONS.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>FINAL_HANDOFF.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>README.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>ROADMAP.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>docs/configuration.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>docs/getting-started.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/constants.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/doctor.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/init.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/templates/root/agentloop-directory-readme.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/doctor.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/init.test.ts</code></td></tr>
+    <tr><td><code>??</code></td><td><code>.agentloop/handoffs/2026-06-10-01-25-pr-summary.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>.agentloop/manifest.json</code></td></tr>
+    <tr><td><code>??</code></td><td><code>.agentloop/reports/2026-06-10-01-25-agentloop-report.html</code></td></tr>
+    <tr><td><code>??</code></td><td><code>.agentloop/reports/2026-06-10-01-25-verification-report.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>.agentloop/research/interview-cycle-068.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>.agentloop/tasks/2026-06-10-add-template-version-guidance.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/template-migrations.md</code></td></tr>
+  </tbody>
+</table>
+    </section>
+
+    <section>
+  <h2>Task Contract</h2>
+  <pre># Add template version guidance
+
+- Created date: 2026-06-10
+- Task type: feature
+- Status: done
+
+## Problem Statement
+
+AgentLoopKit keeps improving generated harness templates, but installed repos have no local marker showing which template generation created their .agentloop setup.
+
+## Desired Outcome
+
+Record a transparent local template manifest during init and have doctor warn when the manifest is missing, old, invalid, or newer than the CLI.
+
+## Constraints
+
+- Do not overwrite existing user harness files.
+- Do not make old configs invalid.
+- Keep this local-only with no network calls.
+
+## Non-Goals
+
+- Do not build a template migration engine.
+- Do not mutate existing harness files automatically.
+
+## Assumptions
+
+- None recorded yet.
+
+## Likely Files or Areas
+
+- src/core/init.ts
+- src/core/doctor.ts
+- src/core/constants.ts
+- tests/init.test.ts
+- tests/doctor.test.ts
+- docs/template-migrations.md
+
+## Files or Areas Not to Touch
+
+- package.json unless release metadata is needed later
+
+## Acceptance Criteria
+
+- init-writes-agentloop-manifest
+- doctor-passes-current-template-version
+- doctor-warns-missing-or-stale-template-manifest
+- docs-explain-manual-migration-guidance
+
+## Verification Commands
+
+- npx pnpm@10.12.1 test tests/init.test.ts tests/doctor.test.ts
+- npx pnpm@10.12.1 lint
+- npx pnpm@10.12.1 typecheck
+- npx pnpm@10.12.1 test
+- npx pnpm@10.12.1 check:links
+- npx projscan doctor --format markdown
+
+## Implementation Plan
+
+- Inspect relevant files before editing.
+- Keep changes focused on this contract.
+- Record any architecture decision in DECISIONS.md.
+
+## Risk Notes
+
+- Re-check protected areas before changing migrations, auth, secrets, billing, deployment, or public APIs.
+
+## Rollback Notes
+
+Revert manifest generation, doctor checks, docs, and tests. Existing generated manifest files are harmless JSON and can be deleted manually if needed.
+
+## Handoff Requirements
+
+- Summarize files changed.
+- Include verification commands and results.
+- State unverified areas honestly.
+- Include risks, rollback notes, and reviewer checklist.</pre>
+</section>
+    <section>
+  <h2>Verification Evidence</h2>
+  <pre># Verification Report
+
+- Timestamp: 2026-06-09T23:25:01.638Z
+- Repo: AgentLoopKit
+- Git branch: main
+- Git commit: 33be847
+- Working tree: dirty
+- Overall status: pass
+
+
+## Commands Run
+### test: `npx pnpm@10.12.1 test`
+
+- Exit code: 0
+- Status: pass
+
+```text
+
+&gt; agentloopkit@0.16.0 test /Users/abhyoh/local dev folder/Apps/AgentLoopKit
+&gt; vitest run
+
+
+ RUN  v4.1.8 /Users/abhyoh/local dev folder/Apps/AgentLoopKit
+
+
+ Test Files  23 passed (23)
+      Tests  85 passed (85)
+   Start at  01:25:03
+   Duration  10.22s (transform 274ms, setup 0ms, import 1.40s, tests 55.90s, environment 2ms)
+
+```
+
+### lint: `npx pnpm@10.12.1 lint`
+
+- Exit code: 0
+- Status: pass
+
+```text
+
+&gt; agentloopkit@0.16.0 lint /Users/abhyoh/local dev folder/Apps/AgentLoopKit
+&gt; eslint .
+
+```
+
+### typecheck: `npx pnpm@10.12.1 typecheck`
+
+- Exit code: 0
+- Status: pass
+
+```text
+
+&gt; agentloopkit@0.16.0 typecheck /Users/abhyoh/local dev folder/Apps/AgentLoopKit
+&gt; tsc --noEmit
+
+```
+
+### build: `npx pnpm@10.12.1 build`
+
+- Exit code: 0
+- Status: pass
+
+```text
+
+&gt; agentloopkit@0.16.0 build /Users/abhyoh/local dev folder/Apps/AgentLoopKit
+&gt; tsup &amp;&amp; node scripts/copy-assets.mjs
+
+CLI Building entry: {&quot;cli/index&quot;:&quot;src/cli/index.ts&quot;}
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/abhyoh/local dev folder/Apps/AgentLoopKit/tsup.config.ts
+CLI Target: node20
+CLI Cleaning output folder
+ESM Build start
+ESM dist/cli/index.js     100.89 KB
+ESM dist/cli/index.js.map 191.08 KB
+ESM ⚡️ Build success in 22ms
+DTS Build start
+DTS ⚡️ Build success in 522ms
+DTS dist/cli/index.d.ts 13.00 B
+```
+
+### custom: `npx pnpm@10.12.1 check:links`
+
+- Exit code: 0
+- Status: pass
+
+```text
+
+&gt; agentloopkit@0.16.0 check:links /Users/abhyoh/local dev folder/Apps/AgentLoopKit
+&gt; tsx scripts/check-markdown-links.ts
+
+Markdown links OK (388 file(s) checked).
+```
+
+### custom: `npx projscan doctor --format markdown`
+
+- Exit code: 0
+- Status: pass
+
+```text
+# Project Health Report
+
+**Health Score: A (100/100)**
+
+[![projscan health](https://img.shields.io/badge/projscan-A-brightgreen)](https://github.com/abhiyoheswaran1/projscan)
+
+No issues detected. Project looks healthy!
+```
+
+## Not Run
+- Nothing skipped.
+
+## Recommended Next Actions
+- Review the diff and prepare a handoff summary.</pre>
+</section>
+    <section>
+  <h2>Reviewer Handoff</h2>
+  <pre># PR Summary
+
+- Generated: 2026-06-10-01-25
+- Task context: Add template version guidance
+- Verification status: Overall status: pass
+
+## Summary
+This summary was generated deterministically from git status, the latest task contract, and the latest verification report.
+
+## Changed Files
+- M `.agentloop/README.md`
+- M `.agentloop/backlog.md`
+- M `.agentloop/dogfood-log.md`
+- M `CHANGELOG.md`
+- M `DECISIONS.md`
+- M `FINAL_HANDOFF.md`
+- M `README.md`
+- M `ROADMAP.md`
+- M `docs/configuration.md`
+- M `docs/getting-started.md`
+- M `src/core/constants.ts`
+- M `src/core/doctor.ts`
+- M `src/core/init.ts`
+- M `src/templates/root/agentloop-directory-readme.md`
+- M `tests/doctor.test.ts`
+- M `tests/init.test.ts`
+- ?? `.agentloop/handoffs/2026-06-10-01-25-pr-summary.md`
+- ?? `.agentloop/manifest.json`
+- ?? `.agentloop/reports/2026-06-10-01-25-agentloop-report.html`
+- ?? `.agentloop/reports/2026-06-10-01-25-verification-report.md`
+- ?? `.agentloop/research/interview-cycle-068.md`
+- ?? `.agentloop/tasks/2026-06-10-add-template-version-guidance.md`
+- ?? `docs/template-migrations.md`
+
+## Change Areas
+### Source
+- M `src/core/constants.ts`
+- M `src/core/doctor.ts`
+- M `src/core/init.ts`
+- M `src/templates/root/agentloop-directory-readme.md`
+
+### Tests
+- M `tests/doctor.test.ts`
+- M `tests/init.test.ts`
+
+### AgentLoop
+- M `.agentloop/README.md`
+- M `.agentloop/backlog.md`
+- M `.agentloop/dogfood-log.md`
+- ?? `.agentloop/handoffs/2026-06-10-01-25-pr-summary.md`
+- ?? `.agentloop/manifest.json`
+- ?? `.agentloop/reports/2026-06-10-01-25-agentloop-report.html`
+- ?? `.agentloop/reports/2026-06-10-01-25-verification-report.md`
+- ?? `.agentloop/research/interview-cycle-068.md`
+- ?? `.agentloop/tasks/2026-06-10-add-template-version-guidance.md`
+
+### Documentation
+- M `CHANGELOG.md`
+- M `DECISIONS.md`
+- M `FINAL_HANDOFF.md`
+- M `README.md`
+- M `ROADMAP.md`
+- M `docs/configuration.md`
+- M `docs/getting-started.md`
+- ?? `docs/template-migrations.md`
+
+## Diff Stats
+.agentloop/README.md                             |  3 +
+ .agentloop/backlog.md                            |  2 +
+ .agentloop/dogfood-log.md                        | 36 ++++++++++++
+ CHANGELOG.md                                     |  4 ++
+ DECISIONS.md                                     |  4 ++
+ FINAL_HANDOFF.md                                 | 20 ++++++-
+ README.md                                        |  5 +-
+ ROADMAP.md                                       |  2 +-
+ docs/configuration.md                            |  4 +-
+ docs/getting-started.md                          |  2 +
+ src/core/constants.ts                            |  2 +
+ src/core/doctor.ts                               | 53 ++++++++++++++++-
+ src/core/init.ts                                 | 16 ++++++
+ src/templates/root/agentloop-directory-readme.md |  3 +
+ tests/doctor.test.ts                             | 73 +++++++++++++++++++++++-
+ tests/init.test.ts                               |  9 +++
+ 16 files changed, 230 insertions(+), 8 deletions(-)
+
+## Behaviour Changed
+- Review changed files and task contract to confirm intended behavior.
+
+## Review Focus
+- Review source changes for behavior and public API impact.
+- Check tests cover the changed behavior.
+- Check docs match the implemented command behavior.
+- Review AgentLoop artifacts for accurate task, verification, and handoff evidence.
+
+## Verification Performed
+- Overall status: pass
+
+## Verification Not Performed
+- Check the verification report for skipped commands.
+
+## Risks
+- Re-check protected files such as migrations, secrets, auth, billing, deployment, and public APIs before merge.
+
+## Rollback Notes
+- Revert the changed files or revert the merge commit if this lands as a PR.
+
+## Reviewer Checklist
+- [ ] Acceptance criteria match the task contract.
+- [ ] Verification evidence is adequate for the change.
+- [ ] Risk areas have been reviewed.
+- [ ] Rollback plan is clear.
+
+## Follow-Ups
+- Capture any deferred work in ROADMAP.md or a new task contract.</pre>
+</section>
+    <section>
+  <h2>Current Deterministic Summary</h2>
+  <pre># PR Summary
+
+- Generated: 2026-06-10-01-25
+- Task context: Add template version guidance
+- Verification status: Overall status: pass
+
+## Summary
+This summary was generated deterministically from git status, the latest task contract, and the latest verification report.
+
+## Changed Files
+- M `.agentloop/README.md`
+- M `.agentloop/backlog.md`
+- M `.agentloop/dogfood-log.md`
+- M `CHANGELOG.md`
+- M `DECISIONS.md`
+- M `FINAL_HANDOFF.md`
+- M `README.md`
+- M `ROADMAP.md`
+- M `docs/configuration.md`
+- M `docs/getting-started.md`
+- M `src/core/constants.ts`
+- M `src/core/doctor.ts`
+- M `src/core/init.ts`
+- M `src/templates/root/agentloop-directory-readme.md`
+- M `tests/doctor.test.ts`
+- M `tests/init.test.ts`
+- ?? `.agentloop/handoffs/2026-06-10-01-25-pr-summary.md`
+- ?? `.agentloop/manifest.json`
+- ?? `.agentloop/reports/2026-06-10-01-25-agentloop-report.html`
+- ?? `.agentloop/reports/2026-06-10-01-25-verification-report.md`
+- ?? `.agentloop/research/interview-cycle-068.md`
+- ?? `.agentloop/tasks/2026-06-10-add-template-version-guidance.md`
+- ?? `docs/template-migrations.md`
+
+## Change Areas
+### Source
+- M `src/core/constants.ts`
+- M `src/core/doctor.ts`
+- M `src/core/init.ts`
+- M `src/templates/root/agentloop-directory-readme.md`
+
+### Tests
+- M `tests/doctor.test.ts`
+- M `tests/init.test.ts`
+
+### AgentLoop
+- M `.agentloop/README.md`
+- M `.agentloop/backlog.md`
+- M `.agentloop/dogfood-log.md`
+- ?? `.agentloop/handoffs/2026-06-10-01-25-pr-summary.md`
+- ?? `.agentloop/manifest.json`
+- ?? `.agentloop/reports/2026-06-10-01-25-agentloop-report.html`
+- ?? `.agentloop/reports/2026-06-10-01-25-verification-report.md`
+- ?? `.agentloop/research/interview-cycle-068.md`
+- ?? `.agentloop/tasks/2026-06-10-add-template-version-guidance.md`
+
+### Documentation
+- M `CHANGELOG.md`
+- M `DECISIONS.md`
+- M `FINAL_HANDOFF.md`
+- M `README.md`
+- M `ROADMAP.md`
+- M `docs/configuration.md`
+- M `docs/getting-started.md`
+- ?? `docs/template-migrations.md`
+
+## Diff Stats
+.agentloop/README.md                             |  3 +
+ .agentloop/backlog.md                            |  2 +
+ .agentloop/dogfood-log.md                        | 36 ++++++++++++
+ CHANGELOG.md                                     |  4 ++
+ DECISIONS.md                                     |  4 ++
+ FINAL_HANDOFF.md                                 | 20 ++++++-
+ README.md                                        |  5 +-
+ ROADMAP.md                                       |  2 +-
+ docs/configuration.md                            |  4 +-
+ docs/getting-started.md                          |  2 +
+ src/core/constants.ts                            |  2 +
+ src/core/doctor.ts                               | 53 ++++++++++++++++-
+ src/core/init.ts                                 | 16 ++++++
+ src/templates/root/agentloop-directory-readme.md |  3 +
+ tests/doctor.test.ts                             | 73 +++++++++++++++++++++++-
+ tests/init.test.ts                               |  9 +++
+ 16 files changed, 230 insertions(+), 8 deletions(-)
+
+## Behaviour Changed
+- Review changed files and task contract to confirm intended behavior.
+
+## Review Focus
+- Review source changes for behavior and public API impact.
+- Check tests cover the changed behavior.
+- Check docs match the implemented command behavior.
+- Review AgentLoop artifacts for accurate task, verification, and handoff evidence.
+
+## Verification Performed
+- Overall status: pass
+
+## Verification Not Performed
+- Check the verification report for skipped commands.
+
+## Risks
+- Re-check protected files such as migrations, secrets, auth, billing, deployment, and public APIs before merge.
+
+## Rollback Notes
+- Revert the changed files or revert the merge commit if this lands as a PR.
+
+## Reviewer Checklist
+- [ ] Acceptance criteria match the task contract.
+- [ ] Verification evidence is adequate for the change.
+- [ ] Risk areas have been reviewed.
+- [ ] Rollback plan is clear.
+
+## Follow-Ups
+- Capture any deferred work in ROADMAP.md or a new task contract.</pre>
+</section>
+
+    <section>
+      <h2>Diff Stats</h2>
+      <pre>.agentloop/README.md                             |  3 +
+ .agentloop/backlog.md                            |  2 +
+ .agentloop/dogfood-log.md                        | 36 ++++++++++++
+ CHANGELOG.md                                     |  4 ++
+ DECISIONS.md                                     |  4 ++
+ FINAL_HANDOFF.md                                 | 20 ++++++-
+ README.md                                        |  5 +-
+ ROADMAP.md                                       |  2 +-
+ docs/configuration.md                            |  4 +-
+ docs/getting-started.md                          |  2 +
+ src/core/constants.ts                            |  2 +
+ src/core/doctor.ts                               | 53 ++++++++++++++++-
+ src/core/init.ts                                 | 16 ++++++
+ src/templates/root/agentloop-directory-readme.md |  3 +
+ tests/doctor.test.ts                             | 73 +++++++++++++++++++++++-
+ tests/init.test.ts                               |  9 +++
+ 16 files changed, 230 insertions(+), 8 deletions(-)</pre>
+    </section>
+
+    <section>
+      <h2>Safety Notes</h2>
+      <div class="safety">This report is a local static artifact. It must not be treated as proof that verification passed unless the verification section says so. Review protected areas such as secrets, auth, billing, deployment, migrations, lockfiles, and public APIs before merge.</div>
+    </section>
+  </main>
+</body>
+</html>

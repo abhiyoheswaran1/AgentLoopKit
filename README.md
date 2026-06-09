@@ -99,7 +99,7 @@ pnpm build
 | --------------------------------------- | ------------------------------------------------------------------------------ |
 | `agentloop init`                        | Generate the repo harness and config                                           |
 | `agentloop init --dry-run`              | Preview generated files without writing them                                   |
-| `agentloop doctor`                      | Check setup health, commands, git state, monorepo markers, and risk categories |
+| `agentloop doctor`                      | Check setup health, template version, commands, git state, and risk categories |
 | `agentloop create-task`                 | Create a task contract in `.agentloop/tasks/`                                  |
 | `agentloop task list`                   | List task contracts and show the pinned active task                            |
 | `agentloop task show <path>`            | Print a task contract without changing active state                            |
@@ -152,6 +152,7 @@ agentloop completion zsh > ~/.zsh/completions/_agentloop
 
 ```text
 .agentloop/
+  manifest.json
   loops/
   gates/
   handoffs/
@@ -170,6 +171,8 @@ agentloop.config.json
 The package ships `schema/agentloop.config.schema.json` for editors and config validation. Generated configs use the GitHub raw schema URL for editor support; the CLI validates config locally and does not fetch that URL at runtime.
 
 See `docs/configuration.md` for config fields and schema notes.
+
+Fresh `init` also writes `.agentloop/manifest.json` so `doctor` can report which template generation created the local harness. See `docs/template-migrations.md` for manual upgrade guidance.
 
 ## Agent Usage
 

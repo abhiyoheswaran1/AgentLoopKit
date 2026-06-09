@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir } from './helpers.js';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -22,7 +22,78 @@ describe('doctor', () => {
 
     expect(result.serious).toHaveLength(0);
     expect(result.checks.some((check) => check.name === 'AGENTLOOP.md')).toBe(true);
+    expect(result.checks).toContainEqual({
+      name: 'Template manifest',
+      status: 'pass',
+      message: 'template version 1 is current',
+    });
     expect(result.markdown).toContain('AgentLoopKit Doctor');
+  });
+
+  test('warns when template manifest is missing', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await rm(path.join(dir, '.agentloop/manifest.json'));
+
+    const result = await runDoctor({ cwd: dir });
+
+    expect(result.serious).toHaveLength(0);
+    expect(result.checks).toContainEqual({
+      name: 'Template manifest',
+      status: 'warn',
+      message:
+        'missing .agentloop/manifest.json; run agentloop init with the current CLI to add missing files without overwriting existing harness files',
+    });
+  });
+
+  test('warns when template manifest is stale, invalid, or newer than the CLI', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    const manifestPath = path.join(dir, '.agentloop/manifest.json');
+
+    await writeFile(
+      manifestPath,
+      JSON.stringify({ version: 1, templateVersion: 0, generatedBy: 'agentloopkit' }),
+    );
+    await expect(runDoctor({ cwd: dir })).resolves.toMatchObject({
+      checks: expect.arrayContaining([
+        {
+          name: 'Template manifest',
+          status: 'warn',
+          message:
+            'template version 0 is older than current version 1; review docs/template-migrations.md and rerun agentloop init to add missing files',
+        },
+      ]),
+    });
+
+    await writeFile(manifestPath, '{not json');
+    await expect(runDoctor({ cwd: dir })).resolves.toMatchObject({
+      checks: expect.arrayContaining([
+        {
+          name: 'Template manifest',
+          status: 'warn',
+          message:
+            'invalid .agentloop/manifest.json; review docs/template-migrations.md and recreate the manifest with agentloop init if needed',
+        },
+      ]),
+    });
+
+    await writeFile(
+      manifestPath,
+      JSON.stringify({ version: 1, templateVersion: 999, generatedBy: 'agentloopkit' }),
+    );
+    await expect(runDoctor({ cwd: dir })).resolves.toMatchObject({
+      checks: expect.arrayContaining([
+        {
+          name: 'Template manifest',
+          status: 'warn',
+          message:
+            'template version 999 is newer than this CLI supports; upgrade AgentLoopKit before changing generated harness files',
+        },
+      ]),
+    });
   });
 
   test('flags invalid config as serious', async () => {

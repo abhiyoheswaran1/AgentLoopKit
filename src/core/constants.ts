@@ -4,6 +4,8 @@ export const CLI_NAME = 'agentloop';
 export const TAGLINE = 'A drop-in engineering loop for coding agents.';
 export const CONFIG_FILE = 'agentloop.config.json';
 export const AGENTLOOP_DIR = '.agentloop';
+export const AGENTLOOP_MANIFEST_FILE = '.agentloop/manifest.json';
+export const CURRENT_TEMPLATE_VERSION = 1;
 export const AGENTS_FILE = 'AGENTS.md';
 export const AGENTLOOP_FILE = 'AGENTLOOP.md';
 

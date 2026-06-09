@@ -3,8 +3,11 @@ import { readdir } from 'node:fs/promises';
 import {
   AGENTLOOP_DIR,
   AGENTLOOP_FILE,
+  AGENTLOOP_MANIFEST_FILE,
   AGENTS_FILE,
   CONFIG_FILE,
+  CURRENT_TEMPLATE_VERSION,
+  PACKAGE_NAME,
   TEMPLATE_GROUPS,
 } from './constants.js';
 import { createDefaultConfig } from './config.js';
@@ -120,6 +123,19 @@ export async function initializeAgentLoop(options: {
   await writeGeneratedFile(
     path.join(cwd, AGENTLOOP_DIR, 'README.md'),
     await readTemplate('root/agentloop-directory-readme.md', values),
+    result,
+  );
+  await writeGeneratedFile(
+    path.join(cwd, AGENTLOOP_MANIFEST_FILE),
+    `${JSON.stringify(
+      {
+        version: 1,
+        templateVersion: CURRENT_TEMPLATE_VERSION,
+        generatedBy: PACKAGE_NAME,
+      },
+      null,
+      2,
+    )}\n`,
     result,
   );
   await writeGeneratedFile(
