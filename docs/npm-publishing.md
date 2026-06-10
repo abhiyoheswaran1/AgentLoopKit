@@ -59,7 +59,7 @@ Short version:
 - GitHub release `v0.20.0` is public with attached `agentloopkit-0.20.0.tgz`.
 - GitHub release `v0.21.0` is public with attached `agentloopkit-0.21.0.tgz`.
 - GitHub release `v0.22.0` is public with attached `agentloopkit-0.22.0.tgz`.
-- GitHub release `v0.23.0` is prepared with `agentloopkit-0.23.0.tgz`.
+- GitHub release `v0.23.0` is public with attached `agentloopkit-0.23.0.tgz`.
 - GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.23.0`.
 - GitHub release tarball SHA-256: `b96f356db5b5b2f94a0f284590f3d272afe20fe87b6668e10c599164be72b27f`.
 - The next npm publish should be the current GitHub release, `0.23.0`, not a backfill of old release-candidate numbers.
@@ -222,6 +222,8 @@ Historical publishing log:
 - Local tarball SHA-256 before GitHub release: `b96f356db5b5b2f94a0f284590f3d272afe20fe87b6668e10c599164be72b27f`.
 - GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.23.0`.
 - GitHub release tarball SHA-256: `b96f356db5b5b2f94a0f284590f3d272afe20fe87b6668e10c599164be72b27f`.
+- GitHub Publish workflow run `27253066701` for `v0.23.0` passed package checks and failed at npm authorization with `E404`.
+- npm registry proof after the `v0.23.0` publish workflow still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 
 Publish the current GitHub release to npm from its matching release commit after browser/OTP authentication completes. Do not backfill old npm versions with newer source.
 

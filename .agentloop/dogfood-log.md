@@ -3022,3 +3022,30 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release candidate stayed metadata- and docs-focused after the feature commit.
 - Improve:
   - After the GitHub release is created, update launch checklist and release status with the final workflow result.
+
+## 2026-06-10: 0.23.0 Release Status Record
+
+- Task contract: `.agentloop/tasks/2026-06-10-record-v0-23-0-release-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-092.md`
+- Trigger:
+  - GitHub release `v0.23.0` was created after the release-prep commit passed CI.
+  - The release-triggered Publish workflow completed and failed at npm publish authorization.
+- Product changes:
+  - Recorded `v0.23.0` release URL, asset digest, publish workflow result, and npm registry proof in release-status docs.
+  - Updated npm publishing docs, launch checklist, final handoff, and dogfood log.
+  - Kept npm availability marked as blocked; npm latest remains `0.1.1`.
+- Verification run:
+  - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.23.0>
+  - GitHub release asset: `agentloopkit-0.23.0.tgz`
+  - GitHub release asset SHA-256: `b96f356db5b5b2f94a0f284590f3d272afe20fe87b6668e10c599164be72b27f`
+  - Release asset smoke: downloaded tarball reported `agentloop version` as `0.23.0`.
+  - Release asset PowerShell smoke: downloaded tarball printed `Register-ArgumentCompleter`.
+  - CI run `27253026447`: pass.
+  - Publish workflow run `27253066701`: package checks passed, npm publish failed with `E404`.
+  - `npm view agentloopkit version versions --json`: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-record-v0-23-0-release-status.md`: pass, wrote `.agentloop/reports/2026-06-10-06-26-verification-report.md`.
+  - `npx tsx src/cli/index.ts handoff --task .agentloop/tasks/2026-06-10-record-v0-23-0-release-status.md --json`: pass, wrote `.agentloop/handoffs/2026-06-10-06-27-pr-summary.md`.
+- Worked well:
+  - The release asset matched the locally verified tarball digest.
+- Improve:
+  - Configure npm trusted publishing or complete local browser/OTP auth before the next real npm publish attempt.

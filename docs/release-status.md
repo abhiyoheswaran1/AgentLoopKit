@@ -24,7 +24,7 @@ This is a temporary fallback. npm remains the intended main distribution path.
 
 ## Publish Blocker
 
-The GitHub Publish workflow for `v0.22.0` passed package checks, then npm rejected `npm publish --access public` with authorization `E404`.
+The GitHub Publish workflow for `v0.23.0` (run `27253066701`) passed package checks, then npm rejected `npm publish --access public` with authorization `E404`.
 
 Local `npm whoami` currently returns `E401`, so local publish is blocked from this shell.
 

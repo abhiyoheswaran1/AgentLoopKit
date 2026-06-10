@@ -36,7 +36,7 @@ Use this before publishing AgentLoopKit.
 - [x] GitHub release `v0.20.0` is published with release-note handoff notes.
 - [x] GitHub release `v0.21.0` is published with next-action and release-safety notes.
 - [x] GitHub release `v0.22.0` is published with task-linked verification and README evidence notes.
-- [ ] GitHub release `v0.23.0` is published with PowerShell completion notes.
+- [x] GitHub release `v0.23.0` is published with PowerShell completion notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -139,7 +139,7 @@ Use this before publishing AgentLoopKit.
 - [x] Publish workflow for `v0.22.0` passed package checks and failed at npm authorization.
 - [x] Package `agentloopkit@0.23.0` is prepared on `main` for PowerShell completions.
 - [ ] Package `agentloopkit@0.23.0` is published.
-- [ ] Publish workflow for `v0.23.0` has run.
+- [x] Publish workflow for `v0.23.0` passed package checks and failed at npm authorization.
 - [ ] npm trusted publishing is configured for this repository.
 - [ ] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -253,7 +253,9 @@ Current recovery note:
 - GitHub release `v0.22.0` tarball SHA-256: `5ad3a2b35e430d6d9fa10cad4c6023230fc7f3593a8232370c9c2a8945b6489f`.
 - GitHub Publish workflow for `v0.22.0` passed package checks and failed at npm authorization with `E404`.
 - `agentloopkit@0.23.0` is prepared for PowerShell completions.
+- GitHub release `v0.23.0` is public with attached `agentloopkit-0.23.0.tgz`.
 - Local `0.23.0` tarball SHA-256: `b96f356db5b5b2f94a0f284590f3d272afe20fe87b6668e10c599164be72b27f`.
+- GitHub Publish workflow for `v0.23.0` passed package checks and failed at npm authorization with `E404`.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
 - npm should catch up to `0.23.0` once. Then use normal semver for future releases.

@@ -1821,7 +1821,7 @@ Top remaining items:
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, `v0.15.0`, `v0.15.1`, and `v0.16.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - GitHub release `v0.17.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - GitHub release `v0.18.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- GitHub releases through `v0.22.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- GitHub releases through `v0.23.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - npm should jump from `0.1.1` to the current GitHub release because public GitHub tags already occupy the intermediate versions.
 - Do not publish `0.16.0`, `0.17.0`, `0.18.0`, or `0.18.1` to npm from current `main`. Publish each version only from its matching release commit or release tarball.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP` for browser/OTP authentication.
@@ -1992,12 +1992,12 @@ Top remaining items:
 - [x] Document temporary `v0.22.0` GitHub tarball usage while npm serves `0.1.1`.
 - [ ] Publish `agentloopkit@0.22.0` to npm.
 - [x] Prepare `agentloopkit@0.23.0` PowerShell completion release candidate.
-- [ ] Publish GitHub release `v0.23.0` with PowerShell completion notes.
-- [ ] Run GitHub Publish workflow for `v0.23.0`.
+- [x] Publish GitHub release `v0.23.0` with PowerShell completion notes.
+- [x] Run GitHub Publish workflow for `v0.23.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.23.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install for the published `0.1.1` package with `npx agentloopkit version`.
-- [x] Confirm current GitHub release tarball with `npx --yes --package /tmp/agentloopkit-0.23.0.tgz agentloop version`.
+- [x] Confirm current GitHub release tarball with `npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop version`.
 - [x] Add GitHub repo description and discovery topics.
 - [x] Add initial good-first-issue labels.
 - [ ] Announce launch.
