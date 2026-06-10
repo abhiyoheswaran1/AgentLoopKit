@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Latest GitHub release: `v0.22.0` once the release workflow below is complete. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.22.0` carry recent source snapshots. The next npm publish should catch up to the current GitHub line once; after that, releases return to normal sequential semver.
+Latest GitHub release: `v0.22.0`. npm still serves `0.1.1`: the `v0.22.0` publish workflow passed package checks, then npm rejected the final publish with authorization `E404`. The next npm publish should catch up once to `0.22.0`; after that, releases return to normal sequential semver.
 
 Run the CLI after install:
 

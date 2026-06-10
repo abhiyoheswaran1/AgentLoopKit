@@ -35,7 +35,7 @@ Use this before publishing AgentLoopKit.
 - [x] GitHub release `v0.19.0` is published with CI-summary release notes.
 - [x] GitHub release `v0.20.0` is published with release-note handoff notes.
 - [x] GitHub release `v0.21.0` is published with next-action and release-safety notes.
-- [ ] GitHub release `v0.22.0` is published with task-linked verification and README evidence notes.
+- [x] GitHub release `v0.22.0` is published with task-linked verification and README evidence notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -135,6 +135,7 @@ Use this before publishing AgentLoopKit.
 - [x] Publish workflow for `v0.21.0` passed package checks and failed at npm authorization.
 - [x] Package `agentloopkit@0.22.0` is prepared on `main` for task-linked verification and README evidence.
 - [ ] Package `agentloopkit@0.22.0` is published.
+- [x] Publish workflow for `v0.22.0` passed package checks and failed at npm authorization.
 - [ ] npm trusted publishing is configured for this repository.
 - [ ] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -242,7 +243,10 @@ Current recovery note:
 - GitHub release `v0.21.0` is public with attached `agentloopkit-0.21.0.tgz`.
 - GitHub release `v0.21.0` tarball SHA-256: `3f7c1ee4042f6dd08d2fd2cc2ecdcc039f853f95afb56be666c5497d7a3fe4d5`.
 - GitHub Publish workflow for `v0.21.0` passed package checks and failed at npm authorization with `E404`.
-- `agentloopkit@0.22.0` is prepared for task-linked verification reports, failed-verification summaries, guarded task paths, and refreshed README visuals.
+- `agentloopkit@0.22.0` was prepared and released on GitHub for task-linked verification reports, failed-verification summaries, guarded task paths, and refreshed README visuals.
+- GitHub release `v0.22.0` is public with attached `agentloopkit-0.22.0.tgz`.
+- GitHub release `v0.22.0` tarball SHA-256: `5ad3a2b35e430d6d9fa10cad4c6023230fc7f3593a8232370c9c2a8945b6489f`.
+- GitHub Publish workflow for `v0.22.0` passed package checks and failed at npm authorization with `E404`.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
 - npm should catch up to `0.22.0` once. Then use normal semver for future releases.

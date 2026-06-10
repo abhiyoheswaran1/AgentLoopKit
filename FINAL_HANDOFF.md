@@ -142,6 +142,11 @@ Latest local verification:
   - Local tarball SHA-256 before GitHub release: `5ad3a2b35e430d6d9fa10cad4c6023230fc7f3593a8232370c9c2a8945b6489f`.
   - AgentLoop verification report: `.agentloop/reports/2026-06-10-05-34-verification-report.md`, overall status `pass`.
   - npm registry proof before release: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
+  - GitHub release `v0.22.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.22.0.
+  - GitHub release asset: `agentloopkit-0.22.0.tgz`.
+  - GitHub release asset SHA-256: `5ad3a2b35e430d6d9fa10cad4c6023230fc7f3593a8232370c9c2a8945b6489f`.
+  - GitHub Publish workflow run `27251450540`: package checks passed, then npm rejected `npm publish --access public` with `E404`.
+  - npm registry proof after release: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
 
 - `0.21.0` next-action and release-safety release-candidate verification:
   - Task contracts: `.agentloop/tasks/2026-06-10-add-next-action-command.md`, `.agentloop/tasks/2026-06-10-add-publish-metadata-guard.md`, and `.agentloop/tasks/2026-06-10-prepare-v0-21-0-release.md`.
@@ -1760,7 +1765,7 @@ Strongest signals:
 
 Top remaining items:
 
-1. Complete npm browser/OTP authentication or trusted publishing for the current prepared release, now `agentloopkit@0.19.0`.
+1. Complete npm browser/OTP authentication or trusted publishing for the current GitHub release, now `agentloopkit@0.22.0`.
 2. Optional schema-store submission after npm publishing is stable.
 3. Add generated release-note handoff.
 4. Evaluate organization policy packs only after local policy workflows mature.
@@ -1771,8 +1776,8 @@ Top remaining items:
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, `v0.15.0`, `v0.15.1`, and `v0.16.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - GitHub release `v0.17.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - GitHub release `v0.18.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- GitHub release `v0.19.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- npm should jump from `0.1.1` to the current prepared release because public GitHub tags already occupy the intermediate versions.
+- GitHub releases through `v0.22.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- npm should jump from `0.1.1` to the current GitHub release because public GitHub tags already occupy the intermediate versions.
 - Do not publish `0.16.0`, `0.17.0`, `0.18.0`, or `0.18.1` to npm from current `main`. Publish each version only from its matching release commit or release tarball.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP` for browser/OTP authentication.
 - The release-triggered GitHub Publish workflow for `v0.16.0` passed checks and failed at npm authorization with `E404`.

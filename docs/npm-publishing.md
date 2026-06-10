@@ -56,8 +56,10 @@ Short version:
 - GitHub release `v0.19.0` is public with attached `agentloopkit-0.19.0.tgz`.
 - GitHub release `v0.20.0` is public with attached `agentloopkit-0.20.0.tgz`.
 - GitHub release `v0.21.0` is public with attached `agentloopkit-0.21.0.tgz`.
-- GitHub release `v0.22.0` is prepared with attached `agentloopkit-0.22.0.tgz` after release verification passes.
-- The next npm publish should be the current prepared release, `0.22.0`, not a backfill of old release-candidate numbers.
+- GitHub release `v0.22.0` is public with attached `agentloopkit-0.22.0.tgz`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.22.0`.
+- GitHub release tarball SHA-256: `5ad3a2b35e430d6d9fa10cad4c6023230fc7f3593a8232370c9c2a8945b6489f`.
+- The next npm publish should be the current GitHub release, `0.22.0`, not a backfill of old release-candidate numbers.
 - Do not publish `0.16.0`, `0.17.0`, `0.18.0`, or `0.18.1` from current `main`. `main` now contains behavior that was not in those release tags.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped with `EOTP` because browser or one-time-password authentication is required.
 - GitHub Publish workflow run `27241996432` for `v0.16.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
@@ -70,19 +72,20 @@ Short version:
 - GitHub Publish workflow run `27246784493` for `v0.19.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - GitHub Publish workflow run `27248000123` for `v0.20.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - GitHub Publish workflow run `27249612803` for `v0.21.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
-- npm latest remains `agentloopkit@0.1.1` until that authentication completes.
+- GitHub Publish workflow run `27251450540` for `v0.22.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- npm latest remains `agentloopkit@0.1.1`; registry versions are still `0.1.0` and `0.1.1`.
 - Do not publish `0.15.1` to npm now. `main` has moved past that tag.
 - Do not publish `0.20.0` or `0.21.0` from current `main`; current `main` now targets `0.22.0`.
 - After the current package line lands on npm, resume normal semver publishing. Do not keep creating higher versions just because npm authorization was blocked.
 
-Why npm should jump to the current prepared release:
+Why npm should jump to the current GitHub release:
 
 - The skipped npm numbers were used as public GitHub release candidates while npm publishing was blocked.
 - The `v0.20.0` tag and release tarball contain the code that belongs to the `0.20.0` release line.
 - The `0.21.0` release line contains `agentloop next` and the prepublish metadata guard.
 - The `0.22.0` release line contains task-linked verification reports, failed-verification summaries, the guarded `--task` path behavior, and refreshed README visuals.
 - Backfilling old versions from current `main` would make npm metadata lie about what those old tags contained.
-- Publishing the current prepared release once, then returning to normal patch and minor releases, gives users the least confusing path.
+- Publishing the current GitHub release once, then returning to normal patch and minor releases, gives users the least confusing path.
 - Do not keep skipping versions after npm catches up. Use normal semver from the first successful catch-up publish onward.
 
 Current `main` includes a prepublish guard:
@@ -175,7 +178,7 @@ Historical publishing log:
 - Tarball SHA-256: `56b3ac5b212d24c2214e73a59c5e5fd08fe9f62a0e17956ec5c07cbad7672490`.
 - GitHub Publish workflow run `27239176000` for `v0.15.1` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - npm registry proof after the `v0.15.1` release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
-- npm should jump from `0.1.1` to the current prepared release for the catch-up publish because older GitHub tags are already public and current source has moved forward.
+- npm should jump from `0.1.1` to the current GitHub release for the catch-up publish because older GitHub tags are already public and current source has moved forward.
 - `agentloopkit@0.16.0` passed source version, built version, lint, typecheck, Vitest, Markdown link checks, build, projscan, `npm pack --dry-run`, `npm publish --access public --dry-run`, and packed-tarball smoke testing.
 - Local `npm publish --access public` for `0.16.0` reached npm publish and stopped at `EOTP`.
 - GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.16.0`.
@@ -205,8 +208,14 @@ Historical publishing log:
 - GitHub release tarball SHA-256: `3f7c1ee4042f6dd08d2fd2cc2ecdcc039f853f95afb56be666c5497d7a3fe4d5`.
 - GitHub Publish workflow run `27249612803` for `v0.21.0` passed package checks and failed at npm authorization with `E404`.
 - npm registry proof after the `v0.21.0` publish workflow still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
+- `agentloopkit@0.22.0` passed source version, built version, lint, typecheck, Vitest, Markdown link checks, build, projscan, `npm pack`, `npm publish --access public --dry-run`, packed-tarball smoke testing, Playwright screenshot rendering, and VHS terminal rendering.
+- Local tarball SHA-256 before GitHub release: `5ad3a2b35e430d6d9fa10cad4c6023230fc7f3593a8232370c9c2a8945b6489f`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.22.0`.
+- GitHub release tarball SHA-256: `5ad3a2b35e430d6d9fa10cad4c6023230fc7f3593a8232370c9c2a8945b6489f`.
+- GitHub Publish workflow run `27251450540` for `v0.22.0` passed package checks and failed at npm authorization with `E404`.
+- npm registry proof after the `v0.22.0` publish workflow still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 
-Publish the current prepared release to npm from its matching release commit after browser/OTP authentication completes. Do not backfill old npm versions with newer source.
+Publish the current GitHub release to npm from its matching release commit after browser/OTP authentication completes. Do not backfill old npm versions with newer source.
 
 Preferred release path after the first publish:
 

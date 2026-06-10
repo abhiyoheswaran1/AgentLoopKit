@@ -2565,7 +2565,7 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Dogfooding caught the missing-tag behavior before release.
   - The command gives maintainers a release handoff without tag mutation, publishing, network calls, token reads, or LLM output.
 - Improve:
-  - Configure npm trusted publishing or complete local account authentication, then publish the current prepared release.
+  - Configure npm trusted publishing or complete local account authentication, then publish the current GitHub release line.
 
 ## 2026-06-10: Unreleased Next Action Command
 
@@ -2836,3 +2836,34 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `.agentloop/reports/2026-06-10-05-34-verification-report.md`
 - Handoff summary:
   - `.agentloop/handoffs/2026-06-10-05-35-pr-summary.md`
+
+## 2026-06-10: 0.22.0 Release Status Record
+
+- Task contract: `.agentloop/tasks/2026-06-10-record-v0-22-0-release-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-086.md`
+- Trigger:
+  - GitHub release `v0.22.0` is public with attached tarball `agentloopkit-0.22.0.tgz`.
+  - GitHub Publish workflow run `27251450540` passed package checks and failed at npm authorization with `E404`.
+  - npm still reports latest `0.1.1` with versions `0.1.0` and `0.1.1`.
+  - The user asked whether the project should keep skipping versions or release a higher version out of the blue.
+- Product changes:
+  - Clarify README install status.
+  - Record `v0.22.0` release URL, tarball digest, workflow result, and npm registry proof in publishing docs.
+  - Mark GitHub `v0.22.0` as published in the launch checklist while leaving npm `0.22.0` unpublished.
+  - Update roadmap and final handoff with the release-status evidence.
+  - Record the product-panel decision not to publish stale intermediate versions from current `main`.
+- Verification run:
+  - `npx pnpm@10.12.1 check:links`: pass, 471 Markdown files checked.
+  - `git diff --check`: pass.
+  - `node scripts/prepublish-check.mjs`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-record-v0-22-0-release-status.md`: pass, wrote `.agentloop/reports/2026-06-10-05-46-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 110 tests, lint, typecheck, and build all passed.
+  - `npx tsx src/cli/index.ts handoff --json`: pass, wrote `.agentloop/handoffs/2026-06-10-05-49-pr-summary.md`.
+  - `npx tsx src/cli/index.ts task clear --json`: pass, removed the local active-task pointer before commit.
+  - Final `npx pnpm@10.12.1 check:links`: pass, 473 Markdown files checked.
+  - Final `git diff --check`: pass.
+- Worked well:
+  - The task contract made the release-status scope narrow: documentation and evidence only.
+- Improve:
+  - Once npm authorization is repaired, update this log with the successful `npm view agentloopkit version` proof and stop recommending GitHub tarball fallback for current users.
