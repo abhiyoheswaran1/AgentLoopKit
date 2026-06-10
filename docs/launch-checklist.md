@@ -34,7 +34,7 @@ Use this before publishing AgentLoopKit.
 - [x] GitHub release `v0.18.1` is published with policy-customization guidance release notes.
 - [x] GitHub release `v0.19.0` is published with CI-summary release notes.
 - [x] GitHub release `v0.20.0` is published with release-note handoff notes.
-- [ ] GitHub release `v0.21.0` is published with next-action and release-safety notes.
+- [x] GitHub release `v0.21.0` is published with next-action and release-safety notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -131,7 +131,7 @@ Use this before publishing AgentLoopKit.
 - [x] Publish workflow for `v0.20.0` passed package checks and failed at npm authorization.
 - [x] Package `agentloopkit@0.21.0` is prepared on `main` for next-action and release-safety guardrails.
 - [ ] Package `agentloopkit@0.21.0` is published.
-- [ ] Publish workflow for `v0.21.0` completes or reports npm authorization status.
+- [x] Publish workflow for `v0.21.0` passed package checks and failed at npm authorization.
 - [ ] npm trusted publishing is configured for this repository.
 - [ ] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -233,9 +233,14 @@ Current recovery note:
 - GitHub release `v0.20.0` tarball SHA-256: `df8407c7da4440a86a544973bdd052cadb0c0d2b10b1bb67f81548b857fdc201`.
 - GitHub Publish workflow for `v0.20.0` passed package checks and failed at npm authorization with `E404`.
 - `agentloopkit@0.21.0` is prepared for `agentloop next` and the prepublish metadata guard.
+- Local `0.21.0` checks passed: focused release-note tests, prepublish metadata check, lint, typecheck, full Vitest, Markdown link checks, build, projscan, `npm pack`, `npm publish --access public --dry-run`, and packed-tarball smoke testing.
+- Local `0.21.0` tarball SHA-256: `3f7c1ee4042f6dd08d2fd2cc2ecdcc039f853f95afb56be666c5497d7a3fe4d5`.
+- GitHub release `v0.21.0` is public with attached `agentloopkit-0.21.0.tgz`.
+- GitHub release `v0.21.0` tarball SHA-256: `3f7c1ee4042f6dd08d2fd2cc2ecdcc039f853f95afb56be666c5497d7a3fe4d5`.
+- GitHub Publish workflow for `v0.21.0` passed package checks and failed at npm authorization with `E404`.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
-- After `v0.21.0` is verified and released, npm should catch up to `0.21.0` once. Then use normal semver for future releases.
+- npm should catch up to `0.21.0` once. Then use normal semver for future releases.
 - npm still reports `agentloopkit@0.1.1` as latest.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.3.0` is now prepared on `main` after the handoff command, create-task flag, latest artifact selection, and create-task alias work.
@@ -277,7 +282,7 @@ Current recovery note:
 - GitHub Publish workflow for `v0.15.0` passed package checks and failed at npm authorization with `E404`.
 - Local `0.15.1` checks passed: `npm publish --access public --dry-run`, packed-tarball smoke test, and npm registry proof that latest remains `0.1.1`.
 - GitHub Publish workflow for `v0.15.1` passed package checks and failed at npm authorization with `E404`.
-- npm should jump from `0.1.1` to the current prepared release for the catch-up publish because public GitHub release candidates already exist through `v0.20.0` and current source targets `v0.21.0`.
+- npm should jump from `0.1.1` to the current GitHub release line for the catch-up publish because public GitHub release candidates already exist through `v0.21.0`.
 - Do not publish `0.16.0` to npm from current `main`. Publish each version only from its matching release commit.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP`.
 - GitHub Publish workflow for `v0.16.0` passed package checks and failed at npm authorization with `E404`.

@@ -142,6 +142,11 @@ Latest local verification:
   - Packed tarball smoke: pass; `agentloop version` reported `0.21.0`, `release-notes --release-version 0.21.0 --json` reported `0.21.0`, and `next --json` returned `agentloop create-task` after `init`.
   - Local tarball SHA-256 before GitHub release: `3f7c1ee4042f6dd08d2fd2cc2ecdcc039f853f95afb56be666c5497d7a3fe4d5`.
   - AgentLoop verification report: `.agentloop/reports/2026-06-10-04-41-verification-report.md`, overall status `pass`.
+  - GitHub release `v0.21.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.21.0.
+  - GitHub release asset: `agentloopkit-0.21.0.tgz`.
+  - GitHub release asset SHA-256: `3f7c1ee4042f6dd08d2fd2cc2ecdcc039f853f95afb56be666c5497d7a3fe4d5`.
+  - GitHub Publish workflow run `27249612803`: package checks passed, then npm rejected `npm publish --access public` with `E404`.
+  - npm registry proof after release: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
 
 - `0.20.0` release-note handoff release-candidate verification:
   - Task contract: `.agentloop/tasks/2026-06-10-add-release-notes-command.md`.

@@ -2676,3 +2676,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Dogfooding the release-note command caught a real CLI ergonomics bug before the GitHub release was cut.
 - Improve:
   - Complete full release verification, regenerate final release notes, push the release commit, create the GitHub release, and record npm/GitHub status honestly.
+
+## 2026-06-10: 0.21.0 Release Status
+
+- Task contract: `.agentloop/tasks/2026-06-10-record-v0-21-0-release-status.md`
+- Trigger:
+  - GitHub release `v0.21.0` is public.
+  - The release-triggered GitHub Publish workflow failed at npm authorization after package checks passed.
+- Product/status changes:
+  - Updated README, npm publishing docs, release notes docs, launch checklist, roadmap, and final handoff to record `v0.21.0` as a public GitHub release.
+  - Recorded the GitHub release asset SHA-256: `3f7c1ee4042f6dd08d2fd2cc2ecdcc039f853f95afb56be666c5497d7a3fe4d5`.
+  - Recorded GitHub Publish workflow run `27249612803` failing at npm authorization with `E404`.
+  - Recorded npm registry proof that latest remains `0.1.1` with versions `0.1.0` and `0.1.1`.
+- Verification run:
+  - `npm view agentloopkit version versions --json`: pass, latest `0.1.1`.
+  - `npx pnpm@10.12.1 check:links`: pass, 453 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-04-48-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-04-49-pr-summary.md`.
+- Worked well:
+  - GitHub release notes were generated from a clean tree with `agentloop release-notes --release-version 0.21.0`.
+- Improve:
+  - Repair npm package permissions or trusted publishing, then publish the current release line once and return to normal semver.

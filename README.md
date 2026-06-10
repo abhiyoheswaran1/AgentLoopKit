@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Current source targets `v0.21.0`. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.20.0` carry recent source snapshots. The next npm publish should catch up to the current GitHub line once; after that, releases return to normal sequential semver.
+Current source and the latest GitHub release target `v0.21.0`. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.21.0` carry recent source snapshots. The next npm publish should catch up to the current GitHub line once; after that, releases return to normal sequential semver.
 
 Run the CLI after install:
 
@@ -483,7 +483,7 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. Current release prep targets `v0.21.0` for the next-action command and prepublish metadata guard. npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
+AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.21.0` is public with the next-action command, prepublish metadata guard, and release-notes flag fix. The release-triggered publish workflow passed package checks and failed at npm authorization, so npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
 
 Do not publish stale older versions from current `main`. If `CHANGELOG.md` has real entries under `Unreleased`, the prepublish guard blocks npm publish until release metadata is prepared.
 

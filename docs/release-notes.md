@@ -57,6 +57,6 @@ If the working tree is dirty, commit or stash those changes before publishing. T
 
 ## Version Catch-Up
 
-If npm lags behind GitHub releases, publish the current prepared release rather than backfilling old versions from newer source. For AgentLoopKit, npm currently serves `0.1.1` while GitHub release candidates already exist through `v0.20.0` and the current source targets `v0.21.0`. The next npm publish should catch up once to the current line, then return to normal semver.
+If npm lags behind GitHub releases, publish the current prepared release rather than backfilling old versions from newer source. For AgentLoopKit, npm currently serves `0.1.1` while GitHub release candidates already exist through `v0.21.0`. The next npm publish should catch up once to the current line, then return to normal semver.
 
 Record that catch-up in the release notes so users know the version jump was a recovery step, not the future release cadence.

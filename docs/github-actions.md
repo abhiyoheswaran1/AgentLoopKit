@@ -6,7 +6,7 @@ AgentLoopKit does not install workflows into user repositories. Copy a recipe in
 
 ## npm Status
 
-The current prepared GitHub tarball is `v0.21.0`, which includes `agentloop ci-summary`, `agentloop release-notes`, and `agentloop next`. npm still serves `0.1.1` until browser/OTP authentication or trusted publishing works.
+The current GitHub release tarball is `v0.21.0`, which includes `agentloop ci-summary`, `agentloop release-notes`, and `agentloop next`. npm still serves `0.1.1` until browser/OTP authentication or trusted publishing works.
 
 Until npm catches up, pin the GitHub release tarball in CI:
 
