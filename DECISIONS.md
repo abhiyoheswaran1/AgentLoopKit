@@ -96,6 +96,10 @@ Generated harness provenance lives in `.agentloop/manifest.json`, not in `agentl
 
 `agentloop npm-status` compares local `package.json` metadata with `npm view <package> version versions --json`. It can read captured registry JSON with `--registry-json` for CI or handoff replay, and `--expect-current` can fail post-publish smoke checks when npm latest does not match the local version. The command does not publish packages, create tags, create GitHub releases, read npm tokens, read `.env` files, upload files, or change package metadata.
 
+## 2026-06-10: Use 0.24.0 For npm-status Release
+
+`main` contains `agentloop npm-status` after the public `v0.23.0` GitHub release. Current source must release as `0.24.0` so package metadata, changelog, tag, tarball, and release notes describe the same code. Do not publish `0.23.0` from current `main`; use the existing `v0.23.0` tag or tarball if that old line must be reproduced.
+
 ## 2026-06-10: npm Catch-Up Is A One-Time Alignment Step
 
 npm still serves `agentloopkit@0.1.1` while public GitHub releases already exist through `v0.19.0`. The next npm publish should catch up to the current GitHub release line once, then AgentLoopKit should return to normal semver. Do not backfill old npm versions from newer source, and do not keep creating higher versions only because npm authorization remains blocked.

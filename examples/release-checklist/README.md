@@ -7,7 +7,7 @@ AgentLoopKit does not publish, tag, or create releases in this workflow. The art
 ## Command starter
 
 ```bash
-agentloop release-notes --release-version 0.23.0 --write
+agentloop release-notes --release-version 0.24.0 --write
 agentloop verify --task .agentloop/tasks/2026-06-10-document-current-release-state.md
 agentloop handoff --task .agentloop/tasks/2026-06-10-document-current-release-state.md
 ```

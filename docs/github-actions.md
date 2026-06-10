@@ -8,12 +8,12 @@ For non-GitHub CI, see [GitLab CI](../examples/gitlab-ci/README.md) and [Buildki
 
 ## npm Status
 
-The current GitHub release tarball is `v0.23.0`, which includes task-linked verification reports, failed-verification summaries, the guarded `--task` path behavior, refreshed README visuals, PowerShell completions, `agentloop ci-summary`, `agentloop release-notes`, and `agentloop next`. npm still serves `0.1.1` until browser/OTP authentication or trusted publishing works.
+The current GitHub release tarball is `v0.24.0`, which includes task-linked verification reports, failed-verification summaries, the guarded `--task` path behavior, refreshed README visuals, PowerShell completions, `agentloop ci-summary`, `agentloop release-notes`, `agentloop next`, and `agentloop npm-status`. npm still serves `0.1.1` until browser/OTP authentication or trusted publishing works.
 
 Until npm catches up, pin the GitHub release tarball in CI:
 
 ```bash
-npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz
+npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz
 npx --no-install agentloop check-gates --strict
 ```
 
@@ -38,7 +38,7 @@ jobs:
           node-version: 24
 
       - name: Install AgentLoopKit
-        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz
+        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz
 
       - name: Check AgentLoop evidence
         run: npx --no-install agentloop check-gates --strict
@@ -70,7 +70,7 @@ jobs:
         run: npm ci
 
       - name: Install AgentLoopKit
-        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz
+        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz
 
       - name: Run AgentLoop verification
         run: npx --no-install agentloop verify

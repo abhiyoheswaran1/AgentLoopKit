@@ -4,6 +4,18 @@
 
 - No unreleased changes yet.
 
+## 0.24.0
+
+npm-status release candidate. npm still serves `0.1.1` until account authentication or trusted publishing is repaired. This is the normal next minor release after `v0.23.0`; after npm catches up to the current release line, future releases should use ordinary sequential semver:
+
+- Added `agentloop npm-status` for read-only npm registry catch-up checks
+- Added `agentloop npm-status --json` for release scripts and handoff evidence
+- Added `agentloop npm-status --expect-current` for post-publish smoke checks that fail until npm latest matches local package metadata
+- Added `agentloop npm-status --registry-json <path>` so CI and release handoffs can replay captured `npm view` output without a network call
+- Compared local `package.json` metadata with `npm view <package> version versions --json` output
+- Documented npm-status usage across README, publishing docs, release-status docs, release notes, generated harness guidance, and AgentLoopKit's own repo harness
+- Kept the command read-only: no package publishing, tag creation, GitHub release creation, token reads, `.env` reads, uploads, or package metadata mutation
+
 ## 0.23.0
 
 PowerShell completion release candidate. npm still serves `0.1.1` until account authentication or trusted publishing is repaired. This is the normal next minor release after `v0.22.0`; after npm catches up to the current release line, future releases should use ordinary sequential semver:

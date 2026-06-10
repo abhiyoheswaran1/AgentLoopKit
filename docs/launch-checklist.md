@@ -39,6 +39,7 @@ For a read-only npm catch-up check, see [npm-status.md](npm-status.md). For a co
 - [x] GitHub release `v0.21.0` is published with next-action and release-safety notes.
 - [x] GitHub release `v0.22.0` is published with task-linked verification and README evidence notes.
 - [x] GitHub release `v0.23.0` is published with PowerShell completion notes.
+- [x] GitHub release `v0.24.0` is published with npm-status notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -142,10 +143,12 @@ For a read-only npm catch-up check, see [npm-status.md](npm-status.md). For a co
 - [x] Package `agentloopkit@0.23.0` is prepared on `main` for PowerShell completions.
 - [ ] Package `agentloopkit@0.23.0` is published.
 - [x] Publish workflow for `v0.23.0` passed package checks and failed at npm authorization.
+- [x] Package `agentloopkit@0.24.0` is prepared on `main` for npm-status.
+- [ ] Package `agentloopkit@0.24.0` is published.
 - [ ] npm trusted publishing is configured for this repository.
 - [ ] `npm whoami` works for manual fallback.
 - [ ] `agentloop npm-status --expect-current` passes after npm publish.
-- [x] Current publish guidance tells maintainers to publish `0.23.0` next from current `main`, not stale intermediate versions.
+- [x] Current publish guidance tells maintainers to publish `0.24.0` next from current `main`, not stale intermediate versions.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
 - [x] No `postinstall` script exists.
 - [x] No telemetry, cloud calls, or credential access exist.
@@ -193,6 +196,7 @@ npx --yes --package ./agentloopkit-0.20.0.tgz agentloop release-notes --json
 npx --yes --package ./agentloopkit-0.21.0.tgz agentloop next --json
 npx --yes --package ./agentloopkit-0.22.0.tgz agentloop verify --task .agentloop/tasks/example.md --json
 npx --yes --package ./agentloopkit-0.23.0.tgz agentloop completion powershell
+npx --yes --package ./agentloopkit-0.24.0.tgz agentloop npm-status --registry-json npm-view.json --json
 ```
 
 ## Publish
@@ -260,9 +264,12 @@ Current recovery note:
 - GitHub release `v0.23.0` is public with attached `agentloopkit-0.23.0.tgz`.
 - Local `0.23.0` tarball SHA-256: `b96f356db5b5b2f94a0f284590f3d272afe20fe87b6668e10c599164be72b27f`.
 - GitHub Publish workflow for `v0.23.0` passed package checks and failed at npm authorization with `E404`.
+- `agentloopkit@0.24.0` is prepared for npm-status.
+- GitHub release `v0.24.0` is public with attached `agentloopkit-0.24.0.tgz`.
+- Local `0.24.0` tarball SHA-256: `4e721a9627d94944f300a60d71a14b0e519045ac3eb51d637f7227503f2a962d`.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
-- npm should catch up to `0.23.0` once. Then use normal semver for future releases.
+- npm should catch up to `0.24.0` once. Then use normal semver for future releases.
 - npm still reports `agentloopkit@0.1.1` as latest.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.3.0` is now prepared on `main` after the handoff command, create-task flag, latest artifact selection, and create-task alias work.
@@ -304,7 +311,7 @@ Current recovery note:
 - GitHub Publish workflow for `v0.15.0` passed package checks and failed at npm authorization with `E404`.
 - Local `0.15.1` checks passed: `npm publish --access public --dry-run`, packed-tarball smoke test, and npm registry proof that latest remains `0.1.1`.
 - GitHub Publish workflow for `v0.15.1` passed package checks and failed at npm authorization with `E404`.
-- npm should jump from `0.1.1` to the current GitHub release line for the catch-up publish because public GitHub release candidates already exist through `v0.23.0`.
+- npm should jump from `0.1.1` to the current GitHub release line for the catch-up publish because public GitHub release candidates already exist through `v0.24.0`.
 - Do not publish stale intermediate versions to npm from current `main`. Publish each version only from its matching release commit or release tarball.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP`.
 - GitHub Publish workflow for `v0.16.0` passed package checks and failed at npm authorization with `E404`.

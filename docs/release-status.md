@@ -4,10 +4,10 @@ Last checked: June 10, 2026.
 
 ## Current State
 
-- Current GitHub release: `v0.23.0`
-- Current GitHub release asset: `agentloopkit-0.23.0.tgz`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.23.0>
-- Tarball SHA-256: `b96f356db5b5b2f94a0f284590f3d272afe20fe87b6668e10c599164be72b27f`
+- Current GitHub release: `v0.24.0`
+- Current GitHub release asset: `agentloopkit-0.24.0.tgz`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.0>
+- Tarball SHA-256: `4e721a9627d94944f300a60d71a14b0e519045ac3eb51d637f7227503f2a962d`
 - npm latest: `0.1.1`
 - npm versions: `0.1.0`, `0.1.1`
 
@@ -25,8 +25,8 @@ agentloop npm-status --expect-current
 npm still serves `0.1.1`. Until npm catches up, run the current GitHub release tarball directly:
 
 ```bash
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop version
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop init
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop version
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop init
 ```
 
 This is a temporary fallback. npm remains the intended main distribution path.
@@ -34,9 +34,9 @@ For a maintainer checklist that documents this state without publishing, see [re
 
 ## npm Catch-Up Version
 
-GitHub releases already exist for the intermediate AgentLoopKit versions between the npm-published `0.1.1` package and the current `v0.23.0` source line. Publishing older numbers from current `main` would create npm packages that do not match their GitHub tags.
+GitHub releases already exist for the intermediate AgentLoopKit versions between the npm-published `0.1.1` package and the current `v0.24.0` source line. Publishing older numbers from current `main` would create npm packages that do not match their GitHub tags.
 
-Once npm authentication or trusted publishing works, the next npm publish should ship the current release line as `0.23.0`. Future releases should then continue with normal sequential semver from the current source.
+Once npm authentication or trusted publishing works, the next npm publish should ship the current release line as `0.24.0`. Future releases should then continue with normal sequential semver from the current source.
 
 ## Publish Blocker
 
@@ -46,14 +46,14 @@ Local `npm whoami` currently returns `E401`, so local publish is blocked from th
 
 ## Next Publish
 
-Publish `agentloopkit@0.23.0` to npm after one of these is true:
+Publish `agentloopkit@0.24.0` to npm after one of these is true:
 
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - local browser or OTP authentication succeeds and `npm whoami` returns the package owner.
 
 Do not publish stale intermediate versions from current `main`. If an old version must be published, use its matching GitHub tag or release tarball.
 
-After npm reports `0.23.0` or newer:
+After npm reports `0.24.0` or newer:
 
 - remove the temporary GitHub tarball fallback from README;
 - update this page with the new npm proof;
@@ -63,7 +63,7 @@ After npm reports `0.23.0` or newer:
 
 ## Verification Evidence
 
-Local release-candidate checks for `0.23.0` passed:
+Local release-candidate checks for `0.24.0` passed:
 
 - lint
 - typecheck
@@ -74,6 +74,7 @@ Local release-candidate checks for `0.23.0` passed:
 - `npm publish --access public --dry-run`
 - packed-tarball smoke testing
 - packed-tarball PowerShell completion smoke testing
+- packed-tarball npm-status smoke testing
 
 Latest release-status documentation checks also passed:
 

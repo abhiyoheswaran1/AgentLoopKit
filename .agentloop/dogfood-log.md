@@ -3302,3 +3302,46 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Captured registry JSON mode made CLI tests deterministic without network.
 - Improve:
   - Add release-workflow examples for `npm-status --expect-current` after npm trusted publishing is repaired.
+
+## 2026-06-10: Prepare 0.24.0 npm-status Release
+
+- Task contract: `.agentloop/tasks/2026-06-10-prepare-0-24-0-npm-status-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-103.md`
+- Trigger:
+  - `agentloop npm-status` landed after public GitHub release `v0.23.0`, so current `main` needed a coherent `0.24.0` release line before any npm catch-up publish.
+- Product changes:
+  - Bumped package metadata to `0.24.0`.
+  - Added the `0.24.0` changelog section for `agentloop npm-status`.
+  - Updated README, release-status, npm publishing, launch checklist, CI examples, release-note docs, release-checklist examples, and final handoff current-state guidance to use `v0.24.0`.
+  - Added the Cycle 103 product-panel record and backlog item.
+  - Kept the release task metadata/docs-only: no CLI behavior changes, workflow mutation, token reads, env reads, or npm publish attempt without authentication.
+- Verification run:
+  - `npx tsx src/cli/index.ts version`: pass, reported `0.24.0`.
+  - `node dist/cli/index.js version`: pass, reported `0.24.0`.
+  - `node scripts/prepublish-check.mjs`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 29 files and 121 tests.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx pnpm@10.12.1 check:links`: pass, 559 Markdown files checked.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - `npm pack --pack-destination /tmp --silent`: pass, produced `/tmp/agentloopkit-0.24.0.tgz`.
+  - Tarball SHA-256: `4e721a9627d94944f300a60d71a14b0e519045ac3eb51d637f7227503f2a962d`.
+  - Packed tarball smoke: `npx --yes --package /tmp/agentloopkit-0.24.0.tgz agentloop version` reported `0.24.0`.
+  - Packed tarball npm-status smoke: `npx --yes --package /tmp/agentloopkit-0.24.0.tgz agentloop npm-status --registry-json /tmp/npm-view-agentloopkit.json --json` reported `catch-up-needed`, local `0.24.0`, and npm latest `0.1.1`.
+  - Packed tarball PowerShell smoke: `npx --yes --package /tmp/agentloopkit-0.24.0.tgz agentloop completion powershell` printed `Register-ArgumentCompleter`.
+  - Packed tarball init smoke: `agentloop init --dry-run --json` listed the expected generated files in a temp git repo.
+  - `npx tsx src/cli/index.ts npm-status --expect-current`: expected fail with exit code 1 because npm latest is still `0.1.1`.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `git diff --check`: pass.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-prepare-0-24-0-npm-status-release.md`: pass, wrote `.agentloop/reports/2026-06-10-10-09-verification-report.md`.
+  - AgentLoop verification commands: Vitest 29 files and 121 tests, lint, typecheck, and build all passed.
+  - `npm whoami`: expected fail with `E401`, so local npm publish remains blocked from this shell.
+- Handoff generated:
+  - Release notes: `.agentloop/handoffs/2026-06-10-10-11-release-notes.md`.
+  - PR summary: `.agentloop/handoffs/2026-06-10-10-11-pr-summary.md`.
+- Worked well:
+  - Dogfooding `npm-status` made the npm gap inspectable without publishing or reading credentials.
+  - The tarball smoke checks caught the exact artifact users will run from GitHub until npm catches up.
+- Improve:
+  - After the GitHub release exists, update the release checklist with the release URL, publish workflow result, and registry proof.

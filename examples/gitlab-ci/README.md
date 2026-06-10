@@ -13,7 +13,7 @@ agentloop-evidence:
   image: node:24
   stage: test
   before_script:
-    - npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz
+    - npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz
   script:
     - npx --no-install agentloop check-gates --strict
 ```
@@ -28,7 +28,7 @@ agentloop-verification:
   stage: test
   before_script:
     - npm ci
-    - npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz
+    - npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz
   script:
     - npx --no-install agentloop verify
     - npx --no-install agentloop badge
@@ -43,7 +43,7 @@ agentloop-verification:
       - .agentloop/handoffs/
 ```
 
-The tarball pin is temporary while npm latest is behind the GitHub release. After npm publishes `0.23.0` or newer, replace the install step with `npm install --no-save agentloopkit@0.23.0` or an unpinned npm install.
+The tarball pin is temporary while npm latest is behind the GitHub release. After npm publishes `0.24.0` or newer, replace the install step with `npm install --no-save agentloopkit@0.24.0` or an unpinned npm install.
 
 Security notes:
 

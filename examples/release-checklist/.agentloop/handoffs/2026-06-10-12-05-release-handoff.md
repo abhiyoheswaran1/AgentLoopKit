@@ -2,15 +2,15 @@
 
 ## Summary
 
-- GitHub release `v0.23.0` is current.
+- GitHub release `v0.24.0` is current.
 - npm still serves `0.1.1`.
 - Public docs include temporary GitHub tarball usage.
 - npm publish still needs trusted publishing setup or manual browser/OTP authentication.
 
 ## Evidence
 
-- GitHub release: `https://github.com/OWNER/REPO/releases/tag/v0.23.0`
-- GitHub asset: `agentloopkit-0.23.0.tgz`
+- GitHub release: `https://github.com/OWNER/REPO/releases/tag/v0.24.0`
+- GitHub asset: `agentloopkit-0.24.0.tgz`
 - npm latest: `0.1.1`
 - npm versions: `0.1.0`, `0.1.1`
 

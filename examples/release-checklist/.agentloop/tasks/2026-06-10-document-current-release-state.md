@@ -6,7 +6,7 @@
 
 ## Problem Statement
 
-GitHub release `v0.23.0` is current, but npm still serves `0.1.1`.
+GitHub release `v0.24.0` is current, but npm still serves `0.1.1`.
 
 ## Desired Outcome
 
