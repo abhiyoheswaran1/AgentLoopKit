@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.24.5
+
+Patch release for release safety and README demo polish:
+
 - Added `npm run smoke:release` for local packed-package release checks
 - The release smoke script builds, packs, runs the packed binary, checks safety guards, and verifies packaged README pins without publishing
+- Refreshed the README VHS terminal demo around the first-run loop, verification evidence, handoff, gates, local report, and badge output
 
 ## 0.24.4
 

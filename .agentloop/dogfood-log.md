@@ -3566,3 +3566,33 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The direct-run regression caught the path-with-spaces issue in this repo path.
 - Improve:
   - Run `npm run smoke:release` before every future npm/GitHub release candidate.
+
+## 2026-06-10: README VHS Demo Refresh
+
+- Task contract: `.agentloop/tasks/2026-06-10-refresh-readme-vhs-demo.md`
+- Product cycle: `.agentloop/research/interview-cycle-106.md`
+- Trigger:
+  - The README terminal GIF had grown into a broad command catalog.
+  - The npm README needed a cleaner public demo that starts with `npx agentloopkit init` and shows the evidence loop.
+- Product changes:
+  - Updated `docs/assets/readme/agentloopkit-cli.tape`.
+  - Regenerated `docs/assets/readme/agentloopkit-cli.gif`.
+  - Updated README alt text to match the commands shown.
+  - Updated the README asset regeneration notes.
+- Verification run:
+  - `vhs docs/assets/readme/agentloopkit-cli.tape`: pass; regenerated a 1200x720 GIF.
+  - `npx playwright screenshot --viewport-size=1440,960 file://.../showcase.html docs/assets/readme/agentloopkit-showcase.png`: pass; rendered unchanged PNG bytes.
+  - `npx playwright screenshot --viewport-size=1440,960 file://.../verification.html docs/assets/readme/agentloopkit-verification.png`: pass; rendered unchanged PNG bytes.
+  - `ffprobe docs/assets/readme/agentloopkit-cli.gif`: reports 1200x720, 30.52 seconds, 763 frames.
+  - `ffmpeg` frame sampling: start, task, verification, handoff, and end frames rendered for visual inspection.
+  - `view_image`: visual check confirmed the final GIF starts with user-facing commands, avoids the setup command at the loop boundary, uses human task output instead of JSON walls, and ends on local report and badge output.
+  - `npm publish --access public --dry-run`: pass; prepublishOnly reran typecheck, 30 Vitest files / 133 tests, and build, then produced the `agentloopkit@0.24.5` dry-run tarball listing.
+  - AgentLoop verification: `.agentloop/reports/2026-06-10-14-53-verification-report.md` passed with Vitest, lint, typecheck, build, `npm run smoke:release`, link check, prepublish guard, and projscan.
+  - Handoff generated: `.agentloop/handoffs/2026-06-10-14-54-pr-summary.md`.
+- Worked well:
+  - VHS exposed issues that static review would have missed: escaped JSON walls, overtyped output, and setup frames leaking through `LoopOffset`.
+  - Replacing a fixed sleep with `Wait` kept setup hidden until the prompt returned.
+  - The new release smoke script verified that the packaged README pins match `package.json` before publish.
+- Improve:
+  - Consider whether `.agentloop/state.json` should be ignored by default in generated harnesses; it appeared as local dogfood state while this task was active.
+  - Projscan reported the release-smoke helper exports as unused because the Vitest coverage imports the `.mjs` script dynamically; track whether projscan should detect that pattern later.

@@ -52,8 +52,8 @@ npx agentloopkit init
 Pin the current version when you need repeatable CI or team setup:
 
 ```bash
-npx --yes agentloopkit@0.24.4 version
-npx --yes agentloopkit@0.24.4 init
+npx --yes agentloopkit@0.24.5 version
+npx --yes agentloopkit@0.24.5 init
 ```
 
 Run the CLI after install:
@@ -87,10 +87,10 @@ npx agentloopkit completion powershell
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, task contracts, active task status, task-linked verify, handoff, reports, badges, release notes, gates, and task archive commands" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, doctor, task contract creation, task status, verification, handoff, gates, HTML report, and badge commands" width="100%">
 </p>
 
-The VHS demo is generated from committed sources in this repository.
+The terminal demo is generated from committed VHS sources in this repository.
 
 Pinned team usage:
 
@@ -384,7 +384,7 @@ See `docs/ci-summary.md`.
 ```bash
 agentloop release-notes
 agentloop release-notes --from v0.19.0 --to HEAD
-agentloop release-notes --release-version 0.24.4
+agentloop release-notes --release-version 0.24.5
 agentloop release-notes --json
 agentloop release-notes --write
 ```
@@ -450,7 +450,7 @@ Use `agentloop check-gates --strict` as a review-evidence gate in pull request C
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
-See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.24.4` or a newer vetted release when reproducibility matters.
+See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.24.5` or a newer vetted release when reproducibility matters.
 
 ## PR Summaries
 
