@@ -26,7 +26,7 @@ For each release:
 6. Let `.github/workflows/publish.yml` publish to npm through trusted publishing.
 7. Let `.github/workflows/docker.yml` publish the GHCR image from the GitHub release.
 8. Let `.github/workflows/publish-mcp.yml` submit MCP Registry metadata after npm publishes.
-9. Verify npm with `agentloop npm-status --expect-current`.
+9. Verify npm with `agentloop npm-status --agentloopkit --expect-current`.
 
 Do not put temporary publish failures, local auth state, or registry repair notes in the README.
 

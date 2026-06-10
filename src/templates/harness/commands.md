@@ -27,7 +27,7 @@ Rules:
 - Use `agentloop ci-summary --write` in CI when reviewers need a compact provenance and evidence summary.
 - Use `agentloop release-notes --write` before a release when reviewers need local release-note evidence.
 - Use `agentloop npm-status` after release attempts to check whether npm latest matches local package metadata.
-- Use `agentloop npm-status --expect-current` as a post-publish smoke check. It never publishes or reads credentials.
+- Use `agentloop npm-status --agentloopkit --expect-current` as an AgentLoopKit post-publish smoke check from any directory. It never publishes or reads credentials.
 - Run targeted checks while developing.
 - Run configured verification before claiming completion.
 - If a command fails, report the failure and fix it when reasonable.
@@ -43,7 +43,7 @@ Use `agentloop ci-summary --write` after verification and handoff when CI should
 
 Use `agentloop release-notes --write` after verification when a release workflow needs a local release-note draft from changelog, git, task, verification, and CI-summary evidence. It does not create tags, publish packages, call provider APIs, or read tokens.
 
-Use `agentloop npm-status` when release docs mention npm availability. It runs `npm view` only when invoked, or reads captured registry JSON with `--registry-json`. It does not publish packages, read tokens, read `.env` files, or change package metadata.
+Use `agentloop npm-status` when release docs mention npm availability. Use `--agentloopkit` when checking AgentLoopKit itself from a temp release-smoke folder or CI workspace. The command runs `npm view` only when invoked, or reads captured registry JSON with `--registry-json`. It does not publish packages, read tokens, read `.env` files, or change package metadata.
 
 `check-gates` checks evidence. It does not prove the code is correct and does not replace review.
 

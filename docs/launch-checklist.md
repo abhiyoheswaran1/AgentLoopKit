@@ -199,7 +199,7 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] GHCR image `ghcr.io/abhiyoheswaran1/agentloopkit:0.27.0` is published.
 - [x] MCP Registry metadata for `io.github.abhiyoheswaran1/agentloopkit` is published for `0.27.0`.
 - [x] npm trusted publishing is configured for this repository.
-- [x] `agentloop npm-status --expect-current` passes after npm publish.
+- [x] `agentloop npm-status --agentloopkit --expect-current` passes after npm publish.
 - [x] Current publish guidance tells maintainers to continue from the current source version, not stale intermediate versions.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
 - [x] No `postinstall` script exists.
@@ -269,7 +269,7 @@ Preferred path:
    - Allowed action: `npm publish`
 3. Publish the GitHub release, or rerun the manual Publish workflow for an existing release.
 4. Confirm the publish workflow either skips an existing version or publishes the new version.
-5. Run `agentloop npm-status --expect-current`.
+5. Run `agentloop npm-status --agentloopkit --expect-current`.
 6. Run `npx agentloopkit init --dry-run` from a separate test repo.
 
 Historical recovery note:

@@ -57,6 +57,6 @@ If the working tree is dirty, commit or stash those changes before publishing. T
 
 ## npm Status
 
-Run `agentloop npm-status` before claiming npm availability. After a publish, use `agentloop npm-status --expect-current` and wait for it to pass before updating public docs.
+Run `agentloop npm-status` before claiming npm availability. After an AgentLoopKit publish, use `agentloop npm-status --agentloopkit --expect-current` and wait for it to pass before updating public docs, especially from temp release-smoke folders or CI workspaces.
 
 If npm ever lags behind GitHub releases again, publish the current prepared release rather than backfilling old versions from newer source. Record the reason in maintainer docs and release notes, not in the user-facing README.

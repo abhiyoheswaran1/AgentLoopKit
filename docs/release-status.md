@@ -21,10 +21,10 @@ Run the local registry check at any time:
 
 ```bash
 agentloop npm-status
-agentloop npm-status --expect-current
+agentloop npm-status --agentloopkit --expect-current
 ```
 
-`--expect-current` should pass when `package.json` matches npm latest.
+`--agentloopkit --expect-current` should pass when the running AgentLoopKit package version matches npm latest, even from a temp release-smoke folder.
 
 ## Use The Current CLI Today
 
@@ -62,7 +62,7 @@ Use the GitHub Actions publish workflow for the next release after release metad
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - `.github/workflows/publish.yml` has `id-token: write`.
 - `package.json` and `CHANGELOG.md` agree on the next version.
-- `agentloop npm-status --expect-current` passes before bumping, or the version gap is explained in release notes.
+- `agentloop npm-status --agentloopkit --expect-current` passes before bumping from a temp or CI workspace, or the version gap is explained in release notes.
 
 Do not publish stale intermediate versions from current `main`. If an old version must be reproduced, use its matching GitHub tag or release tarball.
 
@@ -70,7 +70,7 @@ After each publish:
 
 - update this page with the new npm proof;
 - update `docs/npm-publishing.md`, `docs/launch-checklist.md`, and `FINAL_HANDOFF.md`;
-- run `agentloop npm-status --expect-current`;
+- run `agentloop npm-status --agentloopkit --expect-current`;
 - verify `npx --yes agentloopkit@<version> version`.
 
 ## Verification Evidence
@@ -99,7 +99,7 @@ Latest release-status documentation checks also passed:
 - `npx --no-install agentloop version`
 - `npx --no-install agentloopkit version`
 - `npx --no-install agentloop init --dry-run`
-- `node dist/cli/index.js npm-status --expect-current`
+- `node dist/cli/index.js npm-status --agentloopkit --expect-current`
 - `npx pnpm@10.12.1 check:links`
 - `git diff --check`
 - `node scripts/prepublish-check.mjs`

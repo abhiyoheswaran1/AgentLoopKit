@@ -4183,3 +4183,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The new flag fixes the exact release-smoke failure without changing the default behavior for other packages.
 - Improve:
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-10: Propagate npm-status Self Check Guidance
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-propagate-npm-status-self-check-guidance.md`
+- Trigger:
+  - After adding `agentloop npm-status --agentloopkit`, generated harness guidance and release docs still mostly described local-package checks.
+  - Future release smoke work could repeat the temp-folder package-name mistake.
+- Implementation:
+  - Updated repo harness commands and generated harness command templates.
+  - Updated generated `.agentloop/README.md` template release-smoke examples.
+  - Updated forward-looking release docs to use `agentloop npm-status --agentloopkit --expect-current` for AgentLoopKit publish proof.
+  - Left historical release records intact.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-22-46-verification-report.md`, overall status pass.
+  - Markdown link check passed: 661 files.
+  - Focused init and template-renderer tests passed: 2 files, 13 tests.
+  - Full AgentLoop verification passed with configured Vitest, lint, typecheck, build, and format commands.
+  - `projscan doctor` remained A 97/100 with the known informational unused-export note in `scripts/smoke-packed-release.mjs`.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-10-22-46-pr-summary.md`
+- What worked well:
+  - The docs now describe the exact release smoke mode without changing runtime behavior.
+- Improve:
+  - Keep this unreleased until the planned `0.28.0` batch.

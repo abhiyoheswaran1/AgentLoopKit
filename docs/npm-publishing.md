@@ -70,10 +70,10 @@ Historical rule:
 Post-publish smoke check:
 
 ```bash
-agentloop npm-status --expect-current
+agentloop npm-status --agentloopkit --expect-current
 ```
 
-The command exits with code `1` unless npm latest matches `package.json`. It runs `npm view` only when invoked and never publishes, reads npm tokens, reads `.env` files, or changes package metadata.
+The command exits with code `1` unless npm latest matches the running AgentLoopKit package version. It runs `npm view` only when invoked and never publishes, reads npm tokens, reads `.env` files, or changes package metadata.
 
 Pre-release packed-package smoke check:
 
@@ -318,7 +318,7 @@ Preferred release path:
 1. Prepare release metadata.
 2. Publish the GitHub release.
 3. Let `.github/workflows/publish.yml` run `npm publish` through OIDC.
-4. Verify npm with `agentloop npm-status --expect-current`.
+4. Verify npm with `agentloop npm-status --agentloopkit --expect-current`.
 
 Trusted publisher settings:
 
