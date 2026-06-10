@@ -30,6 +30,28 @@ Before changing code:
 - Run the configured verification commands before claiming completion.
 - Generate a handoff summary with changed files, tests run, risks, and rollback notes.
 
+Agent roster:
+
+Use these roles as routing hints when a coding-agent session needs focused expertise. One session may cover multiple roles, but the handoff should name which roles mattered.
+
+- Product Maintainer: Use for scope, positioning, roadmap, backlog, and release-channel decisions. Owns README claims, ROADMAP.md, DECISIONS.md, and public tradeoffs.
+- CLI Engineer: Use for command behavior, flags, JSON output, exit codes, path handling, and package-manager detection. Owns `src/cli/`, `src/core/`, and command tests.
+- Template and Harness Engineer: Use for `init`, generated files, `.agentloop/` structure, task templates, policies, gates, and agent instructions. Owns `src/templates/`, template tests, and migration notes.
+- Verification Engineer: Use for Vitest coverage, smoke scripts, CI workflows, release gates, and reproducible evidence. Owns `tests/`, `scripts/`, `.github/workflows/`, and verification reports.
+- Security Reviewer: Use for file writes, command execution, env-file handling, dependency changes, publishing, and registry metadata. Blocks unsafe defaults and requires transparent user-facing behavior.
+- Release Engineer: Use for npm, GitHub Releases, GHCR, Homebrew tap, MCP Registry, changelog entries, version bumps, tarballs, checksums, and post-release proof.
+- Docs and DX Writer: Use for README, getting-started docs, examples, CLI copy, error messages, and install instructions. Keeps public docs user-facing and removes maintainer-only notes.
+- Agent Compatibility Engineer: Use for Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and generic-agent guidance. Keeps instructions tool-agnostic unless behavior is implemented.
+- MCP and Automation Engineer: Use for read-only MCP server behavior, GitHub Action usage, CI summaries, and automation docs. Keeps automation local-first and reviewable.
+- Repo Steward: Use for cleanup, file organization, small diffs, issue templates, contribution paths, and preserving unrelated user work.
+
+When splitting work across agents:
+
+- Keep the active task contract as the source of truth.
+- Give each agent a disjoint file scope when possible.
+- Do not let background work bypass verification, review, or handoff.
+- Merge outputs through one final reviewer before claiming completion.
+
 Safety rules:
 
 - Treat migrations, auth, billing, deployment, lockfiles, public APIs, and security code as high-risk.

@@ -3644,7 +3644,6 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Task contracts:
   - `.agentloop/tasks/2026-06-10-build-mcp-server-prerequisite.md`
   - `.agentloop/tasks/2026-06-10-publish-mcp-registry-entry.md`
-  - `.agentloop/tasks/2026-06-10-add-homebrew-tap-distribution.md`
   - `.agentloop/tasks/2026-06-10-add-docker-ghcr-image.md`
   - `.agentloop/tasks/2026-06-10-add-github-action-wrapper.md`
 - Product cycle: `.agentloop/research/interview-cycle-108.md`
@@ -3658,7 +3657,6 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Added MCP Registry publish workflow gated on successful npm publishing.
   - Added root `action.yml`.
   - Added Dockerfile and GHCR release workflow.
-  - Added Homebrew formula template.
   - Updated README, MCP docs, distribution docs, GitHub Actions docs, examples, backlog, decisions, roadmap, and changelog.
 - Verification run so far:
   - Focused MCP tests: `npm test -- tests/mcp-tools.test.ts tests/mcp-server.test.ts`: pass.
@@ -3682,10 +3680,65 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - npm Publish workflow `27283286721` passed for `0.26.1`.
   - Docker/GHCR workflow `27283287182` passed for `0.26.1`.
   - MCP Registry workflow `27283372191` passed for `0.26.1`.
-  - Homebrew tap `abhiyoheswaran1/homebrew-agentloopkit` published formula `0.26.1`; `brew install`, `agentloop version`, `agentloopkit version`, and `brew test` passed.
 - Worked well:
   - Keeping MCP read-only preserved the safety model while giving agents better structured access than filesystem scraping.
   - The distribution artifacts reuse the existing CLI instead of creating separate behavior.
 - Improve:
   - Add Scoop and WinGet manifests only after Windows smoke testing.
   - Consider VS Code/Open VSX only after a clear editor workflow exists.
+
+## 2026-06-10: AGENTS.md Specialist Roster
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-agents-md-specialist-roster.md`
+- Trigger:
+  - Maintainer clarified that "sub-agents" meant reusable specialist role definitions inside `AGENTS.md`, not live runtime delegation.
+  - Future Codex, Claude Code, Cursor, OpenCode, Gemini CLI, and similar sessions need clearer routing guidance for product, release, docs, security, testing, and distribution work.
+- Product changes:
+  - Added an `Agent roster` section to this repository's `AGENTS.md`.
+  - Added the same roster to the generated `src/templates/root/AGENTS.md`.
+  - Documented the generated roster in README.
+  - Added init test coverage for the generated roster.
+  - Updated the changelog for the next release.
+- Verification run:
+  - Focused init test: `npx --yes pnpm@10.12.1 test tests/init.test.ts`: pass, 11 tests.
+  - Full Vitest suite: `npx --yes pnpm@10.12.1 test`: pass, 33 files and 146 tests.
+  - Typecheck: `npx --yes pnpm@10.12.1 typecheck`: pass.
+  - Lint: `npx --yes pnpm@10.12.1 lint`: pass.
+  - Build: `npx --yes pnpm@10.12.1 build`: pass.
+  - Markdown links: `npx --yes pnpm@10.12.1 check:links`: pass, 601 files checked.
+  - Formatting check: `npx --yes prettier@3.7.4 --check CHANGELOG.md AGENTS.md src/templates/root/AGENTS.md tests/init.test.ts README.md`: pass.
+  - Projscan: `npx --yes projscan doctor --format markdown`: A, 97/100, with one existing informational unused-export warning for `scripts/smoke-packed-release.mjs`.
+  - AgentLoop verification: `.agentloop/reports/2026-06-10-16-48-verification-report.md`, overall status pass.
+- Handoff generated:
+  - `.agentloop/handoffs/2026-06-10-16-49-pr-summary.md`
+- Worked well:
+  - The roster gives agents concrete responsibilities without adding a runtime orchestrator.
+  - Keeping it in the root template means new `agentloop init` users get the guidance.
+- Improve:
+  - Consider a future `agentloop roles` command only if users want machine-readable role definitions. Do not build that before the template proves useful.
+
+## 2026-06-10: Remove Homebrew Tap Channel
+
+- Task contract: `.agentloop/tasks/2026-06-10-remove-homebrew-tap-channel.md`
+- Trigger:
+  - Maintainer rejected the temporary tap path because it is not Homebrew Core and should not be treated as a real release channel.
+- Product changes:
+  - Removed the Homebrew formula artifact from `packaging/homebrew/`.
+  - Removed Homebrew tap claims from README, release-status docs, launch checklist, distribution docs, roadmap, npm publishing docs, and final handoff.
+  - Removed the Homebrew formula test from distribution artifact coverage.
+  - Updated backlog to reject tap maintenance unless Homebrew Core becomes realistic later.
+- GitHub repo deletion:
+  - Attempted `gh repo delete abhiyoheswaran1/homebrew-agentloopkit --yes`.
+  - GitHub refused with `HTTP 403` because the current token lacks the `delete_repo` scope.
+  - Required maintainer step: `gh auth refresh -h github.com -s delete_repo`, then rerun the delete command.
+- Verification:
+  - Focused distribution/init tests: `npx --yes pnpm@10.12.1 test tests/distribution-artifacts.test.ts tests/init.test.ts`: pass, 15 tests.
+  - Full Vitest suite: `npx --yes pnpm@10.12.1 test`: pass, 33 files and 145 tests.
+  - Typecheck: `npx --yes pnpm@10.12.1 typecheck`: pass.
+  - Lint: `npx --yes pnpm@10.12.1 lint`: pass.
+  - Build: `npx --yes pnpm@10.12.1 build`: pass.
+  - Markdown links: `npx --yes pnpm@10.12.1 check:links`: pass, 604 files checked.
+  - Formatting check: `npx --yes prettier@3.7.4 --check ...`: pass.
+  - Whitespace: `git diff --check`: pass.
+  - Projscan: `npx --yes projscan doctor --format markdown`: A, 97/100, with one existing informational unused-export warning for `scripts/smoke-packed-release.mjs`.
+  - AgentLoop verification: `.agentloop/reports/2026-06-10-16-57-verification-report.md`, overall status pass.

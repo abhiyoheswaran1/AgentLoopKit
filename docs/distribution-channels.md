@@ -4,14 +4,13 @@ This page is for maintainers planning releases. Keep the README focused on user 
 
 ## Current Channels
 
-| Channel | Status | User command |
-| --- | --- | --- |
-| npm / npx | Primary channel | `npx agentloopkit init` |
-| GitHub Releases | Public release assets | Download `agentloopkit-<version>.tgz` from GitHub |
-| GitHub Action | Live repo action | `uses: abhiyoheswaran1/AgentLoopKit@v0.26.1` |
-| Docker / GHCR | Live image | `docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:0.26.1 doctor` |
-| Homebrew | Live tap | `brew install abhiyoheswaran1/agentloopkit/agentloopkit` |
-| MCP Registry | Published metadata | `npx --yes agentloopkit@0.26.1 mcp-server` |
+| Channel         | Status                | User command                                                                              |
+| --------------- | --------------------- | ----------------------------------------------------------------------------------------- |
+| npm / npx       | Primary channel       | `npx agentloopkit init`                                                                   |
+| GitHub Releases | Public release assets | Download `agentloopkit-<version>.tgz` from GitHub                                         |
+| GitHub Action   | Live repo action      | `uses: abhiyoheswaran1/AgentLoopKit@v0.26.1`                                              |
+| Docker / GHCR   | Live image            | `docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:0.26.1 doctor` |
+| MCP Registry    | Published metadata    | `npx --yes agentloopkit@0.26.1 mcp-server`                                                |
 
 ## Release Rule
 
@@ -22,13 +21,12 @@ For each release:
 1. Prepare `package.json`, `server.json`, `CHANGELOG.md`, docs, and release notes.
 2. Run the full local verification set.
 3. Build and pack the package.
-4. Replace the Homebrew formula checksum with the packed tarball SHA-256.
-5. Push the release commit and tag.
-6. Publish the GitHub release with the packed tarball.
-7. Let `.github/workflows/publish.yml` publish to npm through trusted publishing.
-8. Let `.github/workflows/docker.yml` publish the GHCR image from the GitHub release.
-9. Let `.github/workflows/publish-mcp.yml` submit MCP Registry metadata after npm publishes.
-10. Verify npm with `agentloop npm-status --expect-current`.
+4. Push the release commit and tag.
+5. Publish the GitHub release with the packed tarball.
+6. Let `.github/workflows/publish.yml` publish to npm through trusted publishing.
+7. Let `.github/workflows/docker.yml` publish the GHCR image from the GitHub release.
+8. Let `.github/workflows/publish-mcp.yml` submit MCP Registry metadata after npm publishes.
+9. Verify npm with `agentloop npm-status --expect-current`.
 
 Do not put temporary publish failures, local auth state, or registry repair notes in the README.
 
@@ -64,26 +62,6 @@ docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:0.26.1
 
 The image does not bundle project dependencies. Users still install their own repo dependencies before running verification commands that require them.
 
-## Homebrew
-
-The formula lives at `packaging/homebrew/agentloopkit.rb`.
-
-Before publishing the tap:
-
-1. Build and pack the exact release.
-2. Compute the SHA-256 for `agentloopkit-<version>.tgz`.
-3. Update the formula `url`, `sha256`, and versioned tests.
-4. Copy the formula into the tap repo at `Formula/agentloopkit.rb`.
-5. Run:
-
-```bash
-brew audit --strict --online Formula/agentloopkit.rb
-brew install --build-from-source Formula/agentloopkit.rb
-agentloop version
-```
-
-The formula installs the release tarball with Homebrew's npm install helper and symlinks `agentloop` and `agentloopkit`. It has no postinstall hook.
-
 ## MCP Registry
 
 AgentLoopKit includes a read-only MCP server:
@@ -98,10 +76,10 @@ See [mcp.md](mcp.md).
 
 ## Planned Channels
 
-| Priority | Channel | Why it matters | Decision |
-| --- | --- | --- | --- |
-| P2 | VS Code / Open VSX extension | Helps editor-first users run the loop without leaving the IDE | Later, only after editor UX is scoped |
-| P2 | Scoop / WinGet | Better Windows install path for CLI users | Later, after Windows smoke tests and release checksums |
+| Priority | Channel                      | Why it matters                                                | Decision                                               |
+| -------- | ---------------------------- | ------------------------------------------------------------- | ------------------------------------------------------ |
+| P2       | VS Code / Open VSX extension | Helps editor-first users run the loop without leaving the IDE | Later, only after editor UX is scoped                  |
+| P2       | Scoop / WinGet               | Better Windows install path for CLI users                     | Later, after Windows smoke tests and release checksums |
 
 ## Product Panel Notes
 

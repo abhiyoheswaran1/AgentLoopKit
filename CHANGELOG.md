@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Added a specialist agent roster to generated `AGENTS.md` and this repository's own `AGENTS.md`, with roles for product, CLI, templates, verification, security, release, docs, compatibility, MCP, and repo stewardship.
+- Documented the generated roster in the README and added init coverage so future template changes keep it in place.
+- Removed the temporary Homebrew tap/formula channel from release docs and distribution tests. npm/npx remains the primary install path.
 
 ## 0.26.1
 

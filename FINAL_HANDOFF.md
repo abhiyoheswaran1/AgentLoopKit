@@ -61,7 +61,6 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Publish workflow run: `27283286721`
 - Docker workflow run: `27283287182`
 - MCP Registry workflow run: `27283372191`
-- Homebrew tap: <https://github.com/abhiyoheswaran1/homebrew-agentloopkit>
 - Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.26.1`
 
 ## CLI commands
@@ -1036,7 +1035,7 @@ Current publish state:
 
 - GitHub release `v0.26.1` is public.
 - npm latest is `0.26.1`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, and `0.26.1`.
-- GHCR, MCP Registry, and the Homebrew tap are live for `0.26.1`.
+- GHCR and MCP Registry are live for `0.26.1`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.
@@ -2210,17 +2209,16 @@ Title: I built a local-first engineering loop for coding agents
 ## Next 15 improvements
 
 1. Add a reusable tarball smoke script for release candidates: high trust value, low effort, low maintenance.
-2. Add a Homebrew tap: high install value for macOS/Linux, medium effort, medium maintenance.
-3. Add a Docker/GHCR image for CI: high team usefulness, medium effort, medium security review.
-4. Add a thin GitHub Action wrapper: high CI adoption value, medium effort, medium maintenance.
-5. Build a read-only MCP server: medium star potential, high effort, high safety review.
-6. Publish to MCP Registry after the MCP server exists: medium discovery value, medium effort.
-7. Add Scoop and WinGet manifests: medium Windows value, medium effort.
-8. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
-9. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
-10. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
-11. Add more packed-tarball smoke fixtures for release recovery flows: medium trust improvement, low effort.
-12. Add GitLab CI and Buildkite retry/parallelism guidance after provider-specific provenance sees use: medium usefulness, low effort.
-13. Add Rails and Laravel task-contract recipes if contributors ask for them: medium usefulness, low effort.
-14. Add package-manager-specific dependency-upgrade recipes for npm, yarn, and bun: medium usefulness, low effort.
-15. Add npm-status examples for GitHub Actions release workflows after the next trusted-publishing release is verified: medium trust improvement, low effort.
+2. Add a Docker/GHCR image for CI: high team usefulness, medium effort, medium security review.
+3. Add a thin GitHub Action wrapper: high CI adoption value, medium effort, medium maintenance.
+4. Build a read-only MCP server: medium star potential, high effort, high safety review.
+5. Publish to MCP Registry after the MCP server exists: medium discovery value, medium effort.
+6. Add Scoop and WinGet manifests: medium Windows value, medium effort.
+7. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
+8. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
+9. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
+10. Add more packed-tarball smoke fixtures for release recovery flows: medium trust improvement, low effort.
+11. Add GitLab CI and Buildkite retry/parallelism guidance after provider-specific provenance sees use: medium usefulness, low effort.
+12. Add Rails and Laravel task-contract recipes if contributors ask for them: medium usefulness, low effort.
+13. Add package-manager-specific dependency-upgrade recipes for npm, yarn, and bun: medium usefulness, low effort.
+14. Add npm-status examples for GitHub Actions release workflows after the next trusted-publishing release is verified: medium trust improvement, low effort.

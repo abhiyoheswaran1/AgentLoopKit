@@ -173,7 +173,6 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] Package `agentloopkit@0.26.1` is published through GitHub trusted publishing.
 - [x] GHCR image `ghcr.io/abhiyoheswaran1/agentloopkit:0.26.1` is published.
 - [x] MCP Registry metadata for `io.github.abhiyoheswaran1/agentloopkit` is published.
-- [x] Homebrew tap formula for `agentloopkit@0.26.1` is published and verified.
 - [x] npm trusted publishing is configured for this repository.
 - [x] `agentloop npm-status --expect-current` passes after npm publish.
 - [x] Current publish guidance tells maintainers to continue from the current source version, not stale intermediate versions.
@@ -340,7 +339,6 @@ Historical recovery note:
 - GitHub Publish workflow for `v0.26.1` (run `27283286721`) passed package checks and published to npm.
 - Docker workflow for `v0.26.1` (run `27283287182`) passed and published the GHCR image.
 - MCP Registry workflow for `v0.26.1` (run `27283372191`) passed and published registry metadata.
-- Homebrew tap formula for `0.26.1` is published and verified.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
 - npm latest is `0.26.1`; registry versions include `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, and `0.26.1`.

@@ -25,6 +25,8 @@ AgentLoopKit generates:
 - `agentloop.config.json`
 - `.agentloop/` with task templates, gates, policies, reports, handoffs, and agent instructions
 
+Generated `AGENTS.md` also includes a specialist roster for product, CLI, template, verification, security, release, docs, compatibility, MCP, and repo-steward work. It helps future agent sessions split work cleanly without adding a background service.
+
 ## Why It Exists
 
 Coding agents often move fast but leave reviewers with weak evidence: unclear scope, missing tests, broad diffs, and vague summaries. AgentLoopKit gives the agent a repo-local contract:
@@ -124,7 +126,7 @@ pnpm build
 | --------------------------------------- | ------------------------------------------------------------------------------ |
 | `agentloop init`                        | Generate the repo harness and config                                           |
 | `agentloop init --dry-run`              | Preview generated files without writing them                                   |
-| `agentloop init --force`                | Allow initialization when the current directory is your home directory          |
+| `agentloop init --force`                | Allow initialization when the current directory is your home directory         |
 | `agentloop init --local-only`           | Generate the harness but exclude it from this clone's git status               |
 | `agentloop doctor`                      | Check setup health, template version, commands, git state, and risk categories |
 | `agentloop create-task`                 | Create a task contract in `.agentloop/tasks/`                                  |
@@ -482,7 +484,6 @@ npm and npx remain the primary install path. AgentLoopKit also ships release ass
 - GitHub Releases: versioned tarballs for provenance and rollback.
 - GitHub Action: a thin wrapper for `agentloop` commands in CI.
 - Docker/GHCR: a minimal image that runs `agentloop`.
-- Homebrew: a formula under `packaging/homebrew/` for the tap release flow.
 - MCP Registry: read-only server metadata for MCP clients once the matching npm package is published.
 
 See `docs/distribution-channels.md` for current commands and maintainer release steps.

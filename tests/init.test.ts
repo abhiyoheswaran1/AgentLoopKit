@@ -41,6 +41,13 @@ describe('init', () => {
     );
     expect(config).toContain('"name": "demo"');
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).resolves.toContain('Specify');
+    await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toContain('Agent roster:');
+    await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toContain(
+      'Release Engineer',
+    );
+    await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toContain(
+      'Agent Compatibility Engineer',
+    );
     await expect(readFile(path.join(dir, '.agentloop/README.md'), 'utf8')).resolves.toContain(
       'agentloop create-task',
     );

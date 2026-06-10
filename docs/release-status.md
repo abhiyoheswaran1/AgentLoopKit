@@ -12,7 +12,6 @@ Last checked: June 10, 2026.
 - Publish workflow run: `27283286721` passed and published `agentloopkit@0.26.1` through npm trusted publishing
 - Docker workflow run: `27283287182` passed and published the GHCR image for `0.26.1`
 - MCP Registry workflow run: `27283372191` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
-- Homebrew tap: <https://github.com/abhiyoheswaran1/homebrew-agentloopkit> with formula `0.26.1`
 - Manual npm publish: succeeded for `agentloopkit@0.24.0` after browser authentication
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 - npm latest: `0.26.1`
@@ -105,4 +104,3 @@ Latest release-status documentation checks also passed:
 - `npx projscan doctor --format markdown`
 - AgentLoop verification with Vitest, lint, typecheck, and build
 - GitHub release asset digest matched the local tarball SHA-256
-- Homebrew tap install, `agentloop version`, `agentloopkit version`, and `brew test`

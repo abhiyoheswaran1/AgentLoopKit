@@ -36,7 +36,9 @@ describe('distribution artifacts', () => {
 
     expect(action).toContain('using: composite');
     expect(action).toContain('agentloopkit-version');
-    expect(action).toContain('npm install --no-save "agentloopkit@${{ inputs.agentloopkit-version }}"');
+    expect(action).toContain(
+      'npm install --no-save "agentloopkit@${{ inputs.agentloopkit-version }}"',
+    );
     expect(action).toContain('npx --no-install agentloop ${{ inputs.command }}');
     expect(action).not.toContain('upload-artifact');
   });
@@ -52,24 +54,5 @@ describe('distribution artifacts', () => {
     expect(workflow).toContain('ghcr.io/${{ github.repository_owner }}/agentloopkit');
     expect(workflow).toContain('docker/build-push-action');
     expect(workflow).toContain('push: true');
-  });
-
-  test('Homebrew formula installs the GitHub release tarball without postinstall hooks', async () => {
-    const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
-    const formula = await readFile('packaging/homebrew/agentloopkit.rb', 'utf8');
-
-    expect(formula).toContain('class Agentloopkit < Formula');
-    expect(formula).toContain(
-      `releases/download/v${packageJson.version}/agentloopkit-${packageJson.version}.tgz`,
-    );
-    expect(formula).toMatch(/sha256 "[a-f0-9]{64}"/);
-    expect(formula).not.toContain(
-      'sha256 "0000000000000000000000000000000000000000000000000000000000000000"',
-    );
-    expect(formula).toContain('std_npm_args');
-    expect(formula).toContain('bin.install_symlink libexec/"bin/agentloop"');
-    expect(formula).toContain('agentloop version');
-    expect(formula).not.toContain('post_install');
-    expect(formula).not.toContain('curl');
   });
 });
