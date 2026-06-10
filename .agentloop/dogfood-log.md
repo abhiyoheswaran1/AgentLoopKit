@@ -3800,3 +3800,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The stale active task appeared during normal AgentLoopKit dogfooding, so the fix addresses a real loop cleanup issue.
 - Improve:
   - Consider a future `agentloop task finish` only if users repeatedly need a single command that verifies, hands off, marks done, and archives.
+
+## 2026-06-10: Release 0.26.3 Status Cleanup Patch
+
+- Task contract: `.agentloop/tasks/2026-06-10-prepare-0-26-3-status-cleanup-release.md`
+- Trigger:
+  - The status cleanup fix changed user-facing CLI behavior after `v0.26.2`.
+  - Maintainer release policy is to publish current fixes through GitHub Releases and npm trusted publishing.
+- Release proof:
+  - GitHub release `v0.26.3` is public with attached `agentloopkit-0.26.3.tgz`.
+  - GitHub release tarball SHA-256: `48bc379e41293cbcbc74facbf111548a307fb1bf3a179a0a08121cd2aa4c9c85`.
+  - npm Publish workflow `27294103749` passed and published `agentloopkit@0.26.3`.
+  - Docker/GHCR workflow `27294103779` passed for `0.26.3`.
+  - MCP Registry workflow `27294196815` passed for `0.26.3`.
+  - `npm view agentloopkit version versions --json` reports `latest: 0.26.3`.
+  - Direct temp install of `agentloopkit@0.26.3` printed `0.26.3` for both `agentloop version` and `agentloopkit version`, and `agentloop init --dry-run` completed.
+- Verification run:
+  - Release verification: `.agentloop/reports/2026-06-10-19-30-verification-report.md`, overall status pass.
+  - Verification included prepublish metadata, full Vitest, typecheck, lint, build, Markdown link check, release smoke, dry-run npm publish, projscan, and whitespace checks.
+- Worked well:
+  - Trusted publishing, GHCR, and MCP Registry workflows all completed from the GitHub release.
+- Improve:
+  - Keep post-release status docs in a follow-up commit whenever workflow IDs and registry proof are only available after the tag is released.
