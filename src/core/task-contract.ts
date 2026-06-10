@@ -10,6 +10,7 @@ export type TaskType =
   | 'bugfix'
   | 'refactor'
   | 'tests'
+  | 'test-generation'
   | 'docs'
   | 'release'
   | 'security-review'

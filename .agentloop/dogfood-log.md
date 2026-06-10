@@ -4589,3 +4589,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider moving public-doc hygiene checks into a dedicated docs-quality script if more checks accumulate.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Support `test-generation` Task Type
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-support-test-generation-task-type.md`
+- Trigger:
+  - Dogfooding attempted `create-task --type test-generation` because the repository ships `src/templates/loops/test-generation.md`.
+  - The CLI did not accept that type and dropped into the interactive picker.
+- Implementation:
+  - Added `test-generation` to supported task types.
+  - Added a non-interactive CLI regression test.
+  - Documented supported task types in README, task-contract docs, and generated task README.
+  - Updated backlog and unreleased changelog.
+- Verification run:
+  - Red focused test timed out because the unsupported type entered the prompts flow.
+  - Focused create-task test passed after implementation.
+  - An initial verification run accidentally targeted the previous archived task path and produced an unavailable task-context report; that report was deleted before commit.
+  - `.agentloop/reports/2026-06-11-01-10-verification-report.md`, overall status pass.
+  - Full configured verification passed: Vitest 34 files and 183 tests, lint, typecheck, and build.
+  - Task-command dogfood passed: focused create-task test, full Vitest, Markdown link check, `projscan doctor`, and `git diff --check`.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-11-01-11-pr-summary.md`
+- What worked well:
+  - The fixed CLI created this task contract with `--type test-generation`, so the dogfood path directly exercised the change.
+- Improve:
+  - Consider a friendlier non-interactive error for unsupported `--type` values instead of falling into prompts when title is present.
+  - Keep this unreleased until the planned `0.28.0` batch.

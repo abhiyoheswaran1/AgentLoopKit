@@ -124,6 +124,36 @@ describe('create-task command', () => {
     expect(markdown).toContain('Revert the docs-only update.');
   });
 
+  test('accepts test-generation as a non-interactive task type', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Add regression coverage',
+        '--type',
+        'test-generation',
+        '--out',
+        '.agentloop/tasks/test-generation.md',
+        '--acceptance',
+        'Regression test fails before implementation',
+      ],
+      { cwd: dir },
+    );
+
+    const markdown = await readFile(path.join(dir, '.agentloop/tasks/test-generation.md'), 'utf8');
+    expect(markdown).toContain('- Task type: test-generation');
+    expect(markdown).toContain('- Regression test fails before implementation');
+  });
+
   test('prints created task details as JSON when requested', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

@@ -44,6 +44,7 @@ export const TASK_TYPES = [
   'bugfix',
   'refactor',
   'tests',
+  'test-generation',
   'docs',
   'release',
   'security-review',

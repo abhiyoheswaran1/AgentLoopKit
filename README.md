@@ -247,6 +247,8 @@ agentloop create-task --type feature --title "Add settings page" \
   --rollback "Remove the settings route"
 ```
 
+Supported task types are `feature`, `bugfix`, `refactor`, `tests`, `test-generation`, `docs`, `release`, `security-review`, `dependency-upgrade`, and `migration`.
+
 Pin the contract when more than one task exists:
 
 ```bash

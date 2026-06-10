@@ -14,6 +14,7 @@
 - Added Git root and target-is-root context to `agentloop doctor` human and JSON output.
 - Added Git root and target-is-root context to `agentloop status` human and JSON output.
 - Added Git root and target-is-root context to `agentloop check-gates` human and JSON output.
+- Added `test-generation` as a supported `create-task --type` value and documented the supported task type list.
 - Added `agentloop verify --task-commands` to explicitly run commands listed in a task contract's `Verification Commands` section.
 - Added a verification report note when `--task-commands` is requested but no runnable task commands are found.
 - Added `taskCommands.requested` and `taskCommands.foundCount` to `agentloop verify --json`.

@@ -17,6 +17,8 @@ agentloop create-task --type bugfix --title "Fix checkout redirect" \
   --rollback "Revert the auth callback change"
 ```
 
+Supported task types are `feature`, `bugfix`, `refactor`, `tests`, `test-generation`, `docs`, `release`, `security-review`, `dependency-upgrade`, and `migration`.
+
 A contract includes:
 
 - problem statement
