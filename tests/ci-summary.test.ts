@@ -81,6 +81,8 @@ describe('ci-summary command', () => {
       reject: false,
       env: {
         CI: 'true',
+        GITHUB_ACTIONS: 'false',
+        BUILDKITE: 'false',
         GITLAB_CI: 'true',
         CI_PROJECT_PATH: 'owner/repo',
         CI_PIPELINE_SOURCE: 'merge_request_event',
@@ -112,6 +114,8 @@ describe('ci-summary command', () => {
       reject: false,
       env: {
         CI: 'true',
+        GITHUB_ACTIONS: 'false',
+        GITLAB_CI: 'false',
         BUILDKITE: 'true',
         BUILDKITE_PIPELINE_SLUG: 'agentloopkit',
         BUILDKITE_SOURCE: 'pull_request',
@@ -141,7 +145,7 @@ describe('ci-summary command', () => {
     const result = await execa(tsxPath, [cliPath, 'ci-summary'], {
       cwd: dir,
       reject: false,
-      env: { CI: 'true', GITHUB_ACTIONS: 'false' },
+      env: { CI: 'true', GITHUB_ACTIONS: 'false', GITLAB_CI: 'false', BUILDKITE: 'false' },
     });
 
     expect(result.exitCode).toBe(0);

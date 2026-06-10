@@ -3139,12 +3139,13 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Verification run:
   - Red test: `npx pnpm@10.12.1 test tests/verification.test.ts tests/ci-summary.test.ts` failed before implementation because both providers returned Generic CI.
   - Focused green test: `npx pnpm@10.12.1 test tests/verification.test.ts tests/ci-summary.test.ts`: pass, 2 files and 18 tests.
+  - CI-like regression reproduction: `GITHUB_ACTIONS=true GITHUB_REPOSITORY=owner/current GITHUB_RUN_ID=999 npx pnpm@10.12.1 test tests/ci-summary.test.ts -- --runInBand` failed before test isolation and passed after overriding unrelated provider flags in simulated provider env.
   - `npx pnpm@10.12.1 check:links`: pass, 516 Markdown files checked.
   - `git diff --check`: pass.
   - `npx projscan doctor --format markdown`: A, 100/100 after replacing token-like test fixture names.
-  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-add-gitlab-and-buildkite-ci-provenance.md`: pass, wrote `.agentloop/reports/2026-06-10-08-49-verification-report.md`.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-add-gitlab-and-buildkite-ci-provenance.md`: pass, wrote `.agentloop/reports/2026-06-10-08-53-verification-report.md`.
   - AgentLoop verification commands: Vitest 28 files and 117 tests, lint, typecheck, and build all passed.
-  - `npx tsx src/cli/index.ts handoff --task .agentloop/tasks/2026-06-10-add-gitlab-and-buildkite-ci-provenance.md --json`: pass, wrote `.agentloop/handoffs/2026-06-10-08-50-pr-summary.md`.
+  - `npx tsx src/cli/index.ts handoff --task .agentloop/tasks/2026-06-10-add-gitlab-and-buildkite-ci-provenance.md --json`: pass, wrote `.agentloop/handoffs/2026-06-10-08-54-pr-summary.md`.
 - Worked well:
   - The shared `detectCiContext` helper kept verification reports and CI summaries consistent.
 - Improve:
