@@ -3822,3 +3822,16 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Trusted publishing, GHCR, and MCP Registry workflows all completed from the GitHub release.
 - Improve:
   - Keep post-release status docs in a follow-up commit whenever workflow IDs and registry proof are only available after the tag is released.
+
+## 2026-06-10: Dogfood Done-Task Archive Recommendation
+
+- Trigger:
+  - After `v0.26.3`, `agentloop status` recommended archiving the completed active release task.
+- Action:
+  - Ran `agentloop task archive .agentloop/tasks/2026-06-10-prepare-0-26-3-status-cleanup-release.md`.
+  - The task moved to `.agentloop/tasks/archive/2026-06-10-prepare-0-26-3-status-cleanup-release.md`.
+- Result:
+  - The explicit active-task pointer was cleared.
+  - The new status command gave the expected cleanup instruction before the archive, then moved on to the next local evidence step.
+- Improve:
+  - Consider archiving older finished tasks in batches only if the normal task list becomes too noisy for maintainers.
