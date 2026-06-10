@@ -5,7 +5,7 @@
 ```bash
 agentloop release-notes
 agentloop release-notes --from v0.19.0 --to HEAD
-agentloop release-notes --release-version 0.26.4
+agentloop release-notes --release-version 0.26.5
 agentloop release-notes --json
 agentloop release-notes --write
 agentloop release-notes --write --out .agentloop/handoffs/release.md

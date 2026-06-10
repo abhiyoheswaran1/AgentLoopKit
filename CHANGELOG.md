@@ -2,7 +2,14 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.26.5
+
+Patch release for terminal task fallback cleanup:
+
 - Fixed fallback task selection so `status`, `next`, gates, handoffs, HTML reports, CI summaries, and release notes ignore unpinned terminal tasks marked `done`, `completed`, or `verified`.
+- Kept explicitly pinned `done` tasks visible so `status` and `next` recommend `agentloop task archive <path>`.
 
 ## 0.26.4
 
