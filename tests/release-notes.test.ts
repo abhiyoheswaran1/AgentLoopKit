@@ -110,6 +110,20 @@ describe('release-notes command', () => {
     expect(result.stdout).toContain('No release notes file was written.');
   });
 
+  test('accepts an explicit release version without colliding with the CLI version flag', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'release-notes', '--release-version', '9.9.9', '--json'],
+      { cwd: dir },
+    );
+
+    const output = JSON.parse(result.stdout);
+    expect(output.version).toBe('9.9.9');
+    expect(output.markdown).toContain('- Version: 9.9.9');
+  });
+
   test('handles an explicit missing from ref without pretending the range was read', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: true });
 

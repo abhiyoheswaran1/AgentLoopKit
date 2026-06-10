@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Current source and the latest GitHub release target `v0.20.0`. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.20.0` carry recent source snapshots. The next npm publish should catch up to the current GitHub line once; after that, releases return to normal sequential semver.
+Current source targets `v0.21.0`. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.20.0` carry recent source snapshots. The next npm publish should catch up to the current GitHub line once; after that, releases return to normal sequential semver.
 
 Run the CLI after install:
 
@@ -367,6 +367,7 @@ See `docs/ci-summary.md`.
 ```bash
 agentloop release-notes
 agentloop release-notes --from v0.19.0 --to HEAD
+agentloop release-notes --release-version 0.21.0
 agentloop release-notes --json
 agentloop release-notes --write
 ```
@@ -482,9 +483,9 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.20.0` carries the release-note handoff command and a tarball asset. npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
+AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. Current release prep targets `v0.21.0` for the next-action command and prepublish metadata guard. npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
 
-Current `main` has unreleased work after `v0.20.0`. Publish the `0.20.0` npm catch-up only from the matching GitHub release tarball or tag, not from current `main`.
+Do not publish stale older versions from current `main`. If `CHANGELOG.md` has real entries under `Unreleased`, the prepublish guard blocks npm publish until release metadata is prepared.
 
 The npm version jump is intentional. The skipped npm numbers already exist as public GitHub release candidates while npm publishing was blocked, so the next npm publish should ship the current release line rather than backfilling old source snapshots.
 

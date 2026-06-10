@@ -28,6 +28,8 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - local SVG evidence badges with `agentloop badge`
 - local CI provenance and evidence summaries with `agentloop ci-summary`
 - local release-note handoffs with `agentloop release-notes`
+- next-action shortcut with `agentloop next`
+- prepublish metadata guard that blocks npm publish while `CHANGELOG.md` has unreleased entries
 - read-only local policy inspection with `agentloop policy`
 - read-only local policy template status with `agentloop policy status`
 - verification reports with allowlisted CI context
@@ -62,6 +64,8 @@ agentloop task current --json
 agentloop task clear
 agentloop status
 agentloop status --json
+agentloop next
+agentloop next --json
 agentloop check-gates
 agentloop check-gates --json
 agentloop check-gates --strict
@@ -114,6 +118,30 @@ npx projscan doctor --format markdown
 ```
 
 Latest local verification:
+
+- `0.21.0` next-action and release-safety release-candidate verification:
+  - Task contracts: `.agentloop/tasks/2026-06-10-add-next-action-command.md`, `.agentloop/tasks/2026-06-10-add-publish-metadata-guard.md`, and `.agentloop/tasks/2026-06-10-prepare-v0-21-0-release.md`.
+  - Product cycles: `.agentloop/research/interview-cycle-079.md`, `.agentloop/research/interview-cycle-080.md`, and `.agentloop/research/interview-cycle-081.md`.
+  - Added `agentloop next` and `agentloop next --json`.
+  - Added status logic so older verification reports do not count as current evidence for newer in-progress tasks.
+  - Added `scripts/prepublish-check.mjs` and wired it into `prepublishOnly`.
+  - Added `agentloop release-notes --release-version <version>` after dogfooding caught a collision with the CLI's global `--version` flag.
+  - Red tests covered missing `next`, stale verification report handling, post-verification task status handling, missing prepublish guard behavior, and missing `--release-version` support.
+  - Latest focused guard test: `npx pnpm@10.12.1 test tests/prepublish-check.test.ts`: pass.
+  - Latest focused release-notes test: `npx pnpm@10.12.1 test tests/release-notes.test.ts`: pass, 1 file and 4 tests.
+  - `node scripts/prepublish-check.mjs`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 28 files and 105 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 448 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `git diff --check`: pass.
+  - `npm pack --pack-destination /tmp --silent`: pass, produced `/tmp/agentloopkit-0.21.0.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: pass; `agentloop version` reported `0.21.0`, `release-notes --release-version 0.21.0 --json` reported `0.21.0`, and `next --json` returned `agentloop create-task` after `init`.
+  - Local tarball SHA-256 before GitHub release: `3f7c1ee4042f6dd08d2fd2cc2ecdcc039f853f95afb56be666c5497d7a3fe4d5`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-04-41-verification-report.md`, overall status `pass`.
 
 - `0.20.0` release-note handoff release-candidate verification:
   - Task contract: `.agentloop/tasks/2026-06-10-add-release-notes-command.md`.

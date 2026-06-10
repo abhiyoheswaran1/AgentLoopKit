@@ -2640,3 +2640,39 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The guard catches the exact release-safety problem before npm credentials or network publish actions are involved.
 - Improve:
   - During the next release prep, move `Unreleased` entries into `0.21.0`, reset `Unreleased`, and verify that the guard passes.
+
+## 2026-06-10: 0.21.0 Release Prep
+
+- Task contract: `.agentloop/tasks/2026-06-10-prepare-v0-21-0-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-081.md`
+- Trigger:
+  - `main` contains `agentloop next` and the prepublish metadata guard after `v0.20.0`.
+  - npm still serves `0.1.1`, so the next GitHub/source release needs clear catch-up wording without pretending npm is current.
+  - During release notes dogfooding, `release-notes --version <version>` collided with the CLI's global `--version` flag.
+- Product changes in progress:
+  - Bumped package metadata toward `0.21.0`.
+  - Moved release notes from `Unreleased` into a `0.21.0` changelog section and reset `Unreleased`.
+  - Added `agentloop release-notes --release-version <version>` for explicit release-note metadata without a global flag collision.
+  - Updated README, release docs, npm publishing docs, launch checklist, roadmap, final handoff, and README visual assets for the `0.21.0` release line.
+- Verification run so far:
+  - Red test: `npx pnpm@10.12.1 test tests/release-notes.test.ts` failed with `unknown option '--release-version'`.
+  - Focused green test: `npx pnpm@10.12.1 test tests/release-notes.test.ts`: pass, 1 file and 4 tests.
+  - `node scripts/prepublish-check.mjs`: pass.
+  - `agentloop release-notes --release-version 0.21.0 --json`: pass, reported version `0.21.0`.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 28 files and 105 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 448 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `git diff --check`: pass.
+  - `npm pack --pack-destination /tmp --silent`: pass, produced `/tmp/agentloopkit-0.21.0.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: pass; after `agentloop init`, `agentloop version` reported `0.21.0`, `release-notes --release-version 0.21.0 --json` reported `0.21.0`, and `next --json` returned `agentloop create-task`.
+  - Tarball SHA-256: `3f7c1ee4042f6dd08d2fd2cc2ecdcc039f853f95afb56be666c5497d7a3fe4d5`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-04-41-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-04-42-pr-summary.md`.
+- Worked well:
+  - Dogfooding the release-note command caught a real CLI ergonomics bug before the GitHub release was cut.
+- Improve:
+  - Complete full release verification, regenerate final release notes, push the release commit, create the GitHub release, and record npm/GitHub status honestly.

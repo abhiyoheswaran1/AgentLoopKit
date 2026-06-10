@@ -7,7 +7,7 @@ export function releaseNotesCommand() {
     .description('Generate deterministic release notes')
     .option('--from <ref>', 'git ref to compare from')
     .option('--to <ref>', 'git ref to compare to', 'HEAD')
-    .option('--version <version>', 'release version; defaults to package.json version')
+    .option('--release-version <version>', 'release version; defaults to package.json version')
     .option('--write', 'write notes to .agentloop/handoffs')
     .option('--out <path>', 'output Markdown path when using --write')
     .option('--json', 'print machine-readable output')
@@ -15,7 +15,7 @@ export function releaseNotesCommand() {
       async (options: {
         from?: string;
         to?: string;
-        version?: string;
+        releaseVersion?: string;
         write?: boolean;
         out?: string;
         json?: boolean;
@@ -26,7 +26,7 @@ export function releaseNotesCommand() {
           config,
           from: options.from,
           to: options.to,
-          version: options.version,
+          version: options.releaseVersion,
           write: options.write,
           outPath: options.out,
         });
