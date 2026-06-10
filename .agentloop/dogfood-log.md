@@ -2416,10 +2416,14 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Packed tarball smoke: pass after rerunning with a safely quoted `rg` pattern.
   - Tarball SHA-256: `01f38156e44610021752dadc90fe5d61f63ac210c3778274bce99b11833e972b`.
   - AgentLoop verification report: `.agentloop/reports/2026-06-10-02-34-verification-report.md`, overall status `pass`.
-  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-02-36-pr-summary.md`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-02-40-pr-summary.md`.
+  - GitHub CI run `27245102739`: pass.
+  - GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.18.1
+  - GitHub release asset: `agentloopkit-0.18.1.tgz`.
+  - GitHub Publish workflow run `27245167172`: package checks passed, then npm rejected `npm publish --access public` with `E404`.
   - npm registry proof: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
 - Worked well:
   - The patch release preserves traceability between package metadata and tarball contents.
   - The release remains local-first and docs/template-only.
 - Improve:
-  - After CI passes, publish GitHub release `v0.18.1`, attach `agentloopkit-0.18.1.tgz`, and record the npm Publish workflow result.
+  - Configure npm trusted publishing or re-authenticate locally, then publish `agentloopkit@0.18.1` and verify with `npm view agentloopkit version`.

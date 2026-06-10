@@ -124,6 +124,10 @@ Latest local verification:
   - Tarball SHA-256: `01f38156e44610021752dadc90fe5d61f63ac210c3778274bce99b11833e972b`.
   - README terminal GIF regenerated with VHS from `docs/assets/readme/agentloopkit-cli.tape`.
   - AgentLoop verification report: `.agentloop/reports/2026-06-10-02-34-verification-report.md`, overall status `pass`.
+  - GitHub CI run `27245102739`: pass.
+  - GitHub release `v0.18.1`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.18.1.
+  - GitHub release tarball SHA-256: `01f38156e44610021752dadc90fe5d61f63ac210c3778274bce99b11833e972b`.
+  - GitHub Publish workflow run `27245167172`: package checks passed, then npm rejected `npm publish --access public` with `E404`.
   - npm registry proof before release: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
 
 - `0.18.0` release-status documentation verification:
@@ -1618,6 +1622,9 @@ Top remaining items:
 - The release-triggered GitHub Publish workflow for `v0.18.0` passed checks and failed at npm authorization with `E404`.
 - Local exact-tarball publish for `0.18.0` failed with authorization `E404`.
 - `agentloopkit@0.18.1` is prepared on `main` for policy customization guidance after package templates changed.
+- GitHub release `v0.18.1`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.18.1
+- `agentloopkit@0.18.1` tarball SHA-256: `01f38156e44610021752dadc90fe5d61f63ac210c3778274bce99b11833e972b`.
+- The release-triggered GitHub Publish workflow for `v0.18.1` passed checks and failed at npm authorization with `E404`.
 - Local `npm whoami` returned `E401`; run `npm login` again before another local publish attempt.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
@@ -1746,8 +1753,9 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.18.0`; package checks passed, npm authorization failed.
 - [x] Try local exact-tarball publish for `0.18.0`; npm authorization failed.
 - [x] Prepare `agentloopkit@0.18.1` policy-customization patch release candidate.
-- [ ] Publish GitHub release `v0.18.1` with policy-customization release notes.
+- [x] Publish GitHub release `v0.18.1` with policy-customization release notes.
 - [ ] Publish `agentloopkit@0.18.1` to npm.
+- [x] Run GitHub Publish workflow for `v0.18.1`; package checks passed, npm authorization failed.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.

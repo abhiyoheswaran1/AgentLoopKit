@@ -4,7 +4,7 @@
 
 ## 0.18.1
 
-Policy customization guidance patch release candidate. GitHub release `v0.18.1` is prepared for current source; npm publish is pending account authentication or trusted-publishing repair:
+Policy customization guidance patch release candidate. GitHub release `v0.18.1` is public; npm publish is pending account authentication or trusted-publishing repair:
 
 - Added policy customization workflow docs and generated harness guidance for `policy status` results
 - Added status-specific maintainer actions for `current`, `modified`, `missing`, and `extra` policy files

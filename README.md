@@ -433,7 +433,7 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.18.1` is the current source line with a tarball asset. Earlier `v0.18.0` publish attempts reached npm and failed with authorization `E404`, so npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
+AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.18.1` is public with a tarball asset. The release-triggered Publish workflow reached npm and failed with authorization `E404`, so npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
 
 The npm version jump is intentional. The skipped npm numbers already exist as public GitHub release candidates while npm publishing was blocked, so the next npm publish should ship the current release line rather than backfilling old source snapshots.
 
