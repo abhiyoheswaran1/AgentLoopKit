@@ -2925,3 +2925,31 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The stale guidance was confined to current-state handoff sections; historical release evidence could stay intact.
 - Improve:
   - Consider a future release-status compaction pass so final handoff files do not grow too large.
+
+## 2026-06-10: Concise Release Status Page
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-release-status-page.md`
+- Product cycle: `.agentloop/research/interview-cycle-089.md`
+- Trigger:
+  - Release status was repeated across several files.
+  - Stale current-state guidance had already appeared in the final handoff.
+- Product changes:
+  - Added `docs/release-status.md` with current GitHub release, npm registry state, tarball fallback, publish blocker, and update rules.
+  - Linked the release-status page from README and `docs/npm-publishing.md`.
+  - Updated `FINAL_HANDOFF.md` so release-status compaction is listed as shipped rather than future work.
+- Verification run:
+  - `npx pnpm@10.12.1 check:links`: pass, 484 Markdown files checked.
+  - `git diff --check`: pass.
+  - `node scripts/prepublish-check.mjs`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-add-release-status-page.md`: pass, wrote `.agentloop/reports/2026-06-10-06-03-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 110 tests, lint, typecheck, and build all passed.
+  - `npx tsx src/cli/index.ts task clear --json`: pass, removed the local active-task pointer before handoff.
+  - `npx tsx src/cli/index.ts handoff --json`: pass, wrote `.agentloop/handoffs/2026-06-10-06-03-pr-summary.md`.
+  - Final `npx pnpm@10.12.1 check:links`: pass, 486 Markdown files checked.
+  - Final `git diff --check`: pass.
+  - Final stale release-status search: pass.
+- Worked well:
+  - One compact page should reduce stale launch-state drift.
+- Improve:
+  - After npm publishes `0.22.0`, update this page first and then remove temporary tarball guidance elsewhere.

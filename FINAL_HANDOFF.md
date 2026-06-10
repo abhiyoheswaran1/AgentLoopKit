@@ -42,6 +42,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - generated config schema URL aligned to the GitHub-hosted schema file
 - docs, examples, issue templates, PR template, CI, publish workflow
 - README launch visuals generated with Playwright and VHS
+- compact current release-status page at `docs/release-status.md`
 - internal product panel, target personas, simulated interview cycles, backlog, and dogfood log
 
 ## CLI commands
@@ -2012,16 +2013,16 @@ Title: I built a local-first engineering loop for coding agents
 
 1. Complete browser/OTP npm publish or trusted publishing for `0.22.0`: high usefulness, low repo effort, external auth required.
 2. Remove the temporary GitHub tarball fallback after npm reports `0.22.0` or newer: high trust value, low effort.
-3. Add release-status compaction so future handoffs stay shorter: medium maintainability, low effort.
-4. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
-5. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
-6. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
-7. Add GitLab CI and Buildkite examples for `agentloop ci-summary`: medium usefulness, low effort.
-8. Add generated security-review example: medium trust improvement, low effort.
-9. Add config migration helper for future schema versions: medium usefulness, medium effort.
-10. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
-11. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
-12. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
-13. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
-14. Add doctor heuristics documentation page for risk-file categories: medium trust improvement, low effort.
-15. Add framework-specific example task contracts for Remix, SvelteKit, Django, and FastAPI: medium star potential, low effort.
+3. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
+4. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
+5. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
+6. Add GitLab CI and Buildkite examples for `agentloop ci-summary`: medium usefulness, low effort.
+7. Add generated security-review example: medium trust improvement, low effort.
+8. Add config migration helper for future schema versions: medium usefulness, medium effort.
+9. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
+10. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
+11. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
+12. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
+13. Add doctor heuristics documentation page for risk-file categories: medium trust improvement, low effort.
+14. Add framework-specific example task contracts for Remix, SvelteKit, Django, and FastAPI: medium star potential, low effort.
+15. Add more packed-tarball smoke fixtures for release recovery flows: medium trust improvement, low effort.

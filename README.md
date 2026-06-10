@@ -48,6 +48,8 @@ npx agentloopkit init --dry-run
 
 Latest GitHub release: `v0.22.0`. npm still serves `0.1.1`: the `v0.22.0` publish workflow passed package checks, then npm rejected the final publish with authorization `E404`. The next npm publish should catch up once to `0.22.0`; after that, releases return to normal sequential semver.
 
+See [docs/release-status.md](docs/release-status.md) for the current GitHub/npm status and update rules.
+
 Until npm catches up, run the current GitHub release tarball directly:
 
 ```bash

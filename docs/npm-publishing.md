@@ -43,6 +43,8 @@ The first publish creates the npm package. That step may require an OTP, dependi
 
 As of June 10, 2026:
 
+For a compact current-state summary, see [release-status.md](release-status.md).
+
 Short version:
 
 - npm previously served `agentloopkit@0.1.1` while GitHub/source release candidates from `v0.2.0` through `v0.22.0` were public.
