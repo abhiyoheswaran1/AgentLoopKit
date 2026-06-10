@@ -32,7 +32,7 @@ Use this before publishing AgentLoopKit.
 - [x] GitHub release `v0.17.0` is published with policy-inspection release notes.
 - [x] GitHub release `v0.18.0` is published with policy-status release notes.
 - [x] GitHub release `v0.18.1` is published with policy-customization guidance release notes.
-- [ ] GitHub release `v0.19.0` is published with CI-summary release notes.
+- [x] GitHub release `v0.19.0` is published with CI-summary release notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -123,6 +123,7 @@ Use this before publishing AgentLoopKit.
 - [ ] Local `agentloopkit@0.18.1` publish completes account authentication, or GitHub trusted publishing completes.
 - [x] Package `agentloopkit@0.19.0` is prepared on `main` for CI summaries.
 - [ ] Package `agentloopkit@0.19.0` is published.
+- [x] Publish workflow for `v0.19.0` passed package checks and failed at npm authorization.
 - [ ] npm trusted publishing is configured for this repository.
 - [ ] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -206,7 +207,7 @@ Current recovery note:
 - GitHub release `v0.17.0` is public with attached `agentloopkit-0.17.0.tgz`.
 - GitHub release `v0.18.0` is public with attached `agentloopkit-0.18.0.tgz`.
 - GitHub release `v0.18.1` is public with attached `agentloopkit-0.18.1.tgz`.
-- GitHub release `v0.19.0` is pending for CI summary release notes.
+- GitHub release `v0.19.0` is public with attached `agentloopkit-0.19.0.tgz`.
 - `agentloopkit@0.14.0` is prepared, verified, and published as GitHub release `v0.14.0` for `agentloop check-gates --strict`.
 - `agentloopkit@0.15.0` is prepared, verified, and published as GitHub release `v0.15.0` for CI context in verification reports.
 - `agentloopkit@0.15.1` is prepared, verified, and published as GitHub release `v0.15.1` for doctor risk-file details and config schema URL trust.
@@ -214,8 +215,9 @@ Current recovery note:
 - `agentloopkit@0.17.0` is prepared, verified, and published as GitHub release `v0.17.0` for read-only policy inspection.
 - `agentloopkit@0.18.0` is prepared, verified, and published as GitHub release `v0.18.0` for read-only policy template status.
 - `agentloopkit@0.18.1` is prepared, verified, and published as GitHub release `v0.18.1` for policy customization guidance.
-- `agentloopkit@0.19.0` is prepared on `main` for local CI summaries.
-- Local `agentloopkit@0.19.0` tarball SHA-256 before GitHub release: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
+- `agentloopkit@0.19.0` is prepared, verified, and published as GitHub release `v0.19.0` for local CI summaries.
+- GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
+- GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
 - npm still reports `agentloopkit@0.1.1` as latest.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.3.0` is now prepared on `main` after the handoff command, create-task flag, latest artifact selection, and create-task alias work.
@@ -270,3 +272,5 @@ Current recovery note:
 - GitHub release `v0.18.0` tarball SHA-256: `7c3b6b7f12c34e57b9bfd70bb4491abd566b37b86bf0c642d9d517a7dcdb4d26`.
 - GitHub Publish workflow for `v0.18.1` passed package checks and failed at npm authorization with `E404`.
 - GitHub release `v0.18.1` tarball SHA-256: `01f38156e44610021752dadc90fe5d61f63ac210c3778274bce99b11833e972b`.
+- GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
+- GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
