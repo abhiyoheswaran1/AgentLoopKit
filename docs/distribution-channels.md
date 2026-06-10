@@ -8,10 +8,10 @@ This page is for maintainers planning releases. Keep the README focused on user 
 | --- | --- | --- |
 | npm / npx | Primary channel | `npx agentloopkit init` |
 | GitHub Releases | Public release assets | Download `agentloopkit-<version>.tgz` from GitHub |
-| GitHub Action | Repo action metadata | `uses: abhiyoheswaran1/AgentLoopKit@v0.26.1` |
-| Docker / GHCR | Release workflow prepared | `docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:0.26.1 doctor` |
-| Homebrew | Formula prepared | `brew install abhiyoheswaran1/agentloopkit/agentloopkit` after the tap repo is published |
-| MCP Registry | Metadata and workflow prepared | `npx --yes agentloopkit@0.26.1 mcp-server` |
+| GitHub Action | Live repo action | `uses: abhiyoheswaran1/AgentLoopKit@v0.26.1` |
+| Docker / GHCR | Live image | `docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:0.26.1 doctor` |
+| Homebrew | Live tap | `brew install abhiyoheswaran1/agentloopkit/agentloopkit` |
+| MCP Registry | Published metadata | `npx --yes agentloopkit@0.26.1 mcp-server` |
 
 ## Release Rule
 

@@ -50,12 +50,14 @@ For a read-only registry check, see [npm-status.md](npm-status.md).
 
 Current facts:
 
-- npm latest is `agentloopkit@0.25.0`.
-- GitHub release `v0.25.0` is public with attached `agentloopkit-0.25.0.tgz`.
-- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.25.0`.
-- GitHub release tarball SHA-256: `f39669cf62ec5a455bad788223040dd0a0c65dcb86665cf6086f04a84d9ff427`.
+- npm latest is `agentloopkit@0.26.1`.
+- GitHub release `v0.26.1` is public with attached `agentloopkit-0.26.1.tgz`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.1`.
+- GitHub release tarball SHA-256: `cf836155a2cdfaf8eff818202aa651fc32b3b39a49256f25d0925ffbadad5cc6`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
-- GitHub release `v0.25.0` published to npm through trusted publishing.
+- GitHub release `v0.26.1` published to npm through trusted publishing.
+- MCP Registry metadata for `io.github.abhiyoheswaran1/agentloopkit` published after npm verification.
+- GHCR and Homebrew tap distribution are live for `0.26.1`.
 - Future releases should continue publishing from GitHub Releases through trusted publishing.
 
 Historical rule:
@@ -255,6 +257,21 @@ Historical publishing log:
 - GitHub release tarball SHA-256: `f39669cf62ec5a455bad788223040dd0a0c65dcb86665cf6086f04a84d9ff427`.
 - GitHub Publish workflow run `27279602386` for `v0.25.0` passed package checks and published to npm through trusted publishing.
 - npm registry proof after the `v0.25.0` publish reports latest `0.25.0` and versions `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, and `0.25.0`.
+- `agentloopkit@0.26.0` added the read-only MCP server, MCP Registry metadata, GitHub Action wrapper, Docker/GHCR workflow, and Homebrew formula.
+- Local tarball SHA-256 before GitHub release: `a289ea89ee037ab4099e79102efbf21d3563b7e65961f1b1bd54a4a735cfba65`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.0`.
+- GitHub release tarball SHA-256: `a289ea89ee037ab4099e79102efbf21d3563b7e65961f1b1bd54a4a735cfba65`.
+- GitHub Publish workflow run `27282743955` for `v0.26.0` passed package checks and published to npm through trusted publishing.
+- Docker workflow run `27282743971` for `v0.26.0` passed and published the GHCR image.
+- MCP Registry workflow run `27282831636` for `v0.26.0` failed because `server.json.description` exceeded the registry's 100-character limit.
+- `agentloopkit@0.26.1` shortened MCP Registry metadata and updated install examples.
+- Local tarball SHA-256 before GitHub release: `cf836155a2cdfaf8eff818202aa651fc32b3b39a49256f25d0925ffbadad5cc6`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.1`.
+- GitHub release tarball SHA-256: `cf836155a2cdfaf8eff818202aa651fc32b3b39a49256f25d0925ffbadad5cc6`.
+- GitHub Publish workflow run `27283286721` for `v0.26.1` passed package checks and published to npm through trusted publishing.
+- Docker workflow run `27283287182` for `v0.26.1` passed and published the GHCR image.
+- MCP Registry workflow run `27283372191` for `v0.26.1` passed and published registry metadata.
+- npm registry proof after the `v0.26.1` publish reports latest `0.26.1` and versions through `0.26.1`.
 
 Preferred release path:
 

@@ -53,13 +53,16 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.25.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.25.0>
-- Release asset: `agentloopkit-0.25.0.tgz`
-- Release asset SHA-256: `f39669cf62ec5a455bad788223040dd0a0c65dcb86665cf6086f04a84d9ff427`
-- CI run: `27279587748`
-- Publish workflow run: `27279602386`
-- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.25.0`
+- Current npm release: `agentloopkit@0.26.1`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.1>
+- Release asset: `agentloopkit-0.26.1.tgz`
+- Release asset SHA-256: `cf836155a2cdfaf8eff818202aa651fc32b3b39a49256f25d0925ffbadad5cc6`
+- CI run: `27283261603`
+- Publish workflow run: `27283286721`
+- Docker workflow run: `27283287182`
+- MCP Registry workflow run: `27283372191`
+- Homebrew tap: <https://github.com/abhiyoheswaran1/homebrew-agentloopkit>
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.26.1`
 
 ## CLI commands
 
@@ -1031,8 +1034,9 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.25.0` is public.
-- npm latest is `0.25.0`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, and `0.25.0`.
+- GitHub release `v0.26.1` is public.
+- npm latest is `0.26.1`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, and `0.26.1`.
+- GHCR, MCP Registry, and the Homebrew tap are live for `0.26.1`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

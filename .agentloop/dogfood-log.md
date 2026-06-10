@@ -3671,8 +3671,18 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Handoff generated:
   - `.agentloop/handoffs/2026-06-10-16-15-pr-summary.md`
 - Pending before release:
-  - Publish GitHub release `v0.26.0`.
-  - Verify npm trusted publish, GHCR image publish, MCP Registry publish, and Homebrew tap update.
+  - None for the 0.26.1 release-channel work.
+- Release proof:
+  - GitHub release `v0.26.0` published with tarball SHA-256 `a289ea89ee037ab4099e79102efbf21d3563b7e65961f1b1bd54a4a735cfba65`.
+  - npm Publish workflow `27282743955` passed for `0.26.0`.
+  - Docker/GHCR workflow `27282743971` passed for `0.26.0`.
+  - MCP Registry workflow `27282831636` failed because the registry enforces `description` length <= 100.
+  - Patch release `0.26.1` shortened the registry description.
+  - GitHub release `v0.26.1` published with tarball SHA-256 `cf836155a2cdfaf8eff818202aa651fc32b3b39a49256f25d0925ffbadad5cc6`.
+  - npm Publish workflow `27283286721` passed for `0.26.1`.
+  - Docker/GHCR workflow `27283287182` passed for `0.26.1`.
+  - MCP Registry workflow `27283372191` passed for `0.26.1`.
+  - Homebrew tap `abhiyoheswaran1/homebrew-agentloopkit` published formula `0.26.1`; `brew install`, `agentloop version`, `agentloopkit version`, and `brew test` passed.
 - Worked well:
   - Keeping MCP read-only preserved the safety model while giving agents better structured access than filesystem scraping.
   - The distribution artifacts reuse the existing CLI instead of creating separate behavior.

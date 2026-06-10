@@ -66,7 +66,7 @@ describe('distribution artifacts', () => {
     expect(formula).not.toContain(
       'sha256 "0000000000000000000000000000000000000000000000000000000000000000"',
     );
-    expect(formula).toContain('std_npm_install_args(libexec)');
+    expect(formula).toContain('std_npm_args');
     expect(formula).toContain('bin.install_symlink libexec/"bin/agentloop"');
     expect(formula).toContain('agentloop version');
     expect(formula).not.toContain('post_install');

@@ -47,7 +47,7 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] GitHub release `v0.24.5` is published with release-smoke and README VHS demo notes.
 - [x] GitHub release `v0.25.0` is published with local-only init notes.
 - [x] GitHub release `v0.26.0` is published with MCP and distribution-channel notes.
-- [ ] GitHub release `v0.26.1` is published with MCP Registry metadata validation notes.
+- [x] GitHub release `v0.26.1` is published with MCP Registry metadata validation notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -170,10 +170,10 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] GHCR image `ghcr.io/abhiyoheswaran1/agentloopkit:0.26.0` is published.
 - [x] MCP Registry publish for `0.26.0` was attempted and failed because `server.json.description` exceeded the registry's 100-character limit.
 - [x] Package `agentloopkit@0.26.1` is prepared on `main` for MCP Registry metadata validation.
-- [ ] Package `agentloopkit@0.26.1` is published through GitHub trusted publishing.
-- [ ] GHCR image `ghcr.io/abhiyoheswaran1/agentloopkit:0.26.1` is published.
-- [ ] MCP Registry metadata for `io.github.abhiyoheswaran1/agentloopkit` is published.
-- [ ] Homebrew tap formula for `agentloopkit@0.26.1` is published and verified.
+- [x] Package `agentloopkit@0.26.1` is published through GitHub trusted publishing.
+- [x] GHCR image `ghcr.io/abhiyoheswaran1/agentloopkit:0.26.1` is published.
+- [x] MCP Registry metadata for `io.github.abhiyoheswaran1/agentloopkit` is published.
+- [x] Homebrew tap formula for `agentloopkit@0.26.1` is published and verified.
 - [x] npm trusted publishing is configured for this repository.
 - [x] `agentloop npm-status --expect-current` passes after npm publish.
 - [x] Current publish guidance tells maintainers to continue from the current source version, not stale intermediate versions.
@@ -328,9 +328,22 @@ Historical recovery note:
 - GitHub release `v0.25.0` is public with attached `agentloopkit-0.25.0.tgz`.
 - GitHub release `v0.25.0` tarball SHA-256: `f39669cf62ec5a455bad788223040dd0a0c65dcb86665cf6086f04a84d9ff427`.
 - GitHub Publish workflow for `v0.25.0` (run `27279602386`) passed package checks and published to npm.
+- `agentloopkit@0.26.0` added the read-only MCP server and distribution-channel artifacts.
+- GitHub release `v0.26.0` is public with attached `agentloopkit-0.26.0.tgz`.
+- GitHub release `v0.26.0` tarball SHA-256: `a289ea89ee037ab4099e79102efbf21d3563b7e65961f1b1bd54a4a735cfba65`.
+- GitHub Publish workflow for `v0.26.0` (run `27282743955`) passed package checks and published to npm.
+- Docker workflow for `v0.26.0` (run `27282743971`) passed and published the GHCR image.
+- MCP Registry workflow for `v0.26.0` (run `27282831636`) failed because the registry description exceeded 100 characters.
+- `agentloopkit@0.26.1` shortened the MCP Registry description and published on npm through trusted publishing.
+- GitHub release `v0.26.1` is public with attached `agentloopkit-0.26.1.tgz`.
+- GitHub release `v0.26.1` tarball SHA-256: `cf836155a2cdfaf8eff818202aa651fc32b3b39a49256f25d0925ffbadad5cc6`.
+- GitHub Publish workflow for `v0.26.1` (run `27283286721`) passed package checks and published to npm.
+- Docker workflow for `v0.26.1` (run `27283287182`) passed and published the GHCR image.
+- MCP Registry workflow for `v0.26.1` (run `27283372191`) passed and published registry metadata.
+- Homebrew tap formula for `0.26.1` is published and verified.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
-- npm latest is `0.25.0`; registry versions include `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, and `0.25.0`.
+- npm latest is `0.26.1`; registry versions include `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, and `0.26.1`.
 - npm trusted publishing is configured for GitHub release publishes.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.3.0` is now prepared on `main` after the handoff command, create-task flag, latest artifact selection, and create-task alias work.
