@@ -2764,3 +2764,38 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The dogfood report includes `Task Context` near the top and shows the task status as `done`.
 - Improve:
   - Consider linking verification reports back to the active handoff in a later small iteration.
+
+## 2026-06-10: README Visual Refresh For Task Context
+
+- Task contract: `.agentloop/tasks/2026-06-10-refresh-readme-visuals-task-context.md`
+- Product cycle: `.agentloop/research/interview-cycle-084.md`
+- Trigger:
+  - README visual assets existed, but the verification screenshot still showed older command evidence and no task context.
+  - The VHS tape installed a hardcoded `agentloopkit-0.21.0.tgz` tarball, which would make future asset refreshes brittle.
+- Product changes:
+  - Refresh the verification screenshot around `agentloop verify --task`.
+  - Update stale test counts in the showcase screenshot.
+  - Make the VHS tape install the newest local packed tarball.
+  - Regenerate Playwright screenshots and the terminal GIF.
+- Verification run:
+  - `npx playwright screenshot --viewport-size=1440,960 "file://$(pwd | sed 's/ /%20/g')/docs/assets/readme/showcase.html" docs/assets/readme/agentloopkit-showcase.png`: pass.
+  - `npx playwright screenshot --viewport-size=1440,960 "file://$(pwd | sed 's/ /%20/g')/docs/assets/readme/verification.html" docs/assets/readme/agentloopkit-verification.png`: pass.
+  - `vhs docs/assets/readme/agentloopkit-cli.tape`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 28 files and 110 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 463 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `git diff --check`: pass.
+  - `node scripts/prepublish-check.mjs`: expected fail because `CHANGELOG.md` still has Unreleased entries.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-refresh-readme-visuals-task-context.md`: pass.
+- Verification report:
+  - `.agentloop/reports/2026-06-10-05-22-verification-report.md`
+- Handoff summary:
+  - `.agentloop/handoffs/2026-06-10-05-23-pr-summary.md`
+- Worked well:
+  - The verification screenshot now shows task context, command status, and handoff evidence in one frame.
+  - The VHS tape no longer needs a package-version edit for each visual refresh.
+- Improve:
+  - Consider adding a tiny script that regenerates all README assets with one command.

@@ -77,7 +77,7 @@ npx agentloopkit completion zsh
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, task status, next, policy status, completion, verify, handoff, report, badge, ci-summary, release-notes, and task archive commands" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, task contracts, active task status, task-linked verify, handoff, reports, badges, release notes, gates, and task archive commands" width="100%">
 </p>
 
 The VHS demo runs the local built CLI so the command flow matches this repository even when npm is behind.
@@ -381,7 +381,7 @@ Use it before creating a GitHub release so the release note draft includes the s
 See `docs/release-notes.md`.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report screenshot showing command results and reviewer handoff sections" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report screenshot showing task context, passing command results, and reviewer handoff sections" width="100%">
 </p>
 
 ## Policies

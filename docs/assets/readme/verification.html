@@ -48,7 +48,7 @@
       .canvas {
         width: 1440px;
         height: 960px;
-        padding: 58px 86px;
+        padding: 48px 86px;
       }
 
       .header {
@@ -56,12 +56,12 @@
         grid-template-columns: 1fr auto;
         gap: 48px;
         align-items: end;
-        margin-bottom: 30px;
+        margin-bottom: 24px;
       }
 
       h1 {
         margin: 0;
-        font-size: 58px;
+        font-size: 54px;
         line-height: 0.98;
         letter-spacing: 0;
         max-width: 760px;
@@ -200,17 +200,62 @@
         padding: 28px 34px;
       }
 
+      .task-card {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: oklch(96% 0.018 162);
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+
+      .task-card b {
+        display: block;
+        font-size: 17px;
+        margin-bottom: 8px;
+      }
+
+      .task-card code {
+        display: block;
+        margin: 10px 0 14px;
+        color: var(--blue);
+        font-size: 13px;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+
+      .task-meta {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      .task-meta span {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 9px 10px;
+        color: var(--muted);
+        background: var(--surface);
+        font-size: 13px;
+      }
+
+      .task-meta strong {
+        display: block;
+        color: var(--ink);
+        font-size: 14px;
+        margin-top: 3px;
+      }
+
       .handoff-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 16px;
+        gap: 12px;
       }
 
       .check {
         border: 1px solid var(--line);
         border-radius: 18px;
-        padding: 18px;
-        min-height: 128px;
+        padding: 16px;
+        min-height: 112px;
         background: var(--surface);
       }
 
@@ -227,26 +272,26 @@
       }
 
       .risk {
-        margin-top: 18px;
+        margin-top: 14px;
         border: 1px solid oklch(77% 0.08 42);
         background: oklch(96% 0.03 72);
         border-radius: 18px;
-        padding: 20px;
+        padding: 16px;
         color: oklch(38% 0.07 42);
-        font-size: 15px;
-        line-height: 1.5;
+        font-size: 14px;
+        line-height: 1.42;
       }
     </style>
   </head>
   <body>
     <main class="canvas" aria-label="AgentLoopKit verification report">
       <section class="header">
-        <h1>Verification reports turn agent claims into review evidence.</h1>
+        <h1>Verification reports tie tasks to command evidence.</h1>
         <div class="meta">
-          <strong>agentloop verify</strong>
+          <strong>agentloop verify --task</strong>
           Repo: agentloopkit<br />
           Branch: main<br />
-          Generated: 2026-06-10 03:40
+          Generated: 2026-06-10 05:10
         </div>
       </section>
 
@@ -261,8 +306,8 @@
             <div class="value">5</div>
           </div>
           <div class="status">
-            <div class="label">hidden assumptions</div>
-            <div class="value">0</div>
+            <div class="label">task context</div>
+            <div class="value pass">LINKED</div>
           </div>
         </div>
 
@@ -274,34 +319,41 @@
                 <span class="pill">PASS</span><code>pnpm test</code><span class="exit">0</span>
               </div>
               <div class="command">
+                <span class="pill">PASS</span><code>pnpm lint</code><span class="exit">0</span>
+              </div>
+              <div class="command">
                 <span class="pill">PASS</span><code>pnpm typecheck</code><span class="exit">0</span>
+              </div>
+              <div class="command">
+                <span class="pill">PASS</span><code>pnpm check:links</code><span class="exit">0</span>
               </div>
               <div class="command">
                 <span class="pill">PASS</span><code>pnpm build</code><span class="exit">0</span>
               </div>
-              <div class="command">
-                <span class="pill">PASS</span><code>pnpm check:links</code
-                ><span class="exit">0</span>
-              </div>
-              <div class="command">
-                <span class="pill">PASS</span><code>npx projscan doctor</code
-                ><span class="exit">0</span>
-              </div>
             </div>
             <div class="excerpt">
-              <span class="green">Test Files</span> 26 passed (26)<br />
-              <span class="green">Tests</span> 97 passed (97)<br />
-              Health Score: A (100/100)<br />
-              Release notes written to .agentloop/handoffs/
+              <span class="green">Test Files</span> 28 passed (28)<br />
+              <span class="green">Tests</span> 110 passed (110)<br />
+              Task Context: refresh README visuals<br />
+              Health Score: A (100/100)
             </div>
           </div>
 
           <div class="handoff">
+            <div class="task-card">
+              <b>Task context</b>
+              <code>.agentloop/tasks/2026-06-10-refresh-readme-visuals-task-context.md</code>
+              <div class="task-meta">
+                <span>type<strong>docs</strong></span>
+                <span>status<strong>done</strong></span>
+                <span>source<strong>local</strong></span>
+              </div>
+            </div>
             <h2>Reviewer handoff</h2>
             <div class="handoff-grid">
               <div class="check">
                 <b>Task context</b
-                ><span>What changed, why it changed, and what stayed out of scope.</span>
+                ><span>Title, type, status, and path appear near the report metadata.</span>
               </div>
               <div class="check">
                 <b>Changed files</b><span>Git status and diff stats grouped for review.</span>

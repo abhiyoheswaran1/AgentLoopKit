@@ -6,7 +6,7 @@ Require npm
 
 Set Shell "bash"
 Set FontFamily "JetBrains Mono"
-Set FontSize 20
+Set FontSize 18
 Set Width 1280
 Set Height 760
 Set Padding 28
@@ -19,7 +19,7 @@ Set PlaybackSpeed 1.08
 Set LoopOffset 13%
 Set Theme "Catppuccin Latte"
 
-Type@1ms "npm pack --pack-destination /tmp --silent >/dev/null && rm -rf /tmp/agentloopkit-vhs-demo && mkdir /tmp/agentloopkit-vhs-demo && cd /tmp/agentloopkit-vhs-demo && git init -q && npm init -y >/dev/null && npm pkg set scripts.test='echo demo tests pass' scripts.typecheck='echo types pass' scripts.build='echo build pass' >/dev/null && npm install -D /tmp/agentloopkit-0.21.0.tgz >/dev/null && clear"
+Type@1ms "npm pack --pack-destination /tmp --silent >/tmp/agentloopkit-vhs-pack.txt && rm -rf /tmp/agentloopkit-vhs-demo && mkdir /tmp/agentloopkit-vhs-demo && cd /tmp/agentloopkit-vhs-demo && git init -q && npm init -y >/dev/null && npm pkg set scripts.test='echo demo tests pass' scripts.typecheck='echo types pass' scripts.build='echo build pass' >/dev/null && npm install -D /tmp/$(tail -n 1 /tmp/agentloopkit-vhs-pack.txt) >/dev/null && clear"
 Enter
 Sleep 250ms
 
@@ -71,7 +71,7 @@ Type "npx agentloop completion zsh"
 Enter
 Sleep 1.5s
 
-Type "npx agentloop verify --no-lint"
+Type "npx agentloop verify --task .agentloop/tasks/settings.md --no-lint"
 Enter
 Sleep 2s
 

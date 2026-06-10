@@ -6,6 +6,7 @@
 - Kept full command output excerpts in verification reports; the new summary does not diagnose root cause or parse tool-specific logs
 - Added task context to verification reports generated with `agentloop verify --task <path>`
 - Guarded `agentloop verify --task` so `.env`-style paths are reported as unavailable instead of read as task contracts
+- Refreshed README Playwright screenshots and VHS terminal demo around task-linked verification evidence
 
 ## 0.21.0
 
