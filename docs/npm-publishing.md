@@ -217,6 +217,17 @@ Historical publishing log:
 
 Publish the current GitHub release to npm from its matching release commit after browser/OTP authentication completes. Do not backfill old npm versions with newer source.
 
+## Temporary GitHub Tarball Usage
+
+Until npm publishes `0.22.0`, users who need the current CLI can run the GitHub release tarball directly:
+
+```bash
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop version
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop init
+```
+
+Remove this fallback from README once `npm view agentloopkit version` reports `0.22.0` or newer.
+
 Preferred release path after the first publish:
 
 1. Configure npm trusted publishing for this GitHub repository.

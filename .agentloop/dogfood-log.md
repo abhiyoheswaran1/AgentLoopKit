@@ -2867,3 +2867,32 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The task contract made the release-status scope narrow: documentation and evidence only.
 - Improve:
   - Once npm authorization is repaired, update this log with the successful `npm view agentloopkit version` proof and stop recommending GitHub tarball fallback for current users.
+
+## 2026-06-10: Current GitHub Tarball Usage Docs
+
+- Task contract: `.agentloop/tasks/2026-06-10-document-current-github-tarball-usage.md`
+- Product cycle: `.agentloop/research/interview-cycle-087.md`
+- Trigger:
+  - npm still serves `agentloopkit@0.1.1`.
+  - GitHub release `v0.22.0` is public and contains the current CLI.
+  - README stated the npm lag but did not give users a tested current-release command.
+- Product changes:
+  - Add a temporary `npx --yes --package <v0.22.0 tarball> agentloop version` command to README.
+  - Add a temporary `npx --yes --package <v0.22.0 tarball> agentloop init` command to README.
+  - Add fallback-removal guidance to `docs/npm-publishing.md`.
+- Verification run:
+  - `npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop version`: pass, reported `0.22.0`.
+  - `npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop init --dry-run --json`: pass, returned generated file paths and `dryRun: true`.
+  - `npx pnpm@10.12.1 check:links`: pass, 475 Markdown files checked.
+  - `git diff --check`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-document-current-github-tarball-usage.md`: pass, wrote `.agentloop/reports/2026-06-10-05-52-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 110 tests, lint, typecheck, and build all passed.
+  - `npx tsx src/cli/index.ts task clear --json`: pass, removed the local active-task pointer before handoff.
+  - `npx tsx src/cli/index.ts handoff --json`: pass, wrote `.agentloop/handoffs/2026-06-10-05-53-pr-summary.md`.
+  - Final `npx pnpm@10.12.1 check:links`: pass, 477 Markdown files checked.
+  - Final `git diff --check`: pass.
+- Worked well:
+  - The release tarball path gives current behavior without cloning the repo.
+- Improve:
+  - Remove this fallback from README after npm reports `0.22.0` or newer.
