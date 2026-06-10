@@ -1,0 +1,169 @@
+import path from 'node:path';
+import { access, mkdir, utimes, writeFile } from 'node:fs/promises';
+import { constants } from 'node:fs';
+import { execa } from 'execa';
+import { afterEach, describe, expect, test } from 'vitest';
+import { initializeAgentLoop } from '../src/core/init.js';
+import { makeTempDir, removeTempDir } from './helpers.js';
+
+let tempDirs: string[] = [];
+
+const cliPath = path.resolve('src/cli/index.ts');
+const tsxPath = path.resolve('node_modules/.bin/tsx');
+
+async function exists(filePath: string) {
+  try {
+    await access(filePath, constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+describe('next command', () => {
+  afterEach(async () => {
+    await Promise.all(tempDirs.map(removeTempDir));
+    tempDirs = [];
+  });
+
+  test('prints the next action as JSON without running configured verification commands', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify(
+        {
+          name: 'next-demo',
+          scripts: {
+            test: "node -e \"require('fs').writeFileSync('marker.txt', 'ran')\"",
+          },
+        },
+        null,
+        2,
+      ),
+    );
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'changed.txt'), 'pending change\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-add-settings.md'),
+      '# Add settings\n\n- Status: in-progress\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-10-10-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'next', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const next = JSON.parse(result.stdout);
+    expect(next.command).toBe('agentloop handoff');
+    expect(next.reason).toContain('verification evidence');
+    expect(next.activeTask.title).toBe('Add settings');
+    expect(next.latestReport.overallStatus).toBe('pass');
+    expect(next.workingTree.dirty).toBe(true);
+    expect(next.workingTree.changedFileCount).toBeGreaterThan(0);
+    expect(await exists(path.join(dir, 'marker.txt'))).toBe(false);
+    expect(await exists(path.join(dir, '.agentloop/state.json'))).toBe(false);
+  });
+
+  test('prints a concise human next action when no task exists', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+
+    const result = await execa(tsxPath, [cliPath, 'next'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('# AgentLoopKit Next Action');
+    expect(result.stdout).toContain('Run `agentloop create-task`.');
+    expect(result.stdout).toContain('No task contract was found.');
+  });
+
+  test('points back to verification when the latest report failed', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-fix-login.md'),
+      '# Fix login\n\n- Status: review\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-10-10-05-verification-report.md'),
+      '# Verification Report\n\nOverall status: fail\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'next', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const next = JSON.parse(result.stdout);
+    expect(next.command).toBe('agentloop verify');
+    expect(next.reason).toContain('failed');
+    expect(next.activeTask.title).toBe('Fix login');
+    expect(next.latestReport.overallStatus).toBe('fail');
+  });
+
+  test('does not treat an older verification report as evidence for the active task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-10-current-task.md');
+    const reportPath = path.join(dir, '.agentloop/reports/2026-06-10-08-00-verification-report.md');
+    await mkdir(path.dirname(reportPath), { recursive: true });
+    await writeFile(reportPath, '# Verification Report\n\nOverall status: pass\n');
+    await writeFile(taskPath, '# Current task\n\n- Status: in-progress\n');
+    await utimes(reportPath, new Date('2026-06-10T08:00:00Z'), new Date('2026-06-10T08:00:00Z'));
+    await utimes(taskPath, new Date('2026-06-10T09:00:00Z'), new Date('2026-06-10T09:00:00Z'));
+
+    const result = await execa(tsxPath, [cliPath, 'next', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const next = JSON.parse(result.stdout);
+    expect(next.activeTask.title).toBe('Current task');
+    expect(next.latestReport).toBeNull();
+    expect(next.command).toBe('agentloop verify');
+    expect(next.reason).toContain('no verification report');
+  });
+
+  test('keeps verification evidence after a task is marked done', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-10-complete-task.md');
+    const reportPath = path.join(dir, '.agentloop/reports/2026-06-10-08-00-verification-report.md');
+    await mkdir(path.dirname(reportPath), { recursive: true });
+    await writeFile(reportPath, '# Verification Report\n\nOverall status: pass\n');
+    await writeFile(taskPath, '# Complete task\n\n- Status: done\n');
+    await writeFile(path.join(dir, 'changed.txt'), 'pending handoff\n');
+    await utimes(reportPath, new Date('2026-06-10T08:00:00Z'), new Date('2026-06-10T08:00:00Z'));
+    await utimes(taskPath, new Date('2026-06-10T09:00:00Z'), new Date('2026-06-10T09:00:00Z'));
+
+    const result = await execa(tsxPath, [cliPath, 'next', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const next = JSON.parse(result.stdout);
+    expect(next.activeTask.status).toBe('done');
+    expect(next.latestReport.overallStatus).toBe('pass');
+    expect(next.command).toBe('agentloop handoff');
+  });
+});

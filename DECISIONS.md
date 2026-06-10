@@ -95,3 +95,7 @@ Generated harness provenance lives in `.agentloop/manifest.json`, not in `agentl
 ## 2026-06-10: npm Catch-Up Is A One-Time Alignment Step
 
 npm still serves `agentloopkit@0.1.1` while public GitHub releases already exist through `v0.19.0`. The next npm publish should catch up to the current GitHub release line once, then AgentLoopKit should return to normal semver. Do not backfill old npm versions from newer source, and do not keep creating higher versions only because npm authorization remains blocked.
+
+## 2026-06-10: Next Reuses Status Decisions
+
+`agentloop next` wraps `getAgentLoopStatus` and prints the same `nextAction` that `agentloop status` computes. It should remain a read-only shortcut for humans, agents, and scripts, not a second planner. Keeping one decision source prevents `status` and `next` from disagreeing as the loop grows.

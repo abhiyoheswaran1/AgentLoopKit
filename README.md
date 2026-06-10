@@ -58,6 +58,7 @@ npx agentloopkit task show .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit task set .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit task status .agentloop/tasks/2026-06-09-add-settings-page.md in-progress
 npx agentloopkit status
+npx agentloopkit next
 npx agentloopkit verify
 npx agentloopkit handoff
 npx agentloopkit check-gates
@@ -76,7 +77,7 @@ npx agentloopkit completion zsh
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, task status, policy status, completion, verify, handoff, report, badge, ci-summary, release-notes, and task archive commands" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, task status, next, policy status, completion, verify, handoff, report, badge, ci-summary, release-notes, and task archive commands" width="100%">
 </p>
 
 The VHS demo runs the local built CLI so the command flow matches this repository even when npm is behind.
@@ -114,6 +115,7 @@ pnpm build
 | `agentloop task current`                | Print the pinned active task                                                   |
 | `agentloop task clear`                  | Clear the active task pointer                                                  |
 | `agentloop status`                      | Show active task, latest report, dirty files, next step                        |
+| `agentloop next`                        | Print only the next recommended loop action                                    |
 | `agentloop check-gates`                 | Check task, verification, handoff, harness, policy, and git evidence           |
 | `agentloop check-gates --strict`        | Treat warning gates as failures for CI                                         |
 | `agentloop verify`                      | Run configured checks and write a verification report                          |
@@ -277,6 +279,16 @@ Use JSON output in scripts:
 ```bash
 agentloop status --json
 ```
+
+Use `agentloop next` when an agent or script only needs the next local command:
+
+```bash
+agentloop next
+agentloop next --json
+```
+
+`next` uses the same decision rules as `status`. It does not run verification commands, create task state, call an LLM, make network requests, or read `.env` contents.
+When an active in-progress task exists, an older verification report does not count as current evidence for that task.
 
 See `docs/status.md` for output fields and next-action rules.
 

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { DEFAULT_COMMAND_KEYS } from './constants.js';
 import {
@@ -52,6 +52,10 @@ export type AgentLoopStatusResult = {
   markdown: string;
 };
 
+type Timestamped<T> = T & {
+  modifiedAtMs: number;
+};
+
 function extractHeading(markdown: string, fallback: string) {
   return markdown.match(/^#\s+(.+)$/m)?.[1]?.trim() || fallback;
 }
@@ -67,27 +71,56 @@ function extractOverallStatus(markdown: string) {
 async function readTask(
   cwd: string,
   filePath: string | undefined,
-): Promise<StatusTask | undefined> {
+): Promise<Timestamped<StatusTask> | undefined> {
   if (!filePath) return undefined;
   const markdown = await readFile(filePath, 'utf8');
+  const fileStat = await stat(filePath);
   return {
     path: path.relative(cwd, filePath),
     title: extractHeading(markdown, path.basename(filePath, '.md')),
     status: extractTaskStatus(markdown),
+    modifiedAtMs: fileStat.mtimeMs,
   };
 }
 
 async function readReport(
   cwd: string,
   filePath: string | undefined,
-): Promise<StatusReport | undefined> {
+): Promise<Timestamped<StatusReport> | undefined> {
   if (!filePath) return undefined;
   const markdown = await readFile(filePath, 'utf8');
+  const fileStat = await stat(filePath);
   return {
     path: path.relative(cwd, filePath),
     title: extractHeading(markdown, path.basename(filePath, '.md')),
     overallStatus: extractOverallStatus(markdown),
+    modifiedAtMs: fileStat.mtimeMs,
   };
+}
+
+function stripTaskTimestamp(task: Timestamped<StatusTask> | undefined): StatusTask | undefined {
+  if (!task) return undefined;
+  return {
+    path: task.path,
+    title: task.title,
+    status: task.status,
+  };
+}
+
+function stripReportTimestamp(
+  report: Timestamped<StatusReport> | undefined,
+): StatusReport | undefined {
+  if (!report) return undefined;
+  return {
+    path: report.path,
+    title: report.title,
+    overallStatus: report.overallStatus,
+  };
+}
+
+function isPostVerificationTaskState(task: Timestamped<StatusTask> | undefined) {
+  const status = task?.status.trim().toLowerCase();
+  return status === 'review' || status === 'done';
 }
 
 function chooseNextAction(input: {
@@ -169,17 +202,26 @@ export async function getAgentLoopStatus(options: {
   const inGit = await isInsideGitRepo(options.cwd);
   const rawStatus = inGit ? await getGitStatus(options.cwd) : '';
   const changedFiles = await parseGitStatus(rawStatus);
-  const activeTask = await readTask(
+  const timestampedTask = await readTask(
     options.cwd,
     (await getActiveTaskPath(options)) ??
       (await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir))),
   );
-  const latestReport = await readReport(
+  const timestampedReport = await readReport(
     options.cwd,
     await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {
       pattern: verificationReportPattern,
     }),
   );
+  const currentReport =
+    timestampedTask &&
+    timestampedReport &&
+    timestampedReport.modifiedAtMs < timestampedTask.modifiedAtMs &&
+    !isPostVerificationTaskState(timestampedTask)
+      ? undefined
+      : timestampedReport;
+  const activeTask = stripTaskTimestamp(timestampedTask);
+  const latestReport = stripReportTimestamp(currentReport);
   const configured = DEFAULT_COMMAND_KEYS.filter((key) => options.config.commands[key]);
   const missing = DEFAULT_COMMAND_KEYS.filter((key) => !options.config.commands[key]);
   const nextAction = chooseNextAction({

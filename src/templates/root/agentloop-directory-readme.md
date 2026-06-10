@@ -25,6 +25,7 @@ Archive only after verification and handoff. The archive command moves one named
 
 ```bash
 agentloop status
+agentloop next
 ```
 
 5. Inspect safety policies when the task touches protected areas:

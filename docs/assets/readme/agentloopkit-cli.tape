@@ -47,6 +47,14 @@ Type "npx agentloop task status .agentloop/tasks/settings.md in-progress"
 Enter
 Sleep 1s
 
+Type "npx agentloop status"
+Enter
+Sleep 1.5s
+
+Type "npx agentloop next"
+Enter
+Sleep 1s
+
 Type "npx agentloop policy list"
 Enter
 Sleep 1s

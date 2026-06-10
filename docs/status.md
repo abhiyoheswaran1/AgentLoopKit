@@ -23,6 +23,15 @@ Use JSON for scripts and agents:
 agentloop status --json
 ```
 
+Use the smaller next-action command when you do not need the full status block:
+
+```bash
+agentloop next
+agentloop next --json
+```
+
+`agentloop next` reads the same local evidence and returns the same recommended command as `status`. It does not run project checks, write `.agentloop/state.json`, read `.env` contents, call an LLM, or make network requests.
+
 Pin the active task:
 
 ```bash
@@ -43,8 +52,9 @@ agentloop task clear
 The command suggests one next action:
 
 - `agentloop create-task` when no task contract exists
-- `agentloop verify` when a task exists without verification evidence
+- `agentloop verify` when an in-progress task exists without verification evidence that is at least as new as the task contract
 - `agentloop verify` when the latest verification report failed
 - `agentloop handoff` when task evidence exists and the working tree has changes
 
-`status` does not execute project commands, read `.env` contents, call an LLM, or make network requests.
+`status` and `next` do not execute project commands, read `.env` contents, call an LLM, or make network requests.
+Older verification reports remain on disk, but `status` and `next` ignore them as current evidence for a newer in-progress task. Moving a task to `review` or `done` after verification does not erase the latest report from the loop state.

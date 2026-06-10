@@ -12,6 +12,7 @@ const topLevelCommands = [
   ['summarize', 'Preview a reviewer summary'],
   ['handoff', 'Write a reviewer handoff'],
   ['status', 'Show current loop state'],
+  ['next', 'Show the next recommended loop action'],
   ['check-gates', 'Check review gate evidence'],
   ['report', 'Write a local HTML evidence report'],
   ['badge', 'Write a local SVG evidence badge'],

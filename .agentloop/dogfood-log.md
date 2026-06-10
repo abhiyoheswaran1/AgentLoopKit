@@ -2566,3 +2566,45 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The command gives maintainers a release handoff without tag mutation, publishing, network calls, token reads, or LLM output.
 - Improve:
   - Configure npm trusted publishing or complete local account authentication, then publish the current prepared release.
+
+## 2026-06-10: Unreleased Next Action Command
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-next-action-command.md`
+- Product cycle: `.agentloop/research/interview-cycle-079.md`
+- Trigger:
+  - `agentloop status` already computed a next action, but agents and scripts needed a smaller command that returns only the next local step.
+  - Dogfooding showed that a new active task could inherit an older passing verification report, which made the next action too optimistic.
+- Product changes:
+  - Added `agentloop next`.
+  - Added `agentloop next --json`.
+  - Reused the existing status engine instead of adding a second decision source.
+  - Updated status logic so a verification report older than an in-progress active task no longer counts as current task evidence.
+  - Kept review/done task status updates from invalidating the latest verification report.
+  - Updated shell completions, README, getting-started docs, status docs, generated harness templates, changelog, decisions, backlog, and README VHS demo source.
+  - Regenerated README Playwright screenshots and the VHS terminal GIF.
+  - Left package metadata at `0.20.0` and recorded the command under `Unreleased`; `v0.20.0` still needs npm catch-up before another release is cut.
+- Verification run:
+  - Red test: `npx pnpm@10.12.1 test tests/next.test.ts tests/completion.test.ts` failed before `next` existed.
+  - Stale-report red test: `npx pnpm@10.12.1 test tests/next.test.ts` failed before status ignored older reports for newer active tasks.
+  - Review/done lifecycle red test: `npx pnpm@10.12.1 test tests/next.test.ts` failed before post-verification task status updates kept report evidence.
+  - Focused green tests: `npx pnpm@10.12.1 test tests/next.test.ts tests/status.test.ts tests/completion.test.ts`: pass, 3 files and 16 tests.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 27 files and 102 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 442 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `git diff --check`: pass.
+  - `npm pack`: pass, produced `agentloopkit-0.20.0.tgz` for local smoke testing.
+  - Packed tarball smoke: pass; installed `/tmp/agentloopkit-0.20.0.tgz` into a temp repo and `npx agentloop next --json` returned `agentloop create-task`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - README screenshots regenerated with Playwright.
+  - README terminal GIF regenerated with VHS from `docs/assets/readme/agentloopkit-cli.tape`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-04-17-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-04-18-pr-summary.md`.
+  - `agentloop check-gates --strict --json`: pass.
+- Worked well:
+  - `agentloop next` made the stale-report issue visible during dogfooding.
+  - Reusing `getAgentLoopStatus` kept the command small and avoided planner scope.
+- Improve:
+  - After npm catches up to `0.20.0`, cut the next real release with `agentloop next` and normal semver.

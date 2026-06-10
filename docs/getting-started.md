@@ -66,7 +66,11 @@ Check the current loop state:
 ```bash
 npx agentloopkit status
 npx agentloopkit status --json
+npx agentloopkit next
+npx agentloopkit next --json
 ```
+
+Use `next` when an agent or script only needs the next recommended command. It reads the same local evidence as `status` and does not run checks or write state.
 
 Inspect the generated safety policies:
 
@@ -99,6 +103,7 @@ After implementation:
 ```bash
 npx agentloopkit verify
 npx agentloopkit status
+npx agentloopkit next
 npx agentloopkit handoff
 npx agentloopkit check-gates
 npx agentloopkit check-gates --strict

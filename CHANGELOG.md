@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Added `agentloop next` for a read-only next-action view backed by the existing status engine
+- Added `agentloop next --json` for agents and scripts that need the next command, reason, active task, latest verification report, and dirty-state context
+- Updated status and next-action logic so a verification report older than an active in-progress task no longer counts as current task evidence
+- Documented that `next` does not run verification commands, mutate task state, call an LLM, make network requests, or read `.env` contents
 
 ## 0.20.0
 
