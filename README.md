@@ -46,15 +46,15 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Latest GitHub release: `v0.22.0`. npm still serves `0.1.1`: the `v0.22.0` publish workflow passed package checks, then npm rejected the final publish with authorization `E404`. The next npm publish should catch up once to `0.22.0`; after that, releases return to normal sequential semver.
+Latest GitHub release: `v0.23.0`. npm still serves `0.1.1`: the `v0.22.0` publish workflow passed package checks, then npm rejected the final publish with authorization `E404`. The next npm publish should catch up once to `0.23.0`; after that, releases return to normal sequential semver.
 
 See [docs/release-status.md](docs/release-status.md) for the current GitHub/npm status and update rules.
 
 Until npm catches up, run the current GitHub release tarball directly:
 
 ```bash
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop version
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop init
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop version
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop init
 ```
 
 Run the CLI after install:
@@ -381,7 +381,7 @@ See `docs/ci-summary.md`.
 ```bash
 agentloop release-notes
 agentloop release-notes --from v0.19.0 --to HEAD
-agentloop release-notes --release-version 0.22.0
+agentloop release-notes --release-version 0.23.0
 agentloop release-notes --json
 agentloop release-notes --write
 ```
@@ -497,7 +497,7 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.22.0` carries task-linked verification reports, failed-verification summaries, the guarded `--task` path behavior, and refreshed README visuals. npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
+AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.23.0` carries task-linked verification reports, failed-verification summaries, the guarded `--task` path behavior, refreshed README visuals, and PowerShell shell completions. npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
 
 Do not publish stale older versions from current `main`. If `CHANGELOG.md` has real entries under `Unreleased`, the prepublish guard blocks npm publish until release metadata is prepared.
 

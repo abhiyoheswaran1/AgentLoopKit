@@ -4,6 +4,16 @@
 
 - No unreleased changes yet.
 
+## 0.23.0
+
+PowerShell completion release candidate. npm still serves `0.1.1` until account authentication or trusted publishing is repaired. This is the normal next minor release after `v0.22.0`; after npm catches up to the current release line, future releases should use ordinary sequential semver:
+
+- Added `agentloop completion powershell` to print a static PowerShell `Register-ArgumentCompleter` script
+- Added `agentloop completion pwsh` as an alias for PowerShell users
+- Included top-level commands, task subcommands, policy subcommands, task statuses, agent names, and shell names in PowerShell completion output
+- Kept completion generation stdout-only with no shell profile mutation, telemetry, network calls, or runtime dependency
+- Updated README and getting-started docs so shell-completion guidance includes PowerShell
+
 ## 0.22.0
 
 Task-linked verification and README evidence release candidate. npm still serves `0.1.1` until account authentication or trusted publishing is repaired. This is the normal next minor release after `v0.21.0`; after npm catches up to the current release line, future releases should use ordinary sequential semver:

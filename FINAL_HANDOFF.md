@@ -122,6 +122,26 @@ npx projscan doctor --format markdown
 
 Latest local verification:
 
+- `0.23.0` PowerShell completion release-candidate verification:
+  - Task contract: `.agentloop/tasks/2026-06-10-prepare-0-23-0-powershell-completion-release.md`.
+  - Product cycle: `.agentloop/research/interview-cycle-091.md`.
+  - Bumped package metadata to `0.23.0`.
+  - Added a `0.23.0` changelog section for PowerShell completions.
+  - `npx pnpm@10.12.1 test`: pass, 28 files and 113 tests.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx pnpm@10.12.1 check:links`: pass, 492 Markdown files checked.
+  - `git diff --check`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - `npm pack --pack-destination /tmp --silent`: pass, produced `/tmp/agentloopkit-0.23.0.tgz`.
+  - Packed tarball smoke: pass; `agentloop version` reported `0.23.0`, `completion powershell` printed `Register-ArgumentCompleter`, and `init --dry-run --json` worked in a temp git repo.
+  - Local tarball SHA-256 before GitHub release: `b96f356db5b5b2f94a0f284590f3d272afe20fe87b6668e10c599164be72b27f`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-06-21-verification-report.md`, overall status `pass`.
+  - npm registry proof before release: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
+  - `npm whoami`: expected fail with `E401`, so npm publish remains blocked from this shell.
+
 - `0.22.0` task-linked verification and README evidence release-candidate verification:
   - Task contracts: `.agentloop/tasks/2026-06-10-improve-verification-failure-summary.md`, `.agentloop/tasks/2026-06-10-include-task-context-in-verification.md`, `.agentloop/tasks/2026-06-10-refresh-readme-visuals-task-context.md`, and `.agentloop/tasks/2026-06-10-prepare-v0-22-0-release.md`.
   - Product cycles: `.agentloop/research/interview-cycle-082.md`, `.agentloop/research/interview-cycle-083.md`, `.agentloop/research/interview-cycle-084.md`, and `.agentloop/research/interview-cycle-085.md`.
@@ -988,11 +1008,11 @@ Current publish gap:
 Current GitHub release while npm serves `0.1.1`:
 
 ```bash
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop init
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop doctor
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop init
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop doctor
 ```
 
-After npm reports `0.22.0` or newer:
+After npm reports `0.23.0` or newer:
 
 ```bash
 npx agentloopkit init
@@ -1790,9 +1810,9 @@ Strongest signals:
 
 Top remaining items:
 
-1. Complete npm browser/OTP authentication or trusted publishing for the current GitHub release, now `agentloopkit@0.22.0`.
+1. Complete npm browser/OTP authentication or trusted publishing for the current GitHub release, now `agentloopkit@0.23.0`.
 2. Optional schema-store submission after npm publishing is stable.
-3. Remove the temporary GitHub tarball fallback from README after npm reports `0.22.0` or newer.
+3. Remove the temporary GitHub tarball fallback from README after npm reports `0.23.0` or newer.
 4. Evaluate organization policy packs only after local policy workflows mature.
 5. Add GitHub issue and PR metadata import after the local workflow matures.
 
@@ -1847,7 +1867,7 @@ Top remaining items:
 - Local `npm publish --access public` for `0.8.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.13.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must complete local browser/OTP authentication.
-- Until npm catches up, current users should run the `v0.22.0` GitHub release tarball with `npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop <command>`.
+- Until npm catches up, current users should run the `v0.23.0` GitHub release tarball with `npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop <command>`.
 - Generated configs use the GitHub raw schema URL for editor support; a branded schema domain is not configured yet.
 - Project detection is heuristic.
 - Monorepo support is warning and guidance only; AgentLoopKit does not infer package graphs or orchestrate workspace checks.
@@ -1971,9 +1991,13 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.22.0`; package checks passed, npm authorization failed.
 - [x] Document temporary `v0.22.0` GitHub tarball usage while npm serves `0.1.1`.
 - [ ] Publish `agentloopkit@0.22.0` to npm.
+- [x] Prepare `agentloopkit@0.23.0` PowerShell completion release candidate.
+- [ ] Publish GitHub release `v0.23.0` with PowerShell completion notes.
+- [ ] Run GitHub Publish workflow for `v0.23.0`.
+- [ ] Publish `agentloopkit@0.23.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install for the published `0.1.1` package with `npx agentloopkit version`.
-- [x] Confirm current GitHub release tarball with `npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop version`.
+- [x] Confirm current GitHub release tarball with `npx --yes --package /tmp/agentloopkit-0.23.0.tgz agentloop version`.
 - [x] Add GitHub repo description and discovery topics.
 - [x] Add initial good-first-issue labels.
 - [ ] Announce launch.
@@ -1997,11 +2021,11 @@ Twitter/X launch post:
 ```text
 I built AgentLoopKit: a local-first npm CLI that gives Codex, Claude Code, Cursor, OpenCode, Gemini CLI, and other coding agents a repo-level engineering loop.
 
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop init
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop init
 
 It generates task contracts, safety policies, verification reports, and PR handoffs. No telemetry. No cloud. No LLM required.
 
-npm currently serves 0.1.1; the GitHub release tarball carries the current 0.22.0 CLI until npm publishing is repaired.
+npm currently serves 0.1.1; the GitHub release tarball carries the current 0.23.0 CLI until npm publishing is repaired.
 ```
 
 Hacker News title:
@@ -2017,8 +2041,8 @@ Title: I built a local-first engineering loop for coding agents
 
 - Problem: agent-generated work can be hard to review
 - Approach: repo-level task contracts, gates, policies, verification reports, and handoffs
-- Install today: npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop init
-- npm status: agentloopkit is published, but npm currently serves 0.1.1 while GitHub release 0.22.0 is current
+- Install today: npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop init
+- npm status: agentloopkit is published, but npm currently serves 0.1.1 while GitHub release 0.23.0 is current
 - What it does not do: no LLM wrapper, no SaaS, no telemetry
 - Example workflow: create-task, verify, handoff
 - Ask: feedback from people using Codex, Claude Code, Cursor, OpenCode, Gemini CLI, or Copilot CLI
@@ -2026,8 +2050,8 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Complete browser/OTP npm publish or trusted publishing for `0.22.0`: high usefulness, low repo effort, external auth required.
-2. Remove the temporary GitHub tarball fallback after npm reports `0.22.0` or newer: high trust value, low effort.
+1. Complete browser/OTP npm publish or trusted publishing for `0.23.0`: high usefulness, low repo effort, external auth required.
+2. Remove the temporary GitHub tarball fallback after npm reports `0.23.0` or newer: high trust value, low effort.
 3. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
 4. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
 5. Add package recipe examples for more monorepo managers: medium usefulness, low effort.

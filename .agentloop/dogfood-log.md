@@ -2987,3 +2987,38 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Adding the shell through the existing static renderer kept the change small and dependency-free.
 - Improve:
   - If users ask for NuShell support, add docs first and a renderer only after the command shape is clear.
+
+## 2026-06-10: 0.23.0 PowerShell Completion Release Prep
+
+- Task contract: `.agentloop/tasks/2026-06-10-prepare-0-23-0-powershell-completion-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-091.md`
+- Trigger:
+  - PowerShell completions landed on `main` after the `v0.22.0` GitHub release.
+  - README documented PowerShell completion, but the current GitHub tarball still pointed at `0.22.0`.
+- Product changes:
+  - Bumped package metadata to `0.23.0`.
+  - Added a `0.23.0` changelog section for PowerShell completions.
+  - Updated README, GitHub Actions docs, release-status docs, npm publishing docs, launch checklist, backlog, and final handoff for the `0.23.0` release target.
+  - Kept npm status explicit: npm still serves `0.1.1`, and local `npm whoami` returns `E401`.
+- Verification run:
+  - `npx pnpm@10.12.1 test`: pass, 28 files and 113 tests.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx pnpm@10.12.1 check:links`: pass, 492 Markdown files checked.
+  - `git diff --check`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm pack --pack-destination /tmp --silent`: pass, produced `/tmp/agentloopkit-0.23.0.tgz`.
+  - Local tarball SHA-256: `b96f356db5b5b2f94a0f284590f3d272afe20fe87b6668e10c599164be72b27f`.
+  - Packed tarball smoke: `npx --yes --package /tmp/agentloopkit-0.23.0.tgz agentloop version` reported `0.23.0`.
+  - Packed tarball PowerShell smoke: `npx --yes --package /tmp/agentloopkit-0.23.0.tgz agentloop completion powershell` printed `Register-ArgumentCompleter`.
+  - Packed tarball init smoke: `agentloop init --dry-run --json` worked in a temp git repo.
+  - `npm publish --access public --dry-run`: pass, including prepublish metadata check, typecheck, Vitest, and build.
+  - `npm view agentloopkit version versions --json`: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
+  - `npm whoami`: expected fail with `E401`; real npm publish remains blocked from this shell.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-prepare-0-23-0-powershell-completion-release.md`: pass, wrote `.agentloop/reports/2026-06-10-06-21-verification-report.md`.
+  - `npx tsx src/cli/index.ts handoff --task .agentloop/tasks/2026-06-10-prepare-0-23-0-powershell-completion-release.md --json`: pass, wrote `.agentloop/handoffs/2026-06-10-06-22-pr-summary.md`.
+- Worked well:
+  - The release candidate stayed metadata- and docs-focused after the feature commit.
+- Improve:
+  - After the GitHub release is created, update launch checklist and release status with the final workflow result.

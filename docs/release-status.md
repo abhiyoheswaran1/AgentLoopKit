@@ -4,10 +4,10 @@ Last checked: June 10, 2026.
 
 ## Current State
 
-- Current GitHub release: `v0.22.0`
-- Current GitHub release asset: `agentloopkit-0.22.0.tgz`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.22.0>
-- Tarball SHA-256: `5ad3a2b35e430d6d9fa10cad4c6023230fc7f3593a8232370c9c2a8945b6489f`
+- Current GitHub release: `v0.23.0`
+- Current GitHub release asset: `agentloopkit-0.23.0.tgz`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.23.0>
+- Tarball SHA-256: `b96f356db5b5b2f94a0f284590f3d272afe20fe87b6668e10c599164be72b27f`
 - npm latest: `0.1.1`
 - npm versions: `0.1.0`, `0.1.1`
 
@@ -16,8 +16,8 @@ Last checked: June 10, 2026.
 npm still serves `0.1.1`. Until npm catches up, run the current GitHub release tarball directly:
 
 ```bash
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop version
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop init
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop version
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop init
 ```
 
 This is a temporary fallback. npm remains the intended main distribution path.
@@ -30,14 +30,14 @@ Local `npm whoami` currently returns `E401`, so local publish is blocked from th
 
 ## Next Publish
 
-Publish `agentloopkit@0.22.0` to npm after one of these is true:
+Publish `agentloopkit@0.23.0` to npm after one of these is true:
 
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - local browser or OTP authentication succeeds and `npm whoami` returns the package owner.
 
 Do not publish stale intermediate versions from current `main`. If an old version must be published, use its matching GitHub tag or release tarball.
 
-After npm reports `0.22.0` or newer:
+After npm reports `0.23.0` or newer:
 
 - remove the temporary GitHub tarball fallback from README;
 - update this page with the new npm proof;
@@ -46,7 +46,7 @@ After npm reports `0.22.0` or newer:
 
 ## Verification Evidence
 
-Local release-candidate checks for `0.22.0` passed:
+Local release-candidate checks for `0.23.0` passed:
 
 - lint
 - typecheck
@@ -56,8 +56,7 @@ Local release-candidate checks for `0.22.0` passed:
 - projscan
 - `npm publish --access public --dry-run`
 - packed-tarball smoke testing
-- Playwright README screenshot rendering
-- VHS README terminal rendering
+- packed-tarball PowerShell completion smoke testing
 
 Latest release-status documentation checks also passed:
 
