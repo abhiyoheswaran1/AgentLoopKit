@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: docs
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 Local npm publish for agentloopkit 0.3.0 passed prepublish checks but stopped at npm EOTP browser or one-time-password authentication.

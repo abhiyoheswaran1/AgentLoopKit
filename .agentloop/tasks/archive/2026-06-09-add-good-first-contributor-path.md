@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: docs
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 AgentLoopKit has issue and PR templates, but a new contributor still has to infer which work is safe for a first contribution.

@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: docs
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 GitHub release `v0.2.0` exists, but npm still reports `agentloopkit@0.1.1` as latest. The docs need an exact recovery path for npm trusted publishing and manual fallback without asking anyone to paste OTPs or tokens into chat.

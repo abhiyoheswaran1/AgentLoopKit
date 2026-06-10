@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: release
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 main contains the active task command after the v0.3.0 GitHub release, but package metadata still says 0.3.0.

@@ -2,6 +2,34 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-10: Clean Completed Trusted Publishing Task
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-verify-npm-trusted-publishing.md`
+- Trigger:
+  - `agentloop status` correctly surfaced the newest open task, but that task had already been satisfied by the `v0.27.0` release.
+  - Public distribution docs still included product-panel notes that belonged in internal planning files, not maintainer-facing release-channel guidance.
+  - Archiving the trusted-publishing task exposed older June 9 `proposed` tasks that had already shipped or been superseded by later releases.
+- Product change:
+  - Marked the trusted-publishing task as `done` with release proof.
+  - Replaced the public product-panel notes in `docs/distribution-channels.md` with factual channel rules.
+  - Updated the backlog note so future agents see trusted publishing as proven, not pending.
+  - Archived 12 stale June 9 proposed tasks after checking shipped evidence for contributor guidance, monorepo guidance, markdown link checking, README visuals, active task commands, product-panel records, and historical release candidates.
+  - Left deferred future distribution tasks in place for Scoop/WinGet and VS Code/Open VSX because those are still future work.
+- Verification completed:
+  - `npx pnpm@10.12.1 check:links`
+  - `git diff --check`
+  - `node dist/cli/index.js task doctor --json`: pass with the known remaining legacy/terminal task-folder warnings.
+  - `node dist/cli/index.js status --json`: pass; no active task and no latest open task remain.
+  - `node dist/cli/index.js npm-status --expect-current`
+  - `npx --yes projscan doctor --format markdown`
+- Verification report: `.agentloop/reports/2026-06-10-22-12-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-10-22-12-pr-summary.md`
+- Archive action: moved the completed trusted-publishing task plus 12 stale June 9 proposals into `.agentloop/tasks/archive/`.
+- Worked well:
+  - The `latestTask` split made stale release work visible without pretending it was active.
+- Improve:
+  - Add a future report view that summarizes stale completed release tasks without requiring manual scans.
+
 ## 2026-06-10: Ignore Terminal Task Fallbacks
 
 - Task contract: `.agentloop/tasks/archive/2026-06-10-ignore-completed-tasks-in-status-fallback.md`

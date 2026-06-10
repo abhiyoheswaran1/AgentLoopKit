@@ -81,16 +81,14 @@ See [mcp.md](mcp.md).
 | P2       | VS Code / Open VSX extension | Helps editor-first users run the loop without leaving the IDE | Later, only after editor UX is scoped                  |
 | P2       | Scoop / WinGet               | Better Windows install path for CLI users                     | Later, after Windows smoke tests and release checksums |
 
-## Product Panel Notes
+## Channel Rules
 
-- Abhi: Keep npm as the wedge. New channels should reduce install friction without changing the product.
-- Maya: Reuse the built CLI and release tarball. Avoid separate implementations per channel.
-- Elias: Each channel needs one copy-paste install path and one verification path.
-- Nora: Lead with `npx`; users should not choose a channel before they understand the tool.
-- Samir: No install scripts, hidden network calls, credential access, telemetry, or opaque binaries.
-- Lina: CI, GitHub Action, Docker, and MCP matter more than editor extensions right now.
-- Tom: Mark a channel supported only when maintainers can verify it from a clean machine.
-- Rachel: GitHub Action and Docker are the strongest small-team adoption paths after npm.
+- Keep npm and GitHub Releases as the source of truth for public versions.
+- Mark a channel supported only after a clean release verifies it.
+- Use the same npm package or release tarball across channels.
+- Keep install commands copy-pasteable.
+- Avoid channel-specific implementations unless the channel requires a small wrapper.
+- Do not add telemetry, postinstall scripts, hidden network calls, credential reads, or opaque binaries.
 
 ## Non-Goals
 

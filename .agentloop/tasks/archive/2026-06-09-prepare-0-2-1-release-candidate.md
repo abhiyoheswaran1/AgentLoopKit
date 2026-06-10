@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: release
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 Two package-behavior improvements landed after the public GitHub `v0.2.0` tag: verification tail excerpts and failed-verification status routing. npm still has not published `0.2.0`, so main must move to a clean next version before any future publish attempt.

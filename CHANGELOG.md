@@ -4,6 +4,7 @@
 
 - Changed `agentloop status` and `agentloop next` so unpinned open task contracts appear as `latestTask`, not `activeTask`, and the next action asks users to pin the task with `agentloop task set <path>`.
 - Added `deferred` as a supported task status for parked work that should remain visible in `task list` but stay out of `status` and `next` fallback selection.
+- Removed internal product-panel notes from the public distribution-channel guide, archived completed trusted-publishing evidence, and cleared stale proposed task contracts from the active task folder.
 
 ## 0.27.0
 

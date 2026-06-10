@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: release
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 

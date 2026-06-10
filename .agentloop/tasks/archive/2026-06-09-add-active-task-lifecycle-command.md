@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: feature
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 AgentLoopKit infers the active task from newest task file modification time, which makes long sessions and multiple same-day tasks ambiguous.
