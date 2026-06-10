@@ -11,6 +11,7 @@ let tempDirs: string[] = [];
 const execFileAsync = promisify(execFile);
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
+const originalPath = process.env.PATH;
 
 async function initGitRepository(dir: string) {
   await execFileAsync('git', ['init'], { cwd: dir });
@@ -18,6 +19,7 @@ async function initGitRepository(dir: string) {
 
 describe('init', () => {
   afterEach(async () => {
+    process.env.PATH = originalPath;
     await Promise.all(tempDirs.map(removeTempDir));
     tempDirs = [];
   });
@@ -130,6 +132,20 @@ describe('init', () => {
     expect(output.commands.configured).toEqual(['test', 'typecheck']);
     expect(output.commands.missing).toEqual(['lint', 'build', 'format']);
     expect(output.git).toEqual({ isRepository: false });
+    await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
+  });
+
+  test('dry-run degrades to no git context when git is missing from PATH', async () => {
+    const dir = await makeTempDir();
+    const emptyPath = await makeTempDir('agentloopkit-empty-path-');
+    tempDirs.push(dir, emptyPath);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo-no-git' });
+
+    process.env.PATH = emptyPath;
+    const result = await initializeAgentLoop({ cwd: dir, dryRun: true });
+
+    expect(result.git).toEqual({ isRepository: false });
+    expect(result.created.some((file) => file.endsWith('AGENTLOOP.md'))).toBe(true);
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
   });
 

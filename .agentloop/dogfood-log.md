@@ -4303,3 +4303,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider grouping first-run context lines if more init context is added later.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-10: Cover Missing Git Executable Behavior
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-handle-missing-git-executable-safely.md`
+- Trigger:
+  - After adding Git context to `init`, I checked whether a missing `git` executable could crash first-run commands.
+- Investigation:
+  - A direct `execa('git', ..., { reject: false })` check with an empty `PATH` returned a failed result object, not a thrown error.
+  - The existing Git helpers already degrade to `false` or empty output when `git` is unavailable.
+- Implementation:
+  - Added `tests/git.test.ts` to cover missing executable behavior for shared Git helpers.
+  - Added init coverage for dry-run behavior with `git` missing from `PATH`.
+  - Added an unreleased changelog note.
+- Verification run:
+  - Focused Git/init tests passed: 2 files, 16 tests.
+  - `.agentloop/reports/2026-06-10-23-22-verification-report.md`, overall status pass.
+  - Full Vitest passed: 34 files, 167 tests.
+  - Lint, typecheck, build, Markdown link check, and `projscan doctor` passed.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-10-23-23-pr-summary.md`
+- What worked well:
+  - The investigation avoided an unnecessary source change.
+- Improve:
+  - Keep the regression test because this is easy to break if Git helpers are refactored.
