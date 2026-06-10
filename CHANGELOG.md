@@ -14,6 +14,7 @@ Release-note handoff release candidate. npm still serves `0.1.1` until account a
 - Included package metadata, git range, changelog section, commits, changed files, working tree status, active task, latest verification report, and latest CI summary when available
 - Kept release-note generation local and read-only unless `--write` is passed: no tag creation, package publishing, provider API calls, token reads, uploads, or changelog rewrites
 - Documented the npm catch-up policy so the version jump from `0.1.1` to the current GitHub line is a one-time recovery path, not the ongoing release strategy
+- Recorded the release-triggered `v0.20.0` Publish workflow failure at npm authorization
 
 ## 0.19.0
 

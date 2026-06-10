@@ -133,6 +133,9 @@ Latest local verification:
   - README screenshots regenerated with Playwright.
   - README terminal GIF regenerated with VHS.
   - AgentLoop verification report: `.agentloop/reports/2026-06-10-03-45-verification-report.md`, overall status `pass`.
+  - GitHub release `v0.20.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.20.0.
+  - GitHub release asset: `agentloopkit-0.20.0.tgz`.
+  - GitHub Publish workflow run `27248000123`: package checks passed, then npm rejected `npm publish --access public` with `E404`.
   - npm registry proof: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
 
 - `0.19.0` local CI summary release-candidate verification:

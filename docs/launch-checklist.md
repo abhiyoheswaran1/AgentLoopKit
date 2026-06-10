@@ -33,7 +33,7 @@ Use this before publishing AgentLoopKit.
 - [x] GitHub release `v0.18.0` is published with policy-status release notes.
 - [x] GitHub release `v0.18.1` is published with policy-customization guidance release notes.
 - [x] GitHub release `v0.19.0` is published with CI-summary release notes.
-- [ ] GitHub release `v0.20.0` is published with release-note handoff notes.
+- [x] GitHub release `v0.20.0` is published with release-note handoff notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -127,6 +127,7 @@ Use this before publishing AgentLoopKit.
 - [x] Publish workflow for `v0.19.0` passed package checks and failed at npm authorization.
 - [x] Package `agentloopkit@0.20.0` is prepared on `main` for release-note handoffs.
 - [ ] Package `agentloopkit@0.20.0` is published.
+- [x] Publish workflow for `v0.20.0` passed package checks and failed at npm authorization.
 - [ ] npm trusted publishing is configured for this repository.
 - [ ] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -223,6 +224,9 @@ Current recovery note:
 - `agentloopkit@0.20.0` is prepared for local release-note handoffs.
 - Local `0.20.0` checks passed: focused release-note tests, typecheck, lint, full Vitest, Markdown link checks, build, projscan, `npm pack`, `npm publish --access public --dry-run`, packed-tarball smoke testing, Playwright screenshot rendering, and VHS terminal rendering.
 - Local `0.20.0` tarball SHA-256: `df8407c7da4440a86a544973bdd052cadb0c0d2b10b1bb67f81548b857fdc201`.
+- GitHub release `v0.20.0` is public with attached `agentloopkit-0.20.0.tgz`.
+- GitHub release `v0.20.0` tarball SHA-256: `df8407c7da4440a86a544973bdd052cadb0c0d2b10b1bb67f81548b857fdc201`.
+- GitHub Publish workflow for `v0.20.0` passed package checks and failed at npm authorization with `E404`.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
 - After `v0.20.0` is verified and released, npm should catch up to `0.20.0` once. Then use normal semver for future releases.

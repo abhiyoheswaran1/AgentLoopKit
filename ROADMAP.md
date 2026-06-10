@@ -42,7 +42,8 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - `0.18.1` exists because package templates changed after `v0.18.0`; publish only from its matching release commit or tarball.
 - The release-triggered GitHub Publish workflow for `v0.18.1` passed package checks and failed at npm authorization.
 - The release-triggered GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization.
-- `0.20.0` is prepared locally and should be the next catch-up candidate after verification and GitHub release.
+- GitHub release `v0.20.0` is public for local release-note handoffs.
+- The release-triggered GitHub Publish workflow for `v0.20.0` passed package checks and failed at npm authorization.
 - After the current prepared release lands on npm, normal semver releases resume.
 
 ## Near Term

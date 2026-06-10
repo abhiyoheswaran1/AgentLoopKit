@@ -2557,6 +2557,9 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - README screenshots regenerated with Playwright.
   - README terminal GIF regenerated with VHS from `docs/assets/readme/agentloopkit-cli.tape`.
   - AgentLoop verification report: `.agentloop/reports/2026-06-10-03-45-verification-report.md`, overall status `pass`.
+  - GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.20.0
+  - GitHub release asset: `agentloopkit-0.20.0.tgz`.
+  - GitHub Publish workflow run `27248000123`: package checks passed, then npm rejected `npm publish --access public` with `E404`.
   - npm registry proof: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
 - Worked well:
   - Dogfooding caught the missing-tag behavior before release.
