@@ -13,6 +13,7 @@ Before changing code:
 - Use `agentloop task set <path>` when the active task is ambiguous.
 - Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
 - Use `agentloop task archive <path>` only after verification and handoff are complete.
+- Use `agentloop task doctor` when old task files need a read-only cleanup checklist.
 - Run `agentloop status` when you need the current task, verification, dirty-file, and next-action state.
 - Run `agentloop next` when you only need the next recommended loop command.
 - Run `agentloop policy list`, `agentloop policy show <policy>`, and `agentloop policy status` before touching security, dependency, database, git, public API, or secret-handling areas.

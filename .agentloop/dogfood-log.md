@@ -3979,3 +3979,22 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - GitHub trusted publishing, GHCR, and MCP Registry all completed from the GitHub release without local tokens.
 - Improve:
   - The release-notes command still includes an in-progress task status if notes are generated before the task is marked done; for future releases, generate public release notes after the final status transition when practical.
+
+## 2026-06-10: Add Task Doctor Diagnostics
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-add-task-doctor-diagnostics.md`
+- Trigger:
+  - Dogfooding showed many finished task contracts still in `.agentloop/tasks/`, including legacy `completed` and `verified` statuses.
+  - Fallback task selection already ignores terminal statuses, but agents still lacked a read-only cleanup checklist.
+- Implementation:
+  - Added `agentloop task doctor` with human and JSON output.
+  - Added diagnostics for terminal tasks, missing status lines, legacy statuses, and unsupported statuses.
+  - Added shell completion coverage, README/docs updates, generated harness updates, and agent-guide updates.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-21-13-verification-report.md`, overall status pass.
+  - Commands included full Vitest, lint, typecheck, build, Markdown link check, `projscan doctor`, and built CLI `task doctor --json`.
+- What worked well:
+  - The new command immediately exposed the repo's own task cleanup backlog: 119 active task files checked, 103 diagnostics, 18 unsupported legacy statuses.
+  - Keeping the command read-only made it safe to run during status checks and verification.
+- Improve:
+  - Consider a later, explicit bulk archive workflow only after the read-only diagnostics have proven useful.

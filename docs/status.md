@@ -40,6 +40,7 @@ agentloop task show .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task status .agentloop/tasks/2026-06-09-add-settings-page.md in-progress
 agentloop task archive .agentloop/tasks/2026-06-09-add-settings-page.md
+agentloop task doctor
 agentloop task current --json
 agentloop task clear
 ```
@@ -48,6 +49,7 @@ agentloop task clear
 `agentloop task show --json` returns one task contract's metadata and Markdown content without changing repo state.
 `agentloop task status --json` updates only the task contract's `- Status:` line. Status is not verification evidence.
 `agentloop task archive --json` moves one named contract into `.agentloop/tasks/archive/`, preserves Markdown content, refuses collisions, and clears the active pointer if needed.
+`agentloop task doctor --json` checks for missing, legacy, unsupported, and terminal statuses in the active task directory without writing state.
 
 The command suggests one next action:
 
@@ -61,3 +63,4 @@ The command suggests one next action:
 Older verification reports remain on disk, but `status` and `next` ignore them as current evidence for a newer in-progress task. Moving a task to `review` or `done` after verification does not erase the latest report from the loop state.
 If a task stays pinned after it reaches `done`, `status` and `next` point you at `agentloop task archive <path>` so the next session starts clean.
 When no active task is pinned, `status` and `next` ignore fallback tasks marked `done`, `completed`, or `verified`. If every task contract is terminal, they recommend `agentloop create-task` instead of resurfacing old work.
+Run `agentloop task doctor` when a repo has many old task files and you need a cleanup checklist before choosing the next task.

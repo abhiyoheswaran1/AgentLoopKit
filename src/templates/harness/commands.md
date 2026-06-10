@@ -15,6 +15,7 @@ Rules:
 - Use `agentloop task set <path>` when the active task is ambiguous.
 - Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
 - Use `agentloop task archive <path>` only after verification and handoff are complete.
+- Use `agentloop task doctor` to find missing, legacy, unsupported, or terminal task statuses without mutating task files.
 - Use `agentloop status` to inspect active task, latest report, dirty files, and next action.
 - Use `agentloop next` when you only need the next recommended loop command.
 - Use `agentloop policy list`, `agentloop policy show <policy>`, and `agentloop policy status` to inspect local safety guidance and template drift before risky edits.

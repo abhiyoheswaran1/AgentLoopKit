@@ -75,6 +75,7 @@ npx agentloopkit task list
 npx agentloopkit task show .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit task set .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit task status .agentloop/tasks/2026-06-09-add-settings-page.md in-progress
+npx agentloopkit task doctor
 npx agentloopkit status
 npx agentloopkit next
 npx agentloopkit verify
@@ -137,6 +138,7 @@ pnpm build
 | `agentloop task archive <path>`         | Move a task contract into `.agentloop/tasks/archive/`                          |
 | `agentloop task current`                | Print the pinned active task                                                   |
 | `agentloop task clear`                  | Clear the active task pointer                                                  |
+| `agentloop task doctor`                 | Check task folder hygiene without mutating task files                          |
 | `agentloop status`                      | Show active task, latest report, dirty files, next step                        |
 | `agentloop next`                        | Print only the next recommended loop action                                    |
 | `agentloop check-gates`                 | Check task, verification, handoff, harness, policy, and git evidence           |
@@ -251,6 +253,7 @@ agentloop task show .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task status .agentloop/tasks/2026-06-09-add-settings-page.md in-progress
 agentloop task archive .agentloop/tasks/2026-06-09-add-settings-page.md
+agentloop task doctor
 agentloop task current
 agentloop task clear
 ```
@@ -260,6 +263,7 @@ agentloop task clear
 `task show --json` returns the selected task metadata and Markdown content without changing active state.
 `task status --json` updates only the `- Status:` line. Supported values are `proposed`, `in-progress`, `blocked`, `review`, and `done`. Status is not verification evidence; run `agentloop verify` before claiming completion.
 `task archive --json` moves one named Markdown contract into `.agentloop/tasks/archive/`, refuses to overwrite an existing archive file, and clears the active task pointer when it archives the active task. Archive after verification and handoff, not as a substitute for either.
+`task doctor --json` checks the active task directory for missing, legacy, unsupported, or terminal status lines. It does not edit, archive, or delete task files.
 
 Each contract records:
 

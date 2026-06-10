@@ -28,11 +28,38 @@ export type ArchivedTask = ActiveTask & {
   previousPath: string;
 };
 
+export type TaskDoctorDiagnostic = {
+  id:
+    | 'legacy-task-status'
+    | 'missing-task-status'
+    | 'terminal-task-in-active-folder'
+    | 'unsupported-task-status';
+  severity: 'warn';
+  path: string;
+  title: string;
+  status: string;
+  message: string;
+  recommendation: string;
+};
+
+export type TaskDoctorResult = {
+  overallStatus: 'pass' | 'warn';
+  counts: {
+    checked: number;
+    diagnostics: number;
+    terminalTasks: number;
+    missingStatuses: number;
+    unsupportedStatuses: number;
+  };
+  diagnostics: TaskDoctorDiagnostic[];
+};
+
 export const TASK_STATUSES = ['proposed', 'in-progress', 'blocked', 'review', 'done'] as const;
 
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 
 const TERMINAL_FALLBACK_TASK_STATUSES = new Set(['done', 'completed', 'verified']);
+const LEGACY_TASK_STATUSES = new Set(['completed', 'verified']);
 
 function statePath(cwd: string, config: AgentLoopConfig) {
   return path.join(cwd, config.paths.agentloopDir, 'state.json');
@@ -278,4 +305,91 @@ export async function listTasks(options: {
       active: task.active,
       modifiedAt: task.modifiedAt,
     }));
+}
+
+export async function inspectTaskDirectory(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+}): Promise<TaskDoctorResult> {
+  const tasks = await listTasks(options);
+  const diagnostics: TaskDoctorDiagnostic[] = [];
+
+  for (const task of tasks) {
+    const status = task.status.trim().toLowerCase();
+    if (status === 'unknown') {
+      diagnostics.push({
+        id: 'missing-task-status',
+        severity: 'warn',
+        path: task.path,
+        title: task.title,
+        status,
+        message: 'Task contract has no supported Status line.',
+        recommendation:
+          'Add a `- Status: proposed` line or recreate the contract with `agentloop create-task`.',
+      });
+      continue;
+    }
+
+    if (LEGACY_TASK_STATUSES.has(status)) {
+      diagnostics.push({
+        id: 'legacy-task-status',
+        severity: 'warn',
+        path: task.path,
+        title: task.title,
+        status,
+        message: `Task contract uses legacy terminal status "${status}".`,
+        recommendation: `Run \`agentloop task status ${task.path} done\`, then archive it after verification and handoff.`,
+      });
+      continue;
+    }
+
+    if (!(TASK_STATUSES as readonly string[]).includes(status)) {
+      diagnostics.push({
+        id: 'unsupported-task-status',
+        severity: 'warn',
+        path: task.path,
+        title: task.title,
+        status,
+        message: `Task contract uses unsupported status "${task.status}".`,
+        recommendation: `Run \`agentloop task status ${task.path} proposed\` or another supported status.`,
+      });
+      continue;
+    }
+
+    if (status === 'done') {
+      diagnostics.push({
+        id: 'terminal-task-in-active-folder',
+        severity: 'warn',
+        path: task.path,
+        title: task.title,
+        status,
+        message: 'Terminal task contract is still in the active task folder.',
+        recommendation: `Run \`agentloop task archive ${task.path}\` after verification and handoff.`,
+      });
+    }
+  }
+
+  diagnostics.sort((left, right) => {
+    const byId = left.id.localeCompare(right.id);
+    if (byId !== 0) return byId;
+    return left.path.localeCompare(right.path);
+  });
+
+  return {
+    overallStatus: diagnostics.length === 0 ? 'pass' : 'warn',
+    counts: {
+      checked: tasks.length,
+      diagnostics: diagnostics.length,
+      terminalTasks: tasks.filter((task) =>
+        TERMINAL_FALLBACK_TASK_STATUSES.has(task.status.trim().toLowerCase()),
+      ).length,
+      missingStatuses: tasks.filter((task) => task.status.trim().toLowerCase() === 'unknown')
+        .length,
+      unsupportedStatuses: tasks.filter((task) => {
+        const status = task.status.trim().toLowerCase();
+        return status !== 'unknown' && !(TASK_STATUSES as readonly string[]).includes(status);
+      }).length,
+    },
+    diagnostics,
+  };
 }

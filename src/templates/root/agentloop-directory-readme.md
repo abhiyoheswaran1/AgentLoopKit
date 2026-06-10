@@ -17,9 +17,10 @@ agentloop task show .agentloop/tasks/<task-file>.md
 agentloop task set .agentloop/tasks/<task-file>.md
 agentloop task status .agentloop/tasks/<task-file>.md in-progress
 agentloop task archive .agentloop/tasks/<task-file>.md
+agentloop task doctor
 ```
 
-Archive only after verification and handoff. The archive command moves one named Markdown file into `.agentloop/tasks/archive/` and keeps normal task lists focused.
+Archive only after verification and handoff. The archive command moves one named Markdown file into `.agentloop/tasks/archive/` and keeps normal task lists focused. Use `agentloop task doctor` when old task files need a read-only cleanup checklist.
 
 4. Check current loop state:
 

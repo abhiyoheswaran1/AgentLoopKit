@@ -36,6 +36,7 @@ const taskCommandSpecs = [
   ['archive', 'Archive a task contract'],
   ['current', 'Print the active task contract'],
   ['clear', 'Clear the active task pointer'],
+  ['doctor', 'Check task folder hygiene'],
 ] as const;
 
 const taskCommands = taskCommandSpecs.map(([name]) => name);

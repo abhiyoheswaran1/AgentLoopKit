@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Added `agentloop task doctor`, a read-only task folder hygiene check for missing, legacy, unsupported, and terminal task statuses.
+- Added `task doctor` to shell completions, README usage, task docs, generated harness guidance, and bundled agent instructions.
 
 ## 0.26.5
 

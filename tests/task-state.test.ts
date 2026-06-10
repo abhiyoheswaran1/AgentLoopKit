@@ -245,6 +245,115 @@ describe('task command', () => {
     await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
   });
 
+  test('reports task folder hygiene diagnostics from the CLI without writing state', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-done.md'),
+      '# Done\n\n- Status: done\n',
+    );
+    await writeFile(path.join(dir, '.agentloop/tasks/2026-06-09-missing.md'), '# Missing\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-completed.md'),
+      '# Completed\n\n- Status: completed\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-verified.md'),
+      '# Verified\n\n- Status: verified\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/archive/2026-06-09-archived.md'),
+      '# Archived\n\n- Status: done\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'doctor', '--json'], { cwd: dir });
+
+    const output = JSON.parse(result.stdout);
+    expect(output.taskDoctor).toMatchObject({
+      overallStatus: 'warn',
+      counts: {
+        checked: 5,
+        diagnostics: 4,
+        terminalTasks: 3,
+        missingStatuses: 1,
+        unsupportedStatuses: 2,
+      },
+    });
+    expect(output.taskDoctor.diagnostics.map((item: { id: string }) => item.id)).toEqual([
+      'legacy-task-status',
+      'legacy-task-status',
+      'missing-task-status',
+      'terminal-task-in-active-folder',
+    ]);
+    expect(output.taskDoctor.diagnostics).toContainEqual(
+      expect.objectContaining({
+        id: 'terminal-task-in-active-folder',
+        severity: 'warn',
+        path: '.agentloop/tasks/2026-06-09-done.md',
+        status: 'done',
+        recommendation:
+          'Run `agentloop task archive .agentloop/tasks/2026-06-09-done.md` after verification and handoff.',
+      }),
+    );
+    expect(output.taskDoctor.diagnostics).toContainEqual(
+      expect.objectContaining({
+        id: 'missing-task-status',
+        path: '.agentloop/tasks/2026-06-09-missing.md',
+        status: 'unknown',
+      }),
+    );
+    await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
+  });
+
+  test('prints a concise human task doctor report from the CLI', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-done.md'),
+      '# Done\n\n- Status: done\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-completed.md'),
+      '# Completed\n\n- Status: completed\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'doctor'], { cwd: dir });
+
+    expect(result.stdout).toContain('# AgentLoopKit Task Doctor');
+    expect(result.stdout).toContain('Status: warn');
+    expect(result.stdout).toContain('terminal-task-in-active-folder');
+    expect(result.stdout).toContain('legacy-task-status');
+    expect(result.stdout).toContain('agentloop task archive .agentloop/tasks/2026-06-09-done.md');
+  });
+
+  test('passes task doctor when active task files use supported non-terminal statuses', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-review.md'),
+      '# Review\n\n- Status: review\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/archive/2026-06-09-archived.md'),
+      '# Archived\n\n- Status: done\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'doctor', '--json'], { cwd: dir });
+
+    expect(JSON.parse(result.stdout)).toEqual({
+      taskDoctor: {
+        overallStatus: 'pass',
+        counts: {
+          checked: 2,
+          diagnostics: 0,
+          terminalTasks: 0,
+          missingStatuses: 0,
+          unsupportedStatuses: 0,
+        },
+        diagnostics: [],
+      },
+    });
+  });
+
   test('shows task contract content from the CLI without writing state', async () => {
     const { dir } = await createTaskStateFixture();
 

@@ -69,11 +69,13 @@ npx agentloopkit task list
 npx agentloopkit task show .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit task set .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit task status .agentloop/tasks/2026-06-09-add-settings-page.md in-progress
+npx agentloopkit task doctor
 npx agentloopkit task current
 ```
 
 Use `task status` to keep the task contract current during the loop. Supported statuses are `proposed`, `in-progress`, `blocked`, `review`, and `done`.
 After verification and handoff, use `npx agentloopkit task archive <path>` to move a finished contract into `.agentloop/tasks/archive/` without deleting it.
+Use `task doctor` when a repo has old task files and you need a read-only cleanup checklist before choosing the next active task.
 
 Check the current loop state:
 

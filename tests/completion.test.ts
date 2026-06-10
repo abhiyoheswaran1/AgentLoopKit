@@ -21,6 +21,7 @@ describe('completion scripts', () => {
     expect(script).toContain('show:Show a local policy');
     expect(script).toContain('status:Show local policy template status');
     expect(script).toContain('task:List, inspect, update, or archive task contracts');
+    expect(script).toContain('doctor:Check task folder hygiene');
     expect(script).toContain('status:Update a task contract status');
     expect(script).toContain('in-progress');
     expect(script).toContain('claude-code');
@@ -36,7 +37,7 @@ describe('completion scripts', () => {
     expect(script).toContain('release-notes');
     expect(script).toContain('npm-status');
     expect(script).toContain('next');
-    expect(script).toContain('list show set status archive current clear');
+    expect(script).toContain('list show set status archive current clear doctor');
     expect(script).toContain('compgen -W "list show status"');
     expect(script).toContain(
       'codex claude-code cursor opencode gemini-cli github-copilot-cli generic all',
@@ -58,12 +59,15 @@ describe('completion scripts', () => {
     const aliasScript = renderCompletionScript('pwsh');
 
     expect(script).toContain('# AgentLoopKit PowerShell completion');
-    expect(script).toContain('Register-ArgumentCompleter -Native -CommandName agentloop, agentloopkit');
+    expect(script).toContain(
+      'Register-ArgumentCompleter -Native -CommandName agentloop, agentloopkit',
+    );
     expect(script).toContain("'ci-summary'");
     expect(script).toContain("'release-notes'");
     expect(script).toContain("'npm-status'");
     expect(script).toContain("'task'");
     expect(script).toContain("'archive'");
+    expect(script).toContain("'doctor'");
     expect(script).toContain("'policy'");
     expect(script).toContain("'status'");
     expect(script).toContain("'in-progress'");

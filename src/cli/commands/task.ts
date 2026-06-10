@@ -4,12 +4,19 @@ import {
   archiveTask,
   clearActiveTask,
   getActiveTask,
+  inspectTaskDirectory,
   listTasks,
   readTaskContract,
   setActiveTask,
   updateTaskStatus,
 } from '../../core/task-state.js';
-import type { ActiveTask, ArchivedTask, ListedTask, TaskContract } from '../../core/task-state.js';
+import type {
+  ActiveTask,
+  ArchivedTask,
+  ListedTask,
+  TaskContract,
+  TaskDoctorResult,
+} from '../../core/task-state.js';
 
 function printTask(
   task: Awaited<ReturnType<typeof getActiveTask>> | null,
@@ -73,6 +80,41 @@ function printArchivedTask(task: ArchivedTask, options: { json?: boolean }) {
   console.log(`${task.previousPath} -> ${task.path}`);
 }
 
+function printTaskDoctor(result: TaskDoctorResult, options: { json?: boolean }) {
+  if (options.json) {
+    console.log(JSON.stringify({ taskDoctor: result }, null, 2));
+    return;
+  }
+
+  console.log('# AgentLoopKit Task Doctor');
+  console.log('');
+  console.log(`Status: ${result.overallStatus}`);
+  console.log(`Checked: ${result.counts.checked}`);
+  console.log(`Diagnostics: ${result.counts.diagnostics}`);
+
+  if (result.diagnostics.length === 0) {
+    console.log('');
+    console.log('No task folder hygiene issues found.');
+    return;
+  }
+
+  console.log('');
+  for (const diagnostic of result.diagnostics) {
+    console.log(`- [${diagnostic.severity}] ${diagnostic.id}: ${diagnostic.title}`);
+    console.log(`  Path: ${diagnostic.path}`);
+    console.log(`  Status: ${diagnostic.status}`);
+    console.log(`  ${diagnostic.message}`);
+    console.log(`  Recommendation: ${diagnostic.recommendation}`);
+  }
+
+  console.log('');
+  console.log('Next steps:');
+  console.log('- Archive terminal task contracts after verification and handoff.');
+  console.log(
+    '- Normalize missing or legacy status lines before relying on fallback task selection.',
+  );
+}
+
 export function taskCommand() {
   const command = new Command('task').description(
     'List, inspect, update, or archive task contracts',
@@ -131,6 +173,16 @@ export function taskCommand() {
       const config = await loadAgentLoopConfig(process.cwd());
       const task = await archiveTask({ cwd: process.cwd(), config, taskPath });
       printArchivedTask(task, options);
+    });
+
+  command
+    .command('doctor')
+    .option('--json', 'print machine-readable output')
+    .description('Check task folder hygiene')
+    .action(async (options: { json?: boolean }) => {
+      const config = await loadAgentLoopConfig(process.cwd());
+      const result = await inspectTaskDirectory({ cwd: process.cwd(), config });
+      printTaskDoctor(result, options);
     });
 
   command
