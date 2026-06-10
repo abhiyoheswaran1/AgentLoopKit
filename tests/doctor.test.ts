@@ -1,11 +1,21 @@
 import path from 'node:path';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { mkdir, realpath, rm, writeFile } from 'node:fs/promises';
+import { promisify } from 'node:util';
+import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
-import { makeTempDir, removeTempDir } from './helpers.js';
+import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 import { initializeAgentLoop } from '../src/core/init.js';
 import { runDoctor } from '../src/core/doctor.js';
 
 let tempDirs: string[] = [];
+const execFileAsync = promisify(execFile);
+const cliPath = path.resolve('src/cli/index.ts');
+const tsxPath = path.resolve('node_modules/.bin/tsx');
+
+async function initGitRepository(dir: string) {
+  await execFileAsync('git', ['init'], { cwd: dir });
+}
 
 describe('doctor', () => {
   afterEach(async () => {
@@ -28,6 +38,54 @@ describe('doctor', () => {
       message: 'template version 1 is current',
     });
     expect(result.markdown).toContain('AgentLoopKit Doctor');
+  });
+
+  test('reports git root context for repository root targets', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await initializeAgentLoop({ cwd: dir });
+
+    const result = await runDoctor({ cwd: dir });
+
+    expect(result.git).toEqual({
+      isRepository: true,
+      root: await realpath(dir),
+      targetIsRoot: true,
+    });
+    expect(result.checks).toContainEqual({
+      name: 'Git root',
+      status: 'pass',
+      message: await realpath(dir),
+    });
+    expect(result.checks).toContainEqual({
+      name: 'Git target',
+      status: 'pass',
+      message: 'current directory is the Git root',
+    });
+    expect(result.markdown).not.toContain('AgentLoopKit files live in the current directory');
+  });
+
+  test('doctor human output warns when target is a git repository subdirectory', async () => {
+    const dir = await makeTempDir();
+    const packageDir = path.join(dir, 'packages', 'web');
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await mkdir(packageDir, { recursive: true });
+    await writeJson(path.join(packageDir, 'package.json'), { name: 'demo-web' });
+    await initializeAgentLoop({ cwd: packageDir });
+
+    const result = await execa(tsxPath, [cliPath, 'doctor'], {
+      cwd: packageDir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain(`- [pass] Git root: ${await realpath(dir)}`);
+    expect(result.stdout).toContain('- [warn] Git target: current directory is a Git subdirectory');
+    expect(result.stdout).toContain(
+      '- [warn] Git subdirectory target: AgentLoopKit files live in the current directory, not the Git root.',
+    );
   });
 
   test('warns when template manifest is missing', async () => {

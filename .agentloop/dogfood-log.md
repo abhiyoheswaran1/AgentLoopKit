@@ -4375,3 +4375,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Watch for repeated confusion around subdirectory initialization before adding stronger warnings or confirmation flows.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-10: Show Git Target Context in Doctor
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-show-git-target-context-in-doctor.md`
+- Trigger:
+  - `agentloop init` explained Git root and subdirectory targets, but `agentloop doctor` did not repeat that context after setup.
+- Implementation:
+  - Added structured `git.isRepository`, `git.root`, and `git.targetIsRoot` fields to doctor results.
+  - Added human doctor checks for Git root, Git target, and a subdirectory target warning.
+  - Updated README, getting-started docs, changelog, backlog, and doctor tests.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-23-52-verification-report.md`, overall status pass.
+  - Focused doctor tests failed before implementation because `result.git` and human Git target rows were missing.
+  - Focused doctor tests passed after implementation: 1 file, 8 tests.
+  - Full Vitest passed: 34 files, 172 tests.
+  - Lint, typecheck, build, Markdown link check, `projscan doctor`, and built CLI nested-package doctor smoke passed.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-10-23-53-pr-summary.md`
+- What worked well:
+  - The same Git target context now appears during setup and post-setup health checks.
+- Improve:
+  - Keep subdirectory handling warning-only until real user confusion justifies confirmation prompts.
+  - Keep this unreleased until the planned `0.28.0` batch.

@@ -1,8 +1,9 @@
 import path from 'node:path';
+import { realpath } from 'node:fs/promises';
 import { AGENTLOOP_MANIFEST_FILE, CONFIG_FILE, CURRENT_TEMPLATE_VERSION } from './constants.js';
 import { loadAgentLoopConfig } from './config.js';
 import { pathExists, readTextIfExists } from './file-system.js';
-import { commandExists, getGitStatus, isInsideGitRepo } from './git.js';
+import { commandExists, getGitRoot, getGitStatus, isInsideGitRepo } from './git.js';
 import { detectPackageManager } from './package-manager.js';
 import { detectMonorepo, detectPackageScripts, detectProjectType } from './project-detection.js';
 import { detectRiskFiles } from './safety.js';
@@ -17,6 +18,11 @@ export type DoctorResult = {
   checks: DoctorCheck[];
   warnings: DoctorCheck[];
   serious: DoctorCheck[];
+  git: {
+    isRepository: boolean;
+    root: string;
+    targetIsRoot: boolean;
+  };
   markdown: string;
 };
 
@@ -47,6 +53,14 @@ function formatRiskFiles(files: string[]) {
   const preview = files.slice(0, 3).join(', ');
   const remaining = files.length - 3;
   return `${files.length} detected: ${preview}${remaining > 0 ? ` (+${remaining} more)` : ''}`;
+}
+
+async function resolveComparablePath(filePath: string) {
+  try {
+    return await realpath(filePath);
+  } catch {
+    return path.resolve(filePath);
+  }
 }
 
 async function checkTemplateManifest(cwd: string): Promise<DoctorCheck> {
@@ -114,6 +128,37 @@ export async function runDoctor(options: { cwd: string }): Promise<DoctorResult>
       inGit ? 'inside a git repo' : 'not inside a git repo',
     ),
   );
+  const gitRoot = inGit ? await getGitRoot(cwd) : '';
+  const resolvedGitRoot = gitRoot ? await resolveComparablePath(gitRoot) : '';
+  const targetIsRoot = resolvedGitRoot
+    ? resolvedGitRoot === (await resolveComparablePath(cwd))
+    : false;
+  const git = {
+    isRepository: inGit,
+    root: resolvedGitRoot,
+    targetIsRoot,
+  };
+  if (inGit) {
+    checks.push(check('Git root', 'pass', resolvedGitRoot));
+    checks.push(
+      check(
+        'Git target',
+        targetIsRoot ? 'pass' : 'warn',
+        targetIsRoot
+          ? 'current directory is the Git root'
+          : 'current directory is a Git subdirectory',
+      ),
+    );
+    if (!targetIsRoot) {
+      checks.push(
+        check(
+          'Git subdirectory target',
+          'warn',
+          'AgentLoopKit files live in the current directory, not the Git root.',
+        ),
+      );
+    }
+  }
 
   const status = inGit ? await getGitStatus(cwd) : '';
   checks.push(
@@ -203,5 +248,5 @@ ${checks
   .join('\n')}
 `;
 
-  return { checks, warnings, serious, markdown };
+  return { checks, warnings, serious, git, markdown };
 }
