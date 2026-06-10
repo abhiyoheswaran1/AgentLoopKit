@@ -4445,3 +4445,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider a shared formatter for Git target output if more commands need the same wording.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Avoid Stale Pinned Versions in User-Facing Distribution Docs
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-avoid-stale-pinned-versions-in-user-facing-distribution-docs.md`
+- Trigger:
+  - README, MCP, and distribution examples pinned `0.27.0` in normal user-facing commands, which would make docs look stale after the planned `0.28.0` batch.
+- Implementation:
+  - Replaced normal npm/npx examples with `@latest`.
+  - Replaced maintainer pin examples with `<version>` placeholders.
+  - Kept historical release evidence unchanged.
+  - Updated the changelog and backlog.
+- Verification run:
+  - `.agentloop/reports/2026-06-11-00-22-verification-report.md`, overall status pass.
+  - Full configured verification passed: Vitest 34 files and 174 tests, lint, typecheck, and build.
+  - Manual docs checks passed: Markdown link check, `projscan doctor`, whitespace diff check, and stale-version/Homebrew scan across README, MCP docs, distribution docs, and AGENTS.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-11-00-24-pr-summary.md`
+- What worked well:
+  - The public docs now avoid avoidable current-version drift while still showing where maintainers should pin.
+- Improve:
+  - `agentloop verify` did not automatically run verification commands listed in the task contract; treat that as the next bug-pass candidate.
+  - Keep this unreleased until the planned `0.28.0` batch.

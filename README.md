@@ -59,12 +59,14 @@ npx agentloopkit init --local-only
 
 `--local-only` writes the same files, then adds a marked block to this clone's `.git/info/exclude` for `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, and `agentloop.config.json`. It does not edit `.gitignore`, global Git config, shell profiles, or files outside the current repo.
 
-Pin the current version when you need repeatable CI or team setup:
+Check the published package explicitly:
 
 ```bash
-npx --yes agentloopkit@0.27.0 version
-npx --yes agentloopkit@0.27.0 init
+npx --yes agentloopkit@latest version
+npx --yes agentloopkit@latest init
 ```
+
+For repeatable CI or team setup, replace `@latest` with a vetted version.
 
 Run the CLI after install:
 
@@ -406,7 +408,7 @@ See `docs/ci-summary.md`.
 ```bash
 agentloop release-notes
 agentloop release-notes --from v0.19.0 --to HEAD
-agentloop release-notes --release-version 0.27.0
+agentloop release-notes --release-version <version>
 agentloop release-notes --json
 agentloop release-notes --write
 ```
@@ -436,7 +438,7 @@ See `docs/npm-status.md`.
 AgentLoopKit can expose existing repo evidence to MCP clients through a read-only stdio server:
 
 ```bash
-npx --yes agentloopkit@0.27.0 mcp-server
+npx --yes agentloopkit@latest mcp-server
 ```
 
 The server provides tools for status, next action, task contracts, active task, policies, latest verification report, and handoff summaries. It does not run verification commands, edit files, call external APIs, read `.env` contents, or upload data.
@@ -485,7 +487,7 @@ Use `agentloop check-gates --strict` as a review-evidence gate in pull request C
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
-See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.27.0` or a newer vetted release when reproducibility matters.
+See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@<version>` when reproducibility matters.
 
 ## Other Install Channels
 
