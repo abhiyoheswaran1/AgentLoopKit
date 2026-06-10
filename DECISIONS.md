@@ -99,3 +99,7 @@ npm still serves `agentloopkit@0.1.1` while public GitHub releases already exist
 ## 2026-06-10: Next Reuses Status Decisions
 
 `agentloop next` wraps `getAgentLoopStatus` and prints the same `nextAction` that `agentloop status` computes. It should remain a read-only shortcut for humans, agents, and scripts, not a second planner. Keeping one decision source prevents `status` and `next` from disagreeing as the loop grows.
+
+## 2026-06-10: Prepublish Fails With Unreleased Changelog Entries
+
+Current `main` may contain work after the latest GitHub release tag. `prepublishOnly` should fail while `CHANGELOG.md` has real entries under `## Unreleased`, so npm cannot publish contents that do not match package metadata. Release prep must move those entries into a versioned section and reset `Unreleased` before publishing from `main`.

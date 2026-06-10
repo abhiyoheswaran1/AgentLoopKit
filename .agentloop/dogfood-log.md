@@ -2608,3 +2608,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Reusing `getAgentLoopStatus` kept the command small and avoided planner scope.
 - Improve:
   - After npm catches up to `0.20.0`, cut the next real release with `agentloop next` and normal semver.
+
+## 2026-06-10: Publish Metadata Guard
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-publish-metadata-guard.md`
+- Product cycle: `.agentloop/research/interview-cycle-080.md`
+- Trigger:
+  - Current `main` has unreleased work after `v0.20.0` while package metadata still says `0.20.0`.
+  - A direct `npm publish` from `main` would publish contents that do not match the existing `v0.20.0` release notes.
+- Product changes:
+  - Added `scripts/prepublish-check.mjs`.
+  - Wired the check into `prepublishOnly` before typecheck, tests, and build.
+  - Added Vitest coverage for failing with real unreleased entries and passing when `Unreleased` is empty.
+  - Updated npm publishing docs, README launch notes, changelog, decisions, backlog, and product-panel records.
+  - Left `.github/workflows/publish.yml` unchanged.
+- Verification run:
+  - Red test: `npx pnpm@10.12.1 test tests/prepublish-check.test.ts` failed before the guard script existed.
+  - Focused green test: `npx pnpm@10.12.1 test tests/prepublish-check.test.ts`: pass, 1 file and 2 tests.
+  - Dogfood guard on current repo: `node scripts/prepublish-check.mjs` failed as intended because `CHANGELOG.md` has unreleased entries.
+  - `npx pnpm@10.12.1 lint`: initially failed on Node globals in the `.mjs` script, then passed after declaring the script globals.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 28 files and 104 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 444 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm publish --access public --dry-run`: failed as intended at `prepublishOnly` because `CHANGELOG.md` has unreleased entries.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-04-25-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-04-25-pr-summary.md`.
+  - `agentloop check-gates --strict --json`: pass.
+- Worked well:
+  - The guard catches the exact release-safety problem before npm credentials or network publish actions are involved.
+- Improve:
+  - During the next release prep, move `Unreleased` entries into `0.21.0`, reset `Unreleased`, and verify that the guard passes.

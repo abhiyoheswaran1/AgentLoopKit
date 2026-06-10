@@ -484,6 +484,8 @@ See `ROADMAP.md`.
 
 AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.20.0` carries the release-note handoff command and a tarball asset. npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
 
+Current `main` has unreleased work after `v0.20.0`. Publish the `0.20.0` npm catch-up only from the matching GitHub release tarball or tag, not from current `main`.
+
 The npm version jump is intentional. The skipped npm numbers already exist as public GitHub release candidates while npm publishing was blocked, so the next npm publish should ship the current release line rather than backfilling old source snapshots.
 
 The repository includes a GitHub Actions publish workflow for npm trusted publishing after the package is configured on npm. The workflow runs checks before `npm publish` and skips publish when the version already exists.
