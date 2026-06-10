@@ -53,15 +53,15 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.26.1`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.1>
-- Release asset: `agentloopkit-0.26.1.tgz`
-- Release asset SHA-256: `cf836155a2cdfaf8eff818202aa651fc32b3b39a49256f25d0925ffbadad5cc6`
-- CI run: `27283261603`
-- Publish workflow run: `27283286721`
-- Docker workflow run: `27283287182`
-- MCP Registry workflow run: `27283372191`
-- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.26.1`
+- Current npm release: `agentloopkit@0.26.2`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.2>
+- Release asset: `agentloopkit-0.26.2.tgz`
+- Release asset SHA-256: `3b38dcba05817137630bd4509a2ec40b184cac2432104ee5ed2689c76518b6ee`
+- CI run: `27285878963`
+- Publish workflow run: `27285894024`
+- Docker workflow run: `27285894045`
+- MCP Registry workflow run: `27285979859`
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.26.2`
 
 ## CLI commands
 
@@ -1033,9 +1033,9 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.26.1` is public.
-- npm latest is `0.26.1`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, and `0.26.1`.
-- GHCR and MCP Registry are live for `0.26.1`.
+- GitHub release `v0.26.2` is public.
+- npm latest is `0.26.2`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, and `0.26.2`.
+- GHCR and MCP Registry are live for `0.26.2`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

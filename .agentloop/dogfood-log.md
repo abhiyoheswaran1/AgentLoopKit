@@ -3742,3 +3742,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Whitespace: `git diff --check`: pass.
   - Projscan: `npx --yes projscan doctor --format markdown`: A, 97/100, with one existing informational unused-export warning for `scripts/smoke-packed-release.mjs`.
   - AgentLoop verification: `.agentloop/reports/2026-06-10-16-57-verification-report.md`, overall status pass.
+
+## 2026-06-10: Release 0.26.2 Cleanup Patch
+
+- Task contract: `.agentloop/tasks/2026-06-10-release-0-26-2-cleanup-patch.md`
+- Trigger:
+  - The cleanup work was on `main`, but npm and GitHub Releases still needed a patch release.
+  - Public docs also needed to stop presenting an unsupported install channel as a current release path.
+- Release proof:
+  - GitHub release `v0.26.2` is public with attached `agentloopkit-0.26.2.tgz`.
+  - GitHub release tarball SHA-256: `3b38dcba05817137630bd4509a2ec40b184cac2432104ee5ed2689c76518b6ee`.
+  - npm Publish workflow `27285894024` passed and published `agentloopkit@0.26.2`.
+  - Docker/GHCR workflow `27285894045` passed for `0.26.2`.
+  - MCP Registry workflow `27285979859` passed for `0.26.2`.
+  - `npm view agentloopkit dist-tags version versions --json` reports `latest: 0.26.2`.
+  - `https://registry.npmjs.org/agentloopkit/latest` reports `version: 0.26.2`.
+- Verification run:
+  - `node scripts/prepublish-check.mjs`: pass.
+  - `npx --yes pnpm@10.12.1 test`: pass, 33 files and 145 tests.
+  - `npx --yes pnpm@10.12.1 typecheck`: pass.
+  - `npx --yes pnpm@10.12.1 lint`: pass.
+  - `npx --yes pnpm@10.12.1 build`: pass.
+  - `npx --yes pnpm@10.12.1 check:links`: pass, 607 files checked.
+  - `npm run smoke:release`: pass.
+  - `npm publish --access public --dry-run`: pass.
+  - `git diff --check`: pass.
+  - `node dist/cli/index.js npm-status --expect-current`: pass after publish.
+  - Direct temp install of `agentloopkit@0.26.2`: both `agentloop version` and `agentloopkit version` printed `0.26.2`.
+- Worked well:
+  - Trusted publishing released npm without handling npm tokens locally.
+  - The registry proof was faster and more reliable than the npm website UI.
+- Improve:
+  - After each release, update status docs in the same follow-up commit if the release workflow runs after the version-prep commit.
+  - Treat npmjs.com package pages as a web UI that can lag the registry; use `npm view` and the registry endpoint for release proof.
