@@ -79,7 +79,7 @@ describe('ci-summary command', () => {
     const result = await execa(tsxPath, [cliPath, 'ci-summary'], {
       cwd: dir,
       reject: false,
-      env: { CI: 'true' },
+      env: { CI: 'true', GITHUB_ACTIONS: 'false' },
     });
 
     expect(result.exitCode).toBe(0);
