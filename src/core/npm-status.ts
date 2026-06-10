@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 import { execa } from 'execa';
 import { AgentLoopError } from './errors.js';
 import { pathExists } from './file-system.js';
@@ -91,6 +92,15 @@ async function readPackageMetadata(cwd: string): Promise<PackageMetadata> {
   };
 }
 
+async function readAgentLoopKitPackageVersion() {
+  const packagePath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../package.json');
+  const parsed = JSON.parse(await readFile(packagePath, 'utf8')) as Partial<PackageMetadata>;
+  if (typeof parsed.version !== 'string' || !parsed.version.trim()) {
+    throw new AgentLoopError('AgentLoopKit package version could not be read.');
+  }
+  return parsed.version;
+}
+
 function defaultNpmViewRunner(cwd: string, timeoutMs: number): NpmViewRunner {
   return async (packageName) => {
     const result = await execa('npm', ['view', packageName, 'version', 'versions', '--json'], {
@@ -157,6 +167,7 @@ This command only runs \`npm view ${result.packageName} version versions --json\
 
 export async function checkNpmStatus(options: {
   cwd: string;
+  agentloopkit?: boolean;
   packageName?: string;
   localVersion?: string;
   registryJson?: string;
@@ -164,8 +175,10 @@ export async function checkNpmStatus(options: {
   timeoutMs?: number;
 }): Promise<NpmStatusResult> {
   const packageMetadata = await readPackageMetadata(options.cwd);
-  const packageName = options.packageName ?? packageMetadata.name;
-  const localVersion = options.localVersion ?? packageMetadata.version;
+  const packageName = options.agentloopkit ? (options.packageName ?? 'agentloopkit') : (options.packageName ?? packageMetadata.name);
+  const localVersion =
+    options.localVersion ??
+    (options.agentloopkit ? await readAgentLoopKitPackageVersion() : packageMetadata.version);
   const source: NpmStatusResult['source'] = options.registryJson
     ? {
         command: 'captured npm view JSON',

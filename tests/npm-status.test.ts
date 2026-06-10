@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { checkNpmStatus, parseNpmViewJson } from '../src/core/npm-status.js';
@@ -18,6 +18,13 @@ async function createPackageFixture() {
     version: '0.23.0',
   });
   return dir;
+}
+
+async function readAgentLoopKitVersion() {
+  const packageJson = JSON.parse(await readFile(path.resolve('package.json'), 'utf8')) as {
+    version: string;
+  };
+  return packageJson.version;
 }
 
 describe('npm status', () => {
@@ -67,6 +74,30 @@ describe('npm status', () => {
     expect(result.markdown).toContain('npm latest matches local package version');
   });
 
+  test('can check the AgentLoopKit package from a different current package', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'agentloopkit-release',
+      version: '0.0.0',
+    });
+    const agentloopkitVersion = await readAgentLoopKitVersion();
+
+    const result = await checkNpmStatus({
+      cwd: dir,
+      agentloopkit: true,
+      registryJson: JSON.stringify({
+        version: agentloopkitVersion,
+        versions: ['0.1.0', agentloopkitVersion],
+      }),
+    });
+
+    expect(result.status).toBe('current');
+    expect(result.packageName).toBe('agentloopkit');
+    expect(result.localVersion).toBe(agentloopkitVersion);
+    expect(result.markdown).toContain('npm view agentloopkit version versions --json');
+  });
+
   test('CLI uses captured registry JSON and fails only when expect-current is requested', async () => {
     const dir = await createPackageFixture();
     const registryPath = path.join(dir, 'npm-view.json');
@@ -95,5 +126,35 @@ describe('npm status', () => {
     expect(strictResult.stdout).toContain('npm latest differs from local package version');
     expect(strictResult.stdout).toContain('agentloopkit');
     expect(strictResult.stderr).toBe('');
+  });
+
+  test('CLI --agentloopkit checks AgentLoopKit instead of the current folder package', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'agentloopkit-release',
+      version: '0.0.0',
+    });
+    const agentloopkitVersion = await readAgentLoopKitVersion();
+    const registryPath = path.join(dir, 'npm-view.json');
+    await writeFile(
+      registryPath,
+      JSON.stringify({
+        version: agentloopkitVersion,
+        versions: ['0.1.0', agentloopkitVersion],
+      }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'npm-status', '--agentloopkit', '--registry-json', registryPath, '--json'],
+      { cwd: dir },
+    );
+
+    const json = JSON.parse(result.stdout);
+    expect(json.status).toBe('current');
+    expect(json.packageName).toBe('agentloopkit');
+    expect(json.localVersion).toBe(agentloopkitVersion);
+    expect(json.source.command).toContain('captured npm view JSON');
   });
 });

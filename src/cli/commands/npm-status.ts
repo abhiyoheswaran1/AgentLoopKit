@@ -13,6 +13,7 @@ function parseTimeout(value: string) {
 export function npmStatusCommand() {
   return new Command('npm-status')
     .description('Check npm registry catch-up status')
+    .option('--agentloopkit', 'check the published agentloopkit package from any directory')
     .option('--package-name <name>', 'package name; defaults to package.json name')
     .option('--local-version <version>', 'local version; defaults to package.json version')
     .option(
@@ -24,6 +25,7 @@ export function npmStatusCommand() {
     .option('--json', 'print machine-readable output')
     .action(
       async (options: {
+        agentloopkit?: boolean;
         packageName?: string;
         localVersion?: string;
         registryJson?: string;
@@ -36,6 +38,7 @@ export function npmStatusCommand() {
           : undefined;
         const result = await checkNpmStatus({
           cwd: process.cwd(),
+          agentloopkit: options.agentloopkit,
           packageName: options.packageName,
           localVersion: options.localVersion,
           registryJson,

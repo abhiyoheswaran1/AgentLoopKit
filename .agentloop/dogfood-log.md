@@ -4158,3 +4158,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The next action stays simple and still points at `agentloop create-task` when no open task is ready.
 - Improve:
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-10: Add AgentLoopKit npm-status Self Check
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-add-agentloopkit-npm-status-self-check.md`
+- Trigger:
+  - A release smoke run from a temp folder checked the temp package name `agentloopkit-release` instead of the published `agentloopkit` package.
+  - The root cause was `npm-status` reading the current folder `package.json` by default.
+- Implementation:
+  - Added `agentloop npm-status --agentloopkit`.
+  - In that mode, AgentLoopKit checks the published `agentloopkit` package and compares it with the running CLI package version.
+  - Kept the existing local-package default for general package checks.
+  - Updated README, npm-status docs, and changelog.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-22-39-verification-report.md`, overall status pass.
+  - Red focused tests failed before implementation for missing core and CLI `--agentloopkit` support.
+  - Focused npm-status tests passed after implementation.
+  - Full Vitest passed: 33 files, 162 tests.
+  - Lint, typecheck, build, Markdown link check, `projscan doctor`, and a temp-folder built CLI smoke check passed.
+  - `projscan doctor` remained A 97/100 with the known informational unused-export note in `scripts/smoke-packed-release.mjs`.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-10-22-39-pr-summary.md`
+- What worked well:
+  - The new flag fixes the exact release-smoke failure without changing the default behavior for other packages.
+- Improve:
+  - Keep this unreleased until the planned `0.28.0` batch.

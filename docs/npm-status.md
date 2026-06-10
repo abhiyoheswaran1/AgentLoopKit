@@ -4,6 +4,7 @@
 
 ```bash
 agentloop npm-status
+agentloop npm-status --agentloopkit
 agentloop npm-status --json
 agentloop npm-status --expect-current
 agentloop npm-status --registry-json npm-view.json
@@ -18,6 +19,14 @@ npm view <package> version versions --json
 ```
 
 It compares that registry output with `package.json` in the current directory.
+
+Use `--agentloopkit` when you are checking AgentLoopKit itself from a release smoke directory, CI workspace, or another folder:
+
+```bash
+agentloop npm-status --agentloopkit --expect-current
+```
+
+That mode checks the published `agentloopkit` package and compares it with the running CLI package version. It does not read the current folder's `package.json` for the package name or version unless you pass `--package-name` or `--local-version`.
 
 Human output includes:
 
@@ -48,7 +57,7 @@ Use `--registry-json` when CI or a release handoff already captured registry out
 
 ```bash
 npm view agentloopkit version versions --json > npm-view.json
-agentloop npm-status --registry-json npm-view.json --json
+agentloop npm-status --agentloopkit --registry-json npm-view.json --json
 ```
 
 In this mode, AgentLoopKit does not run `npm view`. It reads the captured file and reports the same status.

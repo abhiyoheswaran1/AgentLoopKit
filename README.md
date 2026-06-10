@@ -419,12 +419,13 @@ See `docs/release-notes.md`.
 
 ```bash
 agentloop npm-status
+agentloop npm-status --agentloopkit
 agentloop npm-status --json
 agentloop npm-status --expect-current
 agentloop npm-status --registry-json npm-view.json
 ```
 
-Use it after a publish attempt before saying npm has caught up. It runs `npm view` unless you pass captured registry JSON. It does not publish packages, create tags, read tokens, read `.env` files, upload files, or change package metadata.
+Use it after a publish attempt before saying npm has caught up. In the AgentLoopKit repo, the default checks local `package.json`. From a temp release-smoke folder, use `--agentloopkit` so the command checks the published `agentloopkit` package and the running CLI version. It runs `npm view` unless you pass captured registry JSON. It does not publish packages, create tags, read tokens, read `.env` files, upload files, or change package metadata.
 
 See `docs/npm-status.md`.
 
