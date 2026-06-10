@@ -6,7 +6,7 @@ It reads:
 
 - `agentloop.config.json`
 - active task pointer in `.agentloop/state.json`, when present
-- newest task contract in `.agentloop/tasks/` when no active task is pinned
+- newest open task contract in `.agentloop/tasks/` when no active task is pinned
 - latest `*-verification-report.md` in `.agentloop/reports/`
 - git branch, commit, and working tree status
 - configured verification commands
@@ -60,3 +60,4 @@ The command suggests one next action:
 `status` and `next` do not execute project commands, read `.env` contents, call an LLM, or make network requests.
 Older verification reports remain on disk, but `status` and `next` ignore them as current evidence for a newer in-progress task. Moving a task to `review` or `done` after verification does not erase the latest report from the loop state.
 If a task stays pinned after it reaches `done`, `status` and `next` point you at `agentloop task archive <path>` so the next session starts clean.
+When no active task is pinned, `status` and `next` ignore fallback tasks marked `done`, `completed`, or `verified`. If every task contract is terminal, they recommend `agentloop create-task` instead of resurfacing old work.

@@ -12,7 +12,7 @@ import {
 } from './git.js';
 import { latestMarkdownFile } from './artifacts.js';
 import { verificationReportPattern } from './artifacts.js';
-import { getActiveTaskPath } from './task-state.js';
+import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 
 export type StatusArtifact = {
   path: string;
@@ -213,8 +213,7 @@ export async function getAgentLoopStatus(options: {
   const activeTaskPath = await getActiveTaskPath(options);
   const timestampedTask = await readTask(
     options.cwd,
-    activeTaskPath ??
-      (await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir))),
+    activeTaskPath ?? (await getFallbackTaskPath(options)),
   );
   const timestampedReport = await readReport(
     options.cwd,

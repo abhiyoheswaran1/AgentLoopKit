@@ -5,7 +5,7 @@ import { formatTimestamp } from './dates.js';
 import { getGitDiffStat, getGitStatus, parseGitStatus, GitFileStatus } from './git.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import { latestMarkdownFile, verificationReportPattern } from './artifacts.js';
-import { getActiveTaskPath } from './task-state.js';
+import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 
 export type PrSummaryInput = {
   timestamp: string;
@@ -221,7 +221,7 @@ export async function summarizeRepository(options: {
   const taskPath =
     options.taskPath ??
     (await getActiveTaskPath({ cwd: options.cwd, config: options.config })) ??
-    (await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir)));
+    (await getFallbackTaskPath({ cwd: options.cwd, config: options.config }));
   const reportPath =
     options.reportPath ??
     (await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {

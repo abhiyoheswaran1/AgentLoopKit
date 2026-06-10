@@ -21,7 +21,7 @@ The command reads local files and git metadata:
 - git commit subjects in the selected range
 - changed file paths in the selected range
 - working tree status from `git status --short`
-- active task contract, or newest task contract when no active task is pinned
+- active task contract, or newest open task contract when no active task is pinned
 - latest `*-verification-report.md`
 - latest `*-ci-summary.md`
 

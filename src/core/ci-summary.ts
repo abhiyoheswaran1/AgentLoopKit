@@ -9,7 +9,7 @@ import {
   verificationReportPattern,
 } from './artifacts.js';
 import { checkGates, CheckGatesResult } from './check-gates.js';
-import { getActiveTaskPath } from './task-state.js';
+import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 import { detectCiContext, VerificationCiContext } from './verification.js';
 
 export type CiSummaryCiContext =
@@ -198,8 +198,7 @@ export async function getCiSummary(options: {
   const reportsDir = path.join(options.cwd, options.config.paths.reportsDir);
   const handoffsDir = path.join(options.cwd, options.config.paths.handoffsDir);
   const taskPath =
-    (await getActiveTaskPath(options)) ??
-    (await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir)));
+    (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
   const verificationPath = await latestMarkdownFile(reportsDir, {
     pattern: verificationReportPattern,
   });

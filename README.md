@@ -298,7 +298,7 @@ See `docs/doctor-risk-files.md` for category examples, limits, and reviewer acti
 `agentloop status` gives agents and humans a quick local readout:
 
 - active task contract, using `agentloop task set` when present
-- newest task contract when no active task is pinned
+- newest open task contract when no active task is pinned
 - latest verification report
 - working tree state
 - configured and missing commands
@@ -320,6 +320,7 @@ agentloop next --json
 `next` uses the same decision rules as `status`. It does not run verification commands, create task state, call an LLM, make network requests, or read `.env` contents.
 When an active in-progress task exists, an older verification report does not count as current evidence for that task.
 When a pinned active task is already `done`, `status` and `next` recommend archiving that task so a finished contract does not stay active.
+When no active task is pinned, `status` and `next` ignore fallback tasks marked `done`, `completed`, or `verified`.
 
 See `docs/status.md` for output fields and next-action rules.
 
@@ -495,7 +496,7 @@ See `docs/distribution-channels.md` for current commands and maintainer release 
 
 - git status
 - git diff stats
-- active task contract, or newest task when no active task is pinned
+- active task contract, or newest open task when no active task is pinned
 - latest verification report
 - config settings
 

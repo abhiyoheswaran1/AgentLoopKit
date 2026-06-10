@@ -4,7 +4,7 @@ import { AgentLoopConfig } from './config.js';
 import { latestMarkdownFile, prSummaryPattern, verificationReportPattern } from './artifacts.js';
 import { pathExists } from './file-system.js';
 import { getGitBranch, getGitCommit, getGitStatus, isInsideGitRepo, parseGitStatus } from './git.js';
-import { getActiveTaskPath } from './task-state.js';
+import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 
 export type GateStatus = 'pass' | 'warn' | 'fail';
 
@@ -142,8 +142,7 @@ export async function checkGates(options: {
 }): Promise<CheckGatesResult> {
   const strict = options.strict ?? false;
   const taskPath =
-    (await getActiveTaskPath(options)) ??
-    (await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir)));
+    (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
   const reportPath = await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {
     pattern: verificationReportPattern,
   });

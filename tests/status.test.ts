@@ -119,6 +119,61 @@ describe('status command', () => {
     expect(status.activeTask.path).toContain('2026-06-09-a-new-task.md');
   });
 
+  test('ignores completed tasks when choosing the fallback active task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    const openPath = path.join(dir, '.agentloop/tasks/2026-06-09-open-task.md');
+    const donePath = path.join(dir, '.agentloop/tasks/2026-06-09-done-task.md');
+    await writeFile(openPath, '# Open task\n\n- Status: in-progress\n');
+    await writeFile(donePath, '# Done task\n\n- Status: done\n');
+    await utimes(openPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
+    await utimes(donePath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const status = JSON.parse(result.stdout);
+    expect(status.activeTask.title).toBe('Open task');
+    expect(status.activeTask.path).toBe('.agentloop/tasks/2026-06-09-open-task.md');
+  });
+
+  test('reports no fallback active task when all task contracts are terminal', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-done-task.md'),
+      '# Done task\n\n- Status: done\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-completed-task.md'),
+      '# Completed task\n\n- Status: completed\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-verified-task.md'),
+      '# Verified task\n\n- Status: verified\n',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'status'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    const status = JSON.parse(jsonResult.stdout);
+    expect(status.activeTask).toBeUndefined();
+    expect(status.nextAction.command).toBe('agentloop create-task');
+    expect(markdownResult.stdout).toContain('Active task: No task contract found.');
+  });
+
   test('prefers explicit active task state over modified time fallback', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

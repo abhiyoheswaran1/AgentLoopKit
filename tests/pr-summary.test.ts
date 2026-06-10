@@ -89,11 +89,32 @@ describe('PR summary generation', () => {
       path.join(dir, '.agentloop/reports/2026-06-09-12-00-verification-report.md'),
       '# Verification Report\n\n- Overall status: pass\n',
     );
-    await writeFile(path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'), '# Demo task\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+      '# Demo task\n\n- Status: in-progress\n',
+    );
 
     const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
 
     expect(summary.markdown).toContain('Overall status: pass');
+  });
+
+  test('uses newest open task instead of a newer finished task for fallback context', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    const openPath = path.join(dir, '.agentloop/tasks/2026-06-09-open-task.md');
+    const donePath = path.join(dir, '.agentloop/tasks/2026-06-09-done-task.md');
+    await writeFile(openPath, '# Open task\n\n- Status: in-progress\n');
+    await writeFile(donePath, '# Done task\n\n- Status: done\n');
+    await utimes(openPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
+    await utimes(donePath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
+
+    const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
+
+    expect(summary.markdown).toContain('Task context: Open task');
+    expect(summary.markdown).not.toContain('Task context: Done task');
   });
 
   test('uses modified time instead of filename sort for the latest task context', async () => {
@@ -103,8 +124,8 @@ describe('PR summary generation', () => {
     await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
     const olderPath = path.join(dir, '.agentloop/tasks/2026-06-09-z-old-task.md');
     const newerPath = path.join(dir, '.agentloop/tasks/2026-06-09-a-new-task.md');
-    await writeFile(olderPath, '# Older task\n');
-    await writeFile(newerPath, '# Newer task\n');
+    await writeFile(olderPath, '# Older task\n\n- Status: proposed\n');
+    await writeFile(newerPath, '# Newer task\n\n- Status: in-progress\n');
     await utimes(olderPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
     await utimes(newerPath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
 
@@ -120,8 +141,8 @@ describe('PR summary generation', () => {
     await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
     const explicitPath = path.join(dir, '.agentloop/tasks/2026-06-09-explicit-task.md');
     const newerPath = path.join(dir, '.agentloop/tasks/2026-06-09-newer-task.md');
-    await writeFile(explicitPath, '# Explicit task\n');
-    await writeFile(newerPath, '# Newer task\n');
+    await writeFile(explicitPath, '# Explicit task\n\n- Status: proposed\n');
+    await writeFile(newerPath, '# Newer task\n\n- Status: in-progress\n');
     await utimes(explicitPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
     await utimes(newerPath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
     await writeFile(

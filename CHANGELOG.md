@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Fixed fallback task selection so `status`, `next`, gates, handoffs, HTML reports, CI summaries, and release notes ignore unpinned terminal tasks marked `done`, `completed`, or `verified`.
 
 ## 0.26.4
 

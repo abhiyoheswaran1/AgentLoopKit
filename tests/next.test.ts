@@ -141,7 +141,7 @@ describe('next command', () => {
     expect(next.reason).toContain('no verification report');
   });
 
-  test('keeps verification evidence after a task is marked done', async () => {
+  test('ignores an unpinned done task when choosing the next action', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await execa('git', ['init', '-q'], { cwd: dir });
@@ -162,8 +162,40 @@ describe('next command', () => {
 
     expect(result.exitCode).toBe(0);
     const next = JSON.parse(result.stdout);
+    expect(next.activeTask).toBeNull();
+    expect(next.latestReport.overallStatus).toBe('pass');
+    expect(next.command).toBe('agentloop create-task');
+  });
+
+  test('recommends archiving a pinned done task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-10-complete-task.md');
+    const reportPath = path.join(dir, '.agentloop/reports/2026-06-10-08-00-verification-report.md');
+    await mkdir(path.dirname(reportPath), { recursive: true });
+    await writeFile(reportPath, '# Verification Report\n\nOverall status: pass\n');
+    await writeFile(taskPath, '# Complete task\n\n- Status: done\n');
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-10-complete-task.md',
+      }),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'next', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const next = JSON.parse(result.stdout);
     expect(next.activeTask.status).toBe('done');
     expect(next.latestReport.overallStatus).toBe('pass');
-    expect(next.command).toBe('agentloop handoff');
+    expect(next.command).toBe(
+      'agentloop task archive .agentloop/tasks/2026-06-10-complete-task.md',
+    );
   });
 });

@@ -6,7 +6,7 @@ import { ciSummaryPattern, latestMarkdownFile, verificationReportPattern } from 
 import { formatTimestamp } from './dates.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import { getGitBranch, getGitCommit } from './git.js';
-import { getActiveTaskPath } from './task-state.js';
+import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 
 export type ReleaseNotesResult = {
   timestamp: string;
@@ -263,8 +263,7 @@ export async function generateReleaseNotes(options: {
   const diffArgs = from ? ['diff', '--name-status', `${from}..${to}`] : [];
   const reportsDir = path.join(options.cwd, options.config.paths.reportsDir);
   const taskPath =
-    (await getActiveTaskPath(options)) ??
-    (await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir)));
+    (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
   const verificationPath = await latestMarkdownFile(reportsDir, {
     pattern: verificationReportPattern,
   });

@@ -2,6 +2,41 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-10: Ignore Terminal Task Fallbacks
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-ignore-completed-tasks-in-status-fallback.md`
+- Trigger:
+  - Archiving completed tasks after `v0.26.4` exposed that unpinned fallback selection could resurface old completed tasks as active work.
+  - A maintainer saw npm's package page report an older visual version, so the registry was checked directly.
+- Product changes:
+  - Added one shared fallback task selector for status, next action, gates, handoffs, HTML reports, CI summaries, and release notes.
+  - Ignored unpinned fallback tasks marked `done`, `completed`, or `verified`.
+  - Kept explicitly pinned `done` tasks visible so agents recommend `agentloop task archive <path>`.
+  - Updated README and docs to say fallback commands use the newest open task.
+  - Archived three completed AgentLoopKit task contracts from the active task folder.
+- Verification completed:
+  - Red focused tests first: status, handoff, and gate fallback tests failed on the stale completed-task behavior.
+  - Focused green tests: `npx --yes pnpm@10.12.1 test tests/next.test.ts tests/status.test.ts tests/pr-summary.test.ts tests/check-gates.test.ts`: pass, 4 files and 24 tests.
+  - `npx --yes pnpm@10.12.1 lint`: pass.
+  - `npx --yes pnpm@10.12.1 typecheck`: pass.
+  - `npx --yes pnpm@10.12.1 test`: pass, 33 files and 151 tests.
+  - `npx --yes pnpm@10.12.1 check:links`: pass, 627 Markdown files checked.
+  - `git diff --check`: pass.
+  - `npx --yes pnpm@10.12.1 build`: pass.
+  - `npx --yes projscan doctor --format markdown`: pass, A 97/100 with one informational unused-export note in `scripts/smoke-packed-release.mjs`.
+  - `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-10-ignore-completed-tasks-in-status-fallback.md ...`: pass.
+  - `npm view agentloopkit version versions --json`: pass, latest `0.26.4`.
+- Verification report: `.agentloop/reports/2026-06-10-20-36-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-10-20-37-pr-summary.md`
+- Archive action: moved the completed task from `.agentloop/tasks/2026-06-10-ignore-completed-tasks-in-status-fallback.md` to `.agentloop/tasks/archive/2026-06-10-ignore-completed-tasks-in-status-fallback.md`.
+- Worked well:
+  - The status bug reproduced quickly with a newer finished task and an older open task.
+  - Centralizing fallback selection kept all evidence commands aligned.
+- Confusing:
+  - Previous tests used task Markdown without status lines. The fallback now treats a task contract as selectable only when it has a real status line.
+- Improve:
+  - Consider a future `agentloop task doctor` command that flags task files missing status lines or stuck in old terminal states.
+
 ## 2026-06-10: Release Channels Roadmap And README Cleanup
 
 - Task contract: `.agentloop/tasks/2026-06-10-plan-release-channels-roadmap.md`

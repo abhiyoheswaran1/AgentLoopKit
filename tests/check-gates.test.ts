@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -96,6 +96,34 @@ describe('check-gates command', () => {
     expect(humanResult.stdout).toContain('# AgentLoopKit Gates');
     expect(humanResult.stdout).toContain('[fail] Task contract');
     expect(humanResult.stdout).toContain('Run `agentloop create-task`.');
+  });
+
+  test('checks the newest open task instead of a newer finished fallback task', async () => {
+    const dir = await createInitializedRepo();
+    const openPath = path.join(dir, '.agentloop/tasks/2026-06-09-open-task.md');
+    const donePath = path.join(dir, '.agentloop/tasks/2026-06-09-done-task.md');
+    await writeFile(openPath, '# Open task\n\n- Status: in-progress\n');
+    await writeFile(donePath, '# Done task\n\n- Status: done\n');
+    await utimes(openPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
+    await utimes(donePath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
+
+    const result = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    const output = JSON.parse(result.stdout);
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'task-contract',
+          status: 'pass',
+          message: 'Open task',
+          path: '.agentloop/tasks/2026-06-09-open-task.md',
+        }),
+      ]),
+    );
   });
 
   test('strict mode treats warning-only gates as failures without changing default behavior', async () => {

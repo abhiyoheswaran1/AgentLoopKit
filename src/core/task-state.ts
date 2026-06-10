@@ -32,6 +32,8 @@ export const TASK_STATUSES = ['proposed', 'in-progress', 'blocked', 'review', 'd
 
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 
+const TERMINAL_FALLBACK_TASK_STATUSES = new Set(['done', 'completed', 'verified']);
+
 function statePath(cwd: string, config: AgentLoopConfig) {
   return path.join(cwd, config.paths.agentloopDir, 'state.json');
 }
@@ -113,6 +115,11 @@ function parseTaskStatus(status: string): TaskStatus {
   throw new AgentLoopError(
     `Unsupported task status "${status}". Use one of: ${TASK_STATUSES.join(', ')}.`,
   );
+}
+
+function isFallbackTaskCandidate(status: string) {
+  const clean = status.trim().toLowerCase();
+  return clean !== 'unknown' && !TERMINAL_FALLBACK_TASK_STATUSES.has(clean);
 }
 
 export async function readTaskMetadata(cwd: string, filePath: string): Promise<ActiveTask> {
@@ -218,6 +225,13 @@ export async function getActiveTaskPath(options: { cwd: string; config: AgentLoo
 export async function getActiveTask(options: { cwd: string; config: AgentLoopConfig }) {
   const activeTaskPath = await getActiveTaskPath(options);
   return activeTaskPath ? readTaskMetadata(options.cwd, activeTaskPath) : undefined;
+}
+
+export async function getFallbackTaskPath(options: { cwd: string; config: AgentLoopConfig }) {
+  const task = (await listTasks(options)).find((candidate) =>
+    isFallbackTaskCandidate(candidate.status),
+  );
+  return task ? path.resolve(options.cwd, task.path) : undefined;
 }
 
 export async function clearActiveTask(options: { cwd: string; config: AgentLoopConfig }) {

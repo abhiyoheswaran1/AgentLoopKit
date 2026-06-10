@@ -12,7 +12,7 @@ agentloop report
 
 The report uses local inputs:
 
-- active task contract from `agentloop task set`, or the newest task when no task is pinned
+- active task contract from `agentloop task set`, or the newest open task when no task is pinned
 - latest verification report
 - latest handoff summary
 - git status

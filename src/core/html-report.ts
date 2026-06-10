@@ -2,7 +2,6 @@ import path from 'node:path';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
-import { latestMarkdownFile } from './artifacts.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import {
   getGitBranch,
@@ -13,7 +12,7 @@ import {
   parseGitStatus,
 } from './git.js';
 import { summarizeRepository } from './pr-summary.js';
-import { getActiveTaskPath } from './task-state.js';
+import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 
 export type HtmlReportInput = {
   timestamp: string;
@@ -258,7 +257,7 @@ export async function writeHtmlReport(options: WriteHtmlReportOptions): Promise<
   const taskPath =
     resolveUserPath(cwd, options.taskPath) ??
     (await getActiveTaskPath({ cwd, config: options.config })) ??
-    (await latestMarkdownFile(path.join(cwd, options.config.paths.tasksDir)));
+    (await getFallbackTaskPath({ cwd, config: options.config }));
   const verificationPath =
     resolveUserPath(cwd, options.reportPath) ??
     (await latestMatchingMarkdownFile(
