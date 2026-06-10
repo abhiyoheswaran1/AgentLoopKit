@@ -107,6 +107,18 @@ npx projscan doctor --format markdown
 
 Latest local verification:
 
+- `0.18.0` release-status documentation verification:
+  - Task contract: `.agentloop/tasks/2026-06-10-record-0-18-0-release-status.md`.
+  - Product cycle: `.agentloop/research/interview-cycle-072.md`.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 24 files and 91 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 405 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-02-19-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-02-20-pr-summary.md`.
+  - AgentLoop gate check: `agentloop check-gates --strict --json`: pass.
+  - npm registry proof during this cleanup: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
+
 - `0.18.0` policy-status release-candidate verification:
   - Focused red test: `npx pnpm@10.12.1 test tests/policy.test.ts tests/completion.test.ts` failed before `getPolicyStatus`, `policy status`, and completion entries existed.
   - Focused green test: `npx pnpm@10.12.1 test tests/policy.test.ts tests/completion.test.ts`: pass, 2 files and 12 tests.
@@ -128,7 +140,12 @@ Latest local verification:
   - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-02-07-pr-summary.md`.
   - AgentLoop HTML report: `.agentloop/reports/2026-06-10-02-07-agentloop-report.html`.
   - AgentLoop gate check: `agentloop check-gates --strict --json`: pass.
-  - npm registry proof before release: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
+  - GitHub CI run `27244057325`: pass.
+  - GitHub release `v0.18.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.18.0.
+  - GitHub release tarball SHA-256: `7c3b6b7f12c34e57b9bfd70bb4491abd566b37b86bf0c642d9d517a7dcdb4d26`.
+  - GitHub Publish workflow run `27244098928`: package checks passed, then npm rejected `npm publish --access public` with `E404`.
+  - Local exact-tarball publish for `0.18.0`: failed with authorization `E404`.
+  - npm registry proof after release: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
 
 - `0.17.0` policy-inspection release-candidate verification:
   - Focused red test: `npx pnpm@10.12.1 test tests/policy.test.ts` failed before `src/core/policy.ts` existed.
@@ -391,12 +408,13 @@ Latest local verification for shell completions:
 
 Latest release status:
 
-- GitHub release `v0.14.0`: public, tarball attached.
-- GitHub release URL: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.14.0
-- Tarball SHA-256: `1cb8b7dc178e6668839577a780943710e8d8689eb0f7a6599b027e9226e30b78`.
-- GitHub release asset digest: `sha256:1cb8b7dc178e6668839577a780943710e8d8689eb0f7a6599b027e9226e30b78`.
-- CI run `27234655492`: passed for commit `a739f834e42d6d2b8f1e96af6bddf49f62ae39c5`.
-- Publish workflow run `27234726013`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- GitHub release `v0.18.0`: public, tarball attached.
+- GitHub release URL: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.18.0
+- Tarball SHA-256: `7c3b6b7f12c34e57b9bfd70bb4491abd566b37b86bf0c642d9d517a7dcdb4d26`.
+- GitHub release asset digest: `sha256:7c3b6b7f12c34e57b9bfd70bb4491abd566b37b86bf0c642d9d517a7dcdb4d26`.
+- CI run `27244057325`: passed for commit `c5d148b79ade57654b4ffc6c858143c926fabadf`.
+- Publish workflow run `27244098928`: package checks passed, final `npm publish` failed with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- Local exact-tarball publish for `0.18.0`: failed with authorization `E404`.
 - npm registry proof after release: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
 
 Latest local verification for the `0.9.0` release candidate:
@@ -1471,6 +1489,19 @@ Implemented:
 - package metadata bump to `0.18.0` because `main` moved after the public `v0.17.0` tag
 - README terminal GIF regenerated with VHS and screenshots regenerated with Playwright
 
+### Cycle 72: 0.18.0 release status
+
+Decision: explain the one-time npm catch-up jump instead of backfilling stale intermediate npm versions. GitHub release `v0.18.0` is public, npm still serves `0.1.1`, and the next npm publish should ship current source as `0.18.0` after account authentication or trusted publishing works.
+
+Implemented:
+
+- release-status task contract for `0.18.0`
+- internal simulated feedback cycle for the version-jump question
+- README note that normal sequential semver resumes after npm catches up
+- changelog update for the `v0.18.0` GitHub release and npm authorization failures
+- npm publishing docs section explaining why npm should jump from `0.1.1` to `0.18.0`
+- launch checklist, roadmap, GitHub Actions docs, example CI tarball pins, final handoff, backlog, and dogfood updates
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1491,6 +1522,7 @@ Strongest signals:
 - Repeat users need a way to move finished task contracts out of the active list without deleting Markdown history.
 - Release readers need the README visuals and changelog to match the newest source command before a GitHub release is cut.
 - Agents need `create-task` to return machine-readable output like the rest of the task lifecycle commands.
+- Release readers need the npm/GitHub version gap explained before they trust a catch-up publish.
 - Release readers need `0.12.0` metadata and visuals to match `create-task --json` before the GitHub release.
 - Agents and reviewers need one deterministic command that checks review evidence without running tests.
 - Release readers need `0.13.0` metadata and visuals to match `check-gates` before the GitHub release.
@@ -1527,6 +1559,7 @@ Top remaining items:
 
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, `v0.15.0`, `v0.15.1`, and `v0.16.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - GitHub release `v0.17.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- GitHub release `v0.18.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - Current source targets `0.18.0`; npm should jump from `0.1.1` to the current prepared release because public GitHub tags already occupy the intermediate versions.
 - Do not publish `0.16.0` or `0.17.0` to npm from current `main`. Publish each version only from its matching release commit or release tarball.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP` for browser/OTP authentication.
@@ -1535,8 +1568,11 @@ Top remaining items:
 - GitHub release `v0.16.0` tarball SHA-256: `687dac923ee3976e4975641a20844ece4ce41c2123794423c46cd72091f8cb18`.
 - GitHub release `v0.17.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.17.0
 - GitHub release `v0.17.0` tarball SHA-256: `8b7bb6ae9307e79cf97e20e405a1cef6a4aefcc48466d865758cc87f3439d49c`.
-- `agentloopkit@0.18.0` is prepared on `main` for policy template status.
+- GitHub release `v0.18.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.18.0
 - `agentloopkit@0.18.0` tarball SHA-256: `7c3b6b7f12c34e57b9bfd70bb4491abd566b37b86bf0c642d9d517a7dcdb4d26`.
+- The release-triggered GitHub Publish workflow for `v0.18.0` passed checks and failed at npm authorization with `E404`.
+- Local exact-tarball publish for `0.18.0` failed with authorization `E404`.
+- Local `npm whoami` returned `E401`; run `npm login` again before another local publish attempt.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -1659,8 +1695,10 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.17.0`; package checks passed, npm authorization failed.
 - [x] Try local exact-tarball publish for `0.17.0`; npm required browser/OTP authentication.
 - [x] Prepare `agentloopkit@0.18.0` policy-status release candidate.
-- [ ] Publish GitHub release `v0.18.0` with policy-status release notes.
+- [x] Publish GitHub release `v0.18.0` with policy-status release notes.
 - [ ] Publish `agentloopkit@0.18.0` to npm.
+- [x] Run GitHub Publish workflow for `v0.18.0`; package checks passed, npm authorization failed.
+- [x] Try local exact-tarball publish for `0.18.0`; npm authorization failed.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.

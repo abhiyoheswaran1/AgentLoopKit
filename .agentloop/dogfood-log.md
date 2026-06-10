@@ -2318,3 +2318,48 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The JSON shape is deterministic enough for agents and CI scripts.
 - Improve:
   - After CI passes, publish GitHub release `v0.18.0`, attach `agentloopkit-0.18.0.tgz`, and record the npm publish result without claiming npm availability until the registry proves it.
+
+## 2026-06-10: 0.18.0 GitHub Release And npm Auth Result
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-policy-drift-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-071.md`
+- Release:
+  - GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.18.0
+  - Attached asset: `agentloopkit-0.18.0.tgz`
+  - SHA-256: `7c3b6b7f12c34e57b9bfd70bb4491abd566b37b86bf0c642d9d517a7dcdb4d26`
+- Publish status:
+  - CI run `27244057325`: pass.
+  - Publish workflow run `27244098928`: package checks passed, then npm rejected `npm publish --access public` with `E404`.
+  - Local `npm publish ./agentloopkit-0.18.0.tgz --access public`: reached npm and failed with authorization `E404`.
+  - Local `npm whoami`: failed with `E401`, so local npm auth needs a fresh login before another manual publish attempt.
+  - npm registry proof: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
+- Worked well:
+  - Release notes include the policy-status command, verification evidence, and tarball digest.
+  - GitHub tarball distribution is available while npm authorization remains blocked.
+- Improve:
+  - Re-run `npm login`, confirm `npm whoami`, then publish the exact `0.18.0` tarball or configure npm trusted publishing for `publish.yml`.
+
+## 2026-06-10: 0.18.0 Release Status Cleanup
+
+- Task contract: `.agentloop/tasks/2026-06-10-record-0-18-0-release-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-072.md`
+- Trigger:
+  - Maintainer asked whether jumping from npm `0.1.1` to a higher version means AgentLoopKit will keep skipping versions.
+  - npm registry proof still shows latest `0.1.1`, while GitHub release `v0.18.0` is public.
+- Product changes:
+  - README now states that npm should catch up to `0.18.0` once authentication is fixed, then return to normal sequential semver.
+  - Publishing docs now explain why backfilling old npm versions from current `main` would make package metadata misleading.
+  - Changelog, roadmap, launch checklist, GitHub Actions docs, GitHub Actions example, final handoff, backlog, and dogfood log now reflect the `v0.18.0` release and npm authorization result.
+- Verification run:
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 24 files and 91 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 405 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-02-19-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-02-20-pr-summary.md`.
+  - `agentloop check-gates --strict --json`: pass.
+- Worked well:
+  - The README now answers the version-jump concern without asking readers to inspect the full release history.
+  - The exact npm publish blocker remains visible instead of being turned into a vague pending status.
+- Improve:
+  - After a fresh `npm login` or trusted-publishing setup, publish `agentloopkit@0.18.0` and verify with `npm view agentloopkit version`.

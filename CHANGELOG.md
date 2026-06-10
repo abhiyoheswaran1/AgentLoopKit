@@ -4,13 +4,14 @@
 
 ## 0.18.0
 
-Policy template status release candidate. npm publish is pending browser/OTP authentication or trusted-publishing repair:
+Policy template status release candidate. GitHub release `v0.18.0` is public; npm publish is pending account authentication or trusted-publishing repair:
 
 - Added `agentloop policy status` for read-only local policy template comparison
 - Added `agentloop policy status --json` with deterministic `current`, `modified`, `missing`, and `extra` entries
 - Added shell completion coverage for the new policy subcommand
 - Documented policy status as template drift visibility, not compliance enforcement
-- Recorded the local exact-tarball `0.17.0` npm publish attempt that stopped at OTP/browser authentication
+- Recorded the release-triggered `v0.18.0` Publish workflow failure at npm authorization
+- Recorded the local exact-tarball `0.18.0` npm publish attempt that failed with authorization `E404`
 
 ## 0.17.0
 

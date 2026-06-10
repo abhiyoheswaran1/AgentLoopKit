@@ -48,16 +48,26 @@ Short version:
 - npm previously served `agentloopkit@0.1.1` while GitHub release candidates from `v0.2.0` through `v0.15.1` were public.
 - GitHub release `v0.16.0` is public with attached `agentloopkit-0.16.0.tgz`.
 - GitHub release `v0.17.0` is public with attached `agentloopkit-0.17.0.tgz`.
-- Current source targets `0.18.0` after adding `agentloop policy status`.
-- `0.18.0` is the next catch-up release line for current source after verification and a matching GitHub release.
+- GitHub release `v0.18.0` is public with attached `agentloopkit-0.18.0.tgz`.
+- `0.18.0` is the current catch-up release line for current source after adding `agentloop policy status`.
 - Do not publish `0.16.0` or `0.17.0` from current `main`. `main` now contains behavior that was not in those release tags.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped with `EOTP` because browser or one-time-password authentication is required.
 - GitHub Publish workflow run `27241996432` for `v0.16.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - GitHub Publish workflow run `27243165066` for `v0.17.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - Local `npm publish ./agentloopkit-0.17.0.tgz --access public` matched the GitHub release tarball, reached npm, and stopped with `EOTP` because the account requires browser or one-time-password authentication.
+- GitHub Publish workflow run `27244098928` for `v0.18.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- Local `npm publish ./agentloopkit-0.18.0.tgz --access public` matched the GitHub release tarball, reached npm, and failed with authorization `E404`.
+- Local `npm whoami` then returned `E401`, so the local npm session needs a fresh login before another local publish attempt.
 - npm latest remains `agentloopkit@0.1.1` until that authentication completes.
 - Do not publish `0.15.1` to npm now. `main` has moved past that tag.
 - After the current package line lands on npm, resume normal semver publishing. Do not keep creating higher versions just because npm authorization was blocked.
+
+Why npm should jump to `0.18.0`:
+
+- The skipped npm numbers were used as public GitHub release candidates while npm publishing was blocked.
+- Current `main` contains code that belongs to the `0.18.0` release line, including `agentloop policy status`.
+- Backfilling old versions from current `main` would make npm metadata lie about what those old tags contained.
+- Publishing `0.18.0` once, then returning to `0.18.1`, `0.19.0`, and later semver releases, gives users the least confusing path.
 
 Historical publishing log:
 
@@ -143,7 +153,9 @@ Historical publishing log:
 - `agentloopkit@0.17.0` passed source version, built version, lint, typecheck, Vitest, Markdown link checks, build, projscan, `npm pack`, `npm publish --access public --dry-run`, packed-tarball smoke testing, and CI.
 - GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.17.0`.
 - GitHub release tarball SHA-256: `8b7bb6ae9307e79cf97e20e405a1cef6a4aefcc48466d865758cc87f3439d49c`.
-- `agentloopkit@0.18.0` is being prepared on `main` after `agentloop policy status` was added.
+- `agentloopkit@0.18.0` passed source version, built version, lint, typecheck, Vitest, Markdown link checks, build, projscan, `npm pack`, `npm publish --access public --dry-run`, packed-tarball smoke testing, and CI.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.18.0`.
+- GitHub release tarball SHA-256: `7c3b6b7f12c34e57b9bfd70bb4491abd566b37b86bf0c642d9d517a7dcdb4d26`.
 
 Publish the current prepared release to npm from its matching release commit after browser/OTP authentication completes. Do not backfill old npm versions with newer source.
 

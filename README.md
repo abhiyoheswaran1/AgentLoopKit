@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Current source targets `0.18.0`. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.17.0` carry current source snapshots. `0.18.0` adds read-only policy template status on top of the `v0.17.0` policy inspection release.
+Current source targets `0.18.0`. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.18.0` carry current source snapshots. `0.18.0` adds read-only policy template status on top of the `v0.17.0` policy inspection release. Once npm authentication is fixed, the npm package should catch up to `0.18.0`; after that, releases return to normal sequential semver.
 
 Run the CLI after install:
 
@@ -431,7 +431,9 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.17.0` is public with a tarball asset. A local exact-tarball publish attempt for `0.17.0` reached npm and stopped at OTP/browser authentication, so npm still needs browser/OTP completion or trusted-publishing repair before a catch-up release lands.
+AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.18.0` is public with a tarball asset. The release-triggered Publish workflow and local exact-tarball publish both reached npm and failed with authorization `E404`, so npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
+
+The npm version jump is intentional. The skipped npm numbers already exist as public GitHub release candidates while npm publishing was blocked, so the next npm publish should ship the current release line rather than backfilling old source snapshots.
 
 The repository includes a GitHub Actions publish workflow for npm trusted publishing after the package is configured on npm. The workflow runs checks before `npm publish` and skips publish when the version already exists.
 
