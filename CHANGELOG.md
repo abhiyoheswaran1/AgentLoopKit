@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Updated `agentloop status` and `agentloop next` to recommend `agentloop task archive <path>` when the pinned active task is already `done`.
 
 ## 0.26.2
 

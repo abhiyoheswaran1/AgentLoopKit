@@ -125,6 +125,7 @@ function isPostVerificationTaskState(task: Timestamped<StatusTask> | undefined) 
 
 function chooseNextAction(input: {
   activeTask?: StatusTask;
+  explicitActiveTask: boolean;
   latestReport?: StatusReport;
   dirty: boolean;
 }) {
@@ -132,6 +133,13 @@ function chooseNextAction(input: {
     return {
       command: 'agentloop create-task',
       reason: 'No task contract was found.',
+    };
+  }
+  if (input.explicitActiveTask && input.activeTask.status.trim().toLowerCase() === 'done') {
+    return {
+      command: `agentloop task archive ${input.activeTask.path}`,
+      reason:
+        'The active task is done. Archive it to clear the active pointer before starting the next task.',
     };
   }
   if (!input.latestReport) {
@@ -202,9 +210,10 @@ export async function getAgentLoopStatus(options: {
   const inGit = await isInsideGitRepo(options.cwd);
   const rawStatus = inGit ? await getGitStatus(options.cwd) : '';
   const changedFiles = await parseGitStatus(rawStatus);
+  const activeTaskPath = await getActiveTaskPath(options);
   const timestampedTask = await readTask(
     options.cwd,
-    (await getActiveTaskPath(options)) ??
+    activeTaskPath ??
       (await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir))),
   );
   const timestampedReport = await readReport(
@@ -226,6 +235,7 @@ export async function getAgentLoopStatus(options: {
   const missing = DEFAULT_COMMAND_KEYS.filter((key) => !options.config.commands[key]);
   const nextAction = chooseNextAction({
     activeTask,
+    explicitActiveTask: Boolean(activeTaskPath),
     latestReport,
     dirty: changedFiles.length > 0,
   });

@@ -3775,3 +3775,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - After each release, update status docs in the same follow-up commit if the release workflow runs after the version-prep commit.
   - Treat npmjs.com package pages as a web UI that can lag the registry; use `npm view` and the registry endpoint for release proof.
+
+## 2026-06-10: Recommend Archiving Done Active Tasks
+
+- Task contract: `.agentloop/tasks/2026-06-10-recommend-archiving-done-active-tasks.md`
+- Trigger:
+  - After the `0.26.2` release, `agentloop status` showed a finished release task as the active task.
+  - The next action still pointed to starting a new task, which left the stale active pointer unresolved.
+- Product change:
+  - `agentloop status` and `agentloop next` now recommend `agentloop task archive <path>` when the pinned active task is already `done`.
+  - The command remains read-only; it suggests the archive command but does not move files automatically.
+- Verification run:
+  - Red test first: `npx --yes pnpm@10.12.1 test tests/status.test.ts` failed because status recommended `agentloop verify`.
+  - Focused status test: `npx --yes pnpm@10.12.1 test tests/status.test.ts`: pass, 6 tests.
+  - Full Vitest suite: `npx --yes pnpm@10.12.1 test`: pass, 33 files and 146 tests.
+  - Typecheck: `npx --yes pnpm@10.12.1 typecheck`: pass.
+  - Lint: `npx --yes pnpm@10.12.1 lint`: pass.
+  - Build: `npx --yes pnpm@10.12.1 build`: pass.
+  - Markdown links: `npx --yes pnpm@10.12.1 check:links`: pass, 611 files checked.
+  - Formatting check: `npx --yes prettier@3.7.4 --check ...`: pass.
+  - Projscan: `npx --yes projscan doctor --format markdown`: A, 97/100, with the existing informational unused-export note for `scripts/smoke-packed-release.mjs`.
+  - AgentLoop verification: `.agentloop/reports/2026-06-10-19-25-verification-report.md`, overall status pass.
+- Worked well:
+  - The stale active task appeared during normal AgentLoopKit dogfooding, so the fix addresses a real loop cleanup issue.
+- Improve:
+  - Consider a future `agentloop task finish` only if users repeatedly need a single command that verifies, hands off, marks done, and archives.

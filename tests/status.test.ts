@@ -131,7 +131,10 @@ describe('status command', () => {
     await utimes(newerPath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
-      JSON.stringify({ version: 1, activeTaskPath: '.agentloop/tasks/2026-06-09-explicit-task.md' }),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-09-explicit-task.md',
+      }),
     );
 
     const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
@@ -143,5 +146,37 @@ describe('status command', () => {
     const status = JSON.parse(result.stdout);
     expect(status.activeTask.title).toBe('Explicit task');
     expect(status.activeTask.path).toBe('.agentloop/tasks/2026-06-09-explicit-task.md');
+  });
+
+  test('recommends archiving an explicitly active done task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    const doneTaskPath = path.join(dir, '.agentloop/tasks/2026-06-09-done-task.md');
+    await writeFile(doneTaskPath, '# Done task\n\n- Status: done\n');
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({ version: 1, activeTaskPath: '.agentloop/tasks/2026-06-09-done-task.md' }),
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'status'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    const status = JSON.parse(jsonResult.stdout);
+    expect(status.activeTask.status).toBe('done');
+    expect(status.nextAction.command).toBe(
+      'agentloop task archive .agentloop/tasks/2026-06-09-done-task.md',
+    );
+    expect(status.nextAction.reason).toContain('active task is done');
+    expect(markdownResult.stdout).toContain(
+      'Run `agentloop task archive .agentloop/tasks/2026-06-09-done-task.md`.',
+    );
   });
 });

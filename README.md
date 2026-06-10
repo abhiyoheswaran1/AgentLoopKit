@@ -319,6 +319,7 @@ agentloop next --json
 
 `next` uses the same decision rules as `status`. It does not run verification commands, create task state, call an LLM, make network requests, or read `.env` contents.
 When an active in-progress task exists, an older verification report does not count as current evidence for that task.
+When a pinned active task is already `done`, `status` and `next` recommend archiving that task so a finished contract does not stay active.
 
 See `docs/status.md` for output fields and next-action rules.
 

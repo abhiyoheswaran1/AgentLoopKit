@@ -52,9 +52,11 @@ agentloop task clear
 The command suggests one next action:
 
 - `agentloop create-task` when no task contract exists
+- `agentloop task archive <path>` when the pinned active task is already `done`
 - `agentloop verify` when an in-progress task exists without verification evidence that is at least as new as the task contract
 - `agentloop verify` when the latest verification report failed
 - `agentloop handoff` when task evidence exists and the working tree has changes
 
 `status` and `next` do not execute project commands, read `.env` contents, call an LLM, or make network requests.
 Older verification reports remain on disk, but `status` and `next` ignore them as current evidence for a newer in-progress task. Moving a task to `review` or `done` after verification does not erase the latest report from the loop state.
+If a task stays pinned after it reaches `done`, `status` and `next` point you at `agentloop task archive <path>` so the next session starts clean.
