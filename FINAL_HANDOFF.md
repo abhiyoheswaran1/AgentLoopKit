@@ -51,6 +51,16 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - release-checklist example for GitHub-current/npm-lag maintainer handoffs
 - internal product panel, target personas, simulated interview cycles, backlog, and dogfood log
 
+## Current release
+
+- Current npm release: `agentloopkit@0.25.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.25.0>
+- Release asset: `agentloopkit-0.25.0.tgz`
+- Release asset SHA-256: `f39669cf62ec5a455bad788223040dd0a0c65dcb86665cf6086f04a84d9ff427`
+- CI run: `27279587748`
+- Publish workflow run: `27279602386`
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.25.0`
+
 ## CLI commands
 
 ```bash
