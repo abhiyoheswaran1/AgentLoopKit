@@ -211,14 +211,30 @@ function parseTaskMetadata(markdown: string) {
 function isMarkdownTaskPath(taskPath: string) {
   const normalized = taskPath.replace(/\\/g, '/').toLowerCase();
   const segments = normalized.split('/').filter(Boolean);
-  return normalized.endsWith('.md') && !segments.some((segment) => segment === '.env' || segment.startsWith('.env.'));
+  return (
+    normalized.endsWith('.md') &&
+    !segments.some((segment) => segment === '.env' || segment.startsWith('.env.'))
+  );
 }
 
-async function renderTaskContext(cwd: string, taskPath: string | undefined) {
+function isInside(parent: string, child: string) {
+  const relative = path.relative(parent, child);
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+async function renderTaskContext(
+  cwd: string,
+  config: AgentLoopConfig,
+  taskPath: string | undefined,
+) {
   if (!taskPath?.trim()) return '';
 
   const cleanPath = taskPath.trim();
-  if (!isMarkdownTaskPath(cleanPath)) {
+  const absolutePath = path.isAbsolute(cleanPath)
+    ? path.resolve(cleanPath)
+    : path.resolve(cwd, cleanPath);
+  const tasksRoot = path.resolve(cwd, config.paths.tasksDir);
+  if (!isMarkdownTaskPath(cleanPath) || !isInside(tasksRoot, absolutePath)) {
     return `## Task Context
 - Path: ${cleanPath}
 - Status: unavailable
@@ -226,8 +242,6 @@ async function renderTaskContext(cwd: string, taskPath: string | undefined) {
 
 `;
   }
-
-  const absolutePath = path.isAbsolute(cleanPath) ? cleanPath : path.join(cwd, cleanPath);
 
   try {
     const markdown = await readFile(absolutePath, 'utf8');
@@ -292,7 +306,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
   const branch = await getGitBranch(options.cwd);
   const commit = await getGitCommit(options.cwd);
   const status = await getGitStatus(options.cwd);
-  const taskContext = await renderTaskContext(options.cwd, options.taskPath);
+  const taskContext = await renderTaskContext(options.cwd, options.config, options.taskPath);
 
   const markdown = `# Verification Report
 

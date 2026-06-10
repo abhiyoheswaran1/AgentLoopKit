@@ -4,6 +4,15 @@
 
 - No unreleased changes yet.
 
+## 0.24.3
+
+Patch release for task-path safety:
+
+- Restricted `agentloop verify --task` to Markdown task contracts inside the configured task directory
+- Restricted `agentloop create-task --out` to Markdown files inside the configured task directory
+- Refused `agentloop init --dry-run` in the user's home directory unless `--force` is passed, preventing accidental home-directory project detection
+- Added regression coverage for task path reads, task output writes, and home-directory dry-run safety
+
 ## 0.24.2
 
 Patch release for safer first-run initialization:

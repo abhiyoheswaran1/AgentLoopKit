@@ -3470,3 +3470,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The tarball smoke checks caught the exact artifact users will run from GitHub until npm catches up.
 - Improve:
   - Configure npm trusted publishing or complete a fresh local npm login before the real npm catch-up release attempt.
+
+## 2026-06-10: Big Bug Pass
+
+- Task contract: `.agentloop/tasks/2026-06-10-run-big-bug-pass.md`
+- Trigger:
+  - Real first-run usage had already exposed init edge cases, so AgentLoopKit needed a broader safety and packaging sweep before the next patch release.
+- Bugs fixed:
+  - `agentloop verify --task <path>` could read an arbitrary Markdown file outside the configured task directory. It now reports outside task paths as unavailable instead of reading them.
+  - `agentloop create-task --out <path>` could write a task contract outside the configured task directory. It now requires a Markdown path inside the configured task directory.
+  - `agentloop init --dry-run` still allowed home-directory detection without `--force`. It now uses the same home-directory guard as real init.
+  - The home-directory guard compared unresolved paths. It now compares real paths so symlink aliases such as `/var` and `/private/var` do not bypass the guard.
+- Verification run:
+  - Red test: `npx pnpm@10.12.1 test tests/verification.test.ts` failed before the outside-task read guard.
+  - Red test: `npx pnpm@10.12.1 test tests/create-task.test.ts` failed before the outside-task write guard.
+  - Red test: `npx pnpm@10.12.1 test tests/init.test.ts` failed before the dry-run and symlinked-home guards.
+  - Focused green tests: `tests/verification.test.ts`, `tests/create-task.test.ts`, and `tests/init.test.ts` passed after fixes.
+  - `npm run lint`: pass.
+  - `npm run typecheck`: pass.
+  - `npm test`: pass, 29 files and 129 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 576 Markdown files checked.
+  - `git diff --check`: pass.
+  - `npm run build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: pass for `agentloop version`, `agentloop init`, blocked `create-task --out` outside the task directory, blocked `verify --task` outside the task directory, and blocked `init --dry-run` from a fake home directory.
+  - AgentLoop verification: `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-10-run-big-bug-pass.md --command "npx projscan doctor --format markdown"` passed and wrote `.agentloop/reports/2026-06-10-13-48-verification-report.md`.
+- Handoff generated:
+  - `.agentloop/handoffs/2026-06-10-13-49-pr-summary.md`
+- Worked well:
+  - Packed smoke testing the npm tarball caught the symlink path alias bug after source-level tests had already passed.
+  - Projscan stayed useful as a quick health gate after the focused safety fixes.
+- Improve:
+  - Add a reusable release-smoke script so tarball guard checks are less dependent on one-off shell scripts.

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, symlink, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -86,15 +86,30 @@ describe('init', () => {
     );
   });
 
-  test('allows dry-run and forced initialization in a home directory', async () => {
+  test('refuses dry-run initialization in a home directory without force', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
 
     await expect(
       initializeAgentLoop({ cwd: dir, homeDirectory: dir, dryRun: true }),
-    ).resolves.toMatchObject({
-      dryRun: true,
-    });
+    ).rejects.toThrow('Refusing to initialize your home directory');
+  });
+
+  test('refuses home initialization through a symlinked path', async () => {
+    const dir = await makeTempDir();
+    const linkParent = await makeTempDir();
+    tempDirs.push(dir, linkParent);
+    const linkedHome = path.join(linkParent, 'linked-home');
+    await symlink(dir, linkedHome, 'dir');
+
+    await expect(
+      initializeAgentLoop({ cwd: linkedHome, homeDirectory: dir, dryRun: true }),
+    ).rejects.toThrow('Refusing to initialize your home directory');
+  });
+
+  test('allows forced initialization in a home directory', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
 
     const result = await initializeAgentLoop({ cwd: dir, homeDirectory: dir, force: true });
 

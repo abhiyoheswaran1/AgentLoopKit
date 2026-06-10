@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { AgentLoopConfig } from './config.js';
 import { formatDate } from './dates.js';
+import { AgentLoopError } from './errors.js';
 import { writeTextFile } from './file-system.js';
 import { slugify } from './slug.js';
 
@@ -102,8 +103,24 @@ export async function createTaskContractFile(options: {
     options.out ??
     path.join(options.config.paths.tasksDir, `${createdDate}-${slugify(options.input.title)}.md`);
   const absolutePath = path.isAbsolute(relativePath)
-    ? relativePath
-    : path.join(options.cwd, relativePath);
+    ? path.resolve(relativePath)
+    : path.resolve(options.cwd, relativePath);
+  const tasksRoot = path.resolve(options.cwd, options.config.paths.tasksDir);
+  const relativeToTasks = path.relative(tasksRoot, absolutePath);
+
+  if (
+    relativeToTasks === '' ||
+    relativeToTasks.startsWith('..') ||
+    path.isAbsolute(relativeToTasks)
+  ) {
+    throw new AgentLoopError(
+      `Task output path must stay inside ${options.config.paths.tasksDir}.`,
+    );
+  }
+  if (!absolutePath.endsWith('.md')) {
+    throw new AgentLoopError('Task output path must be a Markdown file.');
+  }
+
   const markdown = generateTaskContract({ ...options.input, createdDate });
   await writeTextFile(absolutePath, markdown);
   return { path: absolutePath, markdown };

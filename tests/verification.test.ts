@@ -428,6 +428,44 @@ describe('verification', () => {
     expect(result.markdown).not.toContain('leaked');
   });
 
+  test('does not read markdown task paths outside the configured tasks directory', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(outsideDir, 'outside-task.md'),
+      ['# Outside Secret Task', '- Task type: feature', '- Status: leaked', ''].join('\n'),
+    );
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"ok\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: path.join(outsideDir, 'outside-task.md'),
+      reportTimestamp: '2026-06-10-12-04',
+      nowIso: '2026-06-10T12:04:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('pass');
+    expect(result.markdown).toContain('## Task Context');
+    expect(result.markdown).toContain('- Status: unavailable');
+    expect(result.markdown).toContain('Task path must point to a Markdown task contract.');
+    expect(result.markdown).not.toContain('Outside Secret Task');
+    expect(result.markdown).not.toContain('leaked');
+  });
+
   test('CLI verify wires --task into the written report', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

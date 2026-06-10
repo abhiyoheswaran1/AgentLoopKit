@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile, realpath } from 'node:fs/promises';
+import { readFile, realpath, stat } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -158,5 +158,35 @@ describe('create-task command', () => {
       },
     });
     expect(result.stdout).not.toContain('Task contract created:');
+  });
+
+  test('rejects output paths outside the configured tasks directory', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    const outsidePath = path.join(outsideDir, 'outside-task.md');
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Outside write',
+        '--type',
+        'bugfix',
+        '--out',
+        outsidePath,
+      ],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Task output path must stay inside .agentloop/tasks');
+    await expect(stat(outsidePath)).rejects.toThrow();
   });
 });
