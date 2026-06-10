@@ -3098,3 +3098,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The task exposed a stale public sentence without requiring a release or package metadata change.
 - Improve:
   - After npm publishes `0.23.0`, remove temporary tarball fallback references from README and release-status docs.
+
+## 2026-06-10: GitLab And Buildkite CI Examples
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-gitlab-and-buildkite-ci-examples.md`
+- Product cycle: `.agentloop/research/interview-cycle-095.md`
+- Trigger:
+  - GitHub Actions recipes existed, but GitLab CI and Buildkite users had no copyable provider examples.
+  - `examples/github-actions/README.md` still pinned the older `v0.19.0` GitHub release tarball.
+- Product changes:
+  - Added GitLab CI evidence-gate and verification-artifact snippets.
+  - Added Buildkite evidence-gate and verification-artifact snippets.
+  - Updated the GitHub Actions example to pin the current `v0.23.0` tarball while npm serves `0.1.1`.
+  - Linked provider examples from README, getting-started docs, GitHub Actions docs, and CI summary docs.
+  - Documented that GitLab CI and Buildkite currently produce Generic CI provenance, not provider-specific metadata.
+- Verification run:
+  - Stale example tarball search: pass, no `v0.19.0` pin remains in `examples/github-actions/README.md`.
+  - `npx pnpm@10.12.1 check:links`: pass, 512 Markdown files checked.
+  - `git diff --check`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-add-gitlab-and-buildkite-ci-examples.md`: pass, wrote `.agentloop/reports/2026-06-10-08-35-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 113 tests, lint, typecheck, and build all passed.
+  - `npx tsx src/cli/index.ts handoff --task .agentloop/tasks/2026-06-10-add-gitlab-and-buildkite-ci-examples.md --json`: pass, wrote `.agentloop/handoffs/2026-06-10-08-36-pr-summary.md`.
+- Worked well:
+  - The provider examples reuse existing local commands and do not add workflow installation scope.
+- Improve:
+  - If users ask for richer provider provenance, add allowlisted GitLab CI and Buildkite metadata in a focused CLI change with tests.

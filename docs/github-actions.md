@@ -4,6 +4,8 @@ Use GitHub Actions to check whether a pull request has AgentLoopKit evidence.
 
 AgentLoopKit does not install workflows into user repositories. Copy a recipe into `.github/workflows/` only after you inspect it.
 
+For non-GitHub CI, see [GitLab CI](../examples/gitlab-ci/README.md) and [Buildkite](../examples/buildkite/README.md). Those examples run the same AgentLoopKit commands and currently report Generic CI provenance.
+
 ## npm Status
 
 The current GitHub release tarball is `v0.23.0`, which includes task-linked verification reports, failed-verification summaries, the guarded `--task` path behavior, refreshed README visuals, PowerShell completions, `agentloop ci-summary`, `agentloop release-notes`, and `agentloop next`. npm still serves `0.1.1` until browser/OTP authentication or trusted publishing works.

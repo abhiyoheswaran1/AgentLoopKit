@@ -416,13 +416,13 @@ Local policy files are repo guidance. A `modified` policy can be intentional; re
 
 See `docs/policies.md`.
 
-## GitHub Actions
+## CI Recipes
 
 Use `agentloop check-gates --strict` as a review-evidence gate in pull request CI. Use `agentloop verify`, `agentloop handoff`, `agentloop report`, `agentloop badge`, `agentloop ci-summary --write`, and `agentloop release-notes --write` in CI when you want evidence artifacts uploaded for reviewers.
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
-See `docs/github-actions.md` and `examples/github-actions/` for copy-pasteable workflows. Until npm catches up, the examples pin the latest public GitHub release tarball. Current source moves to a new tarball when the next GitHub release is cut.
+See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Until npm catches up, the examples pin the latest public GitHub release tarball. Current source moves to a new tarball when the next GitHub release is cut.
 
 ## PR Summaries
 

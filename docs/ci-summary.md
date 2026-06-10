@@ -21,6 +21,14 @@ The command reads:
 
 When GitHub Actions runs it, the summary can include workflow, event, ref, commit, run URL, and run attempt. When another CI system sets `CI=true`, the summary reports Generic CI.
 
+Provider examples:
+
+- [GitHub Actions](../examples/github-actions/README.md)
+- [GitLab CI](../examples/gitlab-ci/README.md)
+- [Buildkite](../examples/buildkite/README.md)
+
+The GitLab CI and Buildkite examples run the same local commands as the GitHub Actions recipe. They currently produce Generic CI provenance because AgentLoopKit only has a GitHub Actions-specific allowlist. They do not call provider APIs or read CI secrets.
+
 ## Output
 
 Human output is Markdown:

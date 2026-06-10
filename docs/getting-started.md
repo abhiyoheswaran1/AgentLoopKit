@@ -121,4 +121,4 @@ Use `--strict` in CI when warning gates should fail.
 `ci-summary` writes or prints a small CI provenance and evidence summary without running checks.
 `release-notes` drafts local release notes from package metadata, changelog, git history, task, verification, and CI summary evidence without creating tags or publishing packages.
 
-For pull request CI recipes, see `github-actions.md`.
+For pull request CI recipes, see `github-actions.md`, `../examples/gitlab-ci/README.md`, and `../examples/buildkite/README.md`.
