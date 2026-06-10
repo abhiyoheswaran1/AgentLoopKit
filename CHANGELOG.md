@@ -17,6 +17,7 @@
 - Added `test-generation` as a supported `create-task --type` value and documented the supported task type list.
 - Changed `create-task --type <value>` to fail fast on unsupported types instead of entering the interactive picker.
 - Added supported task type values to `agentloop create-task --help`.
+- Added JSON error output for unsupported `agentloop create-task --type` values when `--json` is requested.
 - Changed `npm run smoke:release` so the packed README may stay unpinned while stale exact version pins are still rejected.
 - Added `agentloop verify --task-commands` to explicitly run commands listed in a task contract's `Verification Commands` section.
 - Added a verification report note when `--task-commands` is requested but no runnable task commands are found.

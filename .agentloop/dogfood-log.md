@@ -4679,3 +4679,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The smoke gate now matches the public-doc policy and remains useful before the batched `0.28.0` release.
 - Improve:
   - Run `node scripts/prepublish-check.mjs` only during explicit release prep, after moving unreleased changelog entries into the target version section.
+
+## 2026-06-11: JSON Error for Unsupported Task Type
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-return-json-for-unsupported-create-task-type.md`
+- Trigger:
+  - `create-task --json` returned machine-readable success output, but unsupported task-type validation still used the human stderr path.
+- Implementation:
+  - Added a JSON error payload for unsupported `create-task --type` values when `--json` is requested.
+  - Kept the default human stderr behavior unchanged.
+  - Added a CLI regression test for exit code, stdout JSON shape, empty stderr, supported task types, and no task-file write.
+  - Documented the behavior in the README, task-contract docs, generated task README, and unreleased changelog.
+- Verification run:
+  - Red focused test failed because the old command printed `agentloop: Unsupported task type ...` to stderr.
+  - Focused create-task suite passed after implementation: 8 tests.
+  - Full local verification passed: lint, typecheck, Vitest 34 files and 187 tests, build, Markdown link check, `git diff --check`, and `projscan doctor`.
+  - Built CLI smoke check returned parseable JSON with `UNSUPPORTED_TASK_TYPE` and did not write `.agentloop/tasks/typo-json-smoke.md`.
+  - `.agentloop/reports/2026-06-11-01-35-verification-report.md`, overall status pass.
+- What worked well:
+  - The JSON error path now gives coding agents enough structure to recover without parsing prose.
+- Improve:
+  - Consider a shared JSON error helper for more commands if automation users need consistent machine-readable failures.
+  - Keep this unreleased until the planned `0.28.0` batch.

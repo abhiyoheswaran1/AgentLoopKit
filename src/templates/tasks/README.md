@@ -33,6 +33,7 @@ agentloop task doctor
 
 `agentloop task list --json` is safe for agents and scripts. It reads task files and does not create or update `.agentloop/state.json`.
 `agentloop create-task --json` returns the created task path and Markdown content for scripts and agents.
+For unsupported `--type` values, `agentloop create-task --json` returns a parseable error with `supportedTaskTypes` and writes no task file.
 `agentloop task show --json` returns one task contract's metadata and Markdown content without changing active state.
 `agentloop task status --json` updates only the task contract's `- Status:` line. Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Use `deferred` for parked work that should stay visible without becoming the next unpinned task.
 `agentloop task archive --json` moves one named task contract into `.agentloop/tasks/archive/` after verification and handoff. It preserves the Markdown file and refuses to overwrite an existing archive file.

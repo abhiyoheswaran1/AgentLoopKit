@@ -45,6 +45,7 @@ agentloop task doctor
 
 Use `agentloop task list --json` when an agent needs a machine-readable list of contracts before choosing the active task. The list command is read-only and does not create `.agentloop/state.json`.
 Use `agentloop create-task --json` when an agent needs the created task path and Markdown content without parsing the human success line. If you pass `--out`, the path must be a Markdown file inside the configured task directory.
+For unsupported `--type` values, `agentloop create-task --json` returns a parseable error with `supportedTaskTypes` and writes no task file.
 Use `agentloop task show --json` when an agent needs the selected contract content in a stable schema.
 Use `agentloop task status --json` when an agent needs to update the contract state without hand-editing Markdown. Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Use `deferred` for parked work that should remain visible but not become `latestTask` in `status` or `next`.
 Use `agentloop task archive --json` after verification and handoff when a finished contract should leave the normal task list but remain available as Markdown history.

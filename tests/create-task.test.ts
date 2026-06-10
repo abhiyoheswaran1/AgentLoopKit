@@ -194,6 +194,43 @@ describe('create-task command', () => {
     await expect(stat(path.join(dir, '.agentloop/tasks/typo.md'))).rejects.toThrow();
   });
 
+  test('prints unsupported task type errors as JSON when requested', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Typo task type',
+        '--type',
+        'test-generaton',
+        '--out',
+        '.agentloop/tasks/typo.md',
+        '--json',
+      ],
+      { cwd: dir, reject: false, timeout: 5000 },
+    );
+
+    expect(result.timedOut).toBe(false);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'UNSUPPORTED_TASK_TYPE',
+        message: 'Unsupported task type "test-generaton".',
+        supportedTaskTypes: TASK_TYPES,
+      },
+    });
+    await expect(stat(path.join(dir, '.agentloop/tasks/typo.md'))).rejects.toThrow();
+  });
+
   test('prints created task details as JSON when requested', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

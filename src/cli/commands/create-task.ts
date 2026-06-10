@@ -32,11 +32,29 @@ function resolveTaskType(value: unknown) {
   if (TASK_TYPES.includes(type as TaskType)) return type as TaskType;
   throw new AgentLoopError(
     `Unsupported task type "${type}". Supported task types: ${TASK_TYPES.join(', ')}`,
+    'UNSUPPORTED_TASK_TYPE',
   );
 }
 
 function supportedTaskTypesHelp() {
   return `\nSupported task types:\n${TASK_TYPES.map((type) => `  - ${type}`).join('\n')}\n`;
+}
+
+function printJsonError(error: AgentLoopError, details: Record<string, unknown> = {}) {
+  console.log(
+    JSON.stringify(
+      {
+        error: {
+          code: error.code,
+          message: error.message,
+          ...details,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
 }
 
 async function collectInteractive(initial: { title?: string; type?: TaskType }) {
@@ -133,7 +151,24 @@ export function createTaskCommand() {
     .option('--json', 'print machine-readable output')
     .addHelpText('after', supportedTaskTypesHelp())
     .action(async (options: Record<string, unknown>) => {
-      const type = resolveTaskType(options.type);
+      let type: TaskType | undefined;
+      try {
+        type = resolveTaskType(options.type);
+      } catch (error) {
+        if (
+          options.json &&
+          error instanceof AgentLoopError &&
+          error.code === 'UNSUPPORTED_TASK_TYPE'
+        ) {
+          const requestedType = typeof options.type === 'string' ? options.type.trim() : '';
+          printJsonError(error, {
+            message: `Unsupported task type "${requestedType}".`,
+            supportedTaskTypes: TASK_TYPES,
+          });
+          return;
+        }
+        throw error;
+      }
       const title = typeof options.title === 'string' ? options.title : undefined;
       const config = await loadAgentLoopConfig(process.cwd());
       const input =
