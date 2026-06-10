@@ -9,6 +9,7 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - Task contracts with `agentloop create-task`
 - Active task lifecycle with `agentloop task list`, `show`, `set`, `current`, `status`, `archive`, and `clear`
 - Verification reports with configured commands, custom commands, long-output excerpts, and CI context
+- Task-linked verification reports and failed-verification summaries
 - Deterministic PR summaries and `agentloop handoff`
 - PR summary change-area classification and path-based review-focus hints
 - Local static HTML evidence reports with `agentloop report`
@@ -30,9 +31,10 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 ## Current Blocker
 
 - Configure npm trusted publishing for GitHub Actions.
-- npm previously lagged at `agentloopkit@0.1.1` while GitHub release candidates reached `v0.21.0`.
+- npm previously lagged at `agentloopkit@0.1.1` while GitHub release candidates reached `v0.22.0`.
 - GitHub release `v0.19.0` is public for local CI summaries.
 - GitHub release `v0.21.0` is public for next-action and release-safety guardrails.
+- GitHub release `v0.22.0` is prepared for task-linked verification and README evidence.
 - Local `npm publish --access public` for `0.16.0` passed package checks and stopped at npm OTP/browser authentication.
 - The release-triggered GitHub Publish workflow for `v0.16.0` passed package checks and failed at npm authorization.
 - The release-triggered GitHub Publish workflow for `v0.17.0` passed package checks and failed at npm authorization.

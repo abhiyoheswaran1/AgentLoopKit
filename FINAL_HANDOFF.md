@@ -119,6 +119,30 @@ npx projscan doctor --format markdown
 
 Latest local verification:
 
+- `0.22.0` task-linked verification and README evidence release-candidate verification:
+  - Task contracts: `.agentloop/tasks/2026-06-10-improve-verification-failure-summary.md`, `.agentloop/tasks/2026-06-10-include-task-context-in-verification.md`, `.agentloop/tasks/2026-06-10-refresh-readme-visuals-task-context.md`, and `.agentloop/tasks/2026-06-10-prepare-v0-22-0-release.md`.
+  - Product cycles: `.agentloop/research/interview-cycle-082.md`, `.agentloop/research/interview-cycle-083.md`, `.agentloop/research/interview-cycle-084.md`, and `.agentloop/research/interview-cycle-085.md`.
+  - Added failed-verification summaries.
+  - Added task context to `agentloop verify --task <path>`.
+  - Guarded `.env`-style paths so `verify --task` reports them as unavailable instead of reading them.
+  - Refreshed README Playwright screenshots and VHS terminal demo around task-linked verification.
+  - `npm whoami`: expected fail with `E401`, so npm publish remains blocked from this shell.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 28 files and 110 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 467 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `node dist/cli/index.js version`: `0.22.0`.
+  - `node scripts/prepublish-check.mjs`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `git diff --check`: pass.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - `npm pack --pack-destination /tmp --silent`: pass, produced `/tmp/agentloopkit-0.22.0.tgz`.
+  - Packed tarball smoke: pass; `agentloop version` reported `0.22.0`, `verify --task` passed, `handoff` wrote a PR summary, `release-notes --release-version 0.22.0 --json` reported `0.22.0`, and `check-gates --strict` passed.
+  - Local tarball SHA-256 before GitHub release: `5ad3a2b35e430d6d9fa10cad4c6023230fc7f3593a8232370c9c2a8945b6489f`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-05-34-verification-report.md`, overall status `pass`.
+  - npm registry proof before release: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
+
 - `0.21.0` next-action and release-safety release-candidate verification:
   - Task contracts: `.agentloop/tasks/2026-06-10-add-next-action-command.md`, `.agentloop/tasks/2026-06-10-add-publish-metadata-guard.md`, and `.agentloop/tasks/2026-06-10-prepare-v0-21-0-release.md`.
   - Product cycles: `.agentloop/research/interview-cycle-079.md`, `.agentloop/research/interview-cycle-080.md`, and `.agentloop/research/interview-cycle-081.md`.

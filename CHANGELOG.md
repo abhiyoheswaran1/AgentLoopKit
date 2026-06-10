@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.22.0
+
+Task-linked verification and README evidence release candidate. npm still serves `0.1.1` until account authentication or trusted publishing is repaired. This is the normal next minor release after `v0.21.0`; after npm catches up to the current release line, future releases should use ordinary sequential semver:
+
 - Added a `Failure Summary` section to failed verification reports with failed command, exit code, and final useful output lines
 - Kept full command output excerpts in verification reports; the new summary does not diagnose root cause or parse tool-specific logs
 - Added task context to verification reports generated with `agentloop verify --task <path>`

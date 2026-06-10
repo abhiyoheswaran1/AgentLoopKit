@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Latest GitHub release: `v0.21.0`. Current `main` may include unreleased changes. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.21.0` carry recent source snapshots. The next npm publish should catch up to the current GitHub line once; after that, releases return to normal sequential semver.
+Latest GitHub release: `v0.22.0` once the release workflow below is complete. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.22.0` carry recent source snapshots. The next npm publish should catch up to the current GitHub line once; after that, releases return to normal sequential semver.
 
 Run the CLI after install:
 
@@ -369,7 +369,7 @@ See `docs/ci-summary.md`.
 ```bash
 agentloop release-notes
 agentloop release-notes --from v0.19.0 --to HEAD
-agentloop release-notes --release-version 0.21.0
+agentloop release-notes --release-version 0.22.0
 agentloop release-notes --json
 agentloop release-notes --write
 ```
@@ -485,7 +485,7 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.21.0` is public with the next-action command, prepublish metadata guard, and release-notes flag fix. Current `main` has unreleased verification-report work. The release-triggered publish workflow passed package checks and failed at npm authorization, so npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
+AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.22.0` carries task-linked verification reports, failed-verification summaries, the guarded `--task` path behavior, and refreshed README visuals. npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
 
 Do not publish stale older versions from current `main`. If `CHANGELOG.md` has real entries under `Unreleased`, the prepublish guard blocks npm publish until release metadata is prepared.
 

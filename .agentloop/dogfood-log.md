@@ -2799,3 +2799,40 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The VHS tape no longer needs a package-version edit for each visual refresh.
 - Improve:
   - Consider adding a tiny script that regenerates all README assets with one command.
+
+## 2026-06-10: 0.22.0 Release Prep
+
+- Task contract: `.agentloop/tasks/2026-06-10-prepare-v0-22-0-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-085.md`
+- Trigger:
+  - `main` contains release-worthy verification and README evidence work after `v0.21.0`.
+  - `package.json` still reported `0.21.0` and `CHANGELOG.md` had Unreleased entries.
+  - npm still serves `0.1.1`, and local `npm whoami` returned `E401`.
+- Product changes in progress:
+  - Bump package metadata to `0.22.0`.
+  - Move Unreleased changelog entries into `0.22.0`.
+  - Update README, npm publishing docs, GitHub Actions docs, release-note docs, launch checklist, roadmap, and final handoff for the current release line.
+  - Prepare a GitHub release tarball if package verification passes.
+- Verification run so far:
+  - `npm view agentloopkit version versions --json`: latest `0.1.1`, versions `0.1.0` and `0.1.1`.
+  - `npm whoami`: expected fail with `E401`, so npm publish is blocked from this shell.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 28 files and 110 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 467 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `node scripts/prepublish-check.mjs`: pass.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `node dist/cli/index.js version`: `0.22.0`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - `npm pack --pack-destination /tmp --silent`: pass, produced `/tmp/agentloopkit-0.22.0.tgz`.
+  - Tarball SHA-256 before GitHub release: `5ad3a2b35e430d6d9fa10cad4c6023230fc7f3593a8232370c9c2a8945b6489f`.
+  - Initial packed smoke with `check-gates --strict`: expected fail because no handoff summary existed.
+  - Corrected packed smoke: pass after `agentloop handoff`; `agentloop version` reported `0.22.0`, `verify --task` passed, `release-notes --release-version 0.22.0 --json` reported `0.22.0`, and `check-gates --strict` passed.
+  - `git fetch --tags`: pass, fetched `v0.21.0` for explicit release-note range selection.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-prepare-v0-22-0-release.md`: pass.
+- Verification report:
+  - `.agentloop/reports/2026-06-10-05-34-verification-report.md`
+- Handoff summary:
+  - `.agentloop/handoffs/2026-06-10-05-35-pr-summary.md`
