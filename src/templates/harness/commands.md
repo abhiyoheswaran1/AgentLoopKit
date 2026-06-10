@@ -22,6 +22,7 @@ Rules:
 - Use `agentloop check-gates --strict` in CI when warning gates should fail.
 - Use `agentloop report` after verification and handoff when reviewers need one local HTML evidence artifact.
 - Use `agentloop badge` when reviewers or CI need a local SVG evidence badge.
+- Use `agentloop ci-summary --write` in CI when reviewers need a compact provenance and evidence summary.
 - Run targeted checks while developing.
 - Run configured verification before claiming completion.
 - If a command fails, report the failure and fix it when reasonable.
@@ -32,6 +33,8 @@ Rules:
 Use `agentloop check-gates --strict` in CI after task, verification, and handoff evidence exists. If CI generates reports and handoffs, upload `.agentloop/reports/*.md`, `.agentloop/reports/*.html`, `.agentloop/reports/*.svg`, and `.agentloop/handoffs/*.md` as build artifacts instead of committing them automatically.
 
 When `agentloop verify` runs in GitHub Actions, the verification report records allowlisted CI provenance fields such as workflow, event, ref, commit, run URL, and run attempt. It does not dump arbitrary environment variables.
+
+Use `agentloop ci-summary --write` after verification and handoff when CI should upload one compact Markdown summary of CI provenance, AgentLoop evidence, and gate status. It does not run checks or replace the verification report.
 
 `check-gates` checks evidence. It does not prove the code is correct and does not replace review.
 

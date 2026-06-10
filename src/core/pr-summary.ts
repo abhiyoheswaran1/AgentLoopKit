@@ -4,7 +4,7 @@ import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
 import { getGitDiffStat, getGitStatus, parseGitStatus, GitFileStatus } from './git.js';
 import { pathExists, writeTextFile } from './file-system.js';
-import { latestMarkdownFile } from './artifacts.js';
+import { latestMarkdownFile, verificationReportPattern } from './artifacts.js';
 import { getActiveTaskPath } from './task-state.js';
 
 export type PrSummaryInput = {
@@ -224,7 +224,9 @@ export async function summarizeRepository(options: {
     (await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir)));
   const reportPath =
     options.reportPath ??
-    (await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir)));
+    (await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {
+      pattern: verificationReportPattern,
+    }));
   const taskMarkdown =
     taskPath && (await pathExists(taskPath)) ? await readFile(taskPath, 'utf8') : undefined;
   const verificationMarkdown =

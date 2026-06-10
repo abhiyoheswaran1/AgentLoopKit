@@ -2,8 +2,19 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.19.0
+
+CI summary and contributor-onboarding release candidate. npm publish is pending account authentication or trusted-publishing repair. npm may jump from `0.1.1` to this current release because the intermediate versions were GitHub/source release candidates while npm publishing was blocked:
+
 - Added `docs/contributor-playbook.md` with copyable good-first issue examples and contributor verification expectations
 - Linked contributor playbook guidance from README and `CONTRIBUTING.md`
+- Added `agentloop ci-summary` for local CI provenance and AgentLoop evidence summaries
+- Added `agentloop ci-summary --json` for scripts and CI logs
+- Added `agentloop ci-summary --write` to write `.agentloop/reports/YYYY-MM-DD-HH-mm-ci-summary.md`
+- Kept CI summaries read-only unless `--write` is passed: no provider API calls, secret reads, telemetry, uploads, or verification command execution
+- Updated verification-report lookup so status, summaries, gates, reports, and badges ignore newer CI summary artifacts
 
 ## 0.18.1
 

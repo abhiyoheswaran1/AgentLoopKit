@@ -6,12 +6,12 @@ AgentLoopKit does not install workflows into user repositories. Copy a recipe in
 
 ## npm Status
 
-The latest public GitHub tarball is `v0.18.1`, which includes policy customization guidance for `agentloop policy status`. npm still serves `0.1.1` until browser/OTP authentication or trusted publishing works.
+The current prepared GitHub tarball is `v0.19.0`, which includes `agentloop ci-summary`. npm still serves `0.1.1` until browser/OTP authentication or trusted publishing works.
 
 Until npm catches up, pin the GitHub release tarball in CI:
 
 ```bash
-npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.18.1/agentloopkit-0.18.1.tgz
+npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.19.0/agentloopkit-0.19.0.tgz
 npx --no-install agentloop check-gates --strict
 ```
 
@@ -36,7 +36,7 @@ jobs:
           node-version: 24
 
       - name: Install AgentLoopKit
-        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.18.1/agentloopkit-0.18.1.tgz
+        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.19.0/agentloopkit-0.19.0.tgz
 
       - name: Check AgentLoop evidence
         run: npx --no-install agentloop check-gates --strict
@@ -68,7 +68,7 @@ jobs:
         run: npm ci
 
       - name: Install AgentLoopKit
-        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.18.1/agentloopkit-0.18.1.tgz
+        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.19.0/agentloopkit-0.19.0.tgz
 
       - name: Run AgentLoop verification
         run: npx --no-install agentloop verify
@@ -81,6 +81,9 @@ jobs:
 
       - name: Write HTML evidence report
         run: npx --no-install agentloop report
+
+      - name: Write CI summary
+        run: npx --no-install agentloop ci-summary --write
 
       - name: Check AgentLoop gates
         run: npx --no-install agentloop check-gates --strict
@@ -97,9 +100,11 @@ jobs:
             .agentloop/handoffs/*.md
 ```
 
-This workflow does not commit generated files. It uploads reports, HTML reports, badges, and handoffs as CI artifacts.
+This workflow does not commit generated files. It uploads reports, HTML reports, badges, CI summaries, and handoffs as CI artifacts.
 
 The verification report includes a `CI Context` section when GitHub Actions creates it. Reviewers can see the workflow, event, ref, commit, run URL, and run attempt inside the Markdown artifact.
+
+`agentloop ci-summary --write` adds a small Markdown summary with the same allowlisted CI provenance plus current AgentLoop evidence and gate status. It does not call GitHub APIs, read secrets, run verification commands, or replace the verification report.
 
 ## Required Repository Files
 
@@ -119,6 +124,7 @@ Run `agentloop init` and `agentloop create-task` before relying on CI gates.
 - `agentloop badge` writes a local SVG badge from existing evidence.
 - `agentloop handoff` writes a deterministic reviewer summary.
 - `agentloop report` writes a static HTML evidence artifact from local files.
+- `agentloop ci-summary` summarizes CI context and AgentLoop evidence without running checks.
 - `agentloop check-gates` exits non-zero when a required gate fails.
 - `agentloop check-gates --strict` also exits non-zero when any gate warns.
 
@@ -149,6 +155,6 @@ npx --no-install agentloop check-gates --strict
 
 - Do not upload `.env` files.
 - Do not print secret values.
-- `agentloop verify` does not dump arbitrary environment variables. It only records allowlisted CI provenance fields.
+- `agentloop verify` and `agentloop ci-summary` do not dump arbitrary environment variables. They only record allowlisted CI provenance fields.
 - Do not grant write permissions unless another workflow step needs them.
 - Do not let CI commit generated reports unless maintainers explicitly want that behavior.

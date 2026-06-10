@@ -21,8 +21,13 @@ Rules:
 - Follow local `.agentloop/policies/*.md` files as repo policy. Treat `modified` as a reviewed local rule, not an error.
 - Use `agentloop report` after verification and handoff when reviewers need one local HTML evidence artifact.
 - Use `agentloop badge` when reviewers or CI need a local SVG evidence badge.
+- Use `agentloop ci-summary --write` in CI when reviewers need a compact provenance and evidence summary.
 - Run targeted checks while developing.
 - Run configured verification before claiming completion.
 - Dogfood projscan during implementation work in this repository.
 - If a command fails, report the failure and fix it when reasonable.
 - If a command is not configured, say so in the handoff.
+
+## CI Usage
+
+Use `agentloop ci-summary --write` after verification and handoff when CI should upload one compact Markdown summary of CI provenance, AgentLoop evidence, and gate status. It does not run checks or replace the verification report.

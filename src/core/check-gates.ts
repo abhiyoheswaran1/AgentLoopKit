@@ -1,7 +1,7 @@
 import path from 'node:path';
-import { readFile, readdir, stat } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
-import { latestMarkdownFile } from './artifacts.js';
+import { latestMarkdownFile, prSummaryPattern, verificationReportPattern } from './artifacts.js';
 import { pathExists } from './file-system.js';
 import { getGitBranch, getGitCommit, getGitStatus, isInsideGitRepo, parseGitStatus } from './git.js';
 import { getActiveTaskPath } from './task-state.js';
@@ -33,8 +33,6 @@ export type CheckGatesResult = {
   markdown: string;
 };
 
-const generatedArtifactPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-.+\.md$/;
-
 const requiredRootFiles = ['AGENTS.md', 'AGENTLOOP.md', 'agentloop.config.json'];
 const requiredHarnessFiles = [
   '.agentloop/harness/commands.md',
@@ -58,26 +56,6 @@ function extractOverallStatus(markdown: string) {
 
 function relativePath(cwd: string, filePath: string) {
   return path.relative(cwd, filePath) || '.';
-}
-
-async function latestGeneratedMarkdownFile(dir: string) {
-  if (!(await pathExists(dir))) return undefined;
-  const entries = await Promise.all(
-    (
-      await readdir(dir, { withFileTypes: true })
-    )
-      .filter((entry) => entry.isFile() && generatedArtifactPattern.test(entry.name))
-      .map(async (entry) => {
-        const filePath = path.join(dir, entry.name);
-        const fileStat = await stat(filePath);
-        return { filePath, name: entry.name, mtimeMs: fileStat.mtimeMs };
-      }),
-  );
-  entries.sort((left, right) => {
-    if (left.mtimeMs !== right.mtimeMs) return left.mtimeMs - right.mtimeMs;
-    return left.name.localeCompare(right.name);
-  });
-  return entries.at(-1)?.filePath;
 }
 
 async function missingFiles(cwd: string, files: string[]) {
@@ -166,12 +144,12 @@ export async function checkGates(options: {
   const taskPath =
     (await getActiveTaskPath(options)) ??
     (await latestMarkdownFile(path.join(options.cwd, options.config.paths.tasksDir)));
-  const reportPath = await latestGeneratedMarkdownFile(
-    path.join(options.cwd, options.config.paths.reportsDir),
-  );
-  const handoffPath = await latestGeneratedMarkdownFile(
-    path.join(options.cwd, options.config.paths.handoffsDir),
-  );
+  const reportPath = await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {
+    pattern: verificationReportPattern,
+  });
+  const handoffPath = await latestMarkdownFile(path.join(options.cwd, options.config.paths.handoffsDir), {
+    pattern: prSummaryPattern,
+  });
   const gates: GateCheck[] = [];
 
   if (taskPath) {

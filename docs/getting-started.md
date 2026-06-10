@@ -104,11 +104,13 @@ npx agentloopkit check-gates
 npx agentloopkit check-gates --strict
 npx agentloopkit report
 npx agentloopkit badge
+npx agentloopkit ci-summary
 ```
 
 `check-gates` does not run tests. It checks whether task, verification, handoff, harness, policy, and git evidence exists before review.
 Use `--strict` in CI when warning gates should fail.
 `report` writes a local static HTML evidence page after `verify` and `handoff`.
 `badge` writes a local SVG status badge from existing verification or gate evidence.
+`ci-summary` writes or prints a small CI provenance and evidence summary without running checks.
 
 For pull request CI recipes, see `github-actions.md`.

@@ -26,6 +26,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - deterministic PR summary change-area classification and review-focus hints
 - local static HTML evidence reports with `agentloop report`
 - local SVG evidence badges with `agentloop badge`
+- local CI provenance and evidence summaries with `agentloop ci-summary`
 - read-only local policy inspection with `agentloop policy`
 - read-only local policy template status with `agentloop policy status`
 - verification reports with allowlisted CI context
@@ -68,6 +69,9 @@ agentloop report --json
 agentloop badge
 agentloop badge --source gates
 agentloop badge --json
+agentloop ci-summary
+agentloop ci-summary --json
+agentloop ci-summary --write
 agentloop policy list
 agentloop policy show security
 agentloop policy status
@@ -106,6 +110,28 @@ npx projscan doctor --format markdown
 ```
 
 Latest local verification:
+
+- `0.19.0` local CI summary release-candidate verification:
+  - Task contract: `.agentloop/tasks/2026-06-10-add-local-ci-summary-command.md`.
+  - Product cycle: `.agentloop/research/interview-cycle-077.md`.
+  - Red test: `npx pnpm@10.12.1 test tests/ci-summary.test.ts tests/completion.test.ts` failed before `ci-summary` and lookup isolation existed.
+  - Focused green tests: `npx pnpm@10.12.1 test tests/ci-summary.test.ts tests/completion.test.ts tests/status.test.ts tests/check-gates.test.ts tests/html-report.test.ts tests/badge.test.ts tests/pr-summary.test.ts`: pass, 7 files and 28 tests.
+  - `agentloop version`: reported `0.19.0`.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 25 files and 94 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 431 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm pack`: pass, produced `agentloopkit-0.19.0.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: pass; `agentloop version` reported `0.19.0`, `ci-summary --json --write` reported GitHub Actions context, and `status` plus `check-gates` still selected the verification report.
+  - Tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
+  - README terminal GIF regenerated with VHS from `docs/assets/readme/agentloopkit-cli.tape`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-03-15-verification-report.md`, overall status `pass`.
+  - AgentLoop CI summary: `.agentloop/reports/2026-06-10-03-18-ci-summary.md`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-03-16-pr-summary.md`.
 
 - Contributor playbook examples:
   - Task contract: `.agentloop/tasks/2026-06-10-add-contributor-playbook-examples.md`.
@@ -1583,6 +1609,18 @@ Implemented:
 - README and `CONTRIBUTING.md` links
 - roadmap, changelog, backlog, product-panel, task contract, dogfood, verification, and handoff records
 
+### Cycle 77: Local CI summary command
+
+Decision: add a local read-only CI summary command instead of GitHub API imports, PR comments, or a dashboard.
+
+Implemented:
+
+- `agentloop ci-summary`
+- `agentloop ci-summary --json`
+- `agentloop ci-summary --write`
+- verification-report lookup isolation from `*-ci-summary.md` artifacts
+- GitHub Actions docs, examples, generated harness guidance, completions, tests, release metadata, and README demo source updates
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1628,23 +1666,24 @@ Strongest signals:
 - Teams need one local HTML evidence artifact after task, verification, and handoff files exist.
 - Reviewers need small local status badges that point back to verification or gate evidence.
 - Platform users and agents need policy template drift visibility without a compliance engine.
+- CI reviewers need one compact local summary that ties CI provenance, task evidence, verification status, handoff state, and gates together.
 
 ## Backlog
 
 Top remaining items:
 
-1. Complete npm browser/OTP authentication or trusted publishing for the current prepared release, now `agentloopkit@0.18.1`.
+1. Complete npm browser/OTP authentication or trusted publishing for the current prepared release, now `agentloopkit@0.19.0`.
 2. Optional schema-store submission after npm publishing is stable.
-3. CI summary import.
-4. Add CI summary import planning after npm publishing is fixed.
-5. Evaluate organization policy packs only after local policy workflows mature.
+3. Add generated release-note handoff.
+4. Evaluate organization policy packs only after local policy workflows mature.
+5. Add GitHub issue and PR metadata import after the local workflow matures.
 
 ## Known limitations
 
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, `v0.15.0`, `v0.15.1`, and `v0.16.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - GitHub release `v0.17.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - GitHub release `v0.18.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- Current source targets `0.18.1`; npm should jump from `0.1.1` to the current prepared release because public GitHub tags already occupy the intermediate versions.
+- Current source targets `0.19.0`; npm should jump from `0.1.1` to the current prepared release because public GitHub tags already occupy the intermediate versions.
 - Do not publish `0.16.0` or `0.17.0` to npm from current `main`. Publish each version only from its matching release commit or release tarball.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP` for browser/OTP authentication.
 - The release-triggered GitHub Publish workflow for `v0.16.0` passed checks and failed at npm authorization with `E404`.
@@ -1660,6 +1699,7 @@ Top remaining items:
 - GitHub release `v0.18.1`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.18.1
 - `agentloopkit@0.18.1` tarball SHA-256: `01f38156e44610021752dadc90fe5d61f63ac210c3778274bce99b11833e972b`.
 - The release-triggered GitHub Publish workflow for `v0.18.1` passed checks and failed at npm authorization with `E404`.
+- `agentloopkit@0.19.0` is prepared on `main` for local CI summaries.
 - Local `npm whoami` returned `E401`; run `npm login` again before another local publish attempt.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
@@ -1791,6 +1831,9 @@ Top remaining items:
 - [x] Publish GitHub release `v0.18.1` with policy-customization release notes.
 - [ ] Publish `agentloopkit@0.18.1` to npm.
 - [x] Run GitHub Publish workflow for `v0.18.1`; package checks passed, npm authorization failed.
+- [x] Prepare `agentloopkit@0.19.0` CI-summary release candidate.
+- [ ] Publish GitHub release `v0.19.0` with CI-summary release notes.
+- [ ] Publish `agentloopkit@0.19.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
@@ -1842,12 +1885,12 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Complete browser/OTP npm publish or trusted publishing for `0.18.1`: high usefulness, low repo effort, external auth required.
-2. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
-3. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
-4. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+1. Complete browser/OTP npm publish or trusted publishing for `0.19.0`: high usefulness, low repo effort, external auth required.
+2. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+3. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
+4. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
 5. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
-6. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
+6. Add GitLab CI and Buildkite examples for `agentloop ci-summary`: medium usefulness, low effort.
 7. Add generated security-review example: medium trust improvement, low effort.
 8. Add config migration helper for future schema versions: medium usefulness, medium effort.
 9. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.

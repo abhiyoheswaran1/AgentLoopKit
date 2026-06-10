@@ -2480,3 +2480,44 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Clearing `.agentloop/state.json` after dogfooding avoided committing a local active-task pointer.
 - Improve:
   - CI summary import is the next useful local-first feature after npm publishing catches up.
+
+## 2026-06-10: 0.19.0 Local CI Summary Command
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-local-ci-summary-command.md`
+- Product cycle: `.agentloop/research/interview-cycle-077.md`
+- Trigger:
+  - GitHub Actions recipes can upload several AgentLoop artifacts, but reviewers need one compact CI log summary.
+  - The backlog identified CI summary import as the next local-first improvement after contributor and policy docs.
+- Product changes:
+  - Added `agentloop ci-summary`.
+  - Added `agentloop ci-summary --json` and `agentloop ci-summary --write`.
+  - Added `src/core/ci-summary.ts` and `src/cli/commands/ci-summary.ts`.
+  - Added tests for GitHub Actions metadata, generic CI, written summaries, completions, and verification-report lookup isolation.
+  - Updated `status`, `check-gates`, `summarize`, `report`, and `badge` report lookup so `*-ci-summary.md` does not replace `*-verification-report.md`.
+  - Updated README, GitHub Actions docs, examples, generated harness templates, changelog, roadmap, publishing docs, launch checklist, final handoff, backlog, and decision log.
+  - Bumped package metadata to `0.19.0`.
+  - Regenerated the README terminal GIF with VHS from the `0.19.0` tape.
+- Verification run:
+  - Red test: `npx pnpm@10.12.1 test tests/ci-summary.test.ts tests/completion.test.ts` failed before `ci-summary` and lookup isolation existed.
+  - Focused green tests: `npx pnpm@10.12.1 test tests/ci-summary.test.ts tests/completion.test.ts tests/status.test.ts tests/check-gates.test.ts tests/html-report.test.ts tests/badge.test.ts tests/pr-summary.test.ts`: pass, 7 files and 28 tests.
+  - `agentloop version`: reported `0.19.0`.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 25 files and 94 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 431 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm pack`: pass, produced `agentloopkit-0.19.0.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: pass; `agentloop version` reported `0.19.0`, `ci-summary --json --write` reported GitHub Actions context, and `status` plus `check-gates` still selected the verification report.
+  - Tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
+  - README terminal GIF regenerated with VHS from `docs/assets/readme/agentloopkit-cli.tape`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-03-15-verification-report.md`, overall status `pass`.
+  - AgentLoop CI summary: `.agentloop/reports/2026-06-10-03-18-ci-summary.md`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-03-16-pr-summary.md`.
+- Worked well:
+  - Writing a CI summary did not disturb verification-report lookup.
+  - The command gives CI logs a compact summary without provider API calls or token access.
+- Improve:
+  - Cut the `v0.19.0` GitHub release after commit and CI, then record the publish workflow result.

@@ -11,6 +11,7 @@ import {
   GitFileStatus,
 } from './git.js';
 import { latestMarkdownFile } from './artifacts.js';
+import { verificationReportPattern } from './artifacts.js';
 import { getActiveTaskPath } from './task-state.js';
 
 export type StatusArtifact = {
@@ -175,7 +176,9 @@ export async function getAgentLoopStatus(options: {
   );
   const latestReport = await readReport(
     options.cwd,
-    await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir)),
+    await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {
+      pattern: verificationReportPattern,
+    }),
   );
   const configured = DEFAULT_COMMAND_KEYS.filter((key) => options.config.commands[key]);
   const missing = DEFAULT_COMMAND_KEYS.filter((key) => !options.config.commands[key]);

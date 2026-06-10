@@ -18,6 +18,7 @@ Before changing code:
 - Treat local `.agentloop/policies/*.md` files as the repo's safety guidance. A `modified` policy is a local decision to review, not a failure.
 - Run `agentloop report` after verification and handoff when a local HTML evidence artifact helps review.
 - Run `agentloop badge` when a local SVG evidence badge helps review or CI artifact uploads.
+- Run `agentloop ci-summary --write` in CI when reviewers need a compact provenance and evidence summary.
 - Follow the Specify, Constrain, Plan, Implement, Verify, Review, Handoff loop.
 - Keep changes small and tied to the task contract.
 - Do not run destructive git or filesystem commands unless the user asks for them.

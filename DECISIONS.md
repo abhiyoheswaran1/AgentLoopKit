@@ -83,3 +83,7 @@ Generated harness provenance lives in `.agentloop/manifest.json`, not in `agentl
 ## 2026-06-10: Policy Status Compares Templates, Not Compliance
 
 `agentloop policy status` compares local `.agentloop/policies/*.md` files with bundled AgentLoopKit policy templates. It reports `current`, `modified`, `missing`, and `extra` so agents and maintainers can review local policy drift. It does not score compliance, scan source code, rewrite policies, fetch remote packs, or decide whether a local customization is correct.
+
+## 2026-06-10: CI Summary Is Read-Only Evidence
+
+`agentloop ci-summary` reads allowlisted CI provenance and local AgentLoop artifacts, then prints Markdown or JSON. It writes a Markdown file only when `--write` is passed. It does not call CI provider APIs, read secrets, print arbitrary environment variables, upload files, run verification commands, or replace `*-verification-report.md` as the verification source of truth.

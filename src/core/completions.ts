@@ -15,6 +15,7 @@ const topLevelCommands = [
   ['check-gates', 'Check review gate evidence'],
   ['report', 'Write a local HTML evidence report'],
   ['badge', 'Write a local SVG evidence badge'],
+  ['ci-summary', 'Summarize CI context and AgentLoop evidence'],
   ['policy', 'List or inspect local AgentLoopKit policies'],
   ['task', 'List, inspect, update, or archive task contracts'],
   ['install-agent', 'Install agent-specific instructions'],

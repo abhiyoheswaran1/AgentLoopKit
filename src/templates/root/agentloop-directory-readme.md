@@ -62,7 +62,14 @@ agentloop badge
 agentloop badge --source gates
 ```
 
-10. Check review gates:
+10. Optional: write a CI summary:
+
+```bash
+agentloop ci-summary
+agentloop ci-summary --write
+```
+
+11. Check review gates:
 
 ```bash
 agentloop check-gates
@@ -72,11 +79,14 @@ agentloop check-gates --strict
 `check-gates` inspects local evidence. It does not run tests or call an LLM.
 `report` reads local evidence and writes one static HTML file under `reports/`.
 `badge` reads local evidence and writes SVG files under `reports/`.
+`ci-summary` reads allowlisted CI provenance and local evidence, then writes Markdown under `reports/` when `--write` is passed.
 Use `--strict` in CI when warning gates should fail.
 
 CI can either check committed AgentLoop evidence or generate reports and handoffs as build artifacts. Do not let CI commit generated files unless maintainers explicitly want that behavior.
 
 When GitHub Actions runs `agentloop verify`, the report records allowlisted CI provenance fields such as workflow, event, ref, commit, run URL, and run attempt. AgentLoopKit does not print arbitrary environment variables.
+
+Use `agentloop ci-summary --write` after verification and handoff when CI should upload one compact Markdown summary. It does not run checks or replace the verification report.
 
 ## Directories
 

@@ -7,7 +7,7 @@ It reads:
 - `agentloop.config.json`
 - active task pointer in `.agentloop/state.json`, when present
 - newest task contract in `.agentloop/tasks/` when no active task is pinned
-- latest verification report in `.agentloop/reports/`
+- latest `*-verification-report.md` in `.agentloop/reports/`
 - git branch, commit, and working tree status
 - configured verification commands
 
