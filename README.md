@@ -288,7 +288,7 @@ Each contract records:
 .agentloop/reports/YYYY-MM-DD-HH-mm-verification-report.md
 ```
 
-Pass `--task .agentloop/tasks/file.md` to include task title, type, status, and path in the report. The path must point to a Markdown task contract inside the configured task directory. Invalid paths are reported as unavailable instead of being read. Add `--task-commands` when you also want to run commands listed under that task contract's `Verification Commands` section.
+Pass `--task .agentloop/tasks/file.md` to include task title, type, status, and path in the report. The path must point to a Markdown task contract inside the configured task directory. Invalid paths are reported as unavailable instead of being read. Add `--task-commands` when you also want to run commands listed under that task contract's `Verification Commands` section. If no task commands are found, the report says so.
 
 It does not hide failures. Failed reports include a short failure summary with each failed command, exit code, and final useful output lines before the full command output. If long logs are truncated, the report keeps the first and last output so the final error stays visible. If no commands are configured, it writes a report saying nothing was verified.
 

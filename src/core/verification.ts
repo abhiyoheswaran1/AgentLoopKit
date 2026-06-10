@@ -144,7 +144,16 @@ async function readSafeTaskMarkdown(
   }
 }
 
-async function commandEntries(config: AgentLoopConfig, options: VerificationOptions) {
+type VerificationCommandSelection = {
+  commands: Array<[VerificationCommandKey, string]>;
+  taskCommandsRequested: boolean;
+  taskCommandsFound: number;
+};
+
+async function commandEntries(
+  config: AgentLoopConfig,
+  options: VerificationOptions,
+): Promise<VerificationCommandSelection> {
   const configured: Array<[VerificationCommandKey, string]> = [
     ['test', config.commands.test],
     ['lint', config.commands.lint],
@@ -160,14 +169,21 @@ async function commandEntries(config: AgentLoopConfig, options: VerificationOpti
   for (const command of options.customCommands ?? []) {
     if (command.trim()) active.push(['custom', command.trim()]);
   }
+  let taskCommandsFound = 0;
   if (options.taskCommands) {
     const markdown = await readSafeTaskMarkdown(options.cwd, config, options.taskPath);
-    for (const command of markdown ? parseTaskVerificationCommands(markdown) : []) {
+    const taskCommands = markdown ? parseTaskVerificationCommands(markdown) : [];
+    taskCommandsFound = taskCommands.length;
+    for (const command of taskCommands) {
       active.push(['task', command]);
     }
   }
 
-  return active;
+  return {
+    commands: active,
+    taskCommandsRequested: options.taskCommands === true,
+    taskCommandsFound,
+  };
 }
 
 function singleLine(value: string | undefined, limit = 300) {
@@ -258,6 +274,15 @@ ${lines.join('\n')}
 `;
 }
 
+function renderTaskCommandContext(selection: VerificationCommandSelection) {
+  if (!selection.taskCommandsRequested || selection.taskCommandsFound > 0) return '';
+
+  return `## Task Commands
+- Task verification commands were requested, but none were found in the task contract.
+
+`;
+}
+
 function parseTaskMetadata(markdown: string) {
   const lines = markdown.split(/\r?\n/);
   return {
@@ -325,7 +350,8 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
   const nowIso = options.nowIso ?? new Date().toISOString();
   const env = options.env ?? process.env;
   const ciContext = detectCiContext(env);
-  const commands = await commandEntries(options.config, options);
+  const commandSelection = await commandEntries(options.config, options);
+  const commands = commandSelection.commands;
   const notRun = [
     ...(['test', 'lint', 'typecheck', 'build'] as const).filter((key) => {
       if (options.skip?.[key]) return true;
@@ -374,6 +400,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
 
 ${renderCiContext(ciContext)}
 ${taskContext}
+${renderTaskCommandContext(commandSelection)}
 ${renderFailureSummary(results)}
 ## Commands Run
 ${

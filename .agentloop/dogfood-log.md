@@ -4492,3 +4492,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider showing a report note when `--task-commands` is used but no task commands are found.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Report When Task Verification Commands Are Absent
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-report-when-task-verification-commands-are-absent.md`
+- Trigger:
+  - After adding `--task-commands`, dogfooding showed that an explicit request with no runnable task commands could be ambiguous in the report.
+- Implementation:
+  - Added a `Task Commands` report note when `--task-commands` is requested but no runnable commands are found in a safe task contract.
+  - Kept exit behavior unchanged.
+  - Kept `--task` metadata-only by default.
+  - Updated README, verification docs, changelog, backlog, and verification tests.
+- Verification run:
+  - `.agentloop/reports/2026-06-11-00-39-verification-report.md`, overall status pass.
+  - Focused verification tests failed before implementation because the report note was missing.
+  - Full configured verification passed: Vitest 34 files and 179 tests, lint, typecheck, and build.
+  - Task-command dogfood passed: focused verification tests 1 file and 19 tests, plus typecheck, both run from the task contract through `--task-commands`.
+  - Markdown link check, `projscan doctor`, whitespace diff check, and compiled CLI empty-task smoke passed.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-11-00-42-pr-summary.md`
+- What worked well:
+  - The report now distinguishes "no commands selected" from "task commands were requested but the task contract did not provide any."
+- Improve:
+  - Consider a future JSON field for task-command discovery metadata if CI consumers need it.
+  - Keep this unreleased until the planned `0.28.0` batch.

@@ -15,6 +15,7 @@
 - Added Git root and target-is-root context to `agentloop status` human and JSON output.
 - Added Git root and target-is-root context to `agentloop check-gates` human and JSON output.
 - Added `agentloop verify --task-commands` to explicitly run commands listed in a task contract's `Verification Commands` section.
+- Added a verification report note when `--task-commands` is requested but no runnable task commands are found.
 - Replaced stale current-version pins in user-facing README, MCP, and distribution examples with `@latest` or `<version>` placeholders.
 - Added regression coverage for missing Git executable behavior in local Git helpers and `agentloop init`.
 - Removed internal product-panel notes from the public distribution-channel guide, archived completed trusted-publishing evidence, and cleared stale proposed task contracts from the active task folder.

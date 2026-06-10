@@ -429,7 +429,43 @@ describe('verification', () => {
       }),
     ]);
     expect(result.markdown).toContain('### task: `node -e');
+    expect(result.markdown).not.toContain('Task verification commands were requested, but none were found.');
     expect(await readFile(path.join(dir, 'task-command-ran.txt'), 'utf8')).toBe('yes');
+  });
+
+  test('reports when task verification commands are requested but absent', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/no-task-commands.md'),
+      [
+        '# No task commands',
+        '',
+        '- Task type: docs',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        '- No verification command recorded.',
+        '',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: '.agentloop/tasks/no-task-commands.md',
+      taskCommands: true,
+      reportTimestamp: '2026-06-10-12-08',
+      nowIso: '2026-06-10T12:08:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('not-run');
+    expect(result.markdown).toContain('## Task Commands');
+    expect(result.markdown).toContain(
+      'Task verification commands were requested, but none were found in the task contract.',
+    );
   });
 
   test('reports missing task context without failing configured commands', async () => {
