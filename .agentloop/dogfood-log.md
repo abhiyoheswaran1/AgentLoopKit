@@ -3612,3 +3612,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The fix is local to GitHub language stats and does not affect npm package behavior.
 - Improve:
   - Consider adding a docs note if future contributors confuse README visual sources with product UI.
+
+## 2026-06-10: Local-Only Harness Mode
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-local-only-harness-mode.md`
+- Product cycle: `.agentloop/research/interview-cycle-107.md`
+- Trigger:
+  - Dogfooding AgentLoopKit inside another local repo showed a real setup split: the harness helps local agents, but not every repo owner wants to commit it.
+  - The manual `.git/info/exclude` snippet worked, but it asked users to know Git internals.
+- Product changes:
+  - Added `agentloop init --local-only`.
+  - Added a marked `.git/info/exclude` block for `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, and `agentloop.config.json`.
+  - Added local-only agent guidance to generated `AGENTS.md` and `AGENTLOOP.md`.
+  - Documented local-only mode in README and getting started docs.
+- Verification run:
+  - Red test: `npm test -- tests/init.test.ts` failed before local-only mode existed.
+  - Focused green test: `npm test -- tests/init.test.ts`: pass, 11 tests.
+  - Full test suite: `npm test`: pass, 30 files and 137 tests.
+  - Release checks: `npm run lint`, `npm run typecheck`, `npm run build`, `npx pnpm@10.12.1 check:links`, `git diff --check`, `node scripts/prepublish-check.mjs`, `npm run smoke:release`, and `npm publish --access public --dry-run`: pass.
+  - Projscan: `npx projscan doctor --format markdown`: pass with health score A and the known dynamic-import export false positive for `scripts/smoke-packed-release.mjs`.
+  - AgentLoop verification: `.agentloop/reports/2026-06-10-15-24-verification-report.md` passed with Vitest, lint, typecheck, build, and packed release smoke.
+  - Handoff generated: `.agentloop/handoffs/2026-06-10-15-25-pr-summary.md`.
+- Worked well:
+  - Keeping the behavior behind an explicit flag preserves the normal shared-harness path.
+  - Repo-local exclude gives users an undoable, inspectable Git change without touching `.gitignore`.
+- Improve:
+  - Consider adding generated guidance that describes `.agentloop/state.json` as local runtime state.

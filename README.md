@@ -49,11 +49,19 @@ npx agentloopkit init
 
 `init` writes files into the current directory. Do not run it from `~` unless you intend to configure your home directory. `--dry-run` previews the file changes without writing them.
 
+If you want AgentLoopKit for your local agent workflow but do not want to commit the generated harness:
+
+```bash
+npx agentloopkit init --local-only
+```
+
+`--local-only` writes the same files, then adds a marked block to this clone's `.git/info/exclude` for `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, and `agentloop.config.json`. It does not edit `.gitignore`, global Git config, shell profiles, or files outside the current repo.
+
 Pin the current version when you need repeatable CI or team setup:
 
 ```bash
-npx --yes agentloopkit@0.24.5 version
-npx --yes agentloopkit@0.24.5 init
+npx --yes agentloopkit@0.25.0 version
+npx --yes agentloopkit@0.25.0 init
 ```
 
 Run the CLI after install:
@@ -116,6 +124,7 @@ pnpm build
 | `agentloop init`                        | Generate the repo harness and config                                           |
 | `agentloop init --dry-run`              | Preview generated files without writing them                                   |
 | `agentloop init --force`                | Allow initialization when the current directory is your home directory          |
+| `agentloop init --local-only`           | Generate the harness but exclude it from this clone's git status               |
 | `agentloop doctor`                      | Check setup health, template version, commands, git state, and risk categories |
 | `agentloop create-task`                 | Create a task contract in `.agentloop/tasks/`                                  |
 | `agentloop task list`                   | List task contracts and show the pinned active task                            |
@@ -384,7 +393,7 @@ See `docs/ci-summary.md`.
 ```bash
 agentloop release-notes
 agentloop release-notes --from v0.19.0 --to HEAD
-agentloop release-notes --release-version 0.24.5
+agentloop release-notes --release-version 0.25.0
 agentloop release-notes --json
 agentloop release-notes --write
 ```
@@ -450,7 +459,7 @@ Use `agentloop check-gates --strict` as a review-evidence gate in pull request C
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
-See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.24.5` or a newer vetted release when reproducibility matters.
+See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.25.0` or a newer vetted release when reproducibility matters.
 
 ## PR Summaries
 

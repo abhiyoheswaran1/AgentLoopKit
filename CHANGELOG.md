@@ -4,6 +4,16 @@
 
 - No unreleased changes yet.
 
+## 0.25.0
+
+Minor release for local-only AgentLoopKit harnesses:
+
+- Added `agentloop init --local-only` for developers who want AgentLoopKit guidance in a repo without committing generated harness files
+- Local-only mode writes a marked block to this clone's `.git/info/exclude` for `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, and `agentloop.config.json`
+- Generated `AGENTS.md` and `AGENTLOOP.md` include a local-only notice so coding agents know not to commit the local harness
+- Added dry-run, idempotence, non-Git folder, and packed-package smoke coverage for local-only initialization
+- Documented local-only setup in README and getting-started docs
+
 ## 0.24.5
 
 Patch release for release safety and README demo polish:

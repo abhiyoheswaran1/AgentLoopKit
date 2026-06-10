@@ -1,10 +1,17 @@
 import path from 'node:path';
+import { execFile } from 'node:child_process';
 import { readFile, symlink, writeFile } from 'node:fs/promises';
+import { promisify } from 'node:util';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 import { initializeAgentLoop } from '../src/core/init.js';
 
 let tempDirs: string[] = [];
+const execFileAsync = promisify(execFile);
+
+async function initGitRepository(dir: string) {
+  await execFileAsync('git', ['init'], { cwd: dir });
+}
 
 describe('init', () => {
   afterEach(async () => {
@@ -114,5 +121,74 @@ describe('init', () => {
     const result = await initializeAgentLoop({ cwd: dir, homeDirectory: dir, force: true });
 
     expect(result.created.some((file) => file.endsWith('AGENTLOOP.md'))).toBe(true);
+  });
+
+  test('local-only mode excludes generated harness files from local git tracking', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo' });
+
+    const result = await initializeAgentLoop({ cwd: dir, localOnly: true });
+    const excludePath = path.join(dir, '.git/info/exclude');
+    const exclude = await readFile(excludePath, 'utf8');
+    const agents = await readFile(path.join(dir, 'AGENTS.md'), 'utf8');
+    const agentloop = await readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8');
+
+    expect(result.localOnly).toMatchObject({
+      excludePath,
+      patterns: ['.agentloop/', 'AGENTS.md', 'AGENTLOOP.md', 'agentloop.config.json'],
+    });
+    expect(exclude).toContain('# agentloopkit:local-only:start');
+    expect(exclude).toContain('.agentloop/');
+    expect(exclude).toContain('AGENTS.md');
+    expect(exclude).toContain('AGENTLOOP.md');
+    expect(exclude).toContain('agentloop.config.json');
+    expect(agents).toContain('Local-only AgentLoopKit harness');
+    expect(agents).toContain('Do not commit these AgentLoopKit files');
+    expect(agentloop).toContain('Local-only AgentLoopKit harness');
+  });
+
+  test('local-only mode is idempotent', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+
+    await initializeAgentLoop({ cwd: dir, localOnly: true });
+    const excludePath = path.join(dir, '.git/info/exclude');
+    const firstExclude = await readFile(excludePath, 'utf8');
+
+    await initializeAgentLoop({ cwd: dir, localOnly: true });
+    const secondExclude = await readFile(excludePath, 'utf8');
+
+    expect(secondExclude).toBe(firstExclude);
+    expect(secondExclude.match(/agentloopkit:local-only:start/g)).toHaveLength(1);
+  });
+
+  test('local-only dry-run reports the exclude update without writing it', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    const excludePath = path.join(dir, '.git/info/exclude');
+    const before = await readFile(excludePath, 'utf8');
+
+    const result = await initializeAgentLoop({ cwd: dir, dryRun: true, localOnly: true });
+    const after = await readFile(excludePath, 'utf8');
+
+    expect(after).toBe(before);
+    expect(result.updated).toContain(excludePath);
+    expect(result.localOnly).toMatchObject({
+      excludePath,
+      patterns: ['.agentloop/', 'AGENTS.md', 'AGENTLOOP.md', 'agentloop.config.json'],
+    });
+  });
+
+  test('local-only mode requires a git repository', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    await expect(initializeAgentLoop({ cwd: dir, localOnly: true })).rejects.toThrow(
+      'Local-only mode requires a Git repository',
+    );
   });
 });

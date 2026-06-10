@@ -42,6 +42,7 @@ describe('release smoke script helpers', () => {
     expect(steps.map((step: { name: string }) => step.name)).toEqual([
       'packed binary prints package version',
       'packed init writes AgentLoopKit files in a project directory',
+      'packed local-only init excludes AgentLoopKit files from local git tracking',
       'packed create-task rejects output outside the task directory',
       'packed verify reports outside task paths as unavailable',
       'packed init dry-run refuses the home directory',
@@ -57,6 +58,14 @@ describe('release smoke script helpers', () => {
       '/tmp/agentloopkit-0.24.4.tgz',
       'agentloop',
       'version',
+    ]);
+    expect(steps[2].args).toEqual([
+      '--yes',
+      '--package',
+      '/tmp/agentloopkit-0.24.4.tgz',
+      'agentloop',
+      'init',
+      '--local-only',
     ]);
   });
 

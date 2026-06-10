@@ -12,6 +12,14 @@ npx agentloopkit init
 
 Do not run non-dry `init` from `~` unless you intentionally want AgentLoopKit files in your home directory. AgentLoopKit refuses that by default; pass `--force` only when you mean it.
 
+Use local-only mode when you want the harness in your clone but do not want to commit it:
+
+```bash
+npx agentloopkit init --local-only
+```
+
+This writes the same AgentLoopKit files and adds a marked block to this clone's `.git/info/exclude`. Git ignores `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, and `agentloop.config.json` in that clone. AgentLoopKit does not edit `.gitignore` or global Git config.
+
 Then check the setup:
 
 ```bash

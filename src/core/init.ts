@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readdir, realpath } from 'node:fs/promises';
+import { readdir, realpath, stat } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import {
   AGENTLOOP_DIR,
@@ -22,7 +22,28 @@ export type InitResult = {
   updated: string[];
   skipped: string[];
   dryRun: boolean;
+  localOnly?: {
+    excludePath: string;
+    patterns: string[];
+  };
 };
+
+const LOCAL_ONLY_EXCLUDE_START = '# agentloopkit:local-only:start';
+const LOCAL_ONLY_EXCLUDE_END = '# agentloopkit:local-only:end';
+const LOCAL_ONLY_NOTICE_START = '<!-- agentloopkit:local-only:start -->';
+const LOCAL_ONLY_NOTICE_END = '<!-- agentloopkit:local-only:end -->';
+const LOCAL_ONLY_EXCLUDE_PATTERNS = [
+  `${AGENTLOOP_DIR}/`,
+  AGENTS_FILE,
+  AGENTLOOP_FILE,
+  CONFIG_FILE,
+];
+
+const LOCAL_ONLY_NOTICE = `${LOCAL_ONLY_NOTICE_START}
+## Local-only AgentLoopKit harness
+
+This AgentLoopKit setup is excluded by this clone's \`.git/info/exclude\`. Use these files for local agent work. Do not commit these AgentLoopKit files unless a maintainer intentionally converts the repo to a shared harness.
+${LOCAL_ONLY_NOTICE_END}`;
 
 async function writeGeneratedFile(filePath: string, content: string, result: InitResult) {
   if (await pathExists(filePath)) {
@@ -84,6 +105,69 @@ async function upsertAgentsFile(cwd: string, content: string, result: InitResult
   result.updated.push(filePath);
 }
 
+async function resolveGitInfoExcludePath(cwd: string) {
+  const dotGitPath = path.join(cwd, '.git');
+  const dotGitStat = await stat(dotGitPath).catch(() => undefined);
+  if (!dotGitStat) return undefined;
+  if (dotGitStat.isDirectory()) {
+    return path.join(dotGitPath, 'info', 'exclude');
+  }
+  if (!dotGitStat.isFile()) return undefined;
+
+  const gitFile = await readTextIfExists(dotGitPath);
+  const match = /^gitdir:\s*(.+)\s*$/m.exec(gitFile);
+  if (!match) return undefined;
+
+  const gitDir = match[1].trim();
+  const resolvedGitDir = path.isAbsolute(gitDir) ? gitDir : path.resolve(cwd, gitDir);
+  return path.join(resolvedGitDir, 'info', 'exclude');
+}
+
+async function upsertLocalOnlyGitExclude(cwd: string, result: InitResult) {
+  const excludePath = await resolveGitInfoExcludePath(cwd);
+  if (!excludePath) {
+    throw new Error(
+      'Local-only mode requires a Git repository because it writes to .git/info/exclude. Run git init first, or run agentloop init without --local-only.',
+    );
+  }
+
+  result.localOnly = {
+    excludePath,
+    patterns: [...LOCAL_ONLY_EXCLUDE_PATTERNS],
+  };
+
+  const excludeExists = await pathExists(excludePath);
+  const existing = await readTextIfExists(excludePath);
+  if (existing.includes(LOCAL_ONLY_EXCLUDE_START)) return;
+
+  const block = [
+    LOCAL_ONLY_EXCLUDE_START,
+    '# AgentLoopKit local-only harness files for this clone.',
+    ...LOCAL_ONLY_EXCLUDE_PATTERNS,
+    LOCAL_ONLY_EXCLUDE_END,
+  ].join('\n');
+
+  if (result.dryRun) {
+    (excludeExists ? result.updated : result.created).push(excludePath);
+    return;
+  }
+
+  const prefix = existing.trimEnd();
+  await writeTextFile(excludePath, `${prefix ? `${prefix}\n\n` : ''}${block}\n`);
+  (excludeExists ? result.updated : result.created).push(excludePath);
+}
+
+async function upsertLocalOnlyNotice(filePath: string, result: InitResult) {
+  const existing = await readTextIfExists(filePath);
+  if (existing.includes(LOCAL_ONLY_NOTICE_START)) return;
+  if (result.dryRun) {
+    (existing ? result.updated : result.created).push(filePath);
+    return;
+  }
+  await writeTextFile(filePath, `${existing.trimEnd()}\n\n${LOCAL_ONLY_NOTICE}\n`);
+  (existing ? result.updated : result.created).push(filePath);
+}
+
 async function resolveComparablePath(filePath: string) {
   try {
     return await realpath(filePath);
@@ -97,6 +181,7 @@ export async function initializeAgentLoop(options: {
   dryRun?: boolean;
   force?: boolean;
   homeDirectory?: string;
+  localOnly?: boolean;
 }): Promise<InitResult> {
   const result: InitResult = {
     created: [],
@@ -114,6 +199,9 @@ export async function initializeAgentLoop(options: {
     throw new Error(
       'Refusing to initialize your home directory. Run this inside a project repository, or pass --force if you intentionally want AgentLoopKit files in your home directory.',
     );
+  }
+  if (options.localOnly) {
+    await upsertLocalOnlyGitExclude(cwd, result);
   }
   const packageManager = await detectPackageManager(cwd);
   const projectType = await detectProjectType(cwd);
@@ -134,6 +222,7 @@ export async function initializeAgentLoop(options: {
     typecheckCommand: commands.typecheck || 'not configured',
     buildCommand: commands.build || 'not configured',
     formatCommand: commands.format || 'not configured',
+    localOnlyInstructions: options.localOnly ? LOCAL_ONLY_NOTICE : '',
   };
 
   for (const group of TEMPLATE_GROUPS) {
@@ -177,6 +266,10 @@ export async function initializeAgentLoop(options: {
     await readTemplate('root/AGENTLOOP.md', values),
     result,
   );
+  if (options.localOnly) {
+    await upsertLocalOnlyNotice(path.join(cwd, AGENTS_FILE), result);
+    await upsertLocalOnlyNotice(path.join(cwd, AGENTLOOP_FILE), result);
+  }
 
   const configPath = path.join(cwd, CONFIG_FILE);
   if (await pathExists(configPath)) {

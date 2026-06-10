@@ -42,3 +42,5 @@ Local files under `.agentloop/policies/` are the repo's policy source of truth. 
 Agents may work autonomously inside the task contract. They should stop and ask before changing protected areas, adding dependencies, introducing breaking public APIs, or taking destructive actions.
 
 No agent should claim completion without verification evidence or a clear statement of what was not verified.
+
+{{ localOnlyInstructions }}

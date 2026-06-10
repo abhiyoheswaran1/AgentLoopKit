@@ -37,3 +37,5 @@ Safety rules:
 - Preserve existing user work. Do not revert unrelated changes.
 - Update DECISIONS.md when architecture or public behavior changes.
 <!-- agentloopkit:end -->
+
+{{ localOnlyInstructions }}

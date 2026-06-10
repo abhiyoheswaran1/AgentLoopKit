@@ -43,6 +43,13 @@ export function createSmokeSteps({ version, tarballPath }) {
       env: {},
     },
     {
+      name: 'packed local-only init excludes AgentLoopKit files from local git tracking',
+      command: 'npx',
+      args: [...npxArgs, 'init', '--local-only'],
+      cwd: 'temp',
+      env: {},
+    },
+    {
       name: 'packed create-task rejects output outside the task directory',
       command: 'npx',
       args: [...npxArgs, 'create-task'],
@@ -159,6 +166,41 @@ async function assertPackedInit({ tarballPath, tempRoot }) {
   }
 }
 
+async function assertPackedLocalOnlyInit({ tarballPath, tempRoot }) {
+  const cwd = await makeTempDir(tempRoot, 'local-only-init-smoke');
+  await runRequired('git', ['init', '-q'], { cwd });
+  await runRequired('npm', ['init', '-y'], { cwd });
+  const result = await runPackedAgentLoop(tarballPath, ['init', '--local-only'], { cwd });
+  if (result.exitCode !== 0) {
+    throw new Error(`packed local-only init smoke failed: ${result.stderr || result.stdout}`);
+  }
+
+  const exclude = await readFile(path.join(cwd, '.git/info/exclude'), 'utf8');
+  for (const expected of [
+    '# agentloopkit:local-only:start',
+    '.agentloop/',
+    'AGENTS.md',
+    'AGENTLOOP.md',
+    'agentloop.config.json',
+  ]) {
+    if (!exclude.includes(expected)) {
+      throw new Error(`packed local-only init exclude file is missing ${expected}.`);
+    }
+  }
+
+  const agents = await readFile(path.join(cwd, 'AGENTS.md'), 'utf8');
+  if (!agents.includes('Local-only AgentLoopKit harness')) {
+    throw new Error('packed local-only init did not write local-only agent guidance.');
+  }
+
+  const status = await runRequired('git', ['status', '--short'], { cwd });
+  for (const excludedPath of ['.agentloop', 'AGENTS.md', 'AGENTLOOP.md', 'agentloop.config.json']) {
+    if (status.stdout.includes(excludedPath)) {
+      throw new Error(`packed local-only init left ${excludedPath} visible in git status.`);
+    }
+  }
+}
+
 async function assertCreateTaskGuard({ tarballPath, tempRoot }) {
   const cwd = await makeTempDir(tempRoot, 'create-task-smoke');
   const outsideDir = await makeTempDir(tempRoot, 'outside-create-task');
@@ -252,6 +294,8 @@ export async function runReleaseSmoke(options = {}) {
     console.log('Packed binary version smoke passed.');
     await assertPackedInit({ tarballPath, tempRoot });
     console.log('Packed init smoke passed.');
+    await assertPackedLocalOnlyInit({ tarballPath, tempRoot });
+    console.log('Packed local-only init smoke passed.');
     await assertCreateTaskGuard({ tarballPath, tempRoot });
     console.log('Packed create-task path guard smoke passed.');
     await assertVerifyTaskGuard({ tarballPath, tempRoot });
