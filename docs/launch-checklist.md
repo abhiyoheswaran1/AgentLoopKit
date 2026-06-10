@@ -142,6 +142,7 @@ Use this before publishing AgentLoopKit.
 - [x] Publish workflow for `v0.23.0` passed package checks and failed at npm authorization.
 - [ ] npm trusted publishing is configured for this repository.
 - [ ] `npm whoami` works for manual fallback.
+- [x] Current publish guidance tells maintainers to publish `0.23.0` next from current `main`, not stale intermediate versions.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
 - [x] No `postinstall` script exists.
 - [x] No telemetry, cloud calls, or credential access exist.
@@ -301,7 +302,7 @@ Current recovery note:
 - Local `0.15.1` checks passed: `npm publish --access public --dry-run`, packed-tarball smoke test, and npm registry proof that latest remains `0.1.1`.
 - GitHub Publish workflow for `v0.15.1` passed package checks and failed at npm authorization with `E404`.
 - npm should jump from `0.1.1` to the current GitHub release line for the catch-up publish because public GitHub release candidates already exist through `v0.23.0`.
-- Do not publish `0.16.0` to npm from current `main`. Publish each version only from its matching release commit.
+- Do not publish stale intermediate versions to npm from current `main`. Publish each version only from its matching release commit or release tarball.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP`.
 - GitHub Publish workflow for `v0.16.0` passed package checks and failed at npm authorization with `E404`.
 - GitHub release `v0.16.0` tarball SHA-256: `687dac923ee3976e4975641a20844ece4ce41c2123794423c46cd72091f8cb18`.

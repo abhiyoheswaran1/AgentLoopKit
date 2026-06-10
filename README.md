@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Latest GitHub release: `v0.23.0`. npm still serves `0.1.1`: the `v0.22.0` publish workflow passed package checks, then npm rejected the final publish with authorization `E404`. The next npm publish should catch up once to `0.23.0`; after that, releases return to normal sequential semver.
+Latest GitHub release: `v0.23.0`. npm still serves `0.1.1`: the `v0.23.0` publish workflow passed package checks, then npm rejected the final publish with authorization `E404`. The next npm publish should catch up once to `0.23.0`; after that, releases return to normal sequential semver.
 
 See [docs/release-status.md](docs/release-status.md) for the current GitHub/npm status and update rules.
 
@@ -56,6 +56,8 @@ Until npm catches up, run the current GitHub release tarball directly:
 npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop version
 npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.23.0/agentloopkit-0.23.0.tgz agentloop init
 ```
+
+The npm version jump has one reason: GitHub releases already exist for the intermediate AgentLoopKit versions between the npm-published `0.1.1` package and the current `v0.23.0` source line. Publishing older numbers from current `main` would create npm packages that do not match their GitHub tags. Once npm authentication or trusted publishing works, the next npm publish should ship `0.23.0`; future releases should then continue with normal sequential semver.
 
 Run the CLI after install:
 

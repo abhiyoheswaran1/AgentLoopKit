@@ -989,18 +989,11 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish gap:
 
-- GitHub release `v0.2.0` is public.
-- GitHub release `v0.2.1` is public.
-- GitHub releases `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, and `v0.10.0` are public with tarball assets.
-- npm latest is still `0.1.1`.
-- The `v0.2.0` publish workflow passed install, lint, typecheck, test, and build, then npm rejected `npm publish` because trusted publishing is not configured for this package/workflow.
-- A local `npm publish --access public` retry reached npm browser authentication, then failed at npm's auth completion endpoint.
-- The `v0.2.1` publish workflow passed install, lint, typecheck, tests, build, and `prepublishOnly`, then npm rejected `npm publish` with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
-- The `v0.6.0` publish workflow passed install, lint, typecheck, tests, build, npm upgrade, version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
-- Local `npm publish --access public` for `0.6.0` passed typecheck, Vitest, and build through `prepublishOnly`, then npm stopped at `EOTP`.
-- `v0.9.0` Publish workflow run `27225348061` passed package checks and failed at npm authorization with `E404`.
-- `v0.10.0` Publish workflow run `27226815977` passed package checks and failed at npm authorization with `E404`.
-- npm registry proof after `v0.10.0` still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
+- GitHub releases exist through `v0.23.0`; `v0.23.0` is the current source and release line.
+- npm latest is still `0.1.1`; registry versions are `0.1.0` and `0.1.1`.
+- The `v0.23.0` Publish workflow passed package checks, then npm rejected `npm publish --access public` with authorization `E404`.
+- Current `main` should publish `agentloopkit@0.23.0` next after npm authentication or trusted publishing works.
+- Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.
 - Do not paste npm OTPs or tokens into chat, issues, PRs, or release notes.
 
 ## How users install it
@@ -1818,12 +1811,9 @@ Top remaining items:
 
 ## Known limitations
 
-- GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, `v0.15.0`, `v0.15.1`, and `v0.16.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- GitHub release `v0.17.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- GitHub release `v0.18.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - GitHub releases through `v0.23.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - npm should jump from `0.1.1` to the current GitHub release because public GitHub tags already occupy the intermediate versions.
-- Do not publish `0.16.0`, `0.17.0`, `0.18.0`, or `0.18.1` to npm from current `main`. Publish each version only from its matching release commit or release tarball.
+- Do not publish stale intermediate versions to npm from current `main`. Publish each version only from its matching release commit or release tarball.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP` for browser/OTP authentication.
 - The release-triggered GitHub Publish workflow for `v0.16.0` passed checks and failed at npm authorization with `E404`.
 - GitHub release `v0.16.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.16.0

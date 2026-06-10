@@ -22,6 +22,12 @@ npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/dow
 
 This is a temporary fallback. npm remains the intended main distribution path.
 
+## npm Catch-Up Version
+
+GitHub releases already exist for the intermediate AgentLoopKit versions between the npm-published `0.1.1` package and the current `v0.23.0` source line. Publishing older numbers from current `main` would create npm packages that do not match their GitHub tags.
+
+Once npm authentication or trusted publishing works, the next npm publish should ship the current release line as `0.23.0`. Future releases should then continue with normal sequential semver from the current source.
+
 ## Publish Blocker
 
 The GitHub Publish workflow for `v0.23.0` (run `27253066701`) passed package checks, then npm rejected `npm publish --access public` with authorization `E404`.

@@ -3072,3 +3072,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The roadmap is now shorter and more current without adding product scope.
 - Improve:
   - After npm publishes `0.23.0`, remove temporary tarball fallback references from public docs.
+
+## 2026-06-10: Current Release State Clarity
+
+- Task contract: `.agentloop/tasks/2026-06-10-clarify-current-release-state.md`
+- Product cycle: `.agentloop/research/interview-cycle-094.md`
+- Trigger:
+  - README named GitHub release `v0.23.0` but still cited the older `v0.22.0` publish workflow in the current npm-gap paragraph.
+  - Current-state handoff text led with older release attempts before the current `v0.23.0` package line.
+- Product changes:
+  - Fixed the README workflow reference to `v0.23.0`.
+  - Added a short explanation of the one-time npm catch-up jump from `0.1.1` to `0.23.0`.
+  - Updated release-status docs and launch checklist with the current-main publish rule.
+  - Simplified current publish-gap and known-limitations wording in `FINAL_HANDOFF.md`.
+- Verification run:
+  - `npx pnpm@10.12.1 check:links`: pass, 506 Markdown files checked.
+  - `git diff --check`: pass.
+  - Stale current-release wording search: pass, no stale README current-release workflow reference remains.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm view agentloopkit version versions --json`: latest `0.1.1`; versions `0.1.0` and `0.1.1`.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-clarify-current-release-state.md`: pass, wrote `.agentloop/reports/2026-06-10-08-25-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 113 tests, lint, typecheck, and build all passed.
+  - `npx tsx src/cli/index.ts handoff --task .agentloop/tasks/2026-06-10-clarify-current-release-state.md --json`: pass, wrote `.agentloop/handoffs/2026-06-10-08-27-pr-summary.md`.
+- Worked well:
+  - The task exposed a stale public sentence without requiring a release or package metadata change.
+- Improve:
+  - After npm publishes `0.23.0`, remove temporary tarball fallback references from README and release-status docs.
