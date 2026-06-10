@@ -2896,3 +2896,32 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release tarball path gives current behavior without cloning the repo.
 - Improve:
   - Remove this fallback from README after npm reports `0.22.0` or newer.
+
+## 2026-06-10: Final Handoff Refresh For 0.22.0
+
+- Task contract: `.agentloop/tasks/2026-06-10-refresh-final-handoff-v0-22-0.md`
+- Product cycle: `.agentloop/research/interview-cycle-088.md`
+- Trigger:
+  - `FINAL_HANDOFF.md` still had current-state sections that pointed at `0.19.0` or assumed `npx agentloopkit init` installed the current CLI.
+  - GitHub release `v0.22.0` is public, and npm still serves `0.1.1`.
+- Product changes:
+  - Update the final handoff backlog and limitations for the current GitHub release.
+  - Add launch checklist entries for `v0.20.0`, `v0.21.0`, and `v0.22.0`.
+  - Separate current GitHub tarball usage from future npm usage in install instructions.
+  - Update launch copy and Next 15 improvements so they name `0.22.0` as the npm catch-up target.
+- Verification run:
+  - `npx pnpm@10.12.1 check:links`: pass, 479 Markdown files checked.
+  - `git diff --check`: pass.
+  - `node scripts/prepublish-check.mjs`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-refresh-final-handoff-v0-22-0.md`: pass, wrote `.agentloop/reports/2026-06-10-05-59-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 110 tests, lint, typecheck, and build all passed.
+  - `npx tsx src/cli/index.ts task clear --json`: pass, removed the local active-task pointer before handoff.
+  - `npx tsx src/cli/index.ts handoff --json`: pass, wrote `.agentloop/handoffs/2026-06-10-05-59-pr-summary.md`.
+  - Final `npx pnpm@10.12.1 check:links`: pass, 481 Markdown files checked.
+  - Final `git diff --check`: pass.
+  - Final stale current-state search in `FINAL_HANDOFF.md`: pass, no `0.19.0` current-target guidance remains.
+- Worked well:
+  - The stale guidance was confined to current-state handoff sections; historical release evidence could stay intact.
+- Improve:
+  - Consider a future release-status compaction pass so final handoff files do not grow too large.

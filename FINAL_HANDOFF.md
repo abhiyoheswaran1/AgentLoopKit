@@ -982,19 +982,28 @@ Current publish gap:
 
 ## How users install it
 
+Current GitHub release while npm serves `0.1.1`:
+
+```bash
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop init
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop doctor
+```
+
+After npm reports `0.22.0` or newer:
+
 ```bash
 npx agentloopkit init
 npx agentloopkit doctor
 ```
 
-Pinned team usage:
+Pinned team usage after npm catches up:
 
 ```bash
 pnpm add -D agentloopkit
 pnpm agentloop init
 ```
 
-Global install:
+Global install after npm catches up:
 
 ```bash
 npm install -g agentloopkit
@@ -1767,7 +1776,7 @@ Top remaining items:
 
 1. Complete npm browser/OTP authentication or trusted publishing for the current GitHub release, now `agentloopkit@0.22.0`.
 2. Optional schema-store submission after npm publishing is stable.
-3. Add generated release-note handoff.
+3. Remove the temporary GitHub tarball fallback from README after npm reports `0.22.0` or newer.
 4. Evaluate organization policy packs only after local policy workflows mature.
 5. Add GitHub issue and PR metadata import after the local workflow matures.
 
@@ -1822,6 +1831,7 @@ Top remaining items:
 - Local `npm publish --access public` for `0.8.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - Local `npm publish --access public` for `0.13.0` passed package checks, then npm stopped at `EOTP` and requires browser/OTP authentication.
 - npm trusted publishing still needs npm-side configuration for this repository, or the maintainer must complete local browser/OTP authentication.
+- Until npm catches up, current users should run the `v0.22.0` GitHub release tarball with `npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop <command>`.
 - Generated configs use the GitHub raw schema URL for editor support; a branded schema domain is not configured yet.
 - Project detection is heuristic.
 - Monorepo support is warning and guidance only; AgentLoopKit does not infer package graphs or orchestrate workspace checks.
@@ -1932,8 +1942,22 @@ Top remaining items:
 - [x] Publish GitHub release `v0.19.0` with CI-summary release notes.
 - [x] Run GitHub Publish workflow for `v0.19.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.19.0` to npm.
+- [x] Prepare `agentloopkit@0.20.0` release-note handoff release candidate.
+- [x] Publish GitHub release `v0.20.0` with release-note handoff notes.
+- [x] Run GitHub Publish workflow for `v0.20.0`; package checks passed, npm authorization failed.
+- [ ] Publish `agentloopkit@0.20.0` to npm.
+- [x] Prepare `agentloopkit@0.21.0` next-action and release-safety release candidate.
+- [x] Publish GitHub release `v0.21.0` with next-action and release-safety notes.
+- [x] Run GitHub Publish workflow for `v0.21.0`; package checks passed, npm authorization failed.
+- [ ] Publish `agentloopkit@0.21.0` to npm.
+- [x] Prepare `agentloopkit@0.22.0` task-linked verification and README evidence release candidate.
+- [x] Publish GitHub release `v0.22.0` with task-linked verification and README evidence notes.
+- [x] Run GitHub Publish workflow for `v0.22.0`; package checks passed, npm authorization failed.
+- [x] Document temporary `v0.22.0` GitHub tarball usage while npm serves `0.1.1`.
+- [ ] Publish `agentloopkit@0.22.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
-- [x] Confirm npm package install with `npx agentloopkit version`.
+- [x] Confirm npm package install for the published `0.1.1` package with `npx agentloopkit version`.
+- [x] Confirm current GitHub release tarball with `npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop version`.
 - [x] Add GitHub repo description and discovery topics.
 - [x] Add initial good-first-issue labels.
 - [ ] Announce launch.
@@ -1957,9 +1981,11 @@ Twitter/X launch post:
 ```text
 I built AgentLoopKit: a local-first npm CLI that gives Codex, Claude Code, Cursor, OpenCode, Gemini CLI, and other coding agents a repo-level engineering loop.
 
-npx agentloopkit init
+npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop init
 
 It generates task contracts, safety policies, verification reports, and PR handoffs. No telemetry. No cloud. No LLM required.
+
+npm currently serves 0.1.1; the GitHub release tarball carries the current 0.22.0 CLI until npm publishing is repaired.
 ```
 
 Hacker News title:
@@ -1975,7 +2001,8 @@ Title: I built a local-first engineering loop for coding agents
 
 - Problem: agent-generated work can be hard to review
 - Approach: repo-level task contracts, gates, policies, verification reports, and handoffs
-- Install: npx agentloopkit init
+- Install today: npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.22.0/agentloopkit-0.22.0.tgz agentloop init
+- npm status: agentloopkit is published, but npm currently serves 0.1.1 while GitHub release 0.22.0 is current
 - What it does not do: no LLM wrapper, no SaaS, no telemetry
 - Example workflow: create-task, verify, handoff
 - Ask: feedback from people using Codex, Claude Code, Cursor, OpenCode, Gemini CLI, or Copilot CLI
@@ -1983,17 +2010,17 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Complete browser/OTP npm publish or trusted publishing for `0.19.0`: high usefulness, low repo effort, external auth required.
-2. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
-3. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
-4. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
-5. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
-6. Add GitLab CI and Buildkite examples for `agentloop ci-summary`: medium usefulness, low effort.
-7. Add generated security-review example: medium trust improvement, low effort.
-8. Add config migration helper for future schema versions: medium usefulness, medium effort.
-9. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
-10. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
-11. Add release-status compaction so future handoffs stay shorter: medium maintainability, low effort.
+1. Complete browser/OTP npm publish or trusted publishing for `0.22.0`: high usefulness, low repo effort, external auth required.
+2. Remove the temporary GitHub tarball fallback after npm reports `0.22.0` or newer: high trust value, low effort.
+3. Add release-status compaction so future handoffs stay shorter: medium maintainability, low effort.
+4. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
+5. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
+6. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
+7. Add GitLab CI and Buildkite examples for `agentloop ci-summary`: medium usefulness, low effort.
+8. Add generated security-review example: medium trust improvement, low effort.
+9. Add config migration helper for future schema versions: medium usefulness, medium effort.
+10. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
+11. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
 12. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
 13. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
 14. Add doctor heuristics documentation page for risk-file categories: medium trust improvement, low effort.
