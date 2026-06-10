@@ -2427,3 +2427,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release remains local-first and docs/template-only.
 - Improve:
   - Configure npm trusted publishing or re-authenticate locally, then publish `agentloopkit@0.18.1` and verify with `npm view agentloopkit version`.
+
+## 2026-06-10: Repo-Type Policy Examples
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-repo-type-policy-examples.md`
+- Product cycle: `.agentloop/research/interview-cycle-075.md`
+- Trigger:
+  - Policy customization docs explained the workflow but did not show concrete snippets for common repo types.
+  - This was kept outside package contents to avoid another package version while npm publishing is blocked.
+- Product changes:
+  - Added `docs/policy-examples.md`.
+  - Added examples for web apps, APIs/services, Python services, docs-only repos, monorepos, and open-source review workflows.
+  - Linked the examples from `docs/policies.md`.
+  - Updated roadmap, final handoff, backlog, and product-panel records.
+- Verification run:
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 24 files and 91 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 418 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-02-44-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-02-45-pr-summary.md`.
+  - `agentloop check-gates --strict --json`: pass.
+- Worked well:
+  - The examples make policy customization concrete without adding a policy-pack system.
+  - No package files or runtime code changed.
+- Improve:
+  - Consider CI summary import next, but keep npm authentication as the main external blocker.

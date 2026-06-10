@@ -17,6 +17,7 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - Local safety policy inspection with `agentloop policy`
 - Local safety policy template status with `agentloop policy status`
 - Policy customization guidance for repo-local safety rules
+- Repo-type policy examples for common project shapes
 - Local review-evidence gates with `agentloop check-gates` and `--strict`
 - Agent instruction installers, including `agentloop install-agent all`
 - Static bash, zsh, and fish completions

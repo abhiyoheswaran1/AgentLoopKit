@@ -1550,6 +1550,17 @@ Implemented:
 - README terminal GIF source updated to install the `0.18.1` tarball and regenerated with VHS
 - local verification, pack, dry-run publish, packed-tarball smoke, and AgentLoop verification evidence
 
+### Cycle 75: Repo-type policy examples
+
+Decision: add concrete GitHub docs examples for common repo types instead of building policy packs or enforcement behavior.
+
+Implemented:
+
+- `docs/policy-examples.md`
+- examples for web apps, APIs/services, Python services, docs-only repos, monorepos, and open-source review workflows
+- link from `docs/policies.md`
+- roadmap, backlog, product-panel, task contract, dogfood, verification, and handoff records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1572,6 +1583,7 @@ Strongest signals:
 - Agents need `create-task` to return machine-readable output like the rest of the task lifecycle commands.
 - Release readers need the npm/GitHub version gap explained before they trust a catch-up publish.
 - Maintainers need to know that customized policy files are repo decisions, not automatic errors.
+- Maintainers need repo-type policy examples before local policies become useful in real projects.
 - Release readers need `0.12.0` metadata and visuals to match `create-task --json` before the GitHub release.
 - Agents and reviewers need one deterministic command that checks review evidence without running tests.
 - Release readers need `0.13.0` metadata and visuals to match `check-gates` before the GitHub release.
@@ -1602,7 +1614,7 @@ Top remaining items:
 2. Optional schema-store submission after npm publishing is stable.
 3. CI summary import.
 4. Improve contributor issue examples and good-first tasks.
-5. Add deeper policy examples for common repo types.
+5. Add CI summary import planning after npm publishing is fixed.
 
 ## Known limitations
 
@@ -1809,9 +1821,9 @@ Title: I built a local-first engineering loop for coding agents
 
 1. Complete browser/OTP npm publish or trusted publishing for `0.18.1`: high usefulness, low repo effort, external auth required.
 2. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
-3. Add deeper policy examples for common repo types: medium commercial optionality, low effort.
-4. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
-5. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+3. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
+4. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
+5. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
 6. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
 7. Add generated security-review example: medium trust improvement, low effort.
 8. Add config migration helper for future schema versions: medium usefulness, medium effort.
