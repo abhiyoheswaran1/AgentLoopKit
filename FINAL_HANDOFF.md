@@ -1021,8 +1021,8 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.24.2` is public.
-- npm latest is `0.24.2`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, and `0.24.2`.
+- GitHub release `v0.24.4` is public.
+- npm latest is `0.24.4`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, and `0.24.4`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.
@@ -1033,7 +1033,7 @@ Current publish state:
 ```bash
 npx agentloopkit init
 npx agentloopkit doctor
-npx --yes agentloopkit@0.24.2 version
+npx --yes agentloopkit@0.24.4 version
 ```
 
 Pinned team usage:
@@ -2137,6 +2137,12 @@ Top remaining items:
 - [x] Publish `agentloopkit@0.24.0` to npm.
 - [x] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install for the published `0.24.0` package with `npx --yes agentloopkit@0.24.0 version`.
+- [x] Publish GitHub release `v0.24.3` with task-path and init safety notes.
+- [x] Publish `agentloopkit@0.24.3` to npm through trusted publishing.
+- [x] Confirm npm package install for `0.24.3` with `npx --yes agentloopkit@0.24.3 version`.
+- [x] Publish GitHub release `v0.24.4` with npm README pin notes.
+- [x] Publish `agentloopkit@0.24.4` to npm through trusted publishing.
+- [x] Confirm npm package install for `0.24.4` with `npx --yes agentloopkit@0.24.4 version`.
 - [x] Add GitHub repo description and discovery topics.
 - [x] Add initial good-first-issue labels.
 - [ ] Announce launch.
@@ -2186,7 +2192,7 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Verify npm trusted publishing on the next GitHub release: high trust value, low effort, medium release risk.
+1. Add a reusable tarball smoke script for release candidates: high trust value, low effort, low maintenance.
 2. Add a Homebrew tap: high install value for macOS/Linux, medium effort, medium maintenance.
 3. Add a Docker/GHCR image for CI: high team usefulness, medium effort, medium security review.
 4. Add a thin GitHub Action wrapper: high CI adoption value, medium effort, medium maintenance.

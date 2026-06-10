@@ -3525,6 +3525,10 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
   - Packed README inspection: pass; `/tmp/agentloopkit-0.24.4.tgz` contains README examples pinned to `0.24.4`.
   - AgentLoop verification: `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-10-prepare-0-24-4-readme-pin-patch.md --json` passed and wrote `.agentloop/reports/2026-06-10-14-00-verification-report.md`.
+  - GitHub CI run `27274845018`: pass.
+  - GitHub Publish workflow run `27274917826`: pass and published `agentloopkit@0.24.4` through trusted publishing.
+  - Registry proof: `npm view agentloopkit version versions --json` reported latest `0.24.4`.
+  - npm README proof: `npm view agentloopkit@0.24.4 readme` showed pinned examples for `0.24.4` and no `0.24.2` or `0.24.3` pins.
 - Handoff generated:
   - `.agentloop/handoffs/2026-06-10-14-01-pr-summary.md`
 - Worked well:

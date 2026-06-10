@@ -50,12 +50,12 @@ For a read-only registry check, see [npm-status.md](npm-status.md).
 
 Current facts:
 
-- npm latest is `agentloopkit@0.24.2`.
-- GitHub release `v0.24.2` is public with attached `agentloopkit-0.24.2.tgz`.
-- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.2`.
-- GitHub release tarball SHA-256: `61438ff8e177f48ac815ddbc010acaaf90fdf9de95cf0fe0f78924422a06bfa3`.
+- npm latest is `agentloopkit@0.24.4`.
+- GitHub release `v0.24.4` is public with attached `agentloopkit-0.24.4.tgz`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.4`.
+- GitHub release tarball SHA-256: `1b3dd738dce7bdb241f944c4a381a3c5fce39379db328fcabc3275c5e0aa31df`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
-- GitHub release `v0.24.2` published to npm through trusted publishing.
+- GitHub release `v0.24.4` published to npm through trusted publishing.
 - Future releases should continue publishing from GitHub Releases through trusted publishing.
 
 Historical rule:
@@ -223,6 +223,18 @@ Historical publishing log:
 - GitHub release tarball SHA-256: `61438ff8e177f48ac815ddbc010acaaf90fdf9de95cf0fe0f78924422a06bfa3`.
 - GitHub Publish workflow run `27270795542` for `v0.24.2` passed package checks and published to npm through trusted publishing.
 - npm registry proof after the `v0.24.2` publish reports latest `0.24.2` and versions `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, and `0.24.2`.
+- `agentloopkit@0.24.3` hardened task path safety and home-directory dry-run refusal.
+- Local tarball SHA-256 before GitHub release: `737b7dc9775899426703b9b37088b0d5240601b84c39c4ca7e9ace052eb30451`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.3`.
+- GitHub release tarball SHA-256: `737b7dc9775899426703b9b37088b0d5240601b84c39c4ca7e9ace052eb30451`.
+- GitHub Publish workflow run `27274332178` for `v0.24.3` passed package checks and published to npm through trusted publishing.
+- npm registry proof after the `v0.24.3` publish reports latest `0.24.3` and versions `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, and `0.24.3`.
+- `agentloopkit@0.24.4` refreshed npm README pinned-version examples.
+- Local tarball SHA-256 before GitHub release: `1b3dd738dce7bdb241f944c4a381a3c5fce39379db328fcabc3275c5e0aa31df`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.4`.
+- GitHub release tarball SHA-256: `1b3dd738dce7bdb241f944c4a381a3c5fce39379db328fcabc3275c5e0aa31df`.
+- GitHub Publish workflow run `27274917826` for `v0.24.4` passed package checks and published to npm through trusted publishing.
+- npm registry proof after the `v0.24.4` publish reports latest `0.24.4` and versions `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, and `0.24.4`.
 
 Preferred release path:
 
