@@ -44,6 +44,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - README launch visuals generated with Playwright and VHS
 - compact current release-status page at `docs/release-status.md`
 - security-review workflow docs and a copyable example artifact set
+- doctor risk-file heuristics docs with category examples and reviewer actions
 - internal product panel, target personas, simulated interview cycles, backlog, and dogfood log
 
 ## CLI commands
@@ -1797,6 +1798,19 @@ Implemented:
 - sample PR summary with reviewer checklist and rollback notes
 - README, getting-started, and policy-doc links to the workflow
 
+### Cycle 98: Doctor risk-file heuristics docs
+
+Decision: explain `doctor` risk-file categories in one public page without changing behavior or implying scanner guarantees.
+
+Implemented:
+
+- `docs/doctor-risk-files.md`
+- category table for migrations, auth, security, billing, deployment, lockfiles, and env files
+- env-file path-only handling guidance
+- task-contract usage guidance for agents
+- reviewer questions for risk-file handoffs
+- README, getting-started, and security-review links to the page
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -2097,8 +2111,8 @@ Title: I built a local-first engineering loop for coding agents
 8. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
 9. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
 10. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
-11. Add doctor heuristics documentation page for risk-file categories: medium trust improvement, low effort.
-12. Add framework-specific example task contracts for Remix, SvelteKit, Django, and FastAPI: medium star potential, low effort.
-13. Add more packed-tarball smoke fixtures for release recovery flows: medium trust improvement, low effort.
-14. Add GitLab CI and Buildkite retry/parallelism guidance after provider-specific provenance sees use: medium usefulness, low effort.
-15. Add a release-checklist example for maintainers using GitHub releases while npm publish is blocked: medium trust improvement, low effort.
+11. Add framework-specific example task contracts for Remix, SvelteKit, Django, and FastAPI: medium star potential, low effort.
+12. Add more packed-tarball smoke fixtures for release recovery flows: medium trust improvement, low effort.
+13. Add GitLab CI and Buildkite retry/parallelism guidance after provider-specific provenance sees use: medium usefulness, low effort.
+14. Add a release-checklist example for maintainers using GitHub releases while npm publish is blocked: medium trust improvement, low effort.
+15. Add a dependency-upgrade example workflow with lockfile review notes: medium trust improvement, low effort.

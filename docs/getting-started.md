@@ -20,6 +20,7 @@ npx agentloopkit doctor
 `doctor` also checks `.agentloop/manifest.json`, which records the template generation used by `init`. Missing, stale, invalid, or newer manifests are warnings, not failures. See `template-migrations.md` before copying newer generated guidance into an existing repo.
 
 `doctor` also reports potential risk files by category. For example, it can warn that migrations, auth files, deployment config, lockfiles, or env files exist and show a few path examples. Env files appear only as paths. AgentLoopKit does not read `.env` contents or scan secrets.
+See `doctor-risk-files.md` for the exact category meanings, limits, and reviewer actions.
 
 In monorepos, root checks do not always prove that one package was tested. Add package-specific commands to the task contract when the change lives under one workspace:
 

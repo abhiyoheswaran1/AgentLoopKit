@@ -3174,3 +3174,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The task contract kept this iteration docs/examples-only and avoided accidental security-product scope.
 - Improve:
   - A future release-checklist example could show how to package docs-only trust improvements while npm is behind GitHub releases.
+
+## 2026-06-10: Doctor Risk File Heuristics Docs
+
+- Task contract: `.agentloop/tasks/2026-06-10-document-doctor-risk-file-heuristics.md`
+- Product cycle: `.agentloop/research/interview-cycle-098.md`
+- Trigger:
+  - `doctor` reports risk-file categories, but public guidance did not explain all categories, warning-only semantics, env-file path-only handling, and reviewer actions in one place.
+- Product changes:
+  - Added `docs/doctor-risk-files.md`.
+  - Linked the page from README, getting-started, and security-review docs.
+  - Updated the backlog and final handoff with Cycle 98.
+  - Kept this docs-only: no doctor behavior change, JSON shape change, scanner, risk score, dependency, or policy engine.
+- Verification run:
+  - `npx pnpm@10.12.1 check:links`: pass, 530 Markdown files checked.
+  - `git diff --check`: pass.
+  - Public-claim wording search: pass, only limit statements found.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-document-doctor-risk-file-heuristics.md`: pass, wrote `.agentloop/reports/2026-06-10-09-10-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 117 tests, lint, typecheck, and build all passed.
+- Worked well:
+  - The dedicated page gives agents a clear place to learn how risk warnings should shape task contracts.
+- Improve:
+  - Future example workflows should link to risk-file guidance when they involve dependencies, deployments, migrations, or billing.

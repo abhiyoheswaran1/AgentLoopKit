@@ -278,6 +278,7 @@ When `agentloop verify` runs in GitHub Actions, the report records the workflow,
 In monorepos, `doctor` warns on common workspace markers and suggests package-specific verification commands. Add package checks to the task contract when root commands do not cover the touched package, for example `pnpm --filter web test` or `npm --workspace api test`. AgentLoopKit records and runs configured commands; it does not infer package graphs or run workspace commands automatically.
 
 `doctor` also reports potential risk files by category, such as migrations, auth, deployment, lockfiles, and env files. It lists path examples only. It does not read `.env` contents or claim to scan secrets.
+See `docs/doctor-risk-files.md` for category examples, limits, and reviewer actions.
 
 ## Status
 

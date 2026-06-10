@@ -32,6 +32,7 @@ agentloop doctor
 `doctor` reports risk-file categories such as migrations, auth, security, billing, deployment, lockfiles, and env files. It prints env file paths only. It does not read `.env` contents or scan secrets.
 
 Use those categories to decide whether the task contract needs stricter constraints or extra reviewers.
+See [`doctor-risk-files.md`](doctor-risk-files.md) for category examples and limits.
 
 ## Inspect local policies
 
