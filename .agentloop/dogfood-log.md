@@ -4722,3 +4722,24 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep shell completions static and inspectable. Do not edit user shell profile files from the CLI.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Output for `list-templates`
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-json-output-to-list-templates.md`
+- Trigger:
+  - `agentloop list-templates` helps agents inspect bundled templates, but the command only printed grouped human text.
+- Implementation:
+  - Added `agentloop list-templates --json` with a stable `{ templates }` payload.
+  - Preserved the existing grouped human output by default.
+  - Added CLI regression tests for human and JSON output.
+  - Updated the README and unreleased changelog.
+- Verification run:
+  - Red focused test failed because `--json` was an unknown option.
+  - Focused list-templates suite passed after implementation.
+  - Built CLI smoke check returned grouped template JSON with agents, gates, handoffs, harness, loops, policies, root, and tasks.
+  - `.agentloop/reports/2026-06-11-01-51-verification-report.md`, overall status pass.
+- What worked well:
+  - The existing template renderer already returned the right grouped data, so the CLI change stayed small.
+- Improve:
+  - Keep future discovery commands available in JSON form when agents are likely consumers.
+  - Keep this unreleased until the planned `0.28.0` batch.

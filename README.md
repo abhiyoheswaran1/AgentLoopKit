@@ -270,6 +270,7 @@ For unsupported `--type` values, `create-task --json` returns a parseable error 
 `task status --json` updates only the `- Status:` line. Supported values are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Use `deferred` for parked work that should remain visible in `task list` but should not become the next unpinned task. Status is not verification evidence; run `agentloop verify` before claiming completion.
 `task archive --json` moves one named Markdown contract into `.agentloop/tasks/archive/`, refuses to overwrite an existing archive file, and clears the active task pointer when it archives the active task. Archive after verification and handoff, not as a substitute for either.
 `task doctor --json` checks the active task directory for missing, legacy, unsupported, or terminal status lines. It does not edit, archive, or delete task files.
+`list-templates --json` returns grouped bundled template names for agents that need to inspect available loops, policies, handoffs, and agent instructions.
 
 Each contract records:
 
