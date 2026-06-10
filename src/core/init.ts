@@ -14,6 +14,7 @@ import {
 } from './constants.js';
 import { AgentLoopConfig, createDefaultConfig } from './config.js';
 import { pathExists, readTextIfExists, writeTextFile } from './file-system.js';
+import { isInsideGitRepo } from './git.js';
 import { detectPackageManager } from './package-manager.js';
 import { detectPackageScripts, detectProjectName, detectProjectType } from './project-detection.js';
 import { getTemplateRoot, readTemplate, TemplateValues } from './template-renderer.js';
@@ -28,6 +29,9 @@ export type InitResult = {
   commands: {
     configured: string[];
     missing: string[];
+  };
+  git: {
+    isRepository: boolean;
   };
   localOnly?: {
     excludePath: string;
@@ -206,6 +210,9 @@ export async function initializeAgentLoop(options: {
       configured: [],
       missing: [],
     },
+    git: {
+      isRepository: false,
+    },
   };
   const homeDirectory = options.homeDirectory ?? homedir();
   const [resolvedCwd, resolvedHomeDirectory] = await Promise.all([
@@ -224,6 +231,9 @@ export async function initializeAgentLoop(options: {
   const projectType = await detectProjectType(cwd);
   const projectName = await detectProjectName(cwd);
   const commands = await detectPackageScripts(cwd, packageManager);
+  result.git = {
+    isRepository: await isInsideGitRepo(cwd),
+  };
   result.project = {
     name: projectName,
     type: projectType,

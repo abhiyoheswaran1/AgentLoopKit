@@ -4257,3 +4257,49 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider adding a human-output fixture test if init formatting changes again.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-10: Investigate macOS Metadata Files
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-remove-tracked-macos-metadata-files.md`
+- Trigger:
+  - A workspace scan showed `docs/.DS_Store` and `docs/assets/.DS_Store` on disk.
+  - The initial concern was that macOS Finder metadata had entered tracked source.
+- Investigation:
+  - `git ls-files "*DS_Store"` returned no tracked files.
+  - `.gitignore` already includes `.DS_Store`.
+  - No product change was warranted.
+- Verification run:
+  - No test or build run was needed because the hypothesis was disproven before implementation.
+- Handoff:
+  - Investigation archived in the task contract.
+- What worked well:
+  - The check caught a false-positive assumption before code changed.
+- Improve:
+  - Confirm `git ls-files` before treating ignored local files as repo hygiene defects.
+
+## 2026-06-10: Show Git Context During Init
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-show-git-context-during-init.md`
+- Trigger:
+  - AgentLoopKit is repo-level, but `init` did not tell users whether the target folder was inside a Git work tree.
+  - This matters when someone runs `npx agentloopkit init` from a random folder.
+- Implementation:
+  - Added a `git.isRepository` field to `InitResult`.
+  - Added `Git: detected` or `Git: not detected` to human init output.
+  - Kept non-Git initialization allowed.
+  - Kept `init --local-only` requiring Git.
+  - Updated README, getting-started docs, changelog, and init tests.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-23-14-verification-report.md`, overall status pass.
+  - Red focused init tests failed before implementation for missing Git context.
+  - Focused init tests passed after implementation: 13 tests.
+  - Full Vitest passed: 33 files, 164 tests.
+  - Lint, typecheck, build, Markdown link check, `projscan doctor`, and built CLI Git/non-Git dry-run smoke passed.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-10-23-16-pr-summary.md`
+- What worked well:
+  - The change reused the existing Git helper and stayed read-only.
+  - The first-run output now shows whether the target is a repository without blocking non-Git demos.
+- Improve:
+  - Consider grouping first-run context lines if more init context is added later.
+  - Keep this unreleased until the planned `0.28.0` batch.

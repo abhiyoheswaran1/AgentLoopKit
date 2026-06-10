@@ -35,6 +35,7 @@ export function initCommand() {
         logger.info(
           `Project: ${result.project.name || 'unnamed'} (${result.project.type}, ${result.project.packageManager})`,
         );
+        logger.info(`Git: ${result.git.isRepository ? 'detected' : 'not detected'}`);
         logger.info(`Configured commands: ${formatList(result.commands.configured)}`);
         logger.info(`Missing commands: ${formatList(result.commands.missing)}`);
         logger.info(`Created: ${result.created.length}`);

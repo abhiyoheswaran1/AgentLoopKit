@@ -39,6 +39,7 @@ describe('init', () => {
     });
     expect(result.commands.configured).toEqual(['test']);
     expect(result.commands.missing).toEqual(['lint', 'typecheck', 'build', 'format']);
+    expect(result.git).toEqual({ isRepository: false });
     expect(result.created.some((file) => file.endsWith('.agentloop/loops/feature.md'))).toBe(true);
     expect(result.created.some((file) => file.endsWith('.agentloop/README.md'))).toBe(true);
     expect(result.created.some((file) => file.endsWith('.agentloop/manifest.json'))).toBe(true);
@@ -128,6 +129,27 @@ describe('init', () => {
     });
     expect(output.commands.configured).toEqual(['test', 'typecheck']);
     expect(output.commands.missing).toEqual(['lint', 'build', 'format']);
+    expect(output.git).toEqual({ isRepository: false });
+    await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
+  });
+
+  test('dry-run human output reports git context for repository targets', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'demo-git',
+      scripts: { test: 'vitest' },
+    });
+
+    const result = await execa(tsxPath, [cliPath, 'init', '--dry-run'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('Git: detected');
+    expect(result.stdout).toContain('No files written.');
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
   });
 
@@ -186,6 +208,7 @@ describe('init', () => {
       excludePath,
       patterns: ['.agentloop/', 'AGENTS.md', 'AGENTLOOP.md', 'agentloop.config.json'],
     });
+    expect(result.git).toEqual({ isRepository: true });
     expect(exclude).toContain('# agentloopkit:local-only:start');
     expect(exclude).toContain('.agentloop/');
     expect(exclude).toContain('AGENTS.md');
