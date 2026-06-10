@@ -2453,3 +2453,30 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - No package files or runtime code changed.
 - Improve:
   - Consider CI summary import next, but keep npm authentication as the main external blocker.
+
+## 2026-06-10: Contributor Playbook Examples
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-contributor-playbook-examples.md`
+- Product cycle: `.agentloop/research/interview-cycle-076.md`
+- Trigger:
+  - The repo had issue templates and a PR template, but maintainers still lacked copyable examples for scoped first issues.
+  - `ROADMAP.md` still listed contributor issue examples as near-term launch polish.
+- Product changes:
+  - Added `docs/contributor-playbook.md`.
+  - Added copyable examples for docs link fixes, small Vitest coverage gaps, template wording polish, and example repo updates.
+  - Linked the playbook from README and `CONTRIBUTING.md`.
+  - Updated changelog, roadmap, backlog, final handoff, and product-panel records.
+  - Kept the change docs-only. No runtime code, package metadata, issue bot, label-sync dependency, or npm release metadata changed.
+- Verification run:
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 24 files and 91 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 425 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-02-52-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-02-53-pr-summary.md`.
+  - `agentloop check-gates --strict --json`: pass.
+- Worked well:
+  - The contributor path now has examples instead of only templates.
+  - Clearing `.agentloop/state.json` after dogfooding avoided committing a local active-task pointer.
+- Improve:
+  - CI summary import is the next useful local-first feature after npm publishing catches up.

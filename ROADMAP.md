@@ -43,11 +43,10 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 ## Near Term
 
 - Complete npm browser/OTP authentication or trusted publishing for the current prepared release.
-- Improve contributor issue examples and good-first tasks.
+- Add CI summary import.
 
 ## Later
 
-- Add CI summary import.
 - Add configurable organization policy packs.
 - Add GitHub issue and PR metadata import.
 - Add optional schema-store submission after npm publishing is stable.

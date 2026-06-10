@@ -32,6 +32,8 @@ npx pnpm@10.12.1 install
 
 Start with issues labeled `good first issue` or `docs`. A good first change should name the files it touches, avoid package publishing changes, and include the verification commands you ran.
 
+Maintainers can use `docs/contributor-playbook.md` for copyable issue examples, label guidance, and first-PR expectations.
+
 Before editing, run:
 
 ```bash

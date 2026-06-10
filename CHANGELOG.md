@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added `docs/contributor-playbook.md` with copyable good-first issue examples and contributor verification expectations
+- Linked contributor playbook guidance from README and `CONTRIBUTING.md`
+
 ## 0.18.1
 
 Policy customization guidance patch release candidate. GitHub release `v0.18.1` is public; npm publish is pending account authentication or trusted-publishing repair:

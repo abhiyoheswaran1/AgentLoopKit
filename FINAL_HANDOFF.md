@@ -107,6 +107,17 @@ npx projscan doctor --format markdown
 
 Latest local verification:
 
+- Contributor playbook examples:
+  - Task contract: `.agentloop/tasks/2026-06-10-add-contributor-playbook-examples.md`.
+  - Product cycle: `.agentloop/research/interview-cycle-076.md`.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 24 files and 91 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 425 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-02-52-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-02-53-pr-summary.md`.
+  - `agentloop check-gates --strict --json`: pass.
+
 - `0.18.1` policy-customization patch release-candidate verification:
   - Task contract: `.agentloop/tasks/2026-06-10-prepare-0-18-1-policy-guidance-patch-release.md`.
   - Product cycle: `.agentloop/research/interview-cycle-074.md`.
@@ -1561,6 +1572,17 @@ Implemented:
 - link from `docs/policies.md`
 - roadmap, backlog, product-panel, task contract, dogfood, verification, and handoff records
 
+### Cycle 76: Contributor playbook examples
+
+Decision: add copyable first-issue examples for maintainers instead of adding label automation, issue bots, or package behavior.
+
+Implemented:
+
+- `docs/contributor-playbook.md`
+- docs, test, template-wording, and example-repo issue examples
+- README and `CONTRIBUTING.md` links
+- roadmap, changelog, backlog, product-panel, task contract, dogfood, verification, and handoff records
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1584,6 +1606,7 @@ Strongest signals:
 - Release readers need the npm/GitHub version gap explained before they trust a catch-up publish.
 - Maintainers need to know that customized policy files are repo decisions, not automatic errors.
 - Maintainers need repo-type policy examples before local policies become useful in real projects.
+- Contributors and maintainers need copyable issue examples that name files, acceptance criteria, verification commands, and AgentLoop evidence.
 - Release readers need `0.12.0` metadata and visuals to match `create-task --json` before the GitHub release.
 - Agents and reviewers need one deterministic command that checks review evidence without running tests.
 - Release readers need `0.13.0` metadata and visuals to match `check-gates` before the GitHub release.
@@ -1613,8 +1636,8 @@ Top remaining items:
 1. Complete npm browser/OTP authentication or trusted publishing for the current prepared release, now `agentloopkit@0.18.1`.
 2. Optional schema-store submission after npm publishing is stable.
 3. CI summary import.
-4. Improve contributor issue examples and good-first tasks.
-5. Add CI summary import planning after npm publishing is fixed.
+4. Add CI summary import planning after npm publishing is fixed.
+5. Evaluate organization policy packs only after local policy workflows mature.
 
 ## Known limitations
 

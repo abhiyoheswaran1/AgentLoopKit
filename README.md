@@ -443,7 +443,7 @@ See `docs/launch-checklist.md` before publishing.
 
 ## Contributing
 
-See `CONTRIBUTING.md`.
+See `CONTRIBUTING.md` for local setup and PR expectations. Maintainers can use `docs/contributor-playbook.md` for copyable good-first issue examples.
 
 ## License
 
