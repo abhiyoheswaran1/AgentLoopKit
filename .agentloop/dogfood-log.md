@@ -63,6 +63,39 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Generate public release notes after fetching tags so the range starts at the latest release tag.
 
+## 2026-06-10: Refresh Roadmap Current Release State For 0.26.5
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-refresh-roadmap-current-release-state-for-0-26-5.md`
+- Trigger:
+  - Post-release docs were current, but `ROADMAP.md` still said the current release was `0.26.4`.
+- Product change:
+  - Updated the public roadmap current-state block to `v0.26.5`, `agentloopkit@0.26.5`, and `0.26.5` release-channel availability.
+- Verification completed:
+  - `npx --yes pnpm@10.12.1 check:links`
+  - `git diff --check`
+  - `node dist/cli/index.js npm-status --expect-current`
+  - `npx --yes projscan doctor --format markdown`
+  - `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-10-refresh-roadmap-current-release-state-for-0-26-5.md ...`: pass.
+- Verification report: `.agentloop/reports/2026-06-10-20-56-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-10-20-58-pr-summary.md`
+- Archive action: moved the completed task to `.agentloop/tasks/archive/2026-06-10-refresh-roadmap-current-release-state-for-0-26-5.md`.
+- Worked well:
+  - The stale current-state scan separated real stale copy from historical 0.26.4 evidence.
+- Improve:
+  - Consider a future release-status lint that scans current-state sections after every release.
+
+## 2026-06-10: Archive Completed MCP Registry Task
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-publish-mcp-registry-entry.md`
+- Trigger:
+  - `agentloop status` still surfaced the MCP Registry task as a review-state fallback after the registry workflow had passed.
+- Evidence:
+  - MCP Registry workflow `27298526436`: pass for `0.26.5`.
+  - npm latest is `0.26.5`, and `npx --yes agentloopkit@0.26.5 mcp-server` is the documented install command.
+- Action:
+  - Marked `.agentloop/tasks/2026-06-10-publish-mcp-registry-entry.md` as `done`.
+  - Archived it to `.agentloop/tasks/archive/2026-06-10-publish-mcp-registry-entry.md`.
+
 ## 2026-06-10: Release Channels Roadmap And README Cleanup
 
 - Task contract: `.agentloop/tasks/2026-06-10-plan-release-channels-roadmap.md`

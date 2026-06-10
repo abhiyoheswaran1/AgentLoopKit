@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-10
 - Task type: release
-- Status: review
+- Status: done
 
 ## Problem Statement
 MCP clients cannot discover AgentLoopKit through registry tooling, but registry publication is only valid after a real MCP server exists.
