@@ -3862,3 +3862,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Correcting the external PR body after shell quoting issues kept the upstream request readable.
 - Improve:
   - If AgentLoopKit ever moves schema hosting, update the SchemaStore entry in the same release cycle.
+
+## 2026-06-10: Release 0.26.4 SchemaStore Documentation Patch
+
+- Task contract: `.agentloop/tasks/2026-06-10-prepare-0-26-4-schemastore-documentation-release.md`
+- Trigger:
+  - SchemaStore registration was live, but the npm-facing README and release-channel docs did not mention editor auto-discovery.
+- Release proof:
+  - GitHub release `v0.26.4`: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.4>.
+  - GitHub release asset `agentloopkit-0.26.4.tgz` SHA-256: `a8ede1d0710d67b40fa80c1045e7cfda93afe32525c29f46997617cc6f17fbfa`.
+  - npm Publish workflow `27296379647`: pass, published `agentloopkit@0.26.4`.
+  - Docker/GHCR workflow `27296379642`: pass.
+  - MCP Registry workflow `27296470988`: pass.
+  - `npm view agentloopkit version versions --json` reports latest `0.26.4`.
+  - Direct temp install of `agentloopkit@0.26.4` printed `0.26.4` for both binaries and completed `agentloop init --dry-run`.
+- Verification run:
+  - AgentLoopKit release verification report: `.agentloop/reports/2026-06-10-20-06-verification-report.md`, overall status pass.
+  - Release smoke: pass.
+  - Dry-run npm publish: pass.
+  - Projscan: A, 97/100, with the existing informational unused-export note for `scripts/smoke-packed-release.mjs`.
+- Worked well:
+  - GitHub trusted publishing, GHCR, and MCP Registry all completed from the GitHub release without local tokens.
+- Improve:
+  - The release-notes command still includes an in-progress task status if notes are generated before the task is marked done; for future releases, generate public release notes after the final status transition when practical.

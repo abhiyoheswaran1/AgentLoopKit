@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-10
 - Task type: docs
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 
@@ -45,6 +45,19 @@ Release 0.26.4 with README, changelog, release notes, and release-status docs re
 - Prepublish metadata check passes with no unreleased changelog entries.
 - Local verification, pack, and smoke checks pass before creating the GitHub release.
 - GitHub release, npm trusted publishing, GHCR, and MCP Registry workflows are verified after release.
+
+## Release Proof
+
+- GitHub release: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.4
+- Release asset: `agentloopkit-0.26.4.tgz`
+- Release asset SHA-256: `a8ede1d0710d67b40fa80c1045e7cfda93afe32525c29f46997617cc6f17fbfa`
+- CI run: `27296279892`, passed.
+- npm Publish workflow run: `27296379647`, passed.
+- Docker/GHCR workflow run: `27296379642`, passed.
+- MCP Registry workflow run: `27296470988`, passed.
+- npm latest: `0.26.4`.
+- Direct temp `npx --package agentloopkit@0.26.4` smoke: `agentloop version`, `agentloopkit version`, and `agentloop init --dry-run` passed.
+- Live SchemaStore catalog contains the `AgentLoopKit` entry for `agentloop.config.json`.
 
 ## Verification Commands
 

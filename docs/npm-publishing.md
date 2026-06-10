@@ -50,14 +50,14 @@ For a read-only registry check, see [npm-status.md](npm-status.md).
 
 Current facts:
 
-- npm latest is `agentloopkit@0.26.3`.
-- GitHub release `v0.26.3` is public with attached `agentloopkit-0.26.3.tgz`.
-- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.3`.
-- GitHub release tarball SHA-256: `48bc379e41293cbcbc74facbf111548a307fb1bf3a179a0a08121cd2aa4c9c85`.
+- npm latest is `agentloopkit@0.26.4`.
+- GitHub release `v0.26.4` is public with attached `agentloopkit-0.26.4.tgz`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.4`.
+- GitHub release tarball SHA-256: `a8ede1d0710d67b40fa80c1045e7cfda93afe32525c29f46997617cc6f17fbfa`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
-- GitHub release `v0.26.3` published to npm through trusted publishing.
+- GitHub release `v0.26.4` published to npm through trusted publishing.
 - MCP Registry metadata for `io.github.abhiyoheswaran1/agentloopkit` published after npm verification.
-- GHCR distribution is live for `0.26.3`.
+- GHCR distribution is live for `0.26.4`.
 - Future releases should continue publishing from GitHub Releases through trusted publishing.
 
 Historical rule:
@@ -288,6 +288,14 @@ Historical publishing log:
 - Docker workflow run `27294103779` for `v0.26.3` passed and published the GHCR image.
 - MCP Registry workflow run `27294196815` for `v0.26.3` passed and published registry metadata.
 - npm registry proof after the `v0.26.3` publish reports latest `0.26.3` and versions through `0.26.3`.
+- `agentloopkit@0.26.4` added SchemaStore editor discovery documentation and refreshed package-facing release-channel pins.
+- Local tarball SHA-256 before GitHub release: `a8ede1d0710d67b40fa80c1045e7cfda93afe32525c29f46997617cc6f17fbfa`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.4`.
+- GitHub release tarball SHA-256: `a8ede1d0710d67b40fa80c1045e7cfda93afe32525c29f46997617cc6f17fbfa`.
+- GitHub Publish workflow run `27296379647` for `v0.26.4` passed package checks and published to npm through trusted publishing.
+- Docker workflow run `27296379642` for `v0.26.4` passed and published the GHCR image.
+- MCP Registry workflow run `27296470988` for `v0.26.4` passed and published registry metadata.
+- npm registry proof after the `v0.26.4` publish reports latest `0.26.4` and versions through `0.26.4`.
 
 Preferred release path:
 
