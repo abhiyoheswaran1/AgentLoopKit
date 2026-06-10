@@ -8,6 +8,8 @@ Last checked: June 10, 2026.
 - Current GitHub release asset: `agentloopkit-0.24.0.tgz`
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.0>
 - Tarball SHA-256: `4e721a9627d94944f300a60d71a14b0e519045ac3eb51d637f7227503f2a962d`
+- CI run: `27262792610` passed on commit `1f51e8b`
+- Publish workflow run: `27262870591` passed package checks, then npm rejected publish with `E404`
 - npm latest: `0.1.1`
 - npm versions: `0.1.0`, `0.1.1`
 
@@ -40,7 +42,13 @@ Once npm authentication or trusted publishing works, the next npm publish should
 
 ## Publish Blocker
 
-The GitHub Publish workflow for `v0.23.0` (run `27253066701`) passed package checks, then npm rejected `npm publish --access public` with authorization `E404`.
+The GitHub Publish workflow for `v0.24.0` (run `27262870591`) passed install, lint, typecheck, 121 Vitest tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected `npm publish --access public`:
+
+```text
+npm error code E404
+npm error 404 Not Found - PUT https://registry.npmjs.org/agentloopkit - Not found
+npm error 404 The requested resource 'agentloopkit@0.24.0' could not be found or you do not have permission to access it.
+```
 
 Local `npm whoami` currently returns `E401`, so local publish is blocked from this shell.
 
@@ -83,3 +91,4 @@ Latest release-status documentation checks also passed:
 - `node scripts/prepublish-check.mjs`
 - `npx projscan doctor --format markdown`
 - AgentLoop verification with Vitest, lint, typecheck, and build
+- GitHub release asset digest matched the local tarball SHA-256

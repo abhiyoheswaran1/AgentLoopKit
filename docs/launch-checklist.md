@@ -267,6 +267,8 @@ Current recovery note:
 - `agentloopkit@0.24.0` is prepared for npm-status.
 - GitHub release `v0.24.0` is public with attached `agentloopkit-0.24.0.tgz`.
 - Local `0.24.0` tarball SHA-256: `4e721a9627d94944f300a60d71a14b0e519045ac3eb51d637f7227503f2a962d`.
+- GitHub release `v0.24.0` tarball SHA-256: `4e721a9627d94944f300a60d71a14b0e519045ac3eb51d637f7227503f2a962d`.
+- GitHub Publish workflow for `v0.24.0` (run `27262870591`) passed package checks and failed at npm authorization with `E404`.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
 - npm should catch up to `0.24.0` once. Then use normal semver for future releases.

@@ -1021,9 +1021,9 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish gap:
 
-- GitHub releases exist through `v0.23.0`; current source is being prepared as the `0.24.0` npm-status release line.
+- GitHub releases exist through `v0.24.0`; `v0.24.0` is the current source and release line.
 - npm latest is still `0.1.1`; registry versions are `0.1.0` and `0.1.1`.
-- The `v0.23.0` Publish workflow passed package checks, then npm rejected `npm publish --access public` with authorization `E404`.
+- The `v0.24.0` Publish workflow (run `27262870591`) passed package checks, then npm rejected `npm publish --access public` with authorization `E404`.
 - Current `main` should publish `agentloopkit@0.24.0` next after npm authentication or trusted publishing works.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.
 - Do not paste npm OTPs or tokens into chat, issues, PRs, or release notes.
@@ -1966,7 +1966,7 @@ Top remaining items:
 
 ## Known limitations
 
-- GitHub releases through `v0.23.0` are public, and current source is prepared for `v0.24.0`; npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
+- GitHub releases through `v0.24.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - npm should jump from `0.1.1` to the current GitHub release because public GitHub tags already occupy the intermediate versions.
 - Do not publish stale intermediate versions to npm from current `main`. Publish each version only from its matching release commit or release tarball.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP` for browser/OTP authentication.
@@ -2141,12 +2141,12 @@ Top remaining items:
 - [x] Run GitHub Publish workflow for `v0.23.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.23.0` to npm.
 - [x] Prepare `agentloopkit@0.24.0` npm-status release candidate.
-- [ ] Publish GitHub release `v0.24.0` with npm-status notes.
-- [ ] Run GitHub Publish workflow for `v0.24.0`.
+- [x] Publish GitHub release `v0.24.0` with npm-status notes.
+- [x] Run GitHub Publish workflow for `v0.24.0`; package checks passed, npm authorization failed.
 - [ ] Publish `agentloopkit@0.24.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install for the published `0.1.1` package with `npx agentloopkit version`.
-- [ ] Confirm current GitHub release tarball with `npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop version`.
+- [x] Confirm current GitHub release tarball with `npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop version`.
 - [x] Add GitHub repo description and discovery topics.
 - [x] Add initial good-first-issue labels.
 - [ ] Announce launch.

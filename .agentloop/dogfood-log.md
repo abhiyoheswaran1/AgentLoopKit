@@ -3338,10 +3338,16 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - AgentLoop verification commands: Vitest 29 files and 121 tests, lint, typecheck, and build all passed.
   - `npm whoami`: expected fail with `E401`, so local npm publish remains blocked from this shell.
 - Handoff generated:
-  - Release notes: `.agentloop/handoffs/2026-06-10-10-11-release-notes.md`.
-  - PR summary: `.agentloop/handoffs/2026-06-10-10-11-pr-summary.md`.
+  - Release notes: `.agentloop/handoffs/2026-06-10-10-13-release-notes.md`.
+  - PR summary: `.agentloop/handoffs/2026-06-10-10-13-pr-summary.md`.
+- Post-release status:
+  - GitHub release `v0.24.0` was created at `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.0`.
+  - GitHub release asset `agentloopkit-0.24.0.tgz` reported digest `sha256:4e721a9627d94944f300a60d71a14b0e519045ac3eb51d637f7227503f2a962d`, matching the local tarball.
+  - CI run `27262792610` passed on commit `1f51e8b`.
+  - Release-triggered Publish workflow run `27262870591` passed package checks and failed at `npm publish --access public` with `E404`.
+  - npm registry proof after the workflow still reported latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 - Worked well:
   - Dogfooding `npm-status` made the npm gap inspectable without publishing or reading credentials.
   - The tarball smoke checks caught the exact artifact users will run from GitHub until npm catches up.
 - Improve:
-  - After the GitHub release exists, update the release checklist with the release URL, publish workflow result, and registry proof.
+  - Configure npm trusted publishing or complete a fresh local npm login before the real npm catch-up release attempt.
