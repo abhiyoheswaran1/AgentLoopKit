@@ -44,6 +44,7 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] GitHub release `v0.24.2` is published with home-directory init guard notes.
 - [x] GitHub release `v0.24.3` is published with task-path and init safety notes.
 - [x] GitHub release `v0.24.4` is published with npm README pin notes.
+- [x] GitHub release `v0.24.5` is published with release-smoke and README VHS demo notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -157,6 +158,8 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] Package `agentloopkit@0.24.3` is published through GitHub trusted publishing.
 - [x] Package `agentloopkit@0.24.4` is prepared on `main` for npm README pin freshness.
 - [x] Package `agentloopkit@0.24.4` is published through GitHub trusted publishing.
+- [x] Package `agentloopkit@0.24.5` is prepared on `main` for release-smoke and README VHS demo polish.
+- [x] Package `agentloopkit@0.24.5` is published through GitHub trusted publishing.
 - [x] npm trusted publishing is configured for this repository.
 - [x] `agentloop npm-status --expect-current` passes after npm publish.
 - [x] Current publish guidance tells maintainers to continue from the current source version, not stale intermediate versions.
@@ -302,9 +305,13 @@ Historical recovery note:
 - GitHub release `v0.24.4` is public with attached `agentloopkit-0.24.4.tgz`.
 - GitHub release `v0.24.4` tarball SHA-256: `1b3dd738dce7bdb241f944c4a381a3c5fce39379db328fcabc3275c5e0aa31df`.
 - GitHub Publish workflow for `v0.24.4` (run `27274917826`) passed package checks and published to npm.
+- `agentloopkit@0.24.5` added `npm run smoke:release`, refreshed the README VHS terminal demo, and published on npm through trusted publishing.
+- GitHub release `v0.24.5` is public with attached `agentloopkit-0.24.5.tgz`.
+- GitHub release `v0.24.5` tarball SHA-256: `202454e639170968e5e45ea6a68ebf560111749b63380fa379c8c91ea8ac2253`.
+- GitHub Publish workflow for `v0.24.5` (run `27277913836`) passed package checks and published to npm.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
-- npm latest is `0.24.4`; registry versions include `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, and `0.24.4`.
+- npm latest is `0.24.5`; registry versions include `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, and `0.24.5`.
 - npm trusted publishing is configured for GitHub release publishes.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.3.0` is now prepared on `main` after the handoff command, create-task flag, latest artifact selection, and create-task alias work.

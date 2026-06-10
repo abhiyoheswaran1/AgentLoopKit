@@ -1021,8 +1021,8 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.24.4` is public.
-- npm latest is `0.24.4`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, and `0.24.4`.
+- GitHub release `v0.24.5` is public.
+- npm latest is `0.24.5`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, and `0.24.5`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.
@@ -1033,7 +1033,7 @@ Current publish state:
 ```bash
 npx agentloopkit init
 npx agentloopkit doctor
-npx --yes agentloopkit@0.24.4 version
+npx --yes agentloopkit@0.24.5 version
 ```
 
 Pinned team usage:
@@ -2143,6 +2143,9 @@ Top remaining items:
 - [x] Publish GitHub release `v0.24.4` with npm README pin notes.
 - [x] Publish `agentloopkit@0.24.4` to npm through trusted publishing.
 - [x] Confirm npm package install for `0.24.4` with `npx --yes agentloopkit@0.24.4 version`.
+- [x] Publish GitHub release `v0.24.5` with release-smoke and README VHS demo notes.
+- [x] Publish `agentloopkit@0.24.5` to npm through trusted publishing.
+- [x] Confirm npm package install for `0.24.5` with `npx --yes agentloopkit@0.24.5 version`.
 - [x] Add GitHub repo description and discovery topics.
 - [x] Add initial good-first-issue labels.
 - [ ] Announce launch.

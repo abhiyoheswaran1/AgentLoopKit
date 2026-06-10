@@ -3596,3 +3596,19 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider whether `.agentloop/state.json` should be ignored by default in generated harnesses; it appeared as local dogfood state while this task was active.
   - Projscan reported the release-smoke helper exports as unused because the Vitest coverage imports the `.mjs` script dynamically; track whether projscan should detect that pattern later.
+
+## 2026-06-10: GitHub Linguist README HTML Assets
+
+- Task contract: `.agentloop/tasks/2026-06-10-mark-readme-html-assets-documentation.md`
+- Trigger:
+  - GitHub showed AgentLoopKit as roughly one-third HTML because it counted two static README screenshot source files.
+- Product decision:
+  - Keep the HTML sources because Playwright needs them for reproducible README PNGs.
+  - Mark only `docs/assets/readme/*.html` as Linguist documentation.
+  - Do not build or imply a frontend app.
+- Verification run:
+  - `git check-attr -a -- docs/assets/readme/showcase.html docs/assets/readme/verification.html`: both files report `linguist-documentation: true`.
+- Worked well:
+  - The fix is local to GitHub language stats and does not affect npm package behavior.
+- Improve:
+  - Consider adding a docs note if future contributors confuse README visual sources with product UI.

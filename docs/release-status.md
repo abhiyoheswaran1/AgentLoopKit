@@ -4,16 +4,16 @@ Last checked: June 10, 2026.
 
 ## Current State
 
-- Current GitHub release: `v0.24.4`
-- Current GitHub release asset: `agentloopkit-0.24.4.tgz`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.4>
-- Tarball SHA-256: `1b3dd738dce7bdb241f944c4a381a3c5fce39379db328fcabc3275c5e0aa31df`
-- CI run: `27274845018` passed for the `0.24.4` release commit
-- Publish workflow run: `27274917826` passed and published `agentloopkit@0.24.4` through npm trusted publishing
+- Current GitHub release: `v0.24.5`
+- Current GitHub release asset: `agentloopkit-0.24.5.tgz`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.5>
+- Tarball SHA-256: `202454e639170968e5e45ea6a68ebf560111749b63380fa379c8c91ea8ac2253`
+- CI run: `27277812575` passed for the `0.24.5` release commit
+- Publish workflow run: `27277913836` passed and published `agentloopkit@0.24.5` through npm trusted publishing
 - Manual npm publish: succeeded for `agentloopkit@0.24.0` after browser authentication
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
-- npm latest: `0.24.4`
-- npm versions: `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`
+- npm latest: `0.24.5`
+- npm versions: `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`
 
 Run the local registry check at any time:
 
@@ -30,7 +30,7 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.24.4 version
+npx --yes agentloopkit@0.24.5 version
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -39,7 +39,7 @@ GitHub release tarballs remain useful for provenance checks and rollback, but no
 
 GitHub releases already exist for the intermediate AgentLoopKit versions between the npm-published `0.1.1` package and the `v0.24.0` source line. Publishing older numbers from current `main` would create npm packages that do not match their GitHub tags.
 
-The one-time catch-up publish shipped `0.24.0`, then trusted publishing shipped `0.24.1`, `0.24.2`, `0.24.3`, and `0.24.4` from the GitHub release workflow. Future releases should continue with normal sequential semver from the current source.
+The one-time catch-up publish shipped `0.24.0`, then trusted publishing shipped `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, and `0.24.5` from the GitHub release workflow. Future releases should continue with normal sequential semver from the current source.
 
 ## Publish History
 
@@ -51,7 +51,7 @@ npm error 404 Not Found - PUT https://registry.npmjs.org/agentloopkit - Not foun
 npm error 404 The requested resource 'agentloopkit@0.24.0' could not be found or you do not have permission to access it.
 ```
 
-The maintainer then completed browser authentication and published `0.24.0` manually. The next GitHub releases, `v0.24.1`, `v0.24.2`, `v0.24.3`, and `v0.24.4`, published successfully through trusted publishing. The npm package now reports latest `0.24.4`.
+The maintainer then completed browser authentication and published `0.24.0` manually. The next GitHub releases, `v0.24.1`, `v0.24.2`, `v0.24.3`, `v0.24.4`, and `v0.24.5`, published successfully through trusted publishing. The npm package now reports latest `0.24.5`.
 
 ## Next Publish
 
@@ -73,9 +73,8 @@ After each publish:
 
 ## Verification Evidence
 
-Local release-candidate checks for `0.24.4`:
+Local release-candidate checks for `0.24.5`:
 
-- `npx pnpm@10.12.1 test tests/project-detection.test.ts`
 - `npm run lint`
 - `npm run typecheck`
 - `npm test`
@@ -83,16 +82,20 @@ Local release-candidate checks for `0.24.4`:
 - `node scripts/prepublish-check.mjs`
 - `git diff --check`
 - `npm run build`
+- `npm run smoke:release`
 - `npx projscan doctor --format markdown`
-- `npm pack --pack-destination /tmp --silent`
 - `npm publish --access public --dry-run`
+- `vhs docs/assets/readme/agentloopkit-cli.tape`
+- Playwright screenshots for `docs/assets/readme/showcase.html` and `docs/assets/readme/verification.html`
 - packed README inspection for current pinned-version examples
 
 Latest release-status documentation checks also passed:
 
 - `npm view agentloopkit version versions --json`
-- `npx --yes agentloopkit@0.24.4 version`
-- `npm view agentloopkit@0.24.4 readme`: README examples reference `0.24.4`
+- `npx --yes --package agentloopkit@0.24.5 agentloop version`
+- `npx --yes --package agentloopkit@0.24.5 agentloopkit version`
+- `npx --yes --package agentloopkit@0.24.5 agentloop init --dry-run`
+- `npm view agentloopkit@0.24.5 readme`: README examples reference `0.24.5`
 - `node dist/cli/index.js npm-status --expect-current`
 - `npx pnpm@10.12.1 check:links`
 - `git diff --check`
