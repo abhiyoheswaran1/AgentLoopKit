@@ -173,6 +173,7 @@ agentloopkit init
 ## Shell Completions
 
 AgentLoopKit prints completion scripts to stdout. It does not edit `.zshrc`, `.bashrc`, fish config, PowerShell startup files, or other shell profile files.
+Completions include top-level commands, task subcommands, task statuses, `create-task --type` values, agent names, and supported completion shells.
 
 Inspect a script before installing it:
 

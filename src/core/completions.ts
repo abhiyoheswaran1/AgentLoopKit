@@ -1,4 +1,5 @@
 import { AgentLoopError } from './errors.js';
+import { TASK_TYPES } from './constants.js';
 import { TASK_STATUSES } from './task-state.js';
 
 export const COMPLETION_SHELLS = ['bash', 'zsh', 'fish', 'powershell', 'pwsh'] as const;
@@ -48,6 +49,7 @@ const policyCommandSpecs = [
 ] as const;
 const policyCommands = policyCommandSpecs.map(([name]) => name);
 const taskStatuses = TASK_STATUSES;
+const taskTypes = TASK_TYPES;
 const agentNames = [
   'codex',
   'claude-code',
@@ -79,6 +81,12 @@ _agentloop_completion() {
   previous="\${COMP_WORDS[COMP_CWORD-1]}"
 
   case "\${COMP_WORDS[1]}" in
+    create-task)
+      if [[ "$previous" == "--type" ]]; then
+        COMPREPLY=( $(compgen -W "${taskTypes.join(' ')}" -- "$current") )
+        return 0
+      fi
+      ;;
     task)
       case "\${COMP_WORDS[2]}" in
         status)
@@ -148,6 +156,11 @@ _agentloop() {
             _describe 'task command' taskCommandSpecs
           fi
           ;;
+        create-task)
+          if [[ "\${words[CURRENT-1]}" == "--type" ]]; then
+            _values 'task type' ${taskTypes.map((type) => `"${type}"`).join(' ')}
+          fi
+          ;;
         policy)
           _describe 'policy command' policyCommandSpecs
           ;;
@@ -192,12 +205,14 @@ complete -c agentloopkit -f
 ${fishLine('__fish_use_subcommand', topCommands, 'AgentLoopKit command')}
 complete -c agentloop -n '__fish_seen_subcommand_from task' -a '${taskCommands.join(' ')}' -d 'Task command'
 complete -c agentloop -n '__fish_seen_subcommand_from policy' -a '${policyCommands.join(' ')}' -d 'Policy command'
+complete -c agentloop -n '__fish_seen_subcommand_from create-task' -a '${taskTypes.join(' ')}' -d 'Task type'
 complete -c agentloop -n '__fish_seen_subcommand_from status' -a '${taskStatuses.join(' ')}' -d 'Task status'
 complete -c agentloop -n '__fish_seen_subcommand_from install-agent' -a '${agentNames.join(' ')}' -d 'Agent name'
 complete -c agentloop -n '__fish_seen_subcommand_from completion' -a '${COMPLETION_SHELLS.join(' ')}' -d 'Shell'
 complete -c agentloopkit -n '__fish_use_subcommand' -a '${topCommands.join(' ')}' -d 'AgentLoopKit command'
 complete -c agentloopkit -n '__fish_seen_subcommand_from task' -a '${taskCommands.join(' ')}' -d 'Task command'
 complete -c agentloopkit -n '__fish_seen_subcommand_from policy' -a '${policyCommands.join(' ')}' -d 'Policy command'
+complete -c agentloopkit -n '__fish_seen_subcommand_from create-task' -a '${taskTypes.join(' ')}' -d 'Task type'
 complete -c agentloopkit -n '__fish_seen_subcommand_from status' -a '${taskStatuses.join(' ')}' -d 'Task status'
 complete -c agentloopkit -n '__fish_seen_subcommand_from install-agent' -a '${agentNames.join(' ')}' -d 'Agent name'
 complete -c agentloopkit -n '__fish_seen_subcommand_from completion' -a '${COMPLETION_SHELLS.join(' ')}' -d 'Shell'
@@ -218,6 +233,7 @@ $AgentLoopCommands = ${powerShellArray(topCommands)}
 $AgentLoopTaskCommands = ${powerShellArray(taskCommands)}
 $AgentLoopPolicyCommands = ${powerShellArray(policyCommands)}
 $AgentLoopTaskStatuses = ${powerShellArray(taskStatuses)}
+$AgentLoopTaskTypes = ${powerShellArray(taskTypes)}
 $AgentLoopAgents = ${powerShellArray(agentNames)}
 $AgentLoopShells = ${powerShellArray(COMPLETION_SHELLS)}
 
@@ -235,6 +251,11 @@ Register-ArgumentCompleter -Native -CommandName agentloop, agentloopkit -ScriptB
           $values = $AgentLoopTaskStatuses
         } else {
           $values = $AgentLoopTaskCommands
+        }
+      }
+      'create-task' {
+        if ($words.Count -gt 2 -and ($words[-1] -eq '--type' -or ($words.Count -gt 3 -and $words[-2] -eq '--type'))) {
+          $values = $AgentLoopTaskTypes
         }
       }
       'policy' { $values = $AgentLoopPolicyCommands }

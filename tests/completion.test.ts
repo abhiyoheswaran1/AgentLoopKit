@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { execa } from 'execa';
 import { describe, expect, test } from 'vitest';
+import { TASK_TYPES } from '../src/core/constants.js';
 import { renderCompletionScript } from '../src/core/completions.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -25,6 +26,10 @@ describe('completion scripts', () => {
     expect(script).toContain('status:Update a task contract status');
     expect(script).toContain('in-progress');
     expect(script).toContain('deferred');
+    expect(script).toContain('_values \'task type\'');
+    for (const type of TASK_TYPES) {
+      expect(script).toContain(`"${type}"`);
+    }
     expect(script).toContain('claude-code');
     expect(script).toContain('github-copilot-cli');
   });
@@ -40,6 +45,7 @@ describe('completion scripts', () => {
     expect(script).toContain('next');
     expect(script).toContain('list show set status archive current clear doctor');
     expect(script).toContain('compgen -W "list show status"');
+    expect(script).toContain(`compgen -W "${TASK_TYPES.join(' ')}"`);
     expect(script).toContain(
       'codex claude-code cursor opencode gemini-cli github-copilot-cli generic all',
     );
@@ -51,6 +57,8 @@ describe('completion scripts', () => {
     expect(script).toContain('complete -c agentloop');
     expect(script).toContain("complete -c agentloop -n '__fish_seen_subcommand_from task'");
     expect(script).toContain("complete -c agentloop -n '__fish_seen_subcommand_from policy'");
+    expect(script).toContain("complete -c agentloop -n '__fish_seen_subcommand_from create-task'");
+    expect(script).toContain(`-a '${TASK_TYPES.join(' ')}'`);
     expect(script).toContain('review');
     expect(script).not.toContain('config.fish');
   });
@@ -73,6 +81,10 @@ describe('completion scripts', () => {
     expect(script).toContain("'status'");
     expect(script).toContain("'in-progress'");
     expect(script).toContain("'deferred'");
+    expect(script).toContain('$AgentLoopTaskTypes');
+    for (const type of TASK_TYPES) {
+      expect(script).toContain(`'${type}'`);
+    }
     expect(script).toContain("'claude-code'");
     expect(script).toContain("'github-copilot-cli'");
     expect(script).toContain("'powershell'");

@@ -4701,3 +4701,24 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider a shared JSON error helper for more commands if automation users need consistent machine-readable failures.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Complete `create-task --type` Shell Completions
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-complete-create-task-task-type-completions.md`
+- Trigger:
+  - Completion scripts suggested task statuses and agent names but did not suggest supported `create-task --type` values.
+- Implementation:
+  - Added bash, zsh, fish, and PowerShell completion output for task types from the shared `TASK_TYPES` list.
+  - Added regression coverage that checks generated scripts include `test-generation`, `migration`, and the other supported values.
+  - Updated the README shell-completion section and unreleased changelog.
+- Verification run:
+  - Red focused completion tests failed in all four shell renderers.
+  - First implementation exposed a zsh template-literal escaping bug, fixed before the focused suite passed.
+  - Focused completion suite passed: 9 tests.
+  - Built CLI smoke output showed task-type values in zsh, bash, fish, and PowerShell completion scripts.
+  - `.agentloop/reports/2026-06-11-01-46-verification-report.md`, overall status pass.
+- What worked well:
+  - The completion values now come from the same constants as `create-task` validation and help output.
+- Improve:
+  - Keep shell completions static and inspectable. Do not edit user shell profile files from the CLI.
+  - Keep this unreleased until the planned `0.28.0` batch.
