@@ -87,7 +87,7 @@ Local release-candidate checks for `0.27.0`:
 - `npm run smoke:release`
 - `npx projscan doctor --format markdown`
 - `npm publish --access public --dry-run`
-- packed README inspection for current pinned-version examples
+- packed README inspection for stale exact version pins
 - packed `agentloop init --local-only` smoke check
 - focused task doctor, MCP, and distribution artifact tests
 - MCP Registry description length validation through successful registry workflow

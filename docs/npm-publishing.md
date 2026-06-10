@@ -81,7 +81,7 @@ Pre-release packed-package smoke check:
 npm run smoke:release
 ```
 
-The command builds the local CLI, packs the package into a temporary directory, runs the packed binary in isolated temp repositories, checks task path guards and home-directory refusal, and verifies the packaged README pins match `package.json`. It does not publish, create tags, call GitHub APIs, read npm tokens, or read `.env` files.
+The command builds the local CLI, packs the package into a temporary directory, runs the packed binary in isolated temp repositories, checks task path guards and home-directory refusal, and verifies the packaged README does not contain stale exact version pins. It does not publish, create tags, call GitHub APIs, read npm tokens, or read `.env` files.
 
 Current `main` includes a prepublish guard:
 

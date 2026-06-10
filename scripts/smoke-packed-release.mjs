@@ -19,9 +19,6 @@ export function assertReadmePins(readme, version) {
   if (staleVersion) {
     throw new Error(`README contains stale pinned version ${staleVersion}.`);
   }
-  if (!pinnedVersions.includes(version)) {
-    throw new Error(`README does not contain pinned version ${version}.`);
-  }
 }
 
 const PUBLIC_DOC_ROOTS = ['README.md', 'docs', 'examples', '.github'];
@@ -373,7 +370,7 @@ export async function runReleaseSmoke(options = {}) {
 
     const readme = await readPackedReadme({ tarballPath, extractDir });
     assertReadmePins(readme, metadata.version);
-    console.log('README pins match package version.');
+    console.log('README has no stale exact version pins.');
 
     await assertPackedVersion({ tarballPath, version: metadata.version, tempRoot });
     console.log('Packed binary version smoke passed.');

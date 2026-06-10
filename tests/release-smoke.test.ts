@@ -57,6 +57,12 @@ describe('release smoke script helpers', () => {
     expect(() => smoke.assertReadmePins(readme, '0.24.4')).not.toThrow();
   });
 
+  test('accepts README without exact package version pins', () => {
+    const readme = ['npx agentloopkit init', 'npm install --save-dev agentloopkit'].join('\n');
+
+    expect(() => smoke.assertReadmePins(readme, '0.24.4')).not.toThrow();
+  });
+
   test('rejects stale README pins for older package versions', () => {
     const readme = [
       'npx --yes agentloopkit@0.24.3 version',

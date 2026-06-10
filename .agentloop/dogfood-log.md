@@ -4639,3 +4639,43 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider adding machine-readable JSON error output for CLI validation failures if CI users ask for it.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Show Supported Task Types in Help
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-document-create-task-supported-types-in-help.md`
+- Trigger:
+  - After adding `test-generation` and fail-fast validation, users could learn supported task types from an error but not from `agentloop create-task --help`.
+- Implementation:
+  - Added a supported task type section to `create-task --help`, generated from the shared `TASK_TYPES` list.
+  - Added a CLI help-output regression test.
+  - Updated the unreleased changelog.
+- Verification run:
+  - Red focused test failed because the old help output only said `task type`.
+  - Focused create-task test passed after implementation.
+  - Included in `.agentloop/reports/2026-06-11-01-27-verification-report.md`, overall status pass.
+- What worked well:
+  - The help output now teaches valid values before users hit validation errors.
+- Improve:
+  - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Align Release Smoke with Evergreen README
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-align-release-smoke-with-unpinned-readme-policy.md`
+- Trigger:
+  - `npm run smoke:release` still required the packed README to contain the exact package version, but public docs now intentionally avoid exact pins.
+- Implementation:
+  - Changed the packed README smoke helper to allow unpinned README examples while still rejecting stale exact version pins.
+  - Added regression coverage for unpinned README content.
+  - Updated maintainer release docs to describe stale-pin detection instead of current-version pin matching.
+  - Updated the unreleased changelog.
+- Verification run:
+  - Red focused release-smoke test failed with `README does not contain pinned version 0.24.4`.
+  - Focused release-smoke test passed after implementation.
+  - `npm run smoke:release` passed and reported `README has no stale exact version pins`.
+  - `.agentloop/reports/2026-06-11-01-26-verification-report.md` intentionally failed because `node scripts/prepublish-check.mjs` blocks unreleased changelog entries before npm publishing.
+  - `.agentloop/reports/2026-06-11-01-27-verification-report.md`, overall status pass, excluded the release-only prepublish guard because no version is being cut now.
+  - Final focused checks passed: `npm test -- create-task release-smoke`, `npm run check:links`, and `git diff --check`.
+- What worked well:
+  - The smoke gate now matches the public-doc policy and remains useful before the batched `0.28.0` release.
+- Improve:
+  - Run `node scripts/prepublish-check.mjs` only during explicit release prep, after moving unreleased changelog entries into the target version section.

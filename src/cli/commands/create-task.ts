@@ -35,6 +35,10 @@ function resolveTaskType(value: unknown) {
   );
 }
 
+function supportedTaskTypesHelp() {
+  return `\nSupported task types:\n${TASK_TYPES.map((type) => `  - ${type}`).join('\n')}\n`;
+}
+
 async function collectInteractive(initial: { title?: string; type?: TaskType }) {
   const answers = await prompts([
     {
@@ -127,6 +131,7 @@ export function createTaskCommand() {
     .option('--verification <command>', 'verification command; repeat or use newlines', lines, [])
     .option('--rollback <text>', 'rollback notes')
     .option('--json', 'print machine-readable output')
+    .addHelpText('after', supportedTaskTypesHelp())
     .action(async (options: Record<string, unknown>) => {
       const type = resolveTaskType(options.type);
       const title = typeof options.title === 'string' ? options.title : undefined;

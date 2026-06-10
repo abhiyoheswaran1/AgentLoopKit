@@ -3,6 +3,7 @@ import { readFile, realpath, stat } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { TASK_TYPES } from '../src/core/constants.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -14,6 +15,15 @@ describe('create-task command', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
     tempDirs = [];
+  });
+
+  test('lists supported task types in help output', async () => {
+    const result = await execa(tsxPath, [cliPath, 'create-task', '--help']);
+
+    expect(result.stdout).toContain('Supported task types:');
+    for (const type of TASK_TYPES) {
+      expect(result.stdout).toContain(type);
+    }
   });
 
   test('accumulates repeated non-interactive list options', async () => {
