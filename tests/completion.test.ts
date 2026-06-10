@@ -24,6 +24,7 @@ describe('completion scripts', () => {
     expect(script).toContain('doctor:Check task folder hygiene');
     expect(script).toContain('status:Update a task contract status');
     expect(script).toContain('in-progress');
+    expect(script).toContain('deferred');
     expect(script).toContain('claude-code');
     expect(script).toContain('github-copilot-cli');
   });
@@ -71,6 +72,7 @@ describe('completion scripts', () => {
     expect(script).toContain("'policy'");
     expect(script).toContain("'status'");
     expect(script).toContain("'in-progress'");
+    expect(script).toContain("'deferred'");
     expect(script).toContain("'claude-code'");
     expect(script).toContain("'github-copilot-cli'");
     expect(script).toContain("'powershell'");

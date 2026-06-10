@@ -215,6 +215,28 @@ describe('next command', () => {
     expect(await exists(path.join(dir, '.agentloop/state.json'))).toBe(false);
   });
 
+  test('does not recommend a deferred task as the next action', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-deferred-task.md'),
+      '# Deferred task\n\n- Status: deferred\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'next', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const next = JSON.parse(result.stdout);
+    expect(next.activeTask).toBeNull();
+    expect(next.latestTask).toBeNull();
+    expect(next.command).toBe('agentloop create-task');
+  });
+
   test('recommends archiving a pinned done task', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

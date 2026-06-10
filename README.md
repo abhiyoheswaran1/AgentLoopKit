@@ -261,7 +261,7 @@ agentloop task clear
 `task list --json` gives agents a deterministic list with `path`, `title`, `status`, `active`, and `modifiedAt`. Listing tasks does not create or update `.agentloop/state.json`.
 `create-task --json` returns the created task path and Markdown content so agents do not need to parse the human success line.
 `task show --json` returns the selected task metadata and Markdown content without changing active state.
-`task status --json` updates only the `- Status:` line. Supported values are `proposed`, `in-progress`, `blocked`, `review`, and `done`. Status is not verification evidence; run `agentloop verify` before claiming completion.
+`task status --json` updates only the `- Status:` line. Supported values are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Use `deferred` for parked work that should remain visible in `task list` but should not become the next unpinned task. Status is not verification evidence; run `agentloop verify` before claiming completion.
 `task archive --json` moves one named Markdown contract into `.agentloop/tasks/archive/`, refuses to overwrite an existing archive file, and clears the active task pointer when it archives the active task. Archive after verification and handoff, not as a substitute for either.
 `task doctor --json` checks the active task directory for missing, legacy, unsupported, or terminal status lines. It does not edit, archive, or delete task files.
 
@@ -324,7 +324,7 @@ agentloop next --json
 `next` uses the same decision rules as `status`. It does not run verification commands, create task state, call an LLM, make network requests, or read `.env` contents.
 When an active in-progress task exists, an older verification report does not count as current evidence for that task.
 When a pinned active task is already `done`, `status` and `next` recommend archiving that task so a finished contract does not stay active.
-When no active task is pinned, `status` and `next` report the newest open contract as `latestTask`, not `activeTask`, and recommend `agentloop task set <path>` before continuing. They ignore fallback tasks marked `done`, `completed`, or `verified`.
+When no active task is pinned, `status` and `next` report the newest open contract as `latestTask`, not `activeTask`, and recommend `agentloop task set <path>` before continuing. They ignore fallback tasks marked `deferred`, `done`, `completed`, or `verified`.
 
 See `docs/status.md` for output fields and next-action rules.
 

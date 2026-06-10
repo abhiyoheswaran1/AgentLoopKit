@@ -4051,3 +4051,31 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Dogfooding `status` after the build showed the current repo now reports the pinned task and `latestTask: null`.
 - Improve:
   - Keep this change unreleased until the planned `0.28.0` batch instead of cutting another patch release.
+
+## 2026-06-10: Add Deferred Task Status
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-add-deferred-task-status.md`
+- Trigger:
+  - After separating `activeTask` and `latestTask`, `agentloop status` surfaced old proposed distribution-channel work as the latest open task.
+  - Some task contracts represent parked future work, not the next task an agent should pick up.
+- Implementation:
+  - Added `deferred` as a supported task status.
+  - Kept deferred task contracts visible in `agentloop task list` and `task show`.
+  - Excluded deferred tasks from `status` and `next` fallback selection.
+  - Kept `task doctor` from warning on deferred tasks.
+  - Updated completions, CLI help, README, status docs, task-contract docs, generated task README, backlog notes, and local harness task README.
+  - Marked the Scoop/WinGet and VS Code/Open VSX task contracts as deferred because they are later-channel work.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-22-03-verification-report.md`, overall status pass.
+  - Red run failed before implementation for task-state, status, next, and completion tests.
+  - Focused tests passed after implementation: task-state, status, next, and completion.
+  - Full Vitest passed: 33 files, 160 tests.
+  - Lint, typecheck, build, Markdown link check, `projscan doctor`, `git diff --check`, and built CLI smoke checks passed.
+  - `projscan doctor` remained A 97/100 with the known informational unused-export note in `scripts/smoke-packed-release.mjs`.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-10-22-04-pr-summary.md`
+- What worked well:
+  - The `deferred` status solved the immediate dogfood problem without adding scheduling or priority behavior.
+  - Centralizing completions on `TASK_STATUSES` prevents future status values from drifting between parser and shell completion output.
+- Improve:
+  - Consider archiving old done/legacy task contracts separately; do not bundle that cleanup into this behavior change.

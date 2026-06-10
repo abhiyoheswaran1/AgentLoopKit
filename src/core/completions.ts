@@ -1,4 +1,5 @@
 import { AgentLoopError } from './errors.js';
+import { TASK_STATUSES } from './task-state.js';
 
 export const COMPLETION_SHELLS = ['bash', 'zsh', 'fish', 'powershell', 'pwsh'] as const;
 
@@ -46,7 +47,7 @@ const policyCommandSpecs = [
   ['status', 'Show local policy template status'],
 ] as const;
 const policyCommands = policyCommandSpecs.map(([name]) => name);
-const taskStatuses = ['proposed', 'in-progress', 'blocked', 'review', 'done'] as const;
+const taskStatuses = TASK_STATUSES;
 const agentNames = [
   'codex',
   'claude-code',

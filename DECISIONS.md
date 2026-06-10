@@ -145,3 +145,7 @@ GitHub Action, Docker/GHCR, and MCP Registry support must wrap or expose the exi
 ## 2026-06-10: Status Separates Pinned Active From Latest Open
 
 `agentloop status` and `agentloop next` should reserve `activeTask` for the task pinned in `.agentloop/state.json`. When no task is pinned, they may show the newest open task contract as `latestTask`, but the next action must ask the user or agent to run `agentloop task set <path>` before continuing. This keeps `agentloop task current`, `status`, and `next` consistent while preserving useful context for repos with existing task contracts.
+
+## 2026-06-10: Deferred Tasks Are Parked Work
+
+`deferred` is a supported task status for known work that should remain visible in `agentloop task list` but should not drive `agentloop status` or `agentloop next` when no task is pinned. It is not a scheduler, priority system, or backlog manager. Deferred tasks are local Markdown contracts that a maintainer can later move back to `proposed`, `in-progress`, or another supported status.

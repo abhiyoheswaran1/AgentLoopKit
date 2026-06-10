@@ -54,11 +54,19 @@ export type TaskDoctorResult = {
   diagnostics: TaskDoctorDiagnostic[];
 };
 
-export const TASK_STATUSES = ['proposed', 'in-progress', 'blocked', 'review', 'done'] as const;
+export const TASK_STATUSES = [
+  'proposed',
+  'in-progress',
+  'blocked',
+  'deferred',
+  'review',
+  'done',
+] as const;
 
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 
-const TERMINAL_FALLBACK_TASK_STATUSES = new Set(['done', 'completed', 'verified']);
+const TERMINAL_TASK_STATUSES = new Set(['done', 'completed', 'verified']);
+const NON_FALLBACK_TASK_STATUSES = new Set(['deferred', ...TERMINAL_TASK_STATUSES]);
 const LEGACY_TASK_STATUSES = new Set(['completed', 'verified']);
 
 function statePath(cwd: string, config: AgentLoopConfig) {
@@ -146,7 +154,7 @@ function parseTaskStatus(status: string): TaskStatus {
 
 function isFallbackTaskCandidate(status: string) {
   const clean = status.trim().toLowerCase();
-  return clean !== 'unknown' && !TERMINAL_FALLBACK_TASK_STATUSES.has(clean);
+  return clean !== 'unknown' && !NON_FALLBACK_TASK_STATUSES.has(clean);
 }
 
 export async function readTaskMetadata(cwd: string, filePath: string): Promise<ActiveTask> {
@@ -381,7 +389,7 @@ export async function inspectTaskDirectory(options: {
       checked: tasks.length,
       diagnostics: diagnostics.length,
       terminalTasks: tasks.filter((task) =>
-        TERMINAL_FALLBACK_TASK_STATUSES.has(task.status.trim().toLowerCase()),
+        TERMINAL_TASK_STATUSES.has(task.status.trim().toLowerCase()),
       ).length,
       missingStatuses: tasks.filter((task) => task.status.trim().toLowerCase() === 'unknown')
         .length,

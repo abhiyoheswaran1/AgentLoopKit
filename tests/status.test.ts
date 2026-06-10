@@ -190,6 +190,57 @@ describe('status command', () => {
     expect(markdownResult.stdout).toContain('Active task: No task contract found.');
   });
 
+  test('ignores deferred tasks when choosing the latest unpinned task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    const openPath = path.join(dir, '.agentloop/tasks/2026-06-09-open-task.md');
+    const deferredPath = path.join(dir, '.agentloop/tasks/2026-06-10-deferred-task.md');
+    await writeFile(openPath, '# Open task\n\n- Status: proposed\n');
+    await writeFile(deferredPath, '# Deferred task\n\n- Status: deferred\n');
+    await utimes(openPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
+    await utimes(
+      deferredPath,
+      new Date('2026-06-10T10:00:00Z'),
+      new Date('2026-06-10T10:00:00Z'),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const status = JSON.parse(result.stdout);
+    expect(status.activeTask).toBeNull();
+    expect(status.latestTask.title).toBe('Open task');
+    expect(status.latestTask.path).toBe('.agentloop/tasks/2026-06-09-open-task.md');
+    expect(status.nextAction.command).toBe(
+      'agentloop task set .agentloop/tasks/2026-06-09-open-task.md',
+    );
+  });
+
+  test('reports no latest task when only deferred tasks are present', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-deferred-task.md'),
+      '# Deferred task\n\n- Status: deferred\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const status = JSON.parse(result.stdout);
+    expect(status.activeTask).toBeNull();
+    expect(status.latestTask).toBeNull();
+    expect(status.nextAction.command).toBe('agentloop create-task');
+  });
+
   test('prefers explicit active task state over modified time fallback', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

@@ -127,6 +127,24 @@ describe('task state', () => {
     );
   });
 
+  test('accepts deferred as a parked task status', async () => {
+    const { dir, config, taskPath } = await createTaskStateFixture();
+
+    const task = await updateTaskStatus({
+      cwd: dir,
+      config,
+      taskPath,
+      status: 'deferred',
+    });
+
+    expect(task).toMatchObject({
+      path: '.agentloop/tasks/2026-06-09-demo.md',
+      title: 'Demo task',
+      status: 'deferred',
+    });
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: deferred\n');
+  });
+
   test('archives a task contract and clears active state when it was active', async () => {
     const { dir, config, taskPath } = await createTaskStateFixture();
     await setActiveTask({ cwd: dir, config, taskPath });
@@ -331,6 +349,10 @@ describe('task command', () => {
       path.join(dir, '.agentloop/tasks/2026-06-09-review.md'),
       '# Review\n\n- Status: review\n',
     );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-deferred.md'),
+      '# Deferred\n\n- Status: deferred\n',
+    );
     await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
     await writeFile(
       path.join(dir, '.agentloop/tasks/archive/2026-06-09-archived.md'),
@@ -343,7 +365,7 @@ describe('task command', () => {
       taskDoctor: {
         overallStatus: 'pass',
         counts: {
-          checked: 2,
+          checked: 3,
           diagnostics: 0,
           terminalTasks: 0,
           missingStatuses: 0,
@@ -399,6 +421,25 @@ describe('task command', () => {
       },
     });
     expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: review\n');
+  });
+
+  test('updates task status to deferred from the CLI', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'status', '.agentloop/tasks/2026-06-09-demo.md', 'deferred', '--json'],
+      { cwd: dir },
+    );
+
+    expect(JSON.parse(result.stdout)).toEqual({
+      task: {
+        path: '.agentloop/tasks/2026-06-09-demo.md',
+        title: 'Demo task',
+        status: 'deferred',
+      },
+    });
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: deferred\n');
   });
 
   test('archives a task contract from the CLI', async () => {

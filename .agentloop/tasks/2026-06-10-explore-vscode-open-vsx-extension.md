@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-10
 - Task type: docs
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 Editor-first users may want AgentLoopKit actions inside VS Code-compatible editors, but an extension adds maintenance cost and should not be built without a scoped UX.

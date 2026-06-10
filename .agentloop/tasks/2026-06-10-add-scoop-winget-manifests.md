@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-10
 - Task type: release
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 Windows CLI users may prefer Scoop or WinGet over npm, but AgentLoopKit has not verified native Windows package-manager installs.

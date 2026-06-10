@@ -155,7 +155,7 @@ export function taskCommand() {
   command
     .command('status')
     .argument('<path>', 'task contract path under .agentloop/tasks')
-    .argument('<status>', 'one of: proposed, in-progress, blocked, review, done')
+    .argument('<status>', 'one of: proposed, in-progress, blocked, deferred, review, done')
     .option('--json', 'print machine-readable output')
     .description('Update a task contract status')
     .action(async (taskPath: string, status: string, options: { json?: boolean }) => {
