@@ -3221,3 +3221,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Recipes improve framework recognition without increasing CLI maintenance scope.
 - Improve:
   - Add more framework recipes only when they preserve the same command, task, and extra-care structure.
+
+## 2026-06-10: Dependency Upgrade Workflow Example
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-dependency-upgrade-workflow-example.md`
+- Product cycle: `.agentloop/research/interview-cycle-100.md`
+- Trigger:
+  - Agent-generated dependency changes need clearer package, lockfile, verification, skipped-check, and rollback evidence.
+- Product changes:
+  - Added `docs/dependency-upgrades.md`.
+  - Added `examples/dependency-upgrade/README.md`.
+  - Added sample dependency-upgrade task, verification report, and PR summary artifacts.
+  - Linked the workflow from README, getting-started, and policy docs.
+  - Kept the scope local and boring: no dependency changes, scanners, advisory APIs, registry calls, bots, or package-manager automation.
+- Verification run:
+  - `npx pnpm@10.12.1 check:links`: pass, 543 Markdown files checked.
+  - `git diff --check`: pass.
+  - Public-overclaim search: pass, only non-goal wording found.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-add-dependency-upgrade-workflow-example.md`: pass, wrote `.agentloop/reports/2026-06-10-09-24-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 117 tests, lint, typecheck, and build all passed.
+- Worked well:
+  - The workflow gives dependency PR reviewers a concrete evidence shape without pretending AgentLoopKit audits packages.
+- Improve:
+  - Add package-manager-specific variants only if they stay small and do not imply package-manager automation.

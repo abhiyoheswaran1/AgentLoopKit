@@ -425,6 +425,12 @@ AgentLoopKit helps reviewers see scope, checks run, checks skipped, risk notes, 
 
 See `docs/security-review.md` and `examples/security-review/` for a copyable review task, verification report, and PR summary.
 
+## Dependency Upgrades
+
+Use `dependency-upgrade` task contracts when an agent changes packages or lockfiles. AgentLoopKit records upgrade scope, lockfile impact, verification, risks, and rollback notes. It does not choose package versions, scan advisories, or call package registries.
+
+See `docs/dependency-upgrades.md` and `examples/dependency-upgrade/`.
+
 ## CI Recipes
 
 Use `agentloop check-gates --strict` as a review-evidence gate in pull request CI. Use `agentloop verify`, `agentloop handoff`, `agentloop report`, `agentloop badge`, `agentloop ci-summary --write`, and `agentloop release-notes --write` in CI when you want evidence artifacts uploaded for reviewers.
@@ -500,6 +506,7 @@ See `examples/` for sample generated harnesses:
 - `examples/empty-repo`
 - `examples/github-actions`
 - `examples/security-review`
+- `examples/dependency-upgrade`
 
 See `docs/stack-recipes.md` for Next.js, React/Vite, Remix, SvelteKit, Node API, Django, FastAPI, Python, docs-only, empty-repo, and monorepo verification recipes.
 
