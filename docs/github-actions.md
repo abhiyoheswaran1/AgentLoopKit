@@ -6,14 +6,14 @@ AgentLoopKit does not install workflows into user repositories. Copy a recipe in
 
 For non-GitHub CI, see [GitLab CI](../examples/gitlab-ci/README.md) and [Buildkite](../examples/buildkite/README.md). Those examples run the same AgentLoopKit commands and report provider-specific provenance from allowlisted environment variables.
 
-## npm Status
+## npm Install
 
-The current npm release is `agentloopkit@0.27.0`. Pin a version in CI when you need reproducible evidence checks.
+Use `@latest` while evaluating the workflow. Pin a vetted version in team CI when you need reproducible evidence checks.
 
 Install from npm:
 
 ```bash
-npm install --no-save agentloopkit@0.27.0
+npm install --no-save agentloopkit@latest
 npx --no-install agentloop check-gates --strict
 ```
 
@@ -38,7 +38,7 @@ jobs:
           node-version: 24
 
       - name: Install AgentLoopKit
-        run: npm install --no-save agentloopkit@0.27.0
+        run: npm install --no-save agentloopkit@latest
 
       - name: Check AgentLoop evidence
         run: npx --no-install agentloop check-gates --strict
@@ -70,7 +70,7 @@ jobs:
         run: npm ci
 
       - name: Install AgentLoopKit
-        run: npm install --no-save agentloopkit@0.27.0
+        run: npm install --no-save agentloopkit@latest
 
       - name: Run AgentLoop verification
         run: npx --no-install agentloop verify
@@ -115,6 +115,8 @@ The verification report includes a `CI Context` section when GitHub Actions, Git
 
 Use the repo action when you want a shorter workflow step around the same npm package:
 
+Replace `<version>` with the AgentLoopKit release you have reviewed and want this workflow to use.
+
 ```yaml
 name: AgentLoop Action
 
@@ -131,10 +133,10 @@ jobs:
         with:
           node-version: 24
 
-      - uses: abhiyoheswaran1/AgentLoopKit@v0.27.0
+      - uses: abhiyoheswaran1/AgentLoopKit@v<version>
         with:
           command: check-gates --strict
-          agentloopkit-version: 0.27.0
+          agentloopkit-version: <version>
 ```
 
 The action installs `agentloopkit` with npm and runs the command you provide. It does not upload artifacts, comment on pull requests, read secrets, or replace the direct npm recipes above.

@@ -4540,3 +4540,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider including `taskCommands.ranCount` only if a concrete consumer needs it; current command entries already expose executed task commands.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Clean Public Docs Version Pins
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-clean-public-docs-version-pins.md`
+- Trigger:
+  - Public CI examples and command starters still contained stale package pins such as `0.26.1`, `0.27.0`, and an old release-notes example.
+  - Local `.DS_Store` files under docs were ignored and untracked but kept confusing hygiene scans.
+- Implementation:
+  - Changed normal CI install examples to `agentloopkit@latest`.
+  - Changed composite-action and release-note examples to `<version>` placeholders.
+  - Kept release-status, launch-checklist, and npm-publishing history intact as evidence records.
+  - Removed local ignored `.DS_Store` files from the docs tree.
+  - Updated backlog and unreleased changelog wording to include CI docs and examples.
+- Verification run:
+  - `.agentloop/reports/2026-06-11-00-56-verification-report.md`, overall status pass.
+  - Full configured verification passed: Vitest 34 files and 179 tests, lint, typecheck, and build.
+  - Task-command dogfood passed: Markdown link check, `projscan doctor`, and `git diff --check`.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-11-00-58-pr-summary.md`
+- What worked well:
+  - `agentloop verify --task-commands` now runs the exact task contract checks and reports `taskCommands.requested` plus `foundCount`.
+- Improve:
+  - Future docs tasks should include `CHANGELOG.md` in likely files when user-facing release notes are expected.
+  - Keep this unreleased until the planned `0.28.0` batch.
