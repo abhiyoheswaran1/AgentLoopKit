@@ -255,6 +255,8 @@ Each contract records:
 .agentloop/reports/YYYY-MM-DD-HH-mm-verification-report.md
 ```
 
+Pass `--task .agentloop/tasks/file.md` to include task title, type, status, and path in the report. AgentLoopKit reads Markdown task contracts for this flag. It reports `.env`-style paths as unavailable instead of reading them.
+
 It does not hide failures. Failed reports include a short failure summary with each failed command, exit code, and final useful output lines before the full command output. If long logs are truncated, the report keeps the first and last output so the final error stays visible. If no commands are configured, it writes a report saying nothing was verified.
 
 When `agentloop verify` runs in GitHub Actions, the report records the workflow, event, ref, commit, run URL, and run attempt. Local reports stay quiet. AgentLoopKit does not read `.env` files or print arbitrary environment variables.

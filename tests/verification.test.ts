@@ -1,9 +1,13 @@
 import path from 'node:path';
-import { writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir } from './helpers.js';
 import { createDefaultConfig } from '../src/core/config.js';
 import { runVerification } from '../src/core/verification.js';
+import { execa } from 'execa';
+
+const cliPath = path.resolve('src/cli/index.ts');
+const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 let tempDirs: string[] = [];
 
@@ -198,6 +202,7 @@ describe('verification', () => {
   test('summarizes failed commands before full output excerpts', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
     await writeFile(
       path.join(dir, 'fail-late.mjs'),
       [
@@ -239,5 +244,161 @@ describe('verification', () => {
     );
     expect(result.markdown).toContain('## Commands Run');
     expect(result.markdown).toContain('setup line');
+  });
+
+  test('includes task context when a task path is provided', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/demo-task.md'),
+      [
+        '# Add billing webhook',
+        '',
+        '- Created date: 2026-06-10',
+        '- Task type: feature',
+        '- Status: in-progress',
+        '',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"ok\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: '.agentloop/tasks/demo-task.md',
+      reportTimestamp: '2026-06-10-12-01',
+      nowIso: '2026-06-10T12:01:00.000Z',
+    });
+
+    expect(result.markdown).toContain('## Task Context');
+    expect(result.markdown).toContain('- Path: .agentloop/tasks/demo-task.md');
+    expect(result.markdown).toContain('- Title: Add billing webhook');
+    expect(result.markdown).toContain('- Task type: feature');
+    expect(result.markdown).toContain('- Status: in-progress');
+    expect(result.markdown.indexOf('## Task Context')).toBeLessThan(
+      result.markdown.indexOf('## Commands Run'),
+    );
+  });
+
+  test('reports missing task context without failing configured commands', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"ok\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: '.agentloop/tasks/missing.md',
+      reportTimestamp: '2026-06-10-12-02',
+      nowIso: '2026-06-10T12:02:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('pass');
+    expect(result.markdown).toContain('## Task Context');
+    expect(result.markdown).toContain('- Path: .agentloop/tasks/missing.md');
+    expect(result.markdown).toContain('- Status: unavailable');
+    expect(result.markdown).toContain('Task file could not be read.');
+  });
+
+  test('does not read env files passed as task paths', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeFile(
+      path.join(dir, '.env'),
+      ['# Secret Title', '- Task type: feature', '- Status: leaked', ''].join('\n'),
+    );
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"ok\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: '.env',
+      reportTimestamp: '2026-06-10-12-03',
+      nowIso: '2026-06-10T12:03:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('pass');
+    expect(result.markdown).toContain('## Task Context');
+    expect(result.markdown).toContain('- Path: .env');
+    expect(result.markdown).toContain('- Status: unavailable');
+    expect(result.markdown).toContain('Task path must point to a Markdown task contract.');
+    expect(result.markdown).not.toContain('Secret Title');
+    expect(result.markdown).not.toContain('leaked');
+  });
+
+  test('CLI verify wires --task into the written report', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: 'node -e "console.log(\\"ok\\")"',
+            lint: '',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/demo-task.md'),
+      ['# CLI task context', '', '- Task type: docs', '- Status: review', ''].join('\n'),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'verify', '--task', '.agentloop/tasks/demo-task.md'],
+      { cwd: dir },
+    );
+    const reportPath = result.stdout.match(/Verification report written: (.+)/)?.[1];
+    expect(reportPath).toBeTruthy();
+    const markdown = await readFile(reportPath as string, 'utf8');
+    expect(markdown).toContain('## Task Context');
+    expect(markdown).toContain('- Title: CLI task context');
+    expect(markdown).toContain('- Task type: docs');
+    expect(markdown).toContain('- Status: review');
   });
 });

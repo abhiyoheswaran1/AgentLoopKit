@@ -2728,3 +2728,39 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The change improves handoff readability while keeping report evidence deterministic.
 - Improve:
   - Consider an example failed verification report fixture for documentation screenshots in a later visual refresh.
+
+## 2026-06-10: Verification Task Context
+
+- Task contract: `.agentloop/tasks/2026-06-10-include-task-context-in-verification.md`
+- Product cycle: `.agentloop/research/interview-cycle-083.md`
+- Trigger:
+  - `agentloop verify --task <path>` accepted a task path, but the generated verification report did not include task context.
+  - Product-panel signal favored traceability between task contracts and verification reports.
+- Product changes:
+  - Include task path, title, task type, and status in verification reports generated with `--task`.
+  - Report missing task files as unavailable task context without changing command pass/fail status.
+  - Report `.env`-style task paths as unavailable without reading them as task contracts.
+  - Keep verification command execution unchanged.
+- Verification run:
+  - Red test: `npx pnpm@10.12.1 test tests/verification.test.ts` failed because `## Task Context` was missing.
+  - Focused green test: `npx pnpm@10.12.1 test tests/verification.test.ts`: pass, 1 file and 10 tests.
+  - Red safety test: `npx pnpm@10.12.1 test tests/verification.test.ts` failed because `.env` was read as task context.
+  - Focused green safety test: `npx pnpm@10.12.1 test tests/verification.test.ts`: pass, 1 file and 11 tests.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 28 files and 110 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 459 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `git diff --check`: pass.
+  - `node scripts/prepublish-check.mjs`: expected fail because `CHANGELOG.md` still has Unreleased entries.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-include-task-context-in-verification.md`: pass.
+- Verification report:
+  - `.agentloop/reports/2026-06-10-05-09-verification-report.md`
+- Handoff summary:
+  - `.agentloop/handoffs/2026-06-10-05-10-pr-summary.md`
+- Worked well:
+  - The accepted CLI flag now has visible report value.
+  - The dogfood report includes `Task Context` near the top and shows the task status as `done`.
+- Improve:
+  - Consider linking verification reports back to the active handoff in a later small iteration.

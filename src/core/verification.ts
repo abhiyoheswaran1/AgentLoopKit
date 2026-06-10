@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
@@ -32,6 +33,7 @@ export type VerificationOptions = {
   reportTimestamp?: string;
   nowIso?: string;
   env?: NodeJS.ProcessEnv;
+  taskPath?: string;
   skip?: Partial<Record<'test' | 'lint' | 'typecheck' | 'build', boolean>>;
   customCommands?: string[];
 };
@@ -173,6 +175,58 @@ ${lines.join('\n')}
 `;
 }
 
+function parseTaskMetadata(markdown: string) {
+  const lines = markdown.split(/\r?\n/);
+  return {
+    title: lines.find((line) => line.startsWith('# '))?.replace(/^#\s+/, '').trim(),
+    type: lines.find((line) => line.startsWith('- Task type:'))?.replace('- Task type:', '').trim(),
+    status: lines.find((line) => line.startsWith('- Status:'))?.replace('- Status:', '').trim(),
+  };
+}
+
+function isMarkdownTaskPath(taskPath: string) {
+  const normalized = taskPath.replace(/\\/g, '/').toLowerCase();
+  const segments = normalized.split('/').filter(Boolean);
+  return normalized.endsWith('.md') && !segments.some((segment) => segment === '.env' || segment.startsWith('.env.'));
+}
+
+async function renderTaskContext(cwd: string, taskPath: string | undefined) {
+  if (!taskPath?.trim()) return '';
+
+  const cleanPath = taskPath.trim();
+  if (!isMarkdownTaskPath(cleanPath)) {
+    return `## Task Context
+- Path: ${cleanPath}
+- Status: unavailable
+- Note: Task path must point to a Markdown task contract.
+
+`;
+  }
+
+  const absolutePath = path.isAbsolute(cleanPath) ? cleanPath : path.join(cwd, cleanPath);
+
+  try {
+    const markdown = await readFile(absolutePath, 'utf8');
+    const metadata = parseTaskMetadata(markdown);
+    const lines = [`- Path: ${cleanPath}`];
+    if (metadata.title) lines.push(`- Title: ${metadata.title}`);
+    if (metadata.type) lines.push(`- Task type: ${metadata.type}`);
+    if (metadata.status) lines.push(`- Status: ${metadata.status}`);
+
+    return `## Task Context
+${lines.join('\n')}
+
+`;
+  } catch {
+    return `## Task Context
+- Path: ${cleanPath}
+- Status: unavailable
+- Note: Task file could not be read.
+
+`;
+  }
+}
+
 export async function runVerification(options: VerificationOptions): Promise<VerificationResult> {
   const timestamp = options.reportTimestamp ?? formatTimestamp();
   const nowIso = options.nowIso ?? new Date().toISOString();
@@ -214,6 +268,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
   const branch = await getGitBranch(options.cwd);
   const commit = await getGitCommit(options.cwd);
   const status = await getGitStatus(options.cwd);
+  const taskContext = await renderTaskContext(options.cwd, options.taskPath);
 
   const markdown = `# Verification Report
 
@@ -225,6 +280,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
 - Overall status: ${overallStatus}
 
 ${renderCiContext(ciContext)}
+${taskContext}
 ${renderFailureSummary(results)}
 ## Commands Run
 ${

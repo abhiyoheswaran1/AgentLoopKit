@@ -22,6 +22,7 @@ export function verifyCommand() {
       const result = await runVerification({
         cwd: process.cwd(),
         config,
+        taskPath: typeof options.task === 'string' ? options.task : undefined,
         skip: {
           build: options.build === false,
           test: options.test === false,
