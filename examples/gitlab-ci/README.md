@@ -2,7 +2,7 @@
 
 These snippets show how a repository can use AgentLoopKit in GitLab CI. They are examples only. AgentLoopKit does not install or edit `.gitlab-ci.yml`.
 
-GitLab CI currently appears as Generic CI in AgentLoopKit summaries because AgentLoopKit only has a GitHub Actions-specific provenance allowlist. The commands still produce local verification reports, handoffs, badges, reports, and CI summaries.
+AgentLoopKit records GitLab CI provenance from allowlisted environment variables such as project path, pipeline source, ref, commit, and pipeline URL. The commands produce local verification reports, handoffs, badges, reports, and CI summaries without calling GitLab APIs.
 
 ## Evidence Gate
 

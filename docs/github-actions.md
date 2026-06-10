@@ -4,7 +4,7 @@ Use GitHub Actions to check whether a pull request has AgentLoopKit evidence.
 
 AgentLoopKit does not install workflows into user repositories. Copy a recipe into `.github/workflows/` only after you inspect it.
 
-For non-GitHub CI, see [GitLab CI](../examples/gitlab-ci/README.md) and [Buildkite](../examples/buildkite/README.md). Those examples run the same AgentLoopKit commands and currently report Generic CI provenance.
+For non-GitHub CI, see [GitLab CI](../examples/gitlab-ci/README.md) and [Buildkite](../examples/buildkite/README.md). Those examples run the same AgentLoopKit commands and report provider-specific provenance from allowlisted environment variables.
 
 ## npm Status
 
@@ -107,7 +107,7 @@ jobs:
 
 This workflow does not commit generated files. It uploads reports, HTML reports, badges, CI summaries, and handoffs as CI artifacts.
 
-The verification report includes a `CI Context` section when GitHub Actions creates it. Reviewers can see the workflow, event, ref, commit, run URL, and run attempt inside the Markdown artifact.
+The verification report includes a `CI Context` section when GitHub Actions, GitLab CI, or Buildkite creates it. Reviewers can see provider, workflow or pipeline, event, ref, commit, and run URL inside the Markdown artifact. GitHub Actions also includes run attempt when available.
 
 `agentloop ci-summary --write` adds a small Markdown summary with the same allowlisted CI provenance plus current AgentLoop evidence and gate status. It does not call GitHub APIs, read secrets, run verification commands, or replace the verification report.
 

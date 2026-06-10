@@ -370,7 +370,7 @@ agentloop ci-summary --json
 agentloop ci-summary --write
 ```
 
-In GitHub Actions it reports provider, workflow, event, ref, commit, run URL, and run attempt. Outside GitHub Actions it reports generic CI when `CI=true` is present. The command does not call provider APIs, read secrets, upload files, run tests, or dump arbitrary environment variables.
+In GitHub Actions, GitLab CI, and Buildkite it reports provider, workflow or pipeline, event, ref, commit, and run URL when those allowlisted fields are present. Unsupported CI providers report generic CI when `CI=true` is present. The command does not call provider APIs, read secrets, upload files, run tests, or dump arbitrary environment variables.
 
 Use `--write` when CI should upload a small Markdown summary alongside verification reports, HTML reports, badges, and handoffs. Verification consumers still read `*-verification-report.md`; CI summary artifacts do not replace verification evidence.
 

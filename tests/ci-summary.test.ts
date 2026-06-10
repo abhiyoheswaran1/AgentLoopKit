@@ -74,6 +74,68 @@ describe('ci-summary command', () => {
     expect(markdown).not.toContain('TOKEN');
   });
 
+  test('prints and writes a GitLab CI summary without calling external services', async () => {
+    const dir = await createRepoWithEvidence();
+    const result = await execa(tsxPath, [cliPath, 'ci-summary', '--json', '--write'], {
+      cwd: dir,
+      reject: false,
+      env: {
+        CI: 'true',
+        GITLAB_CI: 'true',
+        CI_PROJECT_PATH: 'owner/repo',
+        CI_PIPELINE_SOURCE: 'merge_request_event',
+        CI_COMMIT_REF_NAME: 'feature/agentloop',
+        CI_COMMIT_SHA: 'abcdef123456',
+        CI_PIPELINE_URL: 'https://gitlab.com/owner/repo/-/pipelines/12345',
+        UNRELATED_ENV_VALUE: 'redacted-fixture-value',
+      },
+    });
+
+    expect(result.exitCode).toBe(0);
+    const payload = JSON.parse(result.stdout);
+    expect(payload.ci.provider).toBe('gitlab-ci');
+    expect(payload.ci.runUrl).toBe('https://gitlab.com/owner/repo/-/pipelines/12345');
+    expect(payload.ci.workflow).toBe('owner/repo');
+    expect(payload.evidence.verification.overallStatus).toBe('pass');
+
+    const markdown = await readFile(payload.writtenPath, 'utf8');
+    expect(markdown).toContain('- Provider: GitLab CI');
+    expect(markdown).toContain('- Event: merge_request_event');
+    expect(markdown).toContain('- Run URL: https://gitlab.com/owner/repo/-/pipelines/12345');
+    expect(markdown).not.toContain('redacted-fixture-value');
+  });
+
+  test('prints and writes a Buildkite CI summary without calling external services', async () => {
+    const dir = await createRepoWithEvidence();
+    const result = await execa(tsxPath, [cliPath, 'ci-summary', '--json', '--write'], {
+      cwd: dir,
+      reject: false,
+      env: {
+        CI: 'true',
+        BUILDKITE: 'true',
+        BUILDKITE_PIPELINE_SLUG: 'agentloopkit',
+        BUILDKITE_SOURCE: 'pull_request',
+        BUILDKITE_BRANCH: 'feature/agentloop',
+        BUILDKITE_COMMIT: 'abcdef123456',
+        BUILDKITE_BUILD_URL: 'https://buildkite.com/owner/agentloopkit/builds/12345',
+        UNRELATED_ENV_VALUE: 'redacted-fixture-value',
+      },
+    });
+
+    expect(result.exitCode).toBe(0);
+    const payload = JSON.parse(result.stdout);
+    expect(payload.ci.provider).toBe('buildkite');
+    expect(payload.ci.runUrl).toBe('https://buildkite.com/owner/agentloopkit/builds/12345');
+    expect(payload.ci.workflow).toBe('agentloopkit');
+    expect(payload.evidence.verification.overallStatus).toBe('pass');
+
+    const markdown = await readFile(payload.writtenPath, 'utf8');
+    expect(markdown).toContain('- Provider: Buildkite');
+    expect(markdown).toContain('- Event: pull_request');
+    expect(markdown).toContain('- Run URL: https://buildkite.com/owner/agentloopkit/builds/12345');
+    expect(markdown).not.toContain('redacted-fixture-value');
+  });
+
   test('prints generic CI markdown when only CI=true is present', async () => {
     const dir = await createRepoWithEvidence();
     const result = await execa(tsxPath, [cliPath, 'ci-summary'], {

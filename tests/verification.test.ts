@@ -105,6 +105,74 @@ describe('verification', () => {
     expect(result.markdown).not.toContain('do-not-print');
   });
 
+  test('includes allowlisted GitLab CI context in markdown reports', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-09-12-36',
+      nowIso: '2026-06-09T12:36:00.000Z',
+      env: {
+        CI: 'true',
+        GITLAB_CI: 'true',
+        CI_PROJECT_PATH: 'acme/demo',
+        CI_PIPELINE_SOURCE: 'merge_request_event',
+        CI_COMMIT_REF_NAME: 'feature/agentloop',
+        CI_COMMIT_SHA: '1234567890abcdef',
+        CI_PIPELINE_URL: 'https://gitlab.com/acme/demo/-/pipelines/123',
+        UNRELATED_ENV_VALUE: 'redacted-fixture-value',
+        EXTRA_ENV_VALUE: 'do-not-print-extra',
+      },
+    });
+
+    expect(result.markdown).toContain('## CI Context');
+    expect(result.markdown).toContain('- Provider: GitLab CI');
+    expect(result.markdown).toContain('- Workflow: acme/demo');
+    expect(result.markdown).toContain('- Event: merge_request_event');
+    expect(result.markdown).toContain('- Ref: feature/agentloop');
+    expect(result.markdown).toContain('- Commit: 1234567890abcdef');
+    expect(result.markdown).toContain('- Run URL: https://gitlab.com/acme/demo/-/pipelines/123');
+    expect(result.markdown).not.toContain('redacted-fixture-value');
+    expect(result.markdown).not.toContain('do-not-print-extra');
+  });
+
+  test('includes allowlisted Buildkite context in markdown reports', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-09-12-37',
+      nowIso: '2026-06-09T12:37:00.000Z',
+      env: {
+        CI: 'true',
+        BUILDKITE: 'true',
+        BUILDKITE_PIPELINE_SLUG: 'agentloopkit',
+        BUILDKITE_SOURCE: 'pull_request',
+        BUILDKITE_BRANCH: 'feature/agentloop',
+        BUILDKITE_COMMIT: 'fedcba0987654321',
+        BUILDKITE_BUILD_URL: 'https://buildkite.com/acme/agentloopkit/builds/42',
+        UNRELATED_ENV_VALUE: 'redacted-fixture-value',
+        EXTRA_ENV_VALUE: 'do-not-print-extra',
+      },
+    });
+
+    expect(result.markdown).toContain('## CI Context');
+    expect(result.markdown).toContain('- Provider: Buildkite');
+    expect(result.markdown).toContain('- Workflow: agentloopkit');
+    expect(result.markdown).toContain('- Event: pull_request');
+    expect(result.markdown).toContain('- Ref: feature/agentloop');
+    expect(result.markdown).toContain('- Commit: fedcba0987654321');
+    expect(result.markdown).toContain('- Run URL: https://buildkite.com/acme/agentloopkit/builds/42');
+    expect(result.markdown).not.toContain('redacted-fixture-value');
+    expect(result.markdown).not.toContain('do-not-print-extra');
+  });
+
   test('includes minimal generic CI context without provider-specific fields', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

@@ -17,7 +17,7 @@ export type VerificationCommandResult = {
 };
 
 export type VerificationCiContext = {
-  provider: 'github-actions' | 'generic-ci';
+  provider: 'github-actions' | 'gitlab-ci' | 'buildkite' | 'generic-ci';
   providerName: string;
   workflow?: string;
   event?: string;
@@ -145,6 +145,30 @@ export function detectCiContext(env: NodeJS.ProcessEnv): VerificationCiContext |
       commit: singleLine(env.GITHUB_SHA),
       runUrl,
       runAttempt: singleLine(env.GITHUB_RUN_ATTEMPT),
+    };
+  }
+
+  if (env.GITLAB_CI === 'true') {
+    return {
+      provider: 'gitlab-ci',
+      providerName: 'GitLab CI',
+      workflow: singleLine(env.CI_PROJECT_PATH),
+      event: singleLine(env.CI_PIPELINE_SOURCE),
+      ref: singleLine(env.CI_COMMIT_REF_NAME),
+      commit: singleLine(env.CI_COMMIT_SHA),
+      runUrl: singleLine(env.CI_PIPELINE_URL),
+    };
+  }
+
+  if (env.BUILDKITE === 'true') {
+    return {
+      provider: 'buildkite',
+      providerName: 'Buildkite',
+      workflow: singleLine(env.BUILDKITE_PIPELINE_SLUG),
+      event: singleLine(env.BUILDKITE_SOURCE),
+      ref: singleLine(env.BUILDKITE_BRANCH),
+      commit: singleLine(env.BUILDKITE_COMMIT),
+      runUrl: singleLine(env.BUILDKITE_BUILD_URL),
     };
   }
 

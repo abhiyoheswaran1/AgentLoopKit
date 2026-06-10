@@ -8,13 +8,13 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - Setup checks with `agentloop doctor`
 - Task contracts with `agentloop create-task`
 - Active task lifecycle with `agentloop task list`, `show`, `set`, `current`, `status`, `archive`, and `clear`
-- Verification reports with configured commands, custom commands, long-output excerpts, and CI context
+- Verification reports with configured commands, custom commands, long-output excerpts, and GitHub Actions, GitLab CI, and Buildkite CI context
 - Task-linked verification reports and failed-verification summaries
 - Deterministic PR summaries and `agentloop handoff`
 - PR summary change-area classification and path-based review-focus hints
 - Local static HTML evidence reports with `agentloop report`
 - Local SVG evidence badges with `agentloop badge`
-- Local CI provenance summaries with `agentloop ci-summary`
+- Local CI provenance summaries with `agentloop ci-summary` for GitHub Actions, GitLab CI, and Buildkite
 - Local release-note handoffs with `agentloop release-notes`
 - Local template manifest checks and manual migration guidance
 - Local safety policy inspection with `agentloop policy`
@@ -24,7 +24,7 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - Local review-evidence gates with `agentloop check-gates` and `--strict`
 - Agent instruction installers, including `agentloop install-agent all`
 - Static bash, zsh, fish, and PowerShell completions
-- GitHub Actions recipes for evidence checks and CI-generated artifacts
+- GitHub Actions, GitLab CI, and Buildkite recipes for evidence checks and CI-generated artifacts
 - Stack recipes for Next.js, React/Vite, Node API, Python, docs-only, empty repos, and monorepos
 - Launch visuals generated from committed Playwright and VHS sources
 

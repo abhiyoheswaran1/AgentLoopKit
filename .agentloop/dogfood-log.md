@@ -3124,3 +3124,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The provider examples reuse existing local commands and do not add workflow installation scope.
 - Improve:
   - If users ask for richer provider provenance, add allowlisted GitLab CI and Buildkite metadata in a focused CLI change with tests.
+
+## 2026-06-10: GitLab And Buildkite CI Provenance
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-gitlab-and-buildkite-ci-provenance.md`
+- Product cycle: `.agentloop/research/interview-cycle-096.md`
+- Trigger:
+  - GitLab CI and Buildkite examples were added, but reports still identified those environments as Generic CI.
+- Product changes:
+  - Added failing tests first for GitLab CI and Buildkite verification reports and CI summaries.
+  - Added provider-specific detection for documented, non-secret GitLab CI and Buildkite variables.
+  - Updated CI summary, verification report, GitHub Actions, GitLab CI, Buildkite, and README docs.
+  - Kept provider support local: no API calls, no token reads, no arbitrary environment dumps.
+- Verification run:
+  - Red test: `npx pnpm@10.12.1 test tests/verification.test.ts tests/ci-summary.test.ts` failed before implementation because both providers returned Generic CI.
+  - Focused green test: `npx pnpm@10.12.1 test tests/verification.test.ts tests/ci-summary.test.ts`: pass, 2 files and 18 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 516 Markdown files checked.
+  - `git diff --check`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100 after replacing token-like test fixture names.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-add-gitlab-and-buildkite-ci-provenance.md`: pass, wrote `.agentloop/reports/2026-06-10-08-49-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 117 tests, lint, typecheck, and build all passed.
+  - `npx tsx src/cli/index.ts handoff --task .agentloop/tasks/2026-06-10-add-gitlab-and-buildkite-ci-provenance.md --json`: pass, wrote `.agentloop/handoffs/2026-06-10-08-50-pr-summary.md`.
+- Worked well:
+  - The shared `detectCiContext` helper kept verification reports and CI summaries consistent.
+- Improve:
+  - Add another provider only when there is a concrete workflow example and documented non-secret environment variables.

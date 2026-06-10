@@ -49,7 +49,16 @@ When `agentloop verify` runs in GitHub Actions, the report includes an allowlist
 - run URL
 - run attempt
 
-When `CI=true` is present outside GitHub Actions, the report records `Generic CI` without provider-specific fields.
+When `agentloop verify` runs in GitLab CI or Buildkite, the report records provider-specific provenance from a small allowlist:
+
+- provider
+- workflow or pipeline
+- event or source
+- ref
+- commit
+- run URL
+
+When `CI=true` is present outside a supported provider, the report records `Generic CI` without provider-specific fields.
 
 Local reports omit this section. AgentLoopKit does not read `.env` files and does not print arbitrary environment variables. It only reads a small allowlist of CI variables needed for report provenance.
 

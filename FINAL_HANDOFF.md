@@ -1751,6 +1751,38 @@ Implemented:
 - top-level command, task command, policy command, task status, agent-name, and shell-name completions
 - README and getting-started updates that keep profile-file mutation out of scope
 
+### Cycle 94: Current release-state clarity
+
+Decision: make the GitHub/npm split easier to trust by naming `v0.23.0` as the current release line and explaining the one-time npm catch-up rule.
+
+Implemented:
+
+- README current-release wording fixed from the older `v0.22.0` workflow to the `v0.23.0` workflow
+- release-status docs and launch checklist updated with the current-main-to-`0.23.0` rule
+- final handoff current-state wording reduced so old release attempts do not obscure the current blocker
+
+### Cycle 95: GitLab CI and Buildkite examples
+
+Decision: add provider examples as documentation, not workflow installers.
+
+Implemented:
+
+- `examples/gitlab-ci/README.md`
+- `examples/buildkite/README.md`
+- GitHub Actions example tarball pins refreshed to `v0.23.0`
+- README and CI docs links to the provider examples
+
+### Cycle 96: GitLab CI and Buildkite provenance
+
+Decision: identify GitLab CI and Buildkite in local verification reports and CI summaries through documented, non-secret environment-variable allowlists.
+
+Implemented:
+
+- GitLab CI provider detection for project path, pipeline source, ref, commit, and pipeline URL
+- Buildkite provider detection for pipeline slug, source, branch, commit, and build URL
+- verification report and `ci-summary` tests for both providers
+- docs updated to state provider-specific provenance without provider APIs, token reads, or arbitrary environment dumps
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1776,6 +1808,7 @@ Strongest signals:
 - Maintainers need to know that customized policy files are repo decisions, not automatic errors.
 - Maintainers need repo-type policy examples before local policies become useful in real projects.
 - Contributors and maintainers need copyable issue examples that name files, acceptance criteria, verification commands, and AgentLoop evidence.
+- Teams using GitLab CI and Buildkite need the same local evidence workflow and provider-specific provenance without API integration.
 - Release readers need `0.12.0` metadata and visuals to match `create-task --json` before the GitHub release.
 - Agents and reviewers need one deterministic command that checks review evidence without running tests.
 - Release readers need `0.13.0` metadata and visuals to match `check-gates` before the GitHub release.
@@ -2045,13 +2078,13 @@ Title: I built a local-first engineering loop for coding agents
 3. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
 4. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
 5. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
-6. Add GitLab CI and Buildkite examples for `agentloop ci-summary`: medium usefulness, low effort.
-7. Add generated security-review example: medium trust improvement, low effort.
-8. Add config migration helper for future schema versions: medium usefulness, medium effort.
-9. Add NuShell completion docs only if users ask for it: low effort, low maintenance.
-10. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
-11. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
-12. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
-13. Add doctor heuristics documentation page for risk-file categories: medium trust improvement, low effort.
-14. Add framework-specific example task contracts for Remix, SvelteKit, Django, and FastAPI: medium star potential, low effort.
-15. Add more packed-tarball smoke fixtures for release recovery flows: medium trust improvement, low effort.
+6. Add generated security-review example: medium trust improvement, low effort.
+7. Add config migration helper for future schema versions: medium usefulness, medium effort.
+8. Add NuShell completion docs only if users ask for it: low effort, low maintenance.
+9. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
+10. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
+11. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
+12. Add doctor heuristics documentation page for risk-file categories: medium trust improvement, low effort.
+13. Add framework-specific example task contracts for Remix, SvelteKit, Django, and FastAPI: medium star potential, low effort.
+14. Add more packed-tarball smoke fixtures for release recovery flows: medium trust improvement, low effort.
+15. Add GitLab CI and Buildkite retry/parallelism guidance after provider-specific provenance sees use: medium usefulness, low effort.

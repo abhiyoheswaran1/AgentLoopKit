@@ -2,7 +2,7 @@
 
 These snippets show how a repository can use AgentLoopKit in a Buildkite pipeline. They are examples only. AgentLoopKit does not install or edit `pipeline.yml`.
 
-Buildkite currently appears as Generic CI in AgentLoopKit summaries because AgentLoopKit only has a GitHub Actions-specific provenance allowlist. The commands still produce local verification reports, handoffs, badges, reports, and CI summaries.
+AgentLoopKit records Buildkite provenance from allowlisted environment variables such as pipeline slug, source, branch, commit, and build URL. The commands produce local verification reports, handoffs, badges, reports, and CI summaries without calling Buildkite APIs.
 
 ## Evidence Gate
 
