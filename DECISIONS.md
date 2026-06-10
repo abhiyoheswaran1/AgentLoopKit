@@ -119,3 +119,7 @@ The README is part of the npm package and should explain user value, install com
 ## 2026-06-10: Stage Distribution Channels After npm
 
 npm/npx and GitHub Releases are the primary release channels. Homebrew, Docker/GHCR, GitHub Action, MCP Registry, VS Code/Open VSX, Scoop, and WinGet should be added as separate, verifiable tasks. MCP Registry is blocked until AgentLoopKit has a real MCP server; do not claim support from metadata alone.
+
+## 2026-06-10: Project Detection Skips Unreadable Directories
+
+Project detection may inspect file names when a repository has no package or Python metadata. If a directory cannot be read, AgentLoopKit skips it instead of failing the command. This prevents first-run crashes on macOS-protected paths such as `.Trash` while still avoiding file-content reads in protected directories.

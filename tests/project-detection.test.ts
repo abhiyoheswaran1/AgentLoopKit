@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { chmod, mkdir, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 import {
@@ -34,6 +34,23 @@ describe('project detection', () => {
     await writeFile(path.join(dir, 'docs', 'guide.md'), '# Guide');
 
     await expect(detectProjectType(dir)).resolves.toBe('docs-only');
+  });
+
+  test('skips unreadable directories while detecting project type', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const unreadableDir = path.join(dir, '.Trash');
+    await mkdir(path.join(dir, 'docs'));
+    await mkdir(unreadableDir);
+    await writeFile(path.join(dir, 'README.md'), '# Docs');
+    await writeFile(path.join(dir, 'docs', 'guide.md'), '# Guide');
+    await chmod(unreadableDir, 0o000);
+
+    try {
+      await expect(detectProjectType(dir)).resolves.toBe('docs-only');
+    } finally {
+      await chmod(unreadableDir, 0o700);
+    }
   });
 
   test('detects package scripts and prefixes them with package manager', async () => {

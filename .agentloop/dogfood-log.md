@@ -41,6 +41,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Confusing: historical release artifacts are useful internally but should not leak into the public README.
 - Improve: add a release-doc checklist item that scans README for maintainer-only phrases before every release.
 
+## 2026-06-10: Unreadable Directory Init Bugfix
+
+- Task contract: `.agentloop/tasks/2026-06-10-skip-unreadable-directories-during-project-detection.md`
+- Trigger:
+  - Running `npx agentloopkit init` from a macOS home directory failed with `EPERM: operation not permitted, scandir '/Users/abhyoh/.Trash'`.
+- Product changes:
+  - Added a regression test for project detection with an unreadable `.Trash` directory.
+  - Changed recursive file discovery to skip unreadable directories instead of aborting.
+  - Prepared patch release `0.24.1`.
+- Verification completed:
+  - Red test first: `npx pnpm@10.12.1 test tests/project-detection.test.ts` failed on `EACCES: permission denied, scandir .../.Trash`.
+  - Focused green test: `npx pnpm@10.12.1 test tests/project-detection.test.ts`: pass, 6 tests.
+  - Built CLI smoke: `agentloop init --dry-run` passed in a temp directory with unreadable `.Trash`.
+  - `npm run lint`: pass
+  - `npm run typecheck`: pass
+  - `npm test`: pass, 29 files and 122 tests
+  - `npx pnpm@10.12.1 check:links`: pass, 574 Markdown files checked
+  - `node scripts/prepublish-check.mjs`: pass
+  - `git diff --check`: pass
+  - `npm run build`: pass
+  - `npx projscan doctor --format markdown`: pass, A 100/100
+  - `npm pack --pack-destination /tmp --silent`: pass, produced `/tmp/agentloopkit-0.24.1.tgz`
+  - `npm publish --access public --dry-run`: pass
+  - packed tarball `agentloop version`: pass, reported `0.24.1`
+  - packed tarball `agentloop init --dry-run` with unreadable `.Trash`: pass
+- Tarball SHA-256: `a3af9b4433ea72cdf1d7a045565d6cea408ec70a5d35973000de6a5ea331eb40`
+- Worked well: the test reproduced the install crash before the fix.
+- Confusing: `init` can be run outside a repository, but the recommended user path remains running it inside a repo.
+- Improve: add a clearer future warning when `init` runs from a likely home directory.
+
 ## 2026-06-09: MVP Build
 
 - Task contract: original build prompt, implemented directly before dogfood log existed.

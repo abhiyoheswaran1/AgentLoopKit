@@ -49,8 +49,8 @@ npx agentloopkit init --dry-run
 Pin the current version when you need repeatable CI or team setup:
 
 ```bash
-npx --yes agentloopkit@0.24.0 version
-npx --yes agentloopkit@0.24.0 init
+npx --yes agentloopkit@0.24.1 version
+npx --yes agentloopkit@0.24.1 init
 ```
 
 Run the CLI after install:
@@ -446,7 +446,7 @@ Use `agentloop check-gates --strict` as a review-evidence gate in pull request C
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
-See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.24.0` or a newer vetted release when reproducibility matters.
+See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.24.1` or a newer vetted release when reproducibility matters.
 
 ## PR Summaries
 

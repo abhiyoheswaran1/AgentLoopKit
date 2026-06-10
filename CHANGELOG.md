@@ -4,6 +4,14 @@
 
 - No unreleased changes yet.
 
+## 0.24.1
+
+Patch release for first-run project detection:
+
+- Fixed `agentloop init` crashing when project detection encounters unreadable directories such as macOS `.Trash`
+- Changed recursive project file discovery to skip directories it cannot read instead of aborting the command
+- Added regression coverage for unreadable directories during project detection
+
 ## 0.24.0
 
 npm-status release candidate. npm still serves `0.1.1` until account authentication or trusted publishing is repaired. This is the normal next minor release after `v0.23.0`; after npm catches up to the current release line, future releases should use ordinary sequential semver:

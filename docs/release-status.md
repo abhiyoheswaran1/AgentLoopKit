@@ -4,15 +4,15 @@ Last checked: June 10, 2026.
 
 ## Current State
 
-- Current GitHub release: `v0.24.0`
-- Current GitHub release asset: `agentloopkit-0.24.0.tgz`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.0>
-- Tarball SHA-256: `4e721a9627d94944f300a60d71a14b0e519045ac3eb51d637f7227503f2a962d`
-- CI run: `27262792610` passed on commit `1f51e8b`
+- Current GitHub release: `v0.24.1`
+- Current GitHub release asset: `agentloopkit-0.24.1.tgz`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.1>
+- Tarball SHA-256: pending until release asset is packed
+- CI run: pending for the `0.24.1` release commit
 - Publish workflow run: `27262870591` passed package checks before npm trusted publishing was configured, then npm rejected publish with `E404`
 - Manual npm publish: succeeded for `agentloopkit@0.24.0` after browser authentication
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
-- npm latest: `0.24.0`
+- npm latest: pending `0.24.1` release
 - npm versions: `0.1.0`, `0.1.1`, `0.24.0`
 
 Run the local registry check at any time:
@@ -30,7 +30,7 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.24.0 version
+npx --yes agentloopkit@0.24.1 version
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -73,23 +73,14 @@ After the next publish:
 
 ## Verification Evidence
 
-Local release-candidate checks for `0.24.0` passed:
+Local release-candidate checks for `0.24.1`:
 
-- lint
-- typecheck
-- Vitest
-- Markdown link checks
-- build
-- projscan
-- `npm publish --access public --dry-run`
-- packed-tarball smoke testing
-- packed-tarball PowerShell completion smoke testing
-- packed-tarball npm-status smoke testing
+- pending final release verification
 
 Latest release-status documentation checks also passed:
 
 - `npm view agentloopkit version versions --json`
-- `npx --yes agentloopkit@0.24.0 version`
+- `npx --yes agentloopkit@0.24.1 version`
 - `node dist/cli/index.js npm-status --expect-current`
 - `npx pnpm@10.12.1 check:links`
 - `git diff --check`

@@ -35,7 +35,7 @@ export async function listFilesRecursive(root: string, options: { ignore?: strin
 
   async function walk(current: string) {
     if (!(await pathExists(current))) return;
-    const entries = await readdir(current, { withFileTypes: true });
+    const entries = await readdir(current, { withFileTypes: true }).catch(() => []);
     for (const entry of entries) {
       if (ignore.has(entry.name)) continue;
       const absolute = path.join(current, entry.name);
