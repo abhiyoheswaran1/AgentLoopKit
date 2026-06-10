@@ -51,6 +51,7 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] GitHub release `v0.26.2` is published with release-channel cleanup notes.
 - [x] GitHub release `v0.26.3` is published with status cleanup notes.
 - [x] GitHub release `v0.26.4` is published with SchemaStore documentation notes.
+- [x] GitHub release `v0.26.5` is published with terminal fallback cleanup notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -188,6 +189,10 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] Package `agentloopkit@0.26.4` is published through GitHub trusted publishing.
 - [x] GHCR image `ghcr.io/abhiyoheswaran1/agentloopkit:0.26.4` is published.
 - [x] MCP Registry metadata for `io.github.abhiyoheswaran1/agentloopkit` is published for `0.26.4`.
+- [x] Package `agentloopkit@0.26.5` is prepared on `main` for terminal fallback cleanup.
+- [x] Package `agentloopkit@0.26.5` is published through GitHub trusted publishing.
+- [x] GHCR image `ghcr.io/abhiyoheswaran1/agentloopkit:0.26.5` is published.
+- [x] MCP Registry metadata for `io.github.abhiyoheswaran1/agentloopkit` is published for `0.26.5`.
 - [x] npm trusted publishing is configured for this repository.
 - [x] `agentloop npm-status --expect-current` passes after npm publish.
 - [x] Current publish guidance tells maintainers to continue from the current source version, not stale intermediate versions.
@@ -372,9 +377,15 @@ Historical recovery note:
 - GitHub Publish workflow for `v0.26.4` (run `27296379647`) passed package checks and published to npm.
 - Docker workflow for `v0.26.4` (run `27296379642`) passed and published the GHCR image.
 - MCP Registry workflow for `v0.26.4` (run `27296470988`) passed and published registry metadata.
+- `agentloopkit@0.26.5` fixed terminal task fallback selection across status, next, gates, handoffs, HTML reports, CI summaries, and release notes.
+- GitHub release `v0.26.5` is public with attached `agentloopkit-0.26.5.tgz`.
+- GitHub release `v0.26.5` tarball SHA-256: `64fe8d8bc6c64b0d5699b85dbc962d64c6d2423b2ac01b13aad537f75cd0edc8`.
+- GitHub Publish workflow for `v0.26.5` (run `27298446341`) passed package checks and published to npm.
+- Docker workflow for `v0.26.5` (run `27298446331`) passed and published the GHCR image.
+- MCP Registry workflow for `v0.26.5` (run `27298526436`) passed and published registry metadata.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
-- npm latest is `0.26.4`; registry versions include `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, and `0.26.4`.
+- npm latest is `0.26.5`; registry versions include `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, and `0.26.5`.
 - npm trusted publishing is configured for GitHub release publishes.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.3.0` is now prepared on `main` after the handoff command, create-task flag, latest artifact selection, and create-task alias work.

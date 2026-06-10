@@ -37,6 +37,32 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider a future `agentloop task doctor` command that flags task files missing status lines or stuck in old terminal states.
 
+## 2026-06-10: Release 0.26.5 Terminal Fallback Patch
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-prepare-0-26-5-terminal-fallback-release.md`
+- Trigger:
+  - The terminal fallback cleanup changed user-facing CLI behavior and needed an immediate npm/GitHub release.
+- Release proof:
+  - GitHub release `v0.26.5`: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.5>.
+  - GitHub release asset `agentloopkit-0.26.5.tgz` SHA-256: `64fe8d8bc6c64b0d5699b85dbc962d64c6d2423b2ac01b13aad537f75cd0edc8`.
+  - CI workflow `27298341631`: pass.
+  - npm Publish workflow `27298446341`: pass, published `agentloopkit@0.26.5`.
+  - Docker/GHCR workflow `27298446331`: pass.
+  - MCP Registry workflow `27298526436`: pass.
+  - `npm view agentloopkit version versions --json`: pass, latest `0.26.5`.
+  - `node dist/cli/index.js npm-status --expect-current`: pass.
+  - Fresh temp `npx --package agentloopkit@0.26.5` smoke: both binaries reported `0.26.5`; `agentloop init --dry-run` completed.
+- Verification run:
+  - Release verification report: `.agentloop/reports/2026-06-10-20-42-verification-report.md`, overall status pass.
+  - Post-release handoff summary: `.agentloop/handoffs/2026-06-10-20-51-pr-summary.md`.
+  - Release smoke: pass.
+  - Dry-run npm publish: pass.
+  - Projscan: A, 97/100, with the existing informational unused-export note for `scripts/smoke-packed-release.mjs`.
+- Worked well:
+  - Trusted publishing, GHCR, and MCP Registry completed from the GitHub release without local tokens.
+- Improve:
+  - Generate public release notes after fetching tags so the range starts at the latest release tag.
+
 ## 2026-06-10: Release Channels Roadmap And README Cleanup
 
 - Task contract: `.agentloop/tasks/2026-06-10-plan-release-channels-roadmap.md`

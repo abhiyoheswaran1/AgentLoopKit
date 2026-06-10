@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-10
 - Task type: release
-- Status: review
+- Status: done
 
 ## Problem Statement
 The terminal fallback bugfix is committed on main but not published to npm, GitHub Releases, GHCR, or MCP Registry.
