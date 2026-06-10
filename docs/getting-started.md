@@ -32,7 +32,7 @@ In monorepos, root checks do not always prove that one package was tested. Add p
 
 AgentLoopKit records and runs the commands you configure. It does not infer package graphs or run workspace commands on its own.
 
-For stack-specific command examples, see `stack-recipes.md`.
+For stack-specific command examples, see `stack-recipes.md`, including Next.js, React/Vite, Remix, SvelteKit, Node API, Django, FastAPI, Python, docs-only, empty-repo, and monorepo recipes.
 For sensitive changes, see `security-review.md` and `../examples/security-review/README.md` for a scoped security-review task, verification report, and PR summary. AgentLoopKit records review evidence; it does not prove code is secure.
 
 Create a task:

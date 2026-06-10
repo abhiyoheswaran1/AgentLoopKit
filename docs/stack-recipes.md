@@ -81,6 +81,84 @@ Extra care:
 - design-system components
 - accessibility behavior
 
+## Remix
+
+Common commands:
+
+```json
+{
+  "commands": {
+    "test": "pnpm test",
+    "lint": "pnpm lint",
+    "typecheck": "pnpm typecheck",
+    "build": "pnpm build",
+    "format": "pnpm format"
+  }
+}
+```
+
+Task contract example:
+
+```bash
+agentloop create-task --type feature --title "Add account export route" \
+  --likely-file app/routes/account.export.tsx \
+  --likely-file app/services/account-export.server.ts \
+  --forbidden-file app/services/billing.server.ts \
+  --acceptance "Only authenticated users can request an export" \
+  --acceptance "Loader and action tests cover success and forbidden paths" \
+  --verification "pnpm test" \
+  --verification "pnpm lint" \
+  --verification "pnpm typecheck" \
+  --verification "pnpm build"
+```
+
+Extra care:
+
+- loaders and actions
+- session storage
+- auth guards
+- server-only modules
+- deployment adapters
+
+## SvelteKit
+
+Common commands:
+
+```json
+{
+  "commands": {
+    "test": "pnpm test",
+    "lint": "pnpm lint",
+    "typecheck": "pnpm check",
+    "build": "pnpm build",
+    "format": "pnpm format"
+  }
+}
+```
+
+Task contract example:
+
+```bash
+agentloop create-task --type feature --title "Add profile preferences" \
+  --likely-file src/routes/settings \
+  --likely-file src/lib/server/preferences.ts \
+  --forbidden-file src/hooks.server.ts \
+  --acceptance "Preferences save through a server action" \
+  --acceptance "Unauthenticated requests redirect to login" \
+  --verification "pnpm test" \
+  --verification "pnpm lint" \
+  --verification "pnpm check" \
+  --verification "pnpm build"
+```
+
+Extra care:
+
+- `+page.server.ts` and `+server.ts` files
+- `hooks.server.ts`
+- form actions
+- session cookies
+- adapter-specific deployment config
+
 ## Node API
 
 Common commands:
@@ -155,6 +233,83 @@ Extra care:
 - background jobs
 - external service clients
 - deployment manifests
+
+## Django
+
+Common commands:
+
+```json
+{
+  "commands": {
+    "test": "python manage.py test",
+    "lint": "ruff check .",
+    "typecheck": "mypy .",
+    "build": "python manage.py check --deploy",
+    "format": "ruff format ."
+  }
+}
+```
+
+Task contract example:
+
+```bash
+agentloop create-task --type bugfix --title "Fix invite permission check" \
+  --likely-file accounts/views.py \
+  --likely-file accounts/tests/test_invites.py \
+  --forbidden-file migrations \
+  --acceptance "Users cannot invite members to organizations they do not own" \
+  --acceptance "Existing owner invite flow still passes" \
+  --verification "python manage.py test accounts" \
+  --verification "ruff check ." \
+  --verification "python manage.py check"
+```
+
+Extra care:
+
+- migrations
+- permissions and decorators
+- middleware
+- settings files
+- management commands that mutate data
+
+## FastAPI
+
+Common commands:
+
+```json
+{
+  "commands": {
+    "test": "pytest",
+    "lint": "ruff check .",
+    "typecheck": "mypy .",
+    "build": "python -m compileall app",
+    "format": "ruff format ."
+  }
+}
+```
+
+Task contract example:
+
+```bash
+agentloop create-task --type feature --title "Add API key rotation endpoint" \
+  --likely-file app/routes/api_keys.py \
+  --likely-file app/services/api_keys.py \
+  --likely-file tests/test_api_keys.py \
+  --forbidden-file alembic/versions \
+  --acceptance "Only the key owner can rotate an API key" \
+  --acceptance "Old keys stop working after rotation" \
+  --verification "pytest tests/test_api_keys.py" \
+  --verification "ruff check ." \
+  --verification "mypy ."
+```
+
+Extra care:
+
+- dependency injection overrides
+- auth dependencies
+- background tasks
+- Alembic migrations
+- OpenAPI contract changes
 
 ## Docs-Only Repo
 

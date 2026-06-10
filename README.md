@@ -501,7 +501,7 @@ See `examples/` for sample generated harnesses:
 - `examples/github-actions`
 - `examples/security-review`
 
-See `docs/stack-recipes.md` for Next.js, React/Vite, Node API, Python, docs-only, empty-repo, and monorepo verification recipes.
+See `docs/stack-recipes.md` for Next.js, React/Vite, Remix, SvelteKit, Node API, Django, FastAPI, Python, docs-only, empty-repo, and monorepo verification recipes.
 
 ## Roadmap
 

@@ -3197,3 +3197,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The dedicated page gives agents a clear place to learn how risk warnings should shape task contracts.
 - Improve:
   - Future example workflows should link to risk-file guidance when they involve dependencies, deployments, migrations, or billing.
+
+## 2026-06-10: Framework-Specific Task Recipes
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-framework-specific-task-recipes.md`
+- Product cycle: `.agentloop/research/interview-cycle-099.md`
+- Trigger:
+  - Stack recipes covered broad project types, but Remix, SvelteKit, Django, and FastAPI users still needed framework-specific task-contract examples.
+- Product changes:
+  - Added Remix and SvelteKit recipes to `docs/stack-recipes.md`.
+  - Added Django and FastAPI recipes to `docs/stack-recipes.md`.
+  - Updated README and getting-started docs to mention the expanded recipe set.
+  - Updated backlog and final handoff with Cycle 99.
+  - Kept this docs-only: no framework detection, runners, sample apps, package graph inference, dependency changes, or official-support claims.
+- Verification run:
+  - `npx pnpm@10.12.1 check:links`: pass, 534 Markdown files checked.
+  - `git diff --check`: pass.
+  - Public-support wording search: pass, only the internal non-decision mentions official support.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-add-framework-specific-task-recipes.md`: pass, wrote `.agentloop/reports/2026-06-10-09-17-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 117 tests, lint, typecheck, and build all passed.
+- Worked well:
+  - Recipes improve framework recognition without increasing CLI maintenance scope.
+- Improve:
+  - Add more framework recipes only when they preserve the same command, task, and extra-care structure.
