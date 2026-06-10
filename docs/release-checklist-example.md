@@ -40,6 +40,7 @@ agentloop create-task --type release --title "Document current release state" \
 - current GitHub release tag and asset name
 - tarball SHA-256 if available
 - `npm view agentloopkit version versions --json`
+- `agentloop npm-status` or `agentloop npm-status --registry-json <captured-json>`
 - package checks run
 - packed-tarball smoke result if a tarball exists
 - publish workflow URL and failure reason, if npm publish failed
@@ -63,6 +64,7 @@ Before stopping, write a handoff that states:
 - npm latest;
 - npm versions listed by the registry;
 - verification commands and results;
+- `agentloop npm-status` result;
 - whether npm publish was attempted;
 - why any publish failed;
 - exact next maintainer action;

@@ -15,6 +15,7 @@ describe('completion scripts', () => {
     expect(script).toContain('badge:Write a local SVG evidence badge');
     expect(script).toContain('ci-summary:Summarize CI context and AgentLoop evidence');
     expect(script).toContain('release-notes:Generate deterministic release notes');
+    expect(script).toContain('npm-status:Check npm registry catch-up status');
     expect(script).toContain('next:Show the next recommended loop action');
     expect(script).toContain('policy:List or inspect local AgentLoopKit policies');
     expect(script).toContain('show:Show a local policy');
@@ -33,6 +34,7 @@ describe('completion scripts', () => {
     expect(script).toContain('COMPREPLY');
     expect(script).toContain('ci-summary');
     expect(script).toContain('release-notes');
+    expect(script).toContain('npm-status');
     expect(script).toContain('next');
     expect(script).toContain('list show set status archive current clear');
     expect(script).toContain('compgen -W "list show status"');
@@ -59,6 +61,7 @@ describe('completion scripts', () => {
     expect(script).toContain('Register-ArgumentCompleter -Native -CommandName agentloop, agentloopkit');
     expect(script).toContain("'ci-summary'");
     expect(script).toContain("'release-notes'");
+    expect(script).toContain("'npm-status'");
     expect(script).toContain("'task'");
     expect(script).toContain("'archive'");
     expect(script).toContain("'policy'");

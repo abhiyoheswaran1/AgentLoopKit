@@ -77,7 +77,14 @@ agentloop release-notes
 agentloop release-notes --write
 ```
 
-12. Check review gates:
+12. Optional: check npm registry catch-up:
+
+```bash
+agentloop npm-status
+agentloop npm-status --expect-current
+```
+
+13. Check review gates:
 
 ```bash
 agentloop check-gates
@@ -89,6 +96,7 @@ agentloop check-gates --strict
 `badge` reads local evidence and writes SVG files under `reports/`.
 `ci-summary` reads allowlisted CI provenance and local evidence, then writes Markdown under `reports/` when `--write` is passed.
 `release-notes` reads local package, changelog, git, task, verification, and CI-summary evidence, then writes Markdown under `handoffs/` when `--write` is passed.
+`npm-status` compares local package metadata with npm registry metadata. It does not publish packages or read credentials.
 Use `--strict` in CI when warning gates should fail.
 
 CI can either check committed AgentLoop evidence or generate reports and handoffs as build artifacts. Do not let CI commit generated files unless maintainers explicitly want that behavior.
@@ -98,6 +106,8 @@ When GitHub Actions runs `agentloop verify`, the report records allowlisted CI p
 Use `agentloop ci-summary --write` after verification and handoff when CI should upload one compact Markdown summary. It does not run checks or replace the verification report.
 
 Use `agentloop release-notes --write` before a release when CI or maintainers need a local release-note draft. It does not create tags, publish packages, call provider APIs, or read tokens.
+
+Use `agentloop npm-status --expect-current` after npm publish when CI or maintainers need proof that npm latest matches local package metadata. It does not publish packages, read tokens, read `.env` files, or change package metadata.
 
 ## Directories
 

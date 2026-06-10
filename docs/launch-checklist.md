@@ -2,7 +2,7 @@
 
 Use this before publishing AgentLoopKit.
 
-For a compact maintainer example that documents GitHub-current/npm-lag state without publishing or creating releases, see [release-checklist-example.md](release-checklist-example.md) and [`../examples/release-checklist/README.md`](../examples/release-checklist/README.md).
+For a read-only npm catch-up check, see [npm-status.md](npm-status.md). For a compact maintainer example that documents GitHub-current/npm-lag state without publishing or creating releases, see [release-checklist-example.md](release-checklist-example.md) and [`../examples/release-checklist/README.md`](../examples/release-checklist/README.md).
 
 ## GitHub
 
@@ -144,6 +144,7 @@ For a compact maintainer example that documents GitHub-current/npm-lag state wit
 - [x] Publish workflow for `v0.23.0` passed package checks and failed at npm authorization.
 - [ ] npm trusted publishing is configured for this repository.
 - [ ] `npm whoami` works for manual fallback.
+- [ ] `agentloop npm-status --expect-current` passes after npm publish.
 - [x] Current publish guidance tells maintainers to publish `0.23.0` next from current `main`, not stale intermediate versions.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
 - [x] No `postinstall` script exists.

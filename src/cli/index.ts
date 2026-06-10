@@ -17,6 +17,7 @@ import { badgeCommand } from './commands/badge.js';
 import { policyCommand } from './commands/policy.js';
 import { ciSummaryCommand } from './commands/ci-summary.js';
 import { releaseNotesCommand } from './commands/release-notes.js';
+import { npmStatusCommand } from './commands/npm-status.js';
 import { getPackageVersion } from '../core/version.js';
 
 const program = new Command();
@@ -39,6 +40,7 @@ program.addCommand(reportCommand());
 program.addCommand(badgeCommand());
 program.addCommand(ciSummaryCommand());
 program.addCommand(releaseNotesCommand());
+program.addCommand(npmStatusCommand());
 program.addCommand(policyCommand());
 program.addCommand(taskCommand());
 program.addCommand(installAgentCommand());

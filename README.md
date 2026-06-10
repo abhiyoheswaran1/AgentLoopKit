@@ -78,6 +78,7 @@ npx agentloopkit report
 npx agentloopkit badge
 npx agentloopkit ci-summary
 npx agentloopkit release-notes
+npx agentloopkit npm-status
 npx agentloopkit policy list
 npx agentloopkit policy show security
 npx agentloopkit policy status
@@ -137,6 +138,7 @@ pnpm build
 | `agentloop badge`                       | Write a local SVG evidence badge                                               |
 | `agentloop ci-summary`                  | Summarize CI context and local AgentLoop evidence                              |
 | `agentloop release-notes`               | Draft local release notes from changelog, git, task, and verification evidence |
+| `agentloop npm-status`                  | Check npm registry catch-up status without publishing                          |
 | `agentloop policy list`                 | List local safety policy files                                                 |
 | `agentloop policy show <policy>`        | Print a local safety policy without mutating files                             |
 | `agentloop policy status`               | Compare local policy files with bundled templates                              |
@@ -395,6 +397,19 @@ Use it before creating a GitHub release so the release note draft includes the s
 
 See `docs/release-notes.md`.
 
+`agentloop npm-status` checks whether npm latest matches the local package version:
+
+```bash
+agentloop npm-status
+agentloop npm-status --json
+agentloop npm-status --expect-current
+agentloop npm-status --registry-json npm-view.json
+```
+
+Use it after a publish attempt before saying npm has caught up. It runs `npm view` unless you pass captured registry JSON. It does not publish packages, create tags, read tokens, read `.env` files, upload files, or change package metadata.
+
+See `docs/npm-status.md`.
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report screenshot showing task context, passing command results, and reviewer handoff sections" width="100%">
 </p>
@@ -524,7 +539,7 @@ The npm version jump is intentional. The skipped npm numbers already exist as pu
 
 The repository includes a GitHub Actions publish workflow for npm trusted publishing after the package is configured on npm. The workflow runs checks before `npm publish` and skips publish when the version already exists.
 
-See `docs/launch-checklist.md` before publishing. See `docs/release-checklist-example.md` and `examples/release-checklist/` for a compact maintainer handoff when GitHub is current but npm is still behind.
+See `docs/launch-checklist.md` before publishing. See `docs/npm-status.md`, `docs/release-checklist-example.md`, and `examples/release-checklist/` for registry checks and compact maintainer handoffs when GitHub is current but npm is still behind.
 
 ## Contributing
 

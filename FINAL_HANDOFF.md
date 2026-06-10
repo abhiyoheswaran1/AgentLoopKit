@@ -28,6 +28,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - local SVG evidence badges with `agentloop badge`
 - local CI provenance and evidence summaries with `agentloop ci-summary`
 - local release-note handoffs with `agentloop release-notes`
+- read-only npm registry catch-up checks with `agentloop npm-status`
 - next-action shortcut with `agentloop next`
 - prepublish metadata guard that blocks npm publish while `CHANGELOG.md` has unreleased entries
 - read-only local policy inspection with `agentloop policy`
@@ -86,6 +87,9 @@ agentloop ci-summary --write
 agentloop release-notes
 agentloop release-notes --json
 agentloop release-notes --write
+agentloop npm-status
+agentloop npm-status --json
+agentloop npm-status --expect-current
 agentloop policy list
 agentloop policy show security
 agentloop policy status
@@ -1852,6 +1856,21 @@ Implemented:
 - sample release handoff with npm state, next action, and rollback notes
 - README, launch checklist, npm publishing, and release-status links to the workflow
 
+### Cycle 102: npm-status catch-up check
+
+Decision: add a read-only npm registry status command so maintainers can check catch-up state without publishing, reading credentials, or changing release metadata.
+
+Implemented:
+
+- `agentloop npm-status`
+- `agentloop npm-status --json`
+- `agentloop npm-status --expect-current`
+- captured registry JSON mode with `--registry-json`
+- core npm registry parsing and status classification
+- shell completion entries
+- `docs/npm-status.md`
+- README, getting-started, publishing, release-status, release-checklist, harness, backlog, and decision updates
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -2156,4 +2175,4 @@ Title: I built a local-first engineering loop for coding agents
 12. Add GitLab CI and Buildkite retry/parallelism guidance after provider-specific provenance sees use: medium usefulness, low effort.
 13. Add Rails and Laravel task-contract recipes if contributors ask for them: medium usefulness, low effort.
 14. Add package-manager-specific dependency-upgrade recipes for npm, yarn, and bun: medium usefulness, low effort.
-15. Add an npm catch-up smoke-test script that never publishes: medium trust improvement, medium effort.
+15. Add npm-status examples for GitHub Actions release workflows after npm trusted publishing is repaired: medium trust improvement, low effort.

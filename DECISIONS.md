@@ -92,6 +92,10 @@ Generated harness provenance lives in `.agentloop/manifest.json`, not in `agentl
 
 `agentloop release-notes` drafts release notes from local package metadata, changelog sections, git history, task contracts, verification reports, and CI summaries. It writes a Markdown file only when `--write` is passed. It does not create tags, publish packages, call GitHub or npm APIs, read tokens, upload files, rewrite changelogs, or infer semantic changes it cannot prove.
 
+## 2026-06-10: npm Status Is A Read-Only Registry Check
+
+`agentloop npm-status` compares local `package.json` metadata with `npm view <package> version versions --json`. It can read captured registry JSON with `--registry-json` for CI or handoff replay, and `--expect-current` can fail post-publish smoke checks when npm latest does not match the local version. The command does not publish packages, create tags, create GitHub releases, read npm tokens, read `.env` files, upload files, or change package metadata.
+
 ## 2026-06-10: npm Catch-Up Is A One-Time Alignment Step
 
 npm still serves `agentloopkit@0.1.1` while public GitHub releases already exist through `v0.19.0`. The next npm publish should catch up to the current GitHub release line once, then AgentLoopKit should return to normal semver. Do not backfill old npm versions from newer source, and do not keep creating higher versions only because npm authorization remains blocked.

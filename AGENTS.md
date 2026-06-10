@@ -21,6 +21,7 @@ Before changing code:
 - Run `agentloop badge` when a local SVG evidence badge helps review or CI artifact uploads.
 - Run `agentloop ci-summary --write` in CI when reviewers need a compact provenance and evidence summary.
 - Run `agentloop release-notes --write` before a release when reviewers need local release-note evidence.
+- Run `agentloop npm-status` before claiming npm availability in release notes or docs.
 - Follow the Specify, Constrain, Plan, Implement, Verify, Review, Handoff loop.
 - Keep changes small and tied to the task contract.
 - Do not run destructive git or filesystem commands unless the user asks for them.

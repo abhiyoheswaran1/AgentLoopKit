@@ -18,6 +18,7 @@ const topLevelCommands = [
   ['badge', 'Write a local SVG evidence badge'],
   ['ci-summary', 'Summarize CI context and AgentLoop evidence'],
   ['release-notes', 'Generate deterministic release notes'],
+  ['npm-status', 'Check npm registry catch-up status'],
   ['policy', 'List or inspect local AgentLoopKit policies'],
   ['task', 'List, inspect, update, or archive task contracts'],
   ['install-agent', 'Install agent-specific instructions'],

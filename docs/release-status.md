@@ -11,6 +11,15 @@ Last checked: June 10, 2026.
 - npm latest: `0.1.1`
 - npm versions: `0.1.0`, `0.1.1`
 
+Run the local registry check at any time:
+
+```bash
+agentloop npm-status
+agentloop npm-status --expect-current
+```
+
+`--expect-current` should fail until npm latest matches `package.json`.
+
 ## Use The Current CLI Today
 
 npm still serves `0.1.1`. Until npm catches up, run the current GitHub release tarball directly:
@@ -49,6 +58,7 @@ After npm reports `0.23.0` or newer:
 - remove the temporary GitHub tarball fallback from README;
 - update this page with the new npm proof;
 - update `docs/npm-publishing.md`, `docs/launch-checklist.md`, and `FINAL_HANDOFF.md`;
+- run `agentloop npm-status --expect-current`;
 - resume normal sequential semver.
 
 ## Verification Evidence

@@ -115,6 +115,7 @@ npx agentloopkit report
 npx agentloopkit badge
 npx agentloopkit ci-summary
 npx agentloopkit release-notes
+npx agentloopkit npm-status
 ```
 
 `check-gates` does not run tests. It checks whether task, verification, handoff, harness, policy, and git evidence exists before review.
@@ -123,5 +124,6 @@ Use `--strict` in CI when warning gates should fail.
 `badge` writes a local SVG status badge from existing verification or gate evidence.
 `ci-summary` writes or prints a small CI provenance and evidence summary without running checks.
 `release-notes` drafts local release notes from package metadata, changelog, git history, task, verification, and CI summary evidence without creating tags or publishing packages.
+`npm-status` compares local package metadata with npm registry metadata. Use it after release attempts to check whether npm latest has caught up before updating public docs.
 
 For pull request CI recipes, see `github-actions.md`, `../examples/gitlab-ci/README.md`, and `../examples/buildkite/README.md`.

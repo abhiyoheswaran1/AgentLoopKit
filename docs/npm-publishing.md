@@ -45,6 +45,7 @@ As of June 10, 2026:
 
 For a compact current-state summary, see [release-status.md](release-status.md).
 For a copyable maintainer handoff when GitHub is current but npm is blocked, see [release-checklist-example.md](release-checklist-example.md).
+For a read-only registry catch-up check, see [npm-status.md](npm-status.md).
 
 Short version:
 
@@ -78,6 +79,7 @@ Short version:
 - GitHub Publish workflow run `27249612803` for `v0.21.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - GitHub Publish workflow run `27251450540` for `v0.22.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - npm latest remains `agentloopkit@0.1.1`; registry versions are still `0.1.0` and `0.1.1`.
+- `agentloop npm-status` should report `catch-up-needed` until npm latest equals the local package version.
 - Do not publish `0.15.1` to npm now. `main` has moved past that tag.
 - Do not publish `0.20.0`, `0.21.0`, or `0.22.0` from current `main`; current `main` now targets `0.23.0`.
 - After the current package line lands on npm, resume normal semver publishing. Do not keep creating higher versions just because npm authorization was blocked.
@@ -92,6 +94,14 @@ Why npm should jump to the current GitHub release:
 - Backfilling old versions from current `main` would make npm metadata lie about what those old tags contained.
 - Publishing the current GitHub release once, then returning to normal patch and minor releases, gives users the least confusing path.
 - Do not keep skipping versions after npm catches up. Use normal semver from the first successful catch-up publish onward.
+
+Post-publish smoke check:
+
+```bash
+agentloop npm-status --expect-current
+```
+
+The command exits with code `1` unless npm latest matches `package.json`. It runs `npm view` only when invoked and never publishes, reads npm tokens, reads `.env` files, or changes package metadata.
 
 Current `main` includes a prepublish guard:
 

@@ -3272,3 +3272,33 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The example gives maintainers a smaller handoff shape than the full launch checklist.
 - Improve:
   - A future npm catch-up smoke-test script could verify a tarball or registry version without publishing.
+
+## 2026-06-10: npm-status Catch-Up Check
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-npm-status-catch-up-check.md`
+- Product cycle: `.agentloop/research/interview-cycle-102.md`
+- Trigger:
+  - Maintainers needed a safe way to check whether npm latest has caught up to local package metadata without publishing, reading credentials, or changing release metadata.
+- Product changes:
+  - Added `agentloop npm-status`.
+  - Added JSON output, captured registry JSON mode, and `--expect-current`.
+  - Added core npm registry parsing and status classification.
+  - Added shell completion entries.
+  - Added `docs/npm-status.md`.
+  - Updated README, getting-started, publishing, release-status, release-checklist, release-notes, launch checklist, root guidance, harness templates, backlog, final handoff, and decisions.
+  - Kept the command read-only: no publish automation, token reads, env reads, tags, releases, workflow changes, or package metadata changes.
+- Verification run:
+  - Red test: `npx pnpm@10.12.1 test tests/npm-status.test.ts tests/completion.test.ts` failed before `npm-status` core, command, and completion entries existed.
+  - Focused green test: `npx pnpm@10.12.1 test tests/npm-status.test.ts tests/completion.test.ts`: pass, 2 files and 13 tests.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - Live registry smoke: `npx tsx src/cli/index.ts npm-status --json`: pass, reported `catch-up-needed`, npm latest `0.1.1`, and local version `0.23.0`.
+  - Expected strict failure: `npx tsx src/cli/index.ts npm-status --expect-current`: exit code 1 because npm latest does not match local version.
+  - `npx pnpm@10.12.1 check:links`: pass, 557 Markdown files checked.
+  - `git diff --check`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-add-npm-status-catch-up-check.md`: pass, wrote `.agentloop/reports/2026-06-10-09-50-verification-report.md`.
+  - AgentLoop verification commands: Vitest 29 files and 121 tests, lint, typecheck, and build all passed.
+- Worked well:
+  - Captured registry JSON mode made CLI tests deterministic without network.
+- Improve:
+  - Add release-workflow examples for `npm-status --expect-current` after npm trusted publishing is repaired.
