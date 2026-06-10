@@ -53,15 +53,15 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.26.5`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.5>
-- Release asset: `agentloopkit-0.26.5.tgz`
-- Release asset SHA-256: `64fe8d8bc6c64b0d5699b85dbc962d64c6d2423b2ac01b13aad537f75cd0edc8`
-- CI run: `27298341631`
-- Publish workflow run: `27298446341`
-- Docker workflow run: `27298446331`
-- MCP Registry workflow run: `27298526436`
-- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.26.5`
+- Current npm release: `agentloopkit@0.27.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.27.0>
+- Release asset: `agentloopkit-0.27.0.tgz`
+- Release asset SHA-256: `7ff6cb0b2079da83b6cc1cad2b59485337338167388ce1deae01f0752f98f3e0`
+- CI run: `27300845808`
+- Publish workflow run: `27300950330`
+- Docker workflow run: `27300951486`
+- MCP Registry workflow run: `27301046893`
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.27.0`
 
 ## CLI commands
 
@@ -1033,9 +1033,9 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.26.5` is public.
-- npm latest is `0.26.5`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, and `0.26.5`.
-- GHCR and MCP Registry are live for `0.26.5`.
+- GitHub release `v0.27.0` is public.
+- npm latest is `0.27.0`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, `0.26.5`, and `0.27.0`.
+- GHCR and MCP Registry are live for `0.27.0`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

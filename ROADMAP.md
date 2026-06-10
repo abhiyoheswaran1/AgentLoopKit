@@ -10,6 +10,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Setup checks with `agentloop doctor`
 - Task contracts with `agentloop create-task`
 - Active task lifecycle with `agentloop task list`, `show`, `set`, `current`, `status`, `archive`, and `clear`
+- Task folder hygiene diagnostics with `agentloop task doctor`
 - Verification reports with configured commands, custom commands, long-output excerpts, and GitHub Actions, GitLab CI, and Buildkite CI context
 - Task-linked verification reports and failed-verification summaries
 - Deterministic PR summaries and `agentloop handoff`
@@ -36,9 +37,9 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 
 ## Current State
 
-- GitHub release `v0.26.5` is public.
-- npm latest is `agentloopkit@0.26.5`.
-- GHCR and MCP Registry are live for `0.26.5`.
+- GitHub release `v0.27.0` is public.
+- npm latest is `agentloopkit@0.27.0`.
+- GHCR and MCP Registry are live for `0.27.0`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.

@@ -4013,6 +4013,15 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `.agentloop/reports/2026-06-10-21-27-verification-report.md`, overall status pass.
   - Commands included full Vitest, lint, typecheck, build, changelog prepublish guard, Markdown link check, `projscan doctor`, packed release smoke, and npm publish dry-run.
   - `projscan doctor` remained A 97/100 with the known informational unused-export note in `scripts/smoke-packed-release.mjs`.
+- Release proof:
+  - GitHub release `v0.27.0`: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.27.0>.
+  - GitHub release asset `agentloopkit-0.27.0.tgz` SHA-256: `7ff6cb0b2079da83b6cc1cad2b59485337338167388ce1deae01f0752f98f3e0`.
+  - CI workflow `27300845808`: pass.
+  - npm Publish workflow `27300950330`: pass, published `agentloopkit@0.27.0`.
+  - Docker/GHCR workflow `27300951486`: pass.
+  - MCP Registry workflow `27301046893`: pass.
+  - `npm view agentloopkit version versions --json` reports latest `0.27.0`.
+  - Clean temp-directory `npx --yes agentloopkit@0.27.0 version` smoke printed `0.27.0`.
 - What worked well:
   - Fetching tags before release-note generation kept the release range anchored at `v0.26.5`.
   - Running npm dry-run inside `agentloop verify` captured the publish tarball summary in the release evidence.

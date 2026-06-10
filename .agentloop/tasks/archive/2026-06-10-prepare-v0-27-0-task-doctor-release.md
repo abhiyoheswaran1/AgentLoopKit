@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-10
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The task doctor diagnostics command is implemented on main but not released. Public package metadata, changelog, README examples, release assets, npm, GHCR, MCP registry metadata, and release-status docs need to stay aligned.

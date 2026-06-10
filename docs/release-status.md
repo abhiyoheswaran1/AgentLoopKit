@@ -4,18 +4,18 @@ Last checked: June 10, 2026.
 
 ## Current State
 
-- Current GitHub release: `v0.26.5`
-- Current GitHub release asset: `agentloopkit-0.26.5.tgz`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.26.5>
-- Tarball SHA-256: `64fe8d8bc6c64b0d5699b85dbc962d64c6d2423b2ac01b13aad537f75cd0edc8`
-- CI run: `27298341631` passed for the `0.26.5` release commit
-- Publish workflow run: `27298446341` passed and published `agentloopkit@0.26.5` through npm trusted publishing
-- Docker workflow run: `27298446331` passed and published the GHCR image for `0.26.5`
-- MCP Registry workflow run: `27298526436` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
+- Current GitHub release: `v0.27.0`
+- Current GitHub release asset: `agentloopkit-0.27.0.tgz`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.27.0>
+- Tarball SHA-256: `7ff6cb0b2079da83b6cc1cad2b59485337338167388ce1deae01f0752f98f3e0`
+- CI run: `27300845808` passed for the `0.27.0` release commit
+- Publish workflow run: `27300950330` passed and published `agentloopkit@0.27.0` through npm trusted publishing
+- Docker workflow run: `27300951486` passed and published the GHCR image for `0.27.0`
+- MCP Registry workflow run: `27301046893` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
 - Manual npm publish: succeeded for `agentloopkit@0.24.0` after browser authentication
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
-- npm latest: `0.26.5`
-- npm versions: `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, `0.26.5`
+- npm latest: `0.27.0`
+- npm versions: `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, `0.26.5`, `0.27.0`
 
 Run the local registry check at any time:
 
@@ -32,7 +32,7 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.26.5 version
+npx --yes agentloopkit@0.27.0 version
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -41,7 +41,7 @@ GitHub release tarballs remain useful for provenance checks and rollback, but no
 
 GitHub releases already exist for the intermediate AgentLoopKit versions between the npm-published `0.1.1` package and the `v0.24.0` source line. Publishing older numbers from current `main` would create npm packages that do not match their GitHub tags.
 
-The one-time catch-up publish shipped `0.24.0`, then trusted publishing shipped `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, and `0.26.5` from the GitHub release workflow. Future releases should continue with normal sequential semver from the current source.
+The one-time catch-up publish shipped `0.24.0`, then trusted publishing shipped `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, `0.26.5`, and `0.27.0` from the GitHub release workflow. Future releases should continue with normal sequential semver from the current source.
 
 ## Publish History
 
@@ -53,7 +53,7 @@ npm error 404 Not Found - PUT https://registry.npmjs.org/agentloopkit - Not foun
 npm error 404 The requested resource 'agentloopkit@0.24.0' could not be found or you do not have permission to access it.
 ```
 
-The maintainer then completed browser authentication and published `0.24.0` manually. The next GitHub releases through `v0.26.5` published successfully through trusted publishing. The npm package now reports latest `0.26.5`.
+The maintainer then completed browser authentication and published `0.24.0` manually. The next GitHub releases through `v0.27.0` published successfully through trusted publishing. The npm package now reports latest `0.27.0`.
 
 ## Next Publish
 
@@ -75,7 +75,7 @@ After each publish:
 
 ## Verification Evidence
 
-Local release-candidate checks for `0.26.5`:
+Local release-candidate checks for `0.27.0`:
 
 - `npm run lint`
 - `npm run typecheck`
@@ -89,13 +89,13 @@ Local release-candidate checks for `0.26.5`:
 - `npm publish --access public --dry-run`
 - packed README inspection for current pinned-version examples
 - packed `agentloop init --local-only` smoke check
-- focused MCP and distribution artifact tests
+- focused task doctor, MCP, and distribution artifact tests
 - MCP Registry description length validation through successful registry workflow
 
 Latest release-status documentation checks also passed:
 
 - `npm view agentloopkit version versions --json`
-- direct temp install smoke for `agentloopkit@0.26.5`
+- direct temp install smoke for `agentloopkit@0.27.0`
 - `npx --no-install agentloop version`
 - `npx --no-install agentloopkit version`
 - `npx --no-install agentloop init --dry-run`
