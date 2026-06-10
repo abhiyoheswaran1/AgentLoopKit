@@ -24,9 +24,14 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Policy customization guidance for repo-local safety rules
 - Repo-type policy examples for common project shapes
 - Local review-evidence gates with `agentloop check-gates` and `--strict`
+- Read-only MCP server with `agentloop mcp-server`
 - Agent instruction installers, including `agentloop install-agent all`
 - Static bash, zsh, fish, and PowerShell completions
 - GitHub Actions, GitLab CI, and Buildkite recipes for evidence checks and CI-generated artifacts
+- Composite GitHub Action wrapper for running AgentLoopKit commands in CI
+- Dockerfile and GHCR release workflow for a minimal `agentloop` image
+- Homebrew formula template for tap distribution
+- MCP Registry metadata and publish workflow for the read-only server
 - Stack recipes for Next.js, React/Vite, Node API, Python, docs-only, empty repos, and monorepos
 - Launch visuals generated from committed Playwright and VHS sources
 
@@ -34,6 +39,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 
 - GitHub release `v0.25.0` is public.
 - npm latest is `agentloopkit@0.25.0`.
+- `0.26.0` is prepared for MCP and distribution-channel release.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
@@ -42,15 +48,11 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 
 - Keep the GitHub release to npm trusted-publishing flow healthy with each release.
 - Keep the README focused on user install and usage, not release operations.
-- Add staged distribution-channel tasks for Homebrew, Docker/GHCR, GitHub Action, MCP Registry, editor extensions, Scoop, and WinGet.
+- Verify the 0.26.0 GHCR image, MCP Registry publish, and Homebrew tap after the GitHub release publishes.
 - Submit the config schema to SchemaStore after npm publishing is stable.
 
 ## Later
 
-- Add Homebrew tap support.
-- Add a Docker/GHCR image for CI usage.
-- Add a GitHub Action wrapper for common AgentLoopKit CI commands.
-- Build a real MCP server before any MCP Registry submission.
 - Evaluate VS Code/Open VSX, Scoop, and WinGet after the core release flow stays stable.
 - Add configurable organization policy packs.
 - Add GitHub issue and PR metadata import.

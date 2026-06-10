@@ -60,8 +60,8 @@ npx agentloopkit init --local-only
 Pin the current version when you need repeatable CI or team setup:
 
 ```bash
-npx --yes agentloopkit@0.25.0 version
-npx --yes agentloopkit@0.25.0 init
+npx --yes agentloopkit@0.26.0 version
+npx --yes agentloopkit@0.26.0 init
 ```
 
 Run the CLI after install:
@@ -84,6 +84,7 @@ npx agentloopkit badge
 npx agentloopkit ci-summary
 npx agentloopkit release-notes
 npx agentloopkit npm-status
+npx agentloopkit mcp-server
 npx agentloopkit policy list
 npx agentloopkit policy show security
 npx agentloopkit policy status
@@ -146,6 +147,7 @@ pnpm build
 | `agentloop ci-summary`                  | Summarize CI context and local AgentLoop evidence                              |
 | `agentloop release-notes`               | Draft local release notes from changelog, git, task, and verification evidence |
 | `agentloop npm-status`                  | Check npm registry status without publishing                                   |
+| `agentloop mcp-server`                  | Start a read-only MCP stdio server for local AgentLoopKit state                |
 | `agentloop policy list`                 | List local safety policy files                                                 |
 | `agentloop policy show <policy>`        | Print a local safety policy without mutating files                             |
 | `agentloop policy status`               | Compare local policy files with bundled templates                              |
@@ -393,7 +395,7 @@ See `docs/ci-summary.md`.
 ```bash
 agentloop release-notes
 agentloop release-notes --from v0.19.0 --to HEAD
-agentloop release-notes --release-version 0.25.0
+agentloop release-notes --release-version 0.26.0
 agentloop release-notes --json
 agentloop release-notes --write
 ```
@@ -416,6 +418,18 @@ agentloop npm-status --registry-json npm-view.json
 Use it after a publish attempt before saying npm has caught up. It runs `npm view` unless you pass captured registry JSON. It does not publish packages, create tags, read tokens, read `.env` files, upload files, or change package metadata.
 
 See `docs/npm-status.md`.
+
+## MCP Server
+
+AgentLoopKit can expose existing repo evidence to MCP clients through a read-only stdio server:
+
+```bash
+npx --yes agentloopkit@0.26.0 mcp-server
+```
+
+The server provides tools for status, next action, task contracts, active task, policies, latest verification report, and handoff summaries. It does not run verification commands, edit files, call external APIs, read `.env` contents, or upload data.
+
+See `docs/mcp.md` for client configuration, tool names, and registry notes.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report screenshot showing task context, passing command results, and reviewer handoff sections" width="100%">
@@ -459,7 +473,19 @@ Use `agentloop check-gates --strict` as a review-evidence gate in pull request C
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
-See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.25.0` or a newer vetted release when reproducibility matters.
+See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.26.0` or a newer vetted release when reproducibility matters.
+
+## Other Install Channels
+
+npm and npx remain the primary install path. AgentLoopKit also ships release assets and maintainer artifacts for:
+
+- GitHub Releases: versioned tarballs for provenance and rollback.
+- GitHub Action: a thin wrapper for `agentloop` commands in CI.
+- Docker/GHCR: a minimal image that runs `agentloop`.
+- Homebrew: a formula under `packaging/homebrew/` for the tap release flow.
+- MCP Registry: read-only server metadata for MCP clients once the matching npm package is published.
+
+See `docs/distribution-channels.md` for current commands and maintainer release steps.
 
 ## PR Summaries
 

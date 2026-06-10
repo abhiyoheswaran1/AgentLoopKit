@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-10
 - Task type: feature
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 AgentLoopKit cannot be released to the MCP Registry until it exposes a real MCP server. The current product is a CLI, not an MCP server.

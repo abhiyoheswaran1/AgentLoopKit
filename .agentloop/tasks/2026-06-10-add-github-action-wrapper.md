@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-10
 - Task type: feature
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 Teams currently copy npm install and `agentloop` commands into each workflow. A thin GitHub Action wrapper could reduce setup friction.

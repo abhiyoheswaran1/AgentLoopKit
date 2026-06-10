@@ -8,12 +8,12 @@ For non-GitHub CI, see [GitLab CI](../examples/gitlab-ci/README.md) and [Buildki
 
 ## npm Status
 
-The current npm release is `agentloopkit@0.25.0`. Pin a version in CI when you need reproducible evidence checks.
+The current npm release is `agentloopkit@0.26.0`. Pin a version in CI when you need reproducible evidence checks.
 
 Install from npm:
 
 ```bash
-npm install --no-save agentloopkit@0.25.0
+npm install --no-save agentloopkit@0.26.0
 npx --no-install agentloop check-gates --strict
 ```
 
@@ -38,7 +38,7 @@ jobs:
           node-version: 24
 
       - name: Install AgentLoopKit
-        run: npm install --no-save agentloopkit@0.25.0
+        run: npm install --no-save agentloopkit@0.26.0
 
       - name: Check AgentLoop evidence
         run: npx --no-install agentloop check-gates --strict
@@ -70,7 +70,7 @@ jobs:
         run: npm ci
 
       - name: Install AgentLoopKit
-        run: npm install --no-save agentloopkit@0.25.0
+        run: npm install --no-save agentloopkit@0.26.0
 
       - name: Run AgentLoop verification
         run: npx --no-install agentloop verify
@@ -110,6 +110,34 @@ This workflow does not commit generated files. It uploads reports, HTML reports,
 The verification report includes a `CI Context` section when GitHub Actions, GitLab CI, or Buildkite creates it. Reviewers can see provider, workflow or pipeline, event, ref, commit, and run URL inside the Markdown artifact. GitHub Actions also includes run attempt when available.
 
 `agentloop ci-summary --write` adds a small Markdown summary with the same allowlisted CI provenance plus current AgentLoop evidence and gate status. It does not call GitHub APIs, read secrets, run verification commands, or replace the verification report.
+
+## Recipe 3: Composite Action Wrapper
+
+Use the repo action when you want a shorter workflow step around the same npm package:
+
+```yaml
+name: AgentLoop Action
+
+on:
+  pull_request:
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - uses: abhiyoheswaran1/AgentLoopKit@v0.26.0
+        with:
+          command: check-gates --strict
+          agentloopkit-version: 0.26.0
+```
+
+The action installs `agentloopkit` with npm and runs the command you provide. It does not upload artifacts, comment on pull requests, read secrets, or replace the direct npm recipes above.
 
 ## Required Repository Files
 

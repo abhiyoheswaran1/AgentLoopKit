@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-10
 - Task type: release
-- Status: proposed
+- Status: review
 
 ## Problem Statement
 MCP clients cannot discover AgentLoopKit through registry tooling, but registry publication is only valid after a real MCP server exists.
@@ -29,6 +29,7 @@ AgentLoopKit publishes MCP Registry metadata for the verified MCP server and doc
 - Registry metadata validates.
 - MCP server install command works from npm.
 - Docs distinguish CLI usage from MCP usage.
+- GitHub MCP publish workflow succeeds after the matching npm package is available.
 
 ## Verification Commands
 - npm test

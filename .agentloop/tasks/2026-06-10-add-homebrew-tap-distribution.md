@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-10
 - Task type: release
-- Status: proposed
+- Status: review
 
 ## Problem Statement
 macOS and Linux CLI users often prefer Homebrew, but AgentLoopKit only supports npm/npx and GitHub release tarballs today.
@@ -29,6 +29,7 @@ Maintainers can publish and verify a Homebrew tap formula for AgentLoopKit witho
 ## Acceptance Criteria
 - Formula install path is documented.
 - Formula uses a reproducible source and checksum.
+- Formula is copied into the Homebrew tap after the release tarball checksum is final.
 - Clean-machine install and `agentloop version` are verified.
 
 ## Verification Commands

@@ -1,0 +1,11 @@
+node_modules
+dist
+coverage
+.git
+.agentloop/reports
+.agentloop/handoffs
+.DS_Store
+*.log
+*.tgz
+.env
+.env.*

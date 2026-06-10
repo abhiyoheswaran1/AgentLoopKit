@@ -1,50 +1,117 @@
 # Distribution Channels
 
-This page is for maintainers planning releases. The README should stay user-facing and should not include release incident history, npm authentication state, or internal backlog notes.
+This page is for maintainers planning releases. Keep the README focused on user install and usage.
 
 ## Current Channels
 
 | Channel | Status | User command |
 | --- | --- | --- |
-| npm / npx | Live | `npx agentloopkit init` |
-| GitHub Releases | Live | Download release assets from GitHub |
+| npm / npx | Primary channel | `npx agentloopkit init` |
+| GitHub Releases | Public release assets | Download `agentloopkit-<version>.tgz` from GitHub |
+| GitHub Action | Repo action metadata | `uses: abhiyoheswaran1/AgentLoopKit@v0.26.0` |
+| Docker / GHCR | Release workflow prepared | `docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:0.26.0 doctor` |
+| Homebrew | Formula prepared | `brew install abhiyoheswaran1/agentloopkit/agentloopkit` after the tap repo is published |
+| MCP Registry | Metadata and workflow prepared | `npx --yes agentloopkit@0.26.0 mcp-server` |
 
 ## Release Rule
 
 Use npm and GitHub Releases as the source of truth for each public version.
 
-For future releases:
+For each release:
 
-1. Prepare `package.json`, `CHANGELOG.md`, docs, and release notes.
+1. Prepare `package.json`, `server.json`, `CHANGELOG.md`, docs, and release notes.
 2. Run the full local verification set.
-3. Push the release commit and tag.
-4. Publish the GitHub release.
-5. Let `.github/workflows/publish.yml` publish to npm through trusted publishing.
-6. Verify npm with `agentloop npm-status --expect-current`.
+3. Build and pack the package.
+4. Replace the Homebrew formula checksum with the packed tarball SHA-256.
+5. Push the release commit and tag.
+6. Publish the GitHub release with the packed tarball.
+7. Let `.github/workflows/publish.yml` publish to npm through trusted publishing.
+8. Let `.github/workflows/docker.yml` publish the GHCR image from the GitHub release.
+9. Let `.github/workflows/publish-mcp.yml` submit MCP Registry metadata after npm publishes.
+10. Verify npm with `agentloop npm-status --expect-current`.
 
 Do not put temporary publish failures, local auth state, or registry repair notes in the README.
 
+## GitHub Action
+
+The root `action.yml` is a thin composite wrapper around the npm package:
+
+```yaml
+- uses: abhiyoheswaran1/AgentLoopKit@v0.26.0
+  with:
+    command: check-gates --strict
+    agentloopkit-version: 0.26.0
+```
+
+The action does not upload artifacts or comment on pull requests. Workflow authors decide which command to run and whether to upload generated AgentLoopKit files.
+
+## Docker / GHCR
+
+The Docker image installs the packed npm tarball globally and runs `agentloop`.
+
+Local smoke test:
+
+```bash
+docker build -t agentloopkit:test .
+docker run --rm -v "$PWD:/workspace" agentloopkit:test version
+```
+
+Release image:
+
+```bash
+docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:0.26.0 doctor
+```
+
+The image does not bundle project dependencies. Users still install their own repo dependencies before running verification commands that require them.
+
+## Homebrew
+
+The formula lives at `packaging/homebrew/agentloopkit.rb`.
+
+Before publishing the tap:
+
+1. Build and pack the exact release.
+2. Compute the SHA-256 for `agentloopkit-<version>.tgz`.
+3. Update the formula `url`, `sha256`, and versioned tests.
+4. Copy the formula into the tap repo at `Formula/agentloopkit.rb`.
+5. Run:
+
+```bash
+brew audit --strict --online Formula/agentloopkit.rb
+brew install --build-from-source Formula/agentloopkit.rb
+agentloop version
+```
+
+The formula installs the release tarball with Homebrew's npm install helper and symlinks `agentloop` and `agentloopkit`. It has no postinstall hook.
+
+## MCP Registry
+
+AgentLoopKit includes a read-only MCP server:
+
+```bash
+npx --yes agentloopkit@0.26.0 mcp-server
+```
+
+Registry metadata lives in `server.json`, and the npm package declares `mcpName`. The MCP publish workflow runs after the npm publish workflow succeeds so the registry entry points at a package version that exists.
+
+See [mcp.md](mcp.md).
+
 ## Planned Channels
 
-| Priority | Channel | Why it matters | First useful task | Prerequisite | Decision |
-| --- | --- | --- | --- | --- | --- |
-| P0 | npm / npx automation | Primary install path for Node users and agents | Verify trusted publishing on the next release and document the exact GitHub-release flow | npm trusted publisher connection | Do next |
-| P1 | Homebrew tap | Good install path for macOS and Linux CLI users | Create a tap formula that installs the npm package or release tarball without adding postinstall behavior | Stable release asset and checksum | Later |
-| P1 | Docker / GHCR image | Useful in CI where teams want a pinned container | Publish a minimal image that runs `agentloop` and contains no project dependencies by default | Container workflow and image hardening checklist | Later |
-| P1 | GitHub Action | Makes `agentloop verify`, `handoff`, and `check-gates` easier in CI | Build a small composite action wrapping npm install plus chosen `agentloop` command | npm release available | Later |
-| P2 | MCP Registry | Lets MCP clients discover AgentLoopKit capabilities | Build a real read-only MCP server first, then register it | `agentloop mcp-server` or separate MCP package | Blocked |
-| P2 | VS Code / Open VSX extension | Helps editor-first users run the loop without leaving the IDE | Design editor UX around existing CLI commands | Clear editor workflow and maintenance owner | Later |
-| P2 | Scoop / WinGet | Better Windows install path for CLI users | Add manifests after release assets are stable | Windows smoke test and release checksums | Later |
+| Priority | Channel | Why it matters | Decision |
+| --- | --- | --- | --- |
+| P2 | VS Code / Open VSX extension | Helps editor-first users run the loop without leaving the IDE | Later, only after editor UX is scoped |
+| P2 | Scoop / WinGet | Better Windows install path for CLI users | Later, after Windows smoke tests and release checksums |
 
 ## Product Panel Notes
 
-- Abhi: Keep npm as the wedge. Add new channels only when they reduce install friction.
-- Maya: Avoid separate implementations per channel. Reuse the built CLI and release tarball.
-- Elias: Each channel needs one copy-paste install path and one uninstall path.
-- Nora: Do not make users choose a channel before they understand the tool. README should lead with `npx`.
+- Abhi: Keep npm as the wedge. New channels should reduce install friction without changing the product.
+- Maya: Reuse the built CLI and release tarball. Avoid separate implementations per channel.
+- Elias: Each channel needs one copy-paste install path and one verification path.
+- Nora: Lead with `npx`; users should not choose a channel before they understand the tool.
 - Samir: No install scripts, hidden network calls, credential access, telemetry, or opaque binaries.
-- Lina: CI, GitHub Action, and Docker matter more than editor extensions for agentic work.
-- Tom: Do not list a channel as supported until a maintainer can verify it from a clean machine.
+- Lina: CI, GitHub Action, Docker, and MCP matter more than editor extensions right now.
+- Tom: Mark a channel supported only when maintainers can verify it from a clean machine.
 - Rachel: GitHub Action and Docker are the strongest small-team adoption paths after npm.
 
 ## Non-Goals
@@ -55,4 +122,3 @@ Do not put temporary publish failures, local auth state, or registry repair note
 - No billing.
 - No telemetry.
 - No installer that runs arbitrary commands during install.
-- No MCP Registry submission before AgentLoopKit exposes a real MCP server.

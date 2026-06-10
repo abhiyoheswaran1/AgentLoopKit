@@ -1,6 +1,7 @@
 {
   "name": "agentloopkit",
-  "version": "0.25.0",
+  "version": "0.26.0",
+  "mcpName": "io.github.abhiyoheswaran1/agentloopkit",
   "description": "A drop-in engineering loop for coding agents.",
   "type": "module",
   "bin": {
@@ -10,6 +11,7 @@
   "files": [
     "dist",
     "schema",
+    "server.json",
     "README.md",
     "LICENSE"
   ],
@@ -53,6 +55,7 @@
     "prepublishOnly": "node scripts/prepublish-check.mjs && npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "commander": "^14.0.2",
     "execa": "^9.6.0",
     "prompts": "^2.4.2",

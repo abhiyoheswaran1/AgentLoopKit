@@ -1,0 +1,27 @@
+name: AgentLoopKit
+description: Run AgentLoopKit commands in GitHub Actions.
+
+inputs:
+  command:
+    description: AgentLoopKit command arguments, for example "check-gates --strict".
+    required: true
+  agentloopkit-version:
+    description: npm package version to install.
+    required: false
+    default: "0.26.0"
+  working-directory:
+    description: Directory where the AgentLoopKit command should run.
+    required: false
+    default: "."
+
+runs:
+  using: composite
+  steps:
+    - name: Install AgentLoopKit
+      shell: bash
+      run: npm install --no-save "agentloopkit@${{ inputs.agentloopkit-version }}"
+
+    - name: Run AgentLoopKit
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: npx --no-install agentloop ${{ inputs.command }}

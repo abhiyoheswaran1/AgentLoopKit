@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-10
 - Task type: release
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 CI users may want a pinned container image with AgentLoopKit installed, especially when they cannot rely on local Node setup.

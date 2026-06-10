@@ -3638,3 +3638,44 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Repo-local exclude gives users an undoable, inspectable Git change without touching `.gitignore`.
 - Improve:
   - Consider adding generated guidance that describes `.agentloop/state.json` as local runtime state.
+
+## 2026-06-10: MCP And Distribution Channels
+
+- Task contracts:
+  - `.agentloop/tasks/2026-06-10-build-mcp-server-prerequisite.md`
+  - `.agentloop/tasks/2026-06-10-publish-mcp-registry-entry.md`
+  - `.agentloop/tasks/2026-06-10-add-homebrew-tap-distribution.md`
+  - `.agentloop/tasks/2026-06-10-add-docker-ghcr-image.md`
+  - `.agentloop/tasks/2026-06-10-add-github-action-wrapper.md`
+- Product cycle: `.agentloop/research/interview-cycle-108.md`
+- Trigger:
+  - The product panel prioritized additional release channels after npm and GitHub Releases.
+  - MCP Registry publication needed a real MCP server first.
+- Product changes:
+  - Added `agentloop mcp-server`.
+  - Added read-only MCP tools for status, next action, tasks, active task content, policies, latest verification report, and handoff summaries.
+  - Added `server.json` and package `mcpName`.
+  - Added MCP Registry publish workflow gated on successful npm publishing.
+  - Added root `action.yml`.
+  - Added Dockerfile and GHCR release workflow.
+  - Added Homebrew formula template.
+  - Updated README, MCP docs, distribution docs, GitHub Actions docs, examples, backlog, decisions, roadmap, and changelog.
+- Verification run so far:
+  - Focused MCP tests: `npm test -- tests/mcp-tools.test.ts tests/mcp-server.test.ts`: pass.
+  - Distribution artifact tests: `npm test -- tests/distribution-artifacts.test.ts`: pass.
+  - Typecheck after MCP test typing fix: `npm run typecheck`: pass.
+  - Full Vitest suite: `npm test`: pass, 33 files and 146 tests.
+  - Full release verification: `.agentloop/reports/2026-06-10-16-13-verification-report.md`, overall status pass.
+  - Release verification included Vitest, lint, typecheck, build, release smoke, Markdown link check, prepublish guard, `git diff --check`, projscan, and `npm publish --access public --dry-run`.
+  - Final packed tarball SHA-256 for `/tmp/agentloopkit-0.26.0.tgz`: `a289ea89ee037ab4099e79102efbf21d3563b7e65961f1b1bd54a4a735cfba65`.
+- Handoff generated:
+  - `.agentloop/handoffs/2026-06-10-16-15-pr-summary.md`
+- Pending before release:
+  - Publish GitHub release `v0.26.0`.
+  - Verify npm trusted publish, GHCR image publish, MCP Registry publish, and Homebrew tap update.
+- Worked well:
+  - Keeping MCP read-only preserved the safety model while giving agents better structured access than filesystem scraping.
+  - The distribution artifacts reuse the existing CLI instead of creating separate behavior.
+- Improve:
+  - Add Scoop and WinGet manifests only after Windows smoke testing.
+  - Consider VS Code/Open VSX only after a clear editor workflow exists.

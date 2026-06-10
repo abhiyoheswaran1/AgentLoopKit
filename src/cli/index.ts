@@ -18,6 +18,7 @@ import { policyCommand } from './commands/policy.js';
 import { ciSummaryCommand } from './commands/ci-summary.js';
 import { releaseNotesCommand } from './commands/release-notes.js';
 import { npmStatusCommand } from './commands/npm-status.js';
+import { mcpServerCommand } from './commands/mcp-server.js';
 import { getPackageVersion } from '../core/version.js';
 
 const program = new Command();
@@ -41,6 +42,7 @@ program.addCommand(badgeCommand());
 program.addCommand(ciSummaryCommand());
 program.addCommand(releaseNotesCommand());
 program.addCommand(npmStatusCommand());
+program.addCommand(mcpServerCommand());
 program.addCommand(policyCommand());
 program.addCommand(taskCommand());
 program.addCommand(installAgentCommand());

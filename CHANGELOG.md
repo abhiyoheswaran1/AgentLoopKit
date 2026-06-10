@@ -4,6 +4,19 @@
 
 - No unreleased changes yet.
 
+## 0.26.0
+
+Minor release for MCP and distribution channels:
+
+- Added `agentloop mcp-server`, a read-only MCP stdio server for local AgentLoopKit status, tasks, policies, verification reports, and handoffs
+- Added MCP Registry metadata through `server.json` and `package.json` `mcpName`
+- Added a post-npm MCP Registry publish workflow that uses GitHub OIDC and verifies the npm package version before publishing metadata
+- Added a root GitHub Action wrapper for running AgentLoopKit commands in CI
+- Added a Dockerfile and GHCR release workflow for a minimal `agentloop` container image
+- Added a Homebrew formula template under `packaging/homebrew/`
+- Added docs for MCP usage, distribution channels, GitHub Action usage, Docker/GHCR, and Homebrew publishing
+- Added Vitest coverage for MCP tool behavior, MCP stdio startup, and distribution artifacts
+
 ## 0.25.0
 
 Minor release for local-only AgentLoopKit harnesses:

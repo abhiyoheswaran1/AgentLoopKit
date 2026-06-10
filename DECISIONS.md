@@ -133,3 +133,11 @@ Project detection may inspect file names when a repository has no package or Pyt
 Project detection uses direct metadata first: `package.json`, Python markers, and known config files. Only metadata-free directories fall back to a shallow capped file-name scan. The fallback is bounded to avoid recursively walking large directories such as a macOS home folder.
 
 Non-dry `agentloop init` refuses to initialize the user's home directory unless `--force` is passed. `--dry-run` remains allowed so users can inspect planned files without writing them. This keeps the normal command safe when a user accidentally runs `npx agentloopkit init` from `~`.
+
+## 2026-06-10: MCP Server Is Read-Only In v1
+
+`agentloop mcp-server` exposes local AgentLoopKit state to MCP clients through stdio. The first version only reads status, next action, task contracts, active task content, policies, latest verification report, and handoff summaries. It does not run verification commands, edit files, create tasks, change task status, read `.env` contents, call external APIs, upload data, publish packages, or create releases.
+
+## 2026-06-10: Distribution Channels Reuse The CLI
+
+GitHub Action, Docker/GHCR, Homebrew, and MCP Registry support must wrap or expose the existing CLI package instead of creating separate product behavior. npm and GitHub Releases remain the source of truth for versioned package contents. Homebrew formula checksums and MCP Registry metadata must point at a package version that exists, and channel docs must distinguish prepared repo artifacts from externally verified publication.
