@@ -8,11 +8,11 @@ inputs:
   agentloopkit-version:
     description: npm package version to install.
     required: false
-    default: "0.26.0"
+    default: '0.26.4'
   working-directory:
     description: Directory where the AgentLoopKit command should run.
     required: false
-    default: "."
+    default: '.'
 
 runs:
   using: composite

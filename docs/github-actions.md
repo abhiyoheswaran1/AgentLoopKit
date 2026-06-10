@@ -8,12 +8,12 @@ For non-GitHub CI, see [GitLab CI](../examples/gitlab-ci/README.md) and [Buildki
 
 ## npm Status
 
-The current npm release is `agentloopkit@0.26.3`. Pin a version in CI when you need reproducible evidence checks.
+The current npm release is `agentloopkit@0.26.4`. Pin a version in CI when you need reproducible evidence checks.
 
 Install from npm:
 
 ```bash
-npm install --no-save agentloopkit@0.26.3
+npm install --no-save agentloopkit@0.26.4
 npx --no-install agentloop check-gates --strict
 ```
 
@@ -38,7 +38,7 @@ jobs:
           node-version: 24
 
       - name: Install AgentLoopKit
-        run: npm install --no-save agentloopkit@0.26.3
+        run: npm install --no-save agentloopkit@0.26.4
 
       - name: Check AgentLoop evidence
         run: npx --no-install agentloop check-gates --strict
@@ -70,7 +70,7 @@ jobs:
         run: npm ci
 
       - name: Install AgentLoopKit
-        run: npm install --no-save agentloopkit@0.26.3
+        run: npm install --no-save agentloopkit@0.26.4
 
       - name: Run AgentLoop verification
         run: npx --no-install agentloop verify
@@ -131,10 +131,10 @@ jobs:
         with:
           node-version: 24
 
-      - uses: abhiyoheswaran1/AgentLoopKit@v0.26.3
+      - uses: abhiyoheswaran1/AgentLoopKit@v0.26.4
         with:
           command: check-gates --strict
-          agentloopkit-version: 0.26.3
+          agentloopkit-version: 0.26.4
 ```
 
 The action installs `agentloopkit` with npm and runs the command you provide. It does not upload artifacts, comment on pull requests, read secrets, or replace the direct npm recipes above.

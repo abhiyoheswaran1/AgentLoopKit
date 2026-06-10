@@ -2,7 +2,14 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.26.4
+
+Patch release for SchemaStore editor discovery:
+
 - Registered `agentloop.config.json` in SchemaStore for editor auto-discovery: <https://github.com/SchemaStore/schemastore/pull/5783>.
+- Added the SchemaStore note to the npm-facing README and release-channel docs.
 
 ## 0.26.3
 

@@ -8,9 +8,9 @@ This page is for maintainers planning releases. Keep the README focused on user 
 | --------------- | --------------------- | ----------------------------------------------------------------------------------------- |
 | npm / npx       | Primary channel       | `npx agentloopkit init`                                                                   |
 | GitHub Releases | Public release assets | Download `agentloopkit-<version>.tgz` from GitHub                                         |
-| GitHub Action   | Live repo action      | `uses: abhiyoheswaran1/AgentLoopKit@v0.26.3`                                              |
-| Docker / GHCR   | Live image            | `docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:0.26.3 doctor` |
-| MCP Registry    | Published metadata    | `npx --yes agentloopkit@0.26.3 mcp-server`                                                |
+| GitHub Action   | Live repo action      | `uses: abhiyoheswaran1/AgentLoopKit@v0.26.4`                                              |
+| Docker / GHCR   | Live image            | `docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:0.26.4 doctor` |
+| MCP Registry    | Published metadata    | `npx --yes agentloopkit@0.26.4 mcp-server`                                                |
 
 ## Release Rule
 
@@ -35,10 +35,10 @@ Do not put temporary publish failures, local auth state, or registry repair note
 The root `action.yml` is a thin composite wrapper around the npm package:
 
 ```yaml
-- uses: abhiyoheswaran1/AgentLoopKit@v0.26.3
+- uses: abhiyoheswaran1/AgentLoopKit@v0.26.4
   with:
     command: check-gates --strict
-    agentloopkit-version: 0.26.3
+    agentloopkit-version: 0.26.4
 ```
 
 The action does not upload artifacts or comment on pull requests. Workflow authors decide which command to run and whether to upload generated AgentLoopKit files.
@@ -57,7 +57,7 @@ docker run --rm -v "$PWD:/workspace" agentloopkit:test version
 Release image:
 
 ```bash
-docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:0.26.3 doctor
+docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:0.26.4 doctor
 ```
 
 The image does not bundle project dependencies. Users still install their own repo dependencies before running verification commands that require them.
@@ -67,7 +67,7 @@ The image does not bundle project dependencies. Users still install their own re
 AgentLoopKit includes a read-only MCP server:
 
 ```bash
-npx --yes agentloopkit@0.26.3 mcp-server
+npx --yes agentloopkit@0.26.4 mcp-server
 ```
 
 Registry metadata lives in `server.json`, and the npm package declares `mcpName`. The MCP publish workflow runs after the npm publish workflow succeeds so the registry entry points at a package version that exists.

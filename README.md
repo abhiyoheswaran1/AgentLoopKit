@@ -62,8 +62,8 @@ npx agentloopkit init --local-only
 Pin the current version when you need repeatable CI or team setup:
 
 ```bash
-npx --yes agentloopkit@0.26.3 version
-npx --yes agentloopkit@0.26.3 init
+npx --yes agentloopkit@0.26.4 version
+npx --yes agentloopkit@0.26.4 init
 ```
 
 Run the CLI after install:
@@ -207,7 +207,7 @@ agentloop.config.json
 
 `init` appends to an existing `AGENTS.md` instead of overwriting it.
 
-The package ships `schema/agentloop.config.schema.json` for editors and config validation. Generated configs use the GitHub raw schema URL for editor support; the CLI validates config locally and does not fetch that URL at runtime.
+The package ships `schema/agentloop.config.schema.json` for editors and config validation. Generated configs use the GitHub raw schema URL for editor support; the CLI validates config locally and does not fetch that URL at runtime. SchemaStore also maps `agentloop.config.json` to that schema, so compatible editors can discover it without extra setup.
 
 See `docs/configuration.md` for config fields and schema notes.
 
@@ -398,7 +398,7 @@ See `docs/ci-summary.md`.
 ```bash
 agentloop release-notes
 agentloop release-notes --from v0.19.0 --to HEAD
-agentloop release-notes --release-version 0.26.3
+agentloop release-notes --release-version 0.26.4
 agentloop release-notes --json
 agentloop release-notes --write
 ```
@@ -427,7 +427,7 @@ See `docs/npm-status.md`.
 AgentLoopKit can expose existing repo evidence to MCP clients through a read-only stdio server:
 
 ```bash
-npx --yes agentloopkit@0.26.3 mcp-server
+npx --yes agentloopkit@0.26.4 mcp-server
 ```
 
 The server provides tools for status, next action, task contracts, active task, policies, latest verification report, and handoff summaries. It does not run verification commands, edit files, call external APIs, read `.env` contents, or upload data.
@@ -476,7 +476,7 @@ Use `agentloop check-gates --strict` as a review-evidence gate in pull request C
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
-See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.26.3` or a newer vetted release when reproducibility matters.
+See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.26.4` or a newer vetted release when reproducibility matters.
 
 ## Other Install Channels
 
