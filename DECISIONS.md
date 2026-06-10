@@ -111,3 +111,11 @@ npm still serves `agentloopkit@0.1.1` while public GitHub releases already exist
 ## 2026-06-10: Prepublish Fails With Unreleased Changelog Entries
 
 Current `main` may contain work after the latest GitHub release tag. `prepublishOnly` should fail while `CHANGELOG.md` has real entries under `## Unreleased`, so npm cannot publish contents that do not match package metadata. Release prep must move those entries into a versioned section and reset `Unreleased` before publishing from `main`.
+
+## 2026-06-10: Keep README User-Facing
+
+The README is part of the npm package and should explain user value, install commands, CLI usage, examples, and safety. It must not include local npm auth state, publish failures, catch-up history, or trusted-publishing operations. Maintainer release process belongs in `docs/npm-publishing.md`, `docs/release-status.md`, `docs/launch-checklist.md`, and internal AgentLoop handoffs.
+
+## 2026-06-10: Stage Distribution Channels After npm
+
+npm/npx and GitHub Releases are the primary release channels. Homebrew, Docker/GHCR, GitHub Action, MCP Registry, VS Code/Open VSX, Scoop, and WinGet should be added as separate, verifiable tasks. MCP Registry is blocked until AgentLoopKit has a real MCP server; do not claim support from metadata alone.

@@ -1,8 +1,8 @@
 # Release Checklist Example
 
-This example shows how to document release readiness when GitHub has the current release but npm still serves an older package.
+This example shows how maintainers can document release readiness if a future GitHub release is current but npm still serves an older package.
 
-AgentLoopKit does not publish, tag, or create releases in this workflow. The artifacts help maintainers keep the current state clear before they retry npm publishing or update public docs.
+AgentLoopKit does not publish, tag, or create releases in this workflow. The artifacts help maintainers keep the incident state clear before they retry npm publishing or update maintainer docs.
 
 ## Command starter
 
@@ -20,7 +20,7 @@ agentloop handoff --task .agentloop/tasks/2026-06-10-document-current-release-st
 - npm latest and full version list
 - verification report path
 - publish workflow URL and failure reason
-- temporary tarball command, if npm lags
+- temporary tarball command, if maintainers approve one for the incident
 - next maintainer action
 
 ## Example artifacts

@@ -9,9 +9,11 @@ Last checked: June 10, 2026.
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.0>
 - Tarball SHA-256: `4e721a9627d94944f300a60d71a14b0e519045ac3eb51d637f7227503f2a962d`
 - CI run: `27262792610` passed on commit `1f51e8b`
-- Publish workflow run: `27262870591` passed package checks, then npm rejected publish with `E404`
-- npm latest: `0.1.1`
-- npm versions: `0.1.0`, `0.1.1`
+- Publish workflow run: `27262870591` passed package checks before npm trusted publishing was configured, then npm rejected publish with `E404`
+- Manual npm publish: succeeded for `agentloopkit@0.24.0` after browser authentication
+- npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
+- npm latest: `0.24.0`
+- npm versions: `0.1.0`, `0.1.1`, `0.24.0`
 
 Run the local registry check at any time:
 
@@ -20,29 +22,28 @@ agentloop npm-status
 agentloop npm-status --expect-current
 ```
 
-`--expect-current` should fail until npm latest matches `package.json`.
+`--expect-current` should pass when `package.json` matches npm latest.
 
 ## Use The Current CLI Today
 
-npm still serves `0.1.1`. Until npm catches up, run the current GitHub release tarball directly:
+npm is the primary install path:
 
 ```bash
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop version
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop init
+npx agentloopkit init
+npx --yes agentloopkit@0.24.0 version
 ```
 
-This is a temporary fallback. npm remains the intended main distribution path.
-For a maintainer checklist that documents this state without publishing, see [release-checklist-example.md](release-checklist-example.md).
+GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
 
-## npm Catch-Up Version
+## npm Catch-Up Result
 
 GitHub releases already exist for the intermediate AgentLoopKit versions between the npm-published `0.1.1` package and the current `v0.24.0` source line. Publishing older numbers from current `main` would create npm packages that do not match their GitHub tags.
 
-Once npm authentication or trusted publishing works, the next npm publish should ship the current release line as `0.24.0`. Future releases should then continue with normal sequential semver from the current source.
+The one-time catch-up publish shipped `0.24.0`. Future releases should continue with normal sequential semver from the current source.
 
-## Publish Blocker
+## Publish History
 
-The GitHub Publish workflow for `v0.24.0` (run `27262870591`) passed install, lint, typecheck, 121 Vitest tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected `npm publish --access public`:
+The GitHub Publish workflow for `v0.24.0` (run `27262870591`) passed install, lint, typecheck, 121 Vitest tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected `npm publish --access public` before the trusted publisher connection existed:
 
 ```text
 npm error code E404
@@ -50,24 +51,25 @@ npm error 404 Not Found - PUT https://registry.npmjs.org/agentloopkit - Not foun
 npm error 404 The requested resource 'agentloopkit@0.24.0' could not be found or you do not have permission to access it.
 ```
 
-Local `npm whoami` currently returns `E401`, so local publish is blocked from this shell.
+The maintainer then completed browser authentication and published `0.24.0` manually. The npm package now reports latest `0.24.0`.
 
 ## Next Publish
 
-Publish `agentloopkit@0.24.0` to npm after one of these is true:
+Use the GitHub Actions publish workflow for the next release after release metadata is prepared:
 
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
-- local browser or OTP authentication succeeds and `npm whoami` returns the package owner.
+- `.github/workflows/publish.yml` has `id-token: write`.
+- `package.json` and `CHANGELOG.md` agree on the next version.
+- `agentloop npm-status --expect-current` passes before bumping, or the version gap is explained in release notes.
 
-Do not publish stale intermediate versions from current `main`. If an old version must be published, use its matching GitHub tag or release tarball.
+Do not publish stale intermediate versions from current `main`. If an old version must be reproduced, use its matching GitHub tag or release tarball.
 
-After npm reports `0.24.0` or newer:
+After the next publish:
 
-- remove the temporary GitHub tarball fallback from README;
 - update this page with the new npm proof;
 - update `docs/npm-publishing.md`, `docs/launch-checklist.md`, and `FINAL_HANDOFF.md`;
 - run `agentloop npm-status --expect-current`;
-- resume normal sequential semver.
+- verify `npx --yes agentloopkit@<version> version`.
 
 ## Verification Evidence
 
@@ -86,6 +88,9 @@ Local release-candidate checks for `0.24.0` passed:
 
 Latest release-status documentation checks also passed:
 
+- `npm view agentloopkit version versions --json`
+- `npx --yes agentloopkit@0.24.0 version`
+- `node dist/cli/index.js npm-status --expect-current`
 - `npx pnpm@10.12.1 check:links`
 - `git diff --check`
 - `node scripts/prepublish-check.mjs`

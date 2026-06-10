@@ -1,6 +1,6 @@
 # Release Checklist Example
 
-Use this workflow when maintainers need to prepare or document a GitHub release while npm still serves an older package.
+Use this workflow only if a future GitHub release is current while npm still serves an older package.
 
 AgentLoopKit does not create tags, create GitHub releases, publish npm packages, read tokens, or call package registries for you. This checklist keeps release evidence in the repo so maintainers can decide the next safe manual step.
 
@@ -10,7 +10,7 @@ Use this workflow when:
 
 - GitHub has the current release tarball;
 - npm publish failed or is still blocked by authentication;
-- users need a temporary GitHub tarball command;
+- maintainers need a temporary GitHub tarball command for a documented incident;
 - maintainers need proof of verification before retrying npm publish.
 
 Do not use current `main` to backfill stale npm versions. If you need an older version, use the matching GitHub tag or release tarball for that version.
@@ -23,7 +23,8 @@ agentloop create-task --type release --title "Document current release state" \
   --desired-outcome "Maintainers can see verification, tarball, npm state, and next publish step" \
   --likely-file docs/release-status.md \
   --likely-file docs/npm-publishing.md \
-  --likely-file README.md \
+  --likely-file FINAL_HANDOFF.md \
+  --forbidden-file README.md \
   --forbidden-file package.json \
   --forbidden-file CHANGELOG.md \
   --acceptance "Current GitHub release and npm latest are documented" \

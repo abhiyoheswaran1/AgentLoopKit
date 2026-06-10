@@ -2,6 +2,8 @@
 
 AgentLoopKit is local-first and npm-distributed. The open-source core stays focused on repo-level task contracts, verification evidence, safety policies, and reviewer handoffs.
 
+See `docs/distribution-channels.md` for the staged release-channel plan beyond npm and GitHub Releases.
+
 ## Shipped
 
 - Repo harness generation with `agentloop init`
@@ -28,22 +30,28 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - Stack recipes for Next.js, React/Vite, Node API, Python, docs-only, empty repos, and monorepos
 - Launch visuals generated from committed Playwright and VHS sources
 
-## Current Blocker
+## Current State
 
-- GitHub release `v0.23.0` is public with the current CLI, including PowerShell completions.
-- npm still serves `agentloopkit@0.1.1` until account authentication or trusted publishing is repaired.
-- The release-triggered GitHub Publish workflow for `v0.23.0` passed package checks and failed at npm authorization with `E404`.
-- The next npm publish should catch up once to `0.23.0`, then normal semver releases resume.
-- Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be published.
+- GitHub release `v0.24.0` is public.
+- npm latest is `agentloopkit@0.24.0`.
+- npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
+- Future releases should publish through GitHub Releases and the trusted-publishing workflow.
+- Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
 
 ## Near Term
 
-- Complete npm browser/OTP authentication or configure npm trusted publishing for `agentloopkit@0.23.0`.
-- Remove temporary GitHub tarball fallback guidance after npm reports `0.23.0` or newer.
+- Verify the next GitHub release publishes to npm through trusted publishing without manual browser auth.
+- Keep the README focused on user install and usage, not release operations.
+- Add staged distribution-channel tasks for Homebrew, Docker/GHCR, GitHub Action, MCP Registry, editor extensions, Scoop, and WinGet.
 - Submit the config schema to SchemaStore after npm publishing is stable.
 
 ## Later
 
+- Add Homebrew tap support.
+- Add a Docker/GHCR image for CI usage.
+- Add a GitHub Action wrapper for common AgentLoopKit CI commands.
+- Build a real MCP server before any MCP Registry submission.
+- Evaluate VS Code/Open VSX, Scoop, and WinGet after the core release flow stays stable.
 - Add configurable organization policy packs.
 - Add GitHub issue and PR metadata import.
 - Evaluate paid team features only after npm publishing is stable and the open-source CLI matures.

@@ -28,7 +28,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - local SVG evidence badges with `agentloop badge`
 - local CI provenance and evidence summaries with `agentloop ci-summary`
 - local release-note handoffs with `agentloop release-notes`
-- read-only npm registry catch-up checks with `agentloop npm-status`
+- read-only npm registry status checks with `agentloop npm-status`
 - next-action shortcut with `agentloop next`
 - prepublish metadata guard that blocks npm publish while `CHANGELOG.md` has unreleased entries
 - read-only local policy inspection with `agentloop policy`
@@ -1019,32 +1019,24 @@ npm publish --access public
 
 The first manual publish for `agentloopkit@0.1.0` was completed with npm browser/OTP authentication.
 
-Current publish gap:
+Current publish state:
 
-- GitHub releases exist through `v0.24.0`; `v0.24.0` is the current source and release line.
-- npm latest is still `0.1.1`; registry versions are `0.1.0` and `0.1.1`.
-- The `v0.24.0` Publish workflow (run `27262870591`) passed package checks, then npm rejected `npm publish --access public` with authorization `E404`.
-- Current `main` should publish `agentloopkit@0.24.0` next after npm authentication or trusted publishing works.
+- GitHub release `v0.24.0` is public.
+- npm latest is `0.24.0`; registry versions are `0.1.0`, `0.1.1`, and `0.24.0`.
+- npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
+- The next release should publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.
 - Do not paste npm OTPs or tokens into chat, issues, PRs, or release notes.
 
 ## How users install it
 
-Current GitHub release while npm serves `0.1.1`:
-
-```bash
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop init
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop doctor
-```
-
-After npm reports `0.24.0` or newer:
-
 ```bash
 npx agentloopkit init
 npx agentloopkit doctor
+npx --yes agentloopkit@0.24.0 version
 ```
 
-Pinned team usage after npm catches up:
+Pinned team usage:
 
 ```bash
 pnpm add -D agentloopkit
@@ -2142,11 +2134,9 @@ Top remaining items:
 - [ ] Publish `agentloopkit@0.23.0` to npm.
 - [x] Prepare `agentloopkit@0.24.0` npm-status release candidate.
 - [x] Publish GitHub release `v0.24.0` with npm-status notes.
-- [x] Run GitHub Publish workflow for `v0.24.0`; package checks passed, npm authorization failed.
-- [ ] Publish `agentloopkit@0.24.0` to npm.
-- [ ] Configure npm trusted publishing for future releases.
-- [x] Confirm npm package install for the published `0.1.1` package with `npx agentloopkit version`.
-- [x] Confirm current GitHub release tarball with `npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop version`.
+- [x] Publish `agentloopkit@0.24.0` to npm.
+- [x] Configure npm trusted publishing for future releases.
+- [x] Confirm npm package install for the published `0.24.0` package with `npx --yes agentloopkit@0.24.0 version`.
 - [x] Add GitHub repo description and discovery topics.
 - [x] Add initial good-first-issue labels.
 - [ ] Announce launch.
@@ -2170,11 +2160,9 @@ Twitter/X launch post:
 ```text
 I built AgentLoopKit: a local-first npm CLI that gives Codex, Claude Code, Cursor, OpenCode, Gemini CLI, and other coding agents a repo-level engineering loop.
 
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop init
+npx agentloopkit init
 
 It generates task contracts, safety policies, verification reports, and PR handoffs. No telemetry. No cloud. No LLM required.
-
-npm currently serves 0.1.1; the GitHub release tarball carries the current 0.24.0 CLI until npm publishing is repaired.
 ```
 
 Hacker News title:
@@ -2190,8 +2178,7 @@ Title: I built a local-first engineering loop for coding agents
 
 - Problem: agent-generated work can be hard to review
 - Approach: repo-level task contracts, gates, policies, verification reports, and handoffs
-- Install today: npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop init
-- npm status: agentloopkit is published, but npm currently serves 0.1.1 while GitHub release 0.24.0 is current
+- Install today: npx agentloopkit init
 - What it does not do: no LLM wrapper, no SaaS, no telemetry
 - Example workflow: create-task, verify, handoff
 - Ask: feedback from people using Codex, Claude Code, Cursor, OpenCode, Gemini CLI, or Copilot CLI
@@ -2199,13 +2186,13 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Complete browser/OTP npm publish or trusted publishing for `0.24.0`: high usefulness, low repo effort, external auth required.
-2. Remove the temporary GitHub tarball fallback after npm reports `0.24.0` or newer: high trust value, low effort.
-3. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
-4. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
-5. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
-6. Add config migration helper for future schema versions: medium usefulness, medium effort.
-7. Add NuShell completion docs only if users ask for it: low effort, low maintenance.
+1. Verify npm trusted publishing on the next GitHub release: high trust value, low effort, medium release risk.
+2. Add a Homebrew tap: high install value for macOS/Linux, medium effort, medium maintenance.
+3. Add a Docker/GHCR image for CI: high team usefulness, medium effort, medium security review.
+4. Add a thin GitHub Action wrapper: high CI adoption value, medium effort, medium maintenance.
+5. Build a read-only MCP server: medium star potential, high effort, high safety review.
+6. Publish to MCP Registry after the MCP server exists: medium discovery value, medium effort.
+7. Add Scoop and WinGet manifests: medium Windows value, medium effort.
 8. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
 9. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
 10. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
@@ -2213,4 +2200,4 @@ Title: I built a local-first engineering loop for coding agents
 12. Add GitLab CI and Buildkite retry/parallelism guidance after provider-specific provenance sees use: medium usefulness, low effort.
 13. Add Rails and Laravel task-contract recipes if contributors ask for them: medium usefulness, low effort.
 14. Add package-manager-specific dependency-upgrade recipes for npm, yarn, and bun: medium usefulness, low effort.
-15. Add npm-status examples for GitHub Actions release workflows after npm trusted publishing is repaired: medium trust improvement, low effort.
+15. Add npm-status examples for GitHub Actions release workflows after the next trusted-publishing release is verified: medium trust improvement, low effort.

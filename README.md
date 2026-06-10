@@ -46,18 +46,12 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Latest GitHub release: `v0.24.0`. npm still serves `0.1.1`: the next npm publish should catch up once to `0.24.0`; after that, releases return to normal sequential semver. Local `npm whoami` currently returns `E401`, so npm publish is blocked from this shell.
-
-See [docs/release-status.md](docs/release-status.md) for the current GitHub/npm status and update rules.
-
-Until npm catches up, run the current GitHub release tarball directly:
+Pin the current version when you need repeatable CI or team setup:
 
 ```bash
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop version
-npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.24.0/agentloopkit-0.24.0.tgz agentloop init
+npx --yes agentloopkit@0.24.0 version
+npx --yes agentloopkit@0.24.0 init
 ```
-
-The npm version jump has one reason: GitHub releases already exist for the intermediate AgentLoopKit versions between the npm-published `0.1.1` package and the current `v0.24.0` source line. Publishing older numbers from current `main` would create npm packages that do not match their GitHub tags. Once npm authentication or trusted publishing works, the next npm publish should ship `0.24.0`; future releases should then continue with normal sequential semver.
 
 Run the CLI after install:
 
@@ -93,7 +87,7 @@ npx agentloopkit completion powershell
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, task contracts, active task status, task-linked verify, handoff, reports, badges, release notes, gates, and task archive commands" width="100%">
 </p>
 
-The VHS demo runs the local built CLI so the command flow matches this repository even when npm is behind.
+The VHS demo is generated from committed sources in this repository.
 
 Pinned team usage:
 
@@ -138,7 +132,7 @@ pnpm build
 | `agentloop badge`                       | Write a local SVG evidence badge                                               |
 | `agentloop ci-summary`                  | Summarize CI context and local AgentLoop evidence                              |
 | `agentloop release-notes`               | Draft local release notes from changelog, git, task, and verification evidence |
-| `agentloop npm-status`                  | Check npm registry catch-up status without publishing                          |
+| `agentloop npm-status`                  | Check npm registry status without publishing                                   |
 | `agentloop policy list`                 | List local safety policy files                                                 |
 | `agentloop policy show <policy>`        | Print a local safety policy without mutating files                             |
 | `agentloop policy status`               | Compare local policy files with bundled templates                              |
@@ -452,7 +446,7 @@ Use `agentloop check-gates --strict` as a review-evidence gate in pull request C
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
-See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Until npm catches up, the examples pin the latest public GitHub release tarball. Current source moves to a new tarball when the next GitHub release is cut.
+See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.24.0` or a newer vetted release when reproducibility matters.
 
 ## PR Summaries
 
@@ -528,18 +522,6 @@ See `docs/stack-recipes.md` for Next.js, React/Vite, Remix, SvelteKit, Node API,
 ## Roadmap
 
 See `ROADMAP.md`.
-
-## Publishing Status
-
-AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.24.0` carries task-linked verification reports, failed-verification summaries, the guarded `--task` path behavior, refreshed README visuals, PowerShell shell completions, and the read-only `npm-status` catch-up check. npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
-
-Do not publish stale older versions from current `main`. If `CHANGELOG.md` has real entries under `Unreleased`, the prepublish guard blocks npm publish until release metadata is prepared.
-
-The npm version jump is intentional. The skipped npm numbers already exist as public GitHub release candidates while npm publishing was blocked, so the next npm publish should ship the current release line rather than backfilling old source snapshots.
-
-The repository includes a GitHub Actions publish workflow for npm trusted publishing after the package is configured on npm. The workflow runs checks before `npm publish` and skips publish when the version already exists.
-
-See `docs/launch-checklist.md` before publishing. See `docs/npm-status.md`, `docs/release-checklist-example.md`, and `examples/release-checklist/` for registry checks and compact maintainer handoffs when GitHub is current but npm is still behind.
 
 ## Contributing
 

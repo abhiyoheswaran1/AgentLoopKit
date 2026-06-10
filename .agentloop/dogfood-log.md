@@ -2,6 +2,45 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-10: Release Channels Roadmap And README Cleanup
+
+- Task contract: `.agentloop/tasks/2026-06-10-plan-release-channels-roadmap.md`
+- Product cycle: `.agentloop/research/interview-cycle-104.md`
+- Trigger:
+  - `agentloopkit@0.24.0` was published on npm.
+  - npm trusted publishing was configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
+  - README still contained internal npm catch-up and auth-state language, which is wrong because the README ships to npm.
+- Product changes:
+  - Removed release-ops state from README.
+  - Updated current release docs to say npm latest is `0.24.0`.
+  - Added `docs/distribution-channels.md`.
+  - Added backlog entries and proposed task contracts for npm trusted-publishing verification, Homebrew, Docker/GHCR, GitHub Action, MCP server, MCP Registry, VS Code/Open VSX, Scoop, and WinGet.
+- Verification planned:
+  - `npx pnpm@10.12.1 check:links`
+  - `npm run typecheck`
+  - `npm test`
+  - `npm run build`
+  - `npx projscan doctor --format markdown`
+  - `agentloop npm-status --expect-current`
+- Verification completed:
+  - `npx pnpm@10.12.1 check:links`: pass, 573 Markdown files checked
+  - `git diff --check`: pass
+  - README stale-release scan: pass, no npm-lag/auth-state phrases found
+  - `npm run typecheck`: pass
+  - `npm test`: pass, 29 files and 121 tests
+  - `npm run build`: pass
+  - `npx projscan doctor --format markdown`: pass, A 100/100
+  - `node dist/cli/index.js npm-status --expect-current`: pass, local `0.24.0` matches npm latest `0.24.0`
+  - `npm view agentloopkit version versions --json`: pass, latest `0.24.0`
+  - `npx --yes agentloopkit@0.24.0 version`: pass, reported `0.24.0`
+  - `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-10-plan-release-channels-roadmap.md`: pass
+- Summary generated: `.agentloop/handoffs/2026-06-10-11-10-pr-summary.md`
+- Verification report generated: `.agentloop/reports/2026-06-10-11-09-verification-report.md`
+- Run-specific report, handoff, and `.agentloop/state.json` were kept out of the source commit because they contain local run state.
+- Worked well: using AgentLoopKit made the scope clear enough to separate README cleanup from future channel implementation.
+- Confusing: historical release artifacts are useful internally but should not leak into the public README.
+- Improve: add a release-doc checklist item that scans README for maintainer-only phrases before every release.
+
 ## 2026-06-09: MVP Build
 
 - Task contract: original build prompt, implemented directly before dogfood log existed.
