@@ -50,12 +50,12 @@ For a read-only registry check, see [npm-status.md](npm-status.md).
 
 Current facts:
 
-- npm latest is `agentloopkit@0.24.1`.
-- GitHub release `v0.24.1` is public with attached `agentloopkit-0.24.1.tgz`.
-- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.1`.
-- GitHub release tarball SHA-256: `a3af9b4433ea72cdf1d7a045565d6cea408ec70a5d35973000de6a5ea331eb40`.
+- npm latest is `agentloopkit@0.24.2`.
+- GitHub release `v0.24.2` is public with attached `agentloopkit-0.24.2.tgz`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.2`.
+- GitHub release tarball SHA-256: `61438ff8e177f48ac815ddbc010acaaf90fdf9de95cf0fe0f78924422a06bfa3`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
-- GitHub release `v0.24.1` published to npm through trusted publishing.
+- GitHub release `v0.24.2` published to npm through trusted publishing.
 - Future releases should continue publishing from GitHub Releases through trusted publishing.
 
 Historical rule:
@@ -217,6 +217,12 @@ Historical publishing log:
 - GitHub release tarball SHA-256: `a3af9b4433ea72cdf1d7a045565d6cea408ec70a5d35973000de6a5ea331eb40`.
 - GitHub Publish workflow run `27266562238` for `v0.24.1` passed package checks and published to npm through trusted publishing.
 - npm registry proof after the `v0.24.1` publish reports latest `0.24.1` and versions `0.1.0`, `0.1.1`, `0.24.0`, and `0.24.1`.
+- `agentloopkit@0.24.2` bounded fallback project detection and added the home-directory init guard.
+- Local tarball SHA-256 before GitHub release: `61438ff8e177f48ac815ddbc010acaaf90fdf9de95cf0fe0f78924422a06bfa3`.
+- GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.2`.
+- GitHub release tarball SHA-256: `61438ff8e177f48ac815ddbc010acaaf90fdf9de95cf0fe0f78924422a06bfa3`.
+- GitHub Publish workflow run `27270795542` for `v0.24.2` passed package checks and published to npm through trusted publishing.
+- npm registry proof after the `v0.24.2` publish reports latest `0.24.2` and versions `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, and `0.24.2`.
 
 Preferred release path:
 

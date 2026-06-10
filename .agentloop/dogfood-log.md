@@ -109,6 +109,13 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Packed tarball `agentloop version`: pass, reported `0.24.2`.
   - Packed tarball `agentloop init --dry-run` from `~`: pass, returned in under 2 seconds.
   - Packed tarball non-dry `agentloop init` from `~`: expected refusal with the home-directory message.
+- Release verification:
+  - GitHub release `v0.24.2`: published at `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.2`
+  - GitHub Publish workflow run `27270795542`: pass, published `agentloopkit@0.24.2` through trusted publishing.
+  - `npm view agentloopkit version versions --json`: pass, latest `0.24.2`.
+  - Published `npx --yes agentloopkit@0.24.2 version`: pass, reported `0.24.2`.
+  - Published `npx --yes agentloopkit@0.24.2 init --dry-run` from `~`: pass.
+  - Published non-dry `npx --yes agentloopkit@0.24.2 init` from `~`: expected refusal with the home-directory message.
 - Tarball SHA-256: `61438ff8e177f48ac815ddbc010acaaf90fdf9de95cf0fe0f78924422a06bfa3`
 - Worked well: the fix keeps normal repo init unchanged and makes accidental home-directory use safe.
 - Confusing: `--dry-run` still reports 51 planned files from `~`, which is accurate but may surprise users.

@@ -32,8 +32,8 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 
 ## Current State
 
-- GitHub release `v0.24.1` is public.
-- npm latest is `agentloopkit@0.24.1`.
+- GitHub release `v0.24.2` is public.
+- npm latest is `agentloopkit@0.24.2`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
