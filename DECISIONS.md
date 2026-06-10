@@ -123,3 +123,9 @@ npm/npx and GitHub Releases are the primary release channels. Homebrew, Docker/G
 ## 2026-06-10: Project Detection Skips Unreadable Directories
 
 Project detection may inspect file names when a repository has no package or Python metadata. If a directory cannot be read, AgentLoopKit skips it instead of failing the command. This prevents first-run crashes on macOS-protected paths such as `.Trash` while still avoiding file-content reads in protected directories.
+
+## 2026-06-10: Bound Fallback Project Detection And Guard Home Init
+
+Project detection uses direct metadata first: `package.json`, Python markers, and known config files. Only metadata-free directories fall back to a shallow capped file-name scan. The fallback is bounded to avoid recursively walking large directories such as a macOS home folder.
+
+Non-dry `agentloop init` refuses to initialize the user's home directory unless `--force` is passed. `--dry-run` remains allowed so users can inspect planned files without writing them. This keeps the normal command safe when a user accidentally runs `npx agentloopkit init` from `~`.

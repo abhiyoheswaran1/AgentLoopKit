@@ -76,4 +76,28 @@ describe('init', () => {
     ).rejects.toThrow();
     await expect(readFile(path.join(dir, '.agentloop/README.md'), 'utf8')).rejects.toThrow();
   });
+
+  test('refuses to initialize a home directory without force', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    await expect(initializeAgentLoop({ cwd: dir, homeDirectory: dir })).rejects.toThrow(
+      'Refusing to initialize your home directory',
+    );
+  });
+
+  test('allows dry-run and forced initialization in a home directory', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    await expect(
+      initializeAgentLoop({ cwd: dir, homeDirectory: dir, dryRun: true }),
+    ).resolves.toMatchObject({
+      dryRun: true,
+    });
+
+    const result = await initializeAgentLoop({ cwd: dir, homeDirectory: dir, force: true });
+
+    expect(result.created.some((file) => file.endsWith('AGENTLOOP.md'))).toBe(true);
+  });
 });

@@ -7,8 +7,13 @@ export function initCommand() {
     .description('Initialize AgentLoopKit in the current repository')
     .option('--dry-run', 'show planned changes without writing files')
     .option('--json', 'print machine-readable output')
-    .action(async (options: { dryRun?: boolean; json?: boolean }) => {
-      const result = await initializeAgentLoop({ cwd: process.cwd(), dryRun: options.dryRun });
+    .option('--force', 'allow initialization when the current directory is your home directory')
+    .action(async (options: { dryRun?: boolean; json?: boolean; force?: boolean }) => {
+      const result = await initializeAgentLoop({
+        cwd: process.cwd(),
+        dryRun: options.dryRun,
+        force: options.force,
+      });
       if (options.json) {
         logger.info(JSON.stringify(result, null, 2));
         return;

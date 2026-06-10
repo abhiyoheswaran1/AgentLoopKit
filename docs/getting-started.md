@@ -1,13 +1,16 @@
 # Getting Started
 
-Run AgentLoopKit inside an existing repository:
+Run AgentLoopKit from the root of the repository you want to configure:
 
 ```bash
+cd /path/to/your/repo
 npx agentloopkit init --dry-run
 npx agentloopkit init
 ```
 
-Use `--dry-run` first when you want to see the planned file changes without writing them.
+`init` writes files into the current directory. Use `--dry-run` first when you want to see the planned file changes without writing them.
+
+Do not run non-dry `init` from `~` unless you intentionally want AgentLoopKit files in your home directory. AgentLoopKit refuses that by default; pass `--force` only when you mean it.
 
 Then check the setup:
 

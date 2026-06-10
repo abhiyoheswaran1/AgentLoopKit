@@ -39,18 +39,21 @@ Coding agents often move fast but leave reviewers with weak evidence: unclear sc
 
 ## Install
 
-Use it with `npx` inside an existing repository:
+Use it with `npx` from the root of the repository you want to configure:
 
 ```bash
-npx agentloopkit init
+cd /path/to/your/repo
 npx agentloopkit init --dry-run
+npx agentloopkit init
 ```
+
+`init` writes files into the current directory. Do not run it from `~` unless you intend to configure your home directory. `--dry-run` previews the file changes without writing them.
 
 Pin the current version when you need repeatable CI or team setup:
 
 ```bash
-npx --yes agentloopkit@0.24.1 version
-npx --yes agentloopkit@0.24.1 init
+npx --yes agentloopkit@0.24.2 version
+npx --yes agentloopkit@0.24.2 init
 ```
 
 Run the CLI after install:
@@ -112,6 +115,7 @@ pnpm build
 | --------------------------------------- | ------------------------------------------------------------------------------ |
 | `agentloop init`                        | Generate the repo harness and config                                           |
 | `agentloop init --dry-run`              | Preview generated files without writing them                                   |
+| `agentloop init --force`                | Allow initialization when the current directory is your home directory          |
 | `agentloop doctor`                      | Check setup health, template version, commands, git state, and risk categories |
 | `agentloop create-task`                 | Create a task contract in `.agentloop/tasks/`                                  |
 | `agentloop task list`                   | List task contracts and show the pinned active task                            |
@@ -380,7 +384,7 @@ See `docs/ci-summary.md`.
 ```bash
 agentloop release-notes
 agentloop release-notes --from v0.19.0 --to HEAD
-agentloop release-notes --release-version 0.24.1
+agentloop release-notes --release-version 0.24.2
 agentloop release-notes --json
 agentloop release-notes --write
 ```
@@ -446,7 +450,7 @@ Use `agentloop check-gates --strict` as a review-evidence gate in pull request C
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
-See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.24.1` or a newer vetted release when reproducibility matters.
+See `docs/github-actions.md`, `examples/github-actions/`, `examples/gitlab-ci/`, and `examples/buildkite/` for copy-pasteable workflows. Pin `agentloopkit@0.24.2` or a newer vetted release when reproducibility matters.
 
 ## PR Summaries
 

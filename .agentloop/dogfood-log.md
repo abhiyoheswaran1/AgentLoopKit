@@ -79,6 +79,41 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Confusing: `init` can be run outside a repository, but the recommended user path remains running it inside a repo.
 - Improve: add a clearer future warning when `init` runs from a likely home directory.
 
+## 2026-06-10: Bound Home Directory Init
+
+- Task contract: `.agentloop/tasks/2026-06-10-bound-project-detection-scans.md`
+- Trigger:
+  - A real first-run attempt from `~` installed `agentloopkit@0.24.1` and then sat without output for about 50 seconds.
+  - The root cause was fallback project detection recursively walking a large metadata-free directory.
+- Product changes:
+  - Bounded fallback project detection to a shallow capped scan after direct metadata checks fail.
+  - Added a home-directory guard so non-dry `agentloop init` refuses to write files into `~` unless `--force` is passed.
+  - Kept `agentloop init --dry-run` allowed from `~` so users can inspect planned files without writes.
+  - Updated README and getting-started docs to say `init` should run from the target repo root.
+  - Prepared patch release `0.24.2`.
+- Verification completed:
+  - Red project-detection test: `npx pnpm@10.12.1 test tests/project-detection.test.ts` failed because a deeply nested docs file still classified the directory as `docs-only`.
+  - Red init safety test: `npx pnpm@10.12.1 test tests/init.test.ts` failed because home-directory init still wrote the harness.
+  - Focused green tests: project-detection and init tests passed, 12 focused tests total.
+  - Source CLI from `~`: `init --dry-run` returned in about 2 seconds; non-dry `init` refused with the home-directory message.
+  - `npm run lint`: pass.
+  - `npm run typecheck`: pass.
+  - `npm test`: pass, 29 files and 125 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 575 Markdown files checked.
+  - `node scripts/prepublish-check.mjs`: pass.
+  - `git diff --check`: pass.
+  - `npm run build`: pass.
+  - `npx projscan doctor --format markdown`: pass, A 100/100.
+  - `npm publish --access public --dry-run`: pass.
+  - `npm pack --pack-destination /tmp --silent`: pass, produced `/tmp/agentloopkit-0.24.2.tgz`.
+  - Packed tarball `agentloop version`: pass, reported `0.24.2`.
+  - Packed tarball `agentloop init --dry-run` from `~`: pass, returned in under 2 seconds.
+  - Packed tarball non-dry `agentloop init` from `~`: expected refusal with the home-directory message.
+- Tarball SHA-256: `61438ff8e177f48ac815ddbc010acaaf90fdf9de95cf0fe0f78924422a06bfa3`
+- Worked well: the fix keeps normal repo init unchanged and makes accidental home-directory use safe.
+- Confusing: `--dry-run` still reports 51 planned files from `~`, which is accurate but may surprise users.
+- Improve: consider adding a non-fatal note to dry-run output when the current directory is `~`.
+
 ## 2026-06-09: MVP Build
 
 - Task contract: original build prompt, implemented directly before dogfood log existed.

@@ -27,20 +27,29 @@ export async function writeTextFile(filePath: string, content: string) {
   await writeFile(filePath, content);
 }
 
-export async function listFilesRecursive(root: string, options: { ignore?: string[] } = {}) {
+export async function listFilesRecursive(
+  root: string,
+  options: { ignore?: string[]; maxDepth?: number; maxEntries?: number } = {},
+) {
   const ignore = new Set(
     options.ignore ?? ['.git', '.agentloop', 'node_modules', 'dist', 'coverage'],
   );
   const files: string[] = [];
+  let inspectedEntries = 0;
 
-  async function walk(current: string) {
+  async function walk(current: string, depth: number) {
     if (!(await pathExists(current))) return;
+    if (options.maxEntries !== undefined && inspectedEntries >= options.maxEntries) return;
     const entries = await readdir(current, { withFileTypes: true }).catch(() => []);
     for (const entry of entries) {
+      if (options.maxEntries !== undefined && inspectedEntries >= options.maxEntries) break;
+      inspectedEntries += 1;
       if (ignore.has(entry.name)) continue;
       const absolute = path.join(current, entry.name);
       if (entry.isDirectory()) {
-        await walk(absolute);
+        if (options.maxDepth === undefined || depth < options.maxDepth) {
+          await walk(absolute, depth + 1);
+        }
       } else if (entry.isFile()) {
         files.push(absolute);
       }
@@ -49,6 +58,6 @@ export async function listFilesRecursive(root: string, options: { ignore?: strin
 
   const rootStat = await stat(root).catch(() => undefined);
   if (!rootStat?.isDirectory()) return [];
-  await walk(root);
+  await walk(root, 0);
   return files;
 }

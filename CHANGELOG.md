@@ -4,6 +4,16 @@
 
 - No unreleased changes yet.
 
+## 0.24.2
+
+Patch release for safer first-run initialization:
+
+- Bounded fallback project detection so `agentloop init --dry-run` returns quickly in large metadata-free directories such as a home folder
+- Added a home-directory guard so `agentloop init` refuses to write AgentLoopKit files into the user's home directory unless `--force` is passed
+- Added `agentloop init --force` for the rare case where a user intentionally wants to initialize the current home directory
+- Added regression coverage for bounded fallback detection and home-directory init safety
+- Clarified README and getting-started docs to run `init` from the target repository root
+
 ## 0.24.1
 
 Patch release for first-run project detection:

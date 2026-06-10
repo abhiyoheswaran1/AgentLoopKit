@@ -26,6 +26,9 @@ const MONOREPO_FILE_MARKERS = [
   'rush.json',
 ] as const;
 
+const FALLBACK_PROJECT_DETECTION_MAX_DEPTH = 2;
+const FALLBACK_PROJECT_DETECTION_MAX_ENTRIES = 500;
+
 export async function readPackageJson(cwd: string): Promise<PackageJson | undefined> {
   const filePath = path.join(cwd, 'package.json');
   if (!(await pathExists(filePath))) return undefined;
@@ -53,7 +56,10 @@ export async function detectProjectType(cwd: string): Promise<ProjectType> {
     return 'python';
   }
 
-  const files = await listFilesRecursive(cwd);
+  const files = await listFilesRecursive(cwd, {
+    maxDepth: FALLBACK_PROJECT_DETECTION_MAX_DEPTH,
+    maxEntries: FALLBACK_PROJECT_DETECTION_MAX_ENTRIES,
+  });
   const relativeFiles = files.map((file) => path.relative(cwd, file));
   const hasCode = relativeFiles.some((file) =>
     /\.(ts|tsx|js|jsx|py|go|rs|java|rb|php|cs)$/.test(file),

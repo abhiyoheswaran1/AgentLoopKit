@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { readdir } from 'node:fs/promises';
+import { homedir } from 'node:os';
 import {
   AGENTLOOP_DIR,
   AGENTLOOP_FILE,
@@ -86,6 +87,8 @@ async function upsertAgentsFile(cwd: string, content: string, result: InitResult
 export async function initializeAgentLoop(options: {
   cwd: string;
   dryRun?: boolean;
+  force?: boolean;
+  homeDirectory?: string;
 }): Promise<InitResult> {
   const result: InitResult = {
     created: [],
@@ -94,6 +97,12 @@ export async function initializeAgentLoop(options: {
     dryRun: Boolean(options.dryRun),
   };
   const cwd = options.cwd;
+  const homeDirectory = options.homeDirectory ?? homedir();
+  if (!options.dryRun && !options.force && path.resolve(cwd) === path.resolve(homeDirectory)) {
+    throw new Error(
+      'Refusing to initialize your home directory. Run this inside a project repository, or pass --force if you intentionally want AgentLoopKit files in your home directory.',
+    );
+  }
   const packageManager = await detectPackageManager(cwd);
   const projectType = await detectProjectType(cwd);
   const projectName = await detectProjectName(cwd);

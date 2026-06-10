@@ -53,6 +53,16 @@ describe('project detection', () => {
     }
   });
 
+  test('does not use deeply nested files for metadata-free project type detection', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const deepDocsDir = path.join(dir, 'large-folder', 'nested', 'archive', 'docs');
+    await mkdir(deepDocsDir, { recursive: true });
+    await writeFile(path.join(deepDocsDir, 'guide.md'), '# Deep docs');
+
+    await expect(detectProjectType(dir)).resolves.toBe('generic');
+  });
+
   test('detects package scripts and prefixes them with package manager', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
