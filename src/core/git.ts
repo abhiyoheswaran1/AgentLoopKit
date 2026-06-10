@@ -25,6 +25,11 @@ export async function getGitCommit(cwd: string) {
   return result.exitCode === 0 ? result.stdout.trim() : '';
 }
 
+export async function getGitRoot(cwd: string) {
+  const result = await execa('git', ['rev-parse', '--show-toplevel'], { cwd, reject: false });
+  return result.exitCode === 0 ? result.stdout.trim() : '';
+}
+
 export async function getGitStatus(cwd: string) {
   const result = await execa('git', ['status', '--short'], { cwd, reject: false });
   return result.exitCode === 0 ? result.stdout : '';

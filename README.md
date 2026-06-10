@@ -49,7 +49,7 @@ npx agentloopkit init --dry-run
 npx agentloopkit init
 ```
 
-`init` writes files into the current directory. The output shows the target folder, detected project type, package manager, Git status, configured commands, and file counts. Do not run it from `~` unless you intend to configure your home directory. `--dry-run` previews the same plan and writes nothing.
+`init` writes files into the current directory. The output shows the target folder, detected project type, package manager, Git status, Git root, configured commands, and file counts. Do not run it from `~` unless you intend to configure your home directory. `--dry-run` previews the same plan and writes nothing.
 
 If you want AgentLoopKit for your local agent workflow but do not want to commit the generated harness:
 

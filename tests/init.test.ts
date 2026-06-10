@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { execFile } from 'node:child_process';
-import { readFile, realpath, symlink, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, realpath, symlink, writeFile } from 'node:fs/promises';
 import { promisify } from 'node:util';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
@@ -41,7 +41,7 @@ describe('init', () => {
     });
     expect(result.commands.configured).toEqual(['test']);
     expect(result.commands.missing).toEqual(['lint', 'typecheck', 'build', 'format']);
-    expect(result.git).toEqual({ isRepository: false });
+    expect(result.git).toEqual({ isRepository: false, root: '', targetIsRoot: false });
     expect(result.created.some((file) => file.endsWith('.agentloop/loops/feature.md'))).toBe(true);
     expect(result.created.some((file) => file.endsWith('.agentloop/README.md'))).toBe(true);
     expect(result.created.some((file) => file.endsWith('.agentloop/manifest.json'))).toBe(true);
@@ -131,7 +131,7 @@ describe('init', () => {
     });
     expect(output.commands.configured).toEqual(['test', 'typecheck']);
     expect(output.commands.missing).toEqual(['lint', 'build', 'format']);
-    expect(output.git).toEqual({ isRepository: false });
+    expect(output.git).toEqual({ isRepository: false, root: '', targetIsRoot: false });
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
   });
 
@@ -144,7 +144,7 @@ describe('init', () => {
     process.env.PATH = emptyPath;
     const result = await initializeAgentLoop({ cwd: dir, dryRun: true });
 
-    expect(result.git).toEqual({ isRepository: false });
+    expect(result.git).toEqual({ isRepository: false, root: '', targetIsRoot: false });
     expect(result.created.some((file) => file.endsWith('AGENTLOOP.md'))).toBe(true);
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
   });
@@ -165,8 +165,52 @@ describe('init', () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('Git: detected');
+    expect(result.stdout).toContain(`Git root: ${await realpath(dir)}`);
     expect(result.stdout).toContain('No files written.');
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
+  });
+
+  test('dry-run JSON output reports git root and whether the target is root', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo-root' });
+
+    const result = await execa(tsxPath, [cliPath, 'init', '--dry-run', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.git).toEqual({
+      isRepository: true,
+      root: await realpath(dir),
+      targetIsRoot: true,
+    });
+  });
+
+  test('dry-run JSON output reports when the target is inside a git repository subdirectory', async () => {
+    const dir = await makeTempDir();
+    const packageDir = path.join(dir, 'packages', 'web');
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await mkdir(packageDir, { recursive: true });
+    await writeJson(path.join(packageDir, 'package.json'), { name: 'demo-web' });
+
+    const result = await execa(tsxPath, [cliPath, 'init', '--dry-run', '--json'], {
+      cwd: packageDir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.targetDirectory).toBe(await realpath(packageDir));
+    expect(output.git).toEqual({
+      isRepository: true,
+      root: await realpath(dir),
+      targetIsRoot: false,
+    });
   });
 
   test('refuses to initialize a home directory without force', async () => {
@@ -224,7 +268,8 @@ describe('init', () => {
       excludePath,
       patterns: ['.agentloop/', 'AGENTS.md', 'AGENTLOOP.md', 'agentloop.config.json'],
     });
-    expect(result.git).toEqual({ isRepository: true });
+    expect(result.git).toMatchObject({ isRepository: true, root: await realpath(dir) });
+    expect(result.git.targetIsRoot).toBe(true);
     expect(exclude).toContain('# agentloopkit:local-only:start');
     expect(exclude).toContain('.agentloop/');
     expect(exclude).toContain('AGENTS.md');

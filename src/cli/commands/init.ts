@@ -36,6 +36,10 @@ export function initCommand() {
           `Project: ${result.project.name || 'unnamed'} (${result.project.type}, ${result.project.packageManager})`,
         );
         logger.info(`Git: ${result.git.isRepository ? 'detected' : 'not detected'}`);
+        if (result.git.isRepository) {
+          logger.info(`Git root: ${result.git.root}`);
+          logger.info(`Git target: ${result.git.targetIsRoot ? 'root directory' : 'subdirectory'}`);
+        }
         logger.info(`Configured commands: ${formatList(result.commands.configured)}`);
         logger.info(`Missing commands: ${formatList(result.commands.missing)}`);
         logger.info(`Created: ${result.created.length}`);

@@ -4327,3 +4327,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The investigation avoided an unnecessary source change.
 - Improve:
   - Keep the regression test because this is easy to break if Git helpers are refactored.
+
+## 2026-06-10: Show Git Root During Init
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-show-git-root-during-init.md`
+- Trigger:
+  - `agentloop init` showed whether Git was detected but not whether the current folder was the Git root.
+  - Users running `init` from a nested package need to know that AgentLoopKit writes files into the current directory, not the repository root.
+- Implementation:
+  - Added `getGitRoot()` to shared Git helpers.
+  - Added `git.root` and `git.targetIsRoot` to `InitResult` and JSON output.
+  - Added `Git root:` and `Git target:` lines to human init output when Git is detected.
+  - Updated README, getting-started docs, changelog, and tests.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-23-31-verification-report.md`, overall status pass.
+  - Red focused Git/init tests failed before implementation for missing root helper and metadata.
+  - Focused Git/init tests passed after implementation: 2 files, 18 tests.
+  - Full Vitest passed: 34 files, 169 tests.
+  - Lint, typecheck, build, Markdown link check, `projscan doctor`, and built CLI nested-package dry-run smoke passed.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-10-23-35-pr-summary.md`
+- What worked well:
+  - The feature improves first-run safety without changing where files are written.
+- Improve:
+  - Consider adding a warning style later if users often initialize subdirectories by mistake.
+  - Keep this unreleased until the planned `0.28.0` batch.

@@ -9,6 +9,7 @@
 - Updated release-smoke helper tests so static analysis can see the helper usage and `projscan doctor` reports a clean health check.
 - Added target directory, detected project, and configured command context to `agentloop init` and `agentloop init --dry-run --json`.
 - Added non-blocking Git detection to `agentloop init` human and JSON output.
+- Added Git root and target-is-root context to `agentloop init` human and JSON output.
 - Added regression coverage for missing Git executable behavior in local Git helpers and `agentloop init`.
 - Removed internal product-panel notes from the public distribution-channel guide, archived completed trusted-publishing evidence, and cleared stale proposed task contracts from the active task folder.
 - Archived the remaining completed and legacy AgentLoopKit task contracts so `agentloop task doctor` reports a clean active task folder.

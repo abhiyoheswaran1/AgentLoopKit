@@ -1,10 +1,12 @@
 import path from 'node:path';
+import { realpath } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import {
   commandExists,
   getGitBranch,
   getGitCommit,
   getGitDiffStat,
+  getGitRoot,
   getGitStatus,
   isInsideGitRepo,
 } from '../src/core/git.js';
@@ -43,6 +45,7 @@ describe('git helpers', () => {
       await expect(isInsideGitRepo(dir)).resolves.toBe(false);
       await expect(getGitBranch(dir)).resolves.toBe('');
       await expect(getGitCommit(dir)).resolves.toBe('');
+      await expect(getGitRoot(dir)).resolves.toBe('');
       await expect(getGitStatus(dir)).resolves.toBe('');
       await expect(getGitDiffStat(dir)).resolves.toBe('');
     }),
@@ -54,5 +57,6 @@ describe('git helpers', () => {
     await import('execa').then(({ execa }) => execa('git', ['init', '-q'], { cwd: dir }));
 
     await expect(isInsideGitRepo(path.resolve(dir))).resolves.toBe(true);
+    await expect(getGitRoot(path.resolve(dir))).resolves.toBe(await realpath(dir));
   });
 });

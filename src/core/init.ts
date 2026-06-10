@@ -14,7 +14,7 @@ import {
 } from './constants.js';
 import { AgentLoopConfig, createDefaultConfig } from './config.js';
 import { pathExists, readTextIfExists, writeTextFile } from './file-system.js';
-import { isInsideGitRepo } from './git.js';
+import { getGitRoot, isInsideGitRepo } from './git.js';
 import { detectPackageManager } from './package-manager.js';
 import { detectPackageScripts, detectProjectName, detectProjectType } from './project-detection.js';
 import { getTemplateRoot, readTemplate, TemplateValues } from './template-renderer.js';
@@ -32,6 +32,8 @@ export type InitResult = {
   };
   git: {
     isRepository: boolean;
+    root: string;
+    targetIsRoot: boolean;
   };
   localOnly?: {
     excludePath: string;
@@ -212,6 +214,8 @@ export async function initializeAgentLoop(options: {
     },
     git: {
       isRepository: false,
+      root: '',
+      targetIsRoot: false,
     },
   };
   const homeDirectory = options.homeDirectory ?? homedir();
@@ -231,8 +235,14 @@ export async function initializeAgentLoop(options: {
   const projectType = await detectProjectType(cwd);
   const projectName = await detectProjectName(cwd);
   const commands = await detectPackageScripts(cwd, packageManager);
+  const gitRoot = await getGitRoot(cwd);
+  const gitTargetIsRoot = gitRoot
+    ? (await resolveComparablePath(gitRoot)) === (await resolveComparablePath(cwd))
+    : false;
   result.git = {
     isRepository: await isInsideGitRepo(cwd),
+    root: gitRoot ? await resolveComparablePath(gitRoot) : '',
+    targetIsRoot: gitTargetIsRoot,
   };
   result.project = {
     name: projectName,
