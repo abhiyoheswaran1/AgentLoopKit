@@ -8,10 +8,11 @@ import {
   AGENTS_FILE,
   CONFIG_FILE,
   CURRENT_TEMPLATE_VERSION,
+  DEFAULT_COMMAND_KEYS,
   PACKAGE_NAME,
   TEMPLATE_GROUPS,
 } from './constants.js';
-import { createDefaultConfig } from './config.js';
+import { AgentLoopConfig, createDefaultConfig } from './config.js';
 import { pathExists, readTextIfExists, writeTextFile } from './file-system.js';
 import { detectPackageManager } from './package-manager.js';
 import { detectPackageScripts, detectProjectName, detectProjectType } from './project-detection.js';
@@ -22,6 +23,12 @@ export type InitResult = {
   updated: string[];
   skipped: string[];
   dryRun: boolean;
+  targetDirectory: string;
+  project: AgentLoopConfig['project'];
+  commands: {
+    configured: string[];
+    missing: string[];
+  };
   localOnly?: {
     excludePath: string;
     patterns: string[];
@@ -183,13 +190,23 @@ export async function initializeAgentLoop(options: {
   homeDirectory?: string;
   localOnly?: boolean;
 }): Promise<InitResult> {
+  const cwd = path.resolve(options.cwd);
   const result: InitResult = {
     created: [],
     updated: [],
     skipped: [],
     dryRun: Boolean(options.dryRun),
+    targetDirectory: cwd,
+    project: {
+      name: '',
+      type: 'generic',
+      packageManager: 'npm',
+    },
+    commands: {
+      configured: [],
+      missing: [],
+    },
   };
-  const cwd = options.cwd;
   const homeDirectory = options.homeDirectory ?? homedir();
   const [resolvedCwd, resolvedHomeDirectory] = await Promise.all([
     resolveComparablePath(cwd),
@@ -207,6 +224,15 @@ export async function initializeAgentLoop(options: {
   const projectType = await detectProjectType(cwd);
   const projectName = await detectProjectName(cwd);
   const commands = await detectPackageScripts(cwd, packageManager);
+  result.project = {
+    name: projectName,
+    type: projectType,
+    packageManager,
+  };
+  result.commands = {
+    configured: DEFAULT_COMMAND_KEYS.filter((key) => commands[key]),
+    missing: DEFAULT_COMMAND_KEYS.filter((key) => !commands[key]),
+  };
   const config = createDefaultConfig({
     name: projectName,
     type: projectType,

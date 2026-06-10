@@ -2,6 +2,10 @@ import { Command } from 'commander';
 import { initializeAgentLoop } from '../../core/init.js';
 import { consoleLogger as logger } from '../../core/logger.js';
 
+function formatList(values: string[]) {
+  return values.length ? values.join(', ') : 'none';
+}
+
 export function initCommand() {
   return new Command('init')
     .description('Initialize AgentLoopKit in the current repository')
@@ -27,9 +31,18 @@ export function initCommand() {
         logger.info(
           options.dryRun ? 'AgentLoopKit init dry run complete.' : 'AgentLoopKit initialized.',
         );
+        logger.info(`Target: ${result.targetDirectory}`);
+        logger.info(
+          `Project: ${result.project.name || 'unnamed'} (${result.project.type}, ${result.project.packageManager})`,
+        );
+        logger.info(`Configured commands: ${formatList(result.commands.configured)}`);
+        logger.info(`Missing commands: ${formatList(result.commands.missing)}`);
         logger.info(`Created: ${result.created.length}`);
         logger.info(`Updated: ${result.updated.length}`);
         logger.info(`Skipped: ${result.skipped.length}`);
+        if (options.dryRun) {
+          logger.info('No files written.');
+        }
         if (result.localOnly) {
           logger.info('\nLocal-only mode:');
           logger.info(`- Updated exclude file: ${result.localOnly.excludePath}`);

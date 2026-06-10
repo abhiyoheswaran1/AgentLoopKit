@@ -4231,3 +4231,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The cleanup improved dogfood signal without changing release-smoke behavior.
 - Improve:
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-10: Improve Init Output Context
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-improve-init-output-context.md`
+- Trigger:
+  - `agentloop init` showed counts but not the target folder or detected project context.
+  - Users need that context when they accidentally run `npx agentloopkit init` from the wrong directory.
+- Implementation:
+  - Added `targetDirectory`, detected `project`, and command `configured`/`missing` arrays to `InitResult`.
+  - Updated human `init` output to print target folder, project type, package manager, command summary, file counts, and dry-run no-write wording.
+  - Updated README, getting-started docs, changelog, and init tests.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-23-05-verification-report.md`, overall status pass.
+  - Red focused init tests failed before implementation for missing metadata.
+  - Focused init tests passed after implementation: 12 tests.
+  - Full Vitest passed: 33 files, 163 tests.
+  - Lint, typecheck, build, Markdown link check, `projscan doctor`, and built CLI dry-run smoke passed.
+  - Built CLI dry-run smoke wrote no AgentLoop files in the temp repo; only `package.json` existed afterward.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-10-23-06-pr-summary.md`
+- What worked well:
+  - The change reused project detection data `init` already computed.
+  - The output now answers the first-run question: which folder did AgentLoopKit inspect?
+- Improve:
+  - Consider adding a human-output fixture test if init formatting changes again.
+  - Keep this unreleased until the planned `0.28.0` batch.

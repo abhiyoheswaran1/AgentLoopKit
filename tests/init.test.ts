@@ -1,13 +1,16 @@
 import path from 'node:path';
 import { execFile } from 'node:child_process';
-import { readFile, symlink, writeFile } from 'node:fs/promises';
+import { readFile, realpath, symlink, writeFile } from 'node:fs/promises';
 import { promisify } from 'node:util';
+import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 import { initializeAgentLoop } from '../src/core/init.js';
 
 let tempDirs: string[] = [];
 const execFileAsync = promisify(execFile);
+const cliPath = path.resolve('src/cli/index.ts');
+const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 async function initGitRepository(dir: string) {
   await execFileAsync('git', ['init'], { cwd: dir });
@@ -28,6 +31,14 @@ describe('init', () => {
     const config = await readFile(path.join(dir, 'agentloop.config.json'), 'utf8');
     const manifest = JSON.parse(await readFile(path.join(dir, '.agentloop/manifest.json'), 'utf8'));
 
+    expect(result.targetDirectory).toBe(dir);
+    expect(result.project).toMatchObject({
+      name: 'demo',
+      type: 'node',
+      packageManager: 'npm',
+    });
+    expect(result.commands.configured).toEqual(['test']);
+    expect(result.commands.missing).toEqual(['lint', 'typecheck', 'build', 'format']);
     expect(result.created.some((file) => file.endsWith('.agentloop/loops/feature.md'))).toBe(true);
     expect(result.created.some((file) => file.endsWith('.agentloop/README.md'))).toBe(true);
     expect(result.created.some((file) => file.endsWith('.agentloop/manifest.json'))).toBe(true);
@@ -89,6 +100,35 @@ describe('init', () => {
       readFile(path.join(dir, '.agentloop/harness/repo-map.md'), 'utf8'),
     ).rejects.toThrow();
     await expect(readFile(path.join(dir, '.agentloop/README.md'), 'utf8')).rejects.toThrow();
+  });
+
+  test('dry-run JSON output includes target, project, and command context', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'demo-cli',
+      scripts: { test: 'vitest', typecheck: 'tsc --noEmit' },
+      devDependencies: { typescript: '^5.0.0' },
+    });
+
+    const result = await execa(tsxPath, [cliPath, 'init', '--dry-run', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const expectedTargetDirectory = await realpath(dir);
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.dryRun).toBe(true);
+    expect(output.targetDirectory).toBe(expectedTargetDirectory);
+    expect(output.project).toMatchObject({
+      name: 'demo-cli',
+      type: 'typescript-package',
+      packageManager: 'npm',
+    });
+    expect(output.commands.configured).toEqual(['test', 'typecheck']);
+    expect(output.commands.missing).toEqual(['lint', 'build', 'format']);
+    await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
   });
 
   test('refuses to initialize a home directory without force', async () => {

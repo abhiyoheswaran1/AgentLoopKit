@@ -8,7 +8,7 @@ npx agentloopkit init --dry-run
 npx agentloopkit init
 ```
 
-`init` writes files into the current directory. Use `--dry-run` first when you want to see the planned file changes without writing them.
+`init` writes files into the current directory. The output shows the target folder, detected project type, package manager, configured commands, and file counts. Use `--dry-run` first when you want to see the same plan without writing files.
 
 Do not run non-dry `init` from `~` unless you intentionally want AgentLoopKit files in your home directory. AgentLoopKit refuses that by default; pass `--force` only when you mean it.
 
