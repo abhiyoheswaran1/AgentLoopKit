@@ -2390,3 +2390,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The generated harness tells agents to follow local policy files instead of treating customized text as broken.
 - Improve:
   - Add deeper policy examples for common repo types after npm publishing is stable.
+
+## 2026-06-10: 0.18.1 Policy Guidance Patch Release Candidate
+
+- Task contract: `.agentloop/tasks/2026-06-10-prepare-0-18-1-policy-guidance-patch-release.md`
+- Product cycle: `.agentloop/research/interview-cycle-074.md`
+- Trigger:
+  - Policy customization guidance changed bundled templates after GitHub release `v0.18.0`.
+  - Keeping package metadata at `0.18.0` would make current source diverge from the existing `v0.18.0` tarball.
+- Product changes:
+  - Bumped package metadata to `0.18.1`.
+  - Updated changelog, README, npm publishing docs, launch checklist, GitHub Actions docs, examples, roadmap, final handoff, backlog, and VHS demo source.
+  - Regenerated the README terminal GIF with VHS from the `0.18.1` tape.
+- Verification run:
+  - `agentloop version`: reported `0.18.1`.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 24 files and 91 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 413 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm pack`: pass, produced `agentloopkit-0.18.1.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: pass after rerunning with a safely quoted `rg` pattern.
+  - Tarball SHA-256: `01f38156e44610021752dadc90fe5d61f63ac210c3778274bce99b11833e972b`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-02-34-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-02-36-pr-summary.md`.
+  - npm registry proof: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
+- Worked well:
+  - The patch release preserves traceability between package metadata and tarball contents.
+  - The release remains local-first and docs/template-only.
+- Improve:
+  - After CI passes, publish GitHub release `v0.18.1`, attach `agentloopkit-0.18.1.tgz`, and record the npm Publish workflow result.

@@ -28,13 +28,14 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 
 - Configure npm trusted publishing for GitHub Actions.
 - npm previously lagged at `agentloopkit@0.1.1` while GitHub release candidates reached `v0.15.1`.
-- GitHub release `v0.18.0` is public with a tarball asset.
+- GitHub release `v0.18.1` is the current patch release line for policy customization guidance.
 - Local `npm publish --access public` for `0.16.0` passed package checks and stopped at npm OTP/browser authentication.
 - The release-triggered GitHub Publish workflow for `v0.16.0` passed package checks and failed at npm authorization.
 - The release-triggered GitHub Publish workflow for `v0.17.0` passed package checks and failed at npm authorization.
 - A local exact-tarball publish attempt for `0.17.0` reached npm and stopped at OTP/browser authentication.
 - The release-triggered GitHub Publish workflow for `v0.18.0` passed package checks and failed at npm authorization.
 - A local exact-tarball publish attempt for `0.18.0` reached npm and failed with authorization `E404`.
+- `0.18.1` exists because package templates changed after `v0.18.0`; publish only from its matching release commit or tarball.
 - After the current prepared release lands on npm, normal semver releases resume.
 
 ## Near Term

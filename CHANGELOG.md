@@ -2,7 +2,14 @@
 
 ## Unreleased
 
+## 0.18.1
+
+Policy customization guidance patch release candidate. GitHub release `v0.18.1` is prepared for current source; npm publish is pending account authentication or trusted-publishing repair:
+
 - Added policy customization workflow docs and generated harness guidance for `policy status` results
+- Added status-specific maintainer actions for `current`, `modified`, `missing`, and `extra` policy files
+- Clarified that local policy files are repo guidance and bundled templates are comparison material
+- Updated generated AGENTS, AGENTLOOP, workspace README, harness commands, and review checklist guidance
 
 ## 0.18.0
 
