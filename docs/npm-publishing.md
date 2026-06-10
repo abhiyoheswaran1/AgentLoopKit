@@ -39,7 +39,7 @@ npm publish --access public
 
 The first publish creates the npm package. That step may require an OTP, depending on the npm account's security settings.
 
-## Current `0.17.0` Publishing State
+## Current `0.18.0` Publishing State
 
 As of June 10, 2026:
 
@@ -48,11 +48,13 @@ Short version:
 - npm previously served `agentloopkit@0.1.1` while GitHub release candidates from `v0.2.0` through `v0.15.1` were public.
 - GitHub release `v0.16.0` is public with attached `agentloopkit-0.16.0.tgz`.
 - GitHub release `v0.17.0` is public with attached `agentloopkit-0.17.0.tgz`.
-- `0.17.0` is the current catch-up release for current source, including `agentloop policy`.
-- Do not publish `0.16.0` from current `main`. `main` now contains behavior that was not in the `v0.16.0` release.
+- Current source targets `0.18.0` after adding `agentloop policy status`.
+- `0.18.0` is the next catch-up release line for current source after verification and a matching GitHub release.
+- Do not publish `0.16.0` or `0.17.0` from current `main`. `main` now contains behavior that was not in those release tags.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped with `EOTP` because browser or one-time-password authentication is required.
 - GitHub Publish workflow run `27241996432` for `v0.16.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - GitHub Publish workflow run `27243165066` for `v0.17.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
+- Local `npm publish ./agentloopkit-0.17.0.tgz --access public` matched the GitHub release tarball, reached npm, and stopped with `EOTP` because the account requires browser or one-time-password authentication.
 - npm latest remains `agentloopkit@0.1.1` until that authentication completes.
 - Do not publish `0.15.1` to npm now. `main` has moved past that tag.
 - After the current package line lands on npm, resume normal semver publishing. Do not keep creating higher versions just because npm authorization was blocked.
@@ -141,6 +143,7 @@ Historical publishing log:
 - `agentloopkit@0.17.0` passed source version, built version, lint, typecheck, Vitest, Markdown link checks, build, projscan, `npm pack`, `npm publish --access public --dry-run`, packed-tarball smoke testing, and CI.
 - GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.17.0`.
 - GitHub release tarball SHA-256: `8b7bb6ae9307e79cf97e20e405a1cef6a4aefcc48466d865758cc87f3439d49c`.
+- `agentloopkit@0.18.0` is being prepared on `main` after `agentloop policy status` was added.
 
 Publish the current prepared release to npm from its matching release commit after browser/OTP authentication completes. Do not backfill old npm versions with newer source.
 
@@ -194,7 +197,7 @@ npm view agentloopkit version
 npm view agentloopkit versions --json
 ```
 
-For `v0.17.0`, the expected successful result is latest `0.17.0` and a versions list containing `0.17.0`.
+For the current `0.18.0` catch-up release, the expected successful result is latest `0.18.0` and a versions list containing `0.18.0`.
 
 ## Package Contents
 

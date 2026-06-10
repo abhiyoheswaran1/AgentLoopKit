@@ -2273,3 +2273,48 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Release notes and docs separate GitHub tarball availability from npm availability.
 - Improve:
   - Complete npm browser/OTP auth or trusted publishing before claiming `npx agentloopkit@0.17.0` support.
+
+## 2026-06-10: Local Policy Drift Status And 0.18.0 Preparation
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-policy-drift-status.md`
+- Product cycle: `.agentloop/research/interview-cycle-071.md`
+- Trigger:
+  - `agentloop policy list` and `agentloop policy show` made policy files visible, but teams and agents still could not tell whether local policies matched bundled templates.
+  - A local exact-tarball publish attempt for `0.17.0` reached npm and stopped at `EOTP`, so npm still requires browser/OTP auth or trusted publishing.
+- Product changes:
+  - Added read-only `agentloop policy status`.
+  - Added `agentloop policy status --json`.
+  - Reports policy files as `current`, `modified`, `missing`, or `extra`.
+  - Compares only local `.agentloop/policies/*.md` files and bundled templates.
+  - Updated shell completions, README, policy docs, getting-started docs, generated harness templates, agent templates, roadmap, changelog, decisions, launch checklist, publishing docs, final handoff, and README visual sources.
+  - Bumped package metadata to `0.18.0`.
+- Dogfooding:
+  - Created and pinned the task with AgentLoopKit, then marked it `in-progress`.
+  - The first dogfood task creation attempt used unsupported `--avoid-file`; the supported flag is `--forbidden-file`.
+  - Ran `agentloop policy status --json` in this repo and confirmed all eight local policies report `current`.
+- Verification run:
+  - Focused red test: `npx pnpm@10.12.1 test tests/policy.test.ts tests/completion.test.ts` failed before `getPolicyStatus`, `policy status`, and completion entries existed.
+  - Focused green test: `npx pnpm@10.12.1 test tests/policy.test.ts tests/completion.test.ts`: pass, 2 files and 12 tests.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 24 files and 91 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 403 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm pack`: pass, produced `agentloopkit-0.18.0.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: first assertion treated the expected traversal failure as unexpected; corrected smoke passed with clean policy status, deliberate drift status, and traversal protection.
+  - Tarball SHA-256: `7c3b6b7f12c34e57b9bfd70bb4491abd566b37b86bf0c642d9d517a7dcdb4d26`.
+  - README terminal GIF regenerated with VHS from `docs/assets/readme/agentloopkit-cli.tape`.
+  - README screenshots regenerated with Playwright from committed HTML sources.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-02-06-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-02-07-pr-summary.md`.
+  - AgentLoop HTML report: `.agentloop/reports/2026-06-10-02-07-agentloop-report.html`.
+  - AgentLoop badge: `.agentloop/reports/agentloop-verification.svg`.
+  - `agentloop check-gates --strict --json`: pass.
+- Worked well:
+  - Policy drift status adds practical review value without enforcement or migration behavior.
+  - The JSON shape is deterministic enough for agents and CI scripts.
+- Improve:
+  - After CI passes, publish GitHub release `v0.18.0`, attach `agentloopkit-0.18.0.tgz`, and record the npm publish result without claiming npm availability until the registry proves it.

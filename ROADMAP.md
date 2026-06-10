@@ -15,6 +15,7 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - Local SVG evidence badges with `agentloop badge`
 - Local template manifest checks and manual migration guidance
 - Local safety policy inspection with `agentloop policy`
+- Local safety policy template status with `agentloop policy status`
 - Local review-evidence gates with `agentloop check-gates` and `--strict`
 - Agent instruction installers, including `agentloop install-agent all`
 - Static bash, zsh, and fish completions
@@ -27,15 +28,18 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - Configure npm trusted publishing for GitHub Actions.
 - npm previously lagged at `agentloopkit@0.1.1` while GitHub release candidates reached `v0.15.1`.
 - GitHub release `v0.17.0` is public with a tarball asset.
+- Current source targets `0.18.0` after adding policy template status.
 - Local `npm publish --access public` for `0.16.0` passed package checks and stopped at npm OTP/browser authentication.
 - The release-triggered GitHub Publish workflow for `v0.16.0` passed package checks and failed at npm authorization.
 - The release-triggered GitHub Publish workflow for `v0.17.0` passed package checks and failed at npm authorization.
+- A local exact-tarball publish attempt for `0.17.0` reached npm and stopped at OTP/browser authentication.
 - After the current prepared release lands on npm, normal semver releases resume.
 
 ## Near Term
 
 - Complete npm browser/OTP authentication or trusted publishing for the current prepared release.
-- Add stricter policy editing and customization guidance.
+- Verify and release `0.18.0` with policy template status.
+- Add stricter policy editing and customization guidance after the read-only status command.
 - Improve contributor issue examples and good-first tasks.
 
 ## Later

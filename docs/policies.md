@@ -8,13 +8,22 @@ Use the policy command to inspect them without browsing the directory:
 agentloop policy list
 agentloop policy show security
 agentloop policy show security-policy.md
+agentloop policy status
 agentloop policy list --json
 agentloop policy show security --json
+agentloop policy status --json
 ```
 
 `policy list` reads Markdown files from `.agentloop/policies/` and prints their titles and paths. `policy show` accepts a policy slug, such as `security`, or the generated filename, such as `security-policy.md`.
 
-The command is read-only. It does not enforce policy, scan code, call a service, read `.env` contents, or download remote policy packs. It only reads known Markdown files from `.agentloop/policies/`.
+`policy status` compares the local Markdown files with AgentLoopKit's bundled policy templates. It reports:
+
+- `current`: local file matches the bundled template
+- `modified`: local file exists and differs from the bundled template
+- `missing`: bundled template has no matching local file
+- `extra`: local file has no matching bundled template
+
+The command is read-only. It does not enforce policy, scan code, call a service, read `.env` contents, download remote policy packs, or rewrite local policy files. It only reads Markdown files from `.agentloop/policies/` and bundled AgentLoopKit templates.
 
 If the policy directory is missing, run:
 
@@ -42,3 +51,5 @@ Fresh installs include policies for:
 - git usage
 
 Edit these files when your repo needs stricter guidance. Review policy changes like code changes, especially in team repositories.
+
+Run `agentloop policy status` after editing policies or upgrading AgentLoopKit. Treat `modified` as a prompt to review the local policy text, not as an error. Treat `missing` as a prompt to decide whether the repo needs that policy file.

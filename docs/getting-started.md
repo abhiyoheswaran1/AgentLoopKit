@@ -73,9 +73,10 @@ Inspect the generated safety policies:
 ```bash
 npx agentloopkit policy list
 npx agentloopkit policy show security
+npx agentloopkit policy status
 ```
 
-`policy` is read-only. It prints Markdown guidance from `.agentloop/policies/` and does not enforce policy or scan source code.
+`policy` is read-only. It prints Markdown guidance from `.agentloop/policies/` and can compare local policy files with bundled templates. It does not enforce policy, mutate policy files, or scan source code.
 
 Optional shell completions:
 

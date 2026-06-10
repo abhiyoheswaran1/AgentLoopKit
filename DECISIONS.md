@@ -79,3 +79,7 @@ Generated harness provenance lives in `.agentloop/manifest.json`, not in `agentl
 ## 2026-06-10: Policy Inspection Is Read-Only
 
 `agentloop policy` lists and reads local Markdown files under `.agentloop/policies/`. It does not enforce policy, scan source code, fetch remote policy packs, mutate policy files, or claim compliance. The command exists so humans and agents can find repo guidance before risky edits while keeping policies as plain files.
+
+## 2026-06-10: Policy Status Compares Templates, Not Compliance
+
+`agentloop policy status` compares local `.agentloop/policies/*.md` files with bundled AgentLoopKit policy templates. It reports `current`, `modified`, `missing`, and `extra` so agents and maintainers can review local policy drift. It does not score compliance, scan source code, rewrite policies, fetch remote packs, or decide whether a local customization is correct.

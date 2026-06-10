@@ -27,6 +27,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - local static HTML evidence reports with `agentloop report`
 - local SVG evidence badges with `agentloop badge`
 - read-only local policy inspection with `agentloop policy`
+- read-only local policy template status with `agentloop policy status`
 - verification reports with allowlisted CI context
 - local status command for active task, latest verification, dirty files, configured commands, and next action
 - local gate-check command for task, verification, handoff, harness, policy, and git evidence
@@ -69,7 +70,9 @@ agentloop badge --source gates
 agentloop badge --json
 agentloop policy list
 agentloop policy show security
+agentloop policy status
 agentloop policy show security --json
+agentloop policy status --json
 agentloop verify
 agentloop verify --command "node smoke-test.js"
 agentloop handoff
@@ -103,6 +106,29 @@ npx projscan doctor --format markdown
 ```
 
 Latest local verification:
+
+- `0.18.0` policy-status release-candidate verification:
+  - Focused red test: `npx pnpm@10.12.1 test tests/policy.test.ts tests/completion.test.ts` failed before `getPolicyStatus`, `policy status`, and completion entries existed.
+  - Focused green test: `npx pnpm@10.12.1 test tests/policy.test.ts tests/completion.test.ts`: pass, 2 files and 12 tests.
+  - Live CLI smoke: `agentloop version` reported `0.18.0`; `policy status --json` reported all eight repo policies as `current`.
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 24 files and 91 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 403 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm pack`: pass, produced `agentloopkit-0.18.0.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: pass after correcting the smoke assertion to expect traversal lookup failure.
+  - Tarball SHA-256: `7c3b6b7f12c34e57b9bfd70bb4491abd566b37b86bf0c642d9d517a7dcdb4d26`.
+  - README terminal GIF regenerated with VHS.
+  - README screenshots regenerated with Playwright.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-02-06-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-02-07-pr-summary.md`.
+  - AgentLoop HTML report: `.agentloop/reports/2026-06-10-02-07-agentloop-report.html`.
+  - AgentLoop gate check: `agentloop check-gates --strict --json`: pass.
+  - npm registry proof before release: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
 
 - `0.17.0` policy-inspection release-candidate verification:
   - Focused red test: `npx pnpm@10.12.1 test tests/policy.test.ts` failed before `src/core/policy.ts` existed.
@@ -1430,6 +1456,21 @@ Implemented:
 - package metadata bump to `0.17.0` because `main` moved after the public `v0.16.0` tag
 - README terminal GIF regenerated with VHS and screenshots regenerated with Playwright
 
+### Cycle 71: Local policy drift status
+
+Decision: add read-only policy template status instead of policy editing, enforcement, migration, or compliance scoring. Agents and maintainers need to know whether local policy files are current, modified, missing, or extra without AgentLoopKit rewriting repo rules.
+
+Implemented:
+
+- `agentloop policy status`
+- `agentloop policy status --json`
+- deterministic `current`, `modified`, `missing`, and `extra` status entries
+- comparison against bundled policy templates without remote fetches or local mutation
+- static shell completion updates
+- README, policy docs, generated harness, agent-template, publishing, launch-checklist, and final-handoff updates
+- package metadata bump to `0.18.0` because `main` moved after the public `v0.17.0` tag
+- README terminal GIF regenerated with VHS and screenshots regenerated with Playwright
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1470,13 +1511,14 @@ Strongest signals:
 - Reviewers need deterministic PR summaries to group changed files by review area without LLM calls.
 - Teams need one local HTML evidence artifact after task, verification, and handoff files exist.
 - Reviewers need small local status badges that point back to verification or gate evidence.
+- Platform users and agents need policy template drift visibility without a compliance engine.
 
 ## Backlog
 
 Top remaining items:
 
-1. Complete npm browser/OTP authentication for `agentloopkit@0.16.0`.
-2. Policy pack customization.
+1. Complete npm browser/OTP authentication or trusted publishing for the current prepared release, now `agentloopkit@0.18.0`.
+2. Policy editing and customization guidance.
 3. Optional schema-store submission after npm publishing is stable.
 4. CI summary import.
 5. Improve contributor issue examples and good-first tasks.
@@ -1485,14 +1527,16 @@ Top remaining items:
 
 - GitHub releases `v0.2.0`, `v0.2.1`, `v0.3.0`, `v0.4.0`, `v0.5.0`, `v0.6.0`, `v0.7.0`, `v0.8.0`, `v0.9.0`, `v0.10.0`, `v0.11.0`, `v0.12.0`, `v0.13.0`, `v0.14.0`, `v0.15.0`, `v0.15.1`, and `v0.16.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
 - GitHub release `v0.17.0` is public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- npm should jump from `0.1.1` to the current prepared release because public GitHub tags already occupy the intermediate versions.
-- Do not publish `0.16.0` to npm from current `main`. Publish each version only from its matching release commit.
+- Current source targets `0.18.0`; npm should jump from `0.1.1` to the current prepared release because public GitHub tags already occupy the intermediate versions.
+- Do not publish `0.16.0` or `0.17.0` to npm from current `main`. Publish each version only from its matching release commit or release tarball.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP` for browser/OTP authentication.
 - The release-triggered GitHub Publish workflow for `v0.16.0` passed checks and failed at npm authorization with `E404`.
 - GitHub release `v0.16.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.16.0
 - GitHub release `v0.16.0` tarball SHA-256: `687dac923ee3976e4975641a20844ece4ce41c2123794423c46cd72091f8cb18`.
 - GitHub release `v0.17.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.17.0
 - GitHub release `v0.17.0` tarball SHA-256: `8b7bb6ae9307e79cf97e20e405a1cef6a4aefcc48466d865758cc87f3439d49c`.
+- `agentloopkit@0.18.0` is prepared on `main` for policy template status.
+- `agentloopkit@0.18.0` tarball SHA-256: `7c3b6b7f12c34e57b9bfd70bb4491abd566b37b86bf0c642d9d517a7dcdb4d26`.
 - `agentloopkit@0.8.0` is not on npm yet.
 - `agentloopkit@0.7.0`, `agentloopkit@0.6.0`, `agentloopkit@0.5.0`, and `agentloopkit@0.4.0` are not on npm.
 - Local `npm publish --access public` for `0.3.0` passed package checks, then npm required browser/OTP authentication with `EOTP`.
@@ -1613,6 +1657,10 @@ Top remaining items:
 - [x] Publish GitHub release `v0.17.0` with policy-inspection release notes.
 - [ ] Publish `agentloopkit@0.17.0` to npm.
 - [x] Run GitHub Publish workflow for `v0.17.0`; package checks passed, npm authorization failed.
+- [x] Try local exact-tarball publish for `0.17.0`; npm required browser/OTP authentication.
+- [x] Prepare `agentloopkit@0.18.0` policy-status release candidate.
+- [ ] Publish GitHub release `v0.18.0` with policy-status release notes.
+- [ ] Publish `agentloopkit@0.18.0` to npm.
 - [ ] Configure npm trusted publishing for future releases.
 - [x] Confirm npm package install with `npx agentloopkit version`.
 - [x] Add GitHub repo description and discovery topics.
@@ -1664,7 +1712,7 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Complete browser/OTP npm publish or trusted publishing for `0.17.0`: high usefulness, low repo effort, external auth required.
+1. Complete browser/OTP npm publish or trusted publishing for `0.18.0`: high usefulness, low repo effort, external auth required.
 2. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
 3. Add policy editing/customization guidance: medium commercial optionality, low effort.
 4. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.

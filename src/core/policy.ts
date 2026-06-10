@@ -2,6 +2,7 @@ import path from 'node:path';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import type { AgentLoopConfig } from './config.js';
 import { AgentLoopError } from './errors.js';
+import { getTemplateRoot } from './template-renderer.js';
 
 export type ListedPolicy = {
   name: string;
@@ -11,6 +12,20 @@ export type ListedPolicy = {
 
 export type PolicyDocument = ListedPolicy & {
   content: string;
+};
+
+export type PolicyStatusValue = 'current' | 'modified' | 'missing' | 'extra';
+
+export type PolicyStatusEntry = ListedPolicy & {
+  status: PolicyStatusValue;
+  templatePath: string | null;
+};
+
+export type PolicyStatusSummary = Record<PolicyStatusValue, number>;
+
+export type PolicyStatusReport = {
+  policies: PolicyStatusEntry[];
+  summary: PolicyStatusSummary;
 };
 
 function policyRoot(cwd: string, config: AgentLoopConfig) {
@@ -33,6 +48,10 @@ function normalizePolicyName(policyName: string) {
     .toLowerCase();
 }
 
+function normalizeContent(content: string) {
+  return content.replace(/\r\n/g, '\n');
+}
+
 async function ensurePolicyRoot(root: string) {
   const rootStat = await stat(root).catch(() => undefined);
   if (!rootStat?.isDirectory()) {
@@ -42,27 +61,39 @@ async function ensurePolicyRoot(root: string) {
   }
 }
 
+async function readMarkdownFiles(root: string) {
+  const entries = await readdir(root, { withFileTypes: true });
+  const files = [];
+
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
+    const absolutePath = path.join(root, entry.name);
+    const content = await readFile(absolutePath, 'utf8');
+    files.push({
+      name: path.basename(entry.name, '.md'),
+      fileName: entry.name,
+      absolutePath,
+      content,
+      title: extractHeading(content, path.basename(entry.name, '.md')),
+    });
+  }
+
+  return files.sort((left, right) => left.name.localeCompare(right.name));
+}
+
 export async function listPolicies(options: {
   cwd: string;
   config: AgentLoopConfig;
 }): Promise<ListedPolicy[]> {
   const root = policyRoot(options.cwd, options.config);
   await ensurePolicyRoot(root);
-  const entries = await readdir(root, { withFileTypes: true });
-  const policies: ListedPolicy[] = [];
+  const policies = await readMarkdownFiles(root);
 
-  for (const entry of entries) {
-    if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
-    const absolutePath = path.join(root, entry.name);
-    const content = await readFile(absolutePath, 'utf8');
-    policies.push({
-      name: path.basename(entry.name, '.md'),
-      title: extractHeading(content, path.basename(entry.name, '.md')),
-      path: toStoredPath(options.cwd, absolutePath),
-    });
-  }
-
-  return policies.sort((left, right) => left.name.localeCompare(right.name));
+  return policies.map((policy) => ({
+    name: policy.name,
+    title: policy.title,
+    path: toStoredPath(options.cwd, policy.absolutePath),
+  }));
 }
 
 export async function readPolicy(options: {
@@ -85,5 +116,57 @@ export async function readPolicy(options: {
   return {
     ...policy,
     content,
+  };
+}
+
+export async function getPolicyStatus(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+}): Promise<PolicyStatusReport> {
+  const root = policyRoot(options.cwd, options.config);
+  await ensurePolicyRoot(root);
+
+  const templateRoot = path.join(getTemplateRoot(), 'policies');
+  const [localPolicies, templatePolicies] = await Promise.all([
+    readMarkdownFiles(root),
+    readMarkdownFiles(templateRoot),
+  ]);
+
+  const localByName = new Map(localPolicies.map((policy) => [policy.name, policy]));
+  const templateByName = new Map(templatePolicies.map((policy) => [policy.name, policy]));
+  const names = [...new Set([...templateByName.keys(), ...localByName.keys()])].sort((left, right) =>
+    left.localeCompare(right),
+  );
+  const summary: PolicyStatusSummary = {
+    current: 0,
+    modified: 0,
+    missing: 0,
+    extra: 0,
+  };
+  const policies = names.map((name): PolicyStatusEntry => {
+    const local = localByName.get(name);
+    const template = templateByName.get(name);
+    const status: PolicyStatusValue = !template
+      ? 'extra'
+      : !local
+        ? 'missing'
+        : normalizeContent(local.content) === normalizeContent(template.content)
+          ? 'current'
+          : 'modified';
+
+    summary[status] += 1;
+
+    return {
+      name,
+      title: local?.title ?? template?.title ?? name,
+      path: toStoredPath(options.cwd, path.join(root, `${name}.md`)),
+      status,
+      templatePath: template ? `templates/policies/${template.fileName}` : null,
+    };
+  });
+
+  return {
+    policies,
+    summary,
   };
 }

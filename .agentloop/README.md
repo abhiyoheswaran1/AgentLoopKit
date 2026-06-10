@@ -25,6 +25,7 @@ agentloop task set .agentloop/tasks/<task-file>.md
 agentloop status
 agentloop policy list
 agentloop policy show security
+agentloop policy status
 agentloop verify
 agentloop handoff
 agentloop report

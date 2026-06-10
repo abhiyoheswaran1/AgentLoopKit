@@ -37,6 +37,7 @@ const taskCommands = taskCommandSpecs.map(([name]) => name);
 const policyCommandSpecs = [
   ['list', 'List local policies'],
   ['show', 'Show a local policy'],
+  ['status', 'Show local policy template status'],
 ] as const;
 const policyCommands = policyCommandSpecs.map(([name]) => name);
 const taskStatuses = ['proposed', 'in-progress', 'blocked', 'review', 'done'] as const;

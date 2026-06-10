@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { loadAgentLoopConfig } from '../../core/config.js';
-import { listPolicies, readPolicy } from '../../core/policy.js';
-import type { ListedPolicy, PolicyDocument } from '../../core/policy.js';
+import { getPolicyStatus, listPolicies, readPolicy } from '../../core/policy.js';
+import type { ListedPolicy, PolicyDocument, PolicyStatusReport } from '../../core/policy.js';
 
 function printPolicyList(policies: ListedPolicy[], options: { json?: boolean }) {
   if (options.json) {
@@ -31,6 +31,30 @@ function printPolicy(policy: PolicyDocument, options: { json?: boolean }) {
   process.stdout.write(policy.content);
 }
 
+function printPolicyStatus(report: PolicyStatusReport, options: { json?: boolean }) {
+  if (options.json) {
+    console.log(JSON.stringify(report, null, 2));
+    return;
+  }
+
+  console.log('AgentLoopKit policy status:');
+  console.log(
+    `Summary: ${report.summary.current} current, ${report.summary.modified} modified, ${report.summary.missing} missing, ${report.summary.extra} extra`,
+  );
+
+  for (const policy of report.policies) {
+    console.log(`- ${policy.status}: ${policy.title}`);
+    console.log(`  ${policy.path}`);
+  }
+
+  const hasDrift =
+    report.summary.modified > 0 || report.summary.missing > 0 || report.summary.extra > 0;
+  if (hasDrift) {
+    console.log('');
+    console.log('Next step: review policy differences before changing repo rules.');
+  }
+}
+
 export function policyCommand() {
   const command = new Command('policy').description('List or inspect local AgentLoopKit policies');
 
@@ -42,6 +66,16 @@ export function policyCommand() {
       const config = await loadAgentLoopConfig(process.cwd());
       const policies = await listPolicies({ cwd: process.cwd(), config });
       printPolicyList(policies, options);
+    });
+
+  command
+    .command('status')
+    .description('Show local policy template status')
+    .option('--json', 'print machine-readable output')
+    .action(async (options: { json?: boolean }) => {
+      const config = await loadAgentLoopConfig(process.cwd());
+      const status = await getPolicyStatus({ cwd: process.cwd(), config });
+      printPolicyStatus(status, options);
     });
 
   command

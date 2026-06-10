@@ -32,6 +32,7 @@ agentloop status
 ```bash
 agentloop policy list
 agentloop policy show security
+agentloop policy status
 ```
 
 6. Run verification when work is ready:
