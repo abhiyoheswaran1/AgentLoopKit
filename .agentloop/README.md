@@ -33,3 +33,5 @@ agentloop badge
 ```
 
 Use `npx projscan doctor --format markdown` during implementation work in this repository.
+
+Local policy files are repo guidance. If `agentloop policy status` reports `modified`, read the local file and follow the repo-specific rule. Do not overwrite customized policy text just to match the bundled template.

@@ -6,4 +6,5 @@
 - [ ] Tests or documented verification cover the change.
 - [ ] Docs were updated when behavior changed.
 - [ ] Protected areas were reviewed.
+- [ ] Policy changes were reviewed when `.agentloop/policies/` changed.
 - [ ] Rollback notes are clear.

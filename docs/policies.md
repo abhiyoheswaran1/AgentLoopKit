@@ -25,6 +25,31 @@ agentloop policy status --json
 
 The command is read-only. It does not enforce policy, scan code, call a service, read `.env` contents, download remote policy packs, or rewrite local policy files. It only reads Markdown files from `.agentloop/policies/` and bundled AgentLoopKit templates.
 
+## How to read status
+
+| Status | What it means | Maintainer action |
+| ------ | ------------- | ----------------- |
+| `current` | The local policy matches the bundled AgentLoopKit template. | No action unless your repo needs stricter guidance. |
+| `modified` | The local policy differs from the bundled template. | Review the local text. Treat it as a repo decision, not an error. |
+| `missing` | A bundled policy template has no matching local file. | Decide whether the repo needs that policy. Run `agentloop init` only if you want to restore missing generated files. |
+| `extra` | The repo has a policy file that is not bundled with AgentLoopKit. | Keep it if it captures repo-specific rules. Review it like any other policy file. |
+
+Local policy files are the source of truth for the repo. Bundled templates are comparison material. Agents should follow `.agentloop/policies/*.md` during repo work, even when `policy status` reports `modified`.
+
+## Customizing policies
+
+Use this workflow when a repo needs stricter or more specific rules:
+
+1. Open the relevant file under `.agentloop/policies/`.
+2. Make the policy concrete enough for agents to follow during implementation and handoff.
+3. Keep safety-sensitive relaxations explicit. If a change weakens guidance for secrets, destructive actions, dependencies, database changes, public APIs, or git history, require human review.
+4. Run `agentloop policy status`.
+5. Include policy changes in the task contract or PR summary so reviewers know the repo rules changed.
+
+Good policy edits name the risky area, the allowed action, the approval trigger, and the verification evidence expected from the agent. Avoid broad values statements that do not change agent behavior.
+
+When upgrading AgentLoopKit, compare modified local policies with the bundled templates before copying text over. Do not replace customized policy files just to make `policy status` show `current`.
+
 If the policy directory is missing, run:
 
 ```bash

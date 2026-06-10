@@ -2363,3 +2363,30 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The exact npm publish blocker remains visible instead of being turned into a vague pending status.
 - Improve:
   - After a fresh `npm login` or trusted-publishing setup, publish `agentloopkit@0.18.0` and verify with `npm view agentloopkit version`.
+
+## 2026-06-10: Policy Customization Guidance
+
+- Task contract: `.agentloop/tasks/2026-06-10-document-policy-customization-workflow.md`
+- Product cycle: `.agentloop/research/interview-cycle-073.md`
+- Trigger:
+  - `agentloop policy status` can report drift, but maintainers need to know what to do with intentional local policy edits.
+  - Future agents need to know that local `.agentloop/policies/*.md` files are repo guidance.
+- Product changes:
+  - Added a status-action table and customization workflow to `docs/policies.md`.
+  - Updated README and template migration docs to treat `modified` as a local decision to review.
+  - Updated generated AGENTS, AGENTLOOP, `.agentloop/README.md`, harness command, and review-checklist guidance.
+  - Kept the CLI read-only. No policy editor, auto-migration, remote policy pack, compliance score, or enforcement engine was added.
+- Verification run:
+  - `git diff --check`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 24 files and 91 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 409 Markdown files checked.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `agentloop policy status --json`: pass, all eight repo policies reported `current`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-02-25-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-02-26-pr-summary.md`.
+  - `agentloop check-gates --strict --json`: pass.
+- Worked well:
+  - The docs now give maintainers a concrete action for each policy status.
+  - The generated harness tells agents to follow local policy files instead of treating customized text as broken.
+- Improve:
+  - Add deeper policy examples for common repo types after npm publishing is stable.

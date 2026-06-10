@@ -346,6 +346,8 @@ agentloop policy status --json
 
 The command reads Markdown files from `.agentloop/policies/`. `policy status` reports `current`, `modified`, `missing`, and `extra` files by comparing local Markdown with bundled templates. It does not enforce compliance, scan source code, fetch remote policy packs, or mutate policy files.
 
+Local policy files are repo guidance. A `modified` policy can be intentional; review it like code instead of overwriting it to match the bundled template.
+
 See `docs/policies.md`.
 
 ## GitHub Actions

@@ -17,6 +17,7 @@ Rules:
 - Use `agentloop task archive <path>` only after verification and handoff are complete.
 - Use `agentloop status` to inspect active task, latest report, dirty files, and next action.
 - Use `agentloop policy list`, `agentloop policy show <policy>`, and `agentloop policy status` to inspect local safety guidance and template drift before risky edits.
+- Follow local `.agentloop/policies/*.md` files as repo policy. Treat `modified` as a reviewed local rule, not an error.
 - Use `agentloop check-gates` to check task, verification, handoff, harness, policy, and git evidence before review.
 - Use `agentloop check-gates --strict` in CI when warning gates should fail.
 - Use `agentloop report` after verification and handoff when reviewers need one local HTML evidence artifact.

@@ -1502,6 +1502,19 @@ Implemented:
 - npm publishing docs section explaining why npm should jump from `0.1.1` to `0.18.0`
 - launch checklist, roadmap, GitHub Actions docs, example CI tarball pins, final handoff, backlog, and dogfood updates
 
+### Cycle 73: Policy customization guidance
+
+Decision: document how maintainers should customize local policy files after `agentloop policy status`, without adding a policy editor, compliance score, remote policy pack, or enforcement engine.
+
+Implemented:
+
+- status-action table for `current`, `modified`, `missing`, and `extra`
+- policy customization workflow in `docs/policies.md`
+- README pointer that modified policies can be intentional repo guidance
+- template migration guidance for reviewing policy drift during upgrades
+- generated `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/README.md`, harness command, and review-checklist guidance
+- internal product-panel cycle and task contract for the docs-only change
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1523,6 +1536,7 @@ Strongest signals:
 - Release readers need the README visuals and changelog to match the newest source command before a GitHub release is cut.
 - Agents need `create-task` to return machine-readable output like the rest of the task lifecycle commands.
 - Release readers need the npm/GitHub version gap explained before they trust a catch-up publish.
+- Maintainers need to know that customized policy files are repo decisions, not automatic errors.
 - Release readers need `0.12.0` metadata and visuals to match `create-task --json` before the GitHub release.
 - Agents and reviewers need one deterministic command that checks review evidence without running tests.
 - Release readers need `0.13.0` metadata and visuals to match `check-gates` before the GitHub release.
@@ -1550,10 +1564,10 @@ Strongest signals:
 Top remaining items:
 
 1. Complete npm browser/OTP authentication or trusted publishing for the current prepared release, now `agentloopkit@0.18.0`.
-2. Policy editing and customization guidance.
-3. Optional schema-store submission after npm publishing is stable.
-4. CI summary import.
-5. Improve contributor issue examples and good-first tasks.
+2. Optional schema-store submission after npm publishing is stable.
+3. CI summary import.
+4. Improve contributor issue examples and good-first tasks.
+5. Add deeper policy examples for common repo types.
 
 ## Known limitations
 
@@ -1752,7 +1766,7 @@ Title: I built a local-first engineering loop for coding agents
 
 1. Complete browser/OTP npm publish or trusted publishing for `0.18.0`: high usefulness, low repo effort, external auth required.
 2. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
-3. Add policy editing/customization guidance: medium commercial optionality, low effort.
+3. Add deeper policy examples for common repo types: medium commercial optionality, low effort.
 4. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
 5. Add generated release-note handoff: medium usefulness, low effort, low maintenance.
 6. Add package recipe examples for more monorepo managers: medium usefulness, low effort.

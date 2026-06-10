@@ -16,6 +16,7 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - Local template manifest checks and manual migration guidance
 - Local safety policy inspection with `agentloop policy`
 - Local safety policy template status with `agentloop policy status`
+- Policy customization guidance for repo-local safety rules
 - Local review-evidence gates with `agentloop check-gates` and `--strict`
 - Agent instruction installers, including `agentloop install-agent all`
 - Static bash, zsh, and fish completions
@@ -39,7 +40,6 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 ## Near Term
 
 - Complete npm browser/OTP authentication or trusted publishing for the current prepared release.
-- Add stricter policy editing and customization guidance after the read-only status command.
 - Improve contributor issue examples and good-first tasks.
 
 ## Later

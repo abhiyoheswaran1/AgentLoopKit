@@ -35,6 +35,8 @@ agentloop policy show security
 agentloop policy status
 ```
 
+Local policy files are repo guidance. If `policy status` reports `modified`, read the local file and follow the repo-specific rule. Do not overwrite customized policy text just to match the bundled template.
+
 6. Run verification when work is ready:
 
 ```bash

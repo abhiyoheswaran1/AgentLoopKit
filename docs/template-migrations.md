@@ -37,9 +37,12 @@ Suggested review flow:
 agentloop doctor
 agentloop init --dry-run
 agentloop list-templates
+agentloop policy status
 ```
 
 Then inspect the relevant files under `.agentloop/`, `AGENTS.md`, and `AGENTLOOP.md`.
+
+For policy files, treat `modified` as a local repo decision to review. Do not copy bundled policy text over a customized local policy unless the maintainer wants that rule change.
 
 ## Non-Goals
 

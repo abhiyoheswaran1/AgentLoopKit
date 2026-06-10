@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added policy customization workflow docs and generated harness guidance for `policy status` results
+
 ## 0.18.0
 
 Policy template status release candidate. GitHub release `v0.18.0` is public; npm publish is pending account authentication or trusted-publishing repair:
