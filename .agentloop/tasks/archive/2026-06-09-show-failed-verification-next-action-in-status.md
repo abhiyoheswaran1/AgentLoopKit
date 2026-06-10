@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: bugfix
-- Status: completed
+- Status: done
 
 ## Problem Statement
 `agentloop status` treats any latest verification report as usable evidence. If the latest report failed and the working tree is dirty, the command can suggest `agentloop summarize --write`, which points users toward handoff before fixing verification.

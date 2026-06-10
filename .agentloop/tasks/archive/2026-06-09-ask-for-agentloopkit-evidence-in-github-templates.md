@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: docs
-- Status: completed
+- Status: done
 
 ## Problem Statement
 GitHub issue and PR templates exist, but they do not ask contributors to include AgentLoopKit status, verification, or handoff evidence. Contributors may miss the repo's main review discipline.

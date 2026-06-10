@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: docs
-- Status: completed
+- Status: done
 
 ## Problem Statement
 CI now forces GitHub JavaScript actions onto Node 24, but GitHub still warns because the pinned action major versions target Node 20. The repo should use action major versions that support the newer runtime.

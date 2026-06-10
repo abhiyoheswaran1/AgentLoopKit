@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: feature
-- Status: completed
+- Status: done
 
 ## Problem Statement
 Users have to remember that the final handoff command is summarize --write, which is less obvious than the loop step name.

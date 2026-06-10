@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: feature
-- Status: verified
+- Status: done
 
 ## Problem Statement
 Users can pin a task with agentloop task set, but they need a quick deterministic list of available task contracts before choosing one.

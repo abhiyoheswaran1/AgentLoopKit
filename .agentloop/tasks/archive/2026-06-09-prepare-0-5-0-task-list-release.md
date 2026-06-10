@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: release
-- Status: verified
+- Status: done
 
 ## Problem Statement
 The task list command is implemented on main but package metadata still says 0.4.0, which already has a GitHub release tag.

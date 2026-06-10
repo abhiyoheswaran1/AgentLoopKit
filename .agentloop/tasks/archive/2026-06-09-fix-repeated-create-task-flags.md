@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: bugfix
-- Status: completed
+- Status: done
 
 ## Problem Statement
 Repeated create-task flags such as --constraint and --acceptance keep only the last value.

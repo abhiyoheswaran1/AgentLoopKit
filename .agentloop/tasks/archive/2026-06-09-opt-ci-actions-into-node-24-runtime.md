@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: docs
-- Status: completed
+- Status: done
 
 ## Problem Statement
 GitHub Actions CI passes, but GitHub warns that JavaScript actions are still running on the deprecated Node.js 20 runtime. Release confidence is better if CI opts into Node 24 before GitHub forces the migration.

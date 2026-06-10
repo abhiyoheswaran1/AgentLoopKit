@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: bugfix
-- Status: completed
+- Status: done
 
 ## Problem Statement
 Latest task and summary detection sort Markdown files by filename, so same-day task files can select an older task.

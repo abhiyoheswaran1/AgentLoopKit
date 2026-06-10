@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: feature
-- Status: completed
+- Status: done
 
 ## Problem Statement
 Long verification output currently keeps only the beginning of stdout/stderr. When a command fails after a large log, the report can drop the final error lines reviewers need most.

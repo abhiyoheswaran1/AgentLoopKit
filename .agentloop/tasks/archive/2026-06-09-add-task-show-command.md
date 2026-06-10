@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: feature
-- Status: verified
+- Status: done
 
 ## Problem Statement
 Users and agents can list task contracts, but they still need to open files manually to inspect a selected task contract.

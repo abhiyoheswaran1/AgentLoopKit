@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: release
-- Status: verified
+- Status: done
 
 ## Problem Statement
 The task show command is implemented on main after the v0.5.0 tag, but package metadata still reports 0.5.0.

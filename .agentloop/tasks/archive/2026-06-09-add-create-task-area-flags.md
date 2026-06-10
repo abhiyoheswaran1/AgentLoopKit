@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: feature
-- Status: completed
+- Status: done
 
 ## Problem Statement
 Non-interactive create-task cannot capture likely files or files not to touch even though those fields are part of the task contract.

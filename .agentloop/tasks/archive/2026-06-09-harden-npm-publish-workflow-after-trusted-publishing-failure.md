@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-09
 - Task type: docs
-- Status: completed
+- Status: done
 
 ## Problem Statement
 GitHub release `v0.2.0` triggered the publish workflow. The workflow passed install, lint, typecheck, tests, and build, then npm rejected `npm publish` with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`, which indicates missing npm publish permission or missing trusted-publisher configuration.

@@ -2,6 +2,31 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-10: Archive Completed Task Contracts
+
+- Task contract: `.agentloop/tasks/2026-06-10-archive-completed-task-contracts.md`
+- Trigger:
+  - After stale proposed tasks were archived, `agentloop task doctor` still reported 103 completed or legacy task contracts in the active task folder.
+  - The active folder should show current or intentionally deferred work, not historical implementation evidence.
+- Product change:
+  - Used `agentloop task status <path> done` to normalize legacy `completed` and `verified` task statuses.
+  - Used `agentloop task archive <path>` to move 103 completed or legacy contracts into `.agentloop/tasks/archive/`.
+  - Preserved the two deferred future distribution tasks for Scoop/WinGet and VS Code/Open VSX.
+  - Did not change runtime CLI behavior, package metadata, README content, or release state.
+- Verification completed:
+  - Active task folder assertion: pass; only `2026-06-10-add-scoop-winget-manifests.md` and `2026-06-10-explore-vscode-open-vsx-extension.md` remain outside `README.md` and `archive/`.
+  - `node dist/cli/index.js task doctor --json`
+  - `node dist/cli/index.js status --json`
+  - `npx pnpm@10.12.1 check:links`
+  - `git diff --check`
+  - `npx --yes projscan doctor --format markdown`
+- Verification report: `.agentloop/reports/2026-06-10-22-18-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-10-22-19-pr-summary.md`
+- Worked well:
+  - The read-only `task doctor` output gave an exact file list for safe one-by-one archival through AgentLoopKit itself.
+- Improve:
+  - A future guarded cleanup helper could generate an archive plan, but bulk mutation should stay opt-in and dry-run-first.
+
 ## 2026-06-10: Clean Completed Trusted Publishing Task
 
 - Task contract: `.agentloop/tasks/archive/2026-06-10-verify-npm-trusted-publishing.md`
