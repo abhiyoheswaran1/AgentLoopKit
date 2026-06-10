@@ -154,6 +154,36 @@ describe('create-task command', () => {
     expect(markdown).toContain('- Regression test fails before implementation');
   });
 
+  test('rejects unsupported non-interactive task types without prompting', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Typo task type',
+        '--type',
+        'test-generaton',
+        '--out',
+        '.agentloop/tasks/typo.md',
+      ],
+      { cwd: dir, reject: false, timeout: 5000 },
+    );
+
+    expect(result.timedOut).toBe(false);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('Unsupported task type "test-generaton"');
+    expect(result.stderr).toContain('test-generation');
+    await expect(stat(path.join(dir, '.agentloop/tasks/typo.md'))).rejects.toThrow();
+  });
+
   test('prints created task details as JSON when requested', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

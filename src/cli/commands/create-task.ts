@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import prompts from 'prompts';
 import { TASK_TYPES } from '../../core/constants.js';
 import { loadAgentLoopConfig } from '../../core/config.js';
+import { AgentLoopError } from '../../core/errors.js';
 import { createTaskContractFile, TaskType } from '../../core/task-contract.js';
 
 function lines(value: string | undefined, previous: string[]) {
@@ -23,6 +24,15 @@ function stringOption(options: Record<string, unknown>, ...keys: string[]) {
 
 function listOption(options: Record<string, unknown>, ...keys: string[]) {
   return keys.flatMap((key) => (Array.isArray(options[key]) ? (options[key] as string[]) : []));
+}
+
+function resolveTaskType(value: unknown) {
+  if (typeof value !== 'string') return undefined;
+  const type = value.trim();
+  if (TASK_TYPES.includes(type as TaskType)) return type as TaskType;
+  throw new AgentLoopError(
+    `Unsupported task type "${type}". Supported task types: ${TASK_TYPES.join(', ')}`,
+  );
 }
 
 async function collectInteractive(initial: { title?: string; type?: TaskType }) {
@@ -118,10 +128,7 @@ export function createTaskCommand() {
     .option('--rollback <text>', 'rollback notes')
     .option('--json', 'print machine-readable output')
     .action(async (options: Record<string, unknown>) => {
-      const type =
-        typeof options.type === 'string' && TASK_TYPES.includes(options.type as TaskType)
-          ? (options.type as TaskType)
-          : undefined;
+      const type = resolveTaskType(options.type);
       const title = typeof options.title === 'string' ? options.title : undefined;
       const config = await loadAgentLoopConfig(process.cwd());
       const input =

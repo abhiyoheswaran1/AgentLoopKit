@@ -4615,3 +4615,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider a friendlier non-interactive error for unsupported `--type` values instead of falling into prompts when title is present.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Fail Fast for Unsupported Task Type
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-fail-fast-for-unsupported-task-type.md`
+- Trigger:
+  - The `test-generation` task-type fix showed that typos in `create-task --type` could hang non-interactive sessions by entering prompts.
+- Implementation:
+  - Added explicit unsupported-type validation before interactive collection.
+  - Reused the normal CLI error path so users see `agentloop: Unsupported task type ...` and exit code 1.
+  - Added a CLI regression test that verifies the command exits without timing out, prints supported values, and writes no task file.
+  - Updated backlog and unreleased changelog.
+- Verification run:
+  - Red focused test failed because the old behavior timed out.
+  - First full AgentLoop verification failed because the test timeout was too tight for full-suite `tsx` startup; the timeout guard was raised from 1s to 5s while keeping the no-hang assertion.
+  - `.agentloop/reports/2026-06-11-01-17-verification-report.md`, overall status pass.
+  - Full configured verification passed: Vitest 34 files and 184 tests, lint, typecheck, and build.
+  - Task-command dogfood passed: focused create-task test, full Vitest, `projscan doctor`, and `git diff --check`.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-11-01-18-pr-summary.md`
+- What worked well:
+  - The regression test now protects non-interactive agent sessions from prompt hangs caused by task-type typos.
+- Improve:
+  - Consider adding machine-readable JSON error output for CLI validation failures if CI users ask for it.
+  - Keep this unreleased until the planned `0.28.0` batch.
