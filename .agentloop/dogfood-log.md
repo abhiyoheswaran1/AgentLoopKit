@@ -4516,3 +4516,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider a future JSON field for task-command discovery metadata if CI consumers need it.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Expose Task Command Discovery Metadata in Verification JSON
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-expose-task-command-discovery-metadata-in-verification-json.md`
+- Trigger:
+  - After adding the task-command empty-state note, CI consumers still had to parse Markdown to know whether `--task-commands` was requested and how many runnable task commands were discovered.
+- Implementation:
+  - Added `taskCommands.requested` and `taskCommands.foundCount` to verification JSON output.
+  - Kept task Markdown content out of the metadata.
+  - Kept command execution behavior unchanged.
+  - Updated verification docs, changelog, backlog, and verification tests.
+- Verification run:
+  - `.agentloop/reports/2026-06-11-00-49-verification-report.md`, overall status pass.
+  - Focused verification tests failed before implementation because `taskCommands` metadata was undefined.
+  - Focused verification tests passed: 1 file and 19 tests.
+  - Typecheck, build, Markdown link check, `projscan doctor`, whitespace diff check, and dogfood JSON metadata smoke passed.
+  - Dogfood verified `taskCommands` as `{"requested":true,"foundCount":2}`.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-11-00-50-pr-summary.md`
+- What worked well:
+  - CI consumers now get structured task-command discovery state without parsing Markdown or exposing task file contents.
+- Improve:
+  - Consider including `taskCommands.ranCount` only if a concrete consumer needs it; current command entries already expose executed task commands.
+  - Keep this unreleased until the planned `0.28.0` batch.

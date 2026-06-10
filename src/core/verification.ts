@@ -43,6 +43,10 @@ export type VerificationResult = {
   overallStatus: 'pass' | 'fail' | 'not-run';
   commands: VerificationCommandResult[];
   notRun: string[];
+  taskCommands: {
+    requested: boolean;
+    foundCount: number;
+  };
   ciContext?: VerificationCiContext;
   markdown: string;
   reportPath: string;
@@ -434,5 +438,16 @@ ${
 `;
 
   await writeTextFile(reportPath, markdown);
-  return { overallStatus, commands: results, notRun, ciContext, markdown, reportPath };
+  return {
+    overallStatus,
+    commands: results,
+    notRun,
+    taskCommands: {
+      requested: commandSelection.taskCommandsRequested,
+      foundCount: commandSelection.taskCommandsFound,
+    },
+    ciContext,
+    markdown,
+    reportPath,
+  };
 }
