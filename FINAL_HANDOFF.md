@@ -43,6 +43,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - docs, examples, issue templates, PR template, CI, publish workflow
 - README launch visuals generated with Playwright and VHS
 - compact current release-status page at `docs/release-status.md`
+- security-review workflow docs and a copyable example artifact set
 - internal product panel, target personas, simulated interview cycles, backlog, and dogfood log
 
 ## CLI commands
@@ -1783,6 +1784,19 @@ Implemented:
 - verification report and `ci-summary` tests for both providers
 - docs updated to state provider-specific provenance without provider APIs, token reads, or arbitrary environment dumps
 
+### Cycle 97: Security-review example
+
+Decision: add a concrete security-review workflow without turning AgentLoopKit into a scanner or compliance product.
+
+Implemented:
+
+- `docs/security-review.md`
+- `examples/security-review/README.md`
+- sample `security-review` task contract
+- sample verification report with explicit checks not run
+- sample PR summary with reviewer checklist and rollback notes
+- README, getting-started, and policy-doc links to the workflow
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -2078,13 +2092,13 @@ Title: I built a local-first engineering loop for coding agents
 3. Add branded config schema hosting after the domain serves the file: medium trust improvement, external hosting required.
 4. Add organization policy packs after local policy inspection proves useful: medium star potential, medium effort, medium maintenance.
 5. Add package recipe examples for more monorepo managers: medium usefulness, low effort.
-6. Add generated security-review example: medium trust improvement, low effort.
-7. Add config migration helper for future schema versions: medium usefulness, medium effort.
-8. Add NuShell completion docs only if users ask for it: low effort, low maintenance.
-9. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
-10. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
-11. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
-12. Add doctor heuristics documentation page for risk-file categories: medium trust improvement, low effort.
-13. Add framework-specific example task contracts for Remix, SvelteKit, Django, and FastAPI: medium star potential, low effort.
-14. Add more packed-tarball smoke fixtures for release recovery flows: medium trust improvement, low effort.
-15. Add GitLab CI and Buildkite retry/parallelism guidance after provider-specific provenance sees use: medium usefulness, low effort.
+6. Add config migration helper for future schema versions: medium usefulness, medium effort.
+7. Add NuShell completion docs only if users ask for it: low effort, low maintenance.
+8. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
+9. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
+10. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
+11. Add doctor heuristics documentation page for risk-file categories: medium trust improvement, low effort.
+12. Add framework-specific example task contracts for Remix, SvelteKit, Django, and FastAPI: medium star potential, low effort.
+13. Add more packed-tarball smoke fixtures for release recovery flows: medium trust improvement, low effort.
+14. Add GitLab CI and Buildkite retry/parallelism guidance after provider-specific provenance sees use: medium usefulness, low effort.
+15. Add a release-checklist example for maintainers using GitHub releases while npm publish is blocked: medium trust improvement, low effort.

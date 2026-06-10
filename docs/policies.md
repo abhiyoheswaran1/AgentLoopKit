@@ -51,6 +51,7 @@ Good policy edits name the risky area, the allowed action, the approval trigger,
 When upgrading AgentLoopKit, compare modified local policies with the bundled templates before copying text over. Do not replace customized policy files just to make `policy status` show `current`.
 
 See [policy examples](policy-examples.md) for repo-type snippets you can adapt for web apps, APIs, Python services, docs-only repos, monorepos, and open-source review workflows.
+For a command-level security-review workflow that combines task contracts, policies, verification, and handoff evidence, see [security review workflow](security-review.md).
 
 If the policy directory is missing, run:
 

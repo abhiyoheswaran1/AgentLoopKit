@@ -416,6 +416,14 @@ Local policy files are repo guidance. A `modified` policy can be intentional; re
 
 See `docs/policies.md`.
 
+## Security Reviews
+
+Use `security-review` task contracts when a change touches auth, sessions, permissions, secrets, dependencies, deployment config, migrations, billing, or other sensitive areas.
+
+AgentLoopKit helps reviewers see scope, checks run, checks skipped, risk notes, and rollback instructions. It does not scan code, certify compliance, or prove that code is secure.
+
+See `docs/security-review.md` and `examples/security-review/` for a copyable review task, verification report, and PR summary.
+
 ## CI Recipes
 
 Use `agentloop check-gates --strict` as a review-evidence gate in pull request CI. Use `agentloop verify`, `agentloop handoff`, `agentloop report`, `agentloop badge`, `agentloop ci-summary --write`, and `agentloop release-notes --write` in CI when you want evidence artifacts uploaded for reviewers.
@@ -490,6 +498,7 @@ See `examples/` for sample generated harnesses:
 - `examples/docs-only`
 - `examples/empty-repo`
 - `examples/github-actions`
+- `examples/security-review`
 
 See `docs/stack-recipes.md` for Next.js, React/Vite, Node API, Python, docs-only, empty-repo, and monorepo verification recipes.
 

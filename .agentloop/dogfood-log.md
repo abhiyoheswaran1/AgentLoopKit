@@ -3150,3 +3150,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The shared `detectCiContext` helper kept verification reports and CI summaries consistent.
 - Improve:
   - Add another provider only when there is a concrete workflow example and documented non-secret environment variables.
+
+## 2026-06-10: Security Review Example
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-security-review-example.md`
+- Product cycle: `.agentloop/research/interview-cycle-097.md`
+- Trigger:
+  - The repo had risk-file warnings, policies, verification reports, and handoffs, but no copyable security-review workflow that tied those pieces together.
+- Product changes:
+  - Added `docs/security-review.md`.
+  - Added `examples/security-review/README.md`.
+  - Added sample security-review task, verification report, and PR summary artifacts.
+  - Linked the workflow from README, getting-started, and policy docs.
+  - Kept the claims narrow: no scanner, compliance claim, secret scanning, policy engine, or cloud feature.
+- Verification run:
+  - `npx pnpm@10.12.1 check:links`: pass, 525 Markdown files checked.
+  - `git diff --check`: pass.
+  - Public-claim wording search: pass, no real-user feedback claims added and security limits are explicit.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-add-security-review-example.md`: pass, wrote `.agentloop/reports/2026-06-10-09-04-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 117 tests, lint, typecheck, and build all passed.
+- Worked well:
+  - The task contract kept this iteration docs/examples-only and avoided accidental security-product scope.
+- Improve:
+  - A future release-checklist example could show how to package docs-only trust improvements while npm is behind GitHub releases.
