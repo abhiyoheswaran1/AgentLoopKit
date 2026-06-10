@@ -215,6 +215,13 @@ describe('status command', () => {
     expect(status.activeTask).toBeNull();
     expect(status.latestTask.title).toBe('Open task');
     expect(status.latestTask.path).toBe('.agentloop/tasks/2026-06-09-open-task.md');
+    expect(status.deferredTasks).toEqual([
+      {
+        path: '.agentloop/tasks/2026-06-10-deferred-task.md',
+        title: 'Deferred task',
+        status: 'deferred',
+      },
+    ]);
     expect(status.nextAction.command).toBe(
       'agentloop task set .agentloop/tasks/2026-06-09-open-task.md',
     );
@@ -229,16 +236,30 @@ describe('status command', () => {
       '# Deferred task\n\n- Status: deferred\n',
     );
 
-    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'status'], {
       cwd: dir,
       reject: false,
     });
 
-    expect(result.exitCode).toBe(0);
-    const status = JSON.parse(result.stdout);
+    expect(jsonResult.exitCode).toBe(0);
+    const status = JSON.parse(jsonResult.stdout);
     expect(status.activeTask).toBeNull();
     expect(status.latestTask).toBeNull();
+    expect(status.deferredTasks).toEqual([
+      {
+        path: '.agentloop/tasks/2026-06-10-deferred-task.md',
+        title: 'Deferred task',
+        status: 'deferred',
+      },
+    ]);
     expect(status.nextAction.command).toBe('agentloop create-task');
+    expect(status.nextAction.reason).toContain('1 deferred task contract is parked');
+    expect(markdownResult.stdout).toContain('Active task: none active; 1 deferred task parked.');
+    expect(markdownResult.stdout).toContain('Deferred tasks: 1 parked - Deferred task');
   });
 
   test('prefers explicit active task state over modified time fallback', async () => {

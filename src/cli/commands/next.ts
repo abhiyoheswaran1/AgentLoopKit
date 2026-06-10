@@ -7,6 +7,7 @@ type NextActionResult = {
   reason: string;
   activeTask: AgentLoopStatusResult['activeTask'] | null;
   latestTask: AgentLoopStatusResult['latestTask'] | null;
+  deferredTasks: AgentLoopStatusResult['deferredTasks'];
   latestReport: AgentLoopStatusResult['latestReport'] | null;
   workingTree: Pick<AgentLoopStatusResult['workingTree'], 'dirty' | 'changedFileCount'>;
   commands: AgentLoopStatusResult['commands'];
@@ -22,12 +23,23 @@ function formatReport(result: NextActionResult) {
   return `${result.latestReport.overallStatus} - ${result.latestReport.path}`;
 }
 
+function formatDeferredTasks(tasks: AgentLoopStatusResult['deferredTasks']) {
+  if (!tasks.length) return 'none';
+  const titles = tasks
+    .slice(0, 3)
+    .map((task) => task.title)
+    .join(', ');
+  const remaining = tasks.length > 3 ? `, +${tasks.length - 3} more` : '';
+  return `${tasks.length} parked - ${titles}${remaining}`;
+}
+
 function toNextActionResult(status: AgentLoopStatusResult): NextActionResult {
   return {
     command: status.nextAction.command,
     reason: status.nextAction.reason,
     activeTask: status.activeTask ?? null,
     latestTask: status.latestTask ?? null,
+    deferredTasks: status.deferredTasks,
     latestReport: status.latestReport ?? null,
     workingTree: {
       dirty: status.workingTree.dirty,
@@ -50,6 +62,7 @@ ${result.reason}
 
 - Active task: ${formatTask(result.activeTask)}
 - Latest open task: ${formatTask(result.latestTask)}
+- Deferred tasks: ${formatDeferredTasks(result.deferredTasks)}
 - Latest verification: ${formatReport(result)}
 - Working tree: ${workingTree}
 `;

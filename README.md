@@ -139,7 +139,7 @@ pnpm build
 | `agentloop task current`                | Print the pinned active task                                                   |
 | `agentloop task clear`                  | Clear the active task pointer                                                  |
 | `agentloop task doctor`                 | Check task folder hygiene without mutating task files                          |
-| `agentloop status`                      | Show pinned task, latest open task, latest report, dirty files, next step      |
+| `agentloop status`                      | Show pinned task, latest open task, parked tasks, latest report, next step     |
 | `agentloop next`                        | Print only the next recommended loop action                                    |
 | `agentloop check-gates`                 | Check task, verification, handoff, harness, policy, and git evidence           |
 | `agentloop check-gates --strict`        | Treat warning gates as failures for CI                                         |
@@ -303,6 +303,7 @@ See `docs/doctor-risk-files.md` for category examples, limits, and reviewer acti
 
 - pinned active task contract, using `agentloop task set` when present
 - newest open task contract as `latestTask` when no task is pinned
+- parked deferred contracts as `deferredTasks`
 - latest verification report
 - working tree state
 - configured and missing commands
@@ -324,7 +325,7 @@ agentloop next --json
 `next` uses the same decision rules as `status`. It does not run verification commands, create task state, call an LLM, make network requests, or read `.env` contents.
 When an active in-progress task exists, an older verification report does not count as current evidence for that task.
 When a pinned active task is already `done`, `status` and `next` recommend archiving that task so a finished contract does not stay active.
-When no active task is pinned, `status` and `next` report the newest open contract as `latestTask`, not `activeTask`, and recommend `agentloop task set <path>` before continuing. They ignore fallback tasks marked `deferred`, `done`, `completed`, or `verified`.
+When no active task is pinned, `status` and `next` report the newest open contract as `latestTask`, not `activeTask`, and recommend `agentloop task set <path>` before continuing. They keep fallback tasks marked `deferred`, `done`, `completed`, or `verified` out of `latestTask`. Deferred tasks stay visible as parked work in `deferredTasks`.
 
 See `docs/status.md` for output fields and next-action rules.
 

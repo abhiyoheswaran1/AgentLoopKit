@@ -4132,3 +4132,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Centralizing completions on `TASK_STATUSES` prevents future status values from drifting between parser and shell completion output.
 - Improve:
   - Consider archiving old done/legacy task contracts separately; do not bundle that cleanup into this behavior change.
+
+## 2026-06-10: Show Parked Deferred Tasks in Status
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-show-deferred-tasks-in-status.md`
+- Trigger:
+  - After the active task folder cleanup, only deferred task contracts remained.
+  - `agentloop status` correctly refused to pick deferred work as `latestTask`, but the next-action reason still said no task contract was found.
+- Implementation:
+  - Added `deferredTasks` to `agentloop status --json`.
+  - Added `deferredTasks` to `agentloop next --json`.
+  - Added Markdown lines that show parked deferred tasks separately from active and latest open work.
+  - Updated README, status docs, MCP docs, generated harness templates, and repo guidance.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-22-30-verification-report.md`, overall status pass.
+  - Red focused tests failed before implementation for missing `deferredTasks` in `status` and `next`.
+  - Focused status and next tests passed after implementation.
+  - Full Vitest passed: 33 files, 160 tests.
+  - Lint, typecheck, build, Markdown link check, `projscan doctor`, `git diff --check`, and built CLI `status`/`next` smoke checks passed.
+  - `projscan doctor` remained A 97/100 with the known informational unused-export note in `scripts/smoke-packed-release.mjs`.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-10-22-30-pr-summary.md`
+- What worked well:
+  - The status output now tells the truth: deferred work exists, but it is parked.
+  - The next action stays simple and still points at `agentloop create-task` when no open task is ready.
+- Improve:
+  - Keep this unreleased until the planned `0.28.0` batch.

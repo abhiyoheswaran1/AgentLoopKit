@@ -14,7 +14,7 @@ Before changing code:
 - Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
 - Use `agentloop task archive <path>` only after verification and handoff are complete.
 - Use `agentloop task doctor` when old task files need a read-only cleanup checklist.
-- Run `agentloop status` when you need the pinned active task, latest open task, verification, dirty-file, and next-action state.
+- Run `agentloop status` when you need the pinned active task, latest open task, parked deferred tasks, verification, dirty-file, and next-action state.
 - Run `agentloop next` when you only need the next recommended loop command.
 - Run `agentloop policy list`, `agentloop policy show <policy>`, and `agentloop policy status` before touching security, dependency, database, git, public API, or secret-handling areas.
 - Treat local `.agentloop/policies/*.md` files as the repo's safety guidance. A `modified` policy is a local decision to review, not a failure.

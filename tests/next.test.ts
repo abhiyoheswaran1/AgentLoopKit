@@ -234,7 +234,15 @@ describe('next command', () => {
     const next = JSON.parse(result.stdout);
     expect(next.activeTask).toBeNull();
     expect(next.latestTask).toBeNull();
+    expect(next.deferredTasks).toEqual([
+      {
+        path: '.agentloop/tasks/2026-06-10-deferred-task.md',
+        title: 'Deferred task',
+        status: 'deferred',
+      },
+    ]);
     expect(next.command).toBe('agentloop create-task');
+    expect(next.reason).toContain('1 deferred task contract is parked');
   });
 
   test('recommends archiving a pinned done task', async () => {

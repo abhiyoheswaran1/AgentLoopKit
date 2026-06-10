@@ -12,7 +12,7 @@ import {
 } from './git.js';
 import { latestMarkdownFile } from './artifacts.js';
 import { verificationReportPattern } from './artifacts.js';
-import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
+import { getActiveTaskPath, getFallbackTaskPath, listTasks } from './task-state.js';
 
 export type StatusArtifact = {
   path: string;
@@ -41,6 +41,7 @@ export type AgentLoopStatusResult = {
   };
   activeTask: StatusTask | null;
   latestTask: StatusTask | null;
+  deferredTasks: StatusTask[];
   latestReport?: StatusReport;
   commands: {
     configured: string[];
@@ -127,6 +128,7 @@ function isPostVerificationTaskState(task: Timestamped<StatusTask> | undefined) 
 function chooseNextAction(input: {
   activeTask: StatusTask | null;
   latestTask: StatusTask | null;
+  deferredTasks: StatusTask[];
   latestReport?: StatusReport;
   dirty: boolean;
 }) {
@@ -136,6 +138,13 @@ function chooseNextAction(input: {
         command: `agentloop task set ${input.latestTask.path}`,
         reason:
           'No active task is pinned, but an open task contract exists. Pin it before continuing the loop, or create a new task if this is not the right work.',
+      };
+    }
+    if (input.deferredTasks.length > 0) {
+      const count = input.deferredTasks.length;
+      return {
+        command: 'agentloop create-task',
+        reason: `${count} deferred task contract${count === 1 ? ' is' : 's are'} parked. Create a new task for current work, or move a deferred task back to proposed when it is ready.`,
       };
     }
     return {
@@ -178,6 +187,17 @@ function formatList(values: string[]) {
   return values.length ? values.join(', ') : 'none';
 }
 
+function formatDeferredTaskSummary(tasks: StatusTask[]) {
+  if (!tasks.length) return 'none';
+  const count = tasks.length;
+  const titles = tasks
+    .slice(0, 3)
+    .map((task) => task.title)
+    .join(', ');
+  const remaining = count > 3 ? `, +${count - 3} more` : '';
+  return `${count} parked - ${titles}${remaining}`;
+}
+
 function renderMarkdown(result: Omit<AgentLoopStatusResult, 'markdown'>) {
   const gitLine = result.git.isRepository
     ? `${result.git.branch || 'unknown branch'}${result.git.commit ? ` @ ${result.git.commit}` : ''}`
@@ -189,6 +209,8 @@ function renderMarkdown(result: Omit<AgentLoopStatusResult, 'markdown'>) {
     ? `${result.activeTask.title} (${result.activeTask.status}) - ${result.activeTask.path}`
     : result.latestTask
       ? 'none pinned.'
+      : result.deferredTasks.length
+        ? `none active; ${result.deferredTasks.length} deferred task${result.deferredTasks.length === 1 ? '' : 's'} parked.`
       : 'No task contract found.';
   const latestTask = result.latestTask
     ? `${result.latestTask.title} (${result.latestTask.status}) - ${result.latestTask.path}`
@@ -205,6 +227,7 @@ function renderMarkdown(result: Omit<AgentLoopStatusResult, 'markdown'>) {
 - Working tree: ${workingTree}
 - Active task: ${activeTask}
 - Latest open task: ${latestTask}
+- Deferred tasks: ${formatDeferredTaskSummary(result.deferredTasks)}
 - Latest verification: ${latestReport}
 - Configured commands: ${formatList(result.commands.configured)}
 - Missing commands: ${formatList(result.commands.missing)}
@@ -228,6 +251,7 @@ export async function getAgentLoopStatus(options: {
   const timestampedActiveTask = await readTask(options.cwd, activeTaskPath);
   const fallbackTaskPath = activeTaskPath ? undefined : await getFallbackTaskPath(options);
   const timestampedLatestTask = await readTask(options.cwd, fallbackTaskPath);
+  const listedTasks = await listTasks(options);
   const timestampedReport = await readReport(
     options.cwd,
     await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {
@@ -244,12 +268,21 @@ export async function getAgentLoopStatus(options: {
       : timestampedReport;
   const activeTask = stripTaskTimestamp(timestampedActiveTask) ?? null;
   const latestTask = stripTaskTimestamp(timestampedLatestTask) ?? null;
+  const deferredTasks = listedTasks
+    .filter((task) => task.status.trim().toLowerCase() === 'deferred')
+    .filter((task) => task.path !== activeTask?.path)
+    .map((task) => ({
+      path: task.path,
+      title: task.title,
+      status: task.status,
+    }));
   const latestReport = stripReportTimestamp(currentReport);
   const configured = DEFAULT_COMMAND_KEYS.filter((key) => options.config.commands[key]);
   const missing = DEFAULT_COMMAND_KEYS.filter((key) => !options.config.commands[key]);
   const nextAction = chooseNextAction({
     activeTask,
     latestTask,
+    deferredTasks,
     latestReport,
     dirty: changedFiles.length > 0,
   });
@@ -267,6 +300,7 @@ export async function getAgentLoopStatus(options: {
     },
     activeTask,
     latestTask,
+    deferredTasks,
     latestReport,
     commands: {
       configured,
