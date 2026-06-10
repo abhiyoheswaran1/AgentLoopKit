@@ -4743,3 +4743,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep future discovery commands available in JSON form when agents are likely consumers.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Output for `version`
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-json-output-to-version-command.md`
+- Trigger:
+  - `agentloop version` is useful in scripts, but it only printed the raw version string.
+- Implementation:
+  - Added `agentloop version --json` with a stable `{ version }` payload.
+  - Preserved the default plain version string and top-level `-V` behavior.
+  - Added CLI regression coverage and documented the new JSON output.
+- Verification run:
+  - Red focused test failed because `--json` was an unknown option.
+  - Focused version suite passed after implementation.
+  - Built CLI smoke check returned `{ "version": "0.27.0" }`.
+  - `.agentloop/reports/2026-06-11-01-57-verification-report.md`, overall status pass.
+- What worked well:
+  - The command already had a single source for package version, so the JSON form stayed tiny.
+- Improve:
+  - Keep raw string output as the default for existing scripts.
+  - Keep this unreleased until the planned `0.28.0` batch.

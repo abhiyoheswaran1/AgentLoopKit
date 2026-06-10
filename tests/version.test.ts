@@ -16,4 +16,14 @@ describe('version command', () => {
 
     expect(result.stdout.trim()).toBe(packageJson.version);
   });
+
+  test('prints the package version as JSON when requested', async () => {
+    const packageJson = JSON.parse(await readFile(path.resolve('package.json'), 'utf8')) as {
+      version: string;
+    };
+
+    const result = await execa(tsxPath, [cliPath, 'version', '--json']);
+
+    expect(JSON.parse(result.stdout)).toEqual({ version: packageJson.version });
+  });
 });
