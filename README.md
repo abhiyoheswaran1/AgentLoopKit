@@ -380,7 +380,7 @@ See `docs/ci-summary.md`.
 ```bash
 agentloop release-notes
 agentloop release-notes --from v0.19.0 --to HEAD
-agentloop release-notes --release-version 0.24.0
+agentloop release-notes --release-version 0.24.1
 agentloop release-notes --json
 agentloop release-notes --write
 ```

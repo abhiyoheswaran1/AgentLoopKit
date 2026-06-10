@@ -1021,10 +1021,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.24.0` is public.
-- npm latest is `0.24.0`; registry versions are `0.1.0`, `0.1.1`, and `0.24.0`.
+- GitHub release `v0.24.1` is public.
+- npm latest is `0.24.1`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, and `0.24.1`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
-- The next release should publish through GitHub Releases and trusted publishing.
+- Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.
 - Do not paste npm OTPs or tokens into chat, issues, PRs, or release notes.
 
@@ -1033,7 +1033,7 @@ Current publish state:
 ```bash
 npx agentloopkit init
 npx agentloopkit doctor
-npx --yes agentloopkit@0.24.0 version
+npx --yes agentloopkit@0.24.1 version
 ```
 
 Pinned team usage:
@@ -1043,7 +1043,7 @@ pnpm add -D agentloopkit
 pnpm agentloop init
 ```
 
-Global install after npm catches up:
+Global install:
 
 ```bash
 npm install -g agentloopkit

@@ -40,6 +40,7 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] GitHub release `v0.22.0` is published with task-linked verification and README evidence notes.
 - [x] GitHub release `v0.23.0` is published with PowerShell completion notes.
 - [x] GitHub release `v0.24.0` is published with npm-status notes.
+- [x] GitHub release `v0.24.1` is published with unreadable-directory fix notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -145,9 +146,11 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] Publish workflow for `v0.23.0` passed package checks and failed at npm authorization.
 - [x] Package `agentloopkit@0.24.0` is prepared on `main` for npm-status.
 - [x] Package `agentloopkit@0.24.0` is published.
+- [x] Package `agentloopkit@0.24.1` is prepared on `main` for the unreadable-directory fix.
+- [x] Package `agentloopkit@0.24.1` is published through GitHub trusted publishing.
 - [x] npm trusted publishing is configured for this repository.
 - [x] `agentloop npm-status --expect-current` passes after npm publish.
-- [x] Current publish guidance tells maintainers to publish `0.24.0` next from current `main`, not stale intermediate versions.
+- [x] Current publish guidance tells maintainers to continue from the current source version, not stale intermediate versions.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
 - [x] No `postinstall` script exists.
 - [x] No telemetry, cloud calls, or credential access exist.
@@ -196,6 +199,7 @@ npx --yes --package ./agentloopkit-0.21.0.tgz agentloop next --json
 npx --yes --package ./agentloopkit-0.22.0.tgz agentloop verify --task .agentloop/tasks/example.md --json
 npx --yes --package ./agentloopkit-0.23.0.tgz agentloop completion powershell
 npx --yes --package ./agentloopkit-0.24.0.tgz agentloop npm-status --registry-json npm-view.json --json
+npx --yes --package ./agentloopkit-0.24.1.tgz agentloop init --dry-run
 ```
 
 ## Publish
@@ -269,10 +273,14 @@ Historical recovery note:
 - Local `0.24.0` tarball SHA-256: `4e721a9627d94944f300a60d71a14b0e519045ac3eb51d637f7227503f2a962d`.
 - GitHub release `v0.24.0` tarball SHA-256: `4e721a9627d94944f300a60d71a14b0e519045ac3eb51d637f7227503f2a962d`.
 - GitHub Publish workflow for `v0.24.0` (run `27262870591`) passed package checks and failed at npm authorization with `E404` before npm trusted publishing was configured.
+- `agentloopkit@0.24.1` fixed unreadable-directory handling during project detection and published on npm through trusted publishing.
+- GitHub release `v0.24.1` is public with attached `agentloopkit-0.24.1.tgz`.
+- GitHub release `v0.24.1` tarball SHA-256: `a3af9b4433ea72cdf1d7a045565d6cea408ec70a5d35973000de6a5ea331eb40`.
+- GitHub Publish workflow for `v0.24.1` (run `27266562238`) passed package checks and published to npm.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
-- npm latest is `0.24.0`; registry versions include `0.1.0`, `0.1.1`, and `0.24.0`.
-- npm trusted publishing is configured for future GitHub release publishes.
+- npm latest is `0.24.1`; registry versions include `0.1.0`, `0.1.1`, `0.24.0`, and `0.24.1`.
+- npm trusted publishing is configured for GitHub release publishes.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.3.0` is now prepared on `main` after the handoff command, create-task flag, latest artifact selection, and create-task alias work.
 - Local `npm publish --access public` for `0.3.0` passed `prepublishOnly`, then npm stopped at `EOTP`.

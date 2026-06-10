@@ -7,13 +7,13 @@ Last checked: June 10, 2026.
 - Current GitHub release: `v0.24.1`
 - Current GitHub release asset: `agentloopkit-0.24.1.tgz`
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.1>
-- Tarball SHA-256: pending until release asset is packed
-- CI run: pending for the `0.24.1` release commit
-- Publish workflow run: `27262870591` passed package checks before npm trusted publishing was configured, then npm rejected publish with `E404`
+- Tarball SHA-256: `a3af9b4433ea72cdf1d7a045565d6cea408ec70a5d35973000de6a5ea331eb40`
+- CI run: `27266433042` passed for the `0.24.1` release commit
+- Publish workflow run: `27266562238` passed and published `agentloopkit@0.24.1` through npm trusted publishing
 - Manual npm publish: succeeded for `agentloopkit@0.24.0` after browser authentication
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
-- npm latest: pending `0.24.1` release
-- npm versions: `0.1.0`, `0.1.1`, `0.24.0`
+- npm latest: `0.24.1`
+- npm versions: `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`
 
 Run the local registry check at any time:
 
@@ -37,9 +37,9 @@ GitHub release tarballs remain useful for provenance checks and rollback, but no
 
 ## npm Catch-Up Result
 
-GitHub releases already exist for the intermediate AgentLoopKit versions between the npm-published `0.1.1` package and the current `v0.24.0` source line. Publishing older numbers from current `main` would create npm packages that do not match their GitHub tags.
+GitHub releases already exist for the intermediate AgentLoopKit versions between the npm-published `0.1.1` package and the `v0.24.0` source line. Publishing older numbers from current `main` would create npm packages that do not match their GitHub tags.
 
-The one-time catch-up publish shipped `0.24.0`. Future releases should continue with normal sequential semver from the current source.
+The one-time catch-up publish shipped `0.24.0`, then trusted publishing shipped `0.24.1` from the GitHub release workflow. Future releases should continue with normal sequential semver from the current source.
 
 ## Publish History
 
@@ -51,7 +51,7 @@ npm error 404 Not Found - PUT https://registry.npmjs.org/agentloopkit - Not foun
 npm error 404 The requested resource 'agentloopkit@0.24.0' could not be found or you do not have permission to access it.
 ```
 
-The maintainer then completed browser authentication and published `0.24.0` manually. The npm package now reports latest `0.24.0`.
+The maintainer then completed browser authentication and published `0.24.0` manually. The next GitHub release, `v0.24.1`, published successfully through trusted publishing. The npm package now reports latest `0.24.1`.
 
 ## Next Publish
 
@@ -64,7 +64,7 @@ Use the GitHub Actions publish workflow for the next release after release metad
 
 Do not publish stale intermediate versions from current `main`. If an old version must be reproduced, use its matching GitHub tag or release tarball.
 
-After the next publish:
+After each publish:
 
 - update this page with the new npm proof;
 - update `docs/npm-publishing.md`, `docs/launch-checklist.md`, and `FINAL_HANDOFF.md`;
@@ -75,12 +75,26 @@ After the next publish:
 
 Local release-candidate checks for `0.24.1`:
 
-- pending final release verification
+- `npx pnpm@10.12.1 test tests/project-detection.test.ts`
+- `npm run lint`
+- `npm run typecheck`
+- `npm test`
+- `npx pnpm@10.12.1 check:links`
+- `node scripts/prepublish-check.mjs`
+- `git diff --check`
+- `npm run build`
+- `npx projscan doctor --format markdown`
+- `npm pack --pack-destination /tmp --silent`
+- `npm publish --access public --dry-run`
+- packed tarball smoke tests for `agentloop version` and `agentloop init --dry-run` with an unreadable `.Trash` directory
 
 Latest release-status documentation checks also passed:
 
 - `npm view agentloopkit version versions --json`
 - `npx --yes agentloopkit@0.24.1 version`
+- `npm exec --yes --package=agentloopkit@0.24.1 -- agentloop version` from a clean temp directory
+- `npm exec --yes --package=agentloopkit@0.24.1 -- agentloopkit version` from a clean temp directory
+- `npx --yes agentloopkit@0.24.1 init --dry-run` from a temp directory with an unreadable `.Trash` directory
 - `node dist/cli/index.js npm-status --expect-current`
 - `npx pnpm@10.12.1 check:links`
 - `git diff --check`

@@ -32,15 +32,15 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 
 ## Current State
 
-- GitHub release `v0.24.0` is public.
-- npm latest is `agentloopkit@0.24.0`.
+- GitHub release `v0.24.1` is public.
+- npm latest is `agentloopkit@0.24.1`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
 
 ## Near Term
 
-- Verify the next GitHub release publishes to npm through trusted publishing without manual browser auth.
+- Keep the GitHub release to npm trusted-publishing flow healthy with each release.
 - Keep the README focused on user install and usage, not release operations.
 - Add staged distribution-channel tasks for Homebrew, Docker/GHCR, GitHub Action, MCP Registry, editor extensions, Scoop, and WinGet.
 - Submit the config schema to SchemaStore after npm publishing is stable.

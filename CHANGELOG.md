@@ -14,7 +14,7 @@ Patch release for first-run project detection:
 
 ## 0.24.0
 
-npm-status release candidate. npm still serves `0.1.1` until account authentication or trusted publishing is repaired. This is the normal next minor release after `v0.23.0`; after npm catches up to the current release line, future releases should use ordinary sequential semver:
+npm-status release. This is the normal next minor release after `v0.23.0`; npm later caught up to the current release line after maintainer authentication and trusted publishing were configured:
 
 - Added `agentloop npm-status` for read-only npm registry catch-up checks
 - Added `agentloop npm-status --json` for release scripts and handoff evidence

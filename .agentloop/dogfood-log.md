@@ -66,6 +66,14 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npm publish --access public --dry-run`: pass
   - packed tarball `agentloop version`: pass, reported `0.24.1`
   - packed tarball `agentloop init --dry-run` with unreadable `.Trash`: pass
+- Release verification:
+  - GitHub release `v0.24.1`: published at `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.24.1`
+  - GitHub Publish workflow run `27266562238`: pass, published `agentloopkit@0.24.1` through trusted publishing
+  - `npm view agentloopkit version versions --json`: pass, latest `0.24.1`
+  - `node dist/cli/index.js npm-status --expect-current`: pass
+  - clean temp `npm exec --yes --package=agentloopkit@0.24.1 -- agentloop version`: pass, reported `0.24.1`
+  - clean temp `npm exec --yes --package=agentloopkit@0.24.1 -- agentloopkit version`: pass, reported `0.24.1`
+  - clean temp `npx --yes agentloopkit@0.24.1 init --dry-run` with unreadable `.Trash`: pass
 - Tarball SHA-256: `a3af9b4433ea72cdf1d7a045565d6cea408ec70a5d35973000de6a5ea331eb40`
 - Worked well: the test reproduced the install crash before the fix.
 - Confusing: `init` can be run outside a repository, but the recommended user path remains running it inside a repo.
