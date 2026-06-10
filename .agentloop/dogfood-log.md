@@ -3503,3 +3503,31 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Projscan stayed useful as a quick health gate after the focused safety fixes.
 - Improve:
   - Add a reusable release-smoke script so tarball guard checks are less dependent on one-off shell scripts.
+
+## 2026-06-10: 0.24.4 README Pin Patch
+
+- Task contract: `.agentloop/tasks/2026-06-10-prepare-0-24-4-readme-pin-patch.md`
+- Trigger:
+  - After `0.24.3` was published, `npm view agentloopkit@0.24.3 readme` still showed README examples pinned to `0.24.2`.
+  - Because npm displays the packaged README, the package needed an immediate patch release with current user-facing pins.
+- Product changes:
+  - Bumped package metadata to `0.24.4`.
+  - Updated README pinned-version examples to `0.24.4`.
+  - Added the `0.24.4` changelog entry.
+  - Kept the release docs-only with no CLI behavior changes.
+- Verification run:
+  - `npm run lint`: pass.
+  - `npm run typecheck`: pass.
+  - `npm test`: pass, 29 files and 129 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 579 Markdown files checked.
+  - `git diff --check`: pass.
+  - `npm run build`: pass.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed README inspection: pass; `/tmp/agentloopkit-0.24.4.tgz` contains README examples pinned to `0.24.4`.
+  - AgentLoop verification: `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-10-prepare-0-24-4-readme-pin-patch.md --json` passed and wrote `.agentloop/reports/2026-06-10-14-00-verification-report.md`.
+- Handoff generated:
+  - `.agentloop/handoffs/2026-06-10-14-01-pr-summary.md`
+- Worked well:
+  - Checking npm's rendered README caught the stale package content before stopping.
+- Improve:
+  - Add packaged README inspection to the reusable tarball smoke script backlog item.

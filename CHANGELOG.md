@@ -4,6 +4,13 @@
 
 - No unreleased changes yet.
 
+## 0.24.4
+
+Patch release for npm README pin freshness:
+
+- Updated README pinned-version examples from `0.24.2` to the current package line
+- Kept this release docs-only with no CLI behavior changes
+
 ## 0.24.3
 
 Patch release for task-path safety:

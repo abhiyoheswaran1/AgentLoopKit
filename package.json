@@ -1,6 +1,6 @@
 {
   "name": "agentloopkit",
-  "version": "0.24.3",
+  "version": "0.24.4",
   "description": "A drop-in engineering loop for coding agents.",
   "type": "module",
   "bin": {
