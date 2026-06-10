@@ -47,6 +47,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - doctor risk-file heuristics docs with category examples and reviewer actions
 - framework-specific task recipes for Remix, SvelteKit, Django, and FastAPI
 - dependency-upgrade workflow docs and a lockfile-review example artifact set
+- release-checklist example for GitHub-current/npm-lag maintainer handoffs
 - internal product panel, target personas, simulated interview cycles, backlog, and dogfood log
 
 ## CLI commands
@@ -1838,6 +1839,19 @@ Implemented:
 - sample PR summary with lockfile review checklist and rollback notes
 - README, getting-started, and policy-doc links to the workflow
 
+### Cycle 101: Release-checklist example
+
+Decision: add a compact maintainer example for documenting GitHub-current/npm-lag release state without publishing, tagging, or changing metadata.
+
+Implemented:
+
+- `docs/release-checklist-example.md`
+- `examples/release-checklist/README.md`
+- sample release-status task contract
+- sample verification report that states publish commands were not run
+- sample release handoff with npm state, next action, and rollback notes
+- README, launch checklist, npm publishing, and release-status links to the workflow
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -2140,6 +2154,6 @@ Title: I built a local-first engineering loop for coding agents
 10. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
 11. Add more packed-tarball smoke fixtures for release recovery flows: medium trust improvement, low effort.
 12. Add GitLab CI and Buildkite retry/parallelism guidance after provider-specific provenance sees use: medium usefulness, low effort.
-13. Add a release-checklist example for maintainers using GitHub releases while npm publish is blocked: medium trust improvement, low effort.
-14. Add Rails and Laravel task-contract recipes if contributors ask for them: medium usefulness, low effort.
-15. Add package-manager-specific dependency-upgrade recipes for npm, yarn, and bun: medium usefulness, low effort.
+13. Add Rails and Laravel task-contract recipes if contributors ask for them: medium usefulness, low effort.
+14. Add package-manager-specific dependency-upgrade recipes for npm, yarn, and bun: medium usefulness, low effort.
+15. Add an npm catch-up smoke-test script that never publishes: medium trust improvement, medium effort.

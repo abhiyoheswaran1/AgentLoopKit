@@ -3245,3 +3245,30 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The workflow gives dependency PR reviewers a concrete evidence shape without pretending AgentLoopKit audits packages.
 - Improve:
   - Add package-manager-specific variants only if they stay small and do not imply package-manager automation.
+
+## 2026-06-10: Release Checklist Example
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-release-checklist-example.md`
+- Product cycle: `.agentloop/research/interview-cycle-101.md`
+- Trigger:
+  - Maintainers needed a compact example for documenting a GitHub-current/npm-lag release without publishing, tagging, changing package metadata, or implying npm availability.
+- Product changes:
+  - Added `docs/release-checklist-example.md`.
+  - Added `examples/release-checklist/README.md`.
+  - Added sample release task, verification report, and release handoff artifacts under `examples/release-checklist/.agentloop/`.
+  - Linked the workflow from README, launch checklist, npm publishing docs, and release-status docs.
+  - Updated backlog and final handoff with Cycle 101.
+  - Kept the scope docs/examples-only: no package metadata, changelog, workflow, release, tag, or npm publish change.
+- Verification run:
+  - `npx pnpm@10.12.1 check:links`: pass, 552 Markdown files checked.
+  - `git diff --check`: pass.
+  - Public-overclaim search: pass, only historical release records and explicit non-claim wording found.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-add-release-checklist-example.md`: pass, wrote `.agentloop/reports/2026-06-10-09-32-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 117 tests, lint, typecheck, and build all passed.
+  - `npx tsx src/cli/index.ts handoff --task .agentloop/tasks/2026-06-10-add-release-checklist-example.md --json`: pass, wrote `.agentloop/handoffs/2026-06-10-09-35-pr-summary.md`.
+  - `npx tsx src/cli/index.ts check-gates --json`: pass, all gates passed.
+- Worked well:
+  - The example gives maintainers a smaller handoff shape than the full launch checklist.
+- Improve:
+  - A future npm catch-up smoke-test script could verify a tarball or registry version without publishing.

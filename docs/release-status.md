@@ -21,6 +21,7 @@ npx --yes --package https://github.com/abhiyoheswaran1/AgentLoopKit/releases/dow
 ```
 
 This is a temporary fallback. npm remains the intended main distribution path.
+For a maintainer checklist that documents this state without publishing, see [release-checklist-example.md](release-checklist-example.md).
 
 ## npm Catch-Up Version
 

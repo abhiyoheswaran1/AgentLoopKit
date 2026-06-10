@@ -524,7 +524,7 @@ The npm version jump is intentional. The skipped npm numbers already exist as pu
 
 The repository includes a GitHub Actions publish workflow for npm trusted publishing after the package is configured on npm. The workflow runs checks before `npm publish` and skips publish when the version already exists.
 
-See `docs/launch-checklist.md` before publishing.
+See `docs/launch-checklist.md` before publishing. See `docs/release-checklist-example.md` and `examples/release-checklist/` for a compact maintainer handoff when GitHub is current but npm is still behind.
 
 ## Contributing
 

@@ -44,6 +44,7 @@ The first publish creates the npm package. That step may require an OTP, dependi
 As of June 10, 2026:
 
 For a compact current-state summary, see [release-status.md](release-status.md).
+For a copyable maintainer handoff when GitHub is current but npm is blocked, see [release-checklist-example.md](release-checklist-example.md).
 
 Short version:
 

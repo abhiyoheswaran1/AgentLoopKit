@@ -2,6 +2,8 @@
 
 Use this before publishing AgentLoopKit.
 
+For a compact maintainer example that documents GitHub-current/npm-lag state without publishing or creating releases, see [release-checklist-example.md](release-checklist-example.md) and [`../examples/release-checklist/README.md`](../examples/release-checklist/README.md).
+
 ## GitHub
 
 - [ ] Repository description is set.
