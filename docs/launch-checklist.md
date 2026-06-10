@@ -48,6 +48,8 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] GitHub release `v0.25.0` is published with local-only init notes.
 - [x] GitHub release `v0.26.0` is published with MCP and distribution-channel notes.
 - [x] GitHub release `v0.26.1` is published with MCP Registry metadata validation notes.
+- [x] GitHub release `v0.26.2` is published with release-channel cleanup notes.
+- [x] GitHub release `v0.26.3` is published with status cleanup notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -237,7 +239,7 @@ npx --yes --package ./agentloopkit-0.24.1.tgz agentloop init --dry-run
 npx --yes --package ./agentloopkit-0.24.2.tgz agentloop init --dry-run
 npx --yes --package ./agentloopkit-0.24.3.tgz agentloop verify --task .agentloop/tasks/example.md --json
 npx --yes --package ./agentloopkit-0.24.4.tgz agentloop version
-npx --yes --package ./agentloopkit-0.26.2.tgz agentloop version
+npx --yes --package ./agentloopkit-0.26.3.tgz agentloop version
 ```
 
 ## Publish

@@ -3835,3 +3835,30 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The new status command gave the expected cleanup instruction before the archive, then moved on to the next local evidence step.
 - Improve:
   - Consider archiving older finished tasks in batches only if the normal task list becomes too noisy for maintainers.
+
+## 2026-06-10: Submit Config Schema to SchemaStore
+
+- Task contract: `.agentloop/tasks/2026-06-10-submit-agentloopkit-schema-to-schemastore.md`
+- Trigger:
+  - AgentLoopKit ships `schema/agentloop.config.schema.json`, and generated configs already reference the raw GitHub schema URL.
+  - Editors that rely on SchemaStore cannot auto-discover `agentloop.config.json` until the catalog includes it.
+- External work:
+  - Confirmed the live SchemaStore catalog did not contain AgentLoopKit.
+  - Opened SchemaStore PR #5783: <https://github.com/SchemaStore/schemastore/pull/5783>.
+  - Kept the external PR to one catalog entry and six inserted lines.
+  - Confirmed upstream SchemaStore checks passed, then the PR merged at 2026-06-10T17:54:33Z.
+  - Confirmed the live SchemaStore catalog now contains the AgentLoopKit entry.
+- Verification run:
+  - AgentLoopKit final verification report under `.agentloop/reports/`, overall status pass.
+  - SchemaStore `npm run typecheck`: pass.
+  - SchemaStore targeted Prettier check for `src/api/json/catalog.json`: pass.
+  - SchemaStore `git diff --check`: pass.
+  - Parsed `src/api/json/catalog.json` and confirmed exactly one AgentLoopKit entry for `agentloop.config.json`.
+  - Upstream SchemaStore checks: pass.
+  - Raw SchemaStore master catalog check: pass.
+  - Live SchemaStore catalog check: pass.
+- Worked well:
+  - The existing raw GitHub schema URL made the SchemaStore entry small and transparent.
+  - Correcting the external PR body after shell quoting issues kept the upstream request readable.
+- Improve:
+  - If AgentLoopKit ever moves schema hosting, update the SchemaStore entry in the same release cycle.

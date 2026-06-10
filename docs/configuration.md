@@ -16,6 +16,8 @@ https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agent
 
 The CLI validates config with its packaged TypeScript schema. It does not fetch this URL at runtime.
 
+AgentLoopKit is registered in SchemaStore for `agentloop.config.json`: <https://github.com/SchemaStore/schemastore/pull/5783>. Editors that use SchemaStore can discover the schema automatically, and generated configs still include the `$schema` URL for clarity.
+
 Generated template provenance lives in `.agentloop/manifest.json`, not in `agentloop.config.json`. This keeps existing configs valid when generated harness templates evolve.
 
 The config controls:

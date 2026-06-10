@@ -2208,17 +2208,18 @@ Title: I built a local-first engineering loop for coding agents
 
 ## Next 15 improvements
 
-1. Add a reusable tarball smoke script for release candidates: high trust value, low effort, low maintenance.
-2. Add a Docker/GHCR image for CI: high team usefulness, medium effort, medium security review.
-3. Add a thin GitHub Action wrapper: high CI adoption value, medium effort, medium maintenance.
-4. Build a read-only MCP server: medium star potential, high effort, high safety review.
-5. Publish to MCP Registry after the MCP server exists: medium discovery value, medium effort.
-6. Add Scoop and WinGet manifests: medium Windows value, medium effort.
-7. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
-8. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
-9. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
-10. Add more packed-tarball smoke fixtures for release recovery flows: medium trust improvement, low effort.
-11. Add GitLab CI and Buildkite retry/parallelism guidance after provider-specific provenance sees use: medium usefulness, low effort.
-12. Add Rails and Laravel task-contract recipes if contributors ask for them: medium usefulness, low effort.
-13. Add package-manager-specific dependency-upgrade recipes for npm, yarn, and bun: medium usefulness, low effort.
-14. Add npm-status examples for GitHub Actions release workflows after the next trusted-publishing release is verified: medium trust improvement, low effort.
+1. Add Scoop and WinGet manifests after Windows smoke tests are stable: medium Windows value, medium effort.
+2. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
+3. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
+4. Add more packed-tarball smoke fixtures for release recovery flows: medium trust improvement, low effort.
+5. Add GitLab CI and Buildkite retry guidance after provider-specific provenance sees use: medium usefulness, low effort.
+6. Add Rails and Laravel task-contract recipes if contributors ask for them: medium usefulness, low effort.
+7. Add package-manager-specific dependency-upgrade recipes for npm, yarn, and bun: medium usefulness, low effort.
+8. Add Windows CI smoke coverage for PowerShell completions and `npx agentloopkit init`: medium trust improvement, medium effort.
+9. Explore a VS Code/Open VSX extension only if CLI usage shows an editor workflow gap: medium adoption value, high maintenance.
+10. Add richer MCP docs and example client configs without expanding write access: medium agent-compatibility value, low effort.
+11. Add GHCR usage recipes for common CI providers: medium CI usefulness, low effort.
+12. Add static report pruning guidance so repos do not accumulate noisy local artifacts: medium maintainability value, low effort.
+13. Add policy-pack examples as plain local templates before considering any registry or marketplace: medium future optionality, medium effort.
+14. Add migration notes for repos initialized on older AgentLoopKit template versions: medium user value, medium effort.
+15. Keep the SchemaStore catalog entry in sync if the config schema URL changes: medium trust value, low effort.

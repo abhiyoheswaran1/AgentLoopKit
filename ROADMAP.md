@@ -48,7 +48,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Keep the GitHub release to npm trusted-publishing flow healthy with each release.
 - Keep the README focused on user install and usage, not release operations.
 - Keep GHCR and MCP Registry release proof current after each release.
-- Submit the config schema to SchemaStore after npm publishing is stable.
+- Keep the SchemaStore catalog entry current if the config schema URL changes.
 
 ## Later
 

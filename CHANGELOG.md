@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Registered `agentloop.config.json` in SchemaStore for editor auto-discovery: <https://github.com/SchemaStore/schemastore/pull/5783>.
 
 ## 0.26.3
 
