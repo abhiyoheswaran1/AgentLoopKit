@@ -6,14 +6,15 @@ type NextActionResult = {
   command: string;
   reason: string;
   activeTask: AgentLoopStatusResult['activeTask'] | null;
+  latestTask: AgentLoopStatusResult['latestTask'] | null;
   latestReport: AgentLoopStatusResult['latestReport'] | null;
   workingTree: Pick<AgentLoopStatusResult['workingTree'], 'dirty' | 'changedFileCount'>;
   commands: AgentLoopStatusResult['commands'];
 };
 
-function formatTask(result: NextActionResult) {
-  if (!result.activeTask) return 'none';
-  return `${result.activeTask.title} (${result.activeTask.status}) - ${result.activeTask.path}`;
+function formatTask(task: AgentLoopStatusResult['activeTask'] | AgentLoopStatusResult['latestTask']) {
+  if (!task) return 'none';
+  return `${task.title} (${task.status}) - ${task.path}`;
 }
 
 function formatReport(result: NextActionResult) {
@@ -26,6 +27,7 @@ function toNextActionResult(status: AgentLoopStatusResult): NextActionResult {
     command: status.nextAction.command,
     reason: status.nextAction.reason,
     activeTask: status.activeTask ?? null,
+    latestTask: status.latestTask ?? null,
     latestReport: status.latestReport ?? null,
     workingTree: {
       dirty: status.workingTree.dirty,
@@ -46,7 +48,8 @@ Run \`${result.command}\`.
 
 ${result.reason}
 
-- Active task: ${formatTask(result)}
+- Active task: ${formatTask(result.activeTask)}
+- Latest open task: ${formatTask(result.latestTask)}
 - Latest verification: ${formatReport(result)}
 - Working tree: ${workingTree}
 `;

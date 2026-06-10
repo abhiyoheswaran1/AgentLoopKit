@@ -7,14 +7,14 @@ This repository uses AgentLoopKit.
 Before changing code:
 
 - Read AGENTLOOP.md.
-- Check .agentloop/tasks/ for an active task contract.
+- Check `.agentloop/state.json` for a pinned active task, then inspect `.agentloop/tasks/` for open task contracts.
 - Use `agentloop task list` to inspect available task contracts before choosing one.
 - Use `agentloop task show <path>` to read a task contract without changing active state.
 - Use `agentloop task set <path>` when the active task is ambiguous.
 - Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
 - Use `agentloop task archive <path>` only after verification and handoff are complete.
 - Use `agentloop task doctor` when old task files need a read-only cleanup checklist.
-- Run `agentloop status` when you need the current task, verification, dirty-file, and next-action state.
+- Run `agentloop status` when you need the pinned active task, latest open task, verification, dirty-file, and next-action state.
 - Run `agentloop next` when you only need the next recommended loop command.
 - Run `agentloop policy list`, `agentloop policy show <policy>`, and `agentloop policy status` before touching security, dependency, database, git, public API, or secret-handling areas.
 - Treat local `.agentloop/policies/*.md` files as the repo's safety guidance. A `modified` policy is a local decision to review, not a failure.
@@ -40,7 +40,7 @@ Use these roles as routing hints when a coding-agent session needs focused exper
 - Template and Harness Engineer: Use for `init`, generated files, `.agentloop/` structure, task templates, policies, gates, and agent instructions. Owns `src/templates/`, template tests, and migration notes.
 - Verification Engineer: Use for Vitest coverage, smoke scripts, CI workflows, release gates, and reproducible evidence. Owns `tests/`, `scripts/`, `.github/workflows/`, and verification reports.
 - Security Reviewer: Use for file writes, command execution, env-file handling, dependency changes, publishing, and registry metadata. Blocks unsafe defaults and requires transparent user-facing behavior.
-- Release Engineer: Use for npm, GitHub Releases, GHCR, Homebrew tap, MCP Registry, changelog entries, version bumps, tarballs, checksums, and post-release proof.
+- Release Engineer: Use for npm, GitHub Releases, GHCR, MCP Registry, changelog entries, version bumps, tarballs, checksums, and post-release proof.
 - Docs and DX Writer: Use for README, getting-started docs, examples, CLI copy, error messages, and install instructions. Keeps public docs user-facing and removes maintainer-only notes.
 - Agent Compatibility Engineer: Use for Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and generic-agent guidance. Keeps instructions tool-agnostic unless behavior is implemented.
 - MCP and Automation Engineer: Use for read-only MCP server behavior, GitHub Action usage, CI summaries, and automation docs. Keeps automation local-first and reviewable.

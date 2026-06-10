@@ -49,6 +49,13 @@ describe('next command', () => {
       path.join(dir, '.agentloop/tasks/2026-06-10-add-settings.md'),
       '# Add settings\n\n- Status: in-progress\n',
     );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-10-add-settings.md',
+      }),
+    );
     await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
     await writeFile(
       path.join(dir, '.agentloop/reports/2026-06-10-10-00-verification-report.md'),
@@ -65,11 +72,11 @@ describe('next command', () => {
     expect(next.command).toBe('agentloop handoff');
     expect(next.reason).toContain('verification evidence');
     expect(next.activeTask.title).toBe('Add settings');
+    expect(next.latestTask).toBeNull();
     expect(next.latestReport.overallStatus).toBe('pass');
     expect(next.workingTree.dirty).toBe(true);
     expect(next.workingTree.changedFileCount).toBeGreaterThan(0);
     expect(await exists(path.join(dir, 'marker.txt'))).toBe(false);
-    expect(await exists(path.join(dir, '.agentloop/state.json'))).toBe(false);
   });
 
   test('prints a concise human next action when no task exists', async () => {
@@ -96,6 +103,13 @@ describe('next command', () => {
       path.join(dir, '.agentloop/tasks/2026-06-10-fix-login.md'),
       '# Fix login\n\n- Status: review\n',
     );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-10-fix-login.md',
+      }),
+    );
     await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
     await writeFile(
       path.join(dir, '.agentloop/reports/2026-06-10-10-05-verification-report.md'),
@@ -112,6 +126,7 @@ describe('next command', () => {
     expect(next.command).toBe('agentloop verify');
     expect(next.reason).toContain('failed');
     expect(next.activeTask.title).toBe('Fix login');
+    expect(next.latestTask).toBeNull();
     expect(next.latestReport.overallStatus).toBe('fail');
   });
 
@@ -125,6 +140,13 @@ describe('next command', () => {
     await mkdir(path.dirname(reportPath), { recursive: true });
     await writeFile(reportPath, '# Verification Report\n\nOverall status: pass\n');
     await writeFile(taskPath, '# Current task\n\n- Status: in-progress\n');
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-10-current-task.md',
+      }),
+    );
     await utimes(reportPath, new Date('2026-06-10T08:00:00Z'), new Date('2026-06-10T08:00:00Z'));
     await utimes(taskPath, new Date('2026-06-10T09:00:00Z'), new Date('2026-06-10T09:00:00Z'));
 
@@ -136,6 +158,7 @@ describe('next command', () => {
     expect(result.exitCode).toBe(0);
     const next = JSON.parse(result.stdout);
     expect(next.activeTask.title).toBe('Current task');
+    expect(next.latestTask).toBeNull();
     expect(next.latestReport).toBeNull();
     expect(next.command).toBe('agentloop verify');
     expect(next.reason).toContain('no verification report');
@@ -163,8 +186,33 @@ describe('next command', () => {
     expect(result.exitCode).toBe(0);
     const next = JSON.parse(result.stdout);
     expect(next.activeTask).toBeNull();
+    expect(next.latestTask).toBeNull();
     expect(next.latestReport.overallStatus).toBe('pass');
     expect(next.command).toBe('agentloop create-task');
+  });
+
+  test('recommends pinning an unpinned open task before continuing', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-open-task.md'),
+      '# Open task\n\n- Status: in-progress\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'next', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const next = JSON.parse(result.stdout);
+    expect(next.activeTask).toBeNull();
+    expect(next.latestTask.title).toBe('Open task');
+    expect(next.command).toBe('agentloop task set .agentloop/tasks/2026-06-10-open-task.md');
+    expect(next.reason).toContain('No active task is pinned');
+    expect(await exists(path.join(dir, '.agentloop/state.json'))).toBe(false);
   });
 
   test('recommends archiving a pinned done task', async () => {
@@ -193,6 +241,7 @@ describe('next command', () => {
     expect(result.exitCode).toBe(0);
     const next = JSON.parse(result.stdout);
     expect(next.activeTask.status).toBe('done');
+    expect(next.latestTask).toBeNull();
     expect(next.latestReport.overallStatus).toBe('pass');
     expect(next.command).toBe(
       'agentloop task archive .agentloop/tasks/2026-06-10-complete-task.md',

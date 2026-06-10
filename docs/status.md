@@ -6,7 +6,7 @@ It reads:
 
 - `agentloop.config.json`
 - active task pointer in `.agentloop/state.json`, when present
-- newest open task contract in `.agentloop/tasks/` when no active task is pinned
+- newest open task contract in `.agentloop/tasks/` as `latestTask` when no task is pinned
 - latest `*-verification-report.md` in `.agentloop/reports/`
 - git branch, commit, and working tree status
 - configured verification commands
@@ -54,6 +54,7 @@ agentloop task clear
 The command suggests one next action:
 
 - `agentloop create-task` when no task contract exists
+- `agentloop task set <path>` when no active task is pinned but an open task contract exists
 - `agentloop task archive <path>` when the pinned active task is already `done`
 - `agentloop verify` when an in-progress task exists without verification evidence that is at least as new as the task contract
 - `agentloop verify` when the latest verification report failed
@@ -62,5 +63,5 @@ The command suggests one next action:
 `status` and `next` do not execute project commands, read `.env` contents, call an LLM, or make network requests.
 Older verification reports remain on disk, but `status` and `next` ignore them as current evidence for a newer in-progress task. Moving a task to `review` or `done` after verification does not erase the latest report from the loop state.
 If a task stays pinned after it reaches `done`, `status` and `next` point you at `agentloop task archive <path>` so the next session starts clean.
-When no active task is pinned, `status` and `next` ignore fallback tasks marked `done`, `completed`, or `verified`. If every task contract is terminal, they recommend `agentloop create-task` instead of resurfacing old work.
+When no active task is pinned, `status` and `next` report the newest open contract as `latestTask`, leave `activeTask` null, and recommend `agentloop task set <path>` before continuing. They ignore fallback tasks marked `done`, `completed`, or `verified`. If every task contract is terminal, they recommend `agentloop create-task` instead of resurfacing old work.
 Run `agentloop task doctor` when a repo has many old task files and you need a cleanup checklist before choosing the next task.

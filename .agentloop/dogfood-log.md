@@ -4027,3 +4027,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Running npm dry-run inside `agentloop verify` captured the publish tarball summary in the release evidence.
 - Improve:
   - Add a future release checklist item that verifies the latest local tag exists before generating release notes.
+
+## 2026-06-10: Fix Unpinned Status Active Task Fallback
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-fix-unpinned-status-active-task-fallback.md`
+- Trigger:
+  - `agentloop task current --json` treated no pinned task as `activeTask: null`, while `agentloop status --json` could label a newest unpinned task as active.
+  - That mismatch could steer coding agents toward stale backlog work without an explicit `agentloop task set <path>`.
+- Implementation:
+  - Split `status` and `next` output into pinned `activeTask` and unpinned `latestTask`.
+  - Updated next-action logic to recommend `agentloop task set <path>` when only an unpinned open task exists.
+  - Updated README, status docs, MCP docs, generated harness templates, and repo guidance to use the new terms.
+  - Removed a stale Homebrew-tap reference from the generated release-agent roster.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-21-51-verification-report.md`, overall status pass.
+  - Focused status/next tests, full Vitest, lint, typecheck, build, Markdown link check, `projscan doctor`, `git diff --check`, and built CLI `status`/`next` smoke checks passed.
+  - `projscan doctor` remained A 97/100 with the known informational unused-export note in `scripts/smoke-packed-release.mjs`.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-10-21-53-pr-summary.md`
+  - Archived the completed task with `agentloop task archive`.
+- What worked well:
+  - The bug reproduced cleanly in JSON tests before the fix.
+  - Dogfooding `status` after the build showed the current repo now reports the pinned task and `latestTask: null`.
+- Improve:
+  - Keep this change unreleased until the planned `0.28.0` batch instead of cutting another patch release.

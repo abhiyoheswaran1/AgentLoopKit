@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Changed `agentloop status` and `agentloop next` so unpinned open task contracts appear as `latestTask`, not `activeTask`, and the next action asks users to pin the task with `agentloop task set <path>`.
 
 ## 0.27.0
 

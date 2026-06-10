@@ -16,7 +16,7 @@ describe('status command', () => {
     tempDirs = [];
   });
 
-  test('prints machine-readable repo status with latest task and report', async () => {
+  test('prints machine-readable repo status with latest unpinned task and report', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await execa('git', ['init', '-q'], { cwd: dir });
@@ -44,12 +44,15 @@ describe('status command', () => {
     expect(result.exitCode).toBe(0);
     const status = JSON.parse(result.stdout);
     expect(status.project.name).toBe('demo');
-    expect(status.activeTask.title).toBe('Add settings page');
+    expect(status.activeTask).toBeNull();
+    expect(status.latestTask.title).toBe('Add settings page');
     expect(status.latestReport.overallStatus).toBe('pass');
     expect(status.workingTree.dirty).toBe(true);
     expect(status.workingTree.changedFileCount).toBeGreaterThan(0);
     expect(status.commands.configured).toContain('test');
-    expect(status.nextAction.command).toBe('agentloop handoff');
+    expect(status.nextAction.command).toBe(
+      'agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md',
+    );
   });
 
   test('prints markdown next action when no task exists', async () => {
@@ -90,11 +93,21 @@ describe('status command', () => {
 
     expect(jsonResult.exitCode).toBe(0);
     const status = JSON.parse(jsonResult.stdout);
+    expect(status.activeTask).toBeNull();
+    expect(status.latestTask.title).toBe('Fix login');
     expect(status.latestReport.overallStatus).toBe('fail');
-    expect(status.nextAction.command).toBe('agentloop verify');
-    expect(status.nextAction.reason).toContain('failed');
+    expect(status.nextAction.command).toBe(
+      'agentloop task set .agentloop/tasks/2026-06-09-fix-login.md',
+    );
+    expect(status.nextAction.reason).toContain('No active task is pinned');
+    expect(markdownResult.stdout).toContain('Active task: none pinned.');
+    expect(markdownResult.stdout).toContain(
+      'Latest open task: Fix login (in progress) - .agentloop/tasks/2026-06-09-fix-login.md',
+    );
     expect(markdownResult.stdout).toContain('Latest verification: fail');
-    expect(markdownResult.stdout).toContain('Run `agentloop verify`.');
+    expect(markdownResult.stdout).toContain(
+      'Run `agentloop task set .agentloop/tasks/2026-06-09-fix-login.md`.',
+    );
   });
 
   test('uses modified time instead of filename sort for the active task', async () => {
@@ -115,11 +128,12 @@ describe('status command', () => {
 
     expect(result.exitCode).toBe(0);
     const status = JSON.parse(result.stdout);
-    expect(status.activeTask.title).toBe('Newer task');
-    expect(status.activeTask.path).toContain('2026-06-09-a-new-task.md');
+    expect(status.activeTask).toBeNull();
+    expect(status.latestTask.title).toBe('Newer task');
+    expect(status.latestTask.path).toContain('2026-06-09-a-new-task.md');
   });
 
-  test('ignores completed tasks when choosing the fallback active task', async () => {
+  test('ignores completed tasks when choosing the latest unpinned task', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await initializeAgentLoop({ cwd: dir });
@@ -137,8 +151,9 @@ describe('status command', () => {
 
     expect(result.exitCode).toBe(0);
     const status = JSON.parse(result.stdout);
-    expect(status.activeTask.title).toBe('Open task');
-    expect(status.activeTask.path).toBe('.agentloop/tasks/2026-06-09-open-task.md');
+    expect(status.activeTask).toBeNull();
+    expect(status.latestTask.title).toBe('Open task');
+    expect(status.latestTask.path).toBe('.agentloop/tasks/2026-06-09-open-task.md');
   });
 
   test('reports no fallback active task when all task contracts are terminal', async () => {
@@ -169,7 +184,8 @@ describe('status command', () => {
 
     expect(jsonResult.exitCode).toBe(0);
     const status = JSON.parse(jsonResult.stdout);
-    expect(status.activeTask).toBeUndefined();
+    expect(status.activeTask).toBeNull();
+    expect(status.latestTask).toBeNull();
     expect(status.nextAction.command).toBe('agentloop create-task');
     expect(markdownResult.stdout).toContain('Active task: No task contract found.');
   });

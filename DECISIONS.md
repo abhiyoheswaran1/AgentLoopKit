@@ -46,7 +46,7 @@ Launch visuals live in `docs/assets/readme/` with source HTML and a VHS tape so 
 
 ## 2026-06-09: Active Task State Is Transparent
 
-`agentloop task set` stores the active task pointer in `.agentloop/state.json`. The file contains only a version and a relative task path. `status` and handoff summaries use that pointer when it references an existing Markdown task inside `.agentloop/tasks/`; otherwise they fall back to the newest task contract. This keeps task lifecycle local and auditable without adding a database, daemon, or hosted service.
+`agentloop task set` stores the active task pointer in `.agentloop/state.json`. The file contains only a version and a relative task path. Commands that need task context use that pointer when it references an existing Markdown task inside `.agentloop/tasks/`; commands such as handoffs, gates, and reports may use the newest open task contract as fallback context. This keeps task lifecycle local and auditable without adding a database, daemon, or hosted service.
 
 ## 2026-06-09: Verification Reports Use Allowlisted CI Context
 
@@ -140,4 +140,8 @@ Non-dry `agentloop init` refuses to initialize the user's home directory unless 
 
 ## 2026-06-10: Distribution Channels Reuse The CLI
 
-GitHub Action, Docker/GHCR, Homebrew, and MCP Registry support must wrap or expose the existing CLI package instead of creating separate product behavior. npm and GitHub Releases remain the source of truth for versioned package contents. Homebrew formula checksums and MCP Registry metadata must point at a package version that exists, and channel docs must distinguish prepared repo artifacts from externally verified publication.
+GitHub Action, Docker/GHCR, and MCP Registry support must wrap or expose the existing CLI package instead of creating separate product behavior. npm and GitHub Releases remain the source of truth for versioned package contents. Registry metadata and generated artifacts must point at a package version that exists, and channel docs must distinguish prepared repo artifacts from externally verified publication.
+
+## 2026-06-10: Status Separates Pinned Active From Latest Open
+
+`agentloop status` and `agentloop next` should reserve `activeTask` for the task pinned in `.agentloop/state.json`. When no task is pinned, they may show the newest open task contract as `latestTask`, but the next action must ask the user or agent to run `agentloop task set <path>` before continuing. This keeps `agentloop task current`, `status`, and `next` consistent while preserving useful context for repos with existing task contracts.
