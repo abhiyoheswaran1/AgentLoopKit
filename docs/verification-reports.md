@@ -30,7 +30,9 @@ agentloop verify --json
 
 Failures stay visible. The command exits non-zero when verification fails.
 
-Long command output is shortened in the report. AgentLoopKit keeps the beginning and ending output with a truncation marker, so setup context and final error lines remain visible without committing huge logs.
+Failed reports include a `Failure Summary` section before command output. It lists each failed command, its exit code, and final useful output lines. The summary uses the same captured command output; AgentLoopKit does not parse tool-specific stack traces or guess the root cause.
+
+Long command output is shortened in the command section. AgentLoopKit keeps the beginning and ending output with a truncation marker, so setup context and final error lines remain visible without committing huge logs.
 
 ## CI Context
 

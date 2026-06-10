@@ -42,6 +42,7 @@ describe('verification', () => {
       path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
     );
     expect(result.markdown).toContain('Overall status: pass');
+    expect(result.markdown).not.toContain('## Failure Summary');
     expect(result.markdown).toContain('ok');
   });
 
@@ -59,6 +60,7 @@ describe('verification', () => {
 
     expect(result.overallStatus).toBe('not-run');
     expect(result.markdown).toContain('No verification commands were configured');
+    expect(result.markdown).not.toContain('## Failure Summary');
     expect(result.markdown).not.toContain('## CI Context');
   });
 
@@ -191,5 +193,51 @@ describe('verification', () => {
     expect(result.markdown).toContain('END: assertion failed at final line');
     expect(result.markdown).toContain('[output truncated: showing first');
     expect(result.markdown).not.toContain('middle-0450');
+  });
+
+  test('summarizes failed commands before full output excerpts', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeFile(
+      path.join(dir, 'fail-late.mjs'),
+      [
+        'console.log("setup line");',
+        'console.log("intermediate detail");',
+        'console.error("ASSERTION: expected enabled to be true");',
+        'console.error("STACK: demo.test.ts:42");',
+        'process.exit(7);',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node fail-late.mjs',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-10-12-00',
+      nowIso: '2026-06-10T12:00:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('fail');
+    expect(result.markdown).toContain('## Failure Summary');
+    expect(result.markdown).toContain('### test: `node fail-late.mjs`');
+    expect(result.markdown).toContain('- Exit code: 7');
+    expect(result.markdown).toContain('ASSERTION: expected enabled to be true');
+    expect(result.markdown).toContain('STACK: demo.test.ts:42');
+    expect(result.markdown.indexOf('## Failure Summary')).toBeLessThan(
+      result.markdown.indexOf('## Commands Run'),
+    );
+    expect(result.markdown).toContain('## Commands Run');
+    expect(result.markdown).toContain('setup line');
   });
 });

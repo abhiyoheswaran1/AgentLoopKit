@@ -58,6 +58,37 @@ function excerpt(output: string, limit = 5000) {
 ${output.slice(-tailLimit)}`;
 }
 
+function failureSnippet(output: string, maxLines = 12, maxChars = 2000) {
+  const lines = output
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .filter((line) => line.trim());
+  const tail = lines.slice(-maxLines).join('\n') || '(no output)';
+  if (tail.length <= maxChars) return tail;
+  return `${tail.slice(0, maxChars)}
+[failure summary truncated]`;
+}
+
+function renderFailureSummary(results: VerificationCommandResult[]) {
+  const failures = results.filter((result) => !result.passed);
+  if (!failures.length) return '';
+
+  return `## Failure Summary
+${failures
+  .map(
+    (result) => `### ${result.key}: \`${result.command}\`
+
+- Exit code: ${result.exitCode}
+
+\`\`\`text
+${failureSnippet(result.output)}
+\`\`\``,
+  )
+  .join('\n\n')}
+
+`;
+}
+
 function commandEntries(config: AgentLoopConfig, options: VerificationOptions) {
   const configured: Array<[VerificationCommandKey, string]> = [
     ['test', config.commands.test],
@@ -194,6 +225,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
 - Overall status: ${overallStatus}
 
 ${renderCiContext(ciContext)}
+${renderFailureSummary(results)}
 ## Commands Run
 ${
   results.length === 0

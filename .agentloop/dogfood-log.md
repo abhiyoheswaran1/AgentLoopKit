@@ -2698,3 +2698,33 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - GitHub release notes were generated from a clean tree with `agentloop release-notes --release-version 0.21.0`.
 - Improve:
   - Repair npm package permissions or trusted publishing, then publish the current release line once and return to normal semver.
+
+## 2026-06-10: Verification Failure Summary
+
+- Task contract: `.agentloop/tasks/2026-06-10-improve-verification-failure-summary.md`
+- Product cycle: `.agentloop/research/interview-cycle-082.md`
+- Trigger:
+  - Failed verification reports preserve output but still require reviewers to scan command sections for the useful failure lines.
+  - Product-panel signal favored better failure readability over another release attempt while npm authentication remains external.
+- Product changes in progress:
+  - Add a `Failure Summary` section only when verification commands fail.
+  - Include failed command, exit code, and final useful output lines from the same captured command output.
+  - Keep the existing full command output excerpt.
+  - Avoid AI diagnosis, stack-trace parsing, network calls, or extra file reads.
+- Verification run so far:
+  - Red test: `npx pnpm@10.12.1 test tests/verification.test.ts` failed because `## Failure Summary` was missing.
+  - Focused green test: `npx pnpm@10.12.1 test tests/verification.test.ts`: pass, 1 file and 7 tests.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 28 files and 106 tests.
+  - `npx pnpm@10.12.1 check:links`: pass initially with 455 Markdown files checked, then pass with 457 files after adding task and handoff artifacts.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `git diff --check`: pass.
+  - `node scripts/prepublish-check.mjs`: failed as intended because `CHANGELOG.md` now has unreleased verification-report entries.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-04-55-verification-report.md`, overall status `pass`.
+  - AgentLoop handoff: `.agentloop/handoffs/2026-06-10-04-57-pr-summary.md`.
+- Worked well:
+  - The change improves handoff readability while keeping report evidence deterministic.
+- Improve:
+  - Consider an example failed verification report fixture for documentation screenshots in a later visual refresh.
