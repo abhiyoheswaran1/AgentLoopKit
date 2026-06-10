@@ -1,0 +1,271 @@
+# Verification Report
+
+- Timestamp: 2026-06-10T15:05:46.427Z
+- Repo: AgentLoopKit
+- Git branch: main
+- Git commit: 52edd5c
+- Working tree: dirty
+- Overall status: pass
+
+
+## Task Context
+- Path: .agentloop/tasks/2026-06-10-release-0-26-2-cleanup-patch.md
+- Title: Release 0.26.2 cleanup patch
+- Task type: release
+- Status: in-progress
+
+
+
+## Commands Run
+### test: `npx pnpm@10.12.1 test`
+
+- Exit code: 0
+- Status: pass
+
+```text
+
+> agentloopkit@0.26.2 test /Users/abhyoh/local dev folder/Apps/AgentLoopKit
+> vitest run
+
+
+ RUN  v4.1.8 /Users/abhyoh/local dev folder/Apps/AgentLoopKit
+
+
+ Test Files  33 passed (33)
+      Tests  145 passed (145)
+   Start at  17:05:47
+   Duration  10.51s (transform 1.28s, setup 0ms, import 5.37s, tests 83.04s, environment 4ms)
+
+```
+
+### lint: `npx pnpm@10.12.1 lint`
+
+- Exit code: 0
+- Status: pass
+
+```text
+
+> agentloopkit@0.26.2 lint /Users/abhyoh/local dev folder/Apps/AgentLoopKit
+> eslint .
+
+```
+
+### typecheck: `npx pnpm@10.12.1 typecheck`
+
+- Exit code: 0
+- Status: pass
+
+```text
+
+> agentloopkit@0.26.2 typecheck /Users/abhyoh/local dev folder/Apps/AgentLoopKit
+> tsc --noEmit
+
+```
+
+### build: `npx pnpm@10.12.1 build`
+
+- Exit code: 0
+- Status: pass
+
+```text
+
+> agentloopkit@0.26.2 build /Users/abhyoh/local dev folder/Apps/AgentLoopKit
+> tsup && node scripts/copy-assets.mjs
+
+CLI Building entry: {"cli/index":"src/cli/index.ts"}
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/abhyoh/local dev folder/Apps/AgentLoopKit/tsup.config.ts
+CLI Target: node20
+CLI Cleaning output folder
+ESM Build start
+ESM dist/cli/index.js     154.09 KB
+ESM dist/cli/index.js.map 292.24 KB
+ESM ⚡️ Build success in 18ms
+DTS Build start
+DTS ⚡️ Build success in 667ms
+DTS dist/cli/index.d.ts 13.00 B
+```
+
+### custom: `node scripts/prepublish-check.mjs`
+
+- Exit code: 0
+- Status: pass
+
+```text
+Prepublish metadata check passed.
+```
+
+### custom: `npm run smoke:release`
+
+- Exit code: 0
+- Status: pass
+
+```text
+
+> agentloopkit@0.26.2 smoke:release
+> node scripts/smoke-packed-release.mjs
+
+Release smoke for agentloopkit@0.26.2
+Packed /var/folders/tc/vn86wd6d7v70rn_pxbv3h2k40000gn/T/agentloopkit-release-smoke-E2qSeF/pack/agentloopkit-0.26.2.tgz
+README pins match package version.
+Packed binary version smoke passed.
+Packed init smoke passed.
+Packed local-only init smoke passed.
+Packed create-task path guard smoke passed.
+Packed verify task path guard smoke passed.
+Packed home-directory dry-run guard smoke passed.
+Release smoke passed.
+```
+
+### custom: `npm publish --access public --dry-run`
+
+- Exit code: 0
+- Status: pass
+
+```text
+
+> agentloopkit@0.26.2 prepublishOnly
+> node scripts/prepublish-check.mjs && npm run typecheck && npm test && npm run build
+
+Prepublish metadata check passed.
+
+> agentloopkit@0.26.2 typecheck
+> tsc --noEmit
+
+
+> agentloopkit@0.26.2 test
+> vitest run
+
+
+ RUN  v4.1.8 /Users/abhyoh/local dev folder/Apps/AgentLoopKit
+
+
+ Test Files  33 passed (33)
+      Tests  145 passed (145)
+   Start at  17:06:18
+   Duration  12.23s (transform 1.56s, setup 0ms, import 6.47s, tests 98.82s, environment 3ms)
+
+
+> agentloopkit@0.26.2 build
+> tsup && node scripts/copy-assets.mjs
+
+CLI Building entry: {"cli/index":"src/cli/index.ts"}
+CLI Using tsconfig: tsconfig.json
+CLI tsup v8.5.1
+CLI Using tsup config: /Users/abhyoh/local dev folder/Apps/AgentLoopKit/tsup.config.ts
+CLI Target: node20
+CLI Cleaning output folder
+ESM Build start
+ESM dist/cli/index.js     154.09 KB
+ESM dist/cli/index.js.map 292.24 KB
+ESM ⚡️ Build success in 16ms
+DTS Build start
+DTS ⚡️ Build success in 693ms
+DTS dist/cli/index.d.ts 13.00 B
+npm notice
+npm notice 📦  agentloopkit@0.26.2
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 25.2kB README.md
+npm notice 13B dist/cli/index.d.ts
+npm notice 157.8kB dist/cli/index.js
+npm notice 299.3kB dist/cli/index.js.map
+npm notice 3.3kB dist/schema/agentloop.config.schema.json
+npm notice 984B dist/templates/agents/claude-code.md
+npm notice 1.2kB dist/templates/agents/codex.md
+npm notice 955B dist/templates/agents/cursor.md
+npm notice 994B dist/templates/agents/gemini-cli.md
+npm notice 879B dist/templates/agents/generic.md
+npm notice 962B dist/templates/agents/github-copilot-cli.md
+npm notice 955B dist/templates/agents/opencode.md
+npm notice 457B dist/templates/gates/dependency-gate.md
+npm notice 472B dist/templates/gates/docs-gate.md
+npm notice 621B dist/templates/gates/implementation-gate.md
+npm notice 440B dist/templates/gates/regression-gate.md
+npm notice 470B dist/templates/gates/review-gate.md
+npm notice 502B dist/templates/gates/security-gate.md
+npm notice 513B dist/templates/gates/test-gate.md
+npm notice 120B dist/templates/handoffs/decision-log.md
+npm notice 387B dist/templates/handoffs/pr-summary.md
+npm notice 133B dist/templates/handoffs/release-notes.md
+npm notice 155B dist/templates/handoffs/reviewer-brief.md
+npm notice 94B dist/templates/handoffs/rollback-plan.md
+npm notice 135B dist/templates/handoffs/verification-report.md
+npm notice 614B dist/templates/harness/autonomous-work-rules.md
+npm notice 4.2kB dist/templates/harness/commands.md
+npm notice 446B dist/templates/harness/definition-of-done.md
+npm notice 260B dist/templates/harness/release-checklist.md
+npm notice 493B dist/templates/harness/repo-map.md
+npm notice 375B dist/templates/harness/review-checklist.md
+npm notice 333B dist/templates/harness/working-agreement.md
+npm notice 720B dist/templates/loops/bugfix.md
+npm notice 646B dist/templates/loops/dependency-upgrade.md
+npm notice 648B dist/templates/loops/docs.md
+npm notice 865B dist/templates/loops/feature.md
+npm notice 674B dist/templates/loops/migration.md
+npm notice 748B dist/templates/loops/refactor.md
+npm notice 620B dist/templates/loops/release.md
+npm notice 688B dist/templates/loops/security-review.md
+npm notice 668B dist/templates/loops/test-generation.md
+npm notice 308B dist/templates/policies/database-change-policy.md
+npm notice 315B dist/templates/policies/dependency-change-policy.md
+npm notice 243B dist/templates/policies/git-policy.md
+npm notice 478B dist/templates/policies/no-destructive-actions.md
+npm notice 325B dist/templates/policies/public-api-change-policy.md
+npm notice 275B dist/templates/policies/secrets-policy.md
+npm notice 314B dist/templates/policies/security-policy.md
+npm notice 255B dist/templates/policies/ui-change-policy.md
+npm notice 4.7kB dist/templates/root/agentloop-directory-readme.md
+npm notice 917B dist/templates/root/agentloop.config.json
+npm notice 3.7kB dist/templates/root/AGENTLOOP.md
+npm notice 4.8kB dist/templates/root/AGENTS.md
+npm notice 2.0kB dist/templates/tasks/README.md
+npm notice 1.9kB package.json
+npm notice 3.3kB schema/agentloop.config.schema.json
+npm notice 563B server.json
+npm notice Tarball Details
+npm notice name: agentloopkit
+npm notice version: 0.26.2
+npm notice filename: agentloopkit-0.26.2.tgz
+npm notice package size: 121.8 kB
+npm notice unpacked size: 535.5 kB
+npm notice shasum: 212044beb305a89c59d9eb66743004c464488034
+npm notice integrity: sha512-RVwWWwnWLWGJW[...]gffll6DEibYGQ==
+npm notice total files: 58
+npm notice
+npm notice Publishing to https://registry.npmjs.org/ with tag latest and public access (dry-run)
++ agentloopkit@0.26.2
+```
+
+### custom: `git diff --check`
+
+- Exit code: 0
+- Status: pass
+
+```text
+(no output)
+```
+
+### custom: `npx --yes projscan doctor --format markdown`
+
+- Exit code: 0
+- Status: pass
+
+```text
+# Project Health Report
+
+**Health Score: A (97/100)**
+
+[![projscan health](https://img.shields.io/badge/projscan-A-brightgreen)](https://github.com/abhiyoheswaran1/projscan)
+
+Found **1** issue(s).
+
+- ℹ️ **Unused exports in scripts/smoke-packed-release.mjs** - 4 named exports (assertReadmePins, createSmokeSteps, runReleaseSmoke, isDirectRun) but nothing in the project imports this file. Dead code or awaiting wiring?
+```
+
+## Not Run
+- Nothing skipped.
+
+## Recommended Next Actions
+- Review the diff and prepare a handoff summary.
