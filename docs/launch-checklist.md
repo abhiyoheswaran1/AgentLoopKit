@@ -222,7 +222,7 @@ Current recovery note:
 - `agentloopkit@0.19.0` is prepared, verified, and published as GitHub release `v0.19.0` for local CI summaries.
 - `agentloopkit@0.20.0` is prepared for local release-note handoffs.
 - Local `0.20.0` checks passed: focused release-note tests, typecheck, lint, full Vitest, Markdown link checks, build, projscan, `npm pack`, `npm publish --access public --dry-run`, packed-tarball smoke testing, Playwright screenshot rendering, and VHS terminal rendering.
-- Local `0.20.0` tarball SHA-256: `7ddb745299ae3d002441fc45c3d90805002ba39776a4067995cd6c42ad42fee3`.
+- Local `0.20.0` tarball SHA-256: `df8407c7da4440a86a544973bdd052cadb0c0d2b10b1bb67f81548b857fdc201`.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
 - After `v0.20.0` is verified and released, npm should catch up to `0.20.0` once. Then use normal semver for future releases.

@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Current source targets `v0.20.0`. The latest GitHub release is `v0.19.0`, and npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.19.0` carry recent source snapshots. The next npm publish should catch up to the current GitHub line once; after that, releases return to normal sequential semver.
+Current source and the latest GitHub release target `v0.20.0`. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.20.0` carry recent source snapshots. The next npm publish should catch up to the current GitHub line once; after that, releases return to normal sequential semver.
 
 Run the CLI after install:
 
@@ -470,7 +470,7 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.19.0` is public with a tarball asset for the CI summary release, and current source targets `v0.20.0` for release-note handoffs. npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
+AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.20.0` carries the release-note handoff command and a tarball asset. npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
 
 The npm version jump is intentional. The skipped npm numbers already exist as public GitHub release candidates while npm publishing was blocked, so the next npm publish should ship the current release line rather than backfilling old source snapshots.
 

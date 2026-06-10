@@ -6,12 +6,12 @@ AgentLoopKit does not install workflows into user repositories. Copy a recipe in
 
 ## npm Status
 
-The latest public GitHub tarball is `v0.19.0`, which includes `agentloop ci-summary`. Current source targets `v0.20.0` with `agentloop release-notes`, but that command is not in the `v0.19.0` tarball. npm still serves `0.1.1` until browser/OTP authentication or trusted publishing works.
+The latest public GitHub tarball is `v0.20.0`, which includes `agentloop ci-summary` and `agentloop release-notes`. npm still serves `0.1.1` until browser/OTP authentication or trusted publishing works.
 
 Until npm catches up, pin the GitHub release tarball in CI:
 
 ```bash
-npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.19.0/agentloopkit-0.19.0.tgz
+npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.20.0/agentloopkit-0.20.0.tgz
 npx --no-install agentloop check-gates --strict
 ```
 
@@ -36,7 +36,7 @@ jobs:
           node-version: 24
 
       - name: Install AgentLoopKit
-        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.19.0/agentloopkit-0.19.0.tgz
+        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.20.0/agentloopkit-0.20.0.tgz
 
       - name: Check AgentLoop evidence
         run: npx --no-install agentloop check-gates --strict
@@ -68,7 +68,7 @@ jobs:
         run: npm ci
 
       - name: Install AgentLoopKit
-        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.19.0/agentloopkit-0.19.0.tgz
+        run: npm install --no-save https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.20.0/agentloopkit-0.20.0.tgz
 
       - name: Run AgentLoop verification
         run: npx --no-install agentloop verify
@@ -85,9 +85,8 @@ jobs:
       - name: Write CI summary
         run: npx --no-install agentloop ci-summary --write
 
-      # Available after the next GitHub tarball includes v0.20.0 or newer.
-      # - name: Write release notes
-      #   run: npx --no-install agentloop release-notes --write
+      - name: Write release notes
+        run: npx --no-install agentloop release-notes --write
 
       - name: Check AgentLoop gates
         run: npx --no-install agentloop check-gates --strict

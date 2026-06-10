@@ -171,7 +171,7 @@ Historical publishing log:
 - GitHub release tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow run `27246784493` for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
 - `agentloopkit@0.20.0` passed focused release-notes tests, typecheck, lint, full Vitest, Markdown link checks, build, projscan, `npm pack`, `npm publish --access public --dry-run`, packed-tarball smoke testing, Playwright screenshot rendering, and VHS terminal rendering.
-- Local tarball SHA-256 before GitHub release: `7ddb745299ae3d002441fc45c3d90805002ba39776a4067995cd6c42ad42fee3`.
+- Local tarball SHA-256 before GitHub release: `df8407c7da4440a86a544973bdd052cadb0c0d2b10b1bb67f81548b857fdc201`.
 - npm registry proof before release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 
 Publish the current prepared release to npm from its matching release commit after browser/OTP authentication completes. Do not backfill old npm versions with newer source.

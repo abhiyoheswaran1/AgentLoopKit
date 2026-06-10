@@ -2553,7 +2553,7 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npm pack`: pass, produced `agentloopkit-0.20.0.tgz`.
   - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
   - Packed tarball smoke: pass; `agentloop version` reported `0.20.0`, `release-notes --json --write` wrote a release-note artifact, and `check-gates --strict --json` passed in the smoke repo.
-  - Tarball SHA-256: `7ddb745299ae3d002441fc45c3d90805002ba39776a4067995cd6c42ad42fee3`.
+  - Tarball SHA-256: `df8407c7da4440a86a544973bdd052cadb0c0d2b10b1bb67f81548b857fdc201`.
   - README screenshots regenerated with Playwright.
   - README terminal GIF regenerated with VHS from `docs/assets/readme/agentloopkit-cli.tape`.
   - AgentLoop verification report: `.agentloop/reports/2026-06-10-03-45-verification-report.md`, overall status `pass`.
