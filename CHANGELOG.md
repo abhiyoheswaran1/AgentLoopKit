@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Added `npm run smoke:release` for local packed-package release checks
+- The release smoke script builds, packs, runs the packed binary, checks safety guards, and verifies packaged README pins without publishing
 
 ## 0.24.4
 

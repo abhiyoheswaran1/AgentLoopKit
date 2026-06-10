@@ -173,6 +173,7 @@ pnpm test
 pnpm check:links
 pnpm build
 pnpm pack
+npm run smoke:release
 npx projscan doctor --format markdown
 ```
 

@@ -3535,3 +3535,34 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Checking npm's rendered README caught the stale package content before stopping.
 - Improve:
   - Add packaged README inspection to the reusable tarball smoke script backlog item.
+
+## 2026-06-10: Release Smoke Script
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-release-smoke-script.md`
+- Product cycle: `.agentloop/research/interview-cycle-105.md`
+- Trigger:
+  - The 0.24.3 and 0.24.4 releases depended on one-off shell smoke commands for packed-package behavior.
+  - Those commands caught real issues, but they were not repeatable enough for future release handoffs.
+- Product changes:
+  - Added `scripts/smoke-packed-release.mjs`.
+  - Added `npm run smoke:release`.
+  - Added `tests/release-smoke.test.ts`.
+  - Documented the command in release maintainer docs.
+  - Updated backlog status for the reusable tarball smoke item.
+- Verification run:
+  - Red test: `npm run test -- tests/release-smoke.test.ts` failed before the script existed.
+  - Red test: focused test failed before direct-run detection handled paths with spaces.
+  - Focused green test: `npm run test -- tests/release-smoke.test.ts`: pass, 4 tests.
+  - `npm run lint`: pass.
+  - `npm run typecheck`: pass.
+  - `npx pnpm@10.12.1 check:links`: pass, 583 Markdown files checked.
+  - `git diff --check`: pass.
+  - `npm run smoke:release`: pass; packed the local package, verified version output, init, task path guards, verification task guard, home-directory dry-run refusal, and README pins.
+  - AgentLoop verification: `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-10-add-release-smoke-script.md --command "npm run smoke:release" --json` passed with 30 test files and 133 tests, plus lint, typecheck, build, and the packed-release smoke.
+- Handoff generated:
+  - `.agentloop/handoffs/2026-06-10-14-23-pr-summary.md`
+- Worked well:
+  - The script reproduced the packed-package checks without publishing, tagging, reading tokens, calling GitHub APIs, or reading `.env` files.
+  - The direct-run regression caught the path-with-spaces issue in this repo path.
+- Improve:
+  - Run `npm run smoke:release` before every future npm/GitHub release candidate.

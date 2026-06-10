@@ -46,6 +46,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check:links": "tsx scripts/check-markdown-links.ts",
+    "smoke:release": "node scripts/smoke-packed-release.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
