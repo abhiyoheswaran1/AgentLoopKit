@@ -39,6 +39,11 @@ export function initCommand() {
         if (result.git.isRepository) {
           logger.info(`Git root: ${result.git.root}`);
           logger.info(`Git target: ${result.git.targetIsRoot ? 'root directory' : 'subdirectory'}`);
+          if (!result.git.targetIsRoot) {
+            logger.info(
+              'Warning: target is a Git subdirectory. Files will be written to the target directory, not the Git root.',
+            );
+          }
         }
         logger.info(`Configured commands: ${formatList(result.commands.configured)}`);
         logger.info(`Missing commands: ${formatList(result.commands.missing)}`);

@@ -4352,3 +4352,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider adding a warning style later if users often initialize subdirectories by mistake.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-10: Warn When Init Targets a Git Subdirectory
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-warn-when-init-targets-a-git-subdirectory.md`
+- Trigger:
+  - After `agentloop init` gained Git-root context, nested-package users could see `Git target: subdirectory` but still had to infer where files would be written.
+- Implementation:
+  - Added a human warning when `git.targetIsRoot` is false.
+  - Kept JSON output unchanged and continued using `git.targetIsRoot` for machine consumers.
+  - Updated README, getting-started docs, changelog, and init tests.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-23-43-verification-report.md`, overall status pass.
+  - Focused init test failed before implementation because the warning was missing.
+  - Focused init tests passed after implementation: 1 file, 17 tests.
+  - Full Vitest passed: 34 files, 170 tests.
+  - Lint, typecheck, build, Markdown link check, `projscan doctor`, and built CLI nested-package dry-run smoke passed.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-10-23-44-pr-summary.md`
+- What worked well:
+  - The warning makes accidental nested initialization clearer without changing write targets or adding prompts.
+- Improve:
+  - Watch for repeated confusion around subdirectory initialization before adding stronger warnings or confirmation flows.
+  - Keep this unreleased until the planned `0.28.0` batch.

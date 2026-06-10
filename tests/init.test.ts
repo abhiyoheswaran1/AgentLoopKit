@@ -166,8 +166,30 @@ describe('init', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('Git: detected');
     expect(result.stdout).toContain(`Git root: ${await realpath(dir)}`);
+    expect(result.stdout).not.toContain('Warning: target is a Git subdirectory.');
     expect(result.stdout).toContain('No files written.');
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
+  });
+
+  test('dry-run human output warns when target is a git repository subdirectory', async () => {
+    const dir = await makeTempDir();
+    const packageDir = path.join(dir, 'packages', 'web');
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await mkdir(packageDir, { recursive: true });
+    await writeJson(path.join(packageDir, 'package.json'), { name: 'demo-web' });
+
+    const result = await execa(tsxPath, [cliPath, 'init', '--dry-run'], {
+      cwd: packageDir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('Git target: subdirectory');
+    expect(result.stdout).toContain(
+      'Warning: target is a Git subdirectory. Files will be written to the target directory, not the Git root.',
+    );
+    await expect(readFile(path.join(packageDir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
   });
 
   test('dry-run JSON output reports git root and whether the target is root', async () => {
