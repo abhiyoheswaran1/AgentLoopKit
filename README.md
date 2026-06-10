@@ -83,6 +83,7 @@ npx agentloopkit task archive .agentloop/tasks/2026-06-09-add-settings-page.md
 npx agentloopkit install-agent codex
 npx agentloopkit install-agent all
 npx agentloopkit completion zsh
+npx agentloopkit completion powershell
 ```
 
 <p align="center">
@@ -140,7 +141,7 @@ pnpm build
 | `agentloop install-agent codex`         | Add agent-specific instructions                                                |
 | `agentloop install-agent all`           | Add all bundled agent instruction files                                        |
 | `agentloop list-templates`              | List bundled templates                                                         |
-| `agentloop completion <shell>`          | Print bash, zsh, or fish completion scripts                                    |
+| `agentloop completion <shell>`          | Print bash, zsh, fish, or PowerShell completion scripts                        |
 | `agentloop version`                     | Print the CLI version                                                          |
 
 The package exposes two binaries:
@@ -152,7 +153,7 @@ agentloopkit init
 
 ## Shell Completions
 
-AgentLoopKit prints completion scripts to stdout. It does not edit `.zshrc`, `.bashrc`, fish config, or other shell profile files.
+AgentLoopKit prints completion scripts to stdout. It does not edit `.zshrc`, `.bashrc`, fish config, PowerShell startup files, or other shell profile files.
 
 Inspect a script before installing it:
 
@@ -160,6 +161,8 @@ Inspect a script before installing it:
 agentloop completion zsh
 agentloop completion bash
 agentloop completion fish
+agentloop completion powershell
+agentloop completion pwsh
 ```
 
 Example zsh setup:

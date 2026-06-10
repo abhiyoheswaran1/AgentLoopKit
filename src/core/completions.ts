@@ -1,6 +1,6 @@
 import { AgentLoopError } from './errors.js';
 
-export const COMPLETION_SHELLS = ['bash', 'zsh', 'fish'] as const;
+export const COMPLETION_SHELLS = ['bash', 'zsh', 'fish', 'powershell', 'pwsh'] as const;
 
 export type CompletionShell = (typeof COMPLETION_SHELLS)[number];
 
@@ -200,6 +200,52 @@ complete -c agentloopkit -n '__fish_seen_subcommand_from completion' -a '${COMPL
 `;
 }
 
+function powerShellArray(values: readonly string[]) {
+  return `@(${values.map((value) => `'${value}'`).join(', ')})`;
+}
+
+function renderPowerShell() {
+  const topCommands = topLevelCommands.map(([name]) => name);
+  return `# AgentLoopKit PowerShell completion
+# Save with: agentloop completion powershell > agentloop-completion.ps1
+# Review the script before dot-sourcing it from your PowerShell startup file.
+
+$AgentLoopCommands = ${powerShellArray(topCommands)}
+$AgentLoopTaskCommands = ${powerShellArray(taskCommands)}
+$AgentLoopPolicyCommands = ${powerShellArray(policyCommands)}
+$AgentLoopTaskStatuses = ${powerShellArray(taskStatuses)}
+$AgentLoopAgents = ${powerShellArray(agentNames)}
+$AgentLoopShells = ${powerShellArray(COMPLETION_SHELLS)}
+
+Register-ArgumentCompleter -Native -CommandName agentloop, agentloopkit -ScriptBlock {
+  param($wordToComplete, $commandAst, $cursorPosition)
+
+  $words = @($commandAst.CommandElements | ForEach-Object { $_.Extent.Text })
+  $prefix = if ($null -eq $wordToComplete) { '' } else { $wordToComplete }
+  $values = $AgentLoopCommands
+
+  if ($words.Count -gt 1) {
+    switch ($words[1]) {
+      'task' {
+        if ($words.Count -gt 2 -and $words[2] -eq 'status') {
+          $values = $AgentLoopTaskStatuses
+        } else {
+          $values = $AgentLoopTaskCommands
+        }
+      }
+      'policy' { $values = $AgentLoopPolicyCommands }
+      'install-agent' { $values = $AgentLoopAgents }
+      'completion' { $values = $AgentLoopShells }
+    }
+  }
+
+  $values |
+    Where-Object { $_.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase) } |
+    ForEach-Object { [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_) }
+}
+`;
+}
+
 export function renderCompletionScript(shell: string) {
   switch (parseShell(shell)) {
     case 'bash':
@@ -208,5 +254,8 @@ export function renderCompletionScript(shell: string) {
       return renderZsh();
     case 'fish':
       return renderFish();
+    case 'powershell':
+    case 'pwsh':
+      return renderPowerShell();
   }
 }

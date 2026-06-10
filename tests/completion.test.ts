@@ -51,8 +51,29 @@ describe('completion scripts', () => {
     expect(script).not.toContain('config.fish');
   });
 
+  test('renders PowerShell completions for commands, nested values, and aliases', () => {
+    const script = renderCompletionScript('powershell');
+    const aliasScript = renderCompletionScript('pwsh');
+
+    expect(script).toContain('# AgentLoopKit PowerShell completion');
+    expect(script).toContain('Register-ArgumentCompleter -Native -CommandName agentloop, agentloopkit');
+    expect(script).toContain("'ci-summary'");
+    expect(script).toContain("'release-notes'");
+    expect(script).toContain("'task'");
+    expect(script).toContain("'archive'");
+    expect(script).toContain("'policy'");
+    expect(script).toContain("'status'");
+    expect(script).toContain("'in-progress'");
+    expect(script).toContain("'claude-code'");
+    expect(script).toContain("'github-copilot-cli'");
+    expect(script).toContain("'powershell'");
+    expect(script).toContain("'pwsh'");
+    expect(script).not.toContain('$PROFILE');
+    expect(aliasScript).toBe(script);
+  });
+
   test('rejects unsupported shells', () => {
-    expect(() => renderCompletionScript('powershell')).toThrow('Unsupported shell');
+    expect(() => renderCompletionScript('nushell')).toThrow('Unsupported shell');
   });
 });
 
@@ -64,8 +85,23 @@ describe('completion command', () => {
     expect(result.stdout).toContain('install-agent');
   });
 
+  test('prints a PowerShell completion script from the CLI', async () => {
+    const result = await execa(tsxPath, [cliPath, 'completion', 'powershell']);
+
+    expect(result.stdout).toContain('Register-ArgumentCompleter');
+    expect(result.stdout).toContain('agentloopkit');
+  });
+
+  test('prints PowerShell completions from the pwsh alias', async () => {
+    const result = await execa(tsxPath, [cliPath, 'completion', 'pwsh']);
+
+    expect(result.stdout).toContain('$AgentLoopShells');
+    expect(result.stdout).toContain("'powershell'");
+    expect(result.stdout).toContain("'pwsh'");
+  });
+
   test('fails clearly for unsupported shells from the CLI', async () => {
-    const result = await execa(tsxPath, [cliPath, 'completion', 'powershell'], {
+    const result = await execa(tsxPath, [cliPath, 'completion', 'nushell'], {
       reject: false,
     });
 

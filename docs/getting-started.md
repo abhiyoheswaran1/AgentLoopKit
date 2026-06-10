@@ -88,6 +88,7 @@ Optional shell completions:
 npx agentloopkit completion zsh
 npx agentloopkit completion bash
 npx agentloopkit completion fish
+npx agentloopkit completion powershell
 ```
 
 These commands print scripts to stdout. AgentLoopKit does not edit shell profile files.

@@ -2953,3 +2953,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - One compact page should reduce stale launch-state drift.
 - Improve:
   - After npm publishes `0.22.0`, update this page first and then remove temporary tarball guidance elsewhere.
+
+## 2026-06-10: PowerShell Shell Completion
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-powershell-completion.md`
+- Product cycle: `.agentloop/research/interview-cycle-090.md`
+- Trigger:
+  - Shell completions supported bash, zsh, and fish.
+  - PowerShell users received an unsupported-shell error.
+  - The product panel accepted a static stdout-only renderer and rejected profile-file mutation.
+- Product changes:
+  - Added `agentloop completion powershell`.
+  - Added `agentloop completion pwsh` as an alias.
+  - Added PowerShell `Register-ArgumentCompleter` output for top-level commands, task commands, policy commands, task statuses, agent names, and shell names.
+  - Updated README, getting-started docs, backlog, and final handoff current-state sections.
+- Verification run:
+  - Red test first: `npx pnpm@10.12.1 test tests/completion.test.ts` failed before PowerShell support because `powershell` was rejected by `parseShell`.
+  - Focused green test: `npx pnpm@10.12.1 test tests/completion.test.ts`: pass, 1 file and 9 tests.
+  - Direct CLI smoke: `npx tsx src/cli/index.ts completion powershell`: pass, printed a PowerShell completion script.
+  - Direct alias smoke: `npx tsx src/cli/index.ts completion pwsh`: pass, matched `powershell` output.
+  - Unsupported shell smoke: `npx tsx src/cli/index.ts completion nushell`: failed with exit 1 and listed supported shells.
+  - Full `npx pnpm@10.12.1 test`: pass, 28 files and 113 tests.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx pnpm@10.12.1 check:links`: pass, 488 Markdown files checked.
+  - `git diff --check`: pass.
+  - `node scripts/prepublish-check.mjs`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-add-powershell-completion.md`: pass, wrote `.agentloop/reports/2026-06-10-06-13-verification-report.md`.
+  - `npx tsx src/cli/index.ts handoff --task .agentloop/tasks/2026-06-10-add-powershell-completion.md --json`: pass, wrote `.agentloop/handoffs/2026-06-10-06-14-pr-summary.md`.
+- Worked well:
+  - Adding the shell through the existing static renderer kept the change small and dependency-free.
+- Improve:
+  - If users ask for NuShell support, add docs first and a renderer only after the command shape is clear.

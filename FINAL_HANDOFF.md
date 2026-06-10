@@ -20,7 +20,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - read-only task contract listing with active-task markers
 - explicit task status transitions in Markdown task contracts
 - task contract archiving into `.agentloop/tasks/archive/`
-- static bash, zsh, and fish shell completion scripts
+- static bash, zsh, fish, and PowerShell shell completion scripts
 - verification report generation
 - deterministic PR summary generation
 - deterministic PR summary change-area classification and review-focus hints
@@ -96,6 +96,8 @@ agentloop list-templates
 agentloop completion zsh
 agentloop completion bash
 agentloop completion fish
+agentloop completion powershell
+agentloop completion pwsh
 agentloop version
 ```
 
@@ -1724,6 +1726,18 @@ Implemented:
 - verification-report lookup isolation from `*-ci-summary.md` artifacts
 - GitHub Actions docs, examples, generated harness guidance, completions, tests, release metadata, and README demo source updates
 
+### Cycle 90: PowerShell completions
+
+Decision: add Windows-friendly shell completion support while keeping completion generation static, inspectable, and stdout-only.
+
+Implemented:
+
+- `agentloop completion powershell`
+- `agentloop completion pwsh`
+- PowerShell `Register-ArgumentCompleter` output for `agentloop` and `agentloopkit`
+- top-level command, task command, policy command, task status, agent-name, and shell-name completions
+- README and getting-started updates that keep profile-file mutation out of scope
+
 ## User persona feedback summary
 
 This section is simulated/internal persona feedback. It is not real user research.
@@ -1741,6 +1755,7 @@ Strongest signals:
 - Agents need a safe status command so task contracts move through the loop without hand-editing Markdown.
 - Agents and maintainers need a local marker for generated template provenance before comparing or refreshing harness files.
 - Repeat CLI users need completions for the growing command surface, but security-sensitive users want inspectable scripts rather than dotfile installers.
+- Windows and PowerShell users need the same inspectable completion flow as bash, zsh, and fish users.
 - Repeat users need a way to move finished task contracts out of the active list without deleting Markdown history.
 - Release readers need the README visuals and changelog to match the newest source command before a GitHub release is cut.
 - Agents need `create-task` to return machine-readable output like the rest of the task lifecycle commands.
@@ -2019,7 +2034,7 @@ Title: I built a local-first engineering loop for coding agents
 6. Add GitLab CI and Buildkite examples for `agentloop ci-summary`: medium usefulness, low effort.
 7. Add generated security-review example: medium trust improvement, low effort.
 8. Add config migration helper for future schema versions: medium usefulness, medium effort.
-9. Add richer shell completion docs for PowerShell users without adding a PowerShell script yet: low effort, low maintenance.
+9. Add NuShell completion docs only if users ask for it: low effort, low maintenance.
 10. Add report theme customization with strict no-external-assets defaults: medium usefulness, medium effort.
 11. Add optional workflow generator only after docs recipes prove useful: medium adoption impact, medium maintenance.
 12. Add SchemaStore submission after npm and release cadence are stable: medium trust improvement, external review required.
