@@ -1,9 +1,16 @@
 import path from 'node:path';
-import { readFile } from 'node:fs/promises';
+import { readFile, realpath } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { latestMarkdownFile, prSummaryPattern, verificationReportPattern } from './artifacts.js';
 import { pathExists } from './file-system.js';
-import { getGitBranch, getGitCommit, getGitStatus, isInsideGitRepo, parseGitStatus } from './git.js';
+import {
+  getGitBranch,
+  getGitCommit,
+  getGitRoot,
+  getGitStatus,
+  isInsideGitRepo,
+  parseGitStatus,
+} from './git.js';
 import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 
 export type GateStatus = 'pass' | 'warn' | 'fail';
@@ -24,6 +31,8 @@ export type CheckGatesResult = {
     isRepository: boolean;
     branch: string;
     commit: string;
+    root: string;
+    targetIsRoot: boolean;
     changedFileCount: number;
   };
   nextAction: {
@@ -68,6 +77,14 @@ async function missingFiles(cwd: string, files: string[]) {
 
 function gate(id: string, name: string, status: GateStatus, message: string, filePath?: string) {
   return { id, name, status, message, ...(filePath ? { path: filePath } : {}) };
+}
+
+async function resolveComparablePath(filePath: string) {
+  try {
+    return await realpath(filePath);
+  } catch {
+    return path.resolve(filePath);
+  }
 }
 
 function overallStatus(gates: GateCheck[], strict: boolean): GateStatus {
@@ -115,12 +132,21 @@ function renderMarkdown(result: Omit<CheckGatesResult, 'markdown'>) {
   const gitLine = result.git.isRepository
     ? `${result.git.branch || 'unknown branch'}${result.git.commit ? ` @ ${result.git.commit}` : ''}`
     : 'not inside a git repository';
+  const gitLines = [
+    `- Git: ${gitLine}`,
+    ...(result.git.isRepository
+      ? [
+          `- Git root: ${result.git.root}`,
+          `- Git target: ${result.git.targetIsRoot ? 'root directory' : 'subdirectory'}`,
+        ]
+      : []),
+  ];
 
   return `# AgentLoopKit Gates
 
 - Overall status: ${result.overallStatus}
 - Strict mode: ${result.strict ? 'enabled (warnings fail)' : 'disabled'}
-- Git: ${gitLine}
+${gitLines.join('\n')}
 - Changed files: ${result.git.changedFileCount}
 
 ## Gates
@@ -227,6 +253,11 @@ export async function checkGates(options: {
 
   const inGit = await isInsideGitRepo(options.cwd);
   const changedFiles = inGit ? await parseGitStatus(await getGitStatus(options.cwd)) : [];
+  const gitRoot = inGit ? await getGitRoot(options.cwd) : '';
+  const resolvedGitRoot = gitRoot ? await resolveComparablePath(gitRoot) : '';
+  const gitTargetIsRoot = resolvedGitRoot
+    ? resolvedGitRoot === (await resolveComparablePath(options.cwd))
+    : false;
   gates.push(
     gate(
       'git-context',
@@ -239,6 +270,18 @@ export async function checkGates(options: {
           : `${changedFiles.length} changed file(s) detected.`,
     ),
   );
+  if (inGit) {
+    gates.push(
+      gate(
+        'git-target',
+        'Git target',
+        gitTargetIsRoot ? 'pass' : 'warn',
+        gitTargetIsRoot
+          ? 'Current directory is the Git root.'
+          : 'Current directory is a Git subdirectory. AgentLoopKit files live in the current directory, not the Git root.',
+      ),
+    );
+  }
 
   const withoutMarkdown = {
     strict,
@@ -248,6 +291,8 @@ export async function checkGates(options: {
       isRepository: inGit,
       branch: inGit ? await getGitBranch(options.cwd) : '',
       commit: inGit ? await getGitCommit(options.cwd) : '',
+      root: resolvedGitRoot,
+      targetIsRoot: gitTargetIsRoot,
       changedFileCount: changedFiles.length,
     },
     nextAction: chooseNextAction(gates),

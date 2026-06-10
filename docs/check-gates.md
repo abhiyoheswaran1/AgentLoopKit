@@ -9,7 +9,7 @@ It inspects local files only:
 - generated handoff summary
 - repo harness files
 - core safety policies
-- git working tree context
+- git working tree, root, and target context
 
 It does not run tests, call an LLM, score code quality, or block human review.
 

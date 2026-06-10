@@ -340,7 +340,7 @@ See `docs/status.md` for output fields and next-action rules.
 - a generated handoff summary
 - repo harness files
 - core safety policies
-- git working tree context
+- git working tree, root, and target context
 
 Use JSON output in scripts:
 

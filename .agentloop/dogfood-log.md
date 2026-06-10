@@ -4421,3 +4421,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep `next` output terse; it should stay focused on one recommended command.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Show Git Target Context in Check-Gates
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-show-git-target-context-in-check-gates.md`
+- Trigger:
+  - `agentloop check-gates` is the review-readiness command, but it still lacked the Git root and target context already added to `init`, `doctor`, and `status`.
+- Implementation:
+  - Added `git.root` and `git.targetIsRoot` to check-gates JSON output.
+  - Added Git root and Git target lines to check-gates Markdown output.
+  - Added a warning gate when check-gates runs from a Git subdirectory.
+  - Updated README, check-gates docs, changelog, backlog, and check-gates tests.
+- Verification run:
+  - `.agentloop/reports/2026-06-11-00-15-verification-report.md`, overall status pass.
+  - Focused check-gates tests failed before implementation because Git root and target output were missing.
+  - Focused check-gates tests passed after implementation: 1 file, 5 tests.
+  - Full Vitest passed: 34 files, 174 tests.
+  - Lint, typecheck, build, Markdown link check, `projscan doctor`, and built CLI nested-package check-gates smoke passed.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-11-00-17-pr-summary.md`
+- What worked well:
+  - Review readiness now shows the same Git target context as setup and status commands.
+- Improve:
+  - Consider a shared formatter for Git target output if more commands need the same wording.
+  - Keep this unreleased until the planned `0.28.0` batch.

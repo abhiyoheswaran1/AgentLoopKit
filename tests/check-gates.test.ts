@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, utimes, writeFile } from 'node:fs/promises';
+import { mkdir, realpath, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -49,6 +49,8 @@ describe('check-gates command', () => {
     expect(result.exitCode).toBe(0);
     const output = JSON.parse(result.stdout);
     expect(output.overallStatus).toBe('pass');
+    expect(output.git.root).toBe(await realpath(dir));
+    expect(output.git.targetIsRoot).toBe(true);
     expect(output.gates).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'task-contract', status: 'pass' }),
@@ -60,6 +62,61 @@ describe('check-gates command', () => {
       ]),
     );
     expect(output.nextAction.command).toBe('agentloop handoff');
+  });
+
+  test('warns when review gates run from a git repository subdirectory', async () => {
+    const dir = await makeTempDir();
+    const packageDir = path.join(dir, 'packages', 'web');
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await mkdir(packageDir, { recursive: true });
+    await writeFile(path.join(packageDir, 'package.json'), JSON.stringify({ name: 'demo-web' }));
+    await initializeAgentLoop({ cwd: packageDir });
+    await writeFile(path.join(packageDir, 'changed.ts'), 'export const changed = true;\n');
+    await writeFile(
+      path.join(packageDir, '.agentloop/tasks/2026-06-09-demo.md'),
+      '# Demo task\n\n- Status: in-progress\n',
+    );
+    await mkdir(path.join(packageDir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(packageDir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await writeFile(
+      path.join(packageDir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: packageDir,
+      reject: false,
+    });
+    const humanResult = await execa(tsxPath, [cliPath, 'check-gates'], {
+      cwd: packageDir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.overallStatus).toBe('warn');
+    expect(output.git.root).toBe(await realpath(dir));
+    expect(output.git.targetIsRoot).toBe(false);
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'git-target',
+          status: 'warn',
+          message:
+            'Current directory is a Git subdirectory. AgentLoopKit files live in the current directory, not the Git root.',
+        }),
+      ]),
+    );
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain(`- Git root: ${await realpath(dir)}`);
+    expect(humanResult.stdout).toContain('- Git target: subdirectory');
+    expect(humanResult.stdout).toContain(
+      '[warn] Git target: Current directory is a Git subdirectory. AgentLoopKit files live in the current directory, not the Git root.',
+    );
   });
 
   test('warns and fails predictably when review evidence is missing', async () => {
