@@ -46,7 +46,8 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] GitHub release `v0.24.4` is published with npm README pin notes.
 - [x] GitHub release `v0.24.5` is published with release-smoke and README VHS demo notes.
 - [x] GitHub release `v0.25.0` is published with local-only init notes.
-- [ ] GitHub release `v0.26.0` is published with MCP and distribution-channel notes.
+- [x] GitHub release `v0.26.0` is published with MCP and distribution-channel notes.
+- [ ] GitHub release `v0.26.1` is published with MCP Registry metadata validation notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -165,10 +166,14 @@ For a read-only npm registry check, see [npm-status.md](npm-status.md). For a co
 - [x] Package `agentloopkit@0.25.0` is prepared on `main` for local-only init mode.
 - [x] Package `agentloopkit@0.25.0` is published through GitHub trusted publishing.
 - [x] Package `agentloopkit@0.26.0` is prepared on `main` for MCP and distribution-channel support.
-- [ ] Package `agentloopkit@0.26.0` is published through GitHub trusted publishing.
-- [ ] GHCR image `ghcr.io/abhiyoheswaran1/agentloopkit:0.26.0` is published.
+- [x] Package `agentloopkit@0.26.0` is published through GitHub trusted publishing.
+- [x] GHCR image `ghcr.io/abhiyoheswaran1/agentloopkit:0.26.0` is published.
+- [x] MCP Registry publish for `0.26.0` was attempted and failed because `server.json.description` exceeded the registry's 100-character limit.
+- [x] Package `agentloopkit@0.26.1` is prepared on `main` for MCP Registry metadata validation.
+- [ ] Package `agentloopkit@0.26.1` is published through GitHub trusted publishing.
+- [ ] GHCR image `ghcr.io/abhiyoheswaran1/agentloopkit:0.26.1` is published.
 - [ ] MCP Registry metadata for `io.github.abhiyoheswaran1/agentloopkit` is published.
-- [ ] Homebrew tap formula for `agentloopkit@0.26.0` is published and verified.
+- [ ] Homebrew tap formula for `agentloopkit@0.26.1` is published and verified.
 - [x] npm trusted publishing is configured for this repository.
 - [x] `agentloop npm-status --expect-current` passes after npm publish.
 - [x] Current publish guidance tells maintainers to continue from the current source version, not stale intermediate versions.
@@ -225,7 +230,7 @@ npx --yes --package ./agentloopkit-0.24.1.tgz agentloop init --dry-run
 npx --yes --package ./agentloopkit-0.24.2.tgz agentloop init --dry-run
 npx --yes --package ./agentloopkit-0.24.3.tgz agentloop verify --task .agentloop/tasks/example.md --json
 npx --yes --package ./agentloopkit-0.24.4.tgz agentloop version
-npx --yes --package ./agentloopkit-0.26.0.tgz agentloop version
+npx --yes --package ./agentloopkit-0.26.1.tgz agentloop version
 ```
 
 ## Publish

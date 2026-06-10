@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-      - run: npm install --no-save agentloopkit@0.26.0
+      - run: npm install --no-save agentloopkit@0.26.1
       - run: npx --no-install agentloop check-gates --strict
 ```
 
@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: 24
       - run: npm ci
-      - run: npm install --no-save agentloopkit@0.26.0
+      - run: npm install --no-save agentloopkit@0.26.1
       - run: npx --no-install agentloop verify
       - run: npx --no-install agentloop badge
       - run: npx --no-install agentloop handoff
@@ -83,10 +83,10 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-      - uses: abhiyoheswaran1/AgentLoopKit@v0.26.0
+      - uses: abhiyoheswaran1/AgentLoopKit@v0.26.1
         with:
           command: check-gates --strict
-          agentloopkit-version: 0.26.0
+          agentloopkit-version: 0.26.1
 ```
 
 The action installs AgentLoopKit and runs the command. It does not upload artifacts or comment on pull requests.

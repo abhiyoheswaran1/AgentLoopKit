@@ -55,10 +55,13 @@ describe('distribution artifacts', () => {
   });
 
   test('Homebrew formula installs the GitHub release tarball without postinstall hooks', async () => {
+    const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
     const formula = await readFile('packaging/homebrew/agentloopkit.rb', 'utf8');
 
     expect(formula).toContain('class Agentloopkit < Formula');
-    expect(formula).toContain('releases/download/v0.26.0/agentloopkit-0.26.0.tgz');
+    expect(formula).toContain(
+      `releases/download/v${packageJson.version}/agentloopkit-${packageJson.version}.tgz`,
+    );
     expect(formula).toMatch(/sha256 "[a-f0-9]{64}"/);
     expect(formula).not.toContain(
       'sha256 "0000000000000000000000000000000000000000000000000000000000000000"',

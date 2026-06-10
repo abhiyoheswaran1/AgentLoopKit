@@ -4,6 +4,14 @@
 
 - No unreleased changes yet.
 
+## 0.26.1
+
+Patch release for MCP Registry metadata validation:
+
+- Shortened the MCP Registry server description to satisfy the registry's 100-character limit
+- Updated 0.26.x docs and install examples to point at `agentloopkit@0.26.1`
+- Kept `agentloop mcp-server` read-only with no command execution, file mutation, telemetry, external API calls, or `.env` content reads
+
 ## 0.26.0
 
 Minor release for MCP and distribution channels:

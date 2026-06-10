@@ -1,8 +1,8 @@
 class Agentloopkit < Formula
   desc "Drop-in engineering loop for coding agents"
   homepage "https://github.com/abhiyoheswaran1/AgentLoopKit"
-  url "https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.26.0/agentloopkit-0.26.0.tgz"
-  sha256 "a289ea89ee037ab4099e79102efbf21d3563b7e65961f1b1bd54a4a735cfba65"
+  url "https://github.com/abhiyoheswaran1/AgentLoopKit/releases/download/v0.26.1/agentloopkit-0.26.1.tgz"
+  sha256 "cf836155a2cdfaf8eff818202aa651fc32b3b39a49256f25d0925ffbadad5cc6"
   license "MIT"
 
   depends_on "node"

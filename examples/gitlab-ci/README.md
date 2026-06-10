@@ -13,7 +13,7 @@ agentloop-evidence:
   image: node:24
   stage: test
   before_script:
-    - npm install --no-save agentloopkit@0.26.0
+    - npm install --no-save agentloopkit@0.26.1
   script:
     - npx --no-install agentloop check-gates --strict
 ```
@@ -28,7 +28,7 @@ agentloop-verification:
   stage: test
   before_script:
     - npm ci
-    - npm install --no-save agentloopkit@0.26.0
+    - npm install --no-save agentloopkit@0.26.1
   script:
     - npx --no-install agentloop verify
     - npx --no-install agentloop badge

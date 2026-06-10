@@ -12,7 +12,7 @@ Use this when task contracts, verification reports, and handoff summaries are co
 steps:
   - label: "AgentLoop evidence gate"
     commands:
-      - npm install --no-save agentloopkit@0.26.0
+      - npm install --no-save agentloopkit@0.26.1
       - npx --no-install agentloop check-gates --strict
 ```
 
@@ -25,7 +25,7 @@ steps:
   - label: "AgentLoop verification"
     commands:
       - npm ci
-      - npm install --no-save agentloopkit@0.26.0
+      - npm install --no-save agentloopkit@0.26.1
       - npx --no-install agentloop verify
       - npx --no-install agentloop badge
       - npx --no-install agentloop handoff
