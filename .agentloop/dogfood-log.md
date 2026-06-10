@@ -4207,3 +4207,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The docs now describe the exact release smoke mode without changing runtime behavior.
 - Improve:
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-10: Make Release Smoke Helper Usage Explicit
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-make-release-smoke-helper-usage-explicit.md`
+- Trigger:
+  - `projscan doctor` reported the named exports in `scripts/smoke-packed-release.mjs` as unused.
+  - The helpers were covered by tests, but the tests accessed them through a dynamic import object that static analysis could not see.
+- Implementation:
+  - Changed `tests/release-smoke.test.ts` to use a static namespace import from the smoke script.
+  - Removed the unused `packageName` option from the helper test input.
+  - Kept the smoke script runtime behavior unchanged.
+  - Added an unreleased changelog note.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-22-55-verification-report.md`, overall status pass.
+  - Focused release-smoke tests passed.
+  - Full Vitest passed: 33 files, 162 tests.
+  - Lint, typecheck, build, Markdown link check, Prettier check for the touched test, and `projscan doctor` passed.
+  - `projscan doctor` now reports A 100/100 with no issues detected.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-10-22-56-pr-summary.md`
+- What worked well:
+  - The cleanup improved dogfood signal without changing release-smoke behavior.
+- Improve:
+  - Keep this unreleased until the planned `0.28.0` batch.

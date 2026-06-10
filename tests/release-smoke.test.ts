@@ -1,31 +1,11 @@
 import { describe, expect, test } from 'vitest';
-import path from 'node:path';
-import { pathToFileURL } from 'node:url';
-
-type ReleaseSmokeScript = {
-  assertReadmePins(readme: string, version: string): void;
-  createSmokeSteps(options: {
-    packageName: string;
-    version: string;
-    tarballPath: string;
-  }): Array<{
-    name: string;
-    command: string;
-    args: string[];
-    cwd: string;
-    env: Record<string, string>;
-  }>;
-  isDirectRun(importMetaUrl: string, argvPath: string): boolean;
-};
-
-const script = (await import(
-  pathToFileURL(path.resolve('scripts/smoke-packed-release.mjs')).href
-)) as ReleaseSmokeScript;
+// @ts-expect-error TS7016: static import keeps helper usage visible to projscan.
+import * as smoke from '../scripts/smoke-packed-release.mjs';
 
 describe('release smoke script helpers', () => {
   test('detects direct execution when the script path contains spaces', () => {
     expect(
-      script.isDirectRun(
+      smoke.isDirectRun(
         'file:///Users/example/local%20dev%20folder/Apps/AgentLoopKit/scripts/smoke-packed-release.mjs',
         '/Users/example/local dev folder/Apps/AgentLoopKit/scripts/smoke-packed-release.mjs',
       ),
@@ -33,8 +13,7 @@ describe('release smoke script helpers', () => {
   });
 
   test('builds isolated packed-package smoke steps', () => {
-    const steps = script.createSmokeSteps({
-      packageName: 'agentloopkit',
+    const steps = smoke.createSmokeSteps({
       version: '0.24.4',
       tarballPath: '/tmp/agentloopkit-0.24.4.tgz',
     });
@@ -75,7 +54,7 @@ describe('release smoke script helpers', () => {
       'npx --yes agentloopkit@0.24.4 init',
     ].join('\n');
 
-    expect(() => script.assertReadmePins(readme, '0.24.4')).not.toThrow();
+    expect(() => smoke.assertReadmePins(readme, '0.24.4')).not.toThrow();
   });
 
   test('rejects stale README pins for older package versions', () => {
@@ -84,7 +63,7 @@ describe('release smoke script helpers', () => {
       'npx --yes agentloopkit@0.24.4 init',
     ].join('\n');
 
-    expect(() => script.assertReadmePins(readme, '0.24.4')).toThrow(
+    expect(() => smoke.assertReadmePins(readme, '0.24.4')).toThrow(
       'README contains stale pinned version 0.24.3',
     );
   });
