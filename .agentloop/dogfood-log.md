@@ -4398,3 +4398,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep subdirectory handling warning-only until real user confusion justifies confirmation prompts.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Show Git Target Context in Status
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-show-git-target-context-in-status.md`
+- Trigger:
+  - Agents use `agentloop status` before work, but it only showed Git branch and commit after `init` and `doctor` gained Git target context.
+- Implementation:
+  - Added `git.root` and `git.targetIsRoot` to status JSON output.
+  - Added Git root, Git target, and subdirectory warning lines to status Markdown output.
+  - Updated README, status docs, changelog, backlog, and status tests.
+- Verification run:
+  - `.agentloop/reports/2026-06-11-00-04-verification-report.md`, overall status pass.
+  - Focused status tests failed before implementation because Git root and target output were missing.
+  - Focused status tests passed after implementation: 1 file, 11 tests.
+  - Full Vitest passed: 34 files, 173 tests.
+  - Lint, typecheck, build, Markdown link check, `projscan doctor`, and built CLI nested-package status smoke passed.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-11-00-05-pr-summary.md`
+- What worked well:
+  - `init`, `doctor`, and `status` now tell the same story about Git root versus current target.
+- Improve:
+  - Keep `next` output terse; it should stay focused on one recommended command.
+  - Keep this unreleased until the planned `0.28.0` batch.

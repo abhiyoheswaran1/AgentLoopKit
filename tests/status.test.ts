@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, utimes, writeFile } from 'node:fs/promises';
+import { mkdir, realpath, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -44,6 +44,8 @@ describe('status command', () => {
     expect(result.exitCode).toBe(0);
     const status = JSON.parse(result.stdout);
     expect(status.project.name).toBe('demo');
+    expect(status.git.root).toBe(await realpath(dir));
+    expect(status.git.targetIsRoot).toBe(true);
     expect(status.activeTask).toBeNull();
     expect(status.latestTask.title).toBe('Add settings page');
     expect(status.latestReport.overallStatus).toBe('pass');
@@ -52,6 +54,28 @@ describe('status command', () => {
     expect(status.commands.configured).toContain('test');
     expect(status.nextAction.command).toBe(
       'agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md',
+    );
+  });
+
+  test('prints git target warning when status runs from a git repository subdirectory', async () => {
+    const dir = await makeTempDir();
+    const packageDir = path.join(dir, 'packages', 'web');
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await mkdir(packageDir, { recursive: true });
+    await writeFile(path.join(packageDir, 'package.json'), JSON.stringify({ name: 'demo-web' }));
+    await initializeAgentLoop({ cwd: packageDir });
+
+    const result = await execa(tsxPath, [cliPath, 'status'], {
+      cwd: packageDir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain(`- Git root: ${await realpath(dir)}`);
+    expect(result.stdout).toContain('- Git target: subdirectory');
+    expect(result.stdout).toContain(
+      '- Git target warning: AgentLoopKit files live in the current directory, not the Git root.',
     );
   });
 

@@ -307,7 +307,7 @@ See `docs/doctor-risk-files.md` for category examples, limits, and reviewer acti
 - newest open task contract as `latestTask` when no task is pinned
 - parked deferred contracts as `deferredTasks`
 - latest verification report
-- working tree state
+- working tree state plus Git root and target context
 - configured and missing commands
 - next suggested command
 

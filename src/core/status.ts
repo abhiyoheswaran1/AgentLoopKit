@@ -1,10 +1,11 @@
 import path from 'node:path';
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, realpath, stat } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { DEFAULT_COMMAND_KEYS } from './constants.js';
 import {
   getGitBranch,
   getGitCommit,
+  getGitRoot,
   getGitStatus,
   isInsideGitRepo,
   parseGitStatus,
@@ -33,6 +34,8 @@ export type AgentLoopStatusResult = {
     isRepository: boolean;
     branch: string;
     commit: string;
+    root: string;
+    targetIsRoot: boolean;
   };
   workingTree: {
     dirty: boolean;
@@ -198,10 +201,32 @@ function formatDeferredTaskSummary(tasks: StatusTask[]) {
   return `${count} parked - ${titles}${remaining}`;
 }
 
+async function resolveComparablePath(filePath: string) {
+  try {
+    return await realpath(filePath);
+  } catch {
+    return path.resolve(filePath);
+  }
+}
+
 function renderMarkdown(result: Omit<AgentLoopStatusResult, 'markdown'>) {
   const gitLine = result.git.isRepository
     ? `${result.git.branch || 'unknown branch'}${result.git.commit ? ` @ ${result.git.commit}` : ''}`
     : 'not inside a git repository';
+  const gitLines = [
+    `- Git: ${gitLine}`,
+    ...(result.git.isRepository
+      ? [
+          `- Git root: ${result.git.root}`,
+          `- Git target: ${result.git.targetIsRoot ? 'root directory' : 'subdirectory'}`,
+          ...(result.git.targetIsRoot
+            ? []
+            : [
+                '- Git target warning: AgentLoopKit files live in the current directory, not the Git root.',
+              ]),
+        ]
+      : []),
+  ];
   const workingTree = result.workingTree.dirty
     ? `dirty (${result.workingTree.changedFileCount} changed file(s))`
     : 'clean';
@@ -223,7 +248,7 @@ function renderMarkdown(result: Omit<AgentLoopStatusResult, 'markdown'>) {
 
 - Project: ${result.project.name || 'unnamed'} (${result.project.type})
 - Package manager: ${result.project.packageManager}
-- Git: ${gitLine}
+${gitLines.join('\n')}
 - Working tree: ${workingTree}
 - Active task: ${activeTask}
 - Latest open task: ${latestTask}
@@ -245,6 +270,11 @@ export async function getAgentLoopStatus(options: {
   config: AgentLoopConfig;
 }): Promise<AgentLoopStatusResult> {
   const inGit = await isInsideGitRepo(options.cwd);
+  const gitRoot = inGit ? await getGitRoot(options.cwd) : '';
+  const resolvedGitRoot = gitRoot ? await resolveComparablePath(gitRoot) : '';
+  const gitTargetIsRoot = resolvedGitRoot
+    ? resolvedGitRoot === (await resolveComparablePath(options.cwd))
+    : false;
   const rawStatus = inGit ? await getGitStatus(options.cwd) : '';
   const changedFiles = await parseGitStatus(rawStatus);
   const activeTaskPath = await getActiveTaskPath(options);
@@ -292,6 +322,8 @@ export async function getAgentLoopStatus(options: {
       isRepository: inGit,
       branch: inGit ? await getGitBranch(options.cwd) : '',
       commit: inGit ? await getGitCommit(options.cwd) : '',
+      root: resolvedGitRoot,
+      targetIsRoot: gitTargetIsRoot,
     },
     workingTree: {
       dirty: changedFiles.length > 0,

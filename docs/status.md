@@ -9,7 +9,7 @@ It reads:
 - newest open task contract in `.agentloop/tasks/` as `latestTask` when no task is pinned
 - deferred task contracts in `.agentloop/tasks/` as parked `deferredTasks`
 - latest `*-verification-report.md` in `.agentloop/reports/`
-- git branch, commit, and working tree status
+- git branch, commit, root, target, and working tree status
 - configured verification commands
 
 Run:
