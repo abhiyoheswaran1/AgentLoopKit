@@ -5,7 +5,7 @@ AgentLoopKit includes a read-only MCP stdio server for MCP clients that need loc
 Start it from a repository that already has AgentLoopKit initialized:
 
 ```bash
-npx --yes agentloopkit@0.26.5 mcp-server
+npx --yes agentloopkit@0.27.0 mcp-server
 ```
 
 Example MCP client configuration:
@@ -15,7 +15,7 @@ Example MCP client configuration:
   "mcpServers": {
     "agentloopkit": {
       "command": "npx",
-      "args": ["--yes", "agentloopkit@0.26.5", "mcp-server"]
+      "args": ["--yes", "agentloopkit@0.27.0", "mcp-server"]
     }
   }
 }
@@ -37,7 +37,7 @@ Example MCP client configuration:
 
 ## Safety
 
-The MCP server is read-only in `0.26.5`.
+The MCP server is read-only in `0.27.0`.
 
 It does not:
 
@@ -61,6 +61,6 @@ The package includes MCP Registry metadata:
 - `package.json` `mcpName`
 - `.github/workflows/publish-mcp.yml`
 
-The MCP Registry publish workflow runs only after the npm publish workflow succeeds for the same version, or when a maintainer starts it manually. It verifies that `agentloopkit@0.26.5` exists on npm before submitting server metadata.
+The MCP Registry publish workflow runs only after the npm publish workflow succeeds for the same version, or when a maintainer starts it manually. It verifies that `agentloopkit@0.27.0` exists on npm before submitting server metadata.
 
 MCP Registry support depends on the public registry accepting the package metadata. npm and GitHub Releases remain the primary install channels.

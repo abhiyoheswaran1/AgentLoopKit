@@ -3998,3 +3998,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Keeping the command read-only made it safe to run during status checks and verification.
 - Improve:
   - Consider a later, explicit bulk archive workflow only after the read-only diagnostics have proven useful.
+
+## 2026-06-10: Prepare v0.27.0 Task Doctor Release
+
+- Task contract: `.agentloop/tasks/2026-06-10-prepare-v0-27-0-task-doctor-release.md`
+- Trigger:
+  - `agentloop task doctor` was implemented and verified on `main`, but the package metadata and public release docs still pointed at `0.26.5`.
+  - Local tags were missing `v0.26.5`, so release-note generation initially used too broad a range until tags were fetched.
+- Release prep:
+  - Bumped package metadata, MCP server metadata, and GitHub Action default version to `0.27.0`.
+  - Moved unreleased task-doctor changelog entries into a `0.27.0` release section.
+  - Updated current README, MCP, GitHub Actions, distribution-channel, and release-note examples to use `0.27.0`.
+- Verification run:
+  - `.agentloop/reports/2026-06-10-21-27-verification-report.md`, overall status pass.
+  - Commands included full Vitest, lint, typecheck, build, changelog prepublish guard, Markdown link check, `projscan doctor`, packed release smoke, and npm publish dry-run.
+  - `projscan doctor` remained A 97/100 with the known informational unused-export note in `scripts/smoke-packed-release.mjs`.
+- What worked well:
+  - Fetching tags before release-note generation kept the release range anchored at `v0.26.5`.
+  - Running npm dry-run inside `agentloop verify` captured the publish tarball summary in the release evidence.
+- Improve:
+  - Add a future release checklist item that verifies the latest local tag exists before generating release notes.
