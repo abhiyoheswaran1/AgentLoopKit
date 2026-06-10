@@ -6,7 +6,7 @@ import { formatTimestamp } from './dates.js';
 import { getGitBranch, getGitCommit, getGitStatus } from './git.js';
 import { writeTextFile } from './file-system.js';
 
-export type VerificationCommandKey = 'test' | 'lint' | 'typecheck' | 'build' | 'custom';
+export type VerificationCommandKey = 'test' | 'lint' | 'typecheck' | 'build' | 'custom' | 'task';
 
 export type VerificationCommandResult = {
   key: VerificationCommandKey;
@@ -34,6 +34,7 @@ export type VerificationOptions = {
   nowIso?: string;
   env?: NodeJS.ProcessEnv;
   taskPath?: string;
+  taskCommands?: boolean;
   skip?: Partial<Record<'test' | 'lint' | 'typecheck' | 'build', boolean>>;
   customCommands?: string[];
 };
@@ -91,7 +92,59 @@ ${failureSnippet(result.output)}
 `;
 }
 
-function commandEntries(config: AgentLoopConfig, options: VerificationOptions) {
+function parseTaskVerificationCommands(markdown: string) {
+  const lines = markdown.split(/\r?\n/);
+  const commands: string[] = [];
+  let inSection = false;
+
+  for (const line of lines) {
+    if (/^##\s+Verification Commands\s*$/.test(line.trim())) {
+      inSection = true;
+      continue;
+    }
+    if (inSection && /^##\s+/.test(line.trim())) break;
+    if (!inSection) continue;
+
+    const match = line.match(/^\s*-\s+(.+?)\s*$/);
+    const command = match?.[1]?.trim();
+    if (!command || command === 'No verification command recorded.') continue;
+    commands.push(command);
+  }
+
+  return commands;
+}
+
+function resolveTaskPath(cwd: string, config: AgentLoopConfig, taskPath: string | undefined) {
+  if (!taskPath?.trim()) return undefined;
+  const cleanPath = taskPath.trim();
+  const absolutePath = path.isAbsolute(cleanPath)
+    ? path.resolve(cleanPath)
+    : path.resolve(cwd, cleanPath);
+  const tasksRoot = path.resolve(cwd, config.paths.tasksDir);
+
+  return {
+    cleanPath,
+    absolutePath,
+    safe: isMarkdownTaskPath(cleanPath) && isInside(tasksRoot, absolutePath),
+  };
+}
+
+async function readSafeTaskMarkdown(
+  cwd: string,
+  config: AgentLoopConfig,
+  taskPath: string | undefined,
+) {
+  const resolved = resolveTaskPath(cwd, config, taskPath);
+  if (!resolved?.safe) return undefined;
+
+  try {
+    return await readFile(resolved.absolutePath, 'utf8');
+  } catch {
+    return undefined;
+  }
+}
+
+async function commandEntries(config: AgentLoopConfig, options: VerificationOptions) {
   const configured: Array<[VerificationCommandKey, string]> = [
     ['test', config.commands.test],
     ['lint', config.commands.lint],
@@ -106,6 +159,12 @@ function commandEntries(config: AgentLoopConfig, options: VerificationOptions) {
 
   for (const command of options.customCommands ?? []) {
     if (command.trim()) active.push(['custom', command.trim()]);
+  }
+  if (options.taskCommands) {
+    const markdown = await readSafeTaskMarkdown(options.cwd, config, options.taskPath);
+    for (const command of markdown ? parseTaskVerificationCommands(markdown) : []) {
+      active.push(['task', command]);
+    }
   }
 
   return active;
@@ -229,14 +288,10 @@ async function renderTaskContext(
 ) {
   if (!taskPath?.trim()) return '';
 
-  const cleanPath = taskPath.trim();
-  const absolutePath = path.isAbsolute(cleanPath)
-    ? path.resolve(cleanPath)
-    : path.resolve(cwd, cleanPath);
-  const tasksRoot = path.resolve(cwd, config.paths.tasksDir);
-  if (!isMarkdownTaskPath(cleanPath) || !isInside(tasksRoot, absolutePath)) {
+  const resolved = resolveTaskPath(cwd, config, taskPath);
+  if (!resolved?.safe) {
     return `## Task Context
-- Path: ${cleanPath}
+- Path: ${taskPath.trim()}
 - Status: unavailable
 - Note: Task path must point to a Markdown task contract.
 
@@ -244,9 +299,9 @@ async function renderTaskContext(
   }
 
   try {
-    const markdown = await readFile(absolutePath, 'utf8');
+    const markdown = await readFile(resolved.absolutePath, 'utf8');
     const metadata = parseTaskMetadata(markdown);
-    const lines = [`- Path: ${cleanPath}`];
+    const lines = [`- Path: ${resolved.cleanPath}`];
     if (metadata.title) lines.push(`- Title: ${metadata.title}`);
     if (metadata.type) lines.push(`- Task type: ${metadata.type}`);
     if (metadata.status) lines.push(`- Status: ${metadata.status}`);
@@ -257,7 +312,7 @@ ${lines.join('\n')}
 `;
   } catch {
     return `## Task Context
-- Path: ${cleanPath}
+- Path: ${resolved.cleanPath}
 - Status: unavailable
 - Note: Task file could not be read.
 
@@ -270,7 +325,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
   const nowIso = options.nowIso ?? new Date().toISOString();
   const env = options.env ?? process.env;
   const ciContext = detectCiContext(env);
-  const commands = commandEntries(options.config, options);
+  const commands = await commandEntries(options.config, options);
   const notRun = [
     ...(['test', 'lint', 'typecheck', 'build'] as const).filter((key) => {
       if (options.skip?.[key]) return true;

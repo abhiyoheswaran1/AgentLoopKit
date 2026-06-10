@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir } from './helpers.js';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -360,6 +360,78 @@ describe('verification', () => {
     );
   });
 
+  test('does not run task verification commands unless explicitly requested', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/task-commands.md'),
+      [
+        '# Task command safety',
+        '',
+        '- Task type: docs',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        '- node -e "require(\'fs\').writeFileSync(\'task-command-ran.txt\', \'yes\')"',
+        '',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: '.agentloop/tasks/task-commands.md',
+      reportTimestamp: '2026-06-10-12-05',
+      nowIso: '2026-06-10T12:05:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('not-run');
+    await expect(access(path.join(dir, 'task-command-ran.txt'))).rejects.toThrow();
+  });
+
+  test('runs task verification commands with explicit opt-in', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/task-commands.md'),
+      [
+        '# Task command opt-in',
+        '',
+        '- Task type: docs',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        '- node -e "require(\'fs\').writeFileSync(\'task-command-ran.txt\', \'yes\'); console.log(\'task-check\')"',
+        '',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: '.agentloop/tasks/task-commands.md',
+      taskCommands: true,
+      reportTimestamp: '2026-06-10-12-06',
+      nowIso: '2026-06-10T12:06:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('pass');
+    expect(result.commands).toEqual([
+      expect.objectContaining({
+        key: 'task',
+        command:
+          'node -e "require(\'fs\').writeFileSync(\'task-command-ran.txt\', \'yes\'); console.log(\'task-check\')"',
+        passed: true,
+      }),
+    ]);
+    expect(result.markdown).toContain('### task: `node -e');
+    expect(await readFile(path.join(dir, 'task-command-ran.txt'), 'utf8')).toBe('yes');
+  });
+
   test('reports missing task context without failing configured commands', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -466,6 +538,38 @@ describe('verification', () => {
     expect(result.markdown).not.toContain('leaked');
   });
 
+  test('does not run task commands from markdown paths outside the configured tasks directory', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(outsideDir, 'outside-task.md'),
+      [
+        '# Outside Command Task',
+        '',
+        '## Verification Commands',
+        '- node -e "require(\'fs\').writeFileSync(\'outside-command-ran.txt\', \'yes\')"',
+        '',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: path.join(outsideDir, 'outside-task.md'),
+      taskCommands: true,
+      reportTimestamp: '2026-06-10-12-07',
+      nowIso: '2026-06-10T12:07:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('not-run');
+    expect(result.markdown).toContain('Task path must point to a Markdown task contract.');
+    expect(result.markdown).not.toContain('Outside Command Task');
+    await expect(access(path.join(dir, 'outside-command-ran.txt'))).rejects.toThrow();
+  });
+
   test('CLI verify wires --task into the written report', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -506,5 +610,58 @@ describe('verification', () => {
     expect(markdown).toContain('- Title: CLI task context');
     expect(markdown).toContain('- Task type: docs');
     expect(markdown).toContain('- Status: review');
+  });
+
+  test('CLI verify runs task verification commands with --task-commands', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: '',
+            lint: '',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/demo-task.md'),
+      [
+        '# CLI task commands',
+        '',
+        '- Task type: docs',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        '- node -e "console.log(\'cli-task-check\')"',
+        '',
+      ].join('\n'),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'verify', '--task', '.agentloop/tasks/demo-task.md', '--task-commands', '--json'],
+      { cwd: dir },
+    );
+    const output = JSON.parse(result.stdout);
+    expect(output.overallStatus).toBe('pass');
+    expect(output.commands).toEqual([
+      expect.objectContaining({
+        key: 'task',
+        command: 'node -e "console.log(\'cli-task-check\')"',
+        passed: true,
+      }),
+    ]);
   });
 });

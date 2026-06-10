@@ -19,12 +19,14 @@ Supported checks:
 - typecheck
 - build
 - custom commands through `--command`
+- task contract commands through `--task-commands`
 
 Flags:
 
 ```bash
 agentloop verify --no-build
 agentloop verify --task .agentloop/tasks/add-settings-page.md
+agentloop verify --task .agentloop/tasks/add-settings-page.md --task-commands
 agentloop verify --command "node smoke-test.js"
 agentloop verify --json
 ```
@@ -32,6 +34,8 @@ agentloop verify --json
 Failures stay visible. The command exits non-zero when verification fails.
 
 Reports generated with `--task` include a `Task Context` section with the task path, title, task type, and status when the task file is a readable Markdown contract inside the configured task directory. If the file is missing or outside that directory, the report says the task context is unavailable and still reports the configured command results.
+
+`--task` is metadata-only by default. Use `--task-commands` to also run commands listed under the task contract's `Verification Commands` section. This keeps task Markdown from executing unexpectedly when a maintainer only wants the task context in the report.
 
 Failed reports include a `Failure Summary` section before command output. It lists each failed command, its exit code, and final useful output lines. The summary uses the same captured command output; AgentLoopKit does not parse tool-specific stack traces or guess the root cause.
 

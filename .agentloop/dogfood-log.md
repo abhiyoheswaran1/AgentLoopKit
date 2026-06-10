@@ -4467,3 +4467,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - `agentloop verify` did not automatically run verification commands listed in the task contract; treat that as the next bug-pass candidate.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Run Task Verification Commands With Explicit Opt-In
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-run-task-verification-commands-with-explicit-opt-in.md`
+- Trigger:
+  - Dogfooding showed that `agentloop verify --task` records task metadata but did not offer a safe way to run the task contract's own `Verification Commands` list.
+- Implementation:
+  - Added `agentloop verify --task-commands`.
+  - Kept `--task` metadata-only by default so task Markdown does not execute unexpectedly.
+  - Added safe parsing for commands under `## Verification Commands` only when the task path is a Markdown file inside the configured task directory.
+  - Added core and CLI tests for default safety, opt-in execution, and outside-path refusal.
+  - Updated README, verification docs, generated harness command guidance, changelog, and backlog.
+- Verification run:
+  - `.agentloop/reports/2026-06-11-00-32-verification-report.md`, overall status pass.
+  - Red focused tests failed before implementation because task commands were not run and the CLI rejected `--task-commands`.
+  - Full configured verification passed: Vitest 34 files and 178 tests, lint, typecheck, and build.
+  - Task-command dogfood passed: focused verification tests 1 file and 18 tests, plus typecheck, both run from the task contract through `--task-commands`.
+  - Markdown link check, `projscan doctor`, whitespace diff check, and CLI help smoke passed.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-11-00-33-pr-summary.md`
+- What worked well:
+  - The explicit flag keeps command execution transparent while making task contracts directly actionable.
+- Improve:
+  - Consider showing a report note when `--task-commands` is used but no task commands are found.
+  - Keep this unreleased until the planned `0.28.0` batch.

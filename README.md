@@ -288,13 +288,13 @@ Each contract records:
 .agentloop/reports/YYYY-MM-DD-HH-mm-verification-report.md
 ```
 
-Pass `--task .agentloop/tasks/file.md` to include task title, type, status, and path in the report. The path must point to a Markdown task contract inside the configured task directory. Invalid paths are reported as unavailable instead of being read.
+Pass `--task .agentloop/tasks/file.md` to include task title, type, status, and path in the report. The path must point to a Markdown task contract inside the configured task directory. Invalid paths are reported as unavailable instead of being read. Add `--task-commands` when you also want to run commands listed under that task contract's `Verification Commands` section.
 
 It does not hide failures. Failed reports include a short failure summary with each failed command, exit code, and final useful output lines before the full command output. If long logs are truncated, the report keeps the first and last output so the final error stays visible. If no commands are configured, it writes a report saying nothing was verified.
 
 When `agentloop verify` runs in GitHub Actions, the report records the workflow, event, ref, commit, run URL, and run attempt. Local reports stay quiet. AgentLoopKit does not read `.env` files or print arbitrary environment variables.
 
-In monorepos, `doctor` warns on common workspace markers and suggests package-specific verification commands. Add package checks to the task contract when root commands do not cover the touched package, for example `pnpm --filter web test` or `npm --workspace api test`. AgentLoopKit records and runs configured commands; it does not infer package graphs or run workspace commands automatically.
+In monorepos, `doctor` warns on common workspace markers and suggests package-specific verification commands. Add package checks to the task contract when root commands do not cover the touched package, for example `pnpm --filter web test` or `npm --workspace api test`. AgentLoopKit runs configured commands by default and task-contract commands only with `--task-commands`; it does not infer package graphs or run workspace commands automatically.
 
 `doctor` also reports the Git root and whether the current directory is the Git root. If you run it from a package subdirectory, it warns that AgentLoopKit files live in the current directory, not the Git root.
 

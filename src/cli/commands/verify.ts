@@ -11,6 +11,7 @@ export function verifyCommand() {
   return new Command('verify')
     .description('Run configured verification commands and write a report')
     .option('--task <path>', 'task contract path for humans to cross-reference')
+    .option('--task-commands', 'also run verification commands listed in the task contract')
     .option('--json', 'print machine-readable output')
     .option('--no-build', 'skip build command')
     .option('--no-test', 'skip test command')
@@ -23,6 +24,7 @@ export function verifyCommand() {
         cwd: process.cwd(),
         config,
         taskPath: typeof options.task === 'string' ? options.task : undefined,
+        taskCommands: options.taskCommands === true,
         skip: {
           build: options.build === false,
           test: options.test === false,
