@@ -27,6 +27,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - local static HTML evidence reports with `agentloop report`
 - local SVG evidence badges with `agentloop badge`
 - local CI provenance and evidence summaries with `agentloop ci-summary`
+- local release-note handoffs with `agentloop release-notes`
 - read-only local policy inspection with `agentloop policy`
 - read-only local policy template status with `agentloop policy status`
 - verification reports with allowlisted CI context
@@ -72,6 +73,9 @@ agentloop badge --json
 agentloop ci-summary
 agentloop ci-summary --json
 agentloop ci-summary --write
+agentloop release-notes
+agentloop release-notes --json
+agentloop release-notes --write
 agentloop policy list
 agentloop policy show security
 agentloop policy status
@@ -110,6 +114,26 @@ npx projscan doctor --format markdown
 ```
 
 Latest local verification:
+
+- `0.20.0` release-note handoff release-candidate verification:
+  - Task contract: `.agentloop/tasks/2026-06-10-add-release-notes-command.md`.
+  - Product cycle: `.agentloop/research/interview-cycle-078.md`.
+  - Red tests: `npx pnpm@10.12.1 test tests/release-notes.test.ts` failed before missing explicit `--from` refs and dirty working trees were reported.
+  - Focused green tests: `npx pnpm@10.12.1 test tests/release-notes.test.ts tests/completion.test.ts`: pass, 2 files and 9 tests.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 test`: pass, 26 files and 97 tests.
+  - `npx pnpm@10.12.1 check:links`: pass, 434 Markdown files checked.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm pack`: pass, produced `agentloopkit-0.20.0.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: pass; `agentloop version` reported `0.20.0`, `release-notes --json --write` wrote a release-note artifact, and `check-gates --strict --json` passed in the smoke repo.
+  - Tarball SHA-256: `7ddb745299ae3d002441fc45c3d90805002ba39776a4067995cd6c42ad42fee3`.
+  - README screenshots regenerated with Playwright.
+  - README terminal GIF regenerated with VHS.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-03-45-verification-report.md`, overall status `pass`.
+  - npm registry proof: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
 
 - `0.19.0` local CI summary release-candidate verification:
   - Task contract: `.agentloop/tasks/2026-06-10-add-local-ci-summary-command.md`.

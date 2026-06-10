@@ -33,6 +33,7 @@ Use this before publishing AgentLoopKit.
 - [x] GitHub release `v0.18.0` is published with policy-status release notes.
 - [x] GitHub release `v0.18.1` is published with policy-customization guidance release notes.
 - [x] GitHub release `v0.19.0` is published with CI-summary release notes.
+- [ ] GitHub release `v0.20.0` is published with release-note handoff notes.
 - [x] Good-first-issue labels are created.
 
 ## npm
@@ -124,6 +125,8 @@ Use this before publishing AgentLoopKit.
 - [x] Package `agentloopkit@0.19.0` is prepared on `main` for CI summaries.
 - [ ] Package `agentloopkit@0.19.0` is published.
 - [x] Publish workflow for `v0.19.0` passed package checks and failed at npm authorization.
+- [x] Package `agentloopkit@0.20.0` is prepared on `main` for release-note handoffs.
+- [ ] Package `agentloopkit@0.20.0` is published.
 - [ ] npm trusted publishing is configured for this repository.
 - [ ] `npm whoami` works for manual fallback.
 - [x] `pnpm pack` contains `dist`, `schema`, README, LICENSE, and package metadata.
@@ -169,6 +172,7 @@ npx --yes --package ./agentloopkit-0.17.0.tgz agentloop policy list --json
 npx --yes --package ./agentloopkit-0.18.0.tgz agentloop policy status --json
 npx --yes --package ./agentloopkit-0.18.1.tgz agentloop policy status --json
 npx --yes --package ./agentloopkit-0.19.0.tgz agentloop ci-summary --json
+npx --yes --package ./agentloopkit-0.20.0.tgz agentloop release-notes --json
 ```
 
 ## Publish
@@ -216,8 +220,12 @@ Current recovery note:
 - `agentloopkit@0.18.0` is prepared, verified, and published as GitHub release `v0.18.0` for read-only policy template status.
 - `agentloopkit@0.18.1` is prepared, verified, and published as GitHub release `v0.18.1` for policy customization guidance.
 - `agentloopkit@0.19.0` is prepared, verified, and published as GitHub release `v0.19.0` for local CI summaries.
+- `agentloopkit@0.20.0` is prepared for local release-note handoffs.
+- Local `0.20.0` checks passed: focused release-note tests, typecheck, lint, full Vitest, Markdown link checks, build, projscan, `npm pack`, `npm publish --access public --dry-run`, packed-tarball smoke testing, Playwright screenshot rendering, and VHS terminal rendering.
+- Local `0.20.0` tarball SHA-256: `7ddb745299ae3d002441fc45c3d90805002ba39776a4067995cd6c42ad42fee3`.
 - GitHub release `v0.19.0` tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
+- After `v0.20.0` is verified and released, npm should catch up to `0.20.0` once. Then use normal semver for future releases.
 - npm still reports `agentloopkit@0.1.1` as latest.
 - `agentloopkit@0.2.1` passed release-candidate checks and the GitHub Publish workflow's prepublish checks, but npm rejected the publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
 - `agentloopkit@0.3.0` is now prepared on `main` after the handoff command, create-task flag, latest artifact selection, and create-task alias work.
@@ -259,7 +267,7 @@ Current recovery note:
 - GitHub Publish workflow for `v0.15.0` passed package checks and failed at npm authorization with `E404`.
 - Local `0.15.1` checks passed: `npm publish --access public --dry-run`, packed-tarball smoke test, and npm registry proof that latest remains `0.1.1`.
 - GitHub Publish workflow for `v0.15.1` passed package checks and failed at npm authorization with `E404`.
-- npm should jump from `0.1.1` to the current prepared release for the catch-up publish because `main` moved after `v0.16.0`.
+- npm should jump from `0.1.1` to the current prepared release for the catch-up publish because public GitHub release candidates already exist through `v0.19.0`.
 - Do not publish `0.16.0` to npm from current `main`. Publish each version only from its matching release commit.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP`.
 - GitHub Publish workflow for `v0.16.0` passed package checks and failed at npm authorization with `E404`.

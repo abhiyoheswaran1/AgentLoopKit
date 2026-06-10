@@ -2525,3 +2525,41 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The command gives CI logs a compact summary without provider API calls or token access.
 - Improve:
   - Configure npm trusted publishing or complete local account authentication, then publish `agentloopkit@0.19.0`.
+
+## 2026-06-10: 0.20.0 Release Notes Command
+
+- Task contract: `.agentloop/tasks/2026-06-10-add-release-notes-command.md`
+- Product cycle: `.agentloop/research/interview-cycle-078.md`
+- Trigger:
+  - GitHub releases have detailed notes, but maintainers still assemble each release summary by hand from changelog, git, verification, and AgentLoop evidence.
+  - npm still serves `0.1.1`, so the next release needs an honest catch-up note.
+- Product changes:
+  - Added `agentloop release-notes`.
+  - Added `agentloop release-notes --json` and `agentloop release-notes --write`.
+  - Added missing-ref handling so an unavailable `--from` ref is reported instead of pretending the range was read.
+  - Added working-tree evidence so release notes warn when local changes are not in the selected git range.
+  - Updated shell completions, README, release docs, generated harness templates, launch checklist, roadmap, decisions, and README visual sources.
+  - Bumped package metadata to `0.20.0`.
+  - Regenerated README Playwright screenshots and the VHS terminal GIF.
+- Verification run:
+  - Red test: `npx pnpm@10.12.1 test tests/release-notes.test.ts` failed before missing explicit `--from` refs were reported.
+  - Focused green tests: `npx pnpm@10.12.1 test tests/release-notes.test.ts tests/completion.test.ts`: pass, 2 files and 9 tests.
+  - `npx pnpm@10.12.1 typecheck`: pass.
+  - `npx pnpm@10.12.1 lint`: pass.
+  - `npx pnpm@10.12.1 check:links`: pass, 434 Markdown files checked.
+  - `npx pnpm@10.12.1 test`: pass, 26 files and 97 tests.
+  - `npx pnpm@10.12.1 build`: pass.
+  - `npx projscan doctor --format markdown`: A, 100/100.
+  - `npm pack`: pass, produced `agentloopkit-0.20.0.tgz`.
+  - `npm publish --access public --dry-run`: pass, including `prepublishOnly`.
+  - Packed tarball smoke: pass; `agentloop version` reported `0.20.0`, `release-notes --json --write` wrote a release-note artifact, and `check-gates --strict --json` passed in the smoke repo.
+  - Tarball SHA-256: `7ddb745299ae3d002441fc45c3d90805002ba39776a4067995cd6c42ad42fee3`.
+  - README screenshots regenerated with Playwright.
+  - README terminal GIF regenerated with VHS from `docs/assets/readme/agentloopkit-cli.tape`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-10-03-45-verification-report.md`, overall status `pass`.
+  - npm registry proof: latest remains `0.1.1`; versions remain `0.1.0` and `0.1.1`.
+- Worked well:
+  - Dogfooding caught the missing-tag behavior before release.
+  - The command gives maintainers a release handoff without tag mutation, publishing, network calls, token reads, or LLM output.
+- Improve:
+  - Configure npm trusted publishing or complete local account authentication, then publish the current prepared release.

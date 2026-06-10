@@ -46,7 +46,7 @@ npx agentloopkit init
 npx agentloopkit init --dry-run
 ```
 
-Current source and the latest GitHub release are `v0.19.0`. npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.19.0` carry recent source snapshots. `0.19.0` adds a local CI summary command on top of the `v0.18.1` policy-guidance release. Once npm authentication is fixed, the npm package should catch up to the current prepared release; after that, releases return to normal sequential semver.
+Current source targets `v0.20.0`. The latest GitHub release is `v0.19.0`, and npm still serves `0.1.1` while GitHub release candidates from `v0.2.0` through `v0.19.0` carry recent source snapshots. The next npm publish should catch up to the current GitHub line once; after that, releases return to normal sequential semver.
 
 Run the CLI after install:
 
@@ -65,6 +65,7 @@ npx agentloopkit check-gates --strict
 npx agentloopkit report
 npx agentloopkit badge
 npx agentloopkit ci-summary
+npx agentloopkit release-notes
 npx agentloopkit policy list
 npx agentloopkit policy show security
 npx agentloopkit policy status
@@ -75,7 +76,7 @@ npx agentloopkit completion zsh
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, task status, policy status, completion, verify, handoff, report, badge, ci-summary, and task archive commands" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, create-task, task list, task show, task status, policy status, completion, verify, handoff, report, badge, ci-summary, release-notes, and task archive commands" width="100%">
 </p>
 
 The VHS demo runs the local built CLI so the command flow matches this repository even when npm is behind.
@@ -121,6 +122,7 @@ pnpm build
 | `agentloop report`                      | Write a local static HTML evidence report                                      |
 | `agentloop badge`                       | Write a local SVG evidence badge                                               |
 | `agentloop ci-summary`                  | Summarize CI context and local AgentLoop evidence                              |
+| `agentloop release-notes`               | Draft local release notes from changelog, git, task, and verification evidence |
 | `agentloop policy list`                 | List local safety policy files                                                 |
 | `agentloop policy show <policy>`        | Print a local safety policy without mutating files                             |
 | `agentloop policy status`               | Compare local policy files with bundled templates                              |
@@ -346,6 +348,23 @@ Use `--write` when CI should upload a small Markdown summary alongside verificat
 
 See `docs/ci-summary.md`.
 
+## Release Notes
+
+`agentloop release-notes` drafts local release notes from the repository state:
+
+```bash
+agentloop release-notes
+agentloop release-notes --from v0.19.0 --to HEAD
+agentloop release-notes --json
+agentloop release-notes --write
+```
+
+The command reads local package metadata, changelog entries, git history, changed files, working tree status, the active task, the latest verification report, and the latest CI summary when those artifacts exist. It does not create tags, publish packages, call GitHub or npm APIs, read tokens, upload files, or rewrite changelogs.
+
+Use it before creating a GitHub release so the release note draft includes the same evidence reviewers see in AgentLoop handoffs.
+
+See `docs/release-notes.md`.
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report screenshot showing command results and reviewer handoff sections" width="100%">
 </p>
@@ -370,7 +389,7 @@ See `docs/policies.md`.
 
 ## GitHub Actions
 
-Use `agentloop check-gates --strict` as a review-evidence gate in pull request CI. Use `agentloop verify`, `agentloop handoff`, `agentloop report`, `agentloop badge`, and `agentloop ci-summary --write` in CI when you want evidence artifacts uploaded for reviewers.
+Use `agentloop check-gates --strict` as a review-evidence gate in pull request CI. Use `agentloop verify`, `agentloop handoff`, `agentloop report`, `agentloop badge`, `agentloop ci-summary --write`, and `agentloop release-notes --write` in CI when you want evidence artifacts uploaded for reviewers.
 
 CI-generated verification reports include GitHub Actions provenance when available, so reviewers can trace an artifact back to the workflow run that created it.
 
@@ -451,7 +470,7 @@ See `ROADMAP.md`.
 
 ## Publishing Status
 
-AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.19.0` is public with a tarball asset for the CI summary release. npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
+AgentLoopKit is published on npm as `agentloopkit`, but npm currently serves `0.1.1`. GitHub release `v0.19.0` is public with a tarball asset for the CI summary release, and current source targets `v0.20.0` for release-note handoffs. npm still needs account authentication or trusted-publishing repair before a catch-up release lands.
 
 The npm version jump is intentional. The skipped npm numbers already exist as public GitHub release candidates while npm publishing was blocked, so the next npm publish should ship the current release line rather than backfilling old source snapshots.
 

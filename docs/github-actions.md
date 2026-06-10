@@ -6,7 +6,7 @@ AgentLoopKit does not install workflows into user repositories. Copy a recipe in
 
 ## npm Status
 
-The current prepared GitHub tarball is `v0.19.0`, which includes `agentloop ci-summary`. npm still serves `0.1.1` until browser/OTP authentication or trusted publishing works.
+The latest public GitHub tarball is `v0.19.0`, which includes `agentloop ci-summary`. Current source targets `v0.20.0` with `agentloop release-notes`, but that command is not in the `v0.19.0` tarball. npm still serves `0.1.1` until browser/OTP authentication or trusted publishing works.
 
 Until npm catches up, pin the GitHub release tarball in CI:
 
@@ -85,6 +85,10 @@ jobs:
       - name: Write CI summary
         run: npx --no-install agentloop ci-summary --write
 
+      # Available after the next GitHub tarball includes v0.20.0 or newer.
+      # - name: Write release notes
+      #   run: npx --no-install agentloop release-notes --write
+
       - name: Check AgentLoop gates
         run: npx --no-install agentloop check-gates --strict
 
@@ -125,6 +129,7 @@ Run `agentloop init` and `agentloop create-task` before relying on CI gates.
 - `agentloop handoff` writes a deterministic reviewer summary.
 - `agentloop report` writes a static HTML evidence artifact from local files.
 - `agentloop ci-summary` summarizes CI context and AgentLoop evidence without running checks.
+- `agentloop release-notes` drafts release notes from local package, changelog, git, task, verification, and CI-summary evidence.
 - `agentloop check-gates` exits non-zero when a required gate fails.
 - `agentloop check-gates --strict` also exits non-zero when any gate warns.
 

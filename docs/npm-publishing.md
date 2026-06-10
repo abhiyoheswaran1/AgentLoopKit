@@ -39,18 +39,20 @@ npm publish --access public
 
 The first publish creates the npm package. That step may require an OTP, depending on the npm account's security settings.
 
-## Current `0.19.0` Publishing State
+## Current `0.20.0` Publishing State
 
 As of June 10, 2026:
 
 Short version:
 
 - npm previously served `agentloopkit@0.1.1` while GitHub/source release candidates from `v0.2.0` through `v0.19.0` were public.
+- Current source targets `0.20.0` with `agentloop release-notes`.
 - GitHub release `v0.16.0` is public with attached `agentloopkit-0.16.0.tgz`.
 - GitHub release `v0.17.0` is public with attached `agentloopkit-0.17.0.tgz`.
 - GitHub release `v0.18.0` is public with attached `agentloopkit-0.18.0.tgz`.
 - GitHub release `v0.18.1` is public with attached `agentloopkit-0.18.1.tgz`.
 - GitHub release `v0.19.0` is public with attached `agentloopkit-0.19.0.tgz`.
+- The next npm publish should be the current prepared release, not a backfill of old release-candidate numbers.
 - Do not publish `0.16.0`, `0.17.0`, `0.18.0`, or `0.18.1` from current `main`. `main` now contains behavior that was not in those release tags.
 - Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped with `EOTP` because browser or one-time-password authentication is required.
 - GitHub Publish workflow run `27241996432` for `v0.16.0` passed install, lint, typecheck, tests, build, npm upgrade, npm version check, and `prepublishOnly`, then npm rejected the final publish with `E404 Not Found - PUT https://registry.npmjs.org/agentloopkit`.
@@ -68,9 +70,10 @@ Short version:
 Why npm should jump to the current prepared release:
 
 - The skipped npm numbers were used as public GitHub release candidates while npm publishing was blocked.
-- Current `main` contains code that belongs to the `0.19.0` release line, including `agentloop ci-summary`.
+- Current `main` contains code that belongs to the `0.20.0` release line, including `agentloop release-notes`.
 - Backfilling old versions from current `main` would make npm metadata lie about what those old tags contained.
 - Publishing the current prepared release once, then returning to normal patch and minor releases, gives users the least confusing path.
+- Do not keep skipping versions after npm catches up. Use normal semver from the first successful catch-up publish onward.
 
 Historical publishing log:
 
@@ -167,6 +170,9 @@ Historical publishing log:
 - GitHub release URL: `https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.19.0`.
 - GitHub release tarball SHA-256: `8d78d22b8b69786bd85b43234815765e2d373d44d05789a20ce3a2d19897e900`.
 - GitHub Publish workflow run `27246784493` for `v0.19.0` passed package checks and failed at npm authorization with `E404`.
+- `agentloopkit@0.20.0` passed focused release-notes tests, typecheck, lint, full Vitest, Markdown link checks, build, projscan, `npm pack`, `npm publish --access public --dry-run`, packed-tarball smoke testing, Playwright screenshot rendering, and VHS terminal rendering.
+- Local tarball SHA-256 before GitHub release: `7ddb745299ae3d002441fc45c3d90805002ba39776a4067995cd6c42ad42fee3`.
+- npm registry proof before release still reports latest `0.1.1` and versions `0.1.0`, `0.1.1`.
 
 Publish the current prepared release to npm from its matching release commit after browser/OTP authentication completes. Do not backfill old npm versions with newer source.
 
@@ -220,7 +226,7 @@ npm view agentloopkit version
 npm view agentloopkit versions --json
 ```
 
-For the current `0.19.0` catch-up release, the expected successful result is latest `0.19.0` and a versions list containing `0.19.0`.
+For the current `0.20.0` catch-up release, the expected successful result is latest `0.20.0` and a versions list containing `0.20.0`.
 
 ## Package Contents
 

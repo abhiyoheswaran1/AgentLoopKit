@@ -87,3 +87,11 @@ Generated harness provenance lives in `.agentloop/manifest.json`, not in `agentl
 ## 2026-06-10: CI Summary Is Read-Only Evidence
 
 `agentloop ci-summary` reads allowlisted CI provenance and local AgentLoop artifacts, then prints Markdown or JSON. It writes a Markdown file only when `--write` is passed. It does not call CI provider APIs, read secrets, print arbitrary environment variables, upload files, run verification commands, or replace `*-verification-report.md` as the verification source of truth.
+
+## 2026-06-10: Release Notes Are Local Handoff Evidence
+
+`agentloop release-notes` drafts release notes from local package metadata, changelog sections, git history, task contracts, verification reports, and CI summaries. It writes a Markdown file only when `--write` is passed. It does not create tags, publish packages, call GitHub or npm APIs, read tokens, upload files, rewrite changelogs, or infer semantic changes it cannot prove.
+
+## 2026-06-10: npm Catch-Up Is A One-Time Alignment Step
+
+npm still serves `agentloopkit@0.1.1` while public GitHub releases already exist through `v0.19.0`. The next npm publish should catch up to the current GitHub release line once, then AgentLoopKit should return to normal semver. Do not backfill old npm versions from newer source, and do not keep creating higher versions only because npm authorization remains blocked.

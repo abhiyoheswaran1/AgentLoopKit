@@ -14,6 +14,7 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - Local static HTML evidence reports with `agentloop report`
 - Local SVG evidence badges with `agentloop badge`
 - Local CI provenance summaries with `agentloop ci-summary`
+- Local release-note handoffs with `agentloop release-notes`
 - Local template manifest checks and manual migration guidance
 - Local safety policy inspection with `agentloop policy`
 - Local safety policy template status with `agentloop policy status`
@@ -31,6 +32,7 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - Configure npm trusted publishing for GitHub Actions.
 - npm previously lagged at `agentloopkit@0.1.1` while GitHub release candidates reached `v0.19.0`.
 - GitHub release `v0.19.0` is public for local CI summaries.
+- Current source targets `v0.20.0` for local release-note handoffs.
 - Local `npm publish --access public` for `0.16.0` passed package checks and stopped at npm OTP/browser authentication.
 - The release-triggered GitHub Publish workflow for `v0.16.0` passed package checks and failed at npm authorization.
 - The release-triggered GitHub Publish workflow for `v0.17.0` passed package checks and failed at npm authorization.
@@ -40,6 +42,7 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - `0.18.1` exists because package templates changed after `v0.18.0`; publish only from its matching release commit or tarball.
 - The release-triggered GitHub Publish workflow for `v0.18.1` passed package checks and failed at npm authorization.
 - The release-triggered GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization.
+- `0.20.0` is prepared locally and should be the next catch-up candidate after verification and GitHub release.
 - After the current prepared release lands on npm, normal semver releases resume.
 
 ## Near Term

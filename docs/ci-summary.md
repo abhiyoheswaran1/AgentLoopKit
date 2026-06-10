@@ -56,4 +56,4 @@ CI summaries are review artifacts. They do not replace verification reports. Com
 - upload files
 - mutate repo files unless `--write` is passed
 
-Use it after `verify`, `handoff`, `report`, and `badge` when CI should upload a small Markdown summary for reviewers.
+Use it after `verify`, `handoff`, `report`, and `badge` when CI should upload a small Markdown summary for reviewers. Pair it with `agentloop release-notes --write` when a release workflow also needs local release-note evidence.

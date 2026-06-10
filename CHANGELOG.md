@@ -4,6 +4,17 @@
 
 - No unreleased changes yet.
 
+## 0.20.0
+
+Release-note handoff release candidate. npm still serves `0.1.1` until account authentication or trusted publishing is repaired. Because GitHub releases already exist from `v0.2.0` through `v0.19.0`, npm should catch up to this current release line once and then return to normal sequential semver:
+
+- Added `agentloop release-notes` for deterministic local release-note drafts
+- Added `agentloop release-notes --json` for scripts and CI logs
+- Added `agentloop release-notes --write` to write `.agentloop/handoffs/YYYY-MM-DD-HH-mm-release-notes.md`
+- Included package metadata, git range, changelog section, commits, changed files, working tree status, active task, latest verification report, and latest CI summary when available
+- Kept release-note generation local and read-only unless `--write` is passed: no tag creation, package publishing, provider API calls, token reads, uploads, or changelog rewrites
+- Documented the npm catch-up policy so the version jump from `0.1.1` to the current GitHub line is a one-time recovery path, not the ongoing release strategy
+
 ## 0.19.0
 
 CI summary and contributor-onboarding GitHub release. npm publish is pending account authentication or trusted-publishing repair. npm may jump from `0.1.1` to this current release because the intermediate versions were GitHub/source release candidates while npm publishing was blocked:
