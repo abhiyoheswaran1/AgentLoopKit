@@ -3049,3 +3049,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release asset matched the locally verified tarball digest.
 - Improve:
   - Configure npm trusted publishing or complete local browser/OTP auth before the next real npm publish attempt.
+
+## 2026-06-10: Roadmap Refresh For v0.23.0
+
+- Task contract: `.agentloop/tasks/2026-06-10-refresh-roadmap-v0-23-0.md`
+- Product cycle: `.agentloop/research/interview-cycle-093.md`
+- Trigger:
+  - `ROADMAP.md` still listed shipped completions as bash, zsh, and fish only.
+  - Its npm blocker section stopped at `v0.22.0` even though GitHub release `v0.23.0` is public.
+- Product changes:
+  - Updated the shipped section to include PowerShell completions.
+  - Rewrote the current blocker section around GitHub `v0.23.0`, npm `0.1.1`, and Publish workflow `E404`.
+  - Kept near-term roadmap work focused on npm auth/trusted publishing, tarball fallback cleanup, and SchemaStore after npm is stable.
+- Verification run:
+  - `npx pnpm@10.12.1 check:links`: pass, 500 Markdown files checked.
+  - `git diff --check`: pass.
+  - Roadmap stale-wording search: pass, no bash/zsh/fish-only completion line remains.
+  - `npx tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-10-refresh-roadmap-v0-23-0.md`: pass, wrote `.agentloop/reports/2026-06-10-08-15-verification-report.md`.
+  - AgentLoop verification commands: Vitest 28 files and 113 tests, lint, typecheck, and build all passed.
+  - `npx tsx src/cli/index.ts handoff --task .agentloop/tasks/2026-06-10-refresh-roadmap-v0-23-0.md --json`: pass, wrote `.agentloop/handoffs/2026-06-10-08-17-pr-summary.md`.
+- Worked well:
+  - The roadmap is now shorter and more current without adding product scope.
+- Improve:
+  - After npm publishes `0.23.0`, remove temporary tarball fallback references from public docs.

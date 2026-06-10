@@ -23,37 +23,24 @@ AgentLoopKit is local-first and npm-distributed. The open-source core stays focu
 - Repo-type policy examples for common project shapes
 - Local review-evidence gates with `agentloop check-gates` and `--strict`
 - Agent instruction installers, including `agentloop install-agent all`
-- Static bash, zsh, and fish completions
+- Static bash, zsh, fish, and PowerShell completions
 - GitHub Actions recipes for evidence checks and CI-generated artifacts
 - Stack recipes for Next.js, React/Vite, Node API, Python, docs-only, empty repos, and monorepos
 - Launch visuals generated from committed Playwright and VHS sources
 
 ## Current Blocker
 
-- Configure npm trusted publishing for GitHub Actions.
-- npm previously lagged at `agentloopkit@0.1.1` while GitHub release candidates reached `v0.22.0`.
-- GitHub release `v0.19.0` is public for local CI summaries.
-- GitHub release `v0.21.0` is public for next-action and release-safety guardrails.
-- GitHub release `v0.22.0` is public for task-linked verification and README evidence.
-- Local `npm publish --access public` for `0.16.0` passed package checks and stopped at npm OTP/browser authentication.
-- The release-triggered GitHub Publish workflow for `v0.16.0` passed package checks and failed at npm authorization.
-- The release-triggered GitHub Publish workflow for `v0.17.0` passed package checks and failed at npm authorization.
-- A local exact-tarball publish attempt for `0.17.0` reached npm and stopped at OTP/browser authentication.
-- The release-triggered GitHub Publish workflow for `v0.18.0` passed package checks and failed at npm authorization.
-- A local exact-tarball publish attempt for `0.18.0` reached npm and failed with authorization `E404`.
-- `0.18.1` exists because package templates changed after `v0.18.0`; publish only from its matching release commit or tarball.
-- The release-triggered GitHub Publish workflow for `v0.18.1` passed package checks and failed at npm authorization.
-- The release-triggered GitHub Publish workflow for `v0.19.0` passed package checks and failed at npm authorization.
-- GitHub release `v0.20.0` is public for local release-note handoffs.
-- The release-triggered GitHub Publish workflow for `v0.20.0` passed package checks and failed at npm authorization.
-- The release-triggered GitHub Publish workflow for `v0.21.0` passed package checks and failed at npm authorization.
-- The release-triggered GitHub Publish workflow for `v0.22.0` passed package checks and failed at npm authorization.
-- After the current GitHub release lands on npm, normal semver releases resume.
+- GitHub release `v0.23.0` is public with the current CLI, including PowerShell completions.
+- npm still serves `agentloopkit@0.1.1` until account authentication or trusted publishing is repaired.
+- The release-triggered GitHub Publish workflow for `v0.23.0` passed package checks and failed at npm authorization with `E404`.
+- The next npm publish should catch up once to `0.23.0`, then normal semver releases resume.
+- Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be published.
 
 ## Near Term
 
-- Complete npm browser/OTP authentication or trusted publishing for the current GitHub release.
-- Optional schema-store submission after npm publishing is stable.
+- Complete npm browser/OTP authentication or configure npm trusted publishing for `agentloopkit@0.23.0`.
+- Remove temporary GitHub tarball fallback guidance after npm reports `0.23.0` or newer.
+- Submit the config schema to SchemaStore after npm publishing is stable.
 
 ## Later
 
