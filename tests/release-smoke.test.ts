@@ -67,4 +67,40 @@ describe('release smoke script helpers', () => {
       'README contains stale pinned version 0.24.3',
     );
   });
+
+  test('rejects hardcoded AgentLoopKit version pins in normal public docs', () => {
+    expect(() =>
+      smoke.assertPublicDocsDoNotPinVersions([
+        {
+          filePath: 'docs/github-actions.md',
+          content: 'npm install --no-save agentloopkit@0.26.1',
+        },
+        {
+          filePath: 'examples/github-actions/README.md',
+          content: 'uses: abhiyoheswaran1/AgentLoopKit@v0.26.1',
+        },
+      ]),
+    ).toThrow('docs/github-actions.md contains hardcoded AgentLoopKit version pin 0.26.1');
+  });
+
+  test('allows release history docs to keep exact version evidence', () => {
+    expect(() =>
+      smoke.assertPublicDocsDoNotPinVersions([
+        {
+          filePath: 'docs/release-status.md',
+          content: 'npx --yes agentloopkit@0.27.0 version',
+        },
+        {
+          filePath: 'docs/launch-checklist.md',
+          content: 'GitHub release `v0.27.0` is public',
+        },
+      ]),
+    ).not.toThrow();
+  });
+
+  test('current public docs avoid hardcoded AgentLoopKit version pins', async () => {
+    const files = await smoke.collectPublicDocPinFiles(process.cwd());
+
+    expect(() => smoke.assertPublicDocsDoNotPinVersions(files)).not.toThrow();
+  });
 });

@@ -4564,3 +4564,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Future docs tasks should include `CHANGELOG.md` in likely files when user-facing release notes are expected.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Guard Public Docs Against Stale Version Pins
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-guard-public-docs-against-stale-version-pins.md`
+- Trigger:
+  - The stale-version cleanup was a one-time docs fix, but only packed README pins had automated coverage.
+- Implementation:
+  - Added public-doc pin helpers to the release-smoke script.
+  - Added Vitest coverage for rejecting hardcoded `agentloopkit@x.y.z`, `AgentLoopKit@vx.y.z`, and release tarball pins in normal public docs and examples.
+  - Kept release-history docs excluded so exact version evidence remains allowed.
+  - Skipped generated `.agentloop` example artifacts after the first green attempt exposed that boundary.
+  - Updated backlog and unreleased changelog.
+- Verification run:
+  - Red focused test failed first because the new helpers did not exist.
+  - Focused test then failed on `examples/release-checklist/.agentloop/...`, proving the collector needed to skip generated evidence artifacts.
+  - `.agentloop/reports/2026-06-11-01-03-verification-report.md`, overall status pass.
+  - Full configured verification passed: Vitest 34 files and 182 tests, lint, typecheck, and build.
+  - Task-command dogfood passed: focused release-smoke test, full Vitest, `projscan doctor`, and `git diff --check`.
+- Handoff:
+  - `.agentloop/handoffs/2026-06-11-01-04-pr-summary.md`
+- What worked well:
+  - The test found a real boundary case before the change was committed.
+- Improve:
+  - Consider moving public-doc hygiene checks into a dedicated docs-quality script if more checks accumulate.
+  - Keep this unreleased until the planned `0.28.0` batch.

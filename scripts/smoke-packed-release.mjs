@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* global console, process */
 import { spawn } from 'node:child_process';
-import { mkdtemp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,6 +22,91 @@ export function assertReadmePins(readme, version) {
   if (!pinnedVersions.includes(version)) {
     throw new Error(`README does not contain pinned version ${version}.`);
   }
+}
+
+const PUBLIC_DOC_ROOTS = ['README.md', 'docs', 'examples', '.github'];
+const RELEASE_HISTORY_DOCS = new Set([
+  'docs/launch-checklist.md',
+  'docs/npm-publishing.md',
+  'docs/release-status.md',
+]);
+
+function toPosixPath(filePath) {
+  return filePath.split(path.sep).join('/');
+}
+
+function isMarkdownFile(filePath) {
+  return filePath.endsWith('.md') || filePath.endsWith('.mdx');
+}
+
+function isGeneratedAgentLoopArtifact(filePath) {
+  return toPosixPath(filePath).split('/').includes('.agentloop');
+}
+
+async function collectMarkdownFiles(rootDir, relativePath) {
+  const absolutePath = path.join(rootDir, relativePath);
+  let fileStat;
+  try {
+    fileStat = await stat(absolutePath);
+  } catch {
+    return [];
+  }
+
+  if (fileStat.isFile()) {
+    return isMarkdownFile(relativePath) && !isGeneratedAgentLoopArtifact(relativePath) ? [relativePath] : [];
+  }
+  if (!fileStat.isDirectory()) {
+    return [];
+  }
+  if (isGeneratedAgentLoopArtifact(relativePath)) {
+    return [];
+  }
+
+  const entries = await readdir(absolutePath, { withFileTypes: true });
+  const files = await Promise.all(
+    entries.map((entry) => collectMarkdownFiles(rootDir, path.join(relativePath, entry.name))),
+  );
+  return files.flat();
+}
+
+function findAgentLoopVersionPins(content) {
+  return unique([
+    ...[...content.matchAll(/agentloopkit@(\d+\.\d+\.\d+)/g)].map((match) => match[1]),
+    ...[...content.matchAll(/AgentLoopKit@v(\d+\.\d+\.\d+)/g)].map((match) => match[1]),
+    ...[...content.matchAll(/agentloopkit-(\d+\.\d+\.\d+)\.tgz/g)].map((match) => match[1]),
+  ]);
+}
+
+export function assertPublicDocsDoNotPinVersions(files) {
+  for (const file of files) {
+    const filePath = toPosixPath(file.filePath);
+    if (RELEASE_HISTORY_DOCS.has(filePath)) {
+      continue;
+    }
+
+    const pinnedVersions = findAgentLoopVersionPins(file.content);
+    if (pinnedVersions.length > 0) {
+      throw new Error(
+        `${filePath} contains hardcoded AgentLoopKit version pin ${pinnedVersions[0]}. Use @latest for evaluation or <version> for examples that must be pinned.`,
+      );
+    }
+  }
+}
+
+export async function collectPublicDocPinFiles(rootDir) {
+  const relativeFiles = unique(
+    (await Promise.all(PUBLIC_DOC_ROOTS.map((root) => collectMarkdownFiles(rootDir, root)))).flat(),
+  )
+    .map(toPosixPath)
+    .filter((filePath) => !RELEASE_HISTORY_DOCS.has(filePath))
+    .sort();
+
+  return Promise.all(
+    relativeFiles.map(async (filePath) => ({
+      filePath,
+      content: await readFile(path.join(rootDir, filePath), 'utf8'),
+    })),
+  );
 }
 
 export function createSmokeSteps({ version, tarballPath }) {
