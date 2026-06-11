@@ -7,6 +7,7 @@ import {
   isInsidePath,
   normalizeExistingAncestor,
   pathExists,
+  resolvesInsidePath,
   writeTextFile,
 } from './file-system.js';
 
@@ -352,6 +353,7 @@ export async function listTasks(options: {
   config: AgentLoopConfig;
 }): Promise<ListedTask[]> {
   const root = tasksRoot(options.cwd, options.config);
+  if (!resolvesInsidePath(options.cwd, root)) return [];
   const entries = await readdir(root, { withFileTypes: true }).catch(() => []);
   const activeTaskPath = await getActiveTaskPath(options);
 

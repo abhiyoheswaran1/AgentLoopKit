@@ -286,6 +286,7 @@ export async function getAgentLoopStatus(options: {
     options.cwd,
     await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {
       pattern: verificationReportPattern,
+      rootDir: options.cwd,
     }),
   );
   const taskForEvidence = timestampedActiveTask ?? timestampedLatestTask;

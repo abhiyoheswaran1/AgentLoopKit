@@ -1,6 +1,12 @@
 import path from 'node:path';
-import { readFile, readdir, stat } from 'node:fs/promises';
-import { resolveExplicitArtifactPath, resolveOutputArtifactPath } from './artifacts.js';
+import { readFile } from 'node:fs/promises';
+import {
+  latestMarkdownFile,
+  prSummaryPattern,
+  resolveExplicitArtifactPath,
+  resolveOutputArtifactPath,
+  verificationReportPattern,
+} from './artifacts.js';
 import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
 import { pathExists, writeTextFile } from './file-system.js';
@@ -97,26 +103,6 @@ function normalizeDisplayPath(cwd: string, filePath: string | undefined) {
 async function readMarkdownIfExists(filePath: string | undefined) {
   if (!filePath || !(await pathExists(filePath))) return undefined;
   return readFile(filePath, 'utf8');
-}
-
-async function latestMatchingMarkdownFile(dir: string, pattern: RegExp) {
-  if (!(await pathExists(dir))) return undefined;
-  const entries = await Promise.all(
-    (await readdir(dir, { withFileTypes: true }))
-      .filter((entry) => entry.isFile() && pattern.test(entry.name))
-      .map(async (entry) => {
-        const filePath = path.join(dir, entry.name);
-        const fileStat = await stat(filePath);
-        return { filePath, name: entry.name, mtimeMs: fileStat.mtimeMs };
-      }),
-  );
-
-  entries.sort((left, right) => {
-    if (left.mtimeMs !== right.mtimeMs) return left.mtimeMs - right.mtimeMs;
-    return left.name.localeCompare(right.name);
-  });
-
-  return entries.at(-1)?.filePath;
 }
 
 function renderSourcePath(label: string, filePath: string | undefined) {
@@ -270,10 +256,10 @@ export async function writeHtmlReport(options: WriteHtmlReportOptions): Promise<
           expectedDir: options.config.paths.reportsDir,
         })
       : undefined) ??
-    (await latestMatchingMarkdownFile(
-      path.join(cwd, options.config.paths.reportsDir),
-      /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report\.md$/,
-    ));
+    (await latestMarkdownFile(path.join(cwd, options.config.paths.reportsDir), {
+      pattern: verificationReportPattern,
+      rootDir: cwd,
+    }));
   const handoffPath =
     (options.handoffPath
       ? await resolveExplicitArtifactPath({
@@ -283,10 +269,10 @@ export async function writeHtmlReport(options: WriteHtmlReportOptions): Promise<
           expectedDir: options.config.paths.handoffsDir,
         })
       : undefined) ??
-    (await latestMatchingMarkdownFile(
-      path.join(cwd, options.config.paths.handoffsDir),
-      /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-pr-summary\.md$/,
-    ));
+    (await latestMarkdownFile(path.join(cwd, options.config.paths.handoffsDir), {
+      pattern: prSummaryPattern,
+      rootDir: cwd,
+    }));
 
   const [status, branch, commit, diffStat, taskMarkdown, verificationMarkdown, handoffMarkdown] =
     await Promise.all([

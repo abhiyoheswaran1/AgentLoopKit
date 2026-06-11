@@ -267,6 +267,36 @@ describe('release-notes command', () => {
     expect(existsSync(outPath)).toBe(false);
   });
 
+  test('ignores verification and CI summary evidence from symlinked report roots outside the repo', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+    const outsideReports = await makeTempDir();
+    tempDirs.push(outsideReports);
+    await writeFile(
+      path.join(outsideReports, '2026-06-10-12-00-verification-report.md'),
+      '# Outside Verification\n\nOverall status: pass\n\noutside-secret-report-content\n',
+    );
+    await writeFile(
+      path.join(outsideReports, '2026-06-10-12-05-ci-summary.md'),
+      '# Outside CI Summary\n\noutside-secret-ci-summary-content\n',
+    );
+    await rm(path.join(dir, '.agentloop/reports'), { recursive: true, force: true });
+    await symlink(outsideReports, path.join(dir, '.agentloop/reports'), 'dir');
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'release-notes', '--from', 'v1.2.2', '--to', 'HEAD', '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).not.toContain('outside-secret');
+    const output = JSON.parse(result.stdout);
+    expect(output.evidence.verification).toBeUndefined();
+    expect(output.evidence.ciSummary).toBeUndefined();
+    expect(output.markdown).toContain('- Verification: not found');
+    expect(output.markdown).toContain('- CI summary: not found');
+  });
+
   test('handles an explicit missing from ref without pretending the range was read', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: true });
 

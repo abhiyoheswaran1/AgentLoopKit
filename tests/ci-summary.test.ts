@@ -74,6 +74,31 @@ describe('ci-summary command', () => {
     expect(markdown).not.toContain('TOKEN');
   });
 
+  test('does not include handoff content from a symlinked handoff root outside the repo', async () => {
+    const dir = await createRepoWithEvidence();
+    const outsideHandoffs = await makeTempDir();
+    tempDirs.push(outsideHandoffs);
+    await rm(path.join(dir, '.agentloop/handoffs'), { recursive: true, force: true });
+    await writeFile(
+      path.join(outsideHandoffs, '2026-06-10-11-05-pr-summary.md'),
+      '# Outside Handoff\n\noutside-secret-handoff-content\n',
+    );
+    await symlink(outsideHandoffs, path.join(dir, '.agentloop/handoffs'), 'dir');
+
+    const result = await execa(tsxPath, [cliPath, 'ci-summary', '--json', '--write'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).not.toContain('outside-secret-handoff-content');
+    const payload = JSON.parse(result.stdout);
+    expect(payload.evidence.handoff).toBeUndefined();
+    const markdown = await readFile(payload.writtenPath, 'utf8');
+    expect(markdown).not.toContain('outside-secret-handoff-content');
+    expect(markdown).toContain('- Handoff: not found');
+  });
+
   test('prints and writes a GitLab CI summary without calling external services', async () => {
     const dir = await createRepoWithEvidence();
     const result = await execa(tsxPath, [cliPath, 'ci-summary', '--json', '--write'], {

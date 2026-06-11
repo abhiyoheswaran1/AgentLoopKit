@@ -249,6 +249,42 @@ describe('HTML report generation', () => {
     expect(await readFile(outPath, 'utf8')).toContain('Overall status: custom-pass');
   });
 
+  test('CLI report command ignores latest handoffs from symlinked roots outside the repo', async () => {
+    const dir = await makeTempDir();
+    const outsideHandoffs = await makeTempDir();
+    tempDirs.push(dir, outsideHandoffs);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-cli-task.md'),
+      '# CLI task\n\n- Status: in-progress\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-10-12-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await writeFile(
+      path.join(outsideHandoffs, '2026-06-10-12-05-pr-summary.md'),
+      '# Outside Handoff\n\noutside-secret-handoff-content\n',
+    );
+    await rm(path.join(dir, '.agentloop/handoffs'), { recursive: true, force: true });
+    await symlink(outsideHandoffs, path.join(dir, '.agentloop/handoffs'), 'dir');
+
+    const outPath = path.join(dir, '.agentloop/reports/custom-report.html');
+    const result = await execa(tsxPath, [cliPath, 'report', '--out', outPath, '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).not.toContain('outside-secret-handoff-content');
+    const payload = JSON.parse(result.stdout);
+    expect(payload.sourcePaths.handoff).toBeUndefined();
+    const html = await readFile(outPath, 'utf8');
+    expect(html).not.toContain('outside-secret-handoff-content');
+    expect(html).toContain('No handoff summary was found.');
+  });
+
   test('CLI report command prints explicit missing handoff paths as JSON errors without writing', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

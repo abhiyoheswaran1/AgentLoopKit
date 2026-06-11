@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, realpath, utimes, writeFile } from 'node:fs/promises';
+import { mkdir, realpath, rm, symlink, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -55,6 +55,40 @@ describe('status command', () => {
     expect(status.nextAction.command).toBe(
       'agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md',
     );
+  });
+
+  test('ignores symlinked task and report roots that resolve outside the repo', async () => {
+    const dir = await makeTempDir();
+    const outsideTasks = await makeTempDir();
+    const outsideReports = await makeTempDir();
+    tempDirs.push(dir, outsideTasks, outsideReports);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(outsideTasks, '2026-06-09-outside-task.md'),
+      '# Outside task\n\n- Status: proposed\n',
+    );
+    await writeFile(
+      path.join(outsideReports, '2026-06-09-12-30-verification-report.md'),
+      '# Outside Verification\n\nOverall status: pass\n',
+    );
+    await rm(path.join(dir, '.agentloop/tasks'), { recursive: true, force: true });
+    await rm(path.join(dir, '.agentloop/reports'), { recursive: true, force: true });
+    await symlink(outsideTasks, path.join(dir, '.agentloop/tasks'), 'dir');
+    await symlink(outsideReports, path.join(dir, '.agentloop/reports'), 'dir');
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).not.toContain('Outside');
+    const status = JSON.parse(result.stdout);
+    expect(status.activeTask).toBeNull();
+    expect(status.latestTask).toBeNull();
+    expect(status.latestReport).toBeUndefined();
+    expect(status.nextAction.command).toBe('agentloop create-task');
   });
 
   test('prints invalid config errors as JSON', async () => {

@@ -1,8 +1,12 @@
 import path from 'node:path';
-import { readFile, readdir, stat } from 'node:fs/promises';
-import { resolveOutputArtifactPath } from './artifacts.js';
+import { readFile } from 'node:fs/promises';
+import {
+  latestMarkdownFile,
+  resolveOutputArtifactPath,
+  verificationReportPattern,
+} from './artifacts.js';
 import { AgentLoopConfig } from './config.js';
-import { pathExists, writeTextFile } from './file-system.js';
+import { writeTextFile } from './file-system.js';
 import { checkGates, GateStatus } from './check-gates.js';
 import { AgentLoopError } from './errors.js';
 
@@ -29,8 +33,6 @@ export type EvidenceBadgeResult = {
   sourcePath?: string;
   svg: string;
 };
-
-const verificationReportPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report\.md$/;
 
 function escapeXml(value: string) {
   return value
@@ -66,24 +68,6 @@ function parseSource(source: string | undefined): BadgeSource {
     'Unsupported badge source. Use one of: verification, gates.',
     'UNSUPPORTED_BADGE_SOURCE',
   );
-}
-
-async function latestVerificationReport(dir: string) {
-  if (!(await pathExists(dir))) return undefined;
-  const entries = await Promise.all(
-    (await readdir(dir, { withFileTypes: true }))
-      .filter((entry) => entry.isFile() && verificationReportPattern.test(entry.name))
-      .map(async (entry) => {
-        const filePath = path.join(dir, entry.name);
-        const fileStat = await stat(filePath);
-        return { filePath, name: entry.name, mtimeMs: fileStat.mtimeMs };
-      }),
-  );
-  entries.sort((left, right) => {
-    if (left.mtimeMs !== right.mtimeMs) return left.mtimeMs - right.mtimeMs;
-    return left.name.localeCompare(right.name);
-  });
-  return entries.at(-1)?.filePath;
 }
 
 function extractVerificationStatus(markdown: string): BadgeStatus {
@@ -146,8 +130,12 @@ export async function writeEvidenceBadge(options: {
   let sourcePath: string | undefined;
 
   if (source === 'verification') {
-    const reportPath = await latestVerificationReport(
+    const reportPath = await latestMarkdownFile(
       path.join(options.cwd, options.config.paths.reportsDir),
+      {
+        pattern: verificationReportPattern,
+        rootDir: options.cwd,
+      },
     );
     sourcePath = normalizeDisplayPath(options.cwd, reportPath);
     if (!reportPath) {

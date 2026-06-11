@@ -266,9 +266,11 @@ export async function generateReleaseNotes(options: {
     (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
   const verificationPath = await latestMarkdownFile(reportsDir, {
     pattern: verificationReportPattern,
+    rootDir: options.cwd,
   });
   const ciSummaryPath = await latestMarkdownFile(reportsDir, {
     pattern: ciSummaryPattern,
+    rootDir: options.cwd,
   });
   const [
     branch,

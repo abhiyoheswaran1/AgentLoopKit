@@ -1,7 +1,12 @@
 import path from 'node:path';
 import { readdir, stat } from 'node:fs/promises';
 import { AgentLoopError } from './errors.js';
-import { isInsidePath, normalizeExistingAncestor, pathExists } from './file-system.js';
+import {
+  isInsidePath,
+  normalizeExistingAncestor,
+  pathExists,
+  resolvesInsidePath,
+} from './file-system.js';
 
 export const verificationReportPattern =
   /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report\.md$/;
@@ -162,7 +167,11 @@ export function resolveOutputArtifactPath(options: {
   return absolutePath;
 }
 
-export async function latestMarkdownFile(dir: string, options: { pattern?: RegExp } = {}) {
+export async function latestMarkdownFile(
+  dir: string,
+  options: { pattern?: RegExp; rootDir?: string } = {},
+) {
+  if (options.rootDir && !resolvesInsidePath(options.rootDir, dir)) return undefined;
   if (!(await pathExists(dir))) return undefined;
   const entries = await Promise.all(
     (

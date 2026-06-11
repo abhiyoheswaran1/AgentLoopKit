@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, realpath, utimes, writeFile } from 'node:fs/promises';
+import { mkdir, realpath, rm, symlink, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -67,6 +67,43 @@ describe('check-gates command', () => {
       ]),
     );
     expect(output.nextAction.command).toBe('agentloop handoff');
+  });
+
+  test('ignores symlinked report and handoff roots that resolve outside the repo', async () => {
+    const dir = await createInitializedRepo();
+    const outsideReports = await makeTempDir();
+    const outsideHandoffs = await makeTempDir();
+    tempDirs.push(outsideReports, outsideHandoffs);
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+      '# Demo task\n\n- Status: in-progress\n',
+    );
+    await writeFile(
+      path.join(outsideReports, '2026-06-09-12-30-verification-report.md'),
+      '# Outside Verification\n\nOverall status: pass\n',
+    );
+    await writeFile(
+      path.join(outsideHandoffs, '2026-06-09-12-35-pr-summary.md'),
+      '# Outside Handoff\n\nVerification status: Overall status: pass\n',
+    );
+    await rm(path.join(dir, '.agentloop/reports'), { recursive: true, force: true });
+    await rm(path.join(dir, '.agentloop/handoffs'), { recursive: true, force: true });
+    await symlink(outsideReports, path.join(dir, '.agentloop/reports'), 'dir');
+    await symlink(outsideHandoffs, path.join(dir, '.agentloop/handoffs'), 'dir');
+
+    const result = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.stdout).not.toContain('Outside');
+    const output = JSON.parse(result.stdout);
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'verification-report', status: 'fail' }),
+        expect.objectContaining({ id: 'handoff-summary', status: 'warn' }),
+      ]),
+    );
   });
 
   test('prints invalid config errors as JSON', async () => {

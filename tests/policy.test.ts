@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, rm, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -90,6 +90,26 @@ describe('policy reader', () => {
     await writeJson(path.join(dir, 'agentloop.config.json'), config);
 
     await expect(listPolicies({ cwd: dir, config })).rejects.toThrow('Run `agentloop init`');
+  });
+
+  test('treats symlinked policy roots outside the repo as missing', async () => {
+    const dir = await makeTempDir();
+    const outsidePolicies = await makeTempDir();
+    tempDirs.push(dir, outsidePolicies);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    await writeJson(path.join(dir, 'agentloop.config.json'), config);
+    await mkdir(path.join(dir, '.agentloop'), { recursive: true });
+    await writeFile(
+      path.join(outsidePolicies, 'security-policy.md'),
+      '# Outside Policy\n\nDo not leak this content.\n',
+    );
+    await symlink(outsidePolicies, path.join(dir, '.agentloop/policies'), 'dir');
+
+    await expect(listPolicies({ cwd: dir, config })).rejects.toThrow('Run `agentloop init`');
+    await expect(getPolicyStatus({ cwd: dir, config })).rejects.toThrow('Run `agentloop init`');
+    await expect(readPolicy({ cwd: dir, config, policyName: 'security' })).rejects.toThrow(
+      'Run `agentloop init`',
+    );
   });
 
   test('compares local policies to bundled templates', async () => {

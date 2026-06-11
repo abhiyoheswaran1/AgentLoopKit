@@ -245,6 +245,7 @@ export async function summarizeRepository(options: {
       : undefined) ??
     (await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {
       pattern: verificationReportPattern,
+      rootDir: options.cwd,
     }));
   const taskMarkdown =
     taskPath && (await pathExists(taskPath)) ? await readFile(taskPath, 'utf8') : undefined;

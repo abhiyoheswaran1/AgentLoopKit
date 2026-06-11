@@ -2,6 +2,7 @@ import path from 'node:path';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import type { AgentLoopConfig } from './config.js';
 import { AgentLoopError } from './errors.js';
+import { resolvesInsidePath } from './file-system.js';
 import { getTemplateRoot } from './template-renderer.js';
 
 export type ListedPolicy = {
@@ -78,7 +79,10 @@ function normalizeContent(content: string) {
   return content.replace(/\r\n/g, '\n');
 }
 
-async function ensurePolicyRoot(root: string, policiesDir: string) {
+async function ensurePolicyRoot(cwd: string, root: string, policiesDir: string) {
+  if (!resolvesInsidePath(cwd, root)) {
+    throw new PolicyDirectoryMissingError(policiesDir);
+  }
   const rootStat = await stat(root).catch(() => undefined);
   if (!rootStat?.isDirectory()) {
     throw new PolicyDirectoryMissingError(policiesDir);
@@ -110,7 +114,7 @@ export async function listPolicies(options: {
   config: AgentLoopConfig;
 }): Promise<ListedPolicy[]> {
   const root = policyRoot(options.cwd, options.config);
-  await ensurePolicyRoot(root, policyDisplayPath(options.config));
+  await ensurePolicyRoot(options.cwd, root, policyDisplayPath(options.config));
   const policies = await readMarkdownFiles(root);
 
   return policies.map((policy) => ({
@@ -151,7 +155,7 @@ export async function getPolicyStatus(options: {
   config: AgentLoopConfig;
 }): Promise<PolicyStatusReport> {
   const root = policyRoot(options.cwd, options.config);
-  await ensurePolicyRoot(root, policyDisplayPath(options.config));
+  await ensurePolicyRoot(options.cwd, root, policyDisplayPath(options.config));
 
   const templateRoot = path.join(getTemplateRoot(), 'policies');
   const [localPolicies, templatePolicies] = await Promise.all([

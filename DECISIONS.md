@@ -173,3 +173,7 @@ Repo-relative config paths are not enough when a directory already exists as a s
 ## 2026-06-11: Task Archives Stay In The Task Directory
 
 `agentloop task archive` moves a task contract from the active task folder into `.agentloop/tasks/archive/`. The archive destination now resolves before the move. If the archive directory is a symlink outside the repo, AgentLoopKit rejects the archive and leaves the source task untouched.
+
+## 2026-06-11: Read-Only Artifact Discovery Stays Repo-Local
+
+Read-only commands are still part of the repo trust boundary. Task listing, status, gates, handoff fallback, HTML reports, badges, CI summaries, release notes, MCP tools, and policy inspection now ignore configured task, report, handoff, or policy roots when those roots resolve outside the current repo through symlinks. These paths behave like missing local artifacts instead of reading outside content, while explicit artifact paths and writes keep their stricter structured errors.

@@ -197,8 +197,12 @@ export async function getCiSummary(options: {
     (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
   const verificationPath = await latestMarkdownFile(reportsDir, {
     pattern: verificationReportPattern,
+    rootDir: options.cwd,
   });
-  const handoffPath = await latestMarkdownFile(handoffsDir, { pattern: prSummaryPattern });
+  const handoffPath = await latestMarkdownFile(handoffsDir, {
+    pattern: prSummaryPattern,
+    rootDir: options.cwd,
+  });
   const [task, verification, handoff, gates] = await Promise.all([
     readTask(options.cwd, taskPath),
     readVerification(options.cwd, verificationPath),

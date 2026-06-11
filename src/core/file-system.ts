@@ -33,6 +33,13 @@ export function isInsidePath(parent: string, child: string) {
   return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
+export function resolvesInsidePath(parent: string, child: string) {
+  return isInsidePath(
+    normalizeExistingAncestor(path.resolve(parent)),
+    normalizeExistingAncestor(path.resolve(child)),
+  );
+}
+
 export function normalizeExistingAncestor(filePath: string) {
   let current = filePath;
   const missingSegments: string[] = [];

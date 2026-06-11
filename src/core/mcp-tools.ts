@@ -3,7 +3,7 @@ import { readdir, readFile, stat } from 'node:fs/promises';
 import { loadAgentLoopConfig } from './config.js';
 import { latestMarkdownFile, prSummaryPattern, verificationReportPattern } from './artifacts.js';
 import { AgentLoopError } from './errors.js';
-import { pathExists } from './file-system.js';
+import { pathExists, resolvesInsidePath } from './file-system.js';
 import { getAgentLoopStatus } from './status.js';
 import { getActiveTask, listTasks, readTaskContract } from './task-state.js';
 import { listPolicies, readPolicy } from './policy.js';
@@ -153,6 +153,7 @@ async function readMarkdownArtifact(cwd: string, filePath: string | undefined, k
 }
 
 async function listHandoffs(cwd: string, handoffsDir: string, limit: number) {
+  if (!resolvesInsidePath(cwd, handoffsDir)) return [];
   if (!(await pathExists(handoffsDir))) return [];
   const entries = await readdir(handoffsDir, { withFileTypes: true });
   const handoffs = await Promise.all(
@@ -239,6 +240,7 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
         path.join(options.cwd, config.paths.reportsDir),
         {
           pattern: verificationReportPattern,
+          rootDir: options.cwd,
         },
       );
       return textResult(await readMarkdownArtifact(options.cwd, reportPath, 'report'));
@@ -258,6 +260,7 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
         path.join(options.cwd, config.paths.handoffsDir),
         {
           pattern: prSummaryPattern,
+          rootDir: options.cwd,
         },
       );
       return textResult(await readMarkdownArtifact(options.cwd, handoffPath, 'handoff'));

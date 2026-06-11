@@ -5700,3 +5700,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Putting the public-doc claim check inside packed-release smoke catches README/npm-package regressions before publish.
 - Improve:
   - Consider adding a small dedicated public-doc lint script later if the smoke helper starts doing too many unrelated checks.
+
+## 2026-06-11: Read-Only Artifact Root Guard
+
+- Task contract: `.agentloop/tasks/2026-06-11-guard-read-only-artifact-roots-from-symlink-escapes.md`
+- Trigger:
+  - The previous symlink-safety work protected writes and explicit task paths, but read-only discovery still trusted configured task, report, handoff, and policy roots.
+  - Status, gates, CI summaries, HTML reports, release notes, MCP tools, task listing, and policy reads could treat a symlinked artifact root outside the repo as local evidence.
+- Implementation:
+  - Added a shared `resolvesInsidePath` helper for read-side repo-boundary checks.
+  - Made latest Markdown discovery optionally ignore roots that resolve outside the current repo.
+  - Applied the guard to status, gates, PR summaries, HTML reports, badges, CI summaries, release notes, MCP report/handoff tools, task listing, and policy inspection.
+  - Replaced duplicate latest-report/latest-handoff helpers in badge and HTML report code with the shared artifact helper.
+  - Updated changelog, decisions, and backlog without changing package version or publishing.
+- Verification run:
+  - Red focused tests first failed because status, check-gates, CI summary, MCP tools, and policy reads exposed outside symlinked roots.
+  - Expanded focused suite passed after the guard: 9 files and 115 tests.
+  - Full `npx pnpm@10.12.1 test` passed: 36 files and 296 tests.
+  - `npx pnpm@10.12.1 lint`, `typecheck`, `check:links`, `npm run build`, `npm run smoke:release`, and `npx --yes projscan doctor --format markdown` passed.
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-09-09-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-09-14-pr-summary.md`.
+- What worked well:
+  - Treating unsafe read roots as missing local evidence preserved existing read-only command UX while closing the content exposure.
+  - Consolidating latest-artifact lookup removed duplicate filesystem scanning code.
+- Improve:
+  - Keep any future read-only artifact feature on the shared latest-artifact helper or an equivalent repo-bound guard.
+  - Continue batching this work into the planned `0.28.0` release instead of cutting a patch for every bug-pass slice.

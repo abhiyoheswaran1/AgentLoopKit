@@ -178,9 +178,11 @@ export async function checkGates(options: {
     (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
   const reportPath = await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {
     pattern: verificationReportPattern,
+    rootDir: options.cwd,
   });
   const handoffPath = await latestMarkdownFile(path.join(options.cwd, options.config.paths.handoffsDir), {
     pattern: prSummaryPattern,
+    rootDir: options.cwd,
   });
   const gates: GateCheck[] = [];
 
