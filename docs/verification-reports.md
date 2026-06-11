@@ -48,6 +48,8 @@ Failed reports include a `Failure Summary` section before command output. It lis
 
 Command output is kept as evidence, but report code blocks use Markdown fences long enough to contain output that itself includes backticks. A failing tool cannot close its own output block by printing ``` in its logs.
 
+Command labels use Markdown inline-code delimiters long enough to contain the exact command string. This keeps command names readable even when a configured command contains backticks.
+
 Use `--timeout-ms` to set a per-command timeout for long or risky checks. Timed-out commands fail verification and the report marks `Timed out: yes`.
 
 Long command output is shortened in the command section. AgentLoopKit keeps the beginning and ending output with a truncation marker, so setup context and final error lines remain visible without committing huge logs.

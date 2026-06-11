@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed verification report command labels to use Markdown-safe inline-code delimiters when command strings contain backticks.
 - Changed verification reports to wrap command output in Markdown fences that are longer than any backtick run in the output, so logs containing ``` cannot break report structure.
 - Added built-CLI smoke coverage for missing setup errors and nested working-directory flows across `status`, `create-task`, `verify`, `handoff`, `check-gates`, `policy`, and `install-agent`.
 - Changed packed-release smoke checks to run child commands with an allowlisted environment instead of inheriting token-like variables from the parent shell.

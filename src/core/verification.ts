@@ -92,6 +92,16 @@ ${content}
 ${fence}`;
 }
 
+function inlineCode(content: string) {
+  const fence = '`'.repeat(Math.max(1, longestBacktickRun(content) + 1));
+  const needsPadding =
+    content.startsWith('`') ||
+    content.endsWith('`') ||
+    content.startsWith(' ') ||
+    content.endsWith(' ');
+  return `${fence}${needsPadding ? ` ${content} ` : content}${fence}`;
+}
+
 function renderFailureSummary(results: VerificationCommandResult[]) {
   const failures = results.filter((result) => !result.passed);
   if (!failures.length) return '';
@@ -99,7 +109,7 @@ function renderFailureSummary(results: VerificationCommandResult[]) {
   return `## Failure Summary
 ${failures
   .map(
-    (result) => `### ${result.key}: \`${result.command}\`
+    (result) => `### ${result.key}: ${inlineCode(result.command)}
 
 - Exit code: ${result.exitCode}
 
@@ -491,7 +501,7 @@ ${
     ? 'No verification commands were configured or selected.'
     : results
         .map(
-          (result) => `### ${result.key}: \`${result.command}\`
+          (result) => `### ${result.key}: ${inlineCode(result.command)}
 
 - Exit code: ${result.exitCode}
 - Status: ${result.passed ? 'pass' : 'fail'}

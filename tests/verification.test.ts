@@ -397,6 +397,37 @@ describe('verification', () => {
     expect(result.markdown).toContain(safeFenceBlock);
   });
 
+  test('escapes command labels when command strings contain backticks', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const command = "node -e 'console.error(`inline-code-fail`); process.exit(1)'";
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: command,
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-11-13-25',
+      nowIso: '2026-06-11T13:25:00.000Z',
+    });
+
+    const safeCommandLabel = `### test: \`\`${command}\`\``;
+
+    expect(result.overallStatus).toBe('fail');
+    expect(result.markdown).toContain('## Failure Summary');
+    expect(result.markdown.split(safeCommandLabel).length - 1).toBe(2);
+  });
+
   test('marks commands as failed when they exceed the verification timeout', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

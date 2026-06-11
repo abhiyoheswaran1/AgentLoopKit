@@ -2,6 +2,39 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Harden Verification Report Command Code Spans
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-verification-report-command-code-spans.md`
+- Trigger:
+  - After fixing report code fences, an adjacent report-rendering review found that command labels still used fixed inline backticks.
+  - Configured command strings can contain backticks, especially `node -e` snippets and shell examples.
+- Product change:
+  - Added a regression test for a failing verification command whose command string contains backticks.
+  - Changed verification report command labels so failure summaries and full command sections use inline-code delimiters longer than any backtick run in the command string.
+  - Updated verification-report docs, changelog, backlog, and decision notes.
+- Verification completed so far:
+  - Red focused test: `npm test -- tests/verification.test.ts -t "escapes command labels"` failed before the inline-code renderer existed.
+  - Focused green test: `npm test -- tests/verification.test.ts -t "escapes command labels"` passed after the renderer change.
+  - Adjacent suite: `npm test -- tests/verification.test.ts` passed.
+- Final verification completed:
+  - `npm run lint`: pass.
+  - `npm run typecheck`: pass.
+  - `npm test`: 41 files, 351 tests passed.
+  - `npm run check:links`: pass, 895 Markdown files checked.
+  - `npm run build`: pass.
+  - `git diff --check`: pass.
+  - `npx --yes projscan doctor --format markdown`: A, 100/100.
+  - `npx pnpm@10.12.1 audit --prod`: pass, no known production vulnerabilities.
+  - `node scripts/smoke-cli.mjs`: pass.
+  - `npm run smoke:release`: pass.
+  - AgentLoop task verification with `--task-commands`: pass.
+- Verification report: `.agentloop/reports/2026-06-11-14-50-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-11-14-53-pr-summary.md`
+- Worked well:
+  - The change reuses the same delimiter-length idea as command-output fences, so report rendering now treats command text and command output consistently.
+- Improve:
+  - Consider extracting shared Markdown rendering helpers if another report surface needs dynamic delimiters.
+
 ## 2026-06-11: Harden Verification Report Markdown Fences
 
 - Task contract: `.agentloop/tasks/2026-06-11-harden-verification-report-markdown-fences.md`

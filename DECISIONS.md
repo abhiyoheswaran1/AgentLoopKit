@@ -42,7 +42,7 @@ Launch visuals live in `docs/assets/readme/` with source HTML and a VHS tape so 
 
 ## 2026-06-11: Verification Report Fences Adapt To Output
 
-`agentloop verify` keeps raw command output as local evidence, but generated Markdown code blocks use a fence longer than any backtick run in that output. This prevents command logs from closing their own code block or forging report sections without adding a sanitizer, parser, dependency, or output mutation.
+`agentloop verify` keeps raw command output and exact command strings as local evidence, but generated Markdown delimiters adapt to that content. Code blocks use a fence longer than any backtick run in command output, and command labels use inline-code delimiters longer than any backtick run in the command string. This prevents logs or command labels from corrupting report structure without adding a sanitizer, parser, dependency, or output mutation.
 
 ## 2026-06-09: Handoff Writes, Summarize Previews
 
