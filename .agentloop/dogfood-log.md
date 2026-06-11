@@ -2,6 +2,29 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Guard Task Lifecycle Symlink Escapes
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-guard-task-lifecycle-symlink-escapes.md`
+- Trigger:
+  - After task artifact path hardening, the task lifecycle layer still had its own lexical containment helper.
+  - `task show`, `task set`, `task status`, `task archive`, and stale active-task state could follow a symlinked task subdirectory outside `.agentloop/tasks/`.
+- Product change:
+  - Changed task lifecycle path validation to use the shared symlink-aware containment helpers.
+  - Kept normal repo-relative display paths by limiting realpath normalization to the containment check.
+  - Added tests for read, set, status, archive, stale active state, and CLI JSON errors through a symlinked task path.
+  - Updated README, task-contract docs, backlog, and the unreleased changelog.
+- Verification completed:
+  - Red focused test first: `npm test -- tests/task-state.test.ts` failed because outside task files were read and pinned through the symlink.
+  - Focused green test: `npm test -- tests/task-state.test.ts`
+  - Adjacent path suites: `npm test -- tests/create-task.test.ts tests/verification.test.ts`
+  - AgentLoop task verification with `--task-commands`, including full `npm test`, lint, typecheck, markdown links, build, `git diff --check`, and `npx --yes projscan doctor --format markdown`
+- Verification report: `.agentloop/reports/2026-06-11-06-51-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-11-06-52-pr-summary.md`
+- Worked well:
+  - The first fix exposed a macOS realpath/display-path regression before commit, so containment and display paths were separated cleanly.
+- Improve:
+  - Consider centralizing all task path resolution behind one exported helper once the safety surface settles.
+
 ## 2026-06-11: Guard Task Path Symlink Escapes
 
 - Task contract: `.agentloop/tasks/archive/2026-06-11-guard-create-task-output-symlink-escapes.md`

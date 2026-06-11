@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Changed task artifact path validation to resolve existing symlinked ancestors before writing or reading task files, so `agentloop create-task --out <path>` and explicit task paths such as `agentloop verify --task <path>` cannot be redirected outside the configured task directory.
+- Changed task lifecycle path validation to resolve existing symlinked ancestors before reading, pinning, updating, or archiving task contracts, so `agentloop task show`, `set`, `status`, and `archive` cannot operate on files outside the configured task directory through symlinked task paths.
 - Changed `agentloop check-gates` so task-hygiene warnings recommend `agentloop task doctor` after required task, verification, and handoff evidence exists.
 - Added a `task-hygiene` warning gate to `agentloop check-gates` so review gates surface `agentloop task doctor` diagnostics without mutating task files.
 - Added CLI regression coverage for invalid explicit artifact output extensions on `agentloop report`, `agentloop badge`, `agentloop ci-summary --write`, and `agentloop release-notes --write`.

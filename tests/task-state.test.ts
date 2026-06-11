@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, readFile, stat, utimes, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat, symlink, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -199,6 +199,47 @@ describe('task state', () => {
     await expect(readTaskContract({ cwd: dir, config, taskPath: outsideTask })).rejects.toThrow(
       'inside .agentloop/tasks',
     );
+  });
+
+  test('rejects task lifecycle paths that traverse a symlinked task subdirectory', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    const outsideTask = path.join(outsideDir, 'outside-task.md');
+    const symlinkTask = '.agentloop/tasks/outside-link/outside-task.md';
+    await writeFile(outsideTask, '# Outside task\n\n- Status: proposed\n');
+    await symlink(outsideDir, path.join(dir, '.agentloop/tasks/outside-link'), 'dir');
+
+    await expect(readTaskContract({ cwd: dir, config, taskPath: symlinkTask })).rejects.toThrow(
+      'inside .agentloop/tasks',
+    );
+    await expect(setActiveTask({ cwd: dir, config, taskPath: symlinkTask })).rejects.toThrow(
+      'inside .agentloop/tasks',
+    );
+    await expect(
+      updateTaskStatus({ cwd: dir, config, taskPath: symlinkTask, status: 'done' }),
+    ).rejects.toThrow('inside .agentloop/tasks');
+    await expect(archiveTask({ cwd: dir, config, taskPath: symlinkTask })).rejects.toThrow(
+      'inside .agentloop/tasks',
+    );
+
+    expect(await readFile(outsideTask, 'utf8')).toBe('# Outside task\n\n- Status: proposed\n');
+    await expect(stat(path.join(dir, '.agentloop/tasks/archive/outside-task.md'))).rejects.toThrow();
+    await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
+  });
+
+  test('ignores active task state that points through a symlinked task subdirectory', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    await writeFile(path.join(outsideDir, 'outside-task.md'), '# Outside task\n\n- Status: proposed\n');
+    await symlink(outsideDir, path.join(dir, '.agentloop/tasks/outside-link'), 'dir');
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/outside-link/outside-task.md',
+    });
+
+    expect(await getActiveTaskPath({ cwd: dir, config })).toBeUndefined();
   });
 });
 
@@ -491,6 +532,33 @@ describe('task command', () => {
         reason: 'outside-tasks-dir',
       },
     });
+  });
+
+  test('prints symlink-escaped task path errors as JSON when requested', async () => {
+    const { dir } = await createTaskStateFixture();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    await writeFile(path.join(outsideDir, 'outside-task.md'), '# Outside task\n\n- Status: proposed\n');
+    await symlink(outsideDir, path.join(dir, '.agentloop/tasks/outside-link'), 'dir');
+    const requestedTask = '.agentloop/tasks/outside-link/outside-task.md';
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'set', requestedTask, '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'TASK_PATH_OUTSIDE_TASKS_DIR',
+        message: 'Active task must be inside .agentloop/tasks.',
+        requestedTask,
+        tasksDir: '.agentloop/tasks',
+        reason: 'outside-tasks-dir',
+      },
+    });
+    await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
   });
 
   test('prints non-Markdown task path errors as JSON when requested', async () => {

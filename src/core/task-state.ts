@@ -2,7 +2,12 @@ import path from 'node:path';
 import { mkdir, readdir, readFile, rename, rm, stat } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { AgentLoopError } from './errors.js';
-import { pathExists, writeTextFile } from './file-system.js';
+import {
+  isInsidePath,
+  normalizeExistingAncestor,
+  pathExists,
+  writeTextFile,
+} from './file-system.js';
 
 type TaskState = {
   version: 1;
@@ -92,11 +97,6 @@ function toStoredPath(cwd: string, absolutePath: string) {
   return path.relative(cwd, absolutePath).split(path.sep).join('/');
 }
 
-function isInside(parent: string, child: string) {
-  const relative = path.relative(parent, child);
-  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
-}
-
 function tasksRoot(cwd: string, config: AgentLoopConfig) {
   return path.resolve(cwd, config.paths.tasksDir);
 }
@@ -135,7 +135,7 @@ async function resolveTaskPath(options: {
   const root = tasksRoot(options.cwd, options.config);
   const displayRoot = options.config.paths.tasksDir;
 
-  if (!isInside(root, absolutePath)) {
+  if (!isInsidePath(normalizeExistingAncestor(root), normalizeExistingAncestor(absolutePath))) {
     if (!options.strict) return undefined;
     throw new TaskPathError(
       `Active task must be inside ${displayRoot}.`,
