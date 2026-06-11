@@ -214,6 +214,39 @@ describe('policy command', () => {
     expect(traversalResult.stdout).toBe('');
   });
 
+  test('prints missing policy errors as JSON when requested', async () => {
+    const { dir } = await createPolicyFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'policy', 'show', 'secrets', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'POLICY_NOT_FOUND',
+        message: 'Policy not found: secrets',
+        requestedPolicy: 'secrets',
+        availablePolicies: ['git-policy', 'security-policy'],
+      },
+    });
+  });
+
+  test('keeps missing policy errors human-readable by default', async () => {
+    const { dir } = await createPolicyFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'policy', 'show', 'secrets'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('agentloop: Policy not found: secrets');
+  });
+
   test('prints policy status from the CLI as JSON', async () => {
     const { dir } = await createPolicyFixture();
 

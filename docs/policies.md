@@ -16,6 +16,8 @@ agentloop policy status --json
 
 `policy list` reads Markdown files from `.agentloop/policies/` and prints their titles and paths. `policy show` accepts a policy slug, such as `security`, or the generated filename, such as `security-policy.md`.
 
+When `policy show --json` cannot find a policy, it returns a JSON error with `code`, `message`, `requestedPolicy`, and `availablePolicies`.
+
 `policy status` compares the local Markdown files with AgentLoopKit's bundled policy templates. It reports:
 
 - `current`: local file matches the bundled template

@@ -1,7 +1,29 @@
 import { Command } from 'commander';
 import { loadAgentLoopConfig } from '../../core/config.js';
-import { getPolicyStatus, listPolicies, readPolicy } from '../../core/policy.js';
+import {
+  getPolicyStatus,
+  listPolicies,
+  PolicyNotFoundError,
+  readPolicy,
+} from '../../core/policy.js';
 import type { ListedPolicy, PolicyDocument, PolicyStatusReport } from '../../core/policy.js';
+
+function printJsonError(error: Error & { code?: string }, details: Record<string, unknown> = {}) {
+  console.log(
+    JSON.stringify(
+      {
+        error: {
+          code: error.code ?? 'AGENTLOOP_ERROR',
+          message: error.message,
+          ...details,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
+}
 
 function printPolicyList(policies: ListedPolicy[], options: { json?: boolean }) {
   if (options.json) {
@@ -85,7 +107,19 @@ export function policyCommand() {
     .option('--json', 'print machine-readable output')
     .action(async (policyName: string, options: { json?: boolean }) => {
       const config = await loadAgentLoopConfig(process.cwd());
-      const policy = await readPolicy({ cwd: process.cwd(), config, policyName });
+      let policy: PolicyDocument;
+      try {
+        policy = await readPolicy({ cwd: process.cwd(), config, policyName });
+      } catch (error) {
+        if (options.json && error instanceof PolicyNotFoundError) {
+          printJsonError(error, {
+            requestedPolicy: error.requestedPolicy,
+            availablePolicies: error.availablePolicies,
+          });
+          return;
+        }
+        throw error;
+      }
       printPolicy(policy, options);
     });
 

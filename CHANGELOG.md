@@ -25,6 +25,7 @@
 - Added JSON error output for unsupported `agentloop install-agent <agent>` values when `--json` is requested.
 - Added JSON error output for unsupported `agentloop task status <path> <status>` values when `--json` is requested.
 - Added JSON error output for unsupported `agentloop badge --source <source>` values when `--json` is requested.
+- Added JSON error output for missing `agentloop policy show <policy>` names when `--json` is requested.
 - Added `--verification <path>` as an alias for `--report <path>` on `agentloop summarize` and `agentloop handoff`.
 - Added `--verification <path>` as an alias for `--report <path>` on `agentloop report`.
 - Changed the composite GitHub Action default `agentloopkit-version` to `latest`; workflows can still pin `<version>` for reproducibility.

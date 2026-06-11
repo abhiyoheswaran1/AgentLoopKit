@@ -28,6 +28,16 @@ export type PolicyStatusReport = {
   summary: PolicyStatusSummary;
 };
 
+export class PolicyNotFoundError extends AgentLoopError {
+  constructor(
+    public readonly requestedPolicy: string,
+    public readonly availablePolicies: string[],
+  ) {
+    super(`Policy not found: ${requestedPolicy}`, 'POLICY_NOT_FOUND');
+    this.name = 'PolicyNotFoundError';
+  }
+}
+
 function policyRoot(cwd: string, config: AgentLoopConfig) {
   return path.resolve(cwd, config.paths.agentloopDir, 'policies');
 }
@@ -106,7 +116,10 @@ export async function readPolicy(options: {
   const policy = policies.find((candidate) => normalizePolicyName(candidate.name) === requested);
 
   if (!policy) {
-    throw new AgentLoopError(`Policy not found: ${options.policyName}`);
+    throw new PolicyNotFoundError(
+      options.policyName,
+      policies.map((candidate) => candidate.name),
+    );
   }
 
   const root = policyRoot(options.cwd, options.config);

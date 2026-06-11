@@ -4979,3 +4979,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep applying structured JSON errors command-by-command where automation has a concrete parsing need.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Error Output for Missing Policy Names
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-json-error-output-for-missing-policy-names.md`
+- Trigger:
+  - `agentloop policy show --json` returned structured success output, but missing policy names still used the global human error path.
+- Implementation:
+  - Added a `POLICY_NOT_FOUND` error with the requested policy and available policy names.
+  - Added a JSON error response for `agentloop policy show <policy> --json`.
+  - Kept default missing-policy errors human-readable on stderr.
+  - Documented the behavior in README, policy docs, and the changelog.
+- Verification run:
+  - Red focused policy test failed because the command printed the human error to stderr.
+  - Focused policy suite passed: 8 tests.
+  - `.agentloop/reports/2026-06-11-03-19-verification-report.md`, overall status pass.
+- What worked well:
+  - The command now tells agents which local policy names exist without changing policy lookup behavior.
+- Improve:
+  - Consider shared JSON-error helpers only if duplication starts making command modules harder to maintain.
+  - Keep this unreleased until the planned `0.28.0` batch.
