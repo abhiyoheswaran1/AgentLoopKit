@@ -1,6 +1,6 @@
 # Release Status
 
-Last checked: June 10, 2026.
+Last checked: June 11, 2026.
 
 ## Current State
 
@@ -15,6 +15,17 @@ Last checked: June 10, 2026.
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 - npm latest: `0.27.0`
 - Current `main` is accumulating unreleased work for the planned `0.28.0` batch
+
+## Current Unreleased Batch
+
+Prepared for the future `0.28.0` release, but not yet released:
+
+- npm-facing README simplified and detailed command behavior moved to `docs/cli-reference.md`
+- generated first-run guidance improved with a risk-aware task example and task-linked verification
+- `agentloop artifacts` added as a read-only local evidence inventory
+- cross-platform CLI smoke workflow added for Ubuntu, macOS, and Windows
+
+These changes must move from `CHANGELOG.md` `## Unreleased` into a versioned `0.28.0` section before publishing.
 
 Do not publish or bump versions until the maintainer asks for release prep.
 
@@ -58,6 +69,8 @@ Local release-candidate checks for `0.27.0`:
 - `git diff --check`
 - `npm run build`
 - `npm run smoke:release`
+- `node scripts/smoke-cli.mjs`
+- `node dist/cli/index.js artifacts --json`
 - `npx projscan doctor --format markdown`
 - `npm publish --access public --dry-run`
 - focused task doctor, MCP, and distribution artifact tests

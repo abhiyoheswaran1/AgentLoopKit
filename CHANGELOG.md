@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added `agentloop artifacts` and `agentloop artifacts --json`, a read-only local evidence inventory for task counts, latest verification report, latest handoff, HTML reports, badges, CI summaries, and release notes.
+- Added a cross-platform CLI smoke workflow for Ubuntu, macOS, and Windows that builds the package and exercises the built CLI in a temporary repository.
+- Simplified the npm-facing README and moved detailed command behavior into `docs/cli-reference.md`.
+- Improved generated first-run guidance with a risk-aware task contract example, task-linked verification command, and read-only artifact inventory hints.
 - Added a VS Code/Open VSX extension design that defers implementation until a thin CLI-wrapper extension has clear demand.
 - Added repeatable `agentloop create-task --risk` and `--risk-note` flags for non-interactive Risk Notes.
 - Changed `agentloop check-gates` so required root, harness, and policy files only satisfy review gates when their resolved path stays inside the current repo; unsafe symlinked files are treated as missing.

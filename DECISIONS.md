@@ -189,3 +189,11 @@ Task contracts already include a Risk Notes section, but non-interactive task cr
 ## 2026-06-11: Editor Extension Work Stays Deferred
 
 AgentLoopKit should not build a VS Code or Open VSX extension until maintainers see a clear editor-specific workflow gap. If that changes, the extension should be a thin command-palette wrapper around the existing CLI, with no dashboard, chat surface, telemetry, background daemon, policy editor, or separate artifact format.
+
+## 2026-06-11: Artifacts Inventory Is Read-Only
+
+`agentloop artifacts` inventories local AgentLoop evidence so agents and reviewers can see what exists before handoff or release prep. It reads configured task, report, and handoff roots only when they resolve inside the current repo. It does not run verification commands, create files, delete files, upload data, inspect credentials, or read `.env` contents.
+
+## 2026-06-11: Smoke CI Exercises The Built CLI
+
+The cross-platform smoke workflow builds AgentLoopKit and then runs `scripts/smoke-cli.mjs` against the built `dist/cli/index.js` in a temporary repo. The smoke path checks first-run setup, task lifecycle, verification, handoff, and gates. It does not publish packages, create releases, upload artifacts, or call external service APIs.

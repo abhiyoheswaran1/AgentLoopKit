@@ -2,6 +2,45 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Run 0.28.0 Launch-Quality Sprint
+
+- Task contract: `.agentloop/tasks/2026-06-11-run-0-28-0-launch-quality-sprint.md`
+- Trigger:
+  - The maintainer asked to batch ongoing work for a later `0.28.0` release instead of cutting many small versions.
+  - The approved sprint focused on README clarity, cross-platform smoke CI, read-only evidence inventory, generated first-run guidance, and release-readiness docs.
+- Product change:
+  - Simplified the npm-facing README and moved detailed command behavior into `docs/cli-reference.md`.
+  - Added `.github/workflows/smoke.yml` and `scripts/smoke-cli.mjs` to exercise the built CLI on Ubuntu, macOS, and Windows.
+  - Added read-only `agentloop artifacts` and `agentloop artifacts --json`.
+  - Improved generated harness guidance with a risk-aware first task example and task-linked verification.
+  - Updated changelog, roadmap, release-status docs, launch checklist, final handoff, decisions, backlog, and internal product-cycle notes.
+- Verification completed:
+  - Red docs behavior checks before implementation:
+    - `npx vitest run tests/distribution-artifacts.test.ts` failed on missing `.github/workflows/smoke.yml`.
+    - `npx vitest run tests/init.test.ts` failed on missing first-run guidance.
+  - Focused green checks:
+    - `npx vitest run tests/distribution-artifacts.test.ts`
+    - `npx vitest run tests/artifacts.test.ts tests/init.test.ts`
+  - Full checks:
+    - `npm test`: 37 files, 306 tests passed.
+    - `npm run lint`: pass.
+    - `npm run typecheck`: pass.
+    - `npm run check:links`: pass, 873 Markdown files checked.
+    - `npm run build`: pass.
+    - `git diff --check`: pass.
+    - `npm run smoke:release`: pass.
+    - `node scripts/smoke-cli.mjs`: pass.
+    - `node dist/cli/index.js artifacts --json`: pass.
+    - `npx --yes projscan doctor --format markdown`: A, 100/100.
+  - AgentLoop task verification with `--task-commands`: pass.
+- Verification report: `.agentloop/reports/2026-06-11-11-06-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-11-11-10-pr-summary.md`
+- Worked well:
+  - Sub-agents handled disjoint smoke-CI and artifacts-command slices while the main session kept README and generated guidance coherent.
+  - `agentloop artifacts --json` immediately made the repo's evidence inventory visible without reading `.env` contents or mutating files.
+- Improve:
+  - The first handoff was generated before this dogfood entry and task archival; regenerate handoff after the final docs/status cleanup when preparing the push.
+
 ## 2026-06-11: Guard Task Lifecycle Symlink Escapes
 
 - Task contract: `.agentloop/tasks/archive/2026-06-11-guard-task-lifecycle-symlink-escapes.md`

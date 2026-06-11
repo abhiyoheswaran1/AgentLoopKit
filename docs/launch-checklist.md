@@ -42,6 +42,8 @@ For a read-only registry check, see [npm-status.md](npm-status.md).
 - [ ] `git diff --check`
 - [ ] `npm run build`
 - [ ] `npm run smoke:release`
+- [ ] `node scripts/smoke-cli.mjs`
+- [ ] `node dist/cli/index.js artifacts --json`
 - [ ] `npx --yes projscan doctor --format markdown`
 
 ## Package Proof

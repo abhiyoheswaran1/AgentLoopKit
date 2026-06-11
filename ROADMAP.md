@@ -19,6 +19,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Local SVG evidence badges with `agentloop badge`
 - Local CI provenance summaries with `agentloop ci-summary` for GitHub Actions, GitLab CI, and Buildkite
 - Local release-note handoffs with `agentloop release-notes`
+- Local evidence inventory with `agentloop artifacts`
 - Local template manifest checks and manual migration guidance
 - Local safety policy inspection with `agentloop policy`
 - Local safety policy template status with `agentloop policy status`
@@ -29,6 +30,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Agent instruction installers, including `agentloop install-agent all`
 - Static bash, zsh, fish, and PowerShell completions
 - GitHub Actions, GitLab CI, and Buildkite recipes for evidence checks and CI-generated artifacts
+- Cross-platform CLI smoke workflow for Ubuntu, macOS, and Windows
 - Composite GitHub Action wrapper for running AgentLoopKit commands in CI
 - Dockerfile and GHCR release workflow for a minimal `agentloop` image
 - MCP Registry metadata and publish workflow for the read-only server
@@ -43,7 +45,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
-- Current `main` is accumulating unreleased work for the planned `0.28.0` batch. Do not cut releases for every small improvement.
+- Current `main` is accumulating unreleased work for the planned `0.28.0` batch, including README cleanup, first-run guidance polish, cross-platform smoke CI, and the read-only artifacts command. Do not cut releases for every small improvement.
 
 ## Near Term
 

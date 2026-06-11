@@ -29,6 +29,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - local CI provenance and evidence summaries with `agentloop ci-summary`
 - local release-note handoffs with `agentloop release-notes`
 - read-only npm registry status checks with `agentloop npm-status`
+- read-only local evidence inventory with `agentloop artifacts`
 - next-action shortcut with `agentloop next`
 - prepublish metadata guard that blocks npm publish while `CHANGELOG.md` has unreleased entries
 - read-only local policy inspection with `agentloop policy`
@@ -63,6 +64,19 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - MCP Registry workflow run: `27301046893`
 - Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.27.0`
 
+## Current unreleased 0.28.0 batch
+
+Current `main` is accumulating work for a future `0.28.0` release. No version bump, GitHub release, npm publish, GHCR publish, or MCP Registry publish has been done for this batch.
+
+Included so far:
+
+- simplified npm-facing README with detailed command behavior moved to `docs/cli-reference.md`
+- generated first-run harness guidance with a risk-aware task example and task-linked verification command
+- read-only `agentloop artifacts` command for local evidence inventory
+- cross-platform CLI smoke workflow for Ubuntu, macOS, and Windows
+
+Before release, move `CHANGELOG.md` `## Unreleased` entries into a versioned `0.28.0` section and then run the normal release checklist.
+
 ## CLI commands
 
 ```bash
@@ -88,6 +102,8 @@ agentloop next --json
 agentloop check-gates
 agentloop check-gates --json
 agentloop check-gates --strict
+agentloop artifacts
+agentloop artifacts --json
 agentloop report
 agentloop report --json
 agentloop badge

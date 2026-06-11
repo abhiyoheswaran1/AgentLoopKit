@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-11
 - Task type: feature
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 AgentLoopKit main has useful unreleased 0.28.0 batch work, but the README, CI smoke coverage, artifact visibility, first-run guidance, and release-readiness evidence need one focused launch-quality pass before a future release.
