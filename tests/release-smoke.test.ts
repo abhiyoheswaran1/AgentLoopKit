@@ -24,6 +24,8 @@ describe('release smoke script helpers', () => {
       'packed local-only init excludes AgentLoopKit files from local git tracking',
       'packed create-task rejects output outside the task directory',
       'packed verify reports outside task paths as unavailable',
+      'packed init rejects symlinked harness targets',
+      'packed task archive rejects symlinked archive destinations',
       'packed init dry-run refuses the home directory',
     ]);
     for (const step of steps) {

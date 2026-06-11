@@ -5656,3 +5656,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Reusing `resolveOutputArtifactPath` kept task archive errors consistent with reports, handoffs, init, and state writes.
 - Improve:
   - Add packed-release smoke coverage for these filesystem safety guards before cutting `0.28.0`.
+
+## 2026-06-11: Packed Symlink Safety Smoke
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-packed-symlink-safety-smoke.md`
+- Trigger:
+  - The source-level tests covered symlink safety, but `npm run smoke:release` did not verify the same behavior in the packed CLI.
+- Implementation:
+  - Added packed smoke steps for unsafe symlinked init harness targets and unsafe symlinked task archive destinations.
+  - Updated the packed verify task-path smoke to expect the current `ARTIFACT_PATH_INVALID` JSON error instead of the older unavailable-context behavior.
+  - Added focused helper coverage for the expanded smoke-step list.
+- Verification run:
+  - Red focused release-smoke test failed because the new smoke steps were missing.
+  - Initial `npm run smoke:release` failed because the verify task-path smoke expected old behavior.
+  - Focused release-smoke suite passed after the script update: 1 file and 8 tests.
+  - Direct `npm run smoke:release` passed after updating the verify task-path assertion.
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-08-29-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-08-31-pr-summary.md`.
+  - Full `npx pnpm@10.12.1 test` passed: 36 files and 285 tests.
+  - `npx pnpm@10.12.1 lint`, `typecheck`, `check:links`, `build`, `git diff --check`, and `npx --yes projscan doctor --format markdown` passed.
+- What worked well:
+  - Running the packed smoke script inside the task verification caught stale release-smoke expectations before the next release batch.
+- Improve:
+  - Keep packed smoke focused on representative safety and packaging failures so it remains fast enough to run before release.

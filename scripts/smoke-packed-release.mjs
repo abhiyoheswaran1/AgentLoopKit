@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* global console, process */
 import { spawn } from 'node:child_process';
-import { mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, readdir, rm, stat, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -142,6 +142,20 @@ export function createSmokeSteps({ version, tarballPath }) {
       name: 'packed verify reports outside task paths as unavailable',
       command: 'npx',
       args: [...npxArgs, 'verify'],
+      cwd: 'temp',
+      env: {},
+    },
+    {
+      name: 'packed init rejects symlinked harness targets',
+      command: 'npx',
+      args: [...npxArgs, 'init', '--json'],
+      cwd: 'temp',
+      env: {},
+    },
+    {
+      name: 'packed task archive rejects symlinked archive destinations',
+      command: 'npx',
+      args: [...npxArgs, 'task', 'archive'],
       cwd: 'temp',
       env: {},
     },
@@ -327,16 +341,87 @@ async function assertVerifyTaskGuard({ tarballPath, tempRoot }) {
     ],
     { cwd },
   );
-  if (result.exitCode !== 0) {
-    throw new Error(`packed verify outside-task smoke failed: ${result.stderr || result.stdout}`);
-  }
-
-  const payload = JSON.parse(result.stdout);
-  if (payload.markdown.includes('Outside Secret Task') || payload.markdown.includes('leaked')) {
+  if (result.stdout.includes('Outside Secret Task') || result.stdout.includes('leaked')) {
     throw new Error('packed verify leaked outside task file contents.');
   }
-  if (!payload.markdown.includes('Status: unavailable')) {
-    throw new Error('packed verify did not report outside task context as unavailable.');
+  if (result.exitCode === 0) {
+    throw new Error('packed verify outside-task smoke unexpectedly succeeded.');
+  }
+
+  const payload = parseJsonSmokeResult(result, 'packed verify outside-task smoke');
+  if (
+    payload.error?.code !== 'ARTIFACT_PATH_INVALID' ||
+    payload.error?.artifactType !== 'task' ||
+    payload.error?.reason !== 'outside-directory'
+  ) {
+    throw new Error(`packed verify outside-task smoke returned unexpected JSON: ${result.stdout}`);
+  }
+}
+
+function parseJsonSmokeResult(result, name) {
+  try {
+    return JSON.parse(result.stdout);
+  } catch {
+    throw new Error(`${name} did not print JSON: ${result.stderr || result.stdout}`);
+  }
+}
+
+async function assertInitSymlinkGuard({ tarballPath, tempRoot }) {
+  const cwd = await makeTempDir(tempRoot, 'init-symlink-smoke');
+  const outsideDir = await makeTempDir(tempRoot, 'outside-init-symlink');
+  await symlink(outsideDir, path.join(cwd, '.agentloop'), 'dir');
+
+  const result = await runPackedAgentLoop(tarballPath, ['init', '--json'], { cwd });
+  if (result.exitCode === 0) {
+    throw new Error('packed init symlink guard unexpectedly succeeded.');
+  }
+
+  const payload = parseJsonSmokeResult(result, 'packed init symlink guard');
+  if (
+    payload.error?.code !== 'OUTPUT_PATH_INVALID' ||
+    payload.error?.reason !== 'outside-directory'
+  ) {
+    throw new Error(`packed init symlink guard returned unexpected JSON: ${result.stdout}`);
+  }
+  if ((await readdir(outsideDir)).length > 0) {
+    throw new Error('packed init symlink guard wrote files outside the repo.');
+  }
+  if (await pathExists(path.join(cwd, 'AGENTS.md'))) {
+    throw new Error('packed init symlink guard wrote root harness files after rejection.');
+  }
+}
+
+async function assertTaskArchiveSymlinkGuard({ tarballPath, tempRoot }) {
+  const cwd = await makeTempDir(tempRoot, 'task-archive-symlink-smoke');
+  const outsideDir = await makeTempDir(tempRoot, 'outside-task-archive-symlink');
+  await runRequired('npm', ['init', '-y'], { cwd });
+  await runRequired('npx', ['--yes', '--package', tarballPath, 'agentloop', 'init'], { cwd });
+  const taskPath = path.join(cwd, '.agentloop/tasks/smoke-task.md');
+  await writeFile(taskPath, '# Smoke task\n\n- Status: proposed\n');
+  await symlink(outsideDir, path.join(cwd, '.agentloop/tasks/archive'), 'dir');
+
+  const result = await runPackedAgentLoop(
+    tarballPath,
+    ['task', 'archive', '.agentloop/tasks/smoke-task.md', '--json'],
+    { cwd },
+  );
+  if (result.exitCode === 0) {
+    throw new Error('packed task archive symlink guard unexpectedly succeeded.');
+  }
+
+  const payload = parseJsonSmokeResult(result, 'packed task archive symlink guard');
+  if (
+    payload.error?.code !== 'OUTPUT_PATH_INVALID' ||
+    payload.error?.artifactType !== 'task-archive' ||
+    payload.error?.reason !== 'outside-directory'
+  ) {
+    throw new Error(`packed task archive symlink guard returned unexpected JSON: ${result.stdout}`);
+  }
+  if (!(await pathExists(taskPath))) {
+    throw new Error('packed task archive symlink guard moved the source task.');
+  }
+  if (await pathExists(path.join(outsideDir, 'smoke-task.md'))) {
+    throw new Error('packed task archive symlink guard wrote outside the repo.');
   }
 }
 
@@ -382,6 +467,10 @@ export async function runReleaseSmoke(options = {}) {
     console.log('Packed create-task path guard smoke passed.');
     await assertVerifyTaskGuard({ tarballPath, tempRoot });
     console.log('Packed verify task path guard smoke passed.');
+    await assertInitSymlinkGuard({ tarballPath, tempRoot });
+    console.log('Packed init symlink guard smoke passed.');
+    await assertTaskArchiveSymlinkGuard({ tarballPath, tempRoot });
+    console.log('Packed task archive symlink guard smoke passed.');
     await assertHomeDryRunGuard({ tarballPath, tempRoot });
     console.log('Packed home-directory dry-run guard smoke passed.');
     console.log('Release smoke passed.');
