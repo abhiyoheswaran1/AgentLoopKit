@@ -60,6 +60,8 @@ Run `agentloop verify` first when you need fresh verification evidence. `release
 
 If the working tree is dirty, commit or stash those changes before publishing. The command lists uncommitted paths so a release draft cannot silently omit local work.
 
+Changed-file and working-tree paths use Markdown inline-code delimiters long enough to contain paths that include backticks. A repository path cannot close its own path label by including ` in the filename.
+
 ## npm Status
 
 Run `agentloop npm-status` before claiming npm availability. After an AgentLoopKit publish, use `agentloop npm-status --agentloopkit --expect-current` and wait for it to pass before updating public docs, especially from temp release-smoke folders or CI workspaces.

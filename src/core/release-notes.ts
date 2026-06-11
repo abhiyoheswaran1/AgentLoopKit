@@ -162,9 +162,24 @@ function renderList(lines: string[], empty: string) {
   return lines.length ? lines.map((line) => `- ${line}`).join('\n') : `- ${empty}`;
 }
 
+function longestBacktickRun(value: string) {
+  const runs = value.match(/`+/g) ?? [];
+  return runs.reduce((longest, run) => Math.max(longest, run.length), 0);
+}
+
+function inlineCode(content: string) {
+  const fence = '`'.repeat(Math.max(1, longestBacktickRun(content) + 1));
+  const needsPadding =
+    content.startsWith('`') ||
+    content.endsWith('`') ||
+    content.startsWith(' ') ||
+    content.endsWith(' ');
+  return `${fence}${needsPadding ? ` ${content} ` : content}${fence}`;
+}
+
 function renderChangedFiles(files: Array<{ status: string; path: string }>) {
   return files.length
-    ? files.map((file) => `- ${file.status} \`${file.path}\``).join('\n')
+    ? files.map((file) => `- ${file.status} ${inlineCode(file.path)}`).join('\n')
     : '- No changed files detected for the selected range.';
 }
 
@@ -172,7 +187,7 @@ function renderWorkingTree(files: string[]) {
   return files.length
     ? [
         '- Uncommitted changes detected. Commit or stash them before publishing a release.',
-        ...files.map((file) => `- \`${file}\``),
+        ...files.map((file) => `- ${inlineCode(file)}`),
       ].join('\n')
     : '- No uncommitted changes detected.';
 }

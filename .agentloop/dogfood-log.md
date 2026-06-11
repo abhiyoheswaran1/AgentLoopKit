@@ -2,6 +2,29 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Harden Release-Note File Path Labels
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-release-note-file-path-labels.md`
+- Trigger:
+  - After hardening PR summary path labels, the next Markdown surface review found that release notes still rendered changed-file and working-tree paths with fixed inline backticks.
+  - Repository paths are release evidence and can legally include backticks.
+- Product change:
+  - Added a regression test covering a changed file path and an uncommitted working-tree path that both contain backticks.
+  - Changed release-note path labels to use inline-code delimiters longer than any backtick run in the path.
+  - Updated release-note docs, changelog, backlog, and decision notes.
+- Verification:
+  - Red focused test: `npm test -- tests/release-notes.test.ts -t "escapes release-note file path labels"` failed before the renderer changed.
+  - Focused green test: `npm test -- tests/release-notes.test.ts -t "escapes release-note file path labels"` passed after the renderer change.
+  - Adjacent suite: `npm test -- tests/release-notes.test.ts` passed.
+  - Full self-verify: `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-11-harden-release-note-file-path-labels.md --task-commands --timeout-ms 240000 --json` passed and wrote `.agentloop/reports/2026-06-11-15-30-verification-report.md`.
+  - CLI smoke: `node scripts/smoke-cli.mjs` passed.
+  - Release smoke: `npm run smoke:release` passed.
+- Worked well:
+  - The fix stayed in the deterministic release-note renderer and did not change git range selection, status parsing, publishing behavior, or artifact writes.
+- Improve:
+  - Consider extracting shared Markdown inline-code helpers after one more renderer uses the same delimiter pattern.
+  - Use a longer verify timeout for full-suite dogfood runs on slow or busy machines; the full suite can exceed 120 seconds.
+
 ## 2026-06-11: Harden PR Summary Changed-File Paths
 
 - Task contract: `.agentloop/tasks/2026-06-11-harden-pr-summary-changed-file-paths.md`

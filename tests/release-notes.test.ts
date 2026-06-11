@@ -100,6 +100,29 @@ describe('release-notes command', () => {
     expect(written).toBe(output.markdown);
   });
 
+  test('escapes release-note file path labels when paths contain backticks', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    const changedPath = 'src/release`path.ts';
+    const dirtyPath = 'src/dirty`path.ts';
+
+    await writeFile(path.join(dir, changedPath), 'export const changed = true;\n');
+    await git(dir, ['add', changedPath]);
+    await git(dir, ['commit', '-m', 'Add tricky release path']);
+    await writeFile(path.join(dir, dirtyPath), 'export const dirty = true;\n');
+
+    const output = await generateReleaseNotes({
+      cwd: dir,
+      config,
+      from: 'v1.2.2',
+      to: 'HEAD',
+      timestamp: '2026-06-11-15-30',
+    });
+
+    expect(output.markdown).toContain(`- A \`\`${changedPath}\`\``);
+    expect(output.markdown).toContain(`- \`\`?? ${dirtyPath}\`\``);
+  });
+
   test('handles missing previous tags honestly in markdown output', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: false });
 

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed release notes to render changed-file and working-tree path labels with Markdown-safe inline-code delimiters when paths contain backticks.
 - Changed PR summaries and handoffs to render changed-file paths with Markdown-safe inline-code delimiters when paths contain backticks.
 - Changed verification report command labels to use Markdown-safe inline-code delimiters when command strings contain backticks.
 - Changed verification reports to wrap command output in Markdown fences that are longer than any backtick run in the output, so logs containing ``` cannot break report structure.
