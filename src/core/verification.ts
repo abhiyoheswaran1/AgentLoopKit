@@ -80,6 +80,18 @@ function failureSnippet(output: string, maxLines = 12, maxChars = 2000) {
 [failure summary truncated]`;
 }
 
+function longestBacktickRun(value: string) {
+  const runs = value.match(/`+/g) ?? [];
+  return runs.reduce((longest, run) => Math.max(longest, run.length), 0);
+}
+
+function fencedCodeBlock(info: string, content: string) {
+  const fence = '`'.repeat(Math.max(3, longestBacktickRun(content) + 1));
+  return `${fence}${info}
+${content}
+${fence}`;
+}
+
 function renderFailureSummary(results: VerificationCommandResult[]) {
   const failures = results.filter((result) => !result.passed);
   if (!failures.length) return '';
@@ -91,9 +103,7 @@ ${failures
 
 - Exit code: ${result.exitCode}
 
-\`\`\`text
-${failureSnippet(result.output)}
-\`\`\``,
+${fencedCodeBlock('text', failureSnippet(result.output))}`,
   )
   .join('\n\n')}
 
@@ -487,9 +497,7 @@ ${
 - Status: ${result.passed ? 'pass' : 'fail'}
 ${result.timedOut ? '- Timed out: yes\n' : ''}
 
-\`\`\`text
-${excerpt(result.output || '(no output)')}
-\`\`\``,
+${fencedCodeBlock('text', excerpt(result.output || '(no output)'))}`,
         )
         .join('\n\n')
 }

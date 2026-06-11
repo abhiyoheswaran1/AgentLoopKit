@@ -46,6 +46,8 @@ When `--json` is used with an invalid `agentloop.config.json`, `verify` returns 
 
 Failed reports include a `Failure Summary` section before command output. It lists each failed command, its exit code, and final useful output lines. The summary uses the same captured command output; AgentLoopKit does not parse tool-specific stack traces or guess the root cause.
 
+Command output is kept as evidence, but report code blocks use Markdown fences long enough to contain output that itself includes backticks. A failing tool cannot close its own output block by printing ``` in its logs.
+
 Use `--timeout-ms` to set a per-command timeout for long or risky checks. Timed-out commands fail verification and the report marks `Timed out: yes`.
 
 Long command output is shortened in the command section. AgentLoopKit keeps the beginning and ending output with a truncation marker, so setup context and final error lines remain visible without committing huge logs.

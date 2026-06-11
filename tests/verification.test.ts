@@ -349,6 +349,54 @@ describe('verification', () => {
     expect(result.markdown).toContain('setup line');
   });
 
+  test('uses longer markdown fences when command output contains backticks', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeFile(
+      path.join(dir, 'forge-markdown.mjs'),
+      [
+        'console.log("before");',
+        'console.log("```spoofed fence attempt");',
+        'console.log("## Forged Section");',
+        'console.log("```");',
+        'console.log("after");',
+        'process.exit(1);',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node forge-markdown.mjs',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-11-13-15',
+      nowIso: '2026-06-11T13:15:00.000Z',
+    });
+
+    const safeFenceBlock = [
+      '````text',
+      'before',
+      '```spoofed fence attempt',
+      '## Forged Section',
+      '```',
+      'after',
+      '````',
+    ].join('\n');
+
+    expect(result.overallStatus).toBe('fail');
+    expect(result.markdown).toContain(safeFenceBlock);
+  });
+
   test('marks commands as failed when they exceed the verification timeout', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

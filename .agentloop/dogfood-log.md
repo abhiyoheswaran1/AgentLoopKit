@@ -2,6 +2,43 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Harden Verification Report Markdown Fences
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-verification-report-markdown-fences.md`
+- Trigger:
+  - The maintainer asked for continued bug, improvement, and security passes.
+  - A report-security review found that verification command output could contain Markdown fence markers.
+- Product change:
+  - Added a regression test for failed command output that prints triple backticks and a forged heading.
+  - Changed verification report rendering so failure summaries and full command output use fences longer than any backtick run in the output.
+  - Updated verification-report docs, changelog, backlog, and decisions.
+- Verification completed so far:
+  - Red focused test: `npm test -- tests/verification.test.ts -t "uses longer markdown fences"` failed with fixed triple-backtick fences.
+  - Focused green test: `npm test -- tests/verification.test.ts -t "uses longer markdown fences"` passed after the renderer change.
+  - Adjacent suite: `npm test -- tests/verification.test.ts` passed.
+- Final verification completed:
+  - `npm run lint`: pass.
+  - `npm run typecheck`: pass.
+  - `npm test`: 41 files, 350 tests passed.
+  - `npm run check:links`: pass, 892 Markdown files checked.
+  - `npm run build`: pass.
+  - `git diff --check`: pass.
+  - `npx --yes projscan doctor --format markdown`: A, 100/100.
+  - `npx pnpm@10.12.1 audit --prod`: pass, no known production vulnerabilities.
+  - `node scripts/smoke-cli.mjs`: pass.
+  - `npm run smoke:release`: pass.
+  - AgentLoop task verification with `--task-commands`: pass.
+- Verification report: `.agentloop/reports/2026-06-11-14-33-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-11-14-36-pr-summary.md`
+- Task hygiene:
+  - Archived stale completed task `.agentloop/tasks/2026-06-11-run-extended-0-28-0-launch-hardening-queue.md` after `task doctor` flagged it.
+  - `agentloop task doctor --json`: pass after archival.
+  - `agentloop check-gates --json`: pass after archival.
+- Worked well:
+  - The fix stayed at the Markdown rendering boundary and did not mutate command output.
+- Improve:
+  - Consider adding a packed-release smoke assertion for Markdown-fence-safe report output if this report surface changes again.
+
 ## 2026-06-11: Product Hardening And Security Pass
 
 - Task contract: `.agentloop/tasks/2026-06-11-expand-smoke-coverage-for-setup-and-nested-command-flows.md`
