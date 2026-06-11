@@ -2,6 +2,34 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Point Gates To Task Doctor For Hygiene Warnings
+
+- Task contract: `.agentloop/tasks/2026-06-11-point-gates-to-task-doctor-for-hygiene-warnings.md`
+- Trigger:
+  - `agentloop check-gates` surfaced `task-hygiene` warnings, but still recommended `agentloop handoff` when task, verification, and handoff evidence were already present.
+  - That made the warning visible but did not send agents to the command that provides the actual cleanup checklist.
+- Product change:
+  - Changed gate next-action selection so task-hygiene warnings recommend `agentloop task doctor` after required task, verification, and handoff evidence exists.
+  - Preserved higher-priority next actions for missing task contracts, failed verification reports, and missing handoffs.
+  - Updated gate docs and the unreleased changelog.
+  - No task files are archived, deleted, rewritten, or auto-fixed by `check-gates`.
+- Verification completed:
+  - Red focused test first: `npm test -- tests/check-gates.test.ts tests/task-state.test.ts` failed because the next action was still `agentloop handoff`.
+  - Focused green test: `npm test -- tests/check-gates.test.ts tests/task-state.test.ts`
+  - Full `npm test`
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run check:links`
+  - `npm run build`
+  - `git diff --check`
+  - `npx --yes projscan doctor --format markdown`
+- Verification report: `.agentloop/reports/2026-06-11-06-26-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-11-06-28-pr-summary.md`
+- Worked well:
+  - The behavior change stayed inside the existing deterministic `chooseNextAction` order.
+- Improve:
+  - Consider whether `ci-summary` should mention the recommended gate next action more prominently.
+
 ## 2026-06-11: Add Task Hygiene Gate
 
 - Task contract: `.agentloop/tasks/2026-06-11-add-task-hygiene-gate.md`

@@ -253,17 +253,26 @@ describe('check-gates command', () => {
         }),
       ]),
     );
+    expect(output.nextAction).toEqual({
+      command: 'agentloop task doctor',
+      reason: 'Review task-folder hygiene diagnostics before refreshing handoff evidence.',
+    });
 
     expect(strictResult.exitCode).toBe(1);
     expect(JSON.parse(strictResult.stdout)).toMatchObject({
       strict: true,
       overallStatus: 'fail',
+      nextAction: {
+        command: 'agentloop task doctor',
+        reason: 'Review task-folder hygiene diagnostics before refreshing handoff evidence.',
+      },
     });
 
     expect(humanResult.exitCode).toBe(0);
     expect(humanResult.stdout).toContain(
       '[warn] Task hygiene: Task folder has 1 hygiene diagnostic. Run `agentloop task doctor` for cleanup details.',
     );
+    expect(humanResult.stdout).toContain('Run `agentloop task doctor`.');
   });
 
   test('strict mode treats warning-only gates as failures without changing default behavior', async () => {

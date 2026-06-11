@@ -98,6 +98,7 @@ function chooseNextAction(gates: GateCheck[]) {
   const task = gates.find((item) => item.id === 'task-contract');
   const report = gates.find((item) => item.id === 'verification-report');
   const handoff = gates.find((item) => item.id === 'handoff-summary');
+  const taskHygiene = gates.find((item) => item.id === 'task-hygiene');
   if (task?.status === 'fail') {
     return {
       command: 'agentloop create-task',
@@ -114,6 +115,12 @@ function chooseNextAction(gates: GateCheck[]) {
     return {
       command: 'agentloop handoff',
       reason: 'Write a reviewer handoff after verification.',
+    };
+  }
+  if (taskHygiene?.status === 'warn') {
+    return {
+      command: 'agentloop task doctor',
+      reason: 'Review task-folder hygiene diagnostics before refreshing handoff evidence.',
     };
   }
   return {

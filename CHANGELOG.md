@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed `agentloop check-gates` so task-hygiene warnings recommend `agentloop task doctor` after required task, verification, and handoff evidence exists.
 - Added a `task-hygiene` warning gate to `agentloop check-gates` so review gates surface `agentloop task doctor` diagnostics without mutating task files.
 - Added CLI regression coverage for invalid explicit artifact output extensions on `agentloop report`, `agentloop badge`, `agentloop ci-summary --write`, and `agentloop release-notes --write`.
 - Changed explicit output paths for `agentloop report`, `agentloop badge`, `agentloop ci-summary --write`, and `agentloop release-notes --write` so generated artifacts must stay inside their configured AgentLoop artifact directories, with `OUTPUT_PATH_INVALID` JSON errors for invalid paths.
