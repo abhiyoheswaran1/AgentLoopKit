@@ -185,3 +185,7 @@ Read-only commands are still part of the repo trust boundary. Task listing, stat
 ## 2026-06-11: Risk Notes Are First-Class Task Inputs
 
 Task contracts already include a Risk Notes section, but non-interactive task creation could not fill it. `agentloop create-task` now accepts repeatable `--risk` and `--risk-note` flags that populate the existing section without changing task headings, adding risk scoring, or turning AgentLoopKit into a policy engine.
+
+## 2026-06-11: Editor Extension Work Stays Deferred
+
+AgentLoopKit should not build a VS Code or Open VSX extension until maintainers see a clear editor-specific workflow gap. If that changes, the extension should be a thin command-palette wrapper around the existing CLI, with no dashboard, chat surface, telemetry, background daemon, policy editor, or separate artifact format.

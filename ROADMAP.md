@@ -54,7 +54,8 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 
 ## Later
 
-- Evaluate VS Code/Open VSX, Scoop, and WinGet after the core release flow stays stable.
+- Keep the VS Code/Open VSX extension deferred until command-palette shortcuts prove necessary. See `docs/designs/vscode-open-vsx-extension.md`.
+- Evaluate Scoop and WinGet after Windows smoke tests and release checksums are stable.
 - Add configurable organization policy packs.
 - Add GitHub issue and PR metadata import.
 - Evaluate paid team features only after npm publishing is stable and the open-source CLI matures.

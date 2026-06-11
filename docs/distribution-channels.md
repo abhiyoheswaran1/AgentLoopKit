@@ -4,13 +4,13 @@ This page is for maintainers planning releases. Keep the README focused on user 
 
 ## Current Channels
 
-| Channel         | Status                | User command                                                                              |
-| --------------- | --------------------- | ----------------------------------------------------------------------------------------- |
-| npm / npx       | Primary channel       | `npx agentloopkit init`                                                                   |
-| GitHub Releases | Public release assets | Download `agentloopkit-<version>.tgz` from GitHub                                         |
-| GitHub Action   | Live repo action      | `uses: abhiyoheswaran1/AgentLoopKit@v<version>`                                           |
+| Channel         | Status                | User command                                                                                 |
+| --------------- | --------------------- | -------------------------------------------------------------------------------------------- |
+| npm / npx       | Primary channel       | `npx agentloopkit init`                                                                      |
+| GitHub Releases | Public release assets | Download `agentloopkit-<version>.tgz` from GitHub                                            |
+| GitHub Action   | Live repo action      | `uses: abhiyoheswaran1/AgentLoopKit@v<version>`                                              |
 | Docker / GHCR   | Live image            | `docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:<version> doctor` |
-| MCP Registry    | Published metadata    | `npx --yes agentloopkit@latest mcp-server`                                                |
+| MCP Registry    | Published metadata    | `npx --yes agentloopkit@latest mcp-server`                                                   |
 
 ## Release Rule
 
@@ -80,10 +80,10 @@ See [mcp.md](mcp.md).
 
 ## Planned Channels
 
-| Priority | Channel                      | Why it matters                                                | Decision                                               |
-| -------- | ---------------------------- | ------------------------------------------------------------- | ------------------------------------------------------ |
-| P2       | VS Code / Open VSX extension | Helps editor-first users run the loop without leaving the IDE | Later, only after editor UX is scoped                  |
-| P2       | Scoop / WinGet               | Better Windows install path for CLI users                     | Later, after Windows smoke tests and release checksums |
+| Priority | Channel                      | Why it matters                                                | Decision                                                               |
+| -------- | ---------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| P2       | VS Code / Open VSX extension | Helps editor-first users run the loop without leaving the IDE | Deferred; see [extension design](designs/vscode-open-vsx-extension.md) |
+| P2       | Scoop / WinGet               | Better Windows install path for CLI users                     | Later, after Windows smoke tests and release checksums                 |
 
 ## Channel Rules
 

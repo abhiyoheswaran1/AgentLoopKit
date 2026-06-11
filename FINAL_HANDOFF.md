@@ -2216,7 +2216,7 @@ Title: I built a local-first engineering loop for coding agents
 6. Add Rails and Laravel task-contract recipes if contributors ask for them: medium usefulness, low effort.
 7. Add package-manager-specific dependency-upgrade recipes for npm, yarn, and bun: medium usefulness, low effort.
 8. Add Windows CI smoke coverage for PowerShell completions and `npx agentloopkit init`: medium trust improvement, medium effort.
-9. Explore a VS Code/Open VSX extension only if CLI usage shows an editor workflow gap: medium adoption value, high maintenance.
+9. Keep the VS Code/Open VSX extension deferred until command-palette shortcuts have clear demand: medium adoption value, high maintenance.
 10. Add richer MCP docs and example client configs without expanding write access: medium agent-compatibility value, low effort.
 11. Add GHCR usage recipes for common CI providers: medium CI usefulness, low effort.
 12. Add static report pruning guidance so repos do not accumulate noisy local artifacts: medium maintainability value, low effort.

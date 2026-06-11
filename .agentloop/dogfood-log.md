@@ -5772,3 +5772,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Keeping Risk Notes as plain task-contract bullets avoided new concepts while making non-interactive task creation complete.
 - Improve:
   - If users need richer risk modeling later, add it as a separate policy feature instead of overloading `create-task`.
+
+## 2026-06-11: VS Code and Open VSX Extension Design
+
+- Task contract: `.agentloop/tasks/archive/2026-06-10-explore-vscode-open-vsx-extension.md`
+- Trigger:
+  - The deferred distribution backlog still included a VS Code/Open VSX extension question.
+  - Building an editor extension now would add a second product surface before the CLI workflow needs it.
+- Implementation:
+  - Added `docs/designs/vscode-open-vsx-extension.md`.
+  - Recorded the decision to defer implementation until command-palette shortcuts have clear demand.
+  - Updated distribution docs, roadmap, backlog, decisions, changelog, and final handoff notes.
+  - Did not build an extension, webview, dashboard, policy editor, or new package.
+- Verification run:
+  - `npx pnpm@10.12.1 check:links` passed: 868 Markdown files checked.
+  - `npx pnpm@10.12.1 lint` passed.
+  - `git diff --check` passed.
+  - `npx --yes projscan doctor --format markdown` passed with health score A.
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-09-49-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-09-51-pr-summary.md`.
+- What worked well:
+  - Treating the extension as a design decision kept the product lightweight while still closing the deferred question.
+- Improve:
+  - Do not pick up more deferred distribution tasks until the maintainer explicitly asks for them.
