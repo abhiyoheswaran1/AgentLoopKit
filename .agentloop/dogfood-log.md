@@ -4844,3 +4844,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Avoid adding aliases broadly unless they remove a real workflow mistake.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: GitHub Action Default Package Version
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-use-latest-as-the-github-action-default-package-version.md`
+- Trigger:
+  - The root composite action defaulted `agentloopkit-version` to `0.27.0`, which would go stale while unreleased `0.28.0` batch work continues.
+- Implementation:
+  - Changed the action default to `latest`.
+  - Kept the `agentloopkit-version` input so teams can pin a reviewed package version.
+  - Added distribution artifact coverage that rejects exact semver defaults in `action.yml`.
+  - Updated GitHub Action docs and examples with concise pinning guidance.
+- Verification run:
+  - Red focused test failed because `action.yml` still contained `default: '0.27.0'`.
+  - Focused distribution artifact suite passed: 4 tests.
+  - `.agentloop/reports/2026-06-11-02-31-verification-report.md`, overall status pass.
+- What worked well:
+  - The change removes release-day action.yml churn without changing the action execution model.
+- Improve:
+  - Keep release-tag examples pinned with `<version>` where reproducibility matters.
+  - Keep this unreleased until the planned `0.28.0` batch.

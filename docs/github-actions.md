@@ -115,7 +115,7 @@ The verification report includes a `CI Context` section when GitHub Actions, Git
 
 Use the repo action when you want a shorter workflow step around the same npm package:
 
-Replace `<version>` with the AgentLoopKit release you have reviewed and want this workflow to use.
+The action defaults to npm `latest`. Set `agentloopkit-version` when you want CI to use a reviewed package version.
 
 ```yaml
 name: AgentLoop Action

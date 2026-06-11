@@ -41,6 +41,8 @@ The root `action.yml` is a thin composite wrapper around the npm package:
     agentloopkit-version: <version>
 ```
 
+The action defaults to `agentloopkit@latest`. Set `agentloopkit-version` when a workflow needs a reviewed package version.
+
 The action does not upload artifacts or comment on pull requests. Workflow authors decide which command to run and whether to upload generated AgentLoopKit files.
 
 ## Docker / GHCR

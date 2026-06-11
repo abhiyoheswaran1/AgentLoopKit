@@ -92,3 +92,4 @@ jobs:
 ```
 
 The action installs AgentLoopKit and runs the command. It does not upload artifacts or comment on pull requests.
+If you omit `agentloopkit-version`, the action installs `agentloopkit@latest`. Keep the input when the workflow should stay pinned to a reviewed package version.

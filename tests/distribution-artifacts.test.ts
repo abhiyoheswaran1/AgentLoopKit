@@ -36,6 +36,8 @@ describe('distribution artifacts', () => {
 
     expect(action).toContain('using: composite');
     expect(action).toContain('agentloopkit-version');
+    expect(action).toContain("default: 'latest'");
+    expect(action).not.toMatch(/default: ['"]\d+\.\d+\.\d+['"]/);
     expect(action).toContain(
       'npm install --no-save "agentloopkit@${{ inputs.agentloopkit-version }}"',
     );

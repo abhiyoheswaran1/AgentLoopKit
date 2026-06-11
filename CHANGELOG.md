@@ -25,6 +25,7 @@
 - Added JSON error output for unsupported `agentloop install-agent <agent>` values when `--json` is requested.
 - Added `--verification <path>` as an alias for `--report <path>` on `agentloop summarize` and `agentloop handoff`.
 - Added `--verification <path>` as an alias for `--report <path>` on `agentloop report`.
+- Changed the composite GitHub Action default `agentloopkit-version` to `latest`; workflows can still pin `<version>` for reproducibility.
 - Changed `npm run smoke:release` so the packed README may stay unpinned while stale exact version pins are still rejected.
 - Added `agentloop verify --task-commands` to explicitly run commands listed in a task contract's `Verification Commands` section.
 - Added a verification report note when `--task-commands` is requested but no runnable task commands are found.
