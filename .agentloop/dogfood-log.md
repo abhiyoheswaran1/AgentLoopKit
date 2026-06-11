@@ -4824,3 +4824,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep `--report` as the canonical documented term where possible so the CLI stays compact.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: `--verification` Alias for `report`
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-verification-alias-for-report-command.md`
+- Trigger:
+  - After adding `--verification` to `summarize` and `handoff`, `agentloop report` still accepted only `--report` for explicit verification evidence.
+- Implementation:
+  - Added `--verification <path>` as an alias for `--report <path>` on `agentloop report`.
+  - Kept `--report` supported and preferred.
+  - Added CLI coverage that selects a non-latest manual verification report and checks the resulting metadata, source path, and HTML content.
+- Verification run:
+  - Red focused test failed because Commander rejected `--verification`.
+  - First green run showed explicit report source paths preserve the supplied relative path; the assertion now matches existing behavior.
+  - Focused HTML report suite passed: 4 tests.
+  - `.agentloop/reports/2026-06-11-02-23-verification-report.md`, overall status pass.
+- What worked well:
+  - The alias kept the report command consistent with handoff generation and did not change HTML output structure.
+- Improve:
+  - Avoid adding aliases broadly unless they remove a real workflow mistake.
+  - Keep this unreleased until the planned `0.28.0` batch.

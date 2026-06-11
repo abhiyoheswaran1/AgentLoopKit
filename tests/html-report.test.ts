@@ -109,4 +109,35 @@ describe('HTML report generation', () => {
     expect(payload.html).toBeUndefined();
     expect(await readFile(outPath, 'utf8')).toContain('CLI task');
   });
+
+  test('CLI report command accepts --verification as an alias for --report', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/manual-verification.md'),
+      '# Verification Report\n\nOverall status: custom-pass\n',
+    );
+
+    const outPath = path.join(dir, '.agentloop/reports/custom-report.html');
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'report',
+        '--verification',
+        '.agentloop/reports/manual-verification.md',
+        '--out',
+        outPath,
+        '--json',
+      ],
+      { cwd: dir },
+    );
+
+    const payload = JSON.parse(result.stdout);
+    expect(payload.metadata.verificationStatus).toBe('custom-pass');
+    expect(payload.sourcePaths.verification).toBe('.agentloop/reports/manual-verification.md');
+    expect(await readFile(outPath, 'utf8')).toContain('Overall status: custom-pass');
+  });
 });

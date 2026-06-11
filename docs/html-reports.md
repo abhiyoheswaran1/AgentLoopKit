@@ -30,6 +30,7 @@ Use JSON output in scripts:
 ```bash
 agentloop report --json
 agentloop report --out .agentloop/reports/review.html --json
+agentloop report --verification .agentloop/reports/2026-06-10-12-00-verification-report.md --json
 ```
 
 JSON output includes the written `outPath`, report metadata, and source paths. It does not embed the full HTML body.

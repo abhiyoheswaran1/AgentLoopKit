@@ -372,6 +372,7 @@ See `docs/check-gates.md` for gate statuses and exit-code behavior.
 agentloop report
 agentloop report --json
 agentloop report --out .agentloop/reports/review.html
+agentloop report --verification .agentloop/reports/2026-06-10-12-00-verification-report.md --json
 ```
 
 The command does not run tests, call an LLM, fetch assets, read `.env` contents, or send data anywhere. It writes one local file under `.agentloop/reports/` by default. Use it after `verify` and `handoff` when you want a browser-readable artifact for a PR or CI upload.

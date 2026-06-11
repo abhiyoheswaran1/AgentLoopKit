@@ -7,6 +7,7 @@ export function reportCommand() {
     .description('Generate a local static HTML evidence report')
     .option('--task <path>', 'task contract path')
     .option('--report <path>', 'verification report path')
+    .option('--verification <path>', 'alias for --report')
     .option('--handoff <path>', 'handoff summary path')
     .option('--out <path>', 'output HTML path')
     .option('--json', 'print machine-readable output')
@@ -14,16 +15,18 @@ export function reportCommand() {
       async (options: {
         task?: string;
         report?: string;
+        verification?: string;
         handoff?: string;
         out?: string;
         json?: boolean;
       }) => {
+        const reportPath = options.report ?? options.verification;
         const config = await loadAgentLoopConfig(process.cwd());
         const result = await writeHtmlReport({
           cwd: process.cwd(),
           config,
           taskPath: options.task,
-          reportPath: options.report,
+          reportPath,
           handoffPath: options.handoff,
           outPath: options.out,
         });
