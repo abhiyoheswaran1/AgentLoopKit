@@ -21,6 +21,7 @@ Prefer high-value, low-complexity improvements. Safety and trust override the sc
 
 | Item                                 | Stars | Usefulness | Explain | Compatibility | Simplicity | Maintenance | Trust | Optionality | Total |
 | ------------------------------------ | ----: | ---------: | ------: | ------------: | ---------: | ----------: | ----: | ----------: | ----: |
+| Markdown-safe CI summary output      |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
 | Markdown-safe check-gates output     |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
 | Markdown-safe artifacts output       |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
 | Markdown-safe status and next output |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |

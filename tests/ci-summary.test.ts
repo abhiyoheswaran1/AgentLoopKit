@@ -70,7 +70,9 @@ describe('ci-summary command', () => {
     expect(markdown).toContain('# AgentLoopKit CI Summary');
     expect(markdown).toContain('- Provider: GitHub Actions');
     expect(markdown).toContain('- Run URL: `https://github.com/owner/repo/actions/runs/12345`');
-    expect(markdown).toContain('- Verification: pass');
+    expect(markdown).toContain(
+      '- Verification: `pass` - `.agentloop/reports/2026-06-10-11-00-verification-report.md`',
+    );
     expect(markdown).not.toContain('TOKEN');
   });
 
@@ -97,6 +99,57 @@ describe('ci-summary command', () => {
     const markdown = await readFile(payload.writtenPath, 'utf8');
     expect(markdown).toContain('- Workflow: `` CI `nightly` ``');
     expect(markdown).toContain('- Ref: `` refs/heads/feature/`agentloop` ``');
+  });
+
+  test('writes markdown-safe CI evidence and gate details when values contain backticks', async () => {
+    const dir = await createRepoWithEvidence();
+    await rm(path.join(dir, '.agentloop/reports/2026-06-10-11-00-verification-report.md'), {
+      force: true,
+    });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-ci`summary.md'),
+      '# CI `gate`\n\n- Status: in-progress\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      `${JSON.stringify(
+        {
+          version: 1,
+          activeTaskPath: '.agentloop/tasks/2026-06-10-ci`summary.md',
+        },
+        null,
+        2,
+      )}\n`,
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-10-11-10-pr-summary.md'),
+      '# Reviewer `brief`\n\nVerification status: Overall status: pass\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'ci-summary', '--json', '--write'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const payload = JSON.parse(result.stdout);
+    const markdown = await readFile(payload.writtenPath, 'utf8');
+    expect(payload.evidence.task.title).toBe('CI `gate`');
+    expect(payload.evidence.task.path).toBe('.agentloop/tasks/2026-06-10-ci`summary.md');
+    expect(payload.evidence.handoff.title).toBe('Reviewer `brief`');
+    expect(markdown).toContain('- Overall status: `fail`');
+    expect(markdown).toContain(
+      '- Task: `` CI `gate` `` - ``.agentloop/tasks/2026-06-10-ci`summary.md``',
+    );
+    expect(markdown).toContain(
+      '- Handoff: `` Reviewer `brief` `` - `.agentloop/handoffs/2026-06-10-11-10-pr-summary.md`',
+    );
+    expect(markdown).toContain('- Gates: `fail`');
+    expect(markdown).toContain(
+      '- [`pass`] `Task contract`: `` CI `gate` `` - ``.agentloop/tasks/2026-06-10-ci`summary.md``',
+    );
+    expect(markdown).toContain('- [`fail`] `Verification report`: `No verification report found.`');
+    expect(markdown).toContain('Run `agentloop verify`.');
   });
 
   test('does not include handoff content from a symlinked handoff root outside the repo', async () => {

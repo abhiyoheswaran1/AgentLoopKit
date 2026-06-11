@@ -24,6 +24,10 @@ Verification reports, reviewer handoffs, and release notes use a shared Markdown
 
 `agentloop npm-status` reports package and version labels as release evidence. Those labels now use the same Markdown inline-code formatter as verification, handoff, and release-note artifacts. This keeps captured registry data readable when a version string contains backticks without changing registry lookup, package-name validation, or version validation.
 
+## 2026-06-11: CI Summary Evidence Uses Shared Markdown Formatting
+
+`agentloop ci-summary` collects local task, verification, handoff, and gate evidence for CI logs. Human Markdown output now formats evidence titles, paths, statuses, gate details, timestamps, and next-action commands with the shared inline-code helper. JSON output keeps raw values so automation does not need to parse Markdown.
+
 ## 2026-06-09: Preserve Existing AGENTS.md
 
 `init` appends a marked AgentLoopKit section when `AGENTS.md` already exists. It does not overwrite user instructions.

@@ -143,34 +143,45 @@ function renderCiLines(ci: CiSummaryCiContext) {
 }
 
 function renderArtifactLine(label: string, artifact: CiSummaryArtifact | undefined) {
-  return artifact ? `- ${label}: ${artifact.title} - ${artifact.path}` : `- ${label}: not found`;
+  return artifact
+    ? `- ${label}: ${inlineCode(artifact.title)} - ${inlineCode(artifact.path)}`
+    : `- ${label}: not found`;
+}
+
+function renderVerificationLine(verification: CiSummaryVerification | undefined) {
+  return verification
+    ? `- Verification: ${inlineCode(verification.overallStatus)} - ${inlineCode(verification.path)}`
+    : '- Verification: not found';
+}
+
+function renderGateLine(gate: CheckGatesResult['gates'][number]) {
+  const suffix = gate.path ? ` - ${inlineCode(gate.path)}` : '';
+  return `- [${inlineCode(gate.status)}] ${inlineCode(gate.name)}: ${inlineCode(
+    gate.message,
+  )}${suffix}`;
 }
 
 function renderMarkdown(result: Omit<CiSummaryResult, 'markdown' | 'writtenPath'>) {
   return `# AgentLoopKit CI Summary
 
-- Generated: ${result.timestamp}
-- Overall status: ${result.gates.overallStatus}
+- Generated: ${inlineCode(result.timestamp)}
+- Overall status: ${inlineCode(result.gates.overallStatus)}
 
 ## CI Context
 ${renderCiLines(result.ci)}
 
 ## AgentLoop Evidence
 ${renderArtifactLine('Task', result.evidence.task)}
-- Verification: ${
-    result.evidence.verification
-      ? `${result.evidence.verification.overallStatus} - ${result.evidence.verification.path}`
-      : 'not found'
-  }
+${renderVerificationLine(result.evidence.verification)}
 ${renderArtifactLine('Handoff', result.evidence.handoff)}
-- Gates: ${result.gates.overallStatus}
+- Gates: ${inlineCode(result.gates.overallStatus)}
 
 ## Gate Details
-${result.gates.gates.map((gate) => `- [${gate.status}] ${gate.name}: ${gate.message}`).join('\n')}
+${result.gates.gates.map(renderGateLine).join('\n')}
 
 ## Next Action
 
-Run \`${result.nextAction.command}\`.
+Run ${inlineCode(result.nextAction.command)}.
 
 ${result.nextAction.reason}
 
