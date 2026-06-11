@@ -119,6 +119,7 @@ The action defaults to npm `latest`. Set `agentloopkit-version` when you want CI
 
 Keep `command` static and trusted. Do not pass untrusted pull request or user input to command.
 Keep `agentloopkit-version` static and trusted. Do not pass untrusted pull request or user input to agentloopkit-version.
+Keep `install-mode` static and trusted. Use `install-mode: npm` to install from npm. Use `install-mode: local` only when the repo already installs AgentLoopKit as a dev dependency.
 
 ```yaml
 name: AgentLoop Action
@@ -140,9 +141,20 @@ jobs:
         with:
           command: check-gates --strict
           agentloopkit-version: <version>
+          install-mode: npm
 ```
 
-The action installs `agentloopkit` with npm and runs the command you provide. It does not upload artifacts, comment on pull requests, read secrets, or replace the direct npm recipes above.
+The action installs `agentloopkit` with npm and runs the command you provide. In npm mode it uses `--package-lock=false` so the CI step does not rewrite package lockfiles. It does not upload artifacts, comment on pull requests, read secrets, or replace the direct npm recipes above.
+
+Use local mode only after the workflow has installed the project dependencies:
+
+```yaml
+- run: npm ci
+- uses: abhiyoheswaran1/AgentLoopKit@v<version>
+  with:
+    command: check-gates --strict
+    install-mode: local
+```
 
 ## Required Repository Files
 

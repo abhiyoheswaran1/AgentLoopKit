@@ -243,6 +243,176 @@ describe('artifacts command', () => {
     expect(result.stdout).not.toContain('do-not-print-this-fixture');
   });
 
+  test('filters JSON inventory by artifact type', async () => {
+    const dir = await createRepoWithArtifacts();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--json', '--type', 'verification'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      verificationReports: {
+        count: 2,
+        latest: {
+          path: '.agentloop/reports/2026-06-10-10-00-verification-report.md',
+          title: 'Latest Verification',
+          overallStatus: 'pass',
+        },
+      },
+    });
+  });
+
+  test('prints only latest artifacts as deterministic JSON', async () => {
+    const dir = await createRepoWithArtifacts();
+
+    const result = await execa(tsxPath, [cliPath, 'artifacts', '--json', '--latest'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      latest: [
+        {
+          type: 'task',
+          path: '.agentloop/tasks/2026-06-11-new-task.md',
+          title: 'New task',
+          status: 'in-progress',
+        },
+        {
+          type: 'verification',
+          path: '.agentloop/reports/2026-06-10-10-00-verification-report.md',
+          title: 'Latest Verification',
+          overallStatus: 'pass',
+        },
+        {
+          type: 'handoff',
+          path: '.agentloop/handoffs/2026-06-10-10-05-pr-summary.md',
+          title: 'Latest Handoff',
+        },
+        {
+          type: 'html-report',
+          path: '.agentloop/reports/2026-06-10-10-10-agentloop-report.html',
+        },
+        {
+          type: 'badge',
+          path: '.agentloop/reports/agentloop-verification.svg',
+        },
+        {
+          type: 'ci-summary',
+          path: '.agentloop/reports/2026-06-10-10-20-ci-summary.md',
+          title: 'AgentLoopKit CI Summary',
+        },
+        {
+          type: 'release-notes',
+          path: '.agentloop/handoffs/2026-06-10-10-25-release-notes.md',
+          title: 'Release Notes',
+        },
+      ],
+    });
+  });
+
+  test('prints only latest matching JSON artifacts when type and latest are combined', async () => {
+    const dir = await createRepoWithArtifacts();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--json', '--type', 'ci-summary', '--latest'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      latest: [
+        {
+          type: 'ci-summary',
+          path: '.agentloop/reports/2026-06-10-10-20-ci-summary.md',
+          title: 'AgentLoopKit CI Summary',
+        },
+      ],
+    });
+  });
+
+  test('prints only latest matching markdown artifacts when type and latest are combined', async () => {
+    const dir = await createRepoWithArtifacts();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--type', 'verification', '--latest'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toBe(`# AgentLoopKit Artifacts
+
+- Latest verification: pass - .agentloop/reports/2026-06-10-10-00-verification-report.md
+`);
+  });
+
+  test('prints a next step when filtered markdown finds no artifacts', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--type', 'html-report', '--latest'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toBe(`# AgentLoopKit Artifacts
+
+No HTML report artifacts found.
+
+Next step: run \`agentloop report\` to create a local HTML report.
+`);
+  });
+
+  test('prints the correct handoff next step when no handoff artifacts exist', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--type', 'handoff', '--latest'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toBe(`# AgentLoopKit Artifacts
+
+No handoff artifacts found.
+
+Next step: run \`agentloop handoff\` to create a handoff summary.
+`);
+  });
+
   test('returns zero counts when AgentLoop artifact directories are missing', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -264,6 +434,36 @@ describe('artifacts command', () => {
       releaseNotes: { count: 0, latest: null },
     });
     expect(existsSync(path.join(dir, '.agentloop'))).toBe(false);
+  });
+
+  test('prints unsupported artifact type errors as JSON', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'artifacts', '--json', '--type', 'unknown'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'UNSUPPORTED_ARTIFACT_TYPE',
+        message: 'Unsupported artifact type: unknown',
+        artifactType: 'unknown',
+        supportedTypes: [
+          'task',
+          'verification',
+          'handoff',
+          'html-report',
+          'badge',
+          'ci-summary',
+          'release-notes',
+        ],
+      },
+    });
   });
 
   test('does not create, delete, or mutate artifact files', async () => {

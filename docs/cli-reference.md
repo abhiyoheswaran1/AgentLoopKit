@@ -9,6 +9,8 @@ agentloopkit init
 
 The examples below use `agentloop`. Replace it with `npx agentloopkit` when you do not have the package installed locally.
 
+For a complete command sequence, see the [End-to-end workflow](../examples/end-to-end/README.md).
+
 ## Init
 
 ```bash
@@ -139,7 +141,10 @@ See [pr-summaries.md](pr-summaries.md).
 
 ```bash
 agentloop artifacts
+agentloop artifacts --type verification
+agentloop artifacts --type ci-summary --latest
 agentloop artifacts --json
+agentloop artifacts --json --latest
 
 agentloop report
 agentloop report --json
@@ -150,7 +155,7 @@ agentloop badge --source gates
 agentloop badge --json
 ```
 
-`artifacts` inventories existing local AgentLoop evidence without writing files. It reports task counts, task statuses, latest verification report, latest handoff, HTML reports, badges, CI summaries, and release notes. JSON output uses repo-relative paths.
+`artifacts` inventories existing local AgentLoop evidence without writing files. It reports task counts, task statuses, latest verification report, latest handoff, HTML reports, badges, CI summaries, and release notes. Use `--type` to filter to `task`, `verification`, `handoff`, `html-report`, `badge`, `ci-summary`, or `release-notes`. Use `--latest` to print only the latest matching artifact entries. JSON output uses repo-relative paths and does not include artifact file contents.
 
 `report` writes a local static HTML evidence report from the current task, latest verification report, latest handoff, Git status, diff stats, and deterministic summary.
 
@@ -183,6 +188,10 @@ agentloop release-notes --release-version <version>
 agentloop release-notes --json
 agentloop release-notes --write
 
+agentloop release-check
+agentloop release-check --json
+agentloop release-check --strict
+
 agentloop npm-status
 agentloop npm-status --agentloopkit
 agentloop npm-status --json
@@ -192,9 +201,11 @@ agentloop npm-status --registry-json npm-view.json
 
 `release-notes` drafts local release notes from package metadata, changelog entries, Git history, changed files, working tree status, the active task, the latest verification report, and the latest CI summary when those artifacts exist.
 
+`release-check` checks local release readiness from package metadata, changelog entries, release scripts, git state, the latest verification report, reviewer handoff, and generated release notes. Use `--strict` when warnings should fail CI or a maintainer release gate.
+
 `npm-status` checks registry state without publishing. It runs `npm view` unless you pass captured registry JSON.
 
-Neither command creates tags, publishes packages, reads tokens, reads `.env` files, uploads files, or changes package metadata.
+These commands do not create tags, publish packages, read tokens, read `.env` files, upload files, or change package metadata.
 
 See [release-notes.md](release-notes.md) and [npm-status.md](npm-status.md).
 
@@ -253,11 +264,14 @@ agentloop completion bash
 agentloop completion fish
 agentloop completion powershell
 agentloop completion pwsh
+agentloop version
 ```
 
 `list-templates` shows bundled loop, policy, handoff, gate, and agent templates.
 
 `completion` prints completion scripts to stdout. It does not edit `.zshrc`, `.bashrc`, fish config, PowerShell startup files, or other shell profile files.
+
+`version` prints the installed AgentLoopKit CLI version.
 
 ## JSON Errors
 

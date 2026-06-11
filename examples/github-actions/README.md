@@ -72,6 +72,7 @@ Use the repo action when you only need to run one AgentLoopKit command:
 Replace `<version>` with the AgentLoopKit release you have reviewed and want this workflow to use.
 Keep `command` static and trusted. Do not pass untrusted pull request or user input to command.
 Keep `agentloopkit-version` static and trusted. Do not pass untrusted pull request or user input to agentloopkit-version.
+Use `install-mode: npm` to install from npm. Use `install-mode: local` only when the repo already installs AgentLoopKit as a dev dependency.
 
 ```yaml
 name: AgentLoop Action
@@ -91,7 +92,18 @@ jobs:
         with:
           command: check-gates --strict
           agentloopkit-version: <version>
+          install-mode: npm
 ```
 
-The action installs AgentLoopKit and runs the command. It does not upload artifacts or comment on pull requests.
+The action installs AgentLoopKit and runs the command. In npm mode it uses `--package-lock=false` so the CI step does not rewrite package lockfiles. It does not upload artifacts or comment on pull requests.
 If you omit `agentloopkit-version`, the action installs `agentloopkit@latest`. Keep the input when the workflow should stay pinned to a reviewed package version.
+
+Local dependency mode:
+
+```yaml
+- run: npm ci
+- uses: abhiyoheswaran1/AgentLoopKit@v<version>
+  with:
+    command: check-gates --strict
+    install-mode: local
+```

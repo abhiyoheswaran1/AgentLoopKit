@@ -5834,3 +5834,41 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Treating the extension as a design decision kept the product lightweight while still closing the deferred question.
 - Improve:
   - Do not pick up more deferred distribution tasks until the maintainer explicitly asks for them.
+
+## 2026-06-11: Extended 0.28.0 Launch-Hardening Queue
+
+- Task contract: `.agentloop/tasks/2026-06-11-run-extended-0-28-0-launch-hardening-queue.md`
+- Trigger:
+  - The product needed a deeper release-quality pass without cutting another npm version.
+  - The approved queue focused on release readiness, evidence inventory, doctor guidance, docs drift, GitHub Action ergonomics, examples, and dogfooding.
+- Implementation:
+  - Added `agentloop release-check` with human, JSON, and strict modes.
+  - Added `agentloop artifacts --type <type>` and `--latest`.
+  - Added structured doctor `nextActions` and a human `## Next Steps` section.
+  - Added a CLI docs drift guard for help, README, CLI reference, and completions.
+  - Hardened the composite GitHub Action with validated `install-mode`, local dependency mode, working-directory-aware install, and lockfile-free npm install.
+  - Added `examples/end-to-end/README.md`.
+  - Updated README, CLI reference, GitHub Action docs, changelog, decisions, and backlog without bumping the package version.
+- Verification run:
+  - Red focused tests failed first for `release-check`, doctor next actions, docs drift, action install modes, end-to-end example, and the handoff next-step copy bug.
+  - Focused suites passed after implementation:
+    - `tests/release-check.test.ts`: 4 tests.
+    - `tests/doctor.test.ts`: 9 tests.
+    - `tests/cli-docs-drift.test.ts` and `tests/completion.test.ts`: 10 tests.
+    - `tests/artifacts.test.ts`: 13 tests.
+    - `tests/distribution-artifacts.test.ts`: 9 tests.
+    - `tests/examples.test.ts`: 1 test.
+  - Full `npm test` passed: 40 files and 321 tests.
+  - `npm run lint`, `npm run typecheck`, `npm run check:links`, `npm run build`, `node scripts/smoke-cli.mjs`, `npm run smoke:release`, and `npx --yes projscan doctor --format markdown` passed.
+  - Built command checks passed:
+    - `node dist/cli/index.js release-check --json`.
+    - `node dist/cli/index.js artifacts --json`.
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-11-48-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-11-50-pr-summary.md`.
+- What worked well:
+  - The new drift guard caught the missing `artifacts` shell completion entry.
+  - Reviewing the artifacts next-step copy caught an invalid `agentloop handoff --write` suggestion before commit.
+  - `projscan doctor --format markdown` stayed clean after the batch.
+- Improve:
+  - Do not run smoke scripts in parallel with `npm run build`; `dist/` cleanup can race template copies.
+  - Consider adding a dedicated `release-check` docs page if the command grows beyond the CLI reference.

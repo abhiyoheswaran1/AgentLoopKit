@@ -105,6 +105,44 @@ describe('doctor', () => {
     });
   });
 
+  test('includes actionable next steps for common warnings', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await rm(path.join(dir, '.agentloop/manifest.json'));
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify({ name: 'demo', version: '1.0.0', scripts: {} }, null, 2),
+    );
+    await writeFile(path.join(dir, '.env.local'), 'SECRET_VALUE=do-not-print\n');
+
+    const result = await runDoctor({ cwd: dir });
+
+    expect(result.nextActions).toEqual(
+      expect.arrayContaining([
+        {
+          id: 'refresh-harness',
+          command: 'agentloop init',
+          reason: 'Refresh missing or stale AgentLoopKit harness metadata without overwriting existing files.',
+        },
+        {
+          id: 'add-verification',
+          command: 'add package scripts or configure verification.commands',
+          reason: 'AgentLoopKit needs project-specific verification commands before agents can prove completion.',
+        },
+        {
+          id: 'review-risk-files',
+          command: 'review risk files before starting autonomous work',
+          reason: 'Risk files were detected; protect sensitive areas in the task contract before editing.',
+        },
+      ]),
+    );
+    expect(result.markdown).toContain('## Next Steps');
+    expect(result.markdown).toContain('Run `agentloop init`');
+    expect(result.markdown).toContain('Run `add package scripts or configure verification.commands`');
+    expect(result.markdown).not.toContain('do-not-print');
+  });
+
   test('warns when template manifest is stale, invalid, or newer than the CLI', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

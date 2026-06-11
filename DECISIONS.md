@@ -197,3 +197,15 @@ AgentLoopKit should not build a VS Code or Open VSX extension until maintainers 
 ## 2026-06-11: Smoke CI Exercises The Built CLI
 
 The cross-platform smoke workflow builds AgentLoopKit and then runs `scripts/smoke-cli.mjs` against the built `dist/cli/index.js` in a temporary repo. The smoke path checks first-run setup, task lifecycle, verification, handoff, and gates. It does not publish packages, create releases, upload artifacts, or call external service APIs.
+
+## 2026-06-11: Release Readiness Stays Local And Read-Only
+
+`agentloop release-check` is a pre-release evidence gate, not a release runner. It reads package metadata, changelog entries, release scripts, git state, local AgentLoop evidence, and package install-script safety. It does not call npm, create tags, publish packages, create GitHub releases, read credentials, read `.env` contents, upload files, or change package metadata. Registry truth stays in `agentloop npm-status`.
+
+## 2026-06-11: Artifact Inventory Filters Stay Content-Free
+
+`agentloop artifacts --type` and `--latest` filter the existing local evidence inventory but keep the same privacy boundary as the base command. They return counts, statuses, headings, and repo-relative paths only. They do not dump task, report, handoff, or env-file contents.
+
+## 2026-06-11: GitHub Action Supports npm And Local Dependency Modes
+
+The composite action should support two clear usage paths: install AgentLoopKit from npm, or use an already-installed local dev dependency. `install-mode` is explicit and validated. npm mode runs in the configured working directory and uses `--package-lock=false` to avoid CI lockfile churn. Local mode verifies the existing local binary before running the requested command.

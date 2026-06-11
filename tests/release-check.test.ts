@@ -1,0 +1,175 @@
+import path from 'node:path';
+import { readdir, writeFile } from 'node:fs/promises';
+import { execa } from 'execa';
+import { afterEach, describe, expect, test } from 'vitest';
+import { initializeAgentLoop } from '../src/core/init.js';
+import { makeTempDir, removeTempDir } from './helpers.js';
+
+const cliPath = path.resolve('src/cli/index.ts');
+const tsxPath = path.resolve('node_modules/.bin/tsx');
+
+let tempDirs: string[] = [];
+
+async function git(cwd: string, args: string[]) {
+  return execa('git', args, { cwd });
+}
+
+async function createReleaseRepo(options: {
+  verification?: 'pass' | 'fail' | 'missing';
+  handoff?: boolean;
+  releaseNotes?: boolean;
+  dirty?: boolean;
+} = {}) {
+  const dir = await makeTempDir();
+  tempDirs.push(dir);
+  await git(dir, ['init', '-q']);
+  await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
+  await git(dir, ['config', 'user.name', 'AgentLoopKit Test']);
+  await initializeAgentLoop({ cwd: dir });
+  await writeFile(
+    path.join(dir, 'package.json'),
+    JSON.stringify(
+      {
+        name: 'demo',
+        version: '1.2.3',
+        scripts: {
+          test: 'echo test',
+          lint: 'echo lint',
+          typecheck: 'echo typecheck',
+          build: 'echo build',
+          'smoke:release': 'echo smoke',
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  await writeFile(
+    path.join(dir, 'CHANGELOG.md'),
+    '# Changelog\n\n## 1.2.3\n\n- Prepared release evidence.\n',
+  );
+  if (options.verification !== 'missing') {
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-11-10-00-verification-report.md'),
+      `# Verification Report\n\nOverall status: ${options.verification ?? 'pass'}\n`,
+    );
+  }
+  if (options.handoff ?? true) {
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-11-10-05-pr-summary.md'),
+      '# PR Summary\n\nReview release evidence.\n',
+    );
+  }
+  if (options.releaseNotes ?? true) {
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-11-10-10-release-notes.md'),
+      '# Release Notes\n\nRelease evidence.\n',
+    );
+  }
+  await writeFile(path.join(dir, '.env.local'), 'SECRET_VALUE=do-not-print\n');
+  await git(dir, ['add', '.']);
+  await git(dir, ['commit', '-m', 'Prepare release fixture']);
+  if (options.dirty) {
+    await writeFile(path.join(dir, 'src-dirty.ts'), 'export const dirty = true;\n');
+  }
+  return dir;
+}
+
+describe('release-check command', () => {
+  afterEach(async () => {
+    await Promise.all(tempDirs.map(removeTempDir));
+    tempDirs = [];
+  });
+
+  test('prints machine-readable pass results from local release evidence', async () => {
+    const dir = await createReleaseRepo();
+
+    const result = await execa(tsxPath, [cliPath, 'release-check', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).not.toContain('do-not-print');
+    const output = JSON.parse(result.stdout);
+    expect(output.overallStatus).toBe('pass');
+    expect(output.package).toEqual({ name: 'demo', version: '1.2.3' });
+    expect(output.git).toMatchObject({
+      isRepository: true,
+      changedFileCount: 0,
+      targetIsRoot: true,
+    });
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'package-metadata', status: 'pass' }),
+        expect.objectContaining({ id: 'changelog-section', status: 'pass' }),
+        expect.objectContaining({ id: 'verification-report', status: 'pass' }),
+        expect.objectContaining({ id: 'handoff-summary', status: 'pass' }),
+        expect.objectContaining({ id: 'release-notes', status: 'pass' }),
+        expect.objectContaining({ id: 'release-scripts', status: 'pass' }),
+        expect.objectContaining({ id: 'package-safety', status: 'pass' }),
+      ]),
+    );
+    expect(output.nextAction.command).toBe('npm publish --access public');
+    expect(output.safety.doesNot).toContain('publish packages');
+    expect(output.safety.doesNot).toContain('read npm tokens');
+  });
+
+  test('warns without failing by default when release evidence is incomplete', async () => {
+    const dir = await createReleaseRepo({ handoff: false, releaseNotes: false });
+
+    const result = await execa(tsxPath, [cliPath, 'release-check', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(0);
+    expect(output.overallStatus).toBe('warn');
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'handoff-summary', status: 'warn' }),
+        expect.objectContaining({ id: 'release-notes', status: 'warn' }),
+      ]),
+    );
+    expect(output.nextAction.command).toBe('agentloop handoff');
+  });
+
+  test('strict mode exits non-zero for warnings', async () => {
+    const dir = await createReleaseRepo({ handoff: false });
+
+    const result = await execa(tsxPath, [cliPath, 'release-check', '--strict', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.strict).toBe(true);
+    expect(output.overallStatus).toBe('fail');
+    expect(output.checks).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: 'handoff-summary', status: 'warn' })]),
+    );
+  });
+
+  test('stays read-only while reporting dirty working tree risk', async () => {
+    const dir = await createReleaseRepo({ dirty: true });
+    const beforeReports = await readdir(path.join(dir, '.agentloop/reports'));
+    const beforeHandoffs = await readdir(path.join(dir, '.agentloop/handoffs'));
+
+    const result = await execa(tsxPath, [cliPath, 'release-check'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toContain('# AgentLoopKit Release Check');
+    expect(result.stdout).toContain('[warn] Working tree');
+    expect(result.stdout).not.toContain('do-not-print');
+    await expect(readdir(path.join(dir, '.agentloop/reports'))).resolves.toEqual(beforeReports);
+    await expect(readdir(path.join(dir, '.agentloop/handoffs'))).resolves.toEqual(beforeHandoffs);
+  });
+});

@@ -1,20 +1,64 @@
 import { Command } from 'commander';
-import { getArtifactInventory, renderArtifactInventoryMarkdown } from '../../core/artifacts.js';
-import { loadConfigForJsonCommand } from '../json-errors.js';
+import {
+  artifactInventoryTypes,
+  getArtifactInventory,
+  isArtifactInventoryType,
+  renderArtifactInventoryJson,
+  renderArtifactInventoryMarkdown,
+} from '../../core/artifacts.js';
+import {
+  CliOptionError,
+  loadConfigForJsonCommand,
+  printAgentLoopJsonError,
+} from '../json-errors.js';
+
+type ArtifactsCommandOptions = {
+  json?: boolean;
+  type?: string;
+  latest?: boolean;
+};
+
+function validateArtifactType(options: ArtifactsCommandOptions) {
+  if (!options.type || isArtifactInventoryType(options.type)) return true;
+
+  const error = new CliOptionError(
+    `Unsupported artifact type: ${options.type}`,
+    'UNSUPPORTED_ARTIFACT_TYPE',
+    {
+      artifactType: options.type,
+      supportedTypes: [...artifactInventoryTypes],
+    },
+  );
+
+  if (options.json) {
+    printAgentLoopJsonError(error);
+    return false;
+  }
+
+  throw error;
+}
 
 export function artifactsCommand() {
   return new Command('artifacts')
     .description('Show local AgentLoop evidence artifacts without writing files')
+    .option('--type <type>', `filter by artifact type (${artifactInventoryTypes.join(', ')})`)
+    .option('--latest', 'print only the latest matching artifact(s)')
     .option('--json', 'print machine-readable output')
-    .action(async (options: { json?: boolean }) => {
+    .action(async (options: ArtifactsCommandOptions) => {
+      if (!validateArtifactType(options)) return;
+
       const config = await loadConfigForJsonCommand(process.cwd(), options.json);
       if (!config) return;
       const inventory = await getArtifactInventory({ cwd: process.cwd(), config });
+      const renderOptions = {
+        type: options.type && isArtifactInventoryType(options.type) ? options.type : undefined,
+        latest: options.latest,
+      };
 
       if (options.json) {
-        console.log(JSON.stringify(inventory, null, 2));
+        console.log(JSON.stringify(renderArtifactInventoryJson(inventory, renderOptions), null, 2));
       } else {
-        console.log(renderArtifactInventoryMarkdown(inventory));
+        console.log(renderArtifactInventoryMarkdown(inventory, renderOptions));
       }
     });
 }

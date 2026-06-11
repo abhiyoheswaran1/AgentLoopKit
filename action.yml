@@ -9,6 +9,10 @@ inputs:
     description: npm package version to install. Do not pass untrusted pull request or user input to agentloopkit-version.
     required: false
     default: 'latest'
+  install-mode:
+    description: Install mode. Use "npm" to install agentloopkit from npm, or "local" when the repo already installed AgentLoopKit as a dependency. Do not pass untrusted pull request or user input to install-mode.
+    required: false
+    default: 'npm'
   working-directory:
     description: Directory where the AgentLoopKit command should run.
     required: false
@@ -19,9 +23,19 @@ runs:
   steps:
     - name: Install AgentLoopKit
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       env:
         AGENTLOOPKIT_VERSION: ${{ inputs.agentloopkit-version }}
-      run: npm install --no-save "agentloopkit@${AGENTLOOPKIT_VERSION}"
+        AGENTLOOPKIT_INSTALL_MODE: ${{ inputs.install-mode }}
+      run: |
+        if [ "$AGENTLOOPKIT_INSTALL_MODE" = "npm" ]; then
+          npm install --no-save --package-lock=false "agentloopkit@${AGENTLOOPKIT_VERSION}"
+        elif [ "$AGENTLOOPKIT_INSTALL_MODE" = "local" ]; then
+          npx --no-install agentloop version
+        else
+          echo "Unsupported install-mode: ${AGENTLOOPKIT_INSTALL_MODE}" >&2
+          exit 1
+        fi
 
     - name: Run AgentLoopKit
       shell: bash

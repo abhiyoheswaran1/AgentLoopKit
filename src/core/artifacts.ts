@@ -15,7 +15,18 @@ export const ciSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ci-summary\.md$/
 export const releaseNotesPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-release-notes\.md$/;
 export const generatedMarkdownPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-.+\.md$/;
 
+export const artifactInventoryTypes = [
+  'task',
+  'verification',
+  'handoff',
+  'html-report',
+  'badge',
+  'ci-summary',
+  'release-notes',
+] as const;
+
 export type ArtifactType = 'task' | 'verification' | 'handoff';
+export type ArtifactInventoryFilterType = (typeof artifactInventoryTypes)[number];
 export type ArtifactPathErrorReason = 'outside-directory' | 'not-markdown' | 'missing';
 export type OutputArtifactType =
   | 'report'
@@ -83,11 +94,27 @@ export type ArtifactInventory = {
   };
 };
 
+export type ArtifactInventoryRenderOptions = {
+  type?: ArtifactInventoryFilterType;
+  latest?: boolean;
+};
+
+export type LatestArtifactInventoryItem =
+  | ({ type: 'task' } & ArtifactInventoryTask)
+  | ({ type: 'verification' } & ArtifactInventoryVerification)
+  | ({ type: 'handoff' } & ArtifactInventoryNamedArtifact)
+  | ({ type: 'html-report' } & ArtifactInventoryPathArtifact)
+  | ({ type: 'badge' } & ArtifactInventoryPathArtifact)
+  | ({ type: 'ci-summary' } & ArtifactInventoryNamedArtifact)
+  | ({ type: 'release-notes' } & ArtifactInventoryNamedArtifact);
+
 type InventoryFile = {
   filePath: string;
   name: string;
   mtimeMs: number;
 };
+
+type ArtifactInventoryJsonKey = keyof ArtifactInventory;
 
 export class ArtifactPathError extends AgentLoopError {
   constructor(
@@ -120,6 +147,40 @@ const outputArtifactLabels: Record<OutputArtifactType, string> = {
   'task-state': 'Task state',
   'task-archive': 'Task archive',
 };
+
+const artifactInventoryJsonKeys: Record<ArtifactInventoryFilterType, ArtifactInventoryJsonKey> = {
+  task: 'tasks',
+  verification: 'verificationReports',
+  handoff: 'handoffs',
+  'html-report': 'htmlReports',
+  badge: 'badges',
+  'ci-summary': 'ciSummaries',
+  'release-notes': 'releaseNotes',
+};
+
+const artifactInventoryDisplayLabels: Record<ArtifactInventoryFilterType, string> = {
+  task: 'task',
+  verification: 'verification report',
+  handoff: 'handoff',
+  'html-report': 'HTML report',
+  badge: 'badge',
+  'ci-summary': 'CI summary',
+  'release-notes': 'release notes',
+};
+
+const artifactInventoryNextSteps: Record<ArtifactInventoryFilterType, string> = {
+  task: 'run `agentloop create-task` to create a task contract.',
+  verification: 'run `agentloop verify` to create a verification report.',
+  handoff: 'run `agentloop handoff` to create a handoff summary.',
+  'html-report': 'run `agentloop report` to create a local HTML report.',
+  badge: 'run `agentloop badge` to create a local SVG evidence badge.',
+  'ci-summary': 'run `agentloop ci-summary --write` to create a local CI summary.',
+  'release-notes': 'run `agentloop release-notes --write` to draft local release notes.',
+};
+
+export function isArtifactInventoryType(value: string): value is ArtifactInventoryFilterType {
+  return artifactInventoryTypes.some((type) => type === value);
+}
 
 export class OutputPathError extends AgentLoopError {
   constructor(
@@ -472,7 +533,158 @@ function formatPathArtifact(label: string, artifact: ArtifactInventoryPathArtifa
   return artifact ? `- ${label}: ${artifact.path}` : `- ${label}: not found`;
 }
 
-export function renderArtifactInventoryMarkdown(inventory: ArtifactInventory) {
+function selectedArtifactTypes(options: ArtifactInventoryRenderOptions) {
+  return options.type ? [options.type] : [...artifactInventoryTypes];
+}
+
+function latestArtifactForType(
+  inventory: ArtifactInventory,
+  type: ArtifactInventoryFilterType,
+): LatestArtifactInventoryItem | null {
+  switch (type) {
+    case 'task':
+      return inventory.tasks.latest ? { type, ...inventory.tasks.latest } : null;
+    case 'verification':
+      return inventory.verificationReports.latest
+        ? { type, ...inventory.verificationReports.latest }
+        : null;
+    case 'handoff':
+      return inventory.handoffs.latest ? { type, ...inventory.handoffs.latest } : null;
+    case 'html-report':
+      return inventory.htmlReports.latest ? { type, ...inventory.htmlReports.latest } : null;
+    case 'badge':
+      return inventory.badges.latest ? { type, ...inventory.badges.latest } : null;
+    case 'ci-summary':
+      return inventory.ciSummaries.latest ? { type, ...inventory.ciSummaries.latest } : null;
+    case 'release-notes':
+      return inventory.releaseNotes.latest ? { type, ...inventory.releaseNotes.latest } : null;
+  }
+}
+
+function latestArtifacts(
+  inventory: ArtifactInventory,
+  options: ArtifactInventoryRenderOptions,
+): LatestArtifactInventoryItem[] {
+  return selectedArtifactTypes(options)
+    .map((type) => latestArtifactForType(inventory, type))
+    .filter((artifact): artifact is LatestArtifactInventoryItem => artifact !== null);
+}
+
+export function renderArtifactInventoryJson(
+  inventory: ArtifactInventory,
+  options: ArtifactInventoryRenderOptions = {},
+) {
+  if (options.latest) {
+    return { latest: latestArtifacts(inventory, options) };
+  }
+
+  if (options.type) {
+    return {
+      [artifactInventoryJsonKeys[options.type]]: inventory[artifactInventoryJsonKeys[options.type]],
+    };
+  }
+
+  return inventory;
+}
+
+function countForType(inventory: ArtifactInventory, type: ArtifactInventoryFilterType) {
+  return inventory[artifactInventoryJsonKeys[type]].count;
+}
+
+function formatTypeCountLine(inventory: ArtifactInventory, type: ArtifactInventoryFilterType) {
+  switch (type) {
+    case 'task':
+      return `- Tasks: ${inventory.tasks.count} total${formatTaskCounts(inventory.tasks.byStatus)}`;
+    case 'verification':
+      return `- Verification reports: ${inventory.verificationReports.count}`;
+    case 'handoff':
+      return `- Handoffs: ${inventory.handoffs.count}`;
+    case 'html-report':
+      return `- HTML reports: ${inventory.htmlReports.count}`;
+    case 'badge':
+      return `- Badges: ${inventory.badges.count}`;
+    case 'ci-summary':
+      return `- CI summaries: ${inventory.ciSummaries.count}`;
+    case 'release-notes':
+      return `- Release notes: ${inventory.releaseNotes.count}`;
+  }
+}
+
+function formatTypeLatestLine(inventory: ArtifactInventory, type: ArtifactInventoryFilterType) {
+  switch (type) {
+    case 'task':
+      return inventory.tasks.latest
+        ? `- Latest task: ${inventory.tasks.latest.title} (${inventory.tasks.latest.status}) - ${inventory.tasks.latest.path}`
+        : '- Latest task: not found';
+    case 'verification':
+      return inventory.verificationReports.latest
+        ? `- Latest verification: ${inventory.verificationReports.latest.overallStatus} - ${inventory.verificationReports.latest.path}`
+        : '- Latest verification: not found';
+    case 'handoff':
+      return formatNamedArtifact('Latest handoff', inventory.handoffs.latest);
+    case 'html-report':
+      return formatPathArtifact('Latest HTML report', inventory.htmlReports.latest);
+    case 'badge':
+      return formatPathArtifact('Latest badge', inventory.badges.latest);
+    case 'ci-summary':
+      return formatNamedArtifact('Latest CI summary', inventory.ciSummaries.latest);
+    case 'release-notes':
+      return formatNamedArtifact('Latest release notes', inventory.releaseNotes.latest);
+  }
+}
+
+function renderNoArtifactMatch(type?: ArtifactInventoryFilterType) {
+  const message = type
+    ? `No ${artifactInventoryDisplayLabels[type]} artifacts found.`
+    : 'No AgentLoopKit artifacts found.';
+  const nextStep = type
+    ? artifactInventoryNextSteps[type]
+    : 'run `agentloop create-task` to create a task contract, then `agentloop verify` when verification is ready.';
+
+  return `# AgentLoopKit Artifacts
+
+${message}
+
+Next step: ${nextStep}
+`;
+}
+
+function renderLatestArtifactInventoryMarkdown(
+  inventory: ArtifactInventory,
+  options: ArtifactInventoryRenderOptions,
+) {
+  const lines = selectedArtifactTypes(options)
+    .filter((type) => latestArtifactForType(inventory, type))
+    .map((type) => formatTypeLatestLine(inventory, type));
+
+  if (!lines.length) return renderNoArtifactMatch(options.type);
+
+  return `# AgentLoopKit Artifacts
+
+${lines.join('\n')}
+`;
+}
+
+function renderFilteredArtifactInventoryMarkdown(
+  inventory: ArtifactInventory,
+  type: ArtifactInventoryFilterType,
+) {
+  if (countForType(inventory, type) === 0) return renderNoArtifactMatch(type);
+
+  return `# AgentLoopKit Artifacts
+
+${formatTypeCountLine(inventory, type)}
+${formatTypeLatestLine(inventory, type)}
+`;
+}
+
+export function renderArtifactInventoryMarkdown(
+  inventory: ArtifactInventory,
+  options: ArtifactInventoryRenderOptions = {},
+) {
+  if (options.latest) return renderLatestArtifactInventoryMarkdown(inventory, options);
+  if (options.type) return renderFilteredArtifactInventoryMarkdown(inventory, options.type);
+
   return `# AgentLoopKit Artifacts
 
 - Tasks: ${inventory.tasks.count} total${formatTaskCounts(inventory.tasks.byStatus)}

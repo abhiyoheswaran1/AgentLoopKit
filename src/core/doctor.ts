@@ -14,10 +14,17 @@ export type DoctorCheck = {
   message: string;
 };
 
+export type DoctorNextAction = {
+  id: string;
+  command: string;
+  reason: string;
+};
+
 export type DoctorResult = {
   checks: DoctorCheck[];
   warnings: DoctorCheck[];
   serious: DoctorCheck[];
+  nextActions: DoctorNextAction[];
   git: {
     isRepository: boolean;
     root: string;
@@ -39,6 +46,10 @@ function check(name: string, status: DoctorCheck['status'], message: string): Do
   return { name, status, message };
 }
 
+function nextAction(id: string, command: string, reason: string): DoctorNextAction {
+  return { id, command, reason };
+}
+
 const RISK_CATEGORY_LABELS = {
   migrations: 'migrations',
   auth: 'auth',
@@ -53,6 +64,112 @@ function formatRiskFiles(files: string[]) {
   const preview = files.slice(0, 3).join(', ');
   const remaining = files.length - 3;
   return `${files.length} detected: ${preview}${remaining > 0 ? ` (+${remaining} more)` : ''}`;
+}
+
+function hasWarnOrFail(checks: DoctorCheck[], name: string) {
+  const item = checks.find((candidate) => candidate.name === name);
+  return item?.status === 'warn' || item?.status === 'fail';
+}
+
+function chooseDoctorNextActions(checks: DoctorCheck[]): DoctorNextAction[] {
+  const actions: DoctorNextAction[] = [];
+  const missingHarness =
+    ['AGENTS.md', 'AGENTLOOP.md', '.agentloop', 'Template manifest'].some((name) =>
+      hasWarnOrFail(checks, name),
+    ) || hasWarnOrFail(checks, 'AGENTS.md AgentLoopKit section');
+
+  if (hasWarnOrFail(checks, CONFIG_FILE)) {
+    actions.push(
+      nextAction(
+        'fix-config',
+        'fix agentloop.config.json',
+        'Doctor cannot validate the repo loop until the AgentLoopKit config is valid.',
+      ),
+    );
+  }
+
+  if (missingHarness) {
+    actions.push(
+      nextAction(
+        'refresh-harness',
+        'agentloop init',
+        'Refresh missing or stale AgentLoopKit harness metadata without overwriting existing files.',
+      ),
+    );
+  }
+
+  if (hasWarnOrFail(checks, 'Git repository')) {
+    actions.push(
+      nextAction(
+        'initialize-git',
+        'git init',
+        'AgentLoopKit evidence is easier to review when the project is inside a Git repository.',
+      ),
+    );
+  }
+
+  if (hasWarnOrFail(checks, 'Git target')) {
+    actions.push(
+      nextAction(
+        'check-git-root',
+        'agentloop doctor from the Git root',
+        'Confirm whether AgentLoopKit should live at the repository root or the current subdirectory.',
+      ),
+    );
+  }
+
+  if (hasWarnOrFail(checks, 'Working tree')) {
+    actions.push(
+      nextAction(
+        'review-working-tree',
+        'git status --short',
+        'Review uncommitted files before asking an agent to continue.',
+      ),
+    );
+  }
+
+  if (['test command', 'lint command', 'typecheck command', 'build command', 'Tests'].some((name) => hasWarnOrFail(checks, name))) {
+    actions.push(
+      nextAction(
+        'add-verification',
+        'add package scripts or configure verification.commands',
+        'AgentLoopKit needs project-specific verification commands before agents can prove completion.',
+      ),
+    );
+  }
+
+  if (hasWarnOrFail(checks, 'Monorepo')) {
+    actions.push(
+      nextAction(
+        'scope-monorepo-verification',
+        'add workspace-specific verification commands to the task contract',
+        'Root checks may miss package-level failures in monorepos.',
+      ),
+    );
+  }
+
+  if (hasWarnOrFail(checks, 'Potential risk files')) {
+    actions.push(
+      nextAction(
+        'review-risk-files',
+        'review risk files before starting autonomous work',
+        'Risk files were detected; protect sensitive areas in the task contract before editing.',
+      ),
+    );
+  }
+
+  return actions;
+}
+
+function renderNextActions(nextActions: DoctorNextAction[]) {
+  if (!nextActions.length) {
+    return '## Next Steps\n\nNo doctor follow-up required. Create a task with `agentloop create-task` when you are ready to start work.\n';
+  }
+
+  return `## Next Steps
+
+${nextActions.map((item) => `- Run \`${item.command}\`: ${item.reason}`).join('\n')}
+`;
 }
 
 async function resolveComparablePath(filePath: string) {
@@ -238,6 +355,7 @@ export async function runDoctor(options: { cwd: string }): Promise<DoctorResult>
 
   const warnings = checks.filter((item) => item.status === 'warn');
   const serious = checks.filter((item) => item.status === 'fail');
+  const nextActions = chooseDoctorNextActions(checks);
   const markdown = `# AgentLoopKit Doctor
 
 ${checks
@@ -246,7 +364,9 @@ ${checks
     return `- ${icon} ${item.name}: ${item.message}`;
   })
   .join('\n')}
+
+${renderNextActions(nextActions)}
 `;
 
-  return { checks, warnings, serious, git, markdown };
+  return { checks, warnings, serious, nextActions, git, markdown };
 }

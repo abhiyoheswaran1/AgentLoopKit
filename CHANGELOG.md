@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Added `agentloop release-check`, a read-only local release readiness check for package metadata, changelog entries, release scripts, git state, verification evidence, handoff evidence, generated release notes, and npm package-safety basics.
+- Added `agentloop artifacts --type <type>` and `agentloop artifacts --latest` for filtered local evidence inventories without reading artifact file contents.
+- Added actionable `doctor` next steps in human and JSON output for stale harness metadata, missing verification commands, Git context issues, monorepo warnings, dirty working trees, and risk-file categories.
+- Added a CLI docs drift test so the public command surface stays aligned across CLI help, README, CLI reference, and shell completions.
+- Changed the composite GitHub Action to support `install-mode: npm` and `install-mode: local`, install in the configured working directory, and avoid package-lock rewrites in npm mode.
+- Added an end-to-end workflow example that walks through init, doctor, task creation, verification, handoff, gates, artifact inventory, and release readiness.
 - Added `agentloop artifacts` and `agentloop artifacts --json`, a read-only local evidence inventory for task counts, latest verification report, latest handoff, HTML reports, badges, CI summaries, and release notes.
 - Added a cross-platform CLI smoke workflow for Ubuntu, macOS, and Windows that builds the package and exercises the built CLI in a temporary repository.
 - Simplified the npm-facing README and moved detailed command behavior into `docs/cli-reference.md`.

@@ -36,7 +36,15 @@ describe('distribution artifacts', () => {
 
     expect(action).toContain('using: composite');
     expect(action).toContain('agentloopkit-version');
+    expect(action).toContain('install-mode');
     expect(action).toContain("default: 'latest'");
+    expect(action).toContain("default: 'npm'");
+    expect(action).toContain('if [ "$AGENTLOOPKIT_INSTALL_MODE" = "npm" ]');
+    expect(action).toContain('elif [ "$AGENTLOOPKIT_INSTALL_MODE" = "local" ]');
+    expect(action).toContain('else');
+    expect(action).toContain('Unsupported install-mode');
+    expect(action).toContain('npm install --no-save --package-lock=false "agentloopkit@${AGENTLOOPKIT_VERSION}"');
+    expect(action.match(/working-directory: \$\{\{ inputs\.working-directory \}\}/g)).toHaveLength(2);
     expect(action).not.toMatch(/default: ['"]\d+\.\d+\.\d+['"]/);
     expect(action).toContain('npx --no-install agentloop ${{ inputs.command }}');
     expect(action).not.toContain('upload-artifact');
@@ -46,8 +54,20 @@ describe('distribution artifacts', () => {
     const action = await readFile('action.yml', 'utf8');
 
     expect(action).toContain('AGENTLOOPKIT_VERSION: ${{ inputs.agentloopkit-version }}');
-    expect(action).toContain('npm install --no-save "agentloopkit@${AGENTLOOPKIT_VERSION}"');
+    expect(action).toContain('AGENTLOOPKIT_INSTALL_MODE: ${{ inputs.install-mode }}');
+    expect(action).toContain('npm install --no-save --package-lock=false "agentloopkit@${AGENTLOOPKIT_VERSION}"');
     expect(action).not.toContain('agentloopkit@${{ inputs.agentloopkit-version }}');
+  });
+
+  test('GitHub Action docs explain install modes and keep local mode pinned-friendly', async () => {
+    const docs = await readFile('docs/github-actions.md', 'utf8');
+    const example = await readFile('examples/github-actions/README.md', 'utf8');
+
+    expect(docs).toContain('install-mode: npm');
+    expect(docs).toContain('install-mode: local');
+    expect(docs).toContain('Use `install-mode: local` only when the repo already installs AgentLoopKit as a dev dependency.');
+    expect(example).toContain('install-mode: npm');
+    expect(example).toContain('install-mode: local');
   });
 
   test('GitHub Action docs warn against untrusted command input', async () => {

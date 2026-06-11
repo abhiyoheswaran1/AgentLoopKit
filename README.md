@@ -123,6 +123,7 @@ agentloopkit init
 | `agentloop badge`                | Write a local SVG evidence badge                            |
 | `agentloop ci-summary`           | Summarize CI context and existing AgentLoop evidence        |
 | `agentloop release-notes`        | Draft local release notes from repo evidence                |
+| `agentloop release-check`        | Check local release readiness without publishing            |
 | `agentloop npm-status`           | Check npm registry status without publishing                |
 | `agentloop mcp-server`           | Start the read-only MCP stdio server                        |
 | `agentloop policy ...`           | Read and compare local safety policies                      |
@@ -185,6 +186,7 @@ Env files are reported by path only. Verification commands run only when you exp
 
 See `examples/` for sample generated harnesses and CI recipes:
 
+- [End-to-end workflow](examples/end-to-end/README.md)
 - [Next.js app](examples/nextjs-app/README.md)
 - [Node API](examples/node-api/README.md)
 - [Python service](examples/python-service/README.md)
