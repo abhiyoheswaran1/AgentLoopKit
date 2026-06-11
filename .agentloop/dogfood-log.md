@@ -6453,3 +6453,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The shared inline-code formatter kept the implementation mechanical and consistent.
 - Improve:
   - Continue scanning non-write human output in lower-traffic commands before the 0.28.0 batch release.
+
+## 2026-06-11: npm Status Registry Error Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-npm-status-registry-error-markdown.md`
+- Trigger:
+  - The continued roadmap hardening pass found that `agentloop npm-status` still rendered npm registry stderr directly into Markdown.
+  - Backticks or newlines in npm output could corrupt reviewer-facing registry status reports even though package and version labels were already safe.
+- Implementation:
+  - Added a regression using a fake npm failure with a backtick and newline in stderr.
+  - Rendered registry errors as one Markdown-safe inline-code value in human Markdown output.
+  - Preserved the exact `source.error` string in structured JSON output.
+- Verification run:
+  - Red focused test failed first in `tests/npm-status.test.ts` because the registry error was raw Markdown.
+  - Focused suite passed after implementation:
+    - `npm test -- tests/npm-status.test.ts`
+  - Broader local checks passed:
+    - `git diff --check`
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run check:links`
+    - `npx --yes projscan doctor --format markdown`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npm test`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-11-20-36-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-20-44-pr-summary.md`.
+- What worked well:
+  - The existing shared inline-code helper made the presentation fix small.
+  - Keeping JSON exact while normalizing human Markdown keeps both automation and reviewer readability intact.
+- Improve:
+  - Continue scanning generated verification report task-context fields, which still include some raw task metadata.

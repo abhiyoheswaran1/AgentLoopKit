@@ -2,6 +2,7 @@ import path from 'node:path';
 import { readFile, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
+import { inlineCode } from '../src/core/markdown-format.js';
 import { checkNpmStatus, parseNpmViewJson } from '../src/core/npm-status.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -90,6 +91,27 @@ describe('npm status', () => {
     expect(result.markdown).toContain('- npm latest: ``1.0.0`local``');
     expect(result.markdown).toContain('``0.9.0`old``');
     expect(result.markdown).toContain('``1.0.0`local``');
+  });
+
+  test('formats npm registry errors as safe inline Markdown without changing JSON data', async () => {
+    const dir = await createPackageFixture();
+    const registryError = 'npm error 404 package `agentloopkit`\nsecond line';
+
+    const result = await checkNpmStatus({
+      cwd: dir,
+      npmView: async () => ({
+        exitCode: 1,
+        stdout: '',
+        stderr: registryError,
+      }),
+    });
+
+    expect(result.status).toBe('unknown');
+    expect(result.source.error).toBe(registryError);
+    expect(result.markdown).toContain(
+      `- Registry error: ${inlineCode('npm error 404 package `agentloopkit` second line')}`,
+    );
+    expect(result.markdown).not.toContain(`- Registry error: ${registryError}`);
   });
 
   test('can check the AgentLoopKit package from a different current package', async () => {

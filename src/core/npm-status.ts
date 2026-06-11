@@ -169,9 +169,15 @@ function renderVersions(versions: string[]) {
     : 'not available';
 }
 
+function renderRegistryError(error: string) {
+  return inlineCode(error.replace(/\s+/g, ' ').trim());
+}
+
 function renderMarkdown(result: Omit<NpmStatusResult, 'markdown'>) {
   const latest = result.registry.latest ? inlineCode(result.registry.latest) : 'not available';
-  const errorLine = result.source.error ? `\n- Registry error: ${result.source.error}` : '';
+  const errorLine = result.source.error
+    ? `\n- Registry error: ${renderRegistryError(result.source.error)}`
+    : '';
 
   return `# npm Status
 

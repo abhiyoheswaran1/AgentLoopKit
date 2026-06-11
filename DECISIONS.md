@@ -293,3 +293,7 @@ Release notes combine package metadata, git range labels, branch names, commit I
 ## 2026-06-11: CLI Write Confirmations Use Safe Inline Formatting
 
 Write confirmations are often pasted into handoffs, CI logs, and chat transcripts. Commands that create local artifacts now render generated paths, statuses, sources, messages, and counts with the shared inline-code formatter. This applies only to human output for task creation, verification, handoffs, HTML reports, badges, CI summaries, release notes, and agent installation. JSON payloads, output paths, artifact contents, write behavior, and exit codes stay unchanged.
+
+## 2026-06-11: npm Status Errors Use Safe Markdown Presentation
+
+`agentloop npm-status` can include npm registry stderr when the live registry check fails. That text is external command output, so Markdown reports now collapse whitespace and render the registry error as a safe inline-code value. The structured `source.error` value remains exact in JSON output so automation can inspect the original npm error without presentation changes.
