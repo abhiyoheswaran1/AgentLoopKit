@@ -105,11 +105,14 @@ agentloop verify --json
 agentloop verify --task .agentloop/tasks/<task-file>.md
 agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands
 agentloop verify --timeout-ms 120000
+agentloop verify --write-run
 ```
 
 `verify` reads `agentloop.config.json`, runs configured commands, captures output excerpts, and writes a Markdown report under `.agentloop/reports/`.
 
 Use `--task` to include task context in the report. Use `--task-commands` when you also want to run verification commands listed inside the task contract.
+
+Use `--write-run` when you want verification to also create a local run ledger entry under `.agentloop/runs/`. The run records the verification report path, task reference when available, current changed files, and overall verification status.
 
 Failed reports include a short failure summary with each failed command, exit code, timeout state, and useful final output lines. If no commands are configured, AgentLoopKit writes a report saying nothing was verified.
 
@@ -149,7 +152,7 @@ agentloop intent src/auth/callback.ts
 agentloop intent src/auth/callback.ts --json
 ```
 
-`ship` records a local run folder under `.agentloop/runs/`. Each run stores metadata, score JSON, changed files JSON, diff stats, the ship report, and the generated PR summary when available.
+`ship` records a local run folder under `.agentloop/runs/` automatically. `verify --write-run`, `summarize --write-run`, and `handoff --write-run` can also write run records when you want narrower evidence history. Runs store metadata, changed files JSON, and command-specific artifacts such as score JSON, verification reports, diff stats, ship reports, or PR summaries.
 
 `intent <file>` reads the local run ledger and shows which previous AgentLoopKit runs changed that file. It uses local ledger metadata only.
 
@@ -186,13 +189,17 @@ See [check-gates.md](check-gates.md).
 agentloop summarize
 agentloop summarize --json
 agentloop summarize --write
+agentloop summarize --write-run
 agentloop handoff
 agentloop handoff --json
+agentloop handoff --write-run
 ```
 
 `summarize` previews a deterministic reviewer summary. `handoff` writes that summary to `.agentloop/handoffs/`.
 
 The summary reads Git status, Git diff stats, active task or newest open task, current verification report, and config settings. It groups changed files into review areas and adds review-focus hints from file paths only. It does not call an LLM.
+
+Use `--write-run` when you want a summary or handoff to also create a local run ledger entry under `.agentloop/runs/`. For `summarize`, this does not write a handoff file unless you also pass `--write`; for `handoff`, the handoff file is written by default.
 
 If the latest verification report is older than the task, `summarize` and `handoff` leave verification as missing instead of showing stale passing evidence.
 

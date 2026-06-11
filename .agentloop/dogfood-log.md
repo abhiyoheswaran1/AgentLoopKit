@@ -2,6 +2,39 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Opt-In Run Ledger Records For Verify And Handoff
+
+- Task contract: `.agentloop/tasks/2026-06-12-add-opt-in-run-ledger-entries-for-verify-and-handoff.md`
+- Trigger:
+  - `agentloop ship` recorded local run history, but narrower `verify` and `handoff` flows could not create ledger entries on their own.
+  - The acceptance-layer direction works better when evidence can be traced at each stage, not only at final ship time.
+- Product change:
+  - Added `agentloop verify --write-run`.
+  - Added `agentloop summarize --write-run` and `agentloop handoff --write-run`.
+  - Extended run records so `verify`, `handoff`, and `ship` can appear together in `agentloop runs`, `show-run`, and `intent`.
+  - Hardened run-id directory handling so symlinked run folders cannot redirect ledger writes outside `.agentloop/runs/`.
+  - Added collision-safe numeric suffixes for same-minute same-command run records.
+  - Fixed `prepare-pr` section parsing after dogfooding showed only the first acceptance-criteria bullet in the generated PR body.
+- Verification:
+  - Red focused run: `npm test -- tests/runs.test.ts` failed before the CLI flags existed.
+  - Red symlink regression: `npm test -- tests/runs.test.ts -t "rejects run directories"` failed before the path guard.
+  - Red same-minute collision regression: `npm test -- tests/runs.test.ts -t "keeps same-minute"` failed before the allocator change.
+  - Red prepare-pr regression: `npm test -- tests/prepare-pr.test.ts` failed before all acceptance-criteria bullets were preserved.
+  - Green focused run: `npm test -- tests/prepare-pr.test.ts tests/runs.test.ts` passed with 6 tests.
+  - Final focused run `npm test -- tests/runs.test.ts tests/cli-docs-drift.test.ts` passed with 6 tests.
+  - Final full suite `npm test` passed with 47 test files and 395 tests.
+  - `npm run typecheck`, `npm run lint`, `npm run build`, `npm run check:links`, `node scripts/smoke-cli.mjs`, and `npm run smoke:release` passed.
+  - Production dependency audit `npx pnpm@10.12.1 audit --prod` reported no known vulnerabilities.
+  - ProjScan `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - Final self-verify `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-12-add-opt-in-run-ledger-entries-for-verify-and-handoff.md --task-commands --timeout-ms 300000 --write-run --json` passed and wrote `.agentloop/reports/2026-06-12-00-45-verification-report.md` plus run `.agentloop/runs/2026-06-12-00-51-verify/`.
+  - Final ship report scored 92/100 and wrote `.agentloop/reports/2026-06-12-00-51-ship-report.md` plus run `.agentloop/runs/2026-06-12-00-51-ship/`.
+  - Final PR description wrote `.agentloop/handoffs/2026-06-12-00-51-pr-description.md`; final handoff summary is `.agentloop/handoffs/2026-06-12-00-51-pr-summary.md`.
+- Worked well:
+  - The feature stayed opt-in, preserving default command behavior.
+  - The same local ledger is now useful before and after `ship`.
+- Improve:
+  - Consider a future retention or pruning command only if `.agentloop/runs/` becomes noisy in real projects.
+
 ## 2026-06-11: Harden Doctor Markdown Output
 
 - Task contract: `.agentloop/tasks/2026-06-11-harden-doctor-markdown-output.md`

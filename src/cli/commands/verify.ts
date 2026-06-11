@@ -4,7 +4,13 @@ import {
   OutputPathError,
   resolveExplicitArtifactPath,
 } from '../../core/artifacts.js';
+import { AgentLoopConfig } from '../../core/config.js';
+import { formatTimestamp } from '../../core/dates.js';
+import { getCurrentTaskPath } from '../../core/evidence.js';
+import { getGitStatus, parseGitStatus } from '../../core/git.js';
 import { inlineCode } from '../../core/markdown-format.js';
+import { writeVerificationRun } from '../../core/runs.js';
+import { readTaskMetadata } from '../../core/task-state.js';
 import { runVerification } from '../../core/verification.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
@@ -42,6 +48,28 @@ function printArtifactPathJsonError(error: ArtifactPathError) {
   process.exitCode = 1;
 }
 
+async function resolveTaskForRun(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  taskPath?: string;
+}) {
+  const taskPath = options.taskPath
+    ? await resolveExplicitArtifactPath({
+        cwd: options.cwd,
+        artifactType: 'task',
+        requestedPath: options.taskPath,
+        expectedDir: options.config.paths.tasksDir,
+      })
+    : await getCurrentTaskPath({ cwd: options.cwd, config: options.config });
+
+  if (!taskPath) return null;
+  try {
+    return await readTaskMetadata(options.cwd, taskPath);
+  } catch {
+    return null;
+  }
+}
+
 export function verifyCommand() {
   return new Command('verify')
     .description('Run configured verification commands and write a report')
@@ -54,6 +82,7 @@ export function verifyCommand() {
     .option('--no-typecheck', 'skip typecheck command')
     .option('--command <command>', 'custom command to run', collect, [])
     .option('--timeout-ms <ms>', 'per-command timeout in milliseconds')
+    .option('--write-run', 'write a local run ledger entry under .agentloop/runs')
     .action(async (options: Record<string, unknown>) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json === true);
       if (!workspace) return;
@@ -97,13 +126,34 @@ export function verifyCommand() {
         }
         throw error;
       }
-      if (options.json) console.log(JSON.stringify(result, null, 2));
-      else
+      let run: Awaited<ReturnType<typeof writeVerificationRun>> | undefined;
+      if (options.writeRun === true) {
+        const changedFiles = await parseGitStatus(await getGitStatus(workspace.cwd));
+        run = await writeVerificationRun({
+          cwd: workspace.cwd,
+          timestamp: formatTimestamp(),
+          task: await resolveTaskForRun({
+            cwd: workspace.cwd,
+            config: workspace.config,
+            taskPath,
+          }),
+          verificationReportPath: result.reportPath,
+          overallStatus: result.overallStatus,
+          changedFiles,
+          markdown: result.markdown,
+        });
+      }
+
+      const output = run ? { ...result, run } : result;
+      if (options.json) console.log(JSON.stringify(output, null, 2));
+      else {
         console.log(
           `Verification report written: ${inlineCode(result.reportPath)}\nOverall status: ${inlineCode(
             result.overallStatus,
           )}`,
         );
+        if (run) console.log(`Run written: ${inlineCode(run.path)}`);
+      }
       if (result.overallStatus === 'fail') process.exitCode = 1;
     });
 }

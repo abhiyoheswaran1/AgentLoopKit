@@ -129,7 +129,7 @@ agentloopkit init
 | `agentloop summarize`            | Preview a deterministic reviewer summary                     |
 | `agentloop handoff`              | Write a reviewer handoff summary                             |
 | `agentloop check-gates`          | Check review evidence without running tests                  |
-| `agentloop runs`                 | List local ship/run ledger entries                           |
+| `agentloop runs`                 | List local ship, verify, and handoff run entries             |
 | `agentloop show-run <id>`        | Show one local run ledger entry                              |
 | `agentloop intent <file>`        | Show which runs touched a file and why                       |
 | `agentloop maintainer-check`     | Check whether an AI-assisted PR is reviewable                |
@@ -181,6 +181,8 @@ AgentLoopKit is intentionally boring:
 Env files are reported by path only. Verification commands run only when you explicitly run `agentloop verify`.
 
 `agentloop ship` reuses current verification evidence by default. Pass `--run-verify` when you want it to run verification as part of the readiness flow.
+
+For narrower evidence history, `agentloop verify --write-run` and `agentloop handoff --write-run` can add their own local run records without changing the default command behavior.
 
 ## More Docs
 

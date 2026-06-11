@@ -270,6 +270,7 @@ async function smokeCli({ keep = false } = {}) {
             '--no-build',
             '--command',
             'node --version',
+            '--write-run',
             '--json',
           ],
           { cwd: smokeRepo },
@@ -280,12 +281,13 @@ async function smokeCli({ keep = false } = {}) {
     assert(verification.overallStatus === 'pass', 'verify did not report pass.');
     assert(verification.reportPath, 'verify JSON did not include reportPath.');
     assert(await pathExists(verification.reportPath), 'verify report was not written.');
+    assert(verification.run?.id, 'verify JSON did not include run.id when --write-run was used.');
     console.log('Verify smoke passed.');
 
     const handoff = parseJson(
       (
         await runAgentLoop(
-          ['handoff', '--task', taskPath, '--report', verification.reportPath, '--json'],
+          ['handoff', '--task', taskPath, '--report', verification.reportPath, '--write-run', '--json'],
           { cwd: smokeRepo },
         )
       ).stdout,
@@ -293,6 +295,7 @@ async function smokeCli({ keep = false } = {}) {
     );
     assert(handoff.outPath, 'handoff JSON did not include outPath.');
     assert(await pathExists(handoff.outPath), 'handoff summary was not written.');
+    assert(handoff.run?.id, 'handoff JSON did not include run.id when --write-run was used.');
     console.log('Handoff smoke passed.');
 
     const gates = parseJson(
@@ -312,8 +315,11 @@ async function smokeCli({ keep = false } = {}) {
 
     const runs = parseJson((await runAgentLoop(['runs', '--json'], { cwd: smokeRepo })).stdout, 'runs');
     assert(
-      Array.isArray(runs.runs) && runs.runs.some((run) => run.id === ship.run.id),
-      'runs JSON did not include the ship run.',
+      Array.isArray(runs.runs) &&
+        runs.runs.some((run) => run.id === verification.run.id && run.command === 'verify') &&
+        runs.runs.some((run) => run.id === handoff.run.id && run.command === 'handoff') &&
+        runs.runs.some((run) => run.id === ship.run.id && run.command === 'ship'),
+      'runs JSON did not include verify, handoff, and ship runs.',
     );
 
     const shownRun = parseJson(

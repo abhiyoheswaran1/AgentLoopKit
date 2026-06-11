@@ -42,6 +42,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - PR description generation with `agentloop prepare-pr`
 - GitHub-comment Markdown output without token handling inside the CLI
 - local run ledger under `.agentloop/runs/`
+- opt-in run ledger records for `verify`, `summarize`, and `handoff` with `--write-run`
 - `agentloop runs`, `agentloop show-run`, and `agentloop intent <file>`
 - read-only maintainer reviewability check with `agentloop maintainer-check`
 - agent instruction installation, including `install-agent all`

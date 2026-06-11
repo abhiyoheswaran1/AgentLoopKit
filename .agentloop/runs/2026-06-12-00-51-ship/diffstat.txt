@@ -1,0 +1,17 @@
+ .agentloop/backlog.md         |   1 +
+ .agentloop/dogfood-log.md     |  32 ++++++++++
+ CHANGELOG.md                  |   4 ++
+ FINAL_HANDOFF.md              |   1 +
+ README.md                     |   4 +-
+ docs/cli-reference.md         |   9 ++-
+ examples/end-to-end/README.md |   4 ++
+ scripts/smoke-cli.mjs         |  12 +++-
+ src/cli/commands/runs.ts      |  15 +++--
+ src/cli/commands/summarize.ts |  22 ++++++-
+ src/cli/commands/verify.ts    |  54 +++++++++++++++-
+ src/core/pr-summary.ts        |   2 +-
+ src/core/prepare-pr.ts        |  15 ++++-
+ src/core/runs.ts              | 142 ++++++++++++++++++++++++++++++++++++++----
+ tests/prepare-pr.test.ts      |   5 ++
+ tests/runs.test.ts            | 141 ++++++++++++++++++++++++++++++++++++++++-
+ 16 files changed, 435 insertions(+), 28 deletions(-)

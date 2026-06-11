@@ -1,8 +1,11 @@
 import { Command } from 'commander';
 import { ArtifactPathError, OutputPathError } from '../../core/artifacts.js';
+import { formatTimestamp } from '../../core/dates.js';
 import { AgentLoopError } from '../../core/errors.js';
 import { inlineCode } from '../../core/markdown-format.js';
 import { summarizeRepository } from '../../core/pr-summary.js';
+import { writeHandoffRun } from '../../core/runs.js';
+import { readTaskMetadata } from '../../core/task-state.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 const SUPPORTED_OUTPUT_FORMATS = ['markdown', 'json'] as const;
@@ -97,11 +100,26 @@ async function runSummaryCommand(options: Record<string, unknown>, defaultWrite:
     }
     throw error;
   }
+  let run: Awaited<ReturnType<typeof writeHandoffRun>> | undefined;
+  if (options.writeRun === true) {
+    run = await writeHandoffRun({
+      cwd: workspace.cwd,
+      timestamp: formatTimestamp(),
+      task: result.taskPath ? await readTaskMetadata(workspace.cwd, result.taskPath) : null,
+      verificationReportPath: result.reportPath,
+      handoffPath: writeOption ? result.outPath : undefined,
+      changedFiles: result.changedFiles,
+      diffStat: result.diffStat,
+      markdown: result.markdown,
+    });
+  }
+  const output = run ? { ...result, run } : result;
   if (json) {
-    console.log(JSON.stringify(result, null, 2));
+    console.log(JSON.stringify(output, null, 2));
   } else {
     console.log(result.markdown);
     if (writeOption) console.log(`\nSummary written: ${inlineCode(result.outPath)}`);
+    if (run) console.log(`Run written: ${inlineCode(run.path)}`);
   }
 }
 
@@ -113,6 +131,7 @@ export function summarizeCommand() {
     .option('--verification <path>', 'alias for --report')
     .option('--format <format>', 'markdown or json', 'markdown')
     .option('--write', 'write summary to .agentloop/handoffs')
+    .option('--write-run', 'write a local run ledger entry under .agentloop/runs')
     .option('--json', 'print JSON output')
     .action((options: Record<string, unknown>) => runSummaryCommand(options, false));
 }
@@ -125,6 +144,7 @@ export function handoffCommand() {
     .option('--verification <path>', 'alias for --report')
     .option('--format <format>', 'markdown or json', 'markdown')
     .option('--no-write', 'print handoff without writing a file')
+    .option('--write-run', 'write a local run ledger entry under .agentloop/runs')
     .option('--json', 'print JSON output')
     .action((options: Record<string, unknown>) => runSummaryCommand(options, true));
 }

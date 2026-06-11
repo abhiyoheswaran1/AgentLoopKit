@@ -5,8 +5,12 @@
 - Added `agentloop ship`, a local review-readiness flow that writes a ship report, records a run ledger entry, and scores task clarity, scope control, verification evidence, evidence freshness, gates, handoff readiness, and risk flags without claiming to measure code quality.
 - Added `agentloop prepare-pr` to generate PR title/body text and GitHub-comment Markdown from local AgentLoopKit evidence without reading GitHub tokens or posting comments.
 - Added `.agentloop/runs/`, `agentloop runs`, `agentloop show-run`, and `agentloop intent <file>` for local run evidence and file-intent lookup.
+- Added `agentloop verify --write-run`, `agentloop summarize --write-run`, and `agentloop handoff --write-run` so narrower evidence flows can opt into local run ledger records.
 - Added `agentloop maintainer-check`, a read-only maintainer reviewability check for AI-assisted PRs.
 - Changed `agentloop policy list/status` human output to render policy titles, statuses, and paths with Markdown-safe inline-code delimiters while keeping JSON output and raw `policy show` content unchanged.
+- Changed run ledger reads and writes to reject run-id directories that resolve outside `.agentloop/runs/` through symlinks.
+- Changed run ledger writes to keep same-minute same-command records by appending collision-safe numeric suffixes instead of overwriting the existing run.
+- Fixed `agentloop prepare-pr` so PR bodies include every acceptance-criteria bullet from the task contract instead of only the first line.
 - Changed release-note missing-ref fallback copy to render requested Git refs with Markdown-safe inline-code delimiters while preserving raw fallback reason data.
 - Changed release notes to render commit subjects with Markdown-safe inline-code delimiters while preserving raw commit subjects in JSON output.
 - Changed PR summaries and handoffs to render non-empty diff stats inside Markdown-safe text fences while keeping the no-diff fallback readable.

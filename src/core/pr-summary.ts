@@ -283,5 +283,5 @@ export async function summarizeRepository(options: {
       })
     : path.join(options.cwd, defaultOutPath);
   if (options.write) await writeTextFile(outPath, summary.markdown);
-  return { ...summary, outPath, changedFiles };
+  return { ...summary, outPath, changedFiles, diffStat, taskPath, reportPath };
 }

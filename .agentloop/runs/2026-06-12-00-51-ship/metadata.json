@@ -1,0 +1,15 @@
+{
+  "id": "2026-06-12-00-51-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-00-51",
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-opt-in-run-ledger-entries-for-verify-and-handoff.md",
+    "title": "Add opt-in run ledger entries for verify and handoff",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-00-45-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-00-51-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-00-51-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 28
+}

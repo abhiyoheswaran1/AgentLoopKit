@@ -61,6 +61,8 @@ Users land on the intended destination after a successful login.
 
 ## Acceptance Criteria
 - Password-reset login redirects to the requested page.
+- Existing session login still redirects to the dashboard.
+- Reviewer can see every acceptance criterion in the PR body.
 
 ## Verification Commands
 - npm test -- auth
@@ -105,6 +107,9 @@ describe('prepare-pr command', () => {
     expect(output.body).toContain('## Changed Files');
     expect(output.body).toContain('src/auth/callback.ts');
     expect(output.body).toContain('## Verification Evidence');
+    expect(output.body).toContain('Password-reset login redirects to the requested page.');
+    expect(output.body).toContain('Existing session login still redirects to the dashboard.');
+    expect(output.body).toContain('Reviewer can see every acceptance criterion in the PR body.');
     expect(output.body).toContain('Overall status: pass');
     expect(output.body).toContain('## Risks');
     expect(output.body).toContain('Auth flow touched; review redirect edge cases.');

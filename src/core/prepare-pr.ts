@@ -19,9 +19,18 @@ export type PreparePrResult = {
 };
 
 function sectionContent(markdown: string, heading: string) {
-  const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const match = markdown.match(new RegExp(`^## ${escapedHeading}\\s*\\n([\\s\\S]*?)(?=^## |$)`, 'm'));
-  return match?.[1]?.trim() ?? '';
+  const lines = markdown.split(/\r?\n/);
+  const headingLine = `## ${heading}`;
+  const startIndex = lines.findIndex((line) => line.trim() === headingLine);
+  if (startIndex === -1) return '';
+
+  const sectionLines: string[] = [];
+  for (const line of lines.slice(startIndex + 1)) {
+    if (/^##\s+/.test(line.trim())) break;
+    sectionLines.push(line);
+  }
+
+  return sectionLines.join('\n').trim();
 }
 
 function listItems(section: string) {

@@ -5,9 +5,11 @@ import { GitFileStatus } from './git.js';
 import { isInsidePath, normalizeExistingAncestor, pathExists, writeTextFile } from './file-system.js';
 import { ReviewReadinessResult } from './readiness-score.js';
 
+export type RunCommand = 'ship' | 'verify' | 'handoff';
+
 export type RunMetadata = {
   id: string;
-  command: 'ship';
+  command: RunCommand;
   createdAt: string;
   task: {
     path: string;
@@ -15,20 +17,30 @@ export type RunMetadata = {
     status: string;
   } | null;
   verificationReportPath?: string;
-  shipReportPath: string;
+  shipReportPath?: string;
   handoffPath?: string;
-  score: number;
+  score?: number;
+  overallStatus?: string;
   changedFileCount: number;
 };
 
 export type RunSummary = Pick<
   RunMetadata,
-  'id' | 'command' | 'createdAt' | 'task' | 'score' | 'changedFileCount' | 'shipReportPath'
+  | 'id'
+  | 'command'
+  | 'createdAt'
+  | 'task'
+  | 'score'
+  | 'overallStatus'
+  | 'changedFileCount'
+  | 'verificationReportPath'
+  | 'shipReportPath'
+  | 'handoffPath'
 >;
 
 export type RunRecord = {
   metadata: RunMetadata;
-  score: ReviewReadinessResult;
+  score: ReviewReadinessResult | null;
   changedFiles: GitFileStatus[];
   diffStat: string;
 };
@@ -56,7 +68,27 @@ function validateRunId(id: string) {
 
 function runDir(cwd: string, id: string) {
   validateRunId(id);
-  return path.join(runsRoot(cwd), id);
+  const root = runsRoot(cwd);
+  const directory = path.join(root, id);
+  const normalizedRoot = normalizeExistingAncestor(root);
+  const normalizedDirectory = normalizeExistingAncestor(directory);
+  if (!isInsidePath(normalizedRoot, normalizedDirectory)) {
+    throw new AgentLoopError(
+      'Run directory must stay inside the run ledger root.',
+      'RUN_PATH_INVALID',
+    );
+  }
+  return directory;
+}
+
+async function allocateRunDirectory(cwd: string, timestamp: string, command: RunCommand) {
+  const baseId = `${timestamp}-${command}`;
+  for (let index = 1; index <= 1000; index += 1) {
+    const id = index === 1 ? baseId : `${baseId}-${index}`;
+    const directory = runDir(cwd, id);
+    if (!(await pathExists(directory))) return { id, directory };
+  }
+  throw new AgentLoopError(`Unable to allocate a run id for ${baseId}.`, 'RUN_ID_COLLISION');
 }
 
 function toSummary(metadata: RunMetadata): RunSummary {
@@ -66,8 +98,11 @@ function toSummary(metadata: RunMetadata): RunSummary {
     createdAt: metadata.createdAt,
     task: metadata.task,
     score: metadata.score,
+    overallStatus: metadata.overallStatus,
     changedFileCount: metadata.changedFileCount,
+    verificationReportPath: metadata.verificationReportPath,
     shipReportPath: metadata.shipReportPath,
+    handoffPath: metadata.handoffPath,
   };
 }
 
@@ -87,8 +122,7 @@ export async function writeShipRun(options: {
   diffStat: string;
   shipMarkdown: string;
 }) {
-  const id = `${options.timestamp}-ship`;
-  const directory = runDir(options.cwd, id);
+  const { id, directory } = await allocateRunDirectory(options.cwd, options.timestamp, 'ship');
   await mkdir(directory, { recursive: true });
 
   const metadata: RunMetadata = {
@@ -125,6 +159,82 @@ export async function writeShipRun(options: {
   };
 }
 
+export async function writeVerificationRun(options: {
+  cwd: string;
+  timestamp: string;
+  task: RunMetadata['task'];
+  verificationReportPath: string;
+  overallStatus: string;
+  changedFiles: GitFileStatus[];
+  markdown: string;
+}) {
+  const { id, directory } = await allocateRunDirectory(options.cwd, options.timestamp, 'verify');
+  await mkdir(directory, { recursive: true });
+
+  const metadata: RunMetadata = {
+    id,
+    command: 'verify',
+    createdAt: options.timestamp,
+    task: options.task,
+    verificationReportPath: options.verificationReportPath,
+    overallStatus: options.overallStatus,
+    changedFileCount: options.changedFiles.length,
+  };
+
+  await writeTextFile(path.join(directory, 'metadata.json'), `${JSON.stringify(metadata, null, 2)}\n`);
+  await writeTextFile(
+    path.join(directory, 'changed-files.json'),
+    `${JSON.stringify(options.changedFiles, null, 2)}\n`,
+  );
+  await writeTextFile(path.join(directory, 'verification-report.md'), options.markdown);
+
+  return {
+    id,
+    path: directory,
+    metadata,
+  };
+}
+
+export async function writeHandoffRun(options: {
+  cwd: string;
+  timestamp: string;
+  task: RunMetadata['task'];
+  verificationReportPath?: string;
+  handoffPath?: string;
+  changedFiles: GitFileStatus[];
+  diffStat: string;
+  markdown: string;
+}) {
+  const { id, directory } = await allocateRunDirectory(options.cwd, options.timestamp, 'handoff');
+  await mkdir(directory, { recursive: true });
+
+  const metadata: RunMetadata = {
+    id,
+    command: 'handoff',
+    createdAt: options.timestamp,
+    task: options.task,
+    ...(options.verificationReportPath
+      ? { verificationReportPath: options.verificationReportPath }
+      : {}),
+    ...(options.handoffPath ? { handoffPath: options.handoffPath } : {}),
+    changedFileCount: options.changedFiles.length,
+  };
+
+  await writeTextFile(path.join(directory, 'metadata.json'), `${JSON.stringify(metadata, null, 2)}\n`);
+  await writeTextFile(
+    path.join(directory, 'changed-files.json'),
+    `${JSON.stringify(options.changedFiles, null, 2)}\n`,
+  );
+  await writeTextFile(path.join(directory, 'diffstat.txt'), options.diffStat);
+  await writeTextFile(path.join(directory, 'pr-summary.md'), options.markdown);
+
+  return {
+    id,
+    path: directory,
+    metadata,
+  };
+}
+
 export async function listRuns(cwd: string): Promise<RunSummary[]> {
   const root = runsRoot(cwd);
   if (!(await pathExists(root))) return [];
@@ -144,10 +254,14 @@ export async function listRuns(cwd: string): Promise<RunSummary[]> {
 export async function readRun(cwd: string, id: string): Promise<RunRecord> {
   const directory = runDir(cwd, id);
   if (!(await pathExists(directory))) throw new AgentLoopError(`Run not found: ${id}`, 'RUN_NOT_FOUND');
+  const scorePath = path.join(directory, 'score.json');
+  const changedFilesPath = path.join(directory, 'changed-files.json');
   return {
     metadata: await readJsonFile<RunMetadata>(path.join(directory, 'metadata.json')),
-    score: await readJsonFile<ReviewReadinessResult>(path.join(directory, 'score.json')),
-    changedFiles: await readJsonFile<GitFileStatus[]>(path.join(directory, 'changed-files.json')),
+    score: (await pathExists(scorePath)) ? await readJsonFile<ReviewReadinessResult>(scorePath) : null,
+    changedFiles: (await pathExists(changedFilesPath))
+      ? await readJsonFile<GitFileStatus[]>(changedFilesPath)
+      : [],
     diffStat: (await pathExists(path.join(directory, 'diffstat.txt')))
       ? await readFile(path.join(directory, 'diffstat.txt'), 'utf8')
       : '',
@@ -167,9 +281,15 @@ export async function findFileIntent(cwd: string, file: string): Promise<IntentM
     matches.push({
       ...run,
       file: normalizedFile,
-      why: `Changed in ship run for task "${run.task?.title ?? 'unknown task'}".`,
+      why: intentWhy(run.command, run.task?.title ?? 'unknown task'),
     });
   }
 
   return matches;
+}
+
+function intentWhy(command: RunCommand, title: string) {
+  if (command === 'verify') return `Verification run for task "${title}".`;
+  if (command === 'handoff') return `Reviewer handoff for task "${title}".`;
+  return `Changed in ship run for task "${title}".`;
 }

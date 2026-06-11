@@ -51,9 +51,11 @@ agentloop task status .agentloop/tasks/<task-file>.md in-progress
 
 ```bash
 agentloop verify
+agentloop verify --write-run
 ```
 
 `verify` runs configured commands from `agentloop.config.json` and writes a Markdown report under `.agentloop/reports/`. Use `--task-commands` when you want to run verification commands recorded inside the active task.
+Use `--write-run` when you want this verification pass to appear in `agentloop runs` before the broader `ship` flow.
 
 ## 6. Ship The Work
 
@@ -78,9 +80,11 @@ agentloop prepare-pr --github-comment
 
 ```bash
 agentloop handoff
+agentloop handoff --write-run
 ```
 
 `handoff` writes a deterministic reviewer summary under `.agentloop/handoffs/`. It reads git status, diff stats, the active task, and the latest verification report.
+Use `--write-run` when you want the handoff itself to be traceable in the local run ledger.
 
 ## 9. Check Review Gates
 

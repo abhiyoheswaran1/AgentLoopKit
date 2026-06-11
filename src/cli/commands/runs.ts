@@ -11,9 +11,13 @@ function printRuns(runs: Awaited<ReturnType<typeof listRuns>>) {
   }
   console.log('AgentLoopKit runs:');
   for (const run of runs) {
-    console.log(
-      `- ${inlineCode(run.id)} ${inlineCode(run.command)} score ${inlineCode(String(run.score))}/100`,
-    );
+    const result =
+      run.score === undefined
+        ? run.overallStatus
+          ? `status ${inlineCode(run.overallStatus)}`
+          : `${inlineCode(String(run.changedFileCount))} changed files`
+        : `score ${inlineCode(String(run.score))}/100`;
+    console.log(`- ${inlineCode(run.id)} ${inlineCode(run.command)} ${result}`);
   }
 }
 
@@ -44,7 +48,10 @@ export function showRunCommand() {
         else {
           console.log(`# AgentLoopKit Run ${inlineCode(run.metadata.id)}`);
           console.log(`- Command: ${inlineCode(run.metadata.command)}`);
-          console.log(`- Score: ${inlineCode(String(run.metadata.score))}/100`);
+          if (run.metadata.score !== undefined)
+            console.log(`- Score: ${inlineCode(String(run.metadata.score))}/100`);
+          if (run.metadata.overallStatus)
+            console.log(`- Status: ${inlineCode(run.metadata.overallStatus)}`);
           console.log(`- Changed files: ${inlineCode(String(run.metadata.changedFileCount))}`);
         }
       } catch (error) {

@@ -1,8 +1,9 @@
 import path from 'node:path';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { access, mkdir, readFile, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { writeVerificationRun } from '../src/core/runs.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -126,5 +127,143 @@ describe('run ledger commands', () => {
         why: 'Changed in ship run for task "Fix login redirect bug".',
       }),
     ]);
+  });
+
+  test('records verification runs in the local ledger when requested', async () => {
+    const dir = await createRunFixture();
+
+    const verify = JSON.parse(
+      (
+        await execa(
+          tsxPath,
+          [cliPath, 'verify', '--no-build', '--no-test', '--no-lint', '--no-typecheck', '--write-run', '--json'],
+          { cwd: dir },
+        )
+      ).stdout,
+    );
+    const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
+    const shown = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'show-run', verify.run.id, '--json'], { cwd: dir })).stdout,
+    );
+    const intent = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'intent', 'src/auth/callback.ts', '--json'], { cwd: dir }))
+        .stdout,
+    );
+
+    expect(verify.overallStatus).toBe('not-run');
+    expect(verify.run.id).toMatch(/verify$/);
+    expect(runs.runs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: verify.run.id,
+          command: 'verify',
+          verificationReportPath: verify.reportPath,
+        }),
+      ]),
+    );
+    expect(shown.run.metadata.command).toBe('verify');
+    expect(shown.run.metadata.verificationReportPath).toBe(verify.reportPath);
+    expect(shown.run.score).toBeNull();
+    expect(intent.runs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: verify.run.id,
+          why: 'Verification run for task "Fix login redirect bug".',
+        }),
+      ]),
+    );
+  });
+
+  test('records handoff runs in the local ledger when requested', async () => {
+    const dir = await createRunFixture();
+
+    const handoff = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'handoff', '--write-run', '--json'], { cwd: dir })).stdout,
+    );
+    const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
+    const shown = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'show-run', handoff.run.id, '--json'], { cwd: dir })).stdout,
+    );
+    const intent = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'intent', 'src/auth/callback.ts', '--json'], { cwd: dir }))
+        .stdout,
+    );
+
+    expect(handoff.run.id).toMatch(/handoff$/);
+    expect(runs.runs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: handoff.run.id,
+          command: 'handoff',
+          handoffPath: handoff.outPath,
+        }),
+      ]),
+    );
+    expect(shown.run.metadata.command).toBe('handoff');
+    expect(shown.run.metadata.handoffPath).toBe(handoff.outPath);
+    expect(shown.run.diffStat).toContain('src/auth/callback.ts');
+    expect(intent.runs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: handoff.run.id,
+          why: 'Reviewer handoff for task "Fix login redirect bug".',
+        }),
+      ]),
+    );
+  });
+
+  test('rejects run directories that resolve outside the repo through symlinks', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir('agentloopkit-outside-run-');
+    tempDirs.push(dir, outsideDir);
+
+    await mkdir(path.join(dir, '.agentloop/runs'), { recursive: true });
+    await symlink(outsideDir, path.join(dir, '.agentloop/runs/2026-06-12-00-00-verify'), 'dir');
+
+    await expect(
+      writeVerificationRun({
+        cwd: dir,
+        timestamp: '2026-06-12-00-00',
+        task: null,
+        verificationReportPath: path.join(dir, '.agentloop/reports/report.md'),
+        overallStatus: 'pass',
+        changedFiles: [],
+        markdown: '# Verification Report\n',
+      }),
+    ).rejects.toThrow('Run directory must stay inside the run ledger root.');
+    await expect(access(path.join(outsideDir, 'metadata.json'))).rejects.toThrow();
+  });
+
+  test('keeps same-minute run records instead of overwriting them', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    const first = await writeVerificationRun({
+      cwd: dir,
+      timestamp: '2026-06-12-00-00',
+      task: null,
+      verificationReportPath: path.join(dir, '.agentloop/reports/first.md'),
+      overallStatus: 'pass',
+      changedFiles: [],
+      markdown: '# First Verification Report\n',
+    });
+    const second = await writeVerificationRun({
+      cwd: dir,
+      timestamp: '2026-06-12-00-00',
+      task: null,
+      verificationReportPath: path.join(dir, '.agentloop/reports/second.md'),
+      overallStatus: 'pass',
+      changedFiles: [],
+      markdown: '# Second Verification Report\n',
+    });
+
+    expect(first.id).toBe('2026-06-12-00-00-verify');
+    expect(second.id).toBe('2026-06-12-00-00-verify-2');
+    await expect(readFile(path.join(first.path, 'verification-report.md'), 'utf8')).resolves.toContain(
+      'First Verification Report',
+    );
+    await expect(readFile(path.join(second.path, 'verification-report.md'), 'utf8')).resolves.toContain(
+      'Second Verification Report',
+    );
   });
 });
