@@ -40,6 +40,7 @@ Archive only after verification and handoff. The archive command moves one named
 ```bash
 agentloop status
 agentloop next
+agentloop artifacts
 ```
 
 5. Inspect safety policies when the task touches protected areas:
@@ -107,6 +108,7 @@ agentloop check-gates --strict
 ```
 
 `check-gates` inspects local evidence. It does not run tests or call an LLM.
+`artifacts` inventories existing local task, report, handoff, badge, CI summary, and release-note evidence without writing files.
 `report` reads local evidence and writes one static HTML file under `reports/`.
 `badge` reads local evidence and writes SVG files under `reports/`.
 `ci-summary` reads allowlisted CI provenance and local evidence, then writes Markdown under `reports/` when `--write` is passed.

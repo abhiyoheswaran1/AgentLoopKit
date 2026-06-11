@@ -118,6 +118,7 @@ agentloopkit init
 | `agentloop summarize`            | Preview a deterministic reviewer summary                    |
 | `agentloop handoff`              | Write a reviewer handoff summary                            |
 | `agentloop check-gates`          | Check review evidence without running tests                 |
+| `agentloop artifacts`            | Inventory local task, report, handoff, and badge evidence   |
 | `agentloop report`               | Write a local static HTML evidence report                   |
 | `agentloop badge`                | Write a local SVG evidence badge                            |
 | `agentloop ci-summary`           | Summarize CI context and existing AgentLoop evidence        |

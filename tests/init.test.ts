@@ -95,8 +95,10 @@ describe('init', () => {
       '--risk "Touches user-facing behavior and needs regression coverage"',
     );
     expect(workspaceReadme).toContain('agentloop verify --task <path> --task-commands');
+    expect(workspaceReadme).toContain('agentloop artifacts');
     expect(taskReadme).toContain('--risk "Touches account preferences"');
     expect(commandsGuide).toContain('agentloop create-task --type feature --title');
+    expect(commandsGuide).toContain('agentloop artifacts');
   });
 
   test('safely appends to an existing AGENTS.md', async () => {

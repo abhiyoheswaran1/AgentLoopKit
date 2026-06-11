@@ -30,6 +30,7 @@ agentloop create-task --type feature --title "Describe the next focused change" 
 - Use `agentloop task doctor` to find missing, legacy, unsupported, or terminal task statuses without mutating task files.
 - Use `agentloop status` to inspect pinned active task, latest open task, parked deferred tasks, latest report, dirty files, and next action.
 - Use `agentloop next` when you only need the next recommended loop command.
+- Use `agentloop artifacts` when you need a read-only inventory of local task, report, handoff, badge, CI summary, and release-note evidence.
 - Use `agentloop policy list`, `agentloop policy show <policy>`, and `agentloop policy status` to inspect local safety guidance and template drift before risky edits.
 - Follow local `.agentloop/policies/*.md` files as repo policy. Treat `modified` as a reviewed local rule, not an error.
 - Use `agentloop check-gates` to check task, verification, handoff, task-folder hygiene, harness, policy, and git evidence before review.

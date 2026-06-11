@@ -138,6 +138,9 @@ See [pr-summaries.md](pr-summaries.md).
 ## Local Evidence Reports
 
 ```bash
+agentloop artifacts
+agentloop artifacts --json
+
 agentloop report
 agentloop report --json
 agentloop report --out .agentloop/reports/review.html
@@ -147,11 +150,13 @@ agentloop badge --source gates
 agentloop badge --json
 ```
 
+`artifacts` inventories existing local AgentLoop evidence without writing files. It reports task counts, task statuses, latest verification report, latest handoff, HTML reports, badges, CI summaries, and release notes. JSON output uses repo-relative paths.
+
 `report` writes a local static HTML evidence report from the current task, latest verification report, latest handoff, Git status, diff stats, and deterministic summary.
 
 `badge` writes a local SVG badge from existing verification or gate evidence.
 
-Neither command runs tests, fetches remote assets, reads `.env` contents, uploads files, or calls an LLM.
+These commands do not run tests, fetch remote assets, read `.env` contents, upload files, or call an LLM.
 
 See [html-reports.md](html-reports.md) and [badges.md](badges.md).
 
