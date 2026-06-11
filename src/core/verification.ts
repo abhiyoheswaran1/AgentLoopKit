@@ -329,12 +329,12 @@ function renderCiContext(ciContext: VerificationCiContext | undefined) {
   if (!ciContext) return '';
 
   const lines = [`- Provider: ${ciContext.providerName}`];
-  if (ciContext.workflow) lines.push(`- Workflow: ${ciContext.workflow}`);
-  if (ciContext.event) lines.push(`- Event: ${ciContext.event}`);
-  if (ciContext.ref) lines.push(`- Ref: ${ciContext.ref}`);
-  if (ciContext.commit) lines.push(`- Commit: ${ciContext.commit}`);
-  if (ciContext.runUrl) lines.push(`- Run URL: ${ciContext.runUrl}`);
-  if (ciContext.runAttempt) lines.push(`- Run attempt: ${ciContext.runAttempt}`);
+  if (ciContext.workflow) lines.push(`- Workflow: ${inlineCode(ciContext.workflow)}`);
+  if (ciContext.event) lines.push(`- Event: ${inlineCode(ciContext.event)}`);
+  if (ciContext.ref) lines.push(`- Ref: ${inlineCode(ciContext.ref)}`);
+  if (ciContext.commit) lines.push(`- Commit: ${inlineCode(ciContext.commit)}`);
+  if (ciContext.runUrl) lines.push(`- Run URL: ${inlineCode(ciContext.runUrl)}`);
+  if (ciContext.runAttempt) lines.push(`- Run attempt: ${inlineCode(ciContext.runAttempt)}`);
 
   return `## CI Context
 ${lines.join('\n')}

@@ -253,3 +253,7 @@ Release helpers are evidence checks, not release authority. `release-check` warn
 ## 2026-06-11: Missing Config Is A Setup Error
 
 Commands that require AgentLoop setup should not leak raw filesystem errors when `agentloop.config.json` is missing. The config loader now reports missing configs as `CONFIG_ERROR` with an `agentloop init` hint. This gives humans and automation one predictable setup-failure shape without adding automatic initialization or global config lookup.
+
+## 2026-06-11: CI Metadata In Markdown Uses Safe Inline Formatting
+
+Verification reports and CI summaries include allowlisted CI fields such as workflow, event, ref, commit, run URL, and run attempt. Those values come from CI environment variables, so Markdown output now renders them with the shared inline-code formatter. Provider labels stay plain because they are fixed internal labels. The change does not expand environment access, call CI provider APIs, read secrets, or alter JSON output.

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed verification reports and CI summaries to render allowlisted CI metadata values with Markdown-safe inline-code delimiters.
 - Refactored Markdown inline-code and code-fence formatting into a shared tested helper used by verification reports, PR summaries, and release notes.
 - Changed npm status reports to render package and version labels with Markdown-safe inline-code delimiters when captured registry data contains backticks.
 - Changed CLI subprocess regression tests to use a shared timeout budget so full-suite load does not create false timeout failures.

@@ -2,6 +2,34 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Harden CI Metadata Markdown Output
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-ci-metadata-markdown-output.md`
+- Trigger:
+  - The Markdown report-surface scan found that verification reports and CI summaries rendered allowlisted CI metadata values directly into Markdown.
+  - CI workflow names, refs, and URLs are trusted only as local provenance evidence and can contain Markdown punctuation such as backticks.
+- Product change:
+  - Added focused regressions for GitHub Actions metadata values containing backticks in verification reports and CI summaries.
+  - Changed CI metadata rendering to use the shared inline-code formatter for workflow, event, ref, commit, run URL, and run attempt values.
+  - Kept provider labels plain because they are fixed internal labels.
+- Verification:
+  - Red focused tests failed before the renderer changed:
+    - `npm test -- tests/verification.test.ts -t "uses markdown-safe inline code for CI metadata"`
+    - `npm test -- tests/ci-summary.test.ts -t "writes markdown-safe CI metadata"`
+  - Focused green tests passed after the renderer change.
+  - Adjacent suite `npm test -- tests/verification.test.ts tests/ci-summary.test.ts` passed with 43 tests.
+  - Full suite `npm test` passed with 42 test files and 359 tests.
+  - Full self-verify `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-11-harden-ci-metadata-markdown-output.md --task-commands --timeout-ms 240000 --json` passed and wrote `.agentloop/reports/2026-06-11-16-27-verification-report.md`.
+  - CLI smoke `node scripts/smoke-cli.mjs` passed.
+  - Release smoke `npm run smoke:release` passed.
+  - Markdown link check `npm run check:links` passed.
+  - Production dependency audit `npx pnpm@10.12.1 audit --prod` reported no known vulnerabilities.
+  - ProjScan `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The change reused the shared Markdown helper and did not change CI provider detection, JSON output, command execution, or environment access.
+- Improve:
+  - Continue reviewing local evidence renderers that combine headings, paths, and user-supplied titles before the `0.28.0` release batch.
+
 ## 2026-06-11: Harden npm Status Markdown Version Labels
 
 - Task contract: `.agentloop/tasks/2026-06-11-harden-npm-status-markdown-version-labels.md`

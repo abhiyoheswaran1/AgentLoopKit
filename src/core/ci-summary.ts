@@ -10,6 +10,7 @@ import {
   verificationReportPattern,
 } from './artifacts.js';
 import { checkGates, CheckGatesResult } from './check-gates.js';
+import { inlineCode } from './markdown-format.js';
 import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 import { detectCiContext, VerificationCiContext } from './verification.js';
 
@@ -131,12 +132,13 @@ function chooseNextAction(input: {
 
 function renderCiLines(ci: CiSummaryCiContext) {
   const lines = [`- Provider: ${ci.providerName}`];
-  if ('workflow' in ci && ci.workflow) lines.push(`- Workflow: ${ci.workflow}`);
-  if ('event' in ci && ci.event) lines.push(`- Event: ${ci.event}`);
-  if ('ref' in ci && ci.ref) lines.push(`- Ref: ${ci.ref}`);
-  if ('commit' in ci && ci.commit) lines.push(`- Commit: ${ci.commit}`);
-  if ('runUrl' in ci && ci.runUrl) lines.push(`- Run URL: ${ci.runUrl}`);
-  if ('runAttempt' in ci && ci.runAttempt) lines.push(`- Run attempt: ${ci.runAttempt}`);
+  if ('workflow' in ci && ci.workflow) lines.push(`- Workflow: ${inlineCode(ci.workflow)}`);
+  if ('event' in ci && ci.event) lines.push(`- Event: ${inlineCode(ci.event)}`);
+  if ('ref' in ci && ci.ref) lines.push(`- Ref: ${inlineCode(ci.ref)}`);
+  if ('commit' in ci && ci.commit) lines.push(`- Commit: ${inlineCode(ci.commit)}`);
+  if ('runUrl' in ci && ci.runUrl) lines.push(`- Run URL: ${inlineCode(ci.runUrl)}`);
+  if ('runAttempt' in ci && ci.runAttempt)
+    lines.push(`- Run attempt: ${inlineCode(ci.runAttempt)}`);
   return lines.join('\n');
 }
 
@@ -164,9 +166,7 @@ ${renderArtifactLine('Handoff', result.evidence.handoff)}
 - Gates: ${result.gates.overallStatus}
 
 ## Gate Details
-${result.gates.gates
-  .map((gate) => `- [${gate.status}] ${gate.name}: ${gate.message}`)
-  .join('\n')}
+${result.gates.gates.map((gate) => `- [${gate.status}] ${gate.name}: ${gate.message}`).join('\n')}
 
 ## Next Action
 
@@ -193,8 +193,7 @@ export async function getCiSummary(options: {
   const nowIso = options.nowIso ?? new Date().toISOString();
   const reportsDir = path.join(options.cwd, options.config.paths.reportsDir);
   const handoffsDir = path.join(options.cwd, options.config.paths.handoffsDir);
-  const taskPath =
-    (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
+  const taskPath = (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
   const verificationPath = await latestMarkdownFile(reportsDir, {
     pattern: verificationReportPattern,
     rootDir: options.cwd,

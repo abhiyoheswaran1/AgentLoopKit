@@ -69,9 +69,34 @@ describe('ci-summary command', () => {
     const markdown = await readFile(payload.writtenPath, 'utf8');
     expect(markdown).toContain('# AgentLoopKit CI Summary');
     expect(markdown).toContain('- Provider: GitHub Actions');
-    expect(markdown).toContain('- Run URL: https://github.com/owner/repo/actions/runs/12345');
+    expect(markdown).toContain('- Run URL: `https://github.com/owner/repo/actions/runs/12345`');
     expect(markdown).toContain('- Verification: pass');
     expect(markdown).not.toContain('TOKEN');
+  });
+
+  test('writes markdown-safe CI metadata when values contain backticks', async () => {
+    const dir = await createRepoWithEvidence();
+    const result = await execa(tsxPath, [cliPath, 'ci-summary', '--json', '--write'], {
+      cwd: dir,
+      reject: false,
+      env: {
+        GITHUB_ACTIONS: 'true',
+        GITHUB_SERVER_URL: 'https://github.com',
+        GITHUB_REPOSITORY: 'owner/repo',
+        GITHUB_RUN_ID: '12345',
+        GITHUB_RUN_ATTEMPT: '2',
+        GITHUB_WORKFLOW: 'CI `nightly`',
+        GITHUB_EVENT_NAME: 'pull_request',
+        GITHUB_REF: 'refs/heads/feature/`agentloop`',
+        GITHUB_SHA: 'abcdef123456',
+      },
+    });
+
+    expect(result.exitCode).toBe(0);
+    const payload = JSON.parse(result.stdout);
+    const markdown = await readFile(payload.writtenPath, 'utf8');
+    expect(markdown).toContain('- Workflow: `` CI `nightly` ``');
+    expect(markdown).toContain('- Ref: `` refs/heads/feature/`agentloop` ``');
   });
 
   test('does not include handoff content from a symlinked handoff root outside the repo', async () => {
@@ -127,8 +152,8 @@ describe('ci-summary command', () => {
 
     const markdown = await readFile(payload.writtenPath, 'utf8');
     expect(markdown).toContain('- Provider: GitLab CI');
-    expect(markdown).toContain('- Event: merge_request_event');
-    expect(markdown).toContain('- Run URL: https://gitlab.com/owner/repo/-/pipelines/12345');
+    expect(markdown).toContain('- Event: `merge_request_event`');
+    expect(markdown).toContain('- Run URL: `https://gitlab.com/owner/repo/-/pipelines/12345`');
     expect(markdown).not.toContain('redacted-fixture-value');
   });
 
@@ -160,8 +185,10 @@ describe('ci-summary command', () => {
 
     const markdown = await readFile(payload.writtenPath, 'utf8');
     expect(markdown).toContain('- Provider: Buildkite');
-    expect(markdown).toContain('- Event: pull_request');
-    expect(markdown).toContain('- Run URL: https://buildkite.com/owner/agentloopkit/builds/12345');
+    expect(markdown).toContain('- Event: `pull_request`');
+    expect(markdown).toContain(
+      '- Run URL: `https://buildkite.com/owner/agentloopkit/builds/12345`',
+    );
     expect(markdown).not.toContain('redacted-fixture-value');
   });
 

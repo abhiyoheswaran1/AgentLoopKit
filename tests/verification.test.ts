@@ -126,16 +126,43 @@ describe('verification', () => {
 
     expect(result.markdown).toContain('## CI Context');
     expect(result.markdown).toContain('- Provider: GitHub Actions');
-    expect(result.markdown).toContain('- Workflow: AgentLoop Verification');
-    expect(result.markdown).toContain('- Event: pull_request');
-    expect(result.markdown).toContain('- Ref: refs/pull/42/merge');
-    expect(result.markdown).toContain('- Commit: abcdef1234567890');
+    expect(result.markdown).toContain('- Workflow: `AgentLoop Verification`');
+    expect(result.markdown).toContain('- Event: `pull_request`');
+    expect(result.markdown).toContain('- Ref: `refs/pull/42/merge`');
+    expect(result.markdown).toContain('- Commit: `abcdef1234567890`');
     expect(result.markdown).toContain(
-      '- Run URL: https://github.com/acme/demo/actions/runs/123456789',
+      '- Run URL: `https://github.com/acme/demo/actions/runs/123456789`',
     );
-    expect(result.markdown).toContain('- Run attempt: 2');
+    expect(result.markdown).toContain('- Run attempt: `2`');
     expect(result.markdown).not.toContain('EXTRA_ENV_VALUE');
     expect(result.markdown).not.toContain('do-not-print');
+  });
+
+  test('uses markdown-safe inline code for CI metadata containing backticks', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-09-12-35',
+      nowIso: '2026-06-09T12:35:00.000Z',
+      env: {
+        GITHUB_ACTIONS: 'true',
+        GITHUB_WORKFLOW: 'CI `nightly`',
+        GITHUB_EVENT_NAME: 'pull_request',
+        GITHUB_REF: 'refs/heads/feature/`agentloop`',
+        GITHUB_SHA: 'abcdef1234567890',
+        GITHUB_REPOSITORY: 'acme/demo',
+        GITHUB_RUN_ID: '123456789',
+        GITHUB_RUN_ATTEMPT: '2',
+        GITHUB_SERVER_URL: 'https://github.com',
+      },
+    });
+
+    expect(result.markdown).toContain('- Workflow: `` CI `nightly` ``');
+    expect(result.markdown).toContain('- Ref: `` refs/heads/feature/`agentloop` ``');
   });
 
   test('includes allowlisted GitLab CI context in markdown reports', async () => {
@@ -163,11 +190,11 @@ describe('verification', () => {
 
     expect(result.markdown).toContain('## CI Context');
     expect(result.markdown).toContain('- Provider: GitLab CI');
-    expect(result.markdown).toContain('- Workflow: acme/demo');
-    expect(result.markdown).toContain('- Event: merge_request_event');
-    expect(result.markdown).toContain('- Ref: feature/agentloop');
-    expect(result.markdown).toContain('- Commit: 1234567890abcdef');
-    expect(result.markdown).toContain('- Run URL: https://gitlab.com/acme/demo/-/pipelines/123');
+    expect(result.markdown).toContain('- Workflow: `acme/demo`');
+    expect(result.markdown).toContain('- Event: `merge_request_event`');
+    expect(result.markdown).toContain('- Ref: `feature/agentloop`');
+    expect(result.markdown).toContain('- Commit: `1234567890abcdef`');
+    expect(result.markdown).toContain('- Run URL: `https://gitlab.com/acme/demo/-/pipelines/123`');
     expect(result.markdown).not.toContain('redacted-fixture-value');
     expect(result.markdown).not.toContain('do-not-print-extra');
   });
@@ -197,12 +224,12 @@ describe('verification', () => {
 
     expect(result.markdown).toContain('## CI Context');
     expect(result.markdown).toContain('- Provider: Buildkite');
-    expect(result.markdown).toContain('- Workflow: agentloopkit');
-    expect(result.markdown).toContain('- Event: pull_request');
-    expect(result.markdown).toContain('- Ref: feature/agentloop');
-    expect(result.markdown).toContain('- Commit: fedcba0987654321');
+    expect(result.markdown).toContain('- Workflow: `agentloopkit`');
+    expect(result.markdown).toContain('- Event: `pull_request`');
+    expect(result.markdown).toContain('- Ref: `feature/agentloop`');
+    expect(result.markdown).toContain('- Commit: `fedcba0987654321`');
     expect(result.markdown).toContain(
-      '- Run URL: https://buildkite.com/acme/agentloopkit/builds/42',
+      '- Run URL: `https://buildkite.com/acme/agentloopkit/builds/42`',
     );
     expect(result.markdown).not.toContain('redacted-fixture-value');
     expect(result.markdown).not.toContain('do-not-print-extra');
