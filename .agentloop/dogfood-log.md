@@ -4763,3 +4763,24 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep raw string output as the default for existing scripts.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Output for `install-agent`
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-json-output-to-install-agent.md`
+- Trigger:
+  - `agentloop install-agent` writes useful setup files but only reported human text, forcing agents to parse output.
+- Implementation:
+  - Added `install-agent <agent> --json` with the installed agent name, agent instruction path, and `AGENTS.md` path.
+  - Added `install-agent all --json` with one entry per bundled agent.
+  - Kept generated file contents and default human output unchanged.
+  - Added CLI regression tests for single-agent and all-agent JSON output.
+- Verification run:
+  - Red focused tests failed because `--json` was an unknown option.
+  - First green attempt exposed macOS temp-path realpath differences; tests now compare against `realpath(dir)`.
+  - Focused agent-installation suite passed: 4 tests.
+  - `.agentloop/reports/2026-06-11-02-03-verification-report.md`, overall status pass.
+- What worked well:
+  - The CLI wrapper could shape JSON without changing the core file-writing functions.
+- Improve:
+  - Consider a shared JSON error shape for unsupported agent names if automation users need it.
+  - Keep this unreleased until the planned `0.28.0` batch.
