@@ -37,6 +37,8 @@ Path values under `paths` must be local repo-relative paths. AgentLoopKit reject
 
 This keeps generated task contracts, verification reports, handoffs, and harness files tied to the repository where the CLI is running.
 
+AgentLoopKit also resolves existing symlinks before writing generated task, report, and handoff artifacts. A repo-relative path such as `.agentloop/reports` is rejected when it points outside the current repo through a symlink.
+
 Run this before writing files:
 
 ```bash

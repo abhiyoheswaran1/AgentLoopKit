@@ -38,6 +38,7 @@ Reports generated with `--task` include a `Task Context` section with the task p
 `--task` is metadata-only by default. Use `--task-commands` to also run commands listed under the task contract's `Verification Commands` section. This keeps task Markdown from executing unexpectedly when a maintainer only wants the task context in the report. If `--task-commands` is requested but no runnable task commands are found, the report includes a `Task Commands` note. JSON output includes `taskCommands.requested`, `taskCommands.foundCount`, and `taskCommands.commands` for CI consumers.
 
 When `--json` is used with an invalid `--task` path, `verify` returns an `ARTIFACT_PATH_INVALID` error with `artifactType`, `requestedPath`, `expectedDir`, and `reason`. It does not run configured or task-defined commands on that path.
+When the configured reports directory resolves outside the current repo through a symlink, `verify --json` returns `OUTPUT_PATH_INVALID` before running configured commands.
 When `--json` is used with an invalid `agentloop.config.json`, `verify` returns a `CONFIG_ERROR` object and does not run commands.
 
 Failed reports include a `Failure Summary` section before command output. It lists each failed command, its exit code, and final useful output lines. The summary uses the same captured command output; AgentLoopKit does not parse tool-specific stack traces or guess the root cause.

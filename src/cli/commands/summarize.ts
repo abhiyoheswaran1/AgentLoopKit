@@ -1,8 +1,8 @@
 import { Command } from 'commander';
-import { ArtifactPathError } from '../../core/artifacts.js';
+import { ArtifactPathError, OutputPathError } from '../../core/artifacts.js';
 import { AgentLoopError } from '../../core/errors.js';
 import { summarizeRepository } from '../../core/pr-summary.js';
-import { loadConfigForJsonCommand } from '../json-errors.js';
+import { loadConfigForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 const SUPPORTED_OUTPUT_FORMATS = ['markdown', 'json'] as const;
 type OutputFormat = (typeof SUPPORTED_OUTPUT_FORMATS)[number];
@@ -88,6 +88,10 @@ async function runSummaryCommand(options: Record<string, unknown>, defaultWrite:
   } catch (error) {
     if (json && error instanceof ArtifactPathError) {
       printArtifactPathJsonError(error);
+      return;
+    }
+    if (json && error instanceof OutputPathError) {
+      printOutputPathJsonError(error);
       return;
     }
     throw error;

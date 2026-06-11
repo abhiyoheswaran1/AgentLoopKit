@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -159,6 +159,35 @@ describe('HTML report generation', () => {
       },
     });
     expect(existsSync(outPath)).toBe(false);
+  });
+
+  test('CLI report command rejects output when the configured reports directory resolves outside the repo', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await rm(path.join(dir, '.agentloop/reports'), { recursive: true, force: true });
+    await symlink(outsideDir, path.join(dir, '.agentloop/reports'), 'dir');
+
+    const result = await execa(tsxPath, [cliPath, 'report', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'OUTPUT_PATH_INVALID',
+      artifactType: 'report',
+      expectedDir: '.agentloop/reports',
+      expectedExtension: '.html',
+      reason: 'outside-directory',
+    });
+    expect(output.error.requestedPath).toContain('.agentloop/reports/');
+    expect(output.error.requestedPath).toContain('-agentloop-report.html');
+    expect(await readdir(outsideDir)).toEqual([]);
   });
 
   test('CLI report command rejects output paths with non-HTML extensions', async () => {

@@ -7,6 +7,7 @@ import { pathExists, writeTextFile } from './file-system.js';
 import {
   latestMarkdownFile,
   resolveExplicitArtifactPath,
+  resolveOutputArtifactPath,
   verificationReportPattern,
 } from './artifacts.js';
 import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
@@ -257,11 +258,16 @@ export async function summarizeRepository(options: {
     verificationMarkdown,
     diffStat,
   });
-  const outPath = path.join(
-    options.cwd,
-    options.config.paths.handoffsDir,
-    `${timestamp}-pr-summary.md`,
-  );
+  const defaultOutPath = path.join(options.config.paths.handoffsDir, `${timestamp}-pr-summary.md`);
+  const outPath = options.write
+    ? resolveOutputArtifactPath({
+        cwd: options.cwd,
+        artifactType: 'handoff',
+        requestedPath: defaultOutPath,
+        expectedDir: options.config.paths.handoffsDir,
+        expectedExtension: '.md',
+      })
+    : path.join(options.cwd, defaultOutPath);
   if (options.write) await writeTextFile(outPath, summary.markdown);
   return { ...summary, outPath, changedFiles };
 }

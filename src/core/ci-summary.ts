@@ -234,7 +234,13 @@ export async function getCiSummary(options: {
             expectedExtension: '.md',
           })
         : undefined) ??
-      path.join(options.cwd, options.config.paths.reportsDir, `${timestamp}-ci-summary.md`))
+      resolveOutputArtifactPath({
+        cwd: options.cwd,
+        artifactType: 'ci-summary',
+        requestedPath: path.join(options.config.paths.reportsDir, `${timestamp}-ci-summary.md`),
+        expectedDir: options.config.paths.reportsDir,
+        expectedExtension: '.md',
+      }))
     : undefined;
 
   if (writtenPath) await writeTextFile(writtenPath, markdown);

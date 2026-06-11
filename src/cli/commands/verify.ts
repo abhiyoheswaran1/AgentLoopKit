@@ -1,7 +1,11 @@
 import { Command } from 'commander';
-import { ArtifactPathError, resolveExplicitArtifactPath } from '../../core/artifacts.js';
+import {
+  ArtifactPathError,
+  OutputPathError,
+  resolveExplicitArtifactPath,
+} from '../../core/artifacts.js';
 import { runVerification } from '../../core/verification.js';
-import { loadConfigForJsonCommand } from '../json-errors.js';
+import { loadConfigForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function collect(value: string, previous: string[]) {
   previous.push(value);
@@ -59,19 +63,28 @@ export function verifyCommand() {
           throw error;
         }
       }
-      const result = await runVerification({
-        cwd: process.cwd(),
-        config,
-        taskPath,
-        taskCommands: options.taskCommands === true,
-        skip: {
-          build: options.build === false,
-          test: options.test === false,
-          lint: options.lint === false,
-          typecheck: options.typecheck === false,
-        },
-        customCommands: options.command as string[],
-      });
+      let result: Awaited<ReturnType<typeof runVerification>>;
+      try {
+        result = await runVerification({
+          cwd: process.cwd(),
+          config,
+          taskPath,
+          taskCommands: options.taskCommands === true,
+          skip: {
+            build: options.build === false,
+            test: options.test === false,
+            lint: options.lint === false,
+            typecheck: options.typecheck === false,
+          },
+          customCommands: options.command as string[],
+        });
+      } catch (error) {
+        if (options.json && error instanceof OutputPathError) {
+          printOutputPathJsonError(error);
+          return;
+        }
+        throw error;
+      }
       if (options.json) console.log(JSON.stringify(result, null, 2));
       else
         console.log(

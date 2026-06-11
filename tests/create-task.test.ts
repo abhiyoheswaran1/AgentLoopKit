@@ -411,6 +411,47 @@ describe('create-task command', () => {
     await expect(stat(path.join(outsideDir, 'escaped-task.md'))).rejects.toThrow();
   });
 
+  test('rejects default output when the configured tasks directory resolves outside the repo', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+    await mkdir(path.join(dir, '.agentloop'), { recursive: true });
+    await symlink(outsideDir, path.join(dir, '.agentloop/tasks'), 'dir');
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Root symlink escape',
+        '--type',
+        'bugfix',
+        '--out',
+        '.agentloop/tasks/root-symlink-escape.md',
+        '--json',
+      ],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'TASK_OUTPUT_PATH_OUTSIDE_TASKS_DIR',
+        message: 'Task output path must stay inside .agentloop/tasks.',
+        requestedOut: '.agentloop/tasks/root-symlink-escape.md',
+        tasksDir: '.agentloop/tasks',
+        reason: 'outside-tasks-dir',
+      },
+    });
+    await expect(stat(path.join(outsideDir, 'root-symlink-escape.md'))).rejects.toThrow();
+  });
+
   test('prints non-Markdown output path errors as JSON when requested', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

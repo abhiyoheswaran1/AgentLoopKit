@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { access, mkdir, readFile, symlink, writeFile } from 'node:fs/promises';
+import { access, mkdir, readdir, readFile, symlink, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir } from './helpers.js';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -792,6 +792,54 @@ describe('verification', () => {
     });
     await expect(access(path.join(dir, 'verify-command-ran.txt'))).rejects.toThrow();
     await expect(access(path.join(dir, '.agentloop/reports'))).rejects.toThrow();
+  });
+
+  test('CLI verify rejects report writes when the configured reports directory resolves outside the repo', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await mkdir(path.join(dir, '.agentloop'), { recursive: true });
+    await symlink(outsideDir, path.join(dir, '.agentloop/reports'), 'dir');
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: 'node -e "require(\'fs\').writeFileSync(\'verify-command-ran.txt\', \'yes\')"',
+            lint: '',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'verify', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'OUTPUT_PATH_INVALID',
+      artifactType: 'report',
+      expectedDir: '.agentloop/reports',
+      expectedExtension: '.md',
+      reason: 'outside-directory',
+    });
+    expect(output.error.requestedPath).toContain('.agentloop/reports/');
+    expect(output.error.requestedPath).toContain('-verification-report.md');
+    await expect(access(path.join(dir, 'verify-command-ran.txt'))).rejects.toThrow();
+    await expect(access(path.join(outsideDir, 'verify-command-ran.txt'))).rejects.toThrow();
+    expect(await readdir(outsideDir)).toEqual([]);
   });
 
   test('CLI verify prints invalid config errors as JSON without running commands', async () => {

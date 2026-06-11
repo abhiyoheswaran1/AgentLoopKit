@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { generateSvgBadge, writeEvidenceBadge } from '../src/core/badge.js';
@@ -135,6 +135,33 @@ describe('badge generation', () => {
       },
     });
     await expect(readFile(outPath, 'utf8')).rejects.toThrow();
+  });
+
+  test('CLI rejects badge output when the configured reports directory resolves outside the repo', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await initializeAgentLoop({ cwd: dir });
+    await rm(path.join(dir, '.agentloop/reports'), { recursive: true, force: true });
+    await symlink(outsideDir, path.join(dir, '.agentloop/reports'), 'dir');
+
+    const result = await execa(tsxPath, [cliPath, 'badge', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'OUTPUT_PATH_INVALID',
+      artifactType: 'badge',
+      expectedDir: '.agentloop/reports',
+      expectedExtension: '.svg',
+      reason: 'outside-directory',
+    });
+    expect(output.error.requestedPath).toContain('.agentloop/reports/agentloop-verification.svg');
+    expect(await readdir(outsideDir)).toEqual([]);
   });
 
   test('CLI rejects badge output paths with non-SVG extensions', async () => {

@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -209,6 +209,33 @@ describe('release-notes command', () => {
       },
     });
     expect(existsSync(outPath)).toBe(false);
+  });
+
+  test('rejects release-note writes when the configured handoffs directory resolves outside the repo', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    await rm(path.join(dir, '.agentloop/handoffs'), { recursive: true, force: true });
+    await symlink(outsideDir, path.join(dir, '.agentloop/handoffs'), 'dir');
+
+    const result = await execa(tsxPath, [cliPath, 'release-notes', '--write', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'OUTPUT_PATH_INVALID',
+      artifactType: 'release-notes',
+      expectedDir: '.agentloop/handoffs',
+      expectedExtension: '.md',
+      reason: 'outside-directory',
+    });
+    expect(output.error.requestedPath).toContain('.agentloop/handoffs/');
+    expect(output.error.requestedPath).toContain('-release-notes.md');
+    expect(await readdir(outsideDir)).toEqual([]);
   });
 
   test('rejects release-note output paths with non-Markdown extensions', async () => {

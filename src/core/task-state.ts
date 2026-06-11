@@ -133,9 +133,14 @@ async function resolveTaskPath(options: {
     ? path.resolve(options.taskPath)
     : path.resolve(options.cwd, options.taskPath);
   const root = tasksRoot(options.cwd, options.config);
+  const repoRoot = normalizeExistingAncestor(path.resolve(options.cwd));
+  const normalizedRoot = normalizeExistingAncestor(root);
   const displayRoot = options.config.paths.tasksDir;
 
-  if (!isInsidePath(normalizeExistingAncestor(root), normalizeExistingAncestor(absolutePath))) {
+  if (
+    !isInsidePath(repoRoot, normalizedRoot) ||
+    !isInsidePath(normalizedRoot, normalizeExistingAncestor(absolutePath))
+  ) {
     if (!options.strict) return undefined;
     throw new TaskPathError(
       `Active task must be inside ${displayRoot}.`,

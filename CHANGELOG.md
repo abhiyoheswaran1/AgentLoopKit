@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed generated artifact writes so configured task, report, and handoff roots must resolve inside the current repo even when those directories already exist as symlinks. `verify --json`, `handoff --json`, `report --json`, `badge --json`, `ci-summary --json --write`, and `release-notes --json --write` now return `OUTPUT_PATH_INVALID` before writing outside the repo.
 - Changed `agentloop.config.json` validation so configured AgentLoopKit paths must be non-empty repo-relative paths, rejecting absolute paths, Windows drive-qualified paths, parent traversal, and null bytes before artifact commands read or write configured locations.
 - Changed task artifact path validation to resolve existing symlinked ancestors before writing or reading task files, so `agentloop create-task --out <path>` and explicit task paths such as `agentloop verify --task <path>` cannot be redirected outside the configured task directory.
 - Changed task lifecycle path validation to resolve existing symlinked ancestors before reading, pinning, updating, or archiving task contracts, so `agentloop task show`, `set`, `status`, and `archive` cannot operate on files outside the configured task directory through symlinked task paths.

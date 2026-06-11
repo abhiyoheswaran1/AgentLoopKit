@@ -2,6 +2,7 @@ import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { AgentLoopConfig } from './config.js';
+import { resolveOutputArtifactPath } from './artifacts.js';
 import { formatTimestamp } from './dates.js';
 import { getGitBranch, getGitCommit, getGitStatus } from './git.js';
 import { isInsidePath, normalizeExistingAncestor, writeTextFile } from './file-system.js';
@@ -125,12 +126,16 @@ function resolveTaskPath(cwd: string, config: AgentLoopConfig, taskPath: string 
   const absolutePath = path.isAbsolute(cleanPath)
     ? path.resolve(cleanPath)
     : path.resolve(cwd, cleanPath);
+  const repoRoot = normalizeExistingAncestor(path.resolve(cwd));
   const tasksRoot = normalizeExistingAncestor(path.resolve(cwd, config.paths.tasksDir));
 
   return {
     cleanPath,
     absolutePath,
-    safe: isMarkdownTaskPath(cleanPath) && isInsidePath(tasksRoot, normalizeExistingAncestor(absolutePath)),
+    safe:
+      isMarkdownTaskPath(cleanPath) &&
+      isInsidePath(repoRoot, tasksRoot) &&
+      isInsidePath(tasksRoot, normalizeExistingAncestor(absolutePath)),
   };
 }
 
@@ -350,6 +355,16 @@ ${lines.join('\n')}
 
 export async function runVerification(options: VerificationOptions): Promise<VerificationResult> {
   const timestamp = options.reportTimestamp ?? formatTimestamp();
+  const reportPath = resolveOutputArtifactPath({
+    cwd: options.cwd,
+    artifactType: 'report',
+    requestedPath: path.join(
+      options.config.paths.reportsDir,
+      `${timestamp}-verification-report.md`,
+    ),
+    expectedDir: options.config.paths.reportsDir,
+    expectedExtension: '.md',
+  });
   const nowIso = options.nowIso ?? new Date().toISOString();
   const env = options.env ?? process.env;
   const ciContext = detectCiContext(env);
@@ -382,11 +397,6 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
 
   const overallStatus =
     results.length === 0 ? 'not-run' : results.every((result) => result.passed) ? 'pass' : 'fail';
-  const reportPath = path.join(
-    options.cwd,
-    options.config.paths.reportsDir,
-    `${timestamp}-verification-report.md`,
-  );
   const branch = await getGitBranch(options.cwd);
   const commit = await getGitCommit(options.cwd);
   const status = await getGitStatus(options.cwd);

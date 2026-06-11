@@ -182,7 +182,13 @@ export async function writeEvidenceBadge(options: {
           expectedExtension: '.svg',
         })
       : undefined) ??
-    path.join(options.cwd, options.config.paths.reportsDir, `agentloop-${source}.svg`);
+    resolveOutputArtifactPath({
+      cwd: options.cwd,
+      artifactType: 'badge',
+      requestedPath: path.join(options.config.paths.reportsDir, `agentloop-${source}.svg`),
+      expectedDir: options.config.paths.reportsDir,
+      expectedExtension: '.svg',
+    });
   const absoluteOutPath = path.isAbsolute(outPath) ? outPath : path.resolve(options.cwd, outPath);
 
   await writeTextFile(absoluteOutPath, badge.svg);

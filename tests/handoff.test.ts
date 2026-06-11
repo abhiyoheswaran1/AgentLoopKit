@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { mkdir, readdir, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -239,5 +239,31 @@ describe('handoff command', () => {
       },
     });
     expect(handoffs).toEqual([]);
+  });
+
+  test('rejects handoff writes when the configured handoffs directory resolves outside the repo', async () => {
+    const dir = await createSummaryFixture();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    await symlink(outsideDir, path.join(dir, '.agentloop/handoffs'), 'dir');
+
+    const result = await execa(tsxPath, [cliPath, 'handoff', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'OUTPUT_PATH_INVALID',
+      artifactType: 'handoff',
+      expectedDir: '.agentloop/handoffs',
+      expectedExtension: '.md',
+      reason: 'outside-directory',
+    });
+    expect(output.error.requestedPath).toContain('.agentloop/handoffs/');
+    expect(output.error.requestedPath).toContain('-pr-summary.md');
+    expect(await readdir(outsideDir)).toEqual([]);
   });
 });

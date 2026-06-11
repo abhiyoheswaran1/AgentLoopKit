@@ -153,3 +153,7 @@ GitHub Action, Docker/GHCR, and MCP Registry support must wrap or expose the exi
 ## 2026-06-11: Config Paths Stay Repo-Relative
 
 AgentLoopKit config paths are local repo paths, not arbitrary filesystem targets. The CLI rejects absolute paths, Windows drive-qualified paths, parent traversal segments, and null bytes in `paths.root`, `paths.agentloopDir`, `paths.tasksDir`, `paths.reportsDir`, and `paths.handoffsDir`. This keeps task contracts, verification reports, handoffs, and generated harness files inside the project boundary while preserving simple nested repo-relative customization such as `tools/agentloop/reports`.
+
+## 2026-06-11: Artifact Roots Must Resolve Inside The Repo
+
+Repo-relative config paths are not enough when a directory already exists as a symlink. Generated task, report, badge, CI-summary, release-note, and handoff outputs now resolve the configured artifact root before writing. If the root points outside the current repo, AgentLoopKit rejects the write instead of following the symlink. This keeps local AgentLoop evidence tied to the repository and avoids surprising filesystem writes.

@@ -11,7 +11,7 @@ export const generatedMarkdownPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-.+\.md$/
 
 export type ArtifactType = 'task' | 'verification' | 'handoff';
 export type ArtifactPathErrorReason = 'outside-directory' | 'not-markdown' | 'missing';
-export type OutputArtifactType = 'report' | 'badge' | 'ci-summary' | 'release-notes';
+export type OutputArtifactType = 'report' | 'handoff' | 'badge' | 'ci-summary' | 'release-notes';
 export type OutputPathErrorReason = 'outside-directory' | 'wrong-extension';
 
 export class ArtifactPathError extends AgentLoopError {
@@ -35,6 +35,7 @@ const artifactLabels: Record<ArtifactType, string> = {
 
 const outputArtifactLabels: Record<OutputArtifactType, string> = {
   report: 'Report',
+  handoff: 'Handoff',
   badge: 'Badge',
   'ci-summary': 'CI summary',
   'release-notes': 'Release notes',
@@ -63,10 +64,14 @@ export async function resolveExplicitArtifactPath(options: {
   const absolutePath = path.isAbsolute(options.requestedPath)
     ? path.resolve(options.requestedPath)
     : path.resolve(options.cwd, options.requestedPath);
+  const repoRoot = normalizeExistingAncestor(path.resolve(options.cwd));
   const expectedRoot = normalizeExistingAncestor(path.resolve(options.cwd, options.expectedDir));
   const label = artifactLabels[options.artifactType];
 
-  if (!isInsidePath(expectedRoot, normalizeExistingAncestor(absolutePath))) {
+  if (
+    !isInsidePath(repoRoot, expectedRoot) ||
+    !isInsidePath(expectedRoot, normalizeExistingAncestor(absolutePath))
+  ) {
     throw new ArtifactPathError(
       `${label} artifact path must stay inside ${options.expectedDir}: ${options.requestedPath}`,
       options.artifactType,
@@ -110,10 +115,14 @@ export function resolveOutputArtifactPath(options: {
   const absolutePath = path.isAbsolute(options.requestedPath)
     ? path.resolve(options.requestedPath)
     : path.resolve(options.cwd, options.requestedPath);
+  const repoRoot = normalizeExistingAncestor(path.resolve(options.cwd));
   const expectedRoot = normalizeExistingAncestor(path.resolve(options.cwd, options.expectedDir));
   const label = outputArtifactLabels[options.artifactType];
 
-  if (!isInsidePath(expectedRoot, normalizeExistingAncestor(absolutePath))) {
+  if (
+    !isInsidePath(repoRoot, expectedRoot) ||
+    !isInsidePath(expectedRoot, normalizeExistingAncestor(absolutePath))
+  ) {
     throw new OutputPathError(
       `${label} output path must stay inside ${options.expectedDir}: ${options.requestedPath}`,
       options.artifactType,

@@ -322,7 +322,13 @@ export async function generateReleaseNotes(options: {
             expectedExtension: '.md',
           })
         : undefined) ??
-      path.join(options.cwd, options.config.paths.handoffsDir, `${timestamp}-release-notes.md`))
+      resolveOutputArtifactPath({
+        cwd: options.cwd,
+        artifactType: 'release-notes',
+        requestedPath: path.join(options.config.paths.handoffsDir, `${timestamp}-release-notes.md`),
+        expectedDir: options.config.paths.handoffsDir,
+        expectedExtension: '.md',
+      }))
     : undefined;
   if (writtenPath) await writeTextFile(writtenPath, markdown);
 

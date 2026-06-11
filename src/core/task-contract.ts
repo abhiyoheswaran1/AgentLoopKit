@@ -121,11 +121,15 @@ export async function createTaskContractFile(options: {
   const absolutePath = path.isAbsolute(relativePath)
     ? path.resolve(relativePath)
     : path.resolve(options.cwd, relativePath);
+  const repoRoot = normalizeExistingAncestor(path.resolve(options.cwd));
   const tasksRoot = normalizeExistingAncestor(
     path.resolve(options.cwd, options.config.paths.tasksDir),
   );
 
-  if (!isInsidePath(tasksRoot, normalizeExistingAncestor(absolutePath))) {
+  if (
+    !isInsidePath(repoRoot, tasksRoot) ||
+    !isInsidePath(tasksRoot, normalizeExistingAncestor(absolutePath))
+  ) {
     throw new TaskOutputPathError(
       `Task output path must stay inside ${options.config.paths.tasksDir}.`,
       'TASK_OUTPUT_PATH_OUTSIDE_TASKS_DIR',

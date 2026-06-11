@@ -334,7 +334,16 @@ export async function writeHtmlReport(options: WriteHtmlReportOptions): Promise<
           expectedExtension: '.html',
         })
       : undefined) ??
-    path.join(cwd, options.config.paths.reportsDir, `${timestamp}-agentloop-report.html`);
+    resolveOutputArtifactPath({
+      cwd,
+      artifactType: 'report',
+      requestedPath: path.join(
+        options.config.paths.reportsDir,
+        `${timestamp}-agentloop-report.html`,
+      ),
+      expectedDir: options.config.paths.reportsDir,
+      expectedExtension: '.html',
+    });
 
   await writeTextFile(outPath, report.html);
 

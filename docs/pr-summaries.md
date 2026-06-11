@@ -36,6 +36,7 @@ AgentLoopKit classifies files by path only. It does not read file contents, `.en
 Use `agentloop summarize` to preview the same deterministic summary without writing a file. `agentloop summarize --write` remains available for scripts that already use it.
 
 Explicit `--task` and `--verification` inputs must point to existing Markdown artifacts inside `.agentloop/tasks/` and `.agentloop/reports/`. With `--json`, invalid input paths return a structured `ARTIFACT_PATH_INVALID` error and `handoff` does not write a summary.
+Handoff output directories must resolve inside the current repo. With `--json`, a configured `.agentloop/handoffs/` symlink that points outside the repo returns `OUTPUT_PATH_INVALID` and writes no summary.
 With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` object and `handoff` does not write a summary.
 Supported output formats are `markdown` and `json`. Unsupported `--format` values fail before writing handoff files. With `--json`, they return `UNSUPPORTED_OUTPUT_FORMAT` with `requestedFormat` and `supportedFormats`.
 

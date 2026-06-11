@@ -5545,3 +5545,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep schema descriptions and runtime validation examples in sync whenever config path rules change.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Artifact Root Symlink Guard
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-reject-artifact-root-symlink-escapes.md`
+- Trigger:
+  - Repo-relative config paths still allowed generated artifacts to follow a configured root directory that was itself a symlink outside the repo.
+- Implementation:
+  - Added a realpath check that rejects configured artifact roots that resolve outside the current repo.
+  - Routed default generated outputs for task contracts, verification reports, handoffs, HTML reports, badges, CI summaries, and release notes through the guard.
+  - Added JSON `OUTPUT_PATH_INVALID` handling for `verify`, `summarize`, and `handoff`.
+  - Documented the behavior in README, configuration docs, command docs, changelog, and decisions.
+- Verification run:
+  - Red focused artifact tests failed because the CLI exited `0` and wrote through the symlinked roots.
+  - Focused artifact suites passed after the guard: 7 files and 89 tests.
+  - Full `npx pnpm@10.12.1 test` passed: 36 files and 275 tests.
+  - `npx pnpm@10.12.1 lint`, `typecheck`, `check:links`, `build`, `git diff --check`, and `npx --yes projscan doctor --format markdown` passed.
+  - Dogfood report: `.agentloop/reports/2026-06-11-07-38-verification-report.md`, overall status pass.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-07-39-pr-summary.md`.
+- What worked well:
+  - One shared output resolver covered several generated artifact commands without adding a new dependency.
+- Improve:
+  - Consider a later pass for non-artifact writes such as agent installation and local-only exclude files.
+  - Keep this unreleased until the planned `0.28.0` batch.

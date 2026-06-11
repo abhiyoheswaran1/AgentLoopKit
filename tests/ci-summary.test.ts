@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -239,6 +239,33 @@ describe('ci-summary command', () => {
       },
     });
     await expect(readFile(outPath, 'utf8')).rejects.toThrow();
+  });
+
+  test('rejects CI summary writes when the configured reports directory resolves outside the repo', async () => {
+    const dir = await createRepoWithEvidence();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    await rm(path.join(dir, '.agentloop/reports'), { recursive: true, force: true });
+    await symlink(outsideDir, path.join(dir, '.agentloop/reports'), 'dir');
+
+    const result = await execa(tsxPath, [cliPath, 'ci-summary', '--write', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'OUTPUT_PATH_INVALID',
+      artifactType: 'ci-summary',
+      expectedDir: '.agentloop/reports',
+      expectedExtension: '.md',
+      reason: 'outside-directory',
+    });
+    expect(output.error.requestedPath).toContain('.agentloop/reports/');
+    expect(output.error.requestedPath).toContain('-ci-summary.md');
+    expect(await readdir(outsideDir)).toEqual([]);
   });
 
   test('rejects CI summary output paths with non-Markdown extensions', async () => {

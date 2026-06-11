@@ -217,7 +217,7 @@ agentloop.config.json
 
 The package ships `schema/agentloop.config.schema.json` for editors and config validation. Generated configs use the GitHub raw schema URL for editor support; the CLI validates config locally and does not fetch that URL at runtime. SchemaStore also maps `agentloop.config.json` to that schema, so compatible editors can discover it without extra setup.
 
-Configured AgentLoopKit paths must be local repo-relative paths. Absolute paths, Windows drive-qualified paths, parent traversal such as `../outside`, and null bytes are rejected before AgentLoopKit reads or writes configured artifacts.
+Configured AgentLoopKit paths must be local repo-relative paths. Absolute paths, Windows drive-qualified paths, parent traversal such as `../outside`, and null bytes are rejected before AgentLoopKit reads or writes configured artifacts. Existing symlinks in configured task, report, and handoff directories must still resolve inside the current repo before AgentLoopKit writes generated files.
 
 See `docs/configuration.md` for config fields and schema notes.
 
@@ -389,6 +389,7 @@ agentloop report --verification .agentloop/reports/2026-06-10-12-00-verification
 ```
 
 The command does not run tests, call an LLM, fetch assets, read `.env` contents, or send data anywhere. It writes one local file under `.agentloop/reports/` by default. Use it after `verify` and `handoff` when you want a browser-readable artifact for a PR or CI upload.
+Output directories must resolve inside the current repo. If `.agentloop/reports/` is a symlink to a location outside the repo, AgentLoopKit refuses the write.
 When you pass explicit `--task`, `--verification`, or `--handoff` paths with `--json`, the path must point to an existing Markdown artifact inside `.agentloop/tasks/`, `.agentloop/reports/`, or `.agentloop/handoffs/`. Invalid paths return a JSON error with `artifactType`, `requestedPath`, `expectedDir`, and `reason`.
 With `--json`, invalid `agentloop.config.json` files return a parseable `CONFIG_ERROR` object and no HTML report is written.
 
@@ -550,6 +551,7 @@ It does not call an LLM.
 
 Use `agentloop summarize` to preview the same output without writing a handoff file. `agentloop summarize --write` remains available for scripts. Both `summarize` and `handoff` accept `--verification <path>` as an alias for `--report <path>`.
 When you pass explicit `--task` or `--verification` paths with `--json`, the path must point to an existing Markdown artifact inside `.agentloop/tasks/` or `.agentloop/reports/`. Invalid paths return a JSON error with `artifactType`, `requestedPath`, `expectedDir`, and `reason`.
+Handoff output directories must resolve inside the current repo before AgentLoopKit writes a summary.
 Supported output formats are `markdown` and `json`. Unsupported `--format` values fail before writing handoff files; with `--json`, they return `UNSUPPORTED_OUTPUT_FORMAT`.
 
 ## Safety Principles
