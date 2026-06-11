@@ -6,7 +6,7 @@ import { pathExists, readTextIfExists } from './file-system.js';
 import { commandExists, getGitRoot, getGitStatus, isInsideGitRepo } from './git.js';
 import { detectPackageManager } from './package-manager.js';
 import { detectMonorepo, detectPackageScripts, detectProjectType } from './project-detection.js';
-import { detectRiskFiles } from './safety.js';
+import { detectRiskFileScan } from './safety.js';
 
 export type DoctorCheck = {
   name: string;
@@ -20,10 +20,14 @@ export type DoctorNextAction = {
   reason: string;
 };
 
+export type DoctorOverallStatus = 'pass' | 'warn' | 'fail';
+
 export type DoctorResult = {
   checks: DoctorCheck[];
   warnings: DoctorCheck[];
   serious: DoctorCheck[];
+  strict: boolean;
+  overallStatus: DoctorOverallStatus;
   nextActions: DoctorNextAction[];
   git: {
     isRepository: boolean;
@@ -128,7 +132,11 @@ function chooseDoctorNextActions(checks: DoctorCheck[]): DoctorNextAction[] {
     );
   }
 
-  if (['test command', 'lint command', 'typecheck command', 'build command', 'Tests'].some((name) => hasWarnOrFail(checks, name))) {
+  if (
+    ['test command', 'lint command', 'typecheck command', 'build command', 'Tests'].some((name) =>
+      hasWarnOrFail(checks, name),
+    )
+  ) {
     actions.push(
       nextAction(
         'add-verification',
@@ -148,7 +156,7 @@ function chooseDoctorNextActions(checks: DoctorCheck[]): DoctorNextAction[] {
     );
   }
 
-  if (hasWarnOrFail(checks, 'Potential risk files')) {
+  if (hasWarnOrFail(checks, 'Potential risk files') || hasWarnOrFail(checks, 'Risk file scan')) {
     actions.push(
       nextAction(
         'review-risk-files',
@@ -170,6 +178,16 @@ function renderNextActions(nextActions: DoctorNextAction[]) {
 
 ${nextActions.map((item) => `- Run \`${item.command}\`: ${item.reason}`).join('\n')}
 `;
+}
+
+function determineOverallStatus(input: {
+  warnings: DoctorCheck[];
+  serious: DoctorCheck[];
+  strict: boolean;
+}): DoctorOverallStatus {
+  if (input.serious.length > 0) return 'fail';
+  if (input.warnings.length > 0) return input.strict ? 'fail' : 'warn';
+  return 'pass';
 }
 
 async function resolveComparablePath(filePath: string) {
@@ -224,8 +242,14 @@ async function checkTemplateManifest(cwd: string): Promise<DoctorCheck> {
   }
 }
 
-export async function runDoctor(options: { cwd: string }): Promise<DoctorResult> {
+export async function runDoctor(options: {
+  cwd: string;
+  strict?: boolean;
+  riskScanMaxDepth?: number;
+  riskScanMaxEntries?: number;
+}): Promise<DoctorResult> {
   const cwd = options.cwd;
+  const strict = options.strict ?? false;
   const checks: DoctorCheck[] = [];
 
   checks.push(check('Current directory', 'pass', cwd));
@@ -330,8 +354,21 @@ export async function runDoctor(options: { cwd: string }): Promise<DoctorResult>
     );
   }
 
-  const risks = await detectRiskFiles(cwd);
+  const riskScan = await detectRiskFileScan(cwd, {
+    maxDepth: options.riskScanMaxDepth ?? 8,
+    maxEntries: options.riskScanMaxEntries ?? 5000,
+  });
+  const risks = riskScan.risks;
   const riskCount = Object.values(risks).reduce((count, files) => count + files.length, 0);
+  checks.push(
+    check(
+      'Risk file scan',
+      riskScan.truncated ? 'warn' : 'pass',
+      riskScan.truncated
+        ? `Risk scan stopped after ${riskScan.inspectedEntries} entries; review large repos with targeted checks.`
+        : `Risk scan inspected ${riskScan.inspectedEntries} entries.`,
+    ),
+  );
   checks.push(
     check(
       'Potential risk files',
@@ -355,8 +392,12 @@ export async function runDoctor(options: { cwd: string }): Promise<DoctorResult>
 
   const warnings = checks.filter((item) => item.status === 'warn');
   const serious = checks.filter((item) => item.status === 'fail');
+  const overallStatus = determineOverallStatus({ warnings, serious, strict });
   const nextActions = chooseDoctorNextActions(checks);
   const markdown = `# AgentLoopKit Doctor
+
+- Overall status: ${overallStatus}
+- Strict mode: ${strict ? 'enabled' : 'disabled'}
 
 ${checks
   .map((item) => {
@@ -368,5 +409,5 @@ ${checks
 ${renderNextActions(nextActions)}
 `;
 
-  return { checks, warnings, serious, nextActions, git, markdown };
+  return { checks, warnings, serious, strict, overallStatus, nextActions, git, markdown };
 }

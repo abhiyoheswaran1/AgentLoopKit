@@ -106,6 +106,47 @@ describe('check-gates command', () => {
     );
   });
 
+  test('fails verification gate when the latest report predates the active task', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-09-demo.md');
+    const reportPath = path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md');
+    await writeFile(taskPath, '# Demo task\n\n- Status: in-progress\n');
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({ version: 1, activeTaskPath: '.agentloop/tasks/2026-06-09-demo.md' }),
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(reportPath, '# Verification Report\n\nOverall status: pass\n');
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+    await utimes(reportPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
+    await utimes(taskPath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
+
+    const result = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    const output = JSON.parse(result.stdout);
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'verification-report',
+          status: 'fail',
+          message: 'Latest verification report predates the current task. Rerun verification.',
+          path: '.agentloop/reports/2026-06-09-12-30-verification-report.md',
+        }),
+      ]),
+    );
+    expect(output.nextAction.command).toBe(
+      'agentloop verify --task .agentloop/tasks/2026-06-09-demo.md',
+    );
+  });
+
   test('treats required harness and policy symlinks outside the repo as missing', async () => {
     const dir = await createInitializedRepo();
     const outsideDir = await makeTempDir();

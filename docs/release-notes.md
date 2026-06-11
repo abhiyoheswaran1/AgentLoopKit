@@ -22,10 +22,12 @@ The command reads local files and git metadata:
 - changed file paths in the selected range
 - working tree status from `git status --short`
 - active task contract, or newest open task contract when no active task is pinned
-- latest `*-verification-report.md`
+- current `*-verification-report.md`
 - latest `*-ci-summary.md`
 
 If you do not pass `--from`, AgentLoopKit looks for the newest local version tag before the selected version. If it cannot find one, the output says that no previous version tag was found and uses the local evidence it can read.
+
+`--from` and `--to` accept ordinary Git refs such as `v1.2.3` and `HEAD`. AgentLoopKit rejects option-shaped refs before running Git commands.
 
 ## Output
 
@@ -54,7 +56,7 @@ With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` obj
 - rewrite `CHANGELOG.md`
 - run verification commands
 
-Run `agentloop verify` first when you need fresh verification evidence. `release-notes` reports the latest existing verification report; it does not prove the current diff passed checks.
+Run `agentloop verify` first when you need fresh verification evidence. `release-notes` ignores a verification report that predates the active or newest open task, unless the task is already in `review` or `done`.
 
 If the working tree is dirty, commit or stash those changes before publishing. The command lists uncommitted paths so a release draft cannot silently omit local work.
 

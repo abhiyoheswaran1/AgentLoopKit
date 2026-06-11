@@ -2,12 +2,8 @@ import path from 'node:path';
 import { readFile, realpath } from 'node:fs/promises';
 import { execa } from 'execa';
 import type { AgentLoopConfig } from './config.js';
-import {
-  latestMarkdownFile,
-  prSummaryPattern,
-  releaseNotesPattern,
-  verificationReportPattern,
-} from './artifacts.js';
+import { latestMarkdownFile, prSummaryPattern, releaseNotesPattern } from './artifacts.js';
+import { resolveCurrentTaskVerificationEvidence } from './evidence.js';
 import { pathExists } from './file-system.js';
 import {
   getGitBranch,
@@ -107,7 +103,10 @@ async function readPackageMetadata(cwd: string): Promise<PackageMetadata> {
       : {};
 
   return {
-    name: typeof parsed.name === 'string' && parsed.name.trim() ? parsed.name.trim() : path.basename(cwd),
+    name:
+      typeof parsed.name === 'string' && parsed.name.trim()
+        ? parsed.name.trim()
+        : path.basename(cwd),
     version:
       typeof parsed.version === 'string' && parsed.version.trim() ? parsed.version.trim() : '0.0.0',
     scripts,
@@ -119,23 +118,26 @@ function extractOverallStatus(markdown: string) {
 }
 
 async function readLatestVerification(options: { cwd: string; config: AgentLoopConfig }) {
-  const reportPath = await latestMarkdownFile(
-    path.join(options.cwd, options.config.paths.reportsDir),
-    { pattern: verificationReportPattern, rootDir: options.cwd },
-  );
+  const evidence = await resolveCurrentTaskVerificationEvidence(options);
+  const reportPath = evidence.currentReportPath;
+  if (evidence.staleReport) {
+    return {
+      path: evidence.staleReport.relativePath,
+      overallStatus: 'stale',
+      stale: true,
+      message: evidence.staleReport.message,
+    };
+  }
   if (!reportPath) return undefined;
   const markdown = await readFile(reportPath, 'utf8');
   return {
     path: relativePath(options.cwd, reportPath),
     overallStatus: extractOverallStatus(markdown),
+    stale: false,
   };
 }
 
-async function latestEvidencePath(options: {
-  cwd: string;
-  dir: string;
-  pattern: RegExp;
-}) {
+async function latestEvidencePath(options: { cwd: string; dir: string; pattern: RegExp }) {
   const filePath = await latestMarkdownFile(path.join(options.cwd, options.dir), {
     pattern: options.pattern,
     rootDir: options.cwd,
@@ -157,6 +159,27 @@ async function readChangelogSection(cwd: string, version: string) {
   return (nextHeading === -1 ? rest : rest.slice(0, nextHeading)).trim();
 }
 
+async function readUnreleasedChangelogSection(cwd: string) {
+  const changelogPath = path.join(cwd, 'CHANGELOG.md');
+  if (!(await pathExists(changelogPath))) return undefined;
+  const changelog = await readFile(changelogPath, 'utf8');
+  const match = changelog.match(/^##\s+Unreleased\s*\n([\s\S]*?)(?=^##\s+|\s*$)/m);
+  return match?.[1]?.trim() ?? '';
+}
+
+function hasUnreleasedChangelogEntries(section: string | undefined) {
+  if (!section) return false;
+  const lines = section
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((line) => !line.startsWith('<!--') && !line.endsWith('-->'));
+
+  if (lines.length === 0) return false;
+  if (lines.length === 1 && /^-\s+No unreleased changes yet\.$/i.test(lines[0])) return false;
+  return true;
+}
+
 async function gitTagExists(cwd: string, version: string) {
   const tag = `v${version}`;
   const result = await execa('git', ['rev-parse', '--verify', '--quiet', `${tag}^{commit}`], {
@@ -176,12 +199,22 @@ function overallStatus(checks: ReleaseReadinessCheck[], strict: boolean): Releas
 function chooseNextAction(checks: ReleaseReadinessCheck[]) {
   const byId = new Map(checks.map((item) => [item.id, item]));
   if (byId.get('package-metadata')?.status === 'fail') {
-    return { command: 'update package.json', reason: 'Package name and version are required before release.' };
+    return {
+      command: 'update package.json',
+      reason: 'Package name and version are required before release.',
+    };
   }
   if (byId.get('package-safety')?.status === 'fail') {
     return {
       command: 'remove install lifecycle scripts',
       reason: 'Install lifecycle scripts weaken npm supply-chain trust.',
+    };
+  }
+  if (byId.get('changelog-unreleased')?.status !== 'pass') {
+    return {
+      command: 'prepare release notes from CHANGELOG.md Unreleased',
+      reason:
+        'Move pending Unreleased entries into the intended version section before publishing.',
     };
   }
   if (byId.get('changelog-section')?.status !== 'pass') {
@@ -194,7 +227,10 @@ function chooseNextAction(checks: ReleaseReadinessCheck[]) {
     return { command: 'agentloop verify', reason: 'A passing verification report is required.' };
   }
   if (byId.get('handoff-summary')?.status !== 'pass') {
-    return { command: 'agentloop handoff', reason: 'Create a reviewer handoff for the release diff.' };
+    return {
+      command: 'agentloop handoff',
+      reason: 'Create a reviewer handoff for the release diff.',
+    };
   }
   if (byId.get('release-notes')?.status !== 'pass') {
     return {
@@ -219,7 +255,8 @@ function chooseNextAction(checks: ReleaseReadinessCheck[]) {
   }
   return {
     command: 'npm publish --access public',
-    reason: 'Local release evidence is ready. Publish only after owner review and npm authentication.',
+    reason:
+      'Local release evidence is ready. Publish only after owner review and npm authentication.',
   };
 }
 
@@ -292,18 +329,38 @@ export async function checkReleaseReadiness(options: {
     ),
   );
 
+  const unreleasedSection = await readUnreleasedChangelogSection(options.cwd);
+  const hasUnreleasedEntries = hasUnreleasedChangelogEntries(unreleasedSection);
+  checks.push(
+    releaseCheck(
+      'changelog-unreleased',
+      'Changelog Unreleased',
+      hasUnreleasedEntries ? 'warn' : 'pass',
+      unreleasedSection === undefined
+        ? 'CHANGELOG.md not found.'
+        : hasUnreleasedEntries
+          ? 'CHANGELOG.md has pending Unreleased entries.'
+          : 'No pending Unreleased entries detected.',
+      'CHANGELOG.md',
+    ),
+  );
+
   const verification = await readLatestVerification({ cwd: options.cwd, config: options.config });
   checks.push(
     releaseCheck(
       'verification-report',
       'Verification report',
       verification
-        ? verification.overallStatus === 'pass'
-          ? 'pass'
-          : 'fail'
+        ? verification.stale
+          ? 'warn'
+          : verification.overallStatus === 'pass'
+            ? 'pass'
+            : 'fail'
         : 'warn',
       verification
-        ? `Latest verification overall status: ${verification.overallStatus}.`
+        ? verification.stale
+          ? (verification.message ?? 'Latest verification report predates the current task.')
+          : `Latest verification overall status: ${verification.overallStatus}.`
         : 'No verification report found.',
       verification?.path,
     ),
@@ -339,7 +396,9 @@ export async function checkReleaseReadiness(options: {
     ),
   );
 
-  const missingRequiredScripts = requiredScripts.filter((script) => !packageMetadata.scripts[script]);
+  const missingRequiredScripts = requiredScripts.filter(
+    (script) => !packageMetadata.scripts[script],
+  );
   const missingRecommendedScripts = recommendedScripts.filter(
     (script) => !packageMetadata.scripts[script],
   );
@@ -348,11 +407,7 @@ export async function checkReleaseReadiness(options: {
     releaseCheck(
       'release-scripts',
       'Release scripts',
-      missingRequiredScripts.length
-        ? 'fail'
-        : missingRecommendedScripts.length
-          ? 'warn'
-          : 'pass',
+      missingRequiredScripts.length ? 'fail' : missingRecommendedScripts.length ? 'warn' : 'pass',
       missingScripts.length
         ? `Missing package scripts: ${missingScripts.join(', ')}.`
         : 'Required and recommended release scripts exist.',

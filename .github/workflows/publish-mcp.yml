@@ -2,7 +2,7 @@ name: Publish MCP Registry
 
 on:
   workflow_run:
-    workflows: ["Publish"]
+    workflows: ['Publish']
     types: [completed]
   workflow_dispatch:
 
@@ -14,6 +14,9 @@ jobs:
   publish-mcp:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    env:
+      MCP_PUBLISHER_VERSION: v1.7.9
+      MCP_PUBLISHER_SHA256_LINUX_AMD64: ab128162b0616090b47cf245afe0a23f3ef08936fdce19074f5ba0a4469281ac
     steps:
       - name: Check out published release commit
         if: github.event_name == 'workflow_run'
@@ -40,7 +43,17 @@ jobs:
       - name: Install mcp-publisher
         shell: bash
         run: |
-          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+          os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+          arch="$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')"
+          if [ "$os" != "linux" ] || [ "$arch" != "amd64" ]; then
+            echo "Unsupported mcp-publisher platform for pinned checksum: ${os}_${arch}" >&2
+            exit 1
+          fi
+          asset="mcp-publisher_${os}_${arch}.tar.gz"
+          curl -fsSLo "$asset" "https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}/${asset}"
+          echo "${MCP_PUBLISHER_SHA256_LINUX_AMD64}  ${asset}" | sha256sum --check
+          tar xzf "$asset" mcp-publisher
+          chmod +x mcp-publisher
           sudo mv mcp-publisher /usr/local/bin/mcp-publisher
 
       - name: Authenticate to MCP Registry

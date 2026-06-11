@@ -5872,3 +5872,55 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Do not run smoke scripts in parallel with `npm run build`; `dist/` cleanup can race template copies.
   - Consider adding a dedicated `release-check` docs page if the command grows beyond the CLI reference.
+
+## 2026-06-11: Two-Hour Product And Security Hardening Pass
+
+- Task contract: `.agentloop/tasks/2026-06-11-run-two-hour-product-security-hardening-pass.md`
+- Trigger:
+  - The maintainer asked for a focused two-hour product-quality pass covering bugs, improvements, and security review without cutting another version.
+  - Two read-only subagents audited security/trust risks and product/UX failure modes.
+- Implementation:
+  - Added `doctor --strict` for CI-style setup gates.
+  - Added `status --brief` for compact loop state and next-action output.
+  - Hardened `init --local-only` so it uses Git's real metadata directory before writing `info/exclude`.
+  - Replaced the composite GitHub Action's shell-interpolated AgentLoop command with a tested Node runner that validates inputs and spawns commands with argument arrays.
+  - Added npm package-name validation to `npm-status`.
+  - Added stale-verification handling across `check-gates`, `handoff`, `release-notes`, and `release-check`.
+  - Added the `CHANGELOG.md` `Unreleased` gate to `release-check`.
+  - Added Git ref validation and `--end-of-options` handling to `release-notes`.
+  - Pinned and SHA-256 checked the MCP publisher download in the MCP Registry workflow.
+  - Bounded doctor risk-file scans and added truncation reporting.
+  - Added `verify --timeout-ms` with timed-out commands recorded as failed evidence.
+  - Updated README, CLI docs, status docs, verification docs, release docs, MCP docs, changelog, decisions, and backlog.
+- Verification run:
+  - Red focused tests failed first for each behavior: strict doctor, brief status, local-only fake `.git`, Unreleased release-check, action runner, npm package-name validation, stale evidence, Git ref validation, risk-scan truncation, and verification timeout.
+  - Focused suites passed after implementation:
+    - `tests/doctor.test.ts`
+    - `tests/status.test.ts`
+    - `tests/init.test.ts`
+    - `tests/release-check.test.ts`
+    - `tests/github-action-runner.test.ts`
+    - `tests/distribution-artifacts.test.ts`
+    - `tests/npm-status.test.ts`
+    - `tests/check-gates.test.ts`
+    - `tests/pr-summary.test.ts`
+    - `tests/release-notes.test.ts`
+    - `tests/safety.test.ts`
+    - `tests/verification.test.ts`
+  - Full release checks passed:
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm test`
+    - `npm run check:links`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+    - `npx --yes projscan doctor --format markdown`
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-12-59-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-13-01-pr-summary.md`.
+- What worked well:
+  - The subagent audits found real release-readiness and stale-evidence bugs, not just polish.
+  - The existing task/report/handoff structure made it straightforward to dogfood fixes without adding a backend or telemetry.
+- Improve:
+  - Add option-level CLI/docs drift coverage so new public flags such as `--strict`, `--brief`, and `--timeout-ms` cannot be missed in docs.
+  - Consider a config-level verification timeout later if users repeatedly pass the same `--timeout-ms`.

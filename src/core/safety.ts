@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { listFilesRecursive } from './file-system.js';
+import { listFilesRecursiveDetailed } from './file-system.js';
 
 export type RiskFiles = {
   migrations: string[];
@@ -9,6 +9,12 @@ export type RiskFiles = {
   deployment: string[];
   lockfiles: string[];
   envFiles: string[];
+};
+
+export type RiskFileScan = {
+  risks: RiskFiles;
+  inspectedEntries: number;
+  truncated: boolean;
 };
 
 function relative(cwd: string, file: string) {
@@ -21,8 +27,8 @@ function isSemanticRiskCandidate(file: string) {
   return true;
 }
 
-export async function detectRiskFiles(cwd: string): Promise<RiskFiles> {
-  const files = (await listFilesRecursive(cwd)).map((file) => relative(cwd, file));
+function categorizeRiskFiles(cwd: string, absoluteFiles: string[]): RiskFiles {
+  const files = absoluteFiles.map((file) => relative(cwd, file));
   const semanticIncludes = (needles: string[]) =>
     files.filter(
       (file) =>
@@ -56,4 +62,20 @@ export async function detectRiskFiles(cwd: string): Promise<RiskFiles> {
     ),
     envFiles: files.filter((file) => /^\.env($|\.)|\/\.env($|\.)/.test(file)),
   };
+}
+
+export async function detectRiskFileScan(
+  cwd: string,
+  options: { maxDepth?: number; maxEntries?: number } = {},
+): Promise<RiskFileScan> {
+  const scan = await listFilesRecursiveDetailed(cwd, options);
+  return {
+    risks: categorizeRiskFiles(cwd, scan.files),
+    inspectedEntries: scan.inspectedEntries,
+    truncated: scan.truncated,
+  };
+}
+
+export async function detectRiskFiles(cwd: string): Promise<RiskFiles> {
+  return (await detectRiskFileScan(cwd)).risks;
 }

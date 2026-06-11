@@ -54,6 +54,7 @@ export type AgentLoopStatusResult = {
     command: string;
     reason: string;
   };
+  brief: string;
   markdown: string;
 };
 
@@ -209,7 +210,26 @@ async function resolveComparablePath(filePath: string) {
   }
 }
 
-function renderMarkdown(result: Omit<AgentLoopStatusResult, 'markdown'>) {
+type StatusRenderInput = Omit<AgentLoopStatusResult, 'brief' | 'markdown'>;
+
+function formatBriefValue(value: string) {
+  return `"${value.replace(/["\r\n]/g, ' ').trim()}"`;
+}
+
+function renderBrief(result: StatusRenderInput) {
+  const task = result.activeTask ?? result.latestTask;
+  const taskTitle = task?.title ?? 'none';
+  const taskStatus = task?.status ?? 'none';
+  const verification = result.latestReport?.overallStatus ?? 'missing';
+  const tree = result.workingTree.dirty
+    ? `dirty (${result.workingTree.changedFileCount})`
+    : 'clean';
+
+  return `AgentLoopKit: task=${formatBriefValue(taskTitle)} status=${formatBriefValue(taskStatus)}; verification=${verification}; tree=${tree}; next=${formatBriefValue(result.nextAction.command)}
+Reason: ${result.nextAction.reason}`;
+}
+
+function renderMarkdown(result: StatusRenderInput) {
   const gitLine = result.git.isRepository
     ? `${result.git.branch || 'unknown branch'}${result.git.commit ? ` @ ${result.git.commit}` : ''}`
     : 'not inside a git repository';
@@ -236,7 +256,7 @@ function renderMarkdown(result: Omit<AgentLoopStatusResult, 'markdown'>) {
       ? 'none pinned.'
       : result.deferredTasks.length
         ? `none active; ${result.deferredTasks.length} deferred task${result.deferredTasks.length === 1 ? '' : 's'} parked.`
-      : 'No task contract found.';
+        : 'No task contract found.';
   const latestTask = result.latestTask
     ? `${result.latestTask.title} (${result.latestTask.status}) - ${result.latestTask.path}`
     : 'No open task found.';
@@ -344,6 +364,7 @@ export async function getAgentLoopStatus(options: {
 
   return {
     ...withoutMarkdown,
+    brief: renderBrief(withoutMarkdown),
     markdown: renderMarkdown(withoutMarkdown),
   };
 }

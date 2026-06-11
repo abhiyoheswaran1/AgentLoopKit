@@ -32,11 +32,15 @@ Configured paths must stay inside the current repo. Absolute paths, parent trave
 ```bash
 agentloop doctor
 agentloop doctor --json
+agentloop doctor --strict
 ```
 
 `doctor` checks setup health, template manifest state, configured commands, Git root, current working tree, package manager detection, project type detection, missing commands, monorepo signals, and risk-file categories.
 
 Env files are reported by path only. AgentLoopKit does not read `.env` contents.
+Risk-file scanning is bounded; on very large repos, doctor reports when the scan stops early so you can run targeted checks.
+
+Warnings keep exit code `0` by default. Use `--strict` when warnings should fail CI or a team setup gate.
 
 ## Task Contracts
 
@@ -79,14 +83,15 @@ Archive task contracts after verification and handoff, not as a substitute for e
 
 ```bash
 agentloop status
+agentloop status --brief
 agentloop status --json
 agentloop next
 agentloop next --json
 ```
 
-`status` shows the pinned active task, newest open task when no task is pinned, deferred tasks, latest verification report, working tree state, Git root, configured commands, missing commands, and next suggested command.
+`status` shows the pinned active task, newest open task when no task is pinned, deferred tasks, current verification report, working tree state, Git root, configured commands, missing commands, and next suggested command.
 
-`next` uses the same decision rules but prints only the next action. Neither command runs verification commands, calls an LLM, reads `.env` contents, or writes task state.
+Use `--brief` when an agent or script needs one compact human-readable line plus the reason. `next` uses the same decision rules but prints only the next action. These commands do not run verification commands, call an LLM, read `.env` contents, or write task state.
 
 See [status.md](status.md).
 
@@ -97,13 +102,14 @@ agentloop verify
 agentloop verify --json
 agentloop verify --task .agentloop/tasks/<task-file>.md
 agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands
+agentloop verify --timeout-ms 120000
 ```
 
 `verify` reads `agentloop.config.json`, runs configured commands, captures output excerpts, and writes a Markdown report under `.agentloop/reports/`.
 
 Use `--task` to include task context in the report. Use `--task-commands` when you also want to run verification commands listed inside the task contract.
 
-Failed reports include a short failure summary with each failed command, exit code, and useful final output lines. If no commands are configured, AgentLoopKit writes a report saying nothing was verified.
+Failed reports include a short failure summary with each failed command, exit code, timeout state, and useful final output lines. If no commands are configured, AgentLoopKit writes a report saying nothing was verified.
 
 See [verification-reports.md](verification-reports.md).
 
@@ -115,7 +121,9 @@ agentloop check-gates --json
 agentloop check-gates --strict
 ```
 
-`check-gates` checks review evidence without running tests. It looks for task evidence, verification evidence, handoff evidence, task-folder hygiene, harness files, policy files, and Git context.
+`check-gates` checks review evidence without running tests. It looks for task evidence, current verification evidence, handoff evidence, task-folder hygiene, harness files, policy files, and Git context.
+
+If the latest verification report is older than the active or newest open task, `check-gates` treats it as stale and asks you to rerun verification for that task.
 
 Warnings keep exit code `0` by default. Use `--strict` in CI when warning gates should fail.
 
@@ -133,7 +141,9 @@ agentloop handoff --json
 
 `summarize` previews a deterministic reviewer summary. `handoff` writes that summary to `.agentloop/handoffs/`.
 
-The summary reads Git status, Git diff stats, active task or newest open task, latest verification report, and config settings. It groups changed files into review areas and adds review-focus hints from file paths only. It does not call an LLM.
+The summary reads Git status, Git diff stats, active task or newest open task, current verification report, and config settings. It groups changed files into review areas and adds review-focus hints from file paths only. It does not call an LLM.
+
+If the latest verification report is older than the task, `summarize` and `handoff` leave verification as missing instead of showing stale passing evidence.
 
 See [pr-summaries.md](pr-summaries.md).
 
@@ -199,11 +209,11 @@ agentloop npm-status --expect-current
 agentloop npm-status --registry-json npm-view.json
 ```
 
-`release-notes` drafts local release notes from package metadata, changelog entries, Git history, changed files, working tree status, the active task, the latest verification report, and the latest CI summary when those artifacts exist.
+`release-notes` drafts local release notes from package metadata, changelog entries, Git history, changed files, working tree status, the active task, the current verification report, and the latest CI summary when those artifacts exist. User-provided Git refs must be ordinary refs such as `v1.2.3` or `HEAD`; option-shaped refs are rejected.
 
-`release-check` checks local release readiness from package metadata, changelog entries, release scripts, git state, the latest verification report, reviewer handoff, and generated release notes. Use `--strict` when warnings should fail CI or a maintainer release gate.
+`release-check` checks local release readiness from package metadata, changelog entries, release scripts, git state, current verification evidence, reviewer handoff, and generated release notes. It warns when `CHANGELOG.md` still has `Unreleased` entries or when verification predates the current task. Use `--strict` when warnings should fail CI or a maintainer release gate.
 
-`npm-status` checks registry state without publishing. It runs `npm view` unless you pass captured registry JSON.
+`npm-status` checks registry state without publishing. It validates package names before running `npm view --json <package> version versions`, unless you pass captured registry JSON.
 
 These commands do not create tags, publish packages, read tokens, read `.env` files, upload files, or change package metadata.
 

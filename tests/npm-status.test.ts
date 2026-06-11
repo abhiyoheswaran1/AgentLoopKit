@@ -95,7 +95,28 @@ describe('npm status', () => {
     expect(result.status).toBe('current');
     expect(result.packageName).toBe('agentloopkit');
     expect(result.localVersion).toBe(agentloopkitVersion);
-    expect(result.markdown).toContain('npm view agentloopkit version versions --json');
+    expect(result.markdown).toContain('npm view --json agentloopkit version versions');
+  });
+
+  test('rejects npm package names that could be interpreted as npm flags or aliases', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    await expect(
+      checkNpmStatus({
+        cwd: dir,
+        packageName: '--registry=https://example.invalid',
+        registryJson: JSON.stringify({ version: '1.0.0', versions: ['1.0.0'] }),
+      }),
+    ).rejects.toThrow('Invalid npm package name');
+
+    await expect(
+      checkNpmStatus({
+        cwd: dir,
+        packageName: 'npm:agentloopkit',
+        registryJson: JSON.stringify({ version: '1.0.0', versions: ['1.0.0'] }),
+      }),
+    ).rejects.toThrow('Invalid npm package name');
   });
 
   test('CLI uses captured registry JSON and fails only when expect-current is requested', async () => {
@@ -229,11 +250,10 @@ describe('npm status', () => {
   test('CLI prints invalid timeout values as JSON errors', async () => {
     const dir = await createPackageFixture();
 
-    const result = await execa(
-      tsxPath,
-      [cliPath, 'npm-status', '--timeout-ms', 'nope', '--json'],
-      { cwd: dir, reject: false },
-    );
+    const result = await execa(tsxPath, [cliPath, 'npm-status', '--timeout-ms', 'nope', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
 
     const json = JSON.parse(result.stdout);
     expect(result.exitCode).toBe(1);

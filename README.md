@@ -54,7 +54,7 @@ Do not run `init` from your home directory unless you intend to configure your h
 npx agentloopkit init --local-only
 ```
 
-`--local-only` writes the harness, then adds a marked block to this clone's `.git/info/exclude` for `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, and `agentloop.config.json`. It does not edit `.gitignore`, global Git config, shell profiles, or files outside the current repo.
+`--local-only` writes the harness, asks Git for this clone's metadata directory, then adds a marked block to that clone's `info/exclude` for `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, and `agentloop.config.json`. It does not edit `.gitignore`, global Git config, shell profiles, or other project files.
 
 Check the published package explicitly:
 
@@ -88,6 +88,7 @@ Use `agentloop status` or `agentloop next` when an agent needs the next local ac
 
 ```bash
 npx agentloopkit status
+npx agentloopkit status --brief
 npx agentloopkit next
 ```
 
@@ -106,31 +107,31 @@ agentloop init
 agentloopkit init
 ```
 
-| Command                          | Purpose                                                     |
-| -------------------------------- | ----------------------------------------------------------- |
-| `agentloop init`                 | Generate the repo harness and config                        |
-| `agentloop doctor`               | Check setup health, commands, git state, and risk files     |
-| `agentloop create-task`          | Create a scoped task contract                               |
-| `agentloop task ...`             | List, show, pin, update, archive, and inspect task state    |
-| `agentloop status`               | Show active task, latest report, dirty files, and next step |
-| `agentloop next`                 | Print only the next recommended loop action                 |
-| `agentloop verify`               | Run configured checks and write a verification report       |
-| `agentloop summarize`            | Preview a deterministic reviewer summary                    |
-| `agentloop handoff`              | Write a reviewer handoff summary                            |
-| `agentloop check-gates`          | Check review evidence without running tests                 |
-| `agentloop artifacts`            | Inventory local task, report, handoff, and badge evidence   |
-| `agentloop report`               | Write a local static HTML evidence report                   |
-| `agentloop badge`                | Write a local SVG evidence badge                            |
-| `agentloop ci-summary`           | Summarize CI context and existing AgentLoop evidence        |
-| `agentloop release-notes`        | Draft local release notes from repo evidence                |
-| `agentloop release-check`        | Check local release readiness without publishing            |
-| `agentloop npm-status`           | Check npm registry status without publishing                |
-| `agentloop mcp-server`           | Start the read-only MCP stdio server                        |
-| `agentloop policy ...`           | Read and compare local safety policies                      |
-| `agentloop install-agent <name>` | Add agent-specific instructions                             |
-| `agentloop list-templates`       | List bundled templates                                      |
-| `agentloop completion <shell>`   | Print shell completion scripts                              |
-| `agentloop version`              | Print the CLI version                                       |
+| Command                          | Purpose                                                      |
+| -------------------------------- | ------------------------------------------------------------ |
+| `agentloop init`                 | Generate the repo harness and config                         |
+| `agentloop doctor`               | Check setup health, commands, git state, and risk files      |
+| `agentloop create-task`          | Create a scoped task contract                                |
+| `agentloop task ...`             | List, show, pin, update, archive, and inspect task state     |
+| `agentloop status`               | Show active task, current report, dirty files, and next step |
+| `agentloop next`                 | Print only the next recommended loop action                  |
+| `agentloop verify`               | Run configured checks and write a verification report        |
+| `agentloop summarize`            | Preview a deterministic reviewer summary                     |
+| `agentloop handoff`              | Write a reviewer handoff summary                             |
+| `agentloop check-gates`          | Check review evidence without running tests                  |
+| `agentloop artifacts`            | Inventory local task, report, handoff, and badge evidence    |
+| `agentloop report`               | Write a local static HTML evidence report                    |
+| `agentloop badge`                | Write a local SVG evidence badge                             |
+| `agentloop ci-summary`           | Summarize CI context and existing AgentLoop evidence         |
+| `agentloop release-notes`        | Draft local release notes from repo evidence                 |
+| `agentloop release-check`        | Check local release readiness without publishing             |
+| `agentloop npm-status`           | Check npm registry status without publishing                 |
+| `agentloop mcp-server`           | Start the read-only MCP stdio server                         |
+| `agentloop policy ...`           | Read and compare local safety policies                       |
+| `agentloop install-agent <name>` | Add agent-specific instructions                              |
+| `agentloop list-templates`       | List bundled templates                                       |
+| `agentloop completion <shell>`   | Print shell completion scripts                               |
+| `agentloop version`              | Print the CLI version                                        |
 
 See [docs/cli-reference.md](docs/cli-reference.md) for command examples, JSON modes, and safety notes.
 

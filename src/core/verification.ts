@@ -15,6 +15,7 @@ export type VerificationCommandResult = {
   exitCode: number;
   passed: boolean;
   output: string;
+  timedOut?: boolean;
 };
 
 export type VerificationCiContext = {
@@ -38,6 +39,7 @@ export type VerificationOptions = {
   taskCommands?: boolean;
   skip?: Partial<Record<'test' | 'lint' | 'typecheck' | 'build', boolean>>;
   customCommands?: string[];
+  timeoutMs?: number;
 };
 
 export type VerificationResult = {
@@ -96,6 +98,60 @@ ${failureSnippet(result.output)}
   .join('\n\n')}
 
 `;
+}
+
+function isTimeoutError(error: unknown) {
+  return Boolean(
+    error &&
+    typeof error === 'object' &&
+    'timedOut' in error &&
+    (error as { timedOut?: unknown }).timedOut === true,
+  );
+}
+
+async function runVerificationCommand(options: {
+  key: VerificationCommandKey;
+  command: string;
+  cwd: string;
+  env: NodeJS.ProcessEnv;
+  timeoutMs?: number;
+}): Promise<VerificationCommandResult> {
+  try {
+    const result = await execa(options.command, {
+      cwd: options.cwd,
+      shell: true,
+      all: true,
+      reject: false,
+      env: { ...options.env, FORCE_COLOR: '0' },
+      ...(options.timeoutMs ? { timeout: options.timeoutMs } : {}),
+    });
+    const timedOut = 'timedOut' in result && (result as { timedOut?: unknown }).timedOut === true;
+    const output = result.all ?? result.stdout ?? result.stderr ?? '';
+    return {
+      key: options.key,
+      command: options.command,
+      exitCode: result.exitCode ?? (timedOut ? 1 : 1),
+      passed: result.exitCode === 0 && !timedOut,
+      output: timedOut
+        ? `${output}${output ? '\n' : ''}Command timed out after ${options.timeoutMs}ms.`
+        : output,
+      ...(timedOut ? { timedOut: true } : {}),
+    };
+  } catch (error) {
+    if (!isTimeoutError(error)) throw error;
+    const output =
+      error && typeof error === 'object' && 'all' in error && typeof error.all === 'string'
+        ? error.all
+        : '';
+    return {
+      key: options.key,
+      command: options.command,
+      exitCode: 1,
+      passed: false,
+      output: `${output}${output ? '\n' : ''}Command timed out after ${options.timeoutMs}ms.`,
+      timedOut: true,
+    };
+  }
 }
 
 function parseTaskVerificationCommands(markdown: string) {
@@ -299,9 +355,18 @@ function renderTaskCommandContext(selection: VerificationCommandSelection) {
 function parseTaskMetadata(markdown: string) {
   const lines = markdown.split(/\r?\n/);
   return {
-    title: lines.find((line) => line.startsWith('# '))?.replace(/^#\s+/, '').trim(),
-    type: lines.find((line) => line.startsWith('- Task type:'))?.replace('- Task type:', '').trim(),
-    status: lines.find((line) => line.startsWith('- Status:'))?.replace('- Status:', '').trim(),
+    title: lines
+      .find((line) => line.startsWith('# '))
+      ?.replace(/^#\s+/, '')
+      .trim(),
+    type: lines
+      .find((line) => line.startsWith('- Task type:'))
+      ?.replace('- Task type:', '')
+      .trim(),
+    status: lines
+      .find((line) => line.startsWith('- Status:'))
+      ?.replace('- Status:', '')
+      .trim(),
   };
 }
 
@@ -379,20 +444,15 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
 
   const results: VerificationCommandResult[] = [];
   for (const [key, command] of commands) {
-    const result = await execa(command, {
-      cwd: options.cwd,
-      shell: true,
-      all: true,
-      reject: false,
-      env: { ...env, FORCE_COLOR: '0' },
-    });
-    results.push({
-      key,
-      command,
-      exitCode: result.exitCode ?? 1,
-      passed: result.exitCode === 0,
-      output: result.all ?? result.stdout ?? result.stderr ?? '',
-    });
+    results.push(
+      await runVerificationCommand({
+        key,
+        command,
+        cwd: options.cwd,
+        env,
+        timeoutMs: options.timeoutMs,
+      }),
+    );
   }
 
   const overallStatus =
@@ -425,6 +485,7 @@ ${
 
 - Exit code: ${result.exitCode}
 - Status: ${result.passed ? 'pass' : 'fail'}
+${result.timedOut ? '- Timed out: yes\n' : ''}
 
 \`\`\`text
 ${excerpt(result.output || '(no output)')}

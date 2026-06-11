@@ -21,23 +21,11 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Install AgentLoopKit
+    - name: Run AgentLoopKit
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
         AGENTLOOPKIT_VERSION: ${{ inputs.agentloopkit-version }}
         AGENTLOOPKIT_INSTALL_MODE: ${{ inputs.install-mode }}
-      run: |
-        if [ "$AGENTLOOPKIT_INSTALL_MODE" = "npm" ]; then
-          npm install --no-save --package-lock=false "agentloopkit@${AGENTLOOPKIT_VERSION}"
-        elif [ "$AGENTLOOPKIT_INSTALL_MODE" = "local" ]; then
-          npx --no-install agentloop version
-        else
-          echo "Unsupported install-mode: ${AGENTLOOPKIT_INSTALL_MODE}" >&2
-          exit 1
-        fi
-
-    - name: Run AgentLoopKit
-      shell: bash
-      working-directory: ${{ inputs.working-directory }}
-      run: npx --no-install agentloop ${{ inputs.command }}
+        AGENTLOOPKIT_COMMAND: ${{ inputs.command }}
+      run: node "$GITHUB_ACTION_PATH/scripts/github-action-runner.mjs"

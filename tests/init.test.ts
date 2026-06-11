@@ -361,7 +361,7 @@ describe('init', () => {
     await writeJson(path.join(dir, 'package.json'), { name: 'demo' });
 
     const result = await initializeAgentLoop({ cwd: dir, localOnly: true });
-    const excludePath = path.join(dir, '.git/info/exclude');
+    const excludePath = path.join(await realpath(path.join(dir, '.git')), 'info', 'exclude');
     const exclude = await readFile(excludePath, 'utf8');
     const agents = await readFile(path.join(dir, 'AGENTS.md'), 'utf8');
     const agentloop = await readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8');
@@ -402,7 +402,7 @@ describe('init', () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await initGitRepository(dir);
-    const excludePath = path.join(dir, '.git/info/exclude');
+    const excludePath = path.join(await realpath(path.join(dir, '.git')), 'info', 'exclude');
     const before = await readFile(excludePath, 'utf8');
 
     const result = await initializeAgentLoop({ cwd: dir, dryRun: true, localOnly: true });
@@ -423,6 +423,22 @@ describe('init', () => {
     await expect(initializeAgentLoop({ cwd: dir, localOnly: true })).rejects.toThrow(
       'Local-only mode requires a Git repository',
     );
+  });
+
+  test('local-only mode does not trust a fake symlinked .git directory', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await mkdir(path.join(outsideDir, 'info'), { recursive: true });
+    const outsideExcludePath = path.join(outsideDir, 'info', 'exclude');
+    await writeFile(outsideExcludePath, '# outside exclude\n');
+    await symlink(outsideDir, path.join(dir, '.git'), 'dir');
+
+    await expect(initializeAgentLoop({ cwd: dir, localOnly: true })).rejects.toThrow(
+      'Local-only mode requires a Git repository',
+    );
+    await expect(readFile(outsideExcludePath, 'utf8')).resolves.toBe('# outside exclude\n');
+    await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).rejects.toThrow();
   });
 
   test('local-only CLI setup errors are JSON when requested', async () => {

@@ -28,6 +28,7 @@ agentloop verify --no-build
 agentloop verify --task .agentloop/tasks/add-settings-page.md
 agentloop verify --task .agentloop/tasks/add-settings-page.md --task-commands
 agentloop verify --command "node smoke-test.js"
+agentloop verify --timeout-ms 120000
 agentloop verify --json
 ```
 
@@ -42,6 +43,8 @@ When the configured reports directory resolves outside the current repo through 
 When `--json` is used with an invalid `agentloop.config.json`, `verify` returns a `CONFIG_ERROR` object and does not run commands.
 
 Failed reports include a `Failure Summary` section before command output. It lists each failed command, its exit code, and final useful output lines. The summary uses the same captured command output; AgentLoopKit does not parse tool-specific stack traces or guess the root cause.
+
+Use `--timeout-ms` to set a per-command timeout for long or risky checks. Timed-out commands fail verification and the report marks `Timed out: yes`.
 
 Long command output is shortened in the command section. AgentLoopKit keeps the beginning and ending output with a truncation marker, so setup context and final error lines remain visible without committing huge logs.
 

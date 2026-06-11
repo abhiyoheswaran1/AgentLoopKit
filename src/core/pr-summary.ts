@@ -4,13 +4,12 @@ import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
 import { getGitDiffStat, getGitStatus, parseGitStatus, GitFileStatus } from './git.js';
 import { pathExists, writeTextFile } from './file-system.js';
+import { resolveExplicitArtifactPath, resolveOutputArtifactPath } from './artifacts.js';
 import {
-  latestMarkdownFile,
-  resolveExplicitArtifactPath,
-  resolveOutputArtifactPath,
-  verificationReportPattern,
-} from './artifacts.js';
-import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
+  getCurrentTaskPath,
+  getLatestVerificationReportPath,
+  resolveCurrentVerificationEvidence,
+} from './evidence.js';
 
 export type PrSummaryInput = {
   timestamp: string;
@@ -231,9 +230,7 @@ export async function summarizeRepository(options: {
           requestedPath: options.taskPath,
           expectedDir: options.config.paths.tasksDir,
         })
-      : undefined) ??
-    (await getActiveTaskPath({ cwd: options.cwd, config: options.config })) ??
-    (await getFallbackTaskPath({ cwd: options.cwd, config: options.config }));
+      : undefined) ?? (await getCurrentTaskPath({ cwd: options.cwd, config: options.config }));
   const reportPath =
     (options.reportPath
       ? await resolveExplicitArtifactPath({
@@ -243,10 +240,16 @@ export async function summarizeRepository(options: {
           expectedDir: options.config.paths.reportsDir,
         })
       : undefined) ??
-    (await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {
-      pattern: verificationReportPattern,
-      rootDir: options.cwd,
-    }));
+    (
+      await resolveCurrentVerificationEvidence({
+        cwd: options.cwd,
+        taskPath,
+        reportPath: await getLatestVerificationReportPath({
+          cwd: options.cwd,
+          config: options.config,
+        }),
+      })
+    ).currentReportPath;
   const taskMarkdown =
     taskPath && (await pathExists(taskPath)) ? await readFile(taskPath, 'utf8') : undefined;
   const verificationMarkdown =

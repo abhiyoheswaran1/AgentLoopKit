@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Added `agentloop doctor --strict` so CI or team setup gates can treat doctor warnings as failures.
+- Added `agentloop status --brief` for compact task, verification, working-tree, and next-action output.
+- Added `agentloop verify --timeout-ms <ms>` so stuck or watcher-style commands fail with clear timeout evidence instead of hanging indefinitely.
+- Changed `agentloop init --local-only` to ask Git for the real metadata directory before writing `info/exclude`, so a fake or symlinked `.git` directory cannot redirect the local-only exclude write.
+- Changed review gates, handoffs, release notes, and release checks to ignore stale verification reports that predate the active or newest open task unless the task is already in `review` or `done`.
+- Changed `agentloop release-check` to warn when `CHANGELOG.md` still has pending `Unreleased` entries before recommending publish steps.
+- Changed `agentloop npm-status` to validate package names before running npm and to clarify that npm may use normal npm configuration during live registry checks.
+- Changed `agentloop release-notes` to reject option-shaped Git refs and pass selected refs after Git's `--end-of-options`.
+- Changed the composite GitHub Action to run through a Node wrapper that validates inputs and uses argument arrays instead of shell interpolation for the AgentLoop command.
+- Changed the MCP Registry publish workflow to download a pinned `mcp-publisher` release and verify its SHA-256 before OIDC authentication.
+- Changed `agentloop doctor` risk-file scanning to use bounded traversal and report when large-repo scanning is truncated.
 - Added `agentloop release-check`, a read-only local release readiness check for package metadata, changelog entries, release scripts, git state, verification evidence, handoff evidence, generated release notes, and npm package-safety basics.
 - Added `agentloop artifacts --type <type>` and `agentloop artifacts --latest` for filtered local evidence inventories without reading artifact file contents.
 - Added actionable `doctor` next steps in human and JSON output for stale harness metadata, missing verification commands, Git context issues, monorepo warnings, dirty working trees, and risk-file categories.

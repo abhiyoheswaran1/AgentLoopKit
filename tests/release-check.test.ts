@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readdir, writeFile } from 'node:fs/promises';
+import { readdir, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -14,12 +14,14 @@ async function git(cwd: string, args: string[]) {
   return execa('git', args, { cwd });
 }
 
-async function createReleaseRepo(options: {
-  verification?: 'pass' | 'fail' | 'missing';
-  handoff?: boolean;
-  releaseNotes?: boolean;
-  dirty?: boolean;
-} = {}) {
+async function createReleaseRepo(
+  options: {
+    verification?: 'pass' | 'fail' | 'missing';
+    handoff?: boolean;
+    releaseNotes?: boolean;
+    dirty?: boolean;
+  } = {},
+) {
   const dir = await makeTempDir();
   tempDirs.push(dir);
   await git(dir, ['init', '-q']);
@@ -134,6 +136,69 @@ describe('release-check command', () => {
       ]),
     );
     expect(output.nextAction.command).toBe('agentloop handoff');
+  });
+
+  test('blocks publish recommendation when changelog has unreleased entries', async () => {
+    const dir = await createReleaseRepo();
+    await writeFile(
+      path.join(dir, 'CHANGELOG.md'),
+      '# Changelog\n\n## Unreleased\n\n- Add pending hardening work.\n\n## 1.2.3\n\n- Prepared release evidence.\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'release-check', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(0);
+    expect(output.overallStatus).toBe('warn');
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'changelog-unreleased',
+          status: 'warn',
+          message: 'CHANGELOG.md has pending Unreleased entries.',
+        }),
+      ]),
+    );
+    expect(output.nextAction.command).toBe('prepare release notes from CHANGELOG.md Unreleased');
+  });
+
+  test('warns when verification report predates the current task', async () => {
+    const dir = await createReleaseRepo();
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-11-release-hardening.md');
+    const reportPath = path.join(dir, '.agentloop/reports/2026-06-11-10-00-verification-report.md');
+    await writeFile(taskPath, '# Release hardening\n\n- Status: in-progress\n');
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-11-release-hardening.md',
+      }),
+    );
+    await utimes(reportPath, new Date('2026-06-11T10:00:00Z'), new Date('2026-06-11T10:00:00Z'));
+    await utimes(taskPath, new Date('2026-06-11T11:00:00Z'), new Date('2026-06-11T11:00:00Z'));
+
+    const result = await execa(tsxPath, [cliPath, 'release-check', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(0);
+    expect(output.overallStatus).toBe('warn');
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'verification-report',
+          status: 'warn',
+          message: 'Latest verification report predates the current task. Rerun verification.',
+          path: '.agentloop/reports/2026-06-11-10-00-verification-report.md',
+        }),
+      ]),
+    );
+    expect(output.nextAction.command).toBe('agentloop verify');
   });
 
   test('strict mode exits non-zero for warnings', async () => {

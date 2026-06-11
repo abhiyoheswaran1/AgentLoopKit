@@ -23,17 +23,17 @@ Example MCP client configuration:
 
 ## Tools
 
-| Tool                                   | Reads                                                                               |
-| -------------------------------------- | ----------------------------------------------------------------------------------- |
+| Tool                                   | Reads                                                                                                                               |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `agentloop_status`                     | Pinned active task, latest open task, parked deferred tasks, latest verification, dirty state, configured commands, and next action |
-| `agentloop_next`                       | Next recommended AgentLoopKit command and reason                                    |
-| `agentloop_list_tasks`                 | Task contracts under the configured task directory                                  |
-| `agentloop_show_active_task`           | Active task contract content                                                        |
-| `agentloop_list_policies`              | Repo-local safety policy files                                                      |
-| `agentloop_read_policy`                | One repo-local safety policy by name                                                |
-| `agentloop_latest_verification_report` | Latest verification report metadata and Markdown content                            |
-| `agentloop_list_handoffs`              | Recent reviewer handoff summaries                                                   |
-| `agentloop_latest_handoff`             | Latest reviewer handoff Markdown content                                            |
+| `agentloop_next`                       | Next recommended AgentLoopKit command and reason                                                                                    |
+| `agentloop_list_tasks`                 | Task contracts under the configured task directory                                                                                  |
+| `agentloop_show_active_task`           | Active task contract content                                                                                                        |
+| `agentloop_list_policies`              | Repo-local safety policy files                                                                                                      |
+| `agentloop_read_policy`                | One repo-local safety policy by name                                                                                                |
+| `agentloop_latest_verification_report` | Latest verification report metadata and Markdown content                                                                            |
+| `agentloop_list_handoffs`              | Recent reviewer handoff summaries                                                                                                   |
+| `agentloop_latest_handoff`             | Latest reviewer handoff Markdown content                                                                                            |
 
 ## Safety
 
@@ -62,5 +62,7 @@ The package includes MCP Registry metadata:
 - `.github/workflows/publish-mcp.yml`
 
 The MCP Registry publish workflow runs only after the npm publish workflow succeeds for the same version, or when a maintainer starts it manually. It verifies that the matching `agentloopkit` version exists on npm before submitting server metadata.
+
+The workflow downloads a pinned `mcp-publisher` release and checks its SHA-256 before OIDC authentication.
 
 MCP Registry support depends on the public registry accepting the package metadata. npm and GitHub Releases remain the primary install channels.

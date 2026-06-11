@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readdir, realpath, stat } from 'node:fs/promises';
+import { readdir, realpath } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import {
   AGENTLOOP_DIR,
@@ -15,7 +15,7 @@ import {
 import { resolveOutputArtifactPath } from './artifacts.js';
 import { AgentLoopConfig, createDefaultConfig } from './config.js';
 import { pathExists, readTextIfExists, writeTextFile } from './file-system.js';
-import { getGitRoot, isInsideGitRepo } from './git.js';
+import { getGitAbsoluteDir, getGitRoot, isInsideGitRepo } from './git.js';
 import { detectPackageManager } from './package-manager.js';
 import { detectPackageScripts, detectProjectName, detectProjectType } from './project-detection.js';
 import { getTemplateRoot, readTemplate, TemplateValues } from './template-renderer.js';
@@ -62,12 +62,7 @@ const LOCAL_ONLY_EXCLUDE_START = '# agentloopkit:local-only:start';
 const LOCAL_ONLY_EXCLUDE_END = '# agentloopkit:local-only:end';
 const LOCAL_ONLY_NOTICE_START = '<!-- agentloopkit:local-only:start -->';
 const LOCAL_ONLY_NOTICE_END = '<!-- agentloopkit:local-only:end -->';
-const LOCAL_ONLY_EXCLUDE_PATTERNS = [
-  `${AGENTLOOP_DIR}/`,
-  AGENTS_FILE,
-  AGENTLOOP_FILE,
-  CONFIG_FILE,
-];
+const LOCAL_ONLY_EXCLUDE_PATTERNS = [`${AGENTLOOP_DIR}/`, AGENTS_FILE, AGENTLOOP_FILE, CONFIG_FILE];
 
 const LOCAL_ONLY_NOTICE = `${LOCAL_ONLY_NOTICE_START}
 ## Local-only AgentLoopKit harness
@@ -217,21 +212,10 @@ async function upsertAgentsFile(cwd: string, content: string, result: InitResult
 }
 
 async function resolveGitInfoExcludePath(cwd: string) {
-  const dotGitPath = path.join(cwd, '.git');
-  const dotGitStat = await stat(dotGitPath).catch(() => undefined);
-  if (!dotGitStat) return undefined;
-  if (dotGitStat.isDirectory()) {
-    return path.join(dotGitPath, 'info', 'exclude');
-  }
-  if (!dotGitStat.isFile()) return undefined;
-
-  const gitFile = await readTextIfExists(dotGitPath);
-  const match = /^gitdir:\s*(.+)\s*$/m.exec(gitFile);
-  if (!match) return undefined;
-
-  const gitDir = match[1].trim();
-  const resolvedGitDir = path.isAbsolute(gitDir) ? gitDir : path.resolve(cwd, gitDir);
-  return path.join(resolvedGitDir, 'info', 'exclude');
+  if (!(await isInsideGitRepo(cwd))) return undefined;
+  const gitDir = await getGitAbsoluteDir(cwd);
+  if (!gitDir) return undefined;
+  return path.join(await resolveComparablePath(gitDir), 'info', 'exclude');
 }
 
 async function upsertLocalOnlyGitExclude(cwd: string, result: InitResult) {

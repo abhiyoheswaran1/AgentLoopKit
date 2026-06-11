@@ -5,13 +5,14 @@ export function doctorCommand() {
   return new Command('doctor')
     .description('Check whether this repo is ready for agentic engineering')
     .option('--json', 'print machine-readable output')
-    .action(async (options: { json?: boolean }) => {
-      const result = await runDoctor({ cwd: process.cwd() });
+    .option('--strict', 'treat warnings as failures')
+    .action(async (options: { json?: boolean; strict?: boolean }) => {
+      const result = await runDoctor({ cwd: process.cwd(), strict: options.strict });
       if (options.json) {
         console.log(JSON.stringify(result, null, 2));
       } else {
         console.log(result.markdown);
       }
-      if (result.serious.length > 0) process.exitCode = 1;
+      if (result.overallStatus === 'fail') process.exitCode = 1;
     });
 }

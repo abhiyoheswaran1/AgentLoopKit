@@ -8,7 +8,8 @@ export function statusCommand() {
   return new Command('status')
     .description('Show active task, latest verification, dirty files, and next action')
     .option('--json', 'print machine-readable output')
-    .action(async (options: { json?: boolean }) => {
+    .option('--brief', 'print compact human-readable output')
+    .action(async (options: { json?: boolean; brief?: boolean }) => {
       let config: Awaited<ReturnType<typeof loadAgentLoopConfig>>;
       try {
         config = await loadAgentLoopConfig(process.cwd());
@@ -22,6 +23,8 @@ export function statusCommand() {
       const result = await getAgentLoopStatus({ cwd: process.cwd(), config });
       if (options.json) {
         console.log(JSON.stringify(result, null, 2));
+      } else if (options.brief) {
+        console.log(result.brief);
       } else {
         console.log(result.markdown);
       }

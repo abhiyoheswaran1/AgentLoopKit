@@ -96,6 +96,8 @@ describe('doctor', () => {
 
     const result = await runDoctor({ cwd: dir });
 
+    expect(result.strict).toBe(false);
+    expect(result.overallStatus).toBe('warn');
     expect(result.serious).toHaveLength(0);
     expect(result.checks).toContainEqual({
       name: 'Template manifest',
@@ -103,6 +105,32 @@ describe('doctor', () => {
       message:
         'missing .agentloop/manifest.json; run agentloop init with the current CLI to add missing files without overwriting existing harness files',
     });
+  });
+
+  test('strict mode treats warnings as failures in JSON output', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await rm(path.join(dir, '.agentloop/manifest.json'));
+
+    const result = await execa(tsxPath, [cliPath, 'doctor', '--strict', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    const output = JSON.parse(result.stdout);
+    expect(output.strict).toBe(true);
+    expect(output.overallStatus).toBe('fail');
+    expect(output.warnings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'Template manifest',
+          status: 'warn',
+        }),
+      ]),
+    );
   });
 
   test('includes actionable next steps for common warnings', async () => {
@@ -123,23 +151,28 @@ describe('doctor', () => {
         {
           id: 'refresh-harness',
           command: 'agentloop init',
-          reason: 'Refresh missing or stale AgentLoopKit harness metadata without overwriting existing files.',
+          reason:
+            'Refresh missing or stale AgentLoopKit harness metadata without overwriting existing files.',
         },
         {
           id: 'add-verification',
           command: 'add package scripts or configure verification.commands',
-          reason: 'AgentLoopKit needs project-specific verification commands before agents can prove completion.',
+          reason:
+            'AgentLoopKit needs project-specific verification commands before agents can prove completion.',
         },
         {
           id: 'review-risk-files',
           command: 'review risk files before starting autonomous work',
-          reason: 'Risk files were detected; protect sensitive areas in the task contract before editing.',
+          reason:
+            'Risk files were detected; protect sensitive areas in the task contract before editing.',
         },
       ]),
     );
     expect(result.markdown).toContain('## Next Steps');
     expect(result.markdown).toContain('Run `agentloop init`');
-    expect(result.markdown).toContain('Run `add package scripts or configure verification.commands`');
+    expect(result.markdown).toContain(
+      'Run `add package scripts or configure verification.commands`',
+    );
     expect(result.markdown).not.toContain('do-not-print');
   });
 
@@ -281,5 +314,23 @@ describe('doctor', () => {
     ]);
     expect(result.markdown).toContain('- [warn] Risk files: env files: 1 detected: .env.local');
     expect(result.markdown).not.toContain('do-not-print');
+  });
+
+  test('warns when risk file scanning is truncated', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await mkdir(path.join(dir, 'src'), { recursive: true });
+    await writeFile(path.join(dir, 'src/auth-session.ts'), 'export const session = true;');
+    await writeFile(path.join(dir, 'src/billing.ts'), 'export const billing = true;');
+    await writeFile(path.join(dir, 'src/extra.ts'), 'export const extra = true;');
+
+    const result = await runDoctor({ cwd: dir, riskScanMaxEntries: 2 });
+
+    expect(result.checks).toContainEqual({
+      name: 'Risk file scan',
+      status: 'warn',
+      message: 'Risk scan stopped after 2 entries; review large repos with targeted checks.',
+    });
   });
 });

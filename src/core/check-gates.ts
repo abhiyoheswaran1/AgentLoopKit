@@ -1,7 +1,8 @@
 import path from 'node:path';
 import { readFile, realpath } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
-import { latestMarkdownFile, prSummaryPattern, verificationReportPattern } from './artifacts.js';
+import { latestMarkdownFile, prSummaryPattern } from './artifacts.js';
+import { resolveCurrentTaskVerificationEvidence } from './evidence.js';
 import { pathExists, resolvesInsidePath } from './file-system.js';
 import {
   getGitBranch,
@@ -11,7 +12,7 @@ import {
   isInsideGitRepo,
   parseGitStatus,
 } from './git.js';
-import { getActiveTaskPath, getFallbackTaskPath, inspectTaskDirectory } from './task-state.js';
+import { inspectTaskDirectory } from './task-state.js';
 
 export type GateStatus = 'pass' | 'warn' | 'fail';
 
@@ -108,7 +109,7 @@ function chooseNextAction(gates: GateCheck[]) {
   }
   if (report?.status === 'fail') {
     return {
-      command: 'agentloop verify',
+      command: task?.path ? `agentloop verify --task ${task.path}` : 'agentloop verify',
       reason: 'Run verification and fix failures before review.',
     };
   }
@@ -175,16 +176,16 @@ export async function checkGates(options: {
   strict?: boolean;
 }): Promise<CheckGatesResult> {
   const strict = options.strict ?? false;
-  const taskPath =
-    (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
-  const reportPath = await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {
-    pattern: verificationReportPattern,
-    rootDir: options.cwd,
-  });
-  const handoffPath = await latestMarkdownFile(path.join(options.cwd, options.config.paths.handoffsDir), {
-    pattern: prSummaryPattern,
-    rootDir: options.cwd,
-  });
+  const evidence = await resolveCurrentTaskVerificationEvidence(options);
+  const taskPath = evidence.taskPath;
+  const reportPath = evidence.currentReportPath;
+  const handoffPath = await latestMarkdownFile(
+    path.join(options.cwd, options.config.paths.handoffsDir),
+    {
+      pattern: prSummaryPattern,
+      rootDir: options.cwd,
+    },
+  );
   const gates: GateCheck[] = [];
 
   if (taskPath) {
@@ -212,6 +213,16 @@ export async function checkGates(options: {
         status === 'pass' ? 'pass' : 'fail',
         `Overall status: ${status}`,
         relativePath(options.cwd, reportPath),
+      ),
+    );
+  } else if (evidence.staleReport) {
+    gates.push(
+      gate(
+        'verification-report',
+        'Verification report',
+        'fail',
+        evidence.staleReport.message,
+        evidence.staleReport.relativePath,
       ),
     );
   } else {

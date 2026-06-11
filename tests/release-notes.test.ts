@@ -4,6 +4,7 @@ import { mkdir, readdir, readFile, rm, symlink, writeFile } from 'node:fs/promis
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { generateReleaseNotes } from '../src/core/release-notes.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -308,5 +309,19 @@ describe('release-notes command', () => {
     expect(result.stdout).toContain('- Range: HEAD (missing from: v9.9.9)');
     expect(result.stdout).toContain('Add release note behavior');
     expect(result.stdout).toContain('No changed files detected for the selected range');
+  });
+
+  test('rejects option-shaped git refs before running release-note git commands', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    await expect(
+      generateReleaseNotes({
+        cwd: dir,
+        config,
+        from: '--upload-pack=echo-owned',
+        to: 'HEAD',
+      }),
+    ).rejects.toThrow('Invalid git ref for --from');
   });
 });

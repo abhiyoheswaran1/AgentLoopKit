@@ -12,6 +12,15 @@ function collect(value: string, previous: string[]) {
   return previous;
 }
 
+function parseTimeoutMs(value: unknown) {
+  if (value === undefined) return undefined;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error('Timeout must be a positive integer in milliseconds.');
+  }
+  return parsed;
+}
+
 function printArtifactPathJsonError(error: ArtifactPathError) {
   console.log(
     JSON.stringify(
@@ -43,6 +52,7 @@ export function verifyCommand() {
     .option('--no-lint', 'skip lint command')
     .option('--no-typecheck', 'skip typecheck command')
     .option('--command <command>', 'custom command to run', collect, [])
+    .option('--timeout-ms <ms>', 'per-command timeout in milliseconds')
     .action(async (options: Record<string, unknown>) => {
       const config = await loadConfigForJsonCommand(process.cwd(), options.json === true);
       if (!config) return;
@@ -77,6 +87,7 @@ export function verifyCommand() {
             typecheck: options.typecheck === false,
           },
           customCommands: options.command as string[],
+          timeoutMs: parseTimeoutMs(options.timeoutMs),
         });
       } catch (error) {
         if (options.json && error instanceof OutputPathError) {

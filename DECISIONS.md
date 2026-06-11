@@ -209,3 +209,19 @@ The cross-platform smoke workflow builds AgentLoopKit and then runs `scripts/smo
 ## 2026-06-11: GitHub Action Supports npm And Local Dependency Modes
 
 The composite action should support two clear usage paths: install AgentLoopKit from npm, or use an already-installed local dev dependency. `install-mode` is explicit and validated. npm mode runs in the configured working directory and uses `--package-lock=false` to avoid CI lockfile churn. Local mode verifies the existing local binary before running the requested command.
+
+## 2026-06-11: Current Verification Evidence Must Match Current Task
+
+AgentLoopKit should not treat any passing verification report as current evidence when a newer active or open task exists. Status already used this rule; gates, handoffs, release notes, and release checks now use the same freshness check. A report that predates an `in-progress` task is stale and the next action points back to verification. Tasks in `review` or `done` keep their report because the status change normally happens after verification.
+
+## 2026-06-11: Automation Wrappers Validate Before Spawning Commands
+
+The GitHub Action should not interpolate user-provided command strings into shell. The composite action now delegates to a small Node wrapper that validates install mode, accepts only `latest` or exact semver package versions, rejects shell metacharacters in `command`, and spawns npm/npx with argument arrays. The README and CI docs still tell maintainers to keep action inputs static because static workflow values are easier to review.
+
+## 2026-06-11: Release Helpers Stay Conservative
+
+Release helpers are evidence checks, not release authority. `release-check` warns when `CHANGELOG.md` has pending `Unreleased` entries, `release-notes` rejects option-shaped Git refs, and `npm-status` validates package names before calling npm. The MCP Registry workflow pins and verifies `mcp-publisher` before OIDC authentication. These checks reduce accidental release claims without adding publishing side effects to local CLI commands.
+
+## 2026-06-11: Doctor Scans Are Bounded
+
+`agentloop doctor` should return promptly in large repositories. Risk-file detection now uses bounded traversal and reports when the scan stops early. The warning tells maintainers to run targeted checks instead of presenting a partial scan as complete coverage.

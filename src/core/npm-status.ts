@@ -43,6 +43,9 @@ type NpmViewRunner = (packageName: string) => Promise<{
   stderr: string;
 }>;
 
+const NPM_UNSCOPED_NAME_PATTERN = /^[a-z0-9][a-z0-9._~-]*$/;
+const NPM_SCOPED_NAME_PATTERN = /^@[a-z0-9][a-z0-9._~-]*\/[a-z0-9][a-z0-9._~-]*$/;
+
 function uniqueStrings(values: string[]) {
   return Array.from(new Set(values.filter(Boolean)));
 }
@@ -53,6 +56,24 @@ function valueAsString(value: unknown) {
 
 function isString(value: string | undefined): value is string {
   return typeof value === 'string';
+}
+
+export function validateNpmPackageName(packageName: string) {
+  const name = packageName.trim();
+  if (
+    !name ||
+    name.length > 214 ||
+    name.startsWith('-') ||
+    /^(npm:|file:|link:|git\+|https?:)/i.test(name) ||
+    name.includes('://') ||
+    (!NPM_UNSCOPED_NAME_PATTERN.test(name) && !NPM_SCOPED_NAME_PATTERN.test(name))
+  ) {
+    throw new AgentLoopError(
+      `Invalid npm package name: ${packageName}. Use a registry package name such as agentloopkit or @scope/name.`,
+      'NPM_PACKAGE_NAME_INVALID',
+    );
+  }
+  return name;
 }
 
 function valueAsVersions(value: unknown) {
@@ -93,7 +114,10 @@ async function readPackageMetadata(cwd: string): Promise<PackageMetadata> {
 }
 
 async function readAgentLoopKitPackageVersion() {
-  const packagePath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../package.json');
+  const packagePath = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../../package.json',
+  );
   const parsed = JSON.parse(await readFile(packagePath, 'utf8')) as Partial<PackageMetadata>;
   if (typeof parsed.version !== 'string' || !parsed.version.trim()) {
     throw new AgentLoopError('AgentLoopKit package version could not be read.');
@@ -103,7 +127,7 @@ async function readAgentLoopKitPackageVersion() {
 
 function defaultNpmViewRunner(cwd: string, timeoutMs: number): NpmViewRunner {
   return async (packageName) => {
-    const result = await execa('npm', ['view', packageName, 'version', 'versions', '--json'], {
+    const result = await execa('npm', ['view', '--json', packageName, 'version', 'versions'], {
       cwd,
       reject: false,
       timeout: timeoutMs,
@@ -161,7 +185,7 @@ ${result.recommendation}
 
 ## Safety
 
-This command only runs \`npm view ${result.packageName} version versions --json\` unless \`--registry-json\` is provided. It does not publish packages, create tags, create GitHub releases, read npm tokens, read .env files, upload files, or change package metadata.
+This command only runs \`npm view --json ${result.packageName} version versions\` unless \`--registry-json\` is provided. AgentLoopKit does not read npm token files directly, but npm may use normal npm configuration when the live registry check runs. It does not publish packages, create tags, create GitHub releases, read .env files, upload files, or change package metadata.
 `;
 }
 
@@ -175,7 +199,11 @@ export async function checkNpmStatus(options: {
   timeoutMs?: number;
 }): Promise<NpmStatusResult> {
   const packageMetadata = await readPackageMetadata(options.cwd);
-  const packageName = options.agentloopkit ? (options.packageName ?? 'agentloopkit') : (options.packageName ?? packageMetadata.name);
+  const packageName = validateNpmPackageName(
+    options.agentloopkit
+      ? (options.packageName ?? 'agentloopkit')
+      : (options.packageName ?? packageMetadata.name),
+  );
   const localVersion =
     options.localVersion ??
     (options.agentloopkit ? await readAgentLoopKitPackageVersion() : packageMetadata.version);
@@ -200,7 +228,9 @@ export async function checkNpmStatus(options: {
       sourceResult = {
         ...source,
         exitCode: result.exitCode,
-        ...(result.exitCode === 0 ? {} : { error: result.stderr || result.stdout || 'npm view failed' }),
+        ...(result.exitCode === 0
+          ? {}
+          : { error: result.stderr || result.stdout || 'npm view failed' }),
       };
       if (result.exitCode === 0) registry = parseNpmViewJson(result.stdout);
     }
@@ -234,7 +264,7 @@ export async function checkNpmStatus(options: {
         'publish packages',
         'create tags',
         'create GitHub releases',
-        'read npm tokens',
+        'read npm token files directly',
         'read .env files',
         'upload files',
         'change package metadata',

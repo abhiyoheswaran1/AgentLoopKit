@@ -15,10 +15,11 @@ agentloop npm-status --registry-json npm-view.json
 By default, the command runs:
 
 ```bash
-npm view <package> version versions --json
+npm view --json <package> version versions
 ```
 
 It compares that registry output with `package.json` in the current directory.
+AgentLoopKit validates the package name before running npm so option-shaped values, aliases, file paths, and URLs are rejected.
 
 Use `--agentloopkit` when you are checking AgentLoopKit itself from a release smoke directory, CI workspace, or another folder:
 
@@ -97,9 +98,11 @@ Reasons are `missing`, `unreadable`, or `invalid-json`.
 - publish packages
 - create tags
 - create GitHub releases
-- read npm tokens
+- read npm token files directly
 - read `.env` files
 - upload files
 - change package metadata
+
+When the live registry check runs, npm may still use your normal npm configuration. Use `--registry-json` when you need an offline or captured check.
 
 It treats registry errors as `unknown`, not success. Do not claim npm availability until `npm latest` matches the local version or a newer intended release.

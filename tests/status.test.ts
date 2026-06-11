@@ -181,6 +181,49 @@ describe('status command', () => {
     expect(result.stdout).toContain('agentloop create-task');
   });
 
+  test('prints compact status with --brief', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-09-ship-brief-status.md');
+    await writeFile(taskPath, '# Ship brief status\n\n- Status: in progress\n');
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-09-ship-brief-status.md',
+      }),
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await writeFile(path.join(dir, 'changed.txt'), 'pending change\n');
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--brief'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--brief', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).not.toContain('# AgentLoopKit Status');
+    expect(result.stdout).toContain('AgentLoopKit:');
+    expect(result.stdout).toContain('task="Ship brief status"');
+    expect(result.stdout).toContain('status="in progress"');
+    expect(result.stdout).toContain('verification=pass');
+    expect(result.stdout).toContain('tree=dirty');
+    expect(result.stdout).toContain('next="agentloop handoff"');
+    expect(jsonResult.exitCode).toBe(0);
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.brief).toContain('next="agentloop handoff"');
+  });
+
   test('points back to verification when the latest report failed', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -313,11 +356,7 @@ describe('status command', () => {
     await writeFile(openPath, '# Open task\n\n- Status: proposed\n');
     await writeFile(deferredPath, '# Deferred task\n\n- Status: deferred\n');
     await utimes(openPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
-    await utimes(
-      deferredPath,
-      new Date('2026-06-10T10:00:00Z'),
-      new Date('2026-06-10T10:00:00Z'),
-    );
+    await utimes(deferredPath, new Date('2026-06-10T10:00:00Z'), new Date('2026-06-10T10:00:00Z'));
 
     const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
       cwd: dir,

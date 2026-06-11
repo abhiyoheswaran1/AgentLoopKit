@@ -99,7 +99,9 @@ describe('verification', () => {
     expect(result.markdown).toContain('- Event: pull_request');
     expect(result.markdown).toContain('- Ref: refs/pull/42/merge');
     expect(result.markdown).toContain('- Commit: abcdef1234567890');
-    expect(result.markdown).toContain('- Run URL: https://github.com/acme/demo/actions/runs/123456789');
+    expect(result.markdown).toContain(
+      '- Run URL: https://github.com/acme/demo/actions/runs/123456789',
+    );
     expect(result.markdown).toContain('- Run attempt: 2');
     expect(result.markdown).not.toContain('EXTRA_ENV_VALUE');
     expect(result.markdown).not.toContain('do-not-print');
@@ -168,7 +170,9 @@ describe('verification', () => {
     expect(result.markdown).toContain('- Event: pull_request');
     expect(result.markdown).toContain('- Ref: feature/agentloop');
     expect(result.markdown).toContain('- Commit: fedcba0987654321');
-    expect(result.markdown).toContain('- Run URL: https://buildkite.com/acme/agentloopkit/builds/42');
+    expect(result.markdown).toContain(
+      '- Run URL: https://buildkite.com/acme/agentloopkit/builds/42',
+    );
     expect(result.markdown).not.toContain('redacted-fixture-value');
     expect(result.markdown).not.toContain('do-not-print-extra');
   });
@@ -314,6 +318,40 @@ describe('verification', () => {
     expect(result.markdown).toContain('setup line');
   });
 
+  test('marks commands as failed when they exceed the verification timeout', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "setTimeout(() => {}, 1000)"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-11-12-45',
+      nowIso: '2026-06-11T12:45:00.000Z',
+      timeoutMs: 50,
+    });
+
+    expect(result.overallStatus).toBe('fail');
+    expect(result.commands[0]).toMatchObject({
+      key: 'test',
+      passed: false,
+      timedOut: true,
+    });
+    expect(result.markdown).toContain('Timed out: yes');
+    expect(result.markdown).toContain('Command timed out after 50ms.');
+  });
+
   test('includes task context when a task path is provided', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -373,7 +411,7 @@ describe('verification', () => {
         '- Status: in-progress',
         '',
         '## Verification Commands',
-        '- node -e "require(\'fs\').writeFileSync(\'task-command-ran.txt\', \'yes\')"',
+        "- node -e \"require('fs').writeFileSync('task-command-ran.txt', 'yes')\"",
         '',
       ].join('\n'),
     );
@@ -405,7 +443,7 @@ describe('verification', () => {
         '- Status: in-progress',
         '',
         '## Verification Commands',
-        '- node -e "require(\'fs\').writeFileSync(\'task-command-ran.txt\', \'yes\'); console.log(\'task-check\')"',
+        "- node -e \"require('fs').writeFileSync('task-command-ran.txt', 'yes'); console.log('task-check')\"",
         '',
       ].join('\n'),
     );
@@ -425,19 +463,21 @@ describe('verification', () => {
       requested: true,
       foundCount: 1,
       commands: [
-        'node -e "require(\'fs\').writeFileSync(\'task-command-ran.txt\', \'yes\'); console.log(\'task-check\')"',
+        "node -e \"require('fs').writeFileSync('task-command-ran.txt', 'yes'); console.log('task-check')\"",
       ],
     });
     expect(result.commands).toEqual([
       expect.objectContaining({
         key: 'task',
         command:
-          'node -e "require(\'fs\').writeFileSync(\'task-command-ran.txt\', \'yes\'); console.log(\'task-check\')"',
+          "node -e \"require('fs').writeFileSync('task-command-ran.txt', 'yes'); console.log('task-check')\"",
         passed: true,
       }),
     ]);
     expect(result.markdown).toContain('### task: `node -e');
-    expect(result.markdown).not.toContain('Task verification commands were requested, but none were found.');
+    expect(result.markdown).not.toContain(
+      'Task verification commands were requested, but none were found.',
+    );
     expect(await readFile(path.join(dir, 'task-command-ran.txt'), 'utf8')).toBe('yes');
   });
 
@@ -594,7 +634,7 @@ describe('verification', () => {
         '# Outside Command Task',
         '',
         '## Verification Commands',
-        '- node -e "require(\'fs\').writeFileSync(\'outside-command-ran.txt\', \'yes\')"',
+        "- node -e \"require('fs').writeFileSync('outside-command-ran.txt', 'yes')\"",
         '',
       ].join('\n'),
     );
@@ -629,7 +669,7 @@ describe('verification', () => {
         '- Status: leaked',
         '',
         '## Verification Commands',
-        '- node -e "require(\'fs\').writeFileSync(\'symlink-command-ran.txt\', \'yes\')"',
+        "- node -e \"require('fs').writeFileSync('symlink-command-ran.txt', 'yes')\"",
         '',
       ].join('\n'),
     );
@@ -708,7 +748,7 @@ describe('verification', () => {
           type: 'generic',
           packageManager: 'npm',
           commands: {
-            test: 'node -e "require(\'fs\').writeFileSync(\'verify-command-ran.txt\', \'yes\')"',
+            test: "node -e \"require('fs').writeFileSync('verify-command-ran.txt', 'yes')\"",
             lint: '',
             typecheck: '',
             build: '',
@@ -757,7 +797,7 @@ describe('verification', () => {
           type: 'generic',
           packageManager: 'npm',
           commands: {
-            test: 'node -e "require(\'fs\').writeFileSync(\'verify-command-ran.txt\', \'yes\')"',
+            test: "node -e \"require('fs').writeFileSync('verify-command-ran.txt', 'yes')\"",
             lint: '',
             typecheck: '',
             build: '',
@@ -808,7 +848,7 @@ describe('verification', () => {
           type: 'generic',
           packageManager: 'npm',
           commands: {
-            test: 'node -e "require(\'fs\').writeFileSync(\'verify-command-ran.txt\', \'yes\')"',
+            test: "node -e \"require('fs').writeFileSync('verify-command-ran.txt', 'yes')\"",
             lint: '',
             typecheck: '',
             build: '',
@@ -851,7 +891,7 @@ describe('verification', () => {
       JSON.stringify({
         version: 2,
         commands: {
-          test: 'node -e "require(\'fs\').writeFileSync(\'verify-command-ran.txt\', \'yes\')"',
+          test: "node -e \"require('fs').writeFileSync('verify-command-ran.txt', 'yes')\"",
         },
       }),
     );

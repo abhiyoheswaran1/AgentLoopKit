@@ -24,38 +24,49 @@ describe('distribution artifacts', () => {
     const workflow = await readFile('.github/workflows/publish-mcp.yml', 'utf8');
 
     expect(workflow).toContain('workflow_run:');
-    expect(workflow).toContain('workflows: ["Publish"]');
+    expect(workflow).toMatch(/workflows:\s+\[['"]Publish['"]\]/);
     expect(workflow).toContain('id-token: write');
     expect(workflow).toContain('mcp-publisher login github-oidc');
     expect(workflow).toContain('mcp-publisher publish');
     expect(workflow).toContain('npm view "$PACKAGE_NAME@$PACKAGE_VERSION" version');
+    expect(workflow).toContain('MCP_PUBLISHER_VERSION: v1.7.9');
+    expect(workflow).toContain('ab128162b0616090b47cf245afe0a23f3ef08936fdce19074f5ba0a4469281ac');
+    expect(workflow).toContain('sha256sum --check');
+    expect(workflow).not.toContain('releases/latest');
   });
 
   test('GitHub Action is a thin AgentLoopKit CLI wrapper', async () => {
     const action = await readFile('action.yml', 'utf8');
+    const runner = await readFile('scripts/github-action-runner.mjs', 'utf8');
 
     expect(action).toContain('using: composite');
     expect(action).toContain('agentloopkit-version');
     expect(action).toContain('install-mode');
     expect(action).toContain("default: 'latest'");
     expect(action).toContain("default: 'npm'");
-    expect(action).toContain('if [ "$AGENTLOOPKIT_INSTALL_MODE" = "npm" ]');
-    expect(action).toContain('elif [ "$AGENTLOOPKIT_INSTALL_MODE" = "local" ]');
-    expect(action).toContain('else');
-    expect(action).toContain('Unsupported install-mode');
-    expect(action).toContain('npm install --no-save --package-lock=false "agentloopkit@${AGENTLOOPKIT_VERSION}"');
-    expect(action.match(/working-directory: \$\{\{ inputs\.working-directory \}\}/g)).toHaveLength(2);
+    expect(action).toContain('AGENTLOOPKIT_COMMAND: ${{ inputs.command }}');
+    expect(action).toContain('node "$GITHUB_ACTION_PATH/scripts/github-action-runner.mjs"');
+    expect(action.match(/working-directory: \$\{\{ inputs\.working-directory \}\}/g)).toHaveLength(
+      1,
+    );
     expect(action).not.toMatch(/default: ['"]\d+\.\d+\.\d+['"]/);
-    expect(action).toContain('npx --no-install agentloop ${{ inputs.command }}');
+    expect(action).not.toContain('npx --no-install agentloop ${{ inputs.command }}');
+    expect(runner).toContain('spawnSync(command, args');
+    expect(runner).toContain('shell: false');
+    expect(runner).toContain("run('npx', ['--no-install', 'agentloop', ...plan.commandArgs])");
     expect(action).not.toContain('upload-artifact');
   });
 
   test('GitHub Action avoids direct shell interpolation for package version input', async () => {
     const action = await readFile('action.yml', 'utf8');
+    const runner = await readFile('scripts/github-action-runner.mjs', 'utf8');
 
     expect(action).toContain('AGENTLOOPKIT_VERSION: ${{ inputs.agentloopkit-version }}');
     expect(action).toContain('AGENTLOOPKIT_INSTALL_MODE: ${{ inputs.install-mode }}');
-    expect(action).toContain('npm install --no-save --package-lock=false "agentloopkit@${AGENTLOOPKIT_VERSION}"');
+    expect(runner).toContain(
+      "run('npm', ['install', '--no-save', '--package-lock=false', plan.packageSpec])",
+    );
+    expect(runner).toContain('validateAgentLoopKitVersion');
     expect(action).not.toContain('agentloopkit@${{ inputs.agentloopkit-version }}');
   });
 
@@ -65,7 +76,9 @@ describe('distribution artifacts', () => {
 
     expect(docs).toContain('install-mode: npm');
     expect(docs).toContain('install-mode: local');
-    expect(docs).toContain('Use `install-mode: local` only when the repo already installs AgentLoopKit as a dev dependency.');
+    expect(docs).toContain(
+      'Use `install-mode: local` only when the repo already installs AgentLoopKit as a dev dependency.',
+    );
     expect(example).toContain('install-mode: npm');
     expect(example).toContain('install-mode: local');
   });
@@ -122,6 +135,8 @@ describe('distribution artifacts', () => {
 
     expect(buildStep).toBeGreaterThan(-1);
     expect(smokeStep).toBeGreaterThan(buildStep);
-    expect(workflow).not.toMatch(/npm publish|pnpm publish|gh release|mcp-publisher|upload-artifact/i);
+    expect(workflow).not.toMatch(
+      /npm publish|pnpm publish|gh release|mcp-publisher|upload-artifact/i,
+    );
   });
 });

@@ -144,7 +144,9 @@ jobs:
           install-mode: npm
 ```
 
-The action installs `agentloopkit` with npm and runs the command you provide. In npm mode it uses `--package-lock=false` so the CI step does not rewrite package lockfiles. It does not upload artifacts, comment on pull requests, read secrets, or replace the direct npm recipes above.
+The action installs `agentloopkit` with npm and runs the command you provide through a small Node wrapper that uses argument arrays instead of shell interpolation. The wrapper accepts `latest` or exact semver package versions, rejects shell metacharacters in `command`, and keeps `install-mode` to `npm` or `local`.
+
+In npm mode it uses `--package-lock=false` so the CI step does not rewrite package lockfiles. It does not upload artifacts, comment on pull requests, read secrets, or replace the direct npm recipes above.
 
 Use local mode only after the workflow has installed the project dependencies:
 
@@ -209,5 +211,6 @@ npx --no-install agentloop check-gates --strict
 - `agentloop verify` and `agentloop ci-summary` do not dump arbitrary environment variables. They only record allowlisted CI provenance fields.
 - Do not pass untrusted pull request or user input to command.
 - Do not pass untrusted pull request or user input to agentloopkit-version.
+- The composite action validates those inputs, but static workflow values remain easier to review.
 - Do not grant write permissions unless another workflow step needs them.
 - Do not let CI commit generated reports unless maintainers explicitly want that behavior.

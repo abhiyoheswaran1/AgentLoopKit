@@ -93,10 +93,39 @@ describe('PR summary generation', () => {
       path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
       '# Demo task\n\n- Status: in-progress\n',
     );
+    await utimes(
+      path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+      new Date('2026-06-09T10:00:00Z'),
+      new Date('2026-06-09T10:00:00Z'),
+    );
+    await utimes(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-00-verification-report.md'),
+      new Date('2026-06-09T11:00:00Z'),
+      new Date('2026-06-09T11:00:00Z'),
+    );
 
     const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
 
     expect(summary.markdown).toContain('Overall status: pass');
+  });
+
+  test('does not use a stale verification report that predates the task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-09-demo.md');
+    const reportPath = path.join(dir, '.agentloop/reports/2026-06-09-12-00-verification-report.md');
+    await writeFile(taskPath, '# Demo task\n\n- Status: in-progress\n');
+    await writeFile(reportPath, '# Verification Report\n\nOverall status: pass\n');
+    await utimes(reportPath, new Date('2026-06-09T10:00:00Z'), new Date('2026-06-09T10:00:00Z'));
+    await utimes(taskPath, new Date('2026-06-09T11:00:00Z'), new Date('2026-06-09T11:00:00Z'));
+
+    const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
+
+    expect(summary.markdown).toContain('Verification status: No verification report found.');
+    expect(summary.markdown).not.toContain('Overall status: pass');
   });
 
   test('uses newest open task instead of a newer finished task for fallback context', async () => {

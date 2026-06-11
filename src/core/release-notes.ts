@@ -2,6 +2,7 @@ import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { AgentLoopConfig } from './config.js';
+import { AgentLoopError } from './errors.js';
 import {
   ciSummaryPattern,
   latestMarkdownFile,
@@ -61,10 +62,14 @@ async function gitLines(cwd: string, args: string[]) {
 }
 
 async function gitRefExists(cwd: string, ref: string) {
-  const result = await execa('git', ['rev-parse', '--verify', '--quiet', `${ref}^{commit}`], {
-    cwd,
-    reject: false,
-  });
+  const result = await execa(
+    'git',
+    ['rev-parse', '--verify', '--quiet', '--end-of-options', `${ref}^{commit}`],
+    {
+      cwd,
+      reject: false,
+    },
+  );
   return result.exitCode === 0;
 }
 
@@ -143,6 +148,14 @@ function parseNameStatus(lines: string[]) {
     const [status = '?', ...rest] = line.split(/\s+/);
     return { status, path: rest.join(' ') };
   });
+}
+
+function validateGitRef(optionName: string, ref: string) {
+  const value = ref.trim();
+  if (!value || value.startsWith('-') || value.includes('..') || /[\0\r\n]/.test(value)) {
+    throw new AgentLoopError(`Invalid git ref for ${optionName}: ${ref}`, 'GIT_REF_INVALID');
+  }
+  return value;
 }
 
 function renderList(lines: string[], empty: string) {
@@ -238,8 +251,9 @@ export async function generateReleaseNotes(options: {
   const timestamp = options.timestamp ?? formatTimestamp();
   const packageMetadata = await readPackageMetadata(options.cwd);
   const version = options.version ?? packageMetadata.version;
-  const to = options.to ?? 'HEAD';
-  const requestedFrom = options.from ?? (await findPreviousTag(options.cwd, version));
+  const to = validateGitRef('--to', options.to ?? 'HEAD');
+  const discoveredFrom = options.from ?? (await findPreviousTag(options.cwd, version));
+  const requestedFrom = discoveredFrom ? validateGitRef('--from', discoveredFrom) : undefined;
   const from =
     requestedFrom && (await gitRefExists(options.cwd, requestedFrom)) ? requestedFrom : undefined;
   const fallbackReason = requestedFrom
@@ -258,12 +272,11 @@ export async function generateReleaseNotes(options: {
     fallbackReason,
   };
   const commitArgs = from
-    ? ['log', '--pretty=format:%s', `${from}..${to}`]
-    : ['log', '--pretty=format:%s', '-n', '10', to];
-  const diffArgs = from ? ['diff', '--name-status', `${from}..${to}`] : [];
+    ? ['log', '--pretty=format:%s', '--end-of-options', `${from}..${to}`]
+    : ['log', '--pretty=format:%s', '-n', '10', '--end-of-options', to];
+  const diffArgs = from ? ['diff', '--name-status', '--end-of-options', `${from}..${to}`] : [];
   const reportsDir = path.join(options.cwd, options.config.paths.reportsDir);
-  const taskPath =
-    (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
+  const taskPath = (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
   const verificationPath = await latestMarkdownFile(reportsDir, {
     pattern: verificationReportPattern,
     rootDir: options.cwd,

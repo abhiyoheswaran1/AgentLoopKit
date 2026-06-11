@@ -8,7 +8,7 @@ It reads:
 - active task pointer in `.agentloop/state.json`, when present
 - newest open task contract in `.agentloop/tasks/` as `latestTask` when no task is pinned
 - deferred task contracts in `.agentloop/tasks/` as parked `deferredTasks`
-- latest `*-verification-report.md` in `.agentloop/reports/`
+- current `*-verification-report.md` in `.agentloop/reports/`
 - git branch, commit, root, target, and working tree status
 - configured verification commands
 
@@ -23,6 +23,14 @@ Use JSON for scripts and agents:
 ```bash
 agentloop status --json
 ```
+
+Use brief output when an agent prompt, shell script, or status line does not need the full Markdown block:
+
+```bash
+agentloop status --brief
+```
+
+Brief output includes the task, task status, verification state, working tree state, next command, and reason.
 
 Use the smaller next-action command when you do not need the full status block:
 
