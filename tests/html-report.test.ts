@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
@@ -139,5 +140,34 @@ describe('HTML report generation', () => {
     expect(payload.metadata.verificationStatus).toBe('custom-pass');
     expect(payload.sourcePaths.verification).toBe('.agentloop/reports/manual-verification.md');
     expect(await readFile(outPath, 'utf8')).toContain('Overall status: custom-pass');
+  });
+
+  test('CLI report command prints explicit missing handoff paths as JSON errors without writing', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+
+    const outPath = path.join(dir, '.agentloop/reports/custom-report.html');
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'report', '--handoff', '.agentloop/handoffs/missing.md', '--out', outPath, '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    const payload = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(payload).toEqual({
+      error: {
+        code: 'ARTIFACT_PATH_INVALID',
+        message: 'Handoff artifact not found: .agentloop/handoffs/missing.md',
+        artifactType: 'handoff',
+        requestedPath: '.agentloop/handoffs/missing.md',
+        expectedDir: '.agentloop/handoffs',
+        reason: 'missing',
+      },
+    });
+    expect(existsSync(outPath)).toBe(false);
   });
 });

@@ -4,7 +4,11 @@ import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
 import { getGitDiffStat, getGitStatus, parseGitStatus, GitFileStatus } from './git.js';
 import { pathExists, writeTextFile } from './file-system.js';
-import { latestMarkdownFile, verificationReportPattern } from './artifacts.js';
+import {
+  latestMarkdownFile,
+  resolveExplicitArtifactPath,
+  verificationReportPattern,
+} from './artifacts.js';
 import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 
 export type PrSummaryInput = {
@@ -219,11 +223,25 @@ export async function summarizeRepository(options: {
   const changedFiles = await parseGitStatus(status);
   const diffStat = await getGitDiffStat(options.cwd);
   const taskPath =
-    options.taskPath ??
+    (options.taskPath
+      ? await resolveExplicitArtifactPath({
+          cwd: options.cwd,
+          artifactType: 'task',
+          requestedPath: options.taskPath,
+          expectedDir: options.config.paths.tasksDir,
+        })
+      : undefined) ??
     (await getActiveTaskPath({ cwd: options.cwd, config: options.config })) ??
     (await getFallbackTaskPath({ cwd: options.cwd, config: options.config }));
   const reportPath =
-    options.reportPath ??
+    (options.reportPath
+      ? await resolveExplicitArtifactPath({
+          cwd: options.cwd,
+          artifactType: 'verification',
+          requestedPath: options.reportPath,
+          expectedDir: options.config.paths.reportsDir,
+        })
+      : undefined) ??
     (await latestMarkdownFile(path.join(options.cwd, options.config.paths.reportsDir), {
       pattern: verificationReportPattern,
     }));

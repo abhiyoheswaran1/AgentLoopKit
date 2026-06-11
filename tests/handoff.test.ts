@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -108,5 +108,55 @@ describe('handoff command', () => {
     const output = JSON.parse(result.stdout);
     expect(output.markdown).toContain('Task context: Demo task');
     expect(output.markdown).not.toContain('Task context: Newer task');
+  });
+
+  test('prints explicit missing summarize task paths as JSON errors', async () => {
+    const dir = await createSummaryFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'summarize', '--task', '.agentloop/tasks/missing.md', '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output).toEqual({
+      error: {
+        code: 'ARTIFACT_PATH_INVALID',
+        message: 'Task artifact not found: .agentloop/tasks/missing.md',
+        artifactType: 'task',
+        requestedPath: '.agentloop/tasks/missing.md',
+        expectedDir: '.agentloop/tasks',
+        reason: 'missing',
+      },
+    });
+  });
+
+  test('prints explicit missing handoff verification paths as JSON errors without writing', async () => {
+    const dir = await createSummaryFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'handoff', '--verification', '.agentloop/reports/missing.md', '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    const output = JSON.parse(result.stdout);
+    const handoffs = await readdir(path.join(dir, '.agentloop/handoffs')).catch(() => []);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output).toEqual({
+      error: {
+        code: 'ARTIFACT_PATH_INVALID',
+        message: 'Verification artifact not found: .agentloop/reports/missing.md',
+        artifactType: 'verification',
+        requestedPath: '.agentloop/reports/missing.md',
+        expectedDir: '.agentloop/reports',
+        reason: 'missing',
+      },
+    });
+    expect(handoffs).toEqual([]);
   });
 });

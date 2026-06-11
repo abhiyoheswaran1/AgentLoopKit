@@ -5059,3 +5059,24 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep `create-task` path validation strict; do not auto-correct or rewrite unsafe output paths.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Error Output for Invalid Artifact Paths
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-return-json-errors-for-invalid-artifact-paths.md`
+- Trigger:
+  - `agentloop summarize`, `handoff`, and `report` accepted explicit missing input artifact paths and still produced output.
+- Implementation:
+  - Added shared validation for explicit task, verification, and handoff Markdown artifact paths.
+  - Added JSON error handling for invalid explicit paths on `summarize`, `handoff`, and `report`.
+  - Kept implicit latest-task, latest-report, and latest-handoff fallback behavior unchanged.
+  - Documented the behavior in README, HTML report docs, PR summary docs, and the changelog.
+- Verification run:
+  - Red focused summary/report tests failed because invalid explicit paths exited `0`.
+  - Focused handoff and HTML report suites passed: 12 tests.
+  - `.agentloop/reports/2026-06-11-03-52-verification-report.md`, overall status pass.
+  - Post-build smoke confirmed missing verification and handoff paths return `ARTIFACT_PATH_INVALID` JSON errors.
+- What worked well:
+  - The same validator now protects command paths that assemble reviewer evidence from local artifacts.
+- Improve:
+  - Consider consolidating duplicate JSON-error printing helpers after the `0.28.0` batch if the next pass adds more structured errors.
+  - Keep this unreleased until the planned `0.28.0` batch.

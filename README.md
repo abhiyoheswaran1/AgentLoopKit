@@ -378,6 +378,7 @@ agentloop report --verification .agentloop/reports/2026-06-10-12-00-verification
 ```
 
 The command does not run tests, call an LLM, fetch assets, read `.env` contents, or send data anywhere. It writes one local file under `.agentloop/reports/` by default. Use it after `verify` and `handoff` when you want a browser-readable artifact for a PR or CI upload.
+When you pass explicit `--task`, `--verification`, or `--handoff` paths with `--json`, the path must point to an existing Markdown artifact inside `.agentloop/tasks/`, `.agentloop/reports/`, or `.agentloop/handoffs/`. Invalid paths return a JSON error with `artifactType`, `requestedPath`, `expectedDir`, and `reason`.
 
 See `docs/html-reports.md` for inputs, output paths, and safety behavior.
 
@@ -530,6 +531,7 @@ The summary groups changed files into review areas such as source, tests, docs, 
 It does not call an LLM.
 
 Use `agentloop summarize` to preview the same output without writing a handoff file. `agentloop summarize --write` remains available for scripts. Both `summarize` and `handoff` accept `--verification <path>` as an alias for `--report <path>`.
+When you pass explicit `--task` or `--verification` paths with `--json`, the path must point to an existing Markdown artifact inside `.agentloop/tasks/` or `.agentloop/reports/`. Invalid paths return a JSON error with `artifactType`, `requestedPath`, `expectedDir`, and `reason`.
 
 ## Safety Principles
 

@@ -35,6 +35,21 @@ agentloop report --verification .agentloop/reports/2026-06-10-12-00-verification
 
 JSON output includes the written `outPath`, report metadata, and source paths. It does not embed the full HTML body.
 
+Explicit `--task`, `--verification`, and `--handoff` inputs must point to existing Markdown artifacts inside `.agentloop/tasks/`, `.agentloop/reports/`, and `.agentloop/handoffs/`. With `--json`, invalid input paths return:
+
+```json
+{
+  "error": {
+    "code": "ARTIFACT_PATH_INVALID",
+    "message": "Handoff artifact not found: .agentloop/handoffs/missing.md",
+    "artifactType": "handoff",
+    "requestedPath": ".agentloop/handoffs/missing.md",
+    "expectedDir": ".agentloop/handoffs",
+    "reason": "missing"
+  }
+}
+```
+
 The command does not run verification commands. It does not call an LLM, fetch remote assets, read `.env` contents, upload files, or collect telemetry. It escapes Markdown-derived and git-derived text before writing HTML.
 
 Use HTML reports when a reviewer wants one browser-readable artifact. Keep the Markdown task contract, verification report, and handoff summary as the source evidence.

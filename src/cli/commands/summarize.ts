@@ -1,6 +1,27 @@
 import { Command } from 'commander';
 import { loadAgentLoopConfig } from '../../core/config.js';
+import { ArtifactPathError } from '../../core/artifacts.js';
 import { summarizeRepository } from '../../core/pr-summary.js';
+
+function printArtifactPathJsonError(error: ArtifactPathError) {
+  console.log(
+    JSON.stringify(
+      {
+        error: {
+          code: error.code,
+          message: error.message,
+          artifactType: error.artifactType,
+          requestedPath: error.requestedPath,
+          expectedDir: error.expectedDir,
+          reason: error.reason,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
+}
 
 async function runSummaryCommand(options: Record<string, unknown>, defaultWrite: boolean) {
   const config = await loadAgentLoopConfig(process.cwd());
@@ -11,13 +32,22 @@ async function runSummaryCommand(options: Record<string, unknown>, defaultWrite:
       : typeof options.verification === 'string'
         ? options.verification
         : undefined;
-  const result = await summarizeRepository({
-    cwd: process.cwd(),
-    config,
-    taskPath: typeof options.task === 'string' ? options.task : undefined,
-    reportPath,
-    write: writeOption,
-  });
+  let result: Awaited<ReturnType<typeof summarizeRepository>>;
+  try {
+    result = await summarizeRepository({
+      cwd: process.cwd(),
+      config,
+      taskPath: typeof options.task === 'string' ? options.task : undefined,
+      reportPath,
+      write: writeOption,
+    });
+  } catch (error) {
+    if ((options.json || options.format === 'json') && error instanceof ArtifactPathError) {
+      printArtifactPathJsonError(error);
+      return;
+    }
+    throw error;
+  }
   if (options.json || options.format === 'json') {
     console.log(JSON.stringify(result, null, 2));
   } else {

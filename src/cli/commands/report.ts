@@ -1,6 +1,27 @@
 import { Command } from 'commander';
+import { ArtifactPathError } from '../../core/artifacts.js';
 import { loadAgentLoopConfig } from '../../core/config.js';
 import { writeHtmlReport } from '../../core/html-report.js';
+
+function printArtifactPathJsonError(error: ArtifactPathError) {
+  console.log(
+    JSON.stringify(
+      {
+        error: {
+          code: error.code,
+          message: error.message,
+          artifactType: error.artifactType,
+          requestedPath: error.requestedPath,
+          expectedDir: error.expectedDir,
+          reason: error.reason,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
+}
 
 export function reportCommand() {
   return new Command('report')
@@ -22,14 +43,23 @@ export function reportCommand() {
       }) => {
         const reportPath = options.report ?? options.verification;
         const config = await loadAgentLoopConfig(process.cwd());
-        const result = await writeHtmlReport({
-          cwd: process.cwd(),
-          config,
-          taskPath: options.task,
-          reportPath,
-          handoffPath: options.handoff,
-          outPath: options.out,
-        });
+        let result: Awaited<ReturnType<typeof writeHtmlReport>>;
+        try {
+          result = await writeHtmlReport({
+            cwd: process.cwd(),
+            config,
+            taskPath: options.task,
+            reportPath,
+            handoffPath: options.handoff,
+            outPath: options.out,
+          });
+        } catch (error) {
+          if (options.json && error instanceof ArtifactPathError) {
+            printArtifactPathJsonError(error);
+            return;
+          }
+          throw error;
+        }
 
         if (options.json) {
           console.log(

@@ -35,6 +35,8 @@ AgentLoopKit classifies files by path only. It does not read file contents, `.en
 
 Use `agentloop summarize` to preview the same deterministic summary without writing a file. `agentloop summarize --write` remains available for scripts that already use it.
 
+Explicit `--task` and `--verification` inputs must point to existing Markdown artifacts inside `.agentloop/tasks/` and `.agentloop/reports/`. With `--json`, invalid input paths return a structured `ARTIFACT_PATH_INVALID` error and `handoff` does not write a summary.
+
 Use `agentloop task list` and `agentloop task show <path>` before handoff when the repo has several task contracts and you need to choose which one to pin.
 
 After `agentloop handoff`, run `agentloop report` when you want one local HTML artifact that combines the task, verification report, handoff, git status, and current deterministic summary. The HTML report does not replace the Markdown source files.

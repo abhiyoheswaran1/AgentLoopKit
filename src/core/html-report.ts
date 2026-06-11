@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { readFile, readdir, stat } from 'node:fs/promises';
+import { resolveExplicitArtifactPath } from './artifacts.js';
 import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
 import { pathExists, writeTextFile } from './file-system.js';
@@ -255,17 +256,38 @@ export async function writeHtmlReport(options: WriteHtmlReportOptions): Promise<
   const timestamp = options.timestamp ?? formatTimestamp();
   const cwd = options.cwd;
   const taskPath =
-    resolveUserPath(cwd, options.taskPath) ??
+    (options.taskPath
+      ? await resolveExplicitArtifactPath({
+          cwd,
+          artifactType: 'task',
+          requestedPath: options.taskPath,
+          expectedDir: options.config.paths.tasksDir,
+        })
+      : undefined) ??
     (await getActiveTaskPath({ cwd, config: options.config })) ??
     (await getFallbackTaskPath({ cwd, config: options.config }));
   const verificationPath =
-    resolveUserPath(cwd, options.reportPath) ??
+    (options.reportPath
+      ? await resolveExplicitArtifactPath({
+          cwd,
+          artifactType: 'verification',
+          requestedPath: options.reportPath,
+          expectedDir: options.config.paths.reportsDir,
+        })
+      : undefined) ??
     (await latestMatchingMarkdownFile(
       path.join(cwd, options.config.paths.reportsDir),
       /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report\.md$/,
     ));
   const handoffPath =
-    resolveUserPath(cwd, options.handoffPath) ??
+    (options.handoffPath
+      ? await resolveExplicitArtifactPath({
+          cwd,
+          artifactType: 'handoff',
+          requestedPath: options.handoffPath,
+          expectedDir: options.config.paths.handoffsDir,
+        })
+      : undefined) ??
     (await latestMatchingMarkdownFile(
       path.join(cwd, options.config.paths.handoffsDir),
       /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-pr-summary\.md$/,

@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { readdir, stat } from 'node:fs/promises';
+import { AgentLoopError } from './errors.js';
 import { pathExists } from './file-system.js';
 
 export const verificationReportPattern =
@@ -7,6 +8,79 @@ export const verificationReportPattern =
 export const prSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-pr-summary\.md$/;
 export const ciSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ci-summary\.md$/;
 export const generatedMarkdownPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-.+\.md$/;
+
+export type ArtifactType = 'task' | 'verification' | 'handoff';
+export type ArtifactPathErrorReason = 'outside-directory' | 'not-markdown' | 'missing';
+
+export class ArtifactPathError extends AgentLoopError {
+  constructor(
+    message: string,
+    public readonly artifactType: ArtifactType,
+    public readonly requestedPath: string,
+    public readonly expectedDir: string,
+    public readonly reason: ArtifactPathErrorReason,
+  ) {
+    super(message, 'ARTIFACT_PATH_INVALID');
+    this.name = 'ArtifactPathError';
+  }
+}
+
+const artifactLabels: Record<ArtifactType, string> = {
+  task: 'Task',
+  verification: 'Verification',
+  handoff: 'Handoff',
+};
+
+function isInside(parent: string, child: string) {
+  const relative = path.relative(parent, child);
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+export async function resolveExplicitArtifactPath(options: {
+  cwd: string;
+  artifactType: ArtifactType;
+  requestedPath: string;
+  expectedDir: string;
+}) {
+  const absolutePath = path.isAbsolute(options.requestedPath)
+    ? path.resolve(options.requestedPath)
+    : path.resolve(options.cwd, options.requestedPath);
+  const expectedRoot = path.resolve(options.cwd, options.expectedDir);
+  const label = artifactLabels[options.artifactType];
+
+  if (!isInside(expectedRoot, absolutePath)) {
+    throw new ArtifactPathError(
+      `${label} artifact path must stay inside ${options.expectedDir}: ${options.requestedPath}`,
+      options.artifactType,
+      options.requestedPath,
+      options.expectedDir,
+      'outside-directory',
+    );
+  }
+
+  if (!absolutePath.endsWith('.md')) {
+    throw new ArtifactPathError(
+      `${label} artifact path must be a Markdown file: ${options.requestedPath}`,
+      options.artifactType,
+      options.requestedPath,
+      options.expectedDir,
+      'not-markdown',
+    );
+  }
+
+  const fileStat = await stat(absolutePath).catch(() => undefined);
+  if (!fileStat?.isFile()) {
+    throw new ArtifactPathError(
+      `${label} artifact not found: ${options.requestedPath}`,
+      options.artifactType,
+      options.requestedPath,
+      options.expectedDir,
+      'missing',
+    );
+  }
+
+  return absolutePath;
+}
 
 export async function latestMarkdownFile(dir: string, options: { pattern?: RegExp } = {}) {
   if (!(await pathExists(dir))) return undefined;
