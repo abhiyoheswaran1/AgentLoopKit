@@ -79,6 +79,26 @@ describe('next command', () => {
     expect(await exists(path.join(dir, 'marker.txt'))).toBe(false);
   });
 
+  test('prints invalid config errors as JSON', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');
+
+    const result = await execa(tsxPath, [cliPath, 'next', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'CONFIG_ERROR',
+      message: expect.stringContaining('Invalid AgentLoopKit config'),
+    });
+  });
+
   test('prints a concise human next action when no task exists', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

@@ -338,6 +338,7 @@ agentloop next --json
 ```
 
 `next` uses the same decision rules as `status`. It does not run verification commands, create task state, call an LLM, make network requests, or read `.env` contents.
+With `--json`, invalid `agentloop.config.json` files return a parseable `CONFIG_ERROR` object.
 When an active in-progress task exists, an older verification report does not count as current evidence for that task.
 When a pinned active task is already `done`, `status` and `next` recommend archiving that task so a finished contract does not stay active.
 When no active task is pinned, `status` and `next` report the newest open contract as `latestTask`, not `activeTask`, and recommend `agentloop task set <path>` before continuing. They keep fallback tasks marked `deferred`, `done`, `completed`, or `verified` out of `latestTask`. Deferred tasks stay visible as parked work in `deferredTasks`.
@@ -363,6 +364,7 @@ agentloop check-gates --strict
 ```
 
 Warnings keep exit code `0` by default. Use `--strict` in CI when warning gates should fail the command.
+With `--json`, invalid `agentloop.config.json` files return a parseable `CONFIG_ERROR` object.
 
 `doctor` checks setup health. `check-gates` checks whether the current work session has the evidence reviewers expect.
 

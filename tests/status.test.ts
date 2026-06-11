@@ -57,6 +57,26 @@ describe('status command', () => {
     );
   });
 
+  test('prints invalid config errors as JSON', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'CONFIG_ERROR',
+      message: expect.stringContaining('Invalid AgentLoopKit config'),
+    });
+  });
+
   test('prints git target warning when status runs from a git repository subdirectory', async () => {
     const dir = await makeTempDir();
     const packageDir = path.join(dir, 'packages', 'web');

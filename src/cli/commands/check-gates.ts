@@ -1,6 +1,8 @@
 import { Command } from 'commander';
 import { loadAgentLoopConfig } from '../../core/config.js';
+import { ConfigError } from '../../core/errors.js';
 import { checkGates } from '../../core/check-gates.js';
+import { printAgentLoopJsonError } from '../json-errors.js';
 
 export function checkGatesCommand() {
   return new Command('check-gates')
@@ -8,7 +10,16 @@ export function checkGatesCommand() {
     .option('--json', 'print machine-readable output')
     .option('--strict', 'treat warning gates as failures')
     .action(async (options: { json?: boolean; strict?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      let config: Awaited<ReturnType<typeof loadAgentLoopConfig>>;
+      try {
+        config = await loadAgentLoopConfig(process.cwd());
+      } catch (error) {
+        if (options.json && error instanceof ConfigError) {
+          printAgentLoopJsonError(error);
+          return;
+        }
+        throw error;
+      }
       const result = await checkGates({ cwd: process.cwd(), config, strict: options.strict });
       if (options.json) {
         console.log(JSON.stringify(result, null, 2));

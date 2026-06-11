@@ -1,6 +1,8 @@
 import { Command } from 'commander';
 import { loadAgentLoopConfig } from '../../core/config.js';
+import { ConfigError } from '../../core/errors.js';
 import { AgentLoopStatusResult, getAgentLoopStatus } from '../../core/status.js';
+import { printAgentLoopJsonError } from '../json-errors.js';
 
 type NextActionResult = {
   command: string;
@@ -73,7 +75,16 @@ export function nextCommand() {
     .description('Show the next recommended loop action')
     .option('--json', 'print machine-readable output')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      let config: Awaited<ReturnType<typeof loadAgentLoopConfig>>;
+      try {
+        config = await loadAgentLoopConfig(process.cwd());
+      } catch (error) {
+        if (options.json && error instanceof ConfigError) {
+          printAgentLoopJsonError(error);
+          return;
+        }
+        throw error;
+      }
       const status = await getAgentLoopStatus({ cwd: process.cwd(), config });
       const result = toNextActionResult(status);
 

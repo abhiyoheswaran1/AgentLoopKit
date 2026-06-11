@@ -5166,3 +5166,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider extracting the repeated artifact-path JSON printer after the `0.28.0` batch if more commands need it.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Config Errors for Loop State Commands
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-return-json-config-errors-for-loop-state-commands.md`
+- Trigger:
+  - `agentloop status --json`, `agentloop next --json`, and `agentloop check-gates --json` fell back to the global stderr path when `agentloop.config.json` was invalid.
+- Implementation:
+  - Added a shared CLI JSON error printer for `AgentLoopError` values.
+  - Added command-level `ConfigError` handling to `status`, `next`, and `check-gates` in JSON mode.
+  - Kept human output on the existing global stderr path.
+  - Documented the behavior in README, status docs, check-gates docs, and the changelog.
+- Verification run:
+  - Red focused loop-state tests failed because JSON stdout was empty for invalid config.
+  - Focused loop-state suites passed: 27 tests.
+  - `.agentloop/reports/2026-06-11-04-38-verification-report.md`, overall status pass.
+  - `.agentloop/handoffs/2026-06-11-04-39-pr-summary.md` captured the review handoff.
+  - Built CLI smoke confirmed `CONFIG_ERROR` JSON for all three commands.
+- What worked well:
+  - The shared JSON printer keeps future command-level setup errors consistent without changing global human error handling.
+- Improve:
+  - Consider applying the same helper to other config-loading commands in small, tested passes.
+  - Keep this unreleased until the planned `0.28.0` batch.

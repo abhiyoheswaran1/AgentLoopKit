@@ -32,6 +32,7 @@ agentloop next --json
 ```
 
 `agentloop next` reads the same local evidence and returns the same recommended command as `status`. It does not run project checks, write `.agentloop/state.json`, read `.env` contents, call an LLM, or make network requests.
+With `--json`, `status` and `next` return a `CONFIG_ERROR` object when `agentloop.config.json` is invalid.
 
 Pin the active task:
 

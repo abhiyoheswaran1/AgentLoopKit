@@ -64,6 +64,24 @@ describe('check-gates command', () => {
     expect(output.nextAction.command).toBe('agentloop handoff');
   });
 
+  test('prints invalid config errors as JSON', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');
+
+    const result = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'CONFIG_ERROR',
+      message: expect.stringContaining('Invalid AgentLoopKit config'),
+    });
+  });
+
   test('warns when review gates run from a git repository subdirectory', async () => {
     const dir = await makeTempDir();
     const packageDir = path.join(dir, 'packages', 'web');
