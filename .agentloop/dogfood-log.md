@@ -40,6 +40,7 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Worked well:
   - `projscan` caught a test fixture value that looked like a hardcoded secret before commit.
   - The smoke script exposed a macOS `/var` versus `/private/var` realpath issue in the assertion, which was fixed inside the smoke helper.
+  - GitHub Actions caught a Windows-only path separator issue in the nested task assertion after the first push; the smoke script now normalizes reported task paths before comparison.
 - Improve:
   - Keep adding packaged-CLI smoke assertions for flows that users run through `npx`, especially when unit tests cover TypeScript sources only.
 

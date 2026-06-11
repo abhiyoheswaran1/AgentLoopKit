@@ -38,6 +38,10 @@ function formatCommand(command, args) {
   return [command, ...args].join(' ');
 }
 
+function toPosixPath(filePath) {
+  return String(filePath).replace(/\\/g, '/');
+}
+
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -335,7 +339,10 @@ async function smokeCli({ keep = false } = {}) {
       ).stdout,
       'nested create-task',
     );
-    assert(nestedTask.task?.path?.endsWith(nestedTaskPath), 'nested task path was not reported.');
+    assert(
+      toPosixPath(nestedTask.task?.path ?? '').endsWith(nestedTaskPath),
+      'nested task path was not reported.',
+    );
     await assertFileExists(smokeRepo, nestedTaskPath);
 
     const nestedVerification = parseJson(
