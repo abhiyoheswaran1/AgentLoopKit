@@ -6618,3 +6618,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The final handoff visibly confirmed the new fenced diff-stat section.
 - Improve:
   - Continue scanning remaining release and report surfaces for raw multi-line command or Git output.
+
+## 2026-06-11: Release Note Commit Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-release-note-commit-markdown.md`
+- Trigger:
+  - The roadmap hardening pass found that `agentloop release-notes` rendered Git commit subjects directly into Markdown.
+  - Commit subjects can include backticks or Markdown-looking syntax, so release notes should treat them as evidence values.
+- Implementation:
+  - Added a red regression in `tests/release-notes.test.ts` using a real temp Git repo with commit subject `Add \`release\` hook`.
+  - Rendered commit subjects with the shared inline-code formatter.
+  - Preserved raw commit subjects in the structured `commits` array and kept the empty commits fallback as fixed plain text.
+- Verification run:
+  - Red focused test failed first in `tests/release-notes.test.ts` because the commit subject was raw Markdown.
+  - Focused suite passed after implementation:
+    - `npm test -- tests/release-notes.test.ts`
+  - Broader local checks passed:
+    - `git diff --check`
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run check:links`
+    - `npx --yes projscan doctor --format markdown`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npm test`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-11-22-28-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-22-37-pr-summary.md`.
+- What worked well:
+  - The existing shared inline-code helper made release-note commit hardening a one-line renderer change.
+- Improve:
+  - Continue scanning release-note changelog/fallback boundaries separately; changelog content is authored Markdown and should not be blindly escaped.

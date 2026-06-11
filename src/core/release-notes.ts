@@ -160,7 +160,7 @@ function validateGitRef(optionName: string, ref: string) {
 }
 
 function renderList(lines: string[], empty: string) {
-  return lines.length ? lines.map((line) => `- ${line}`).join('\n') : `- ${empty}`;
+  return lines.length ? lines.map((line) => `- ${inlineCode(line)}`).join('\n') : `- ${empty}`;
 }
 
 function renderChangedFiles(files: Array<{ status: string; path: string }>) {

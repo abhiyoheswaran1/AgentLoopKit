@@ -313,3 +313,7 @@ PR summaries and handoffs include the task title as reviewer-facing context. Tha
 ## 2026-06-11: PR Summary Diff Stats Use Safe Text Fences
 
 PR summaries and handoffs include `git diff --stat` output as local review evidence. That output can contain repo paths with Markdown-sensitive punctuation, so non-empty diff stats now render inside an adaptive `text` code fence. The empty-state fallback remains plain text because it is fixed copy and reads better as prose.
+
+## 2026-06-11: Release Note Commit Subjects Use Safe Inline Formatting
+
+Release notes include commit subjects from local Git history. Commit subjects are evidence values, not trusted Markdown, so each rendered commit line now uses the shared inline-code formatter. The structured `commits` array remains raw for automation and release tooling.

@@ -124,6 +124,28 @@ describe('release-notes command', () => {
     expect(output.markdown).toContain(`- \`\`?? ${dirtyPath}\`\``);
   });
 
+  test('escapes release-note commit subjects when subjects contain backticks', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    const commitSubject = 'Add `release` hook';
+
+    await writeFile(path.join(dir, 'src/commit-subject.ts'), 'export const subject = true;\n');
+    await git(dir, ['add', 'src/commit-subject.ts']);
+    await git(dir, ['commit', '-m', commitSubject]);
+
+    const output = await generateReleaseNotes({
+      cwd: dir,
+      config,
+      from: 'v1.2.2',
+      to: 'HEAD',
+      timestamp: '2026-06-11-22-30',
+    });
+
+    expect(output.commits).toContain(commitSubject);
+    expect(output.markdown).toContain(`- ${inlineCode(commitSubject)}`);
+    expect(output.markdown).not.toContain('- No commits found for the selected range.');
+  });
+
   test('escapes release-note metadata and AgentLoop evidence labels when values contain backticks', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: false });
     const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
