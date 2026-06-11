@@ -217,6 +217,8 @@ agentloop.config.json
 
 The package ships `schema/agentloop.config.schema.json` for editors and config validation. Generated configs use the GitHub raw schema URL for editor support; the CLI validates config locally and does not fetch that URL at runtime. SchemaStore also maps `agentloop.config.json` to that schema, so compatible editors can discover it without extra setup.
 
+Configured AgentLoopKit paths must be local repo-relative paths. Absolute paths, parent traversal such as `../outside`, and null bytes are rejected before AgentLoopKit reads or writes configured artifacts.
+
 See `docs/configuration.md` for config fields and schema notes.
 
 Fresh `init` also writes `.agentloop/manifest.json` so `doctor` can report which template generation created the local harness. See `docs/template-migrations.md` for manual upgrade guidance.

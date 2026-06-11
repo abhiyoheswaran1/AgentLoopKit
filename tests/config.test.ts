@@ -38,6 +38,61 @@ describe('config', () => {
     expect(() => parseAgentLoopConfig({ version: 2 })).toThrow(/version/i);
   });
 
+  test('rejects absolute config paths', () => {
+    const config = createDefaultConfig();
+
+    expect(() =>
+      parseAgentLoopConfig({
+        ...config,
+        paths: {
+          ...config.paths,
+          reportsDir: '/tmp/agentloop-reports',
+        },
+      }),
+    ).toThrow(/repo-relative/i);
+    expect(() =>
+      parseAgentLoopConfig({
+        ...config,
+        paths: {
+          ...config.paths,
+          reportsDir: 'C:\\agentloop\\reports',
+        },
+      }),
+    ).toThrow(/repo-relative/i);
+  });
+
+  test('rejects config paths with parent traversal', () => {
+    const config = createDefaultConfig();
+
+    expect(() =>
+      parseAgentLoopConfig({
+        ...config,
+        paths: {
+          ...config.paths,
+          tasksDir: '../outside/tasks',
+        },
+      }),
+    ).toThrow(/parent traversal/i);
+    expect(() =>
+      parseAgentLoopConfig({
+        ...config,
+        paths: {
+          ...config.paths,
+          handoffsDir: '.agentloop/../outside-handoffs',
+        },
+      }),
+    ).toThrow(/parent traversal/i);
+    expect(() =>
+      parseAgentLoopConfig({
+        ...config,
+        paths: {
+          ...config.paths,
+          handoffsDir: '.agentloop\\..\\outside-handoffs',
+        },
+      }),
+    ).toThrow(/parent traversal/i);
+  });
+
   test('rejects malformed config JSON as a config error', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

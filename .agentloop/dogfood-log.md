@@ -5502,3 +5502,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep config parse errors normalized at the loader boundary so commands can stay small.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Repo-Relative Config Paths
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-reject-unsafe-config-paths.md`
+- Trigger:
+  - `agentloop.config.json` accepted arbitrary string path values for AgentLoopKit artifact directories.
+  - Absolute paths or parent traversal could move configured task, report, or handoff locations outside the current repo boundary.
+- Implementation:
+  - Added config validation that rejects empty paths, null bytes, absolute paths, and `..` segments across POSIX and Windows-style separators.
+  - Updated the shipped JSON schema to document the same repo-relative path rule for editors.
+  - Documented the behavior in README, configuration docs, changelog, and decisions.
+- Verification run:
+  - Red focused config/schema tests failed because unsafe paths were accepted and schema metadata was absent.
+  - Focused config/schema tests passed after the validation and schema update.
+  - Full `npm test`, `npm run lint`, `npm run typecheck`, `npm run check:links`, `npm run build`, `git diff --check`, and `npx --yes projscan doctor --format markdown` passed.
+  - Dogfood report: `.agentloop/reports/2026-06-11-07-05-verification-report.md`, overall status pass.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-07-09-pr-summary.md`.
+- What worked well:
+  - The existing `ConfigError` path means JSON-capable commands can report unsafe path config through the same `CONFIG_ERROR` setup failure.
+- Improve:
+  - Keep future config path customization simple and repo-local; do not introduce arbitrary filesystem output targets.
+  - Keep this unreleased until the planned `0.28.0` batch.

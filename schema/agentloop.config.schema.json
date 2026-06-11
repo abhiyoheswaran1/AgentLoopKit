@@ -44,19 +44,29 @@
       "required": ["root", "agentloopDir", "tasksDir", "reportsDir", "handoffsDir"],
       "properties": {
         "root": {
-          "type": "string"
+          "type": "string",
+          "description": "A non-empty repo-relative path; absolute paths, parent traversal segments, and null bytes are rejected.",
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$"
         },
         "agentloopDir": {
-          "type": "string"
+          "type": "string",
+          "description": "A non-empty repo-relative path; absolute paths, parent traversal segments, and null bytes are rejected.",
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$"
         },
         "tasksDir": {
-          "type": "string"
+          "type": "string",
+          "description": "A non-empty repo-relative path; absolute paths, parent traversal segments, and null bytes are rejected.",
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$"
         },
         "reportsDir": {
-          "type": "string"
+          "type": "string",
+          "description": "A non-empty repo-relative path; absolute paths, parent traversal segments, and null bytes are rejected.",
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$"
         },
         "handoffsDir": {
-          "type": "string"
+          "type": "string",
+          "description": "A non-empty repo-relative path; absolute paths, parent traversal segments, and null bytes are rejected.",
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$"
         }
       }
     },

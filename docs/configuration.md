@@ -28,6 +28,14 @@ The config controls:
 - safety settings
 - summary settings
 
+Path values under `paths` must be local repo-relative paths. AgentLoopKit rejects:
+
+- absolute paths, including POSIX, Windows drive, and UNC-style paths
+- parent traversal segments such as `../outside` or `.agentloop/../outside`
+- null bytes
+
+This keeps generated task contracts, verification reports, handoffs, and harness files tied to the repository where the CLI is running.
+
 Run this before writing files:
 
 ```bash

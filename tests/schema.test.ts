@@ -9,6 +9,9 @@ describe('config JSON schema', () => {
       properties?: Record<string, unknown>;
       required?: string[];
     };
+    const paths = (
+      schema.properties?.paths as { properties?: Record<string, { pattern?: string }> }
+    ).properties;
 
     expect(schema.$id).toBe(
       'https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agentloop.config.schema.json',
@@ -19,5 +22,9 @@ describe('config JSON schema', () => {
     expect(JSON.stringify(schema.properties)).toContain('"const":1');
     expect(JSON.stringify(schema.properties)).toContain('nextjs');
     expect(JSON.stringify(schema.properties)).toContain('protectEnvFiles');
+    expect(JSON.stringify(schema.properties)).toContain('repo-relative path');
+    expect(paths?.reportsDir?.pattern).toContain('(?![A-Za-z]:)');
+    expect(paths?.reportsDir?.pattern).toContain('[\\\\/]');
+    expect(paths?.reportsDir?.pattern).toContain('\\.\\.');
   });
 });
