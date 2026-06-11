@@ -76,6 +76,29 @@ describe('init', () => {
     );
   });
 
+  test('generated onboarding includes a risk-aware first task example', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'demo-onboarding',
+      scripts: { test: 'vitest', lint: 'eslint .' },
+    });
+
+    await initializeAgentLoop({ cwd: dir });
+
+    const workspaceReadme = await readFile(path.join(dir, '.agentloop/README.md'), 'utf8');
+    const taskReadme = await readFile(path.join(dir, '.agentloop/tasks/README.md'), 'utf8');
+    const commandsGuide = await readFile(path.join(dir, '.agentloop/harness/commands.md'), 'utf8');
+
+    expect(workspaceReadme).toContain('First task to try');
+    expect(workspaceReadme).toContain(
+      '--risk "Touches user-facing behavior and needs regression coverage"',
+    );
+    expect(workspaceReadme).toContain('agentloop verify --task <path> --task-commands');
+    expect(taskReadme).toContain('--risk "Touches account preferences"');
+    expect(commandsGuide).toContain('agentloop create-task --type feature --title');
+  });
+
   test('safely appends to an existing AGENTS.md', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

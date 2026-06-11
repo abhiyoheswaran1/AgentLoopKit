@@ -8,10 +8,23 @@ This directory contains repo-local engineering loop artifacts for coding agents 
 
 1. Read `../AGENTS.md`.
 2. Read `../AGENTLOOP.md`.
-3. Create or inspect a task contract:
+3. Create or inspect a task contract.
+
+First task to try:
 
 ```bash
-agentloop create-task --title "Describe the next focused change" --type feature
+agentloop create-task --type feature --title "Describe the next focused change" \
+  --problem-statement "What problem should this change solve?" \
+  --desired-outcome "What should be true when the work is done?" \
+  --acceptance "The changed behavior is covered by an explicit check" \
+  --verification "{{ testCommand }}" \
+  --risk "Touches user-facing behavior and needs regression coverage" \
+  --rollback "Revert the focused change"
+```
+
+Then pin it before implementation starts:
+
+```bash
 agentloop task list
 agentloop task show .agentloop/tasks/<task-file>.md
 agentloop task set .agentloop/tasks/<task-file>.md
@@ -43,6 +56,7 @@ Local policy files are repo guidance. If `policy status` reports `modified`, rea
 
 ```bash
 agentloop verify
+agentloop verify --task <path> --task-commands
 ```
 
 7. Generate a reviewer handoff:

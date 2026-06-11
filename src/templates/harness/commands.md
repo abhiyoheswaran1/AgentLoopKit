@@ -10,6 +10,18 @@ Detected during AgentLoopKit init:
 
 Rules:
 
+- Start meaningful work with a scoped task contract:
+
+```bash
+agentloop create-task --type feature --title "Describe the next focused change" \
+  --problem-statement "What problem should this change solve?" \
+  --desired-outcome "What should be true when the work is done?" \
+  --acceptance "The changed behavior is covered by an explicit check" \
+  --verification "{{ testCommand }}" \
+  --risk "Touches user-facing behavior and needs regression coverage" \
+  --rollback "Revert the focused change"
+```
+
 - Use `agentloop task list` to inspect task contracts before pinning one.
 - Use `agentloop task show <path>` to read a task contract without changing active state.
 - Use `agentloop task set <path>` when the active task is ambiguous.
@@ -30,6 +42,7 @@ Rules:
 - Use `agentloop npm-status --agentloopkit --expect-current` as an AgentLoopKit post-publish smoke check from any directory. It never publishes or reads credentials.
 - Run targeted checks while developing.
 - Run configured verification before claiming completion.
+- Use `agentloop verify --task <path> --task-commands` only after reviewing task-defined commands.
 - If a command fails, report the failure and fix it when reasonable.
 - If a command is not configured, say so in the handoff.
 

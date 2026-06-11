@@ -11,6 +11,7 @@ agentloop create-task --type feature --title "Add settings page" \
   --forbidden-file migrations/ \
   --acceptance "Settings can be saved" \
   --verification "pnpm test" \
+  --risk "Touches account preferences" \
   --rollback "Remove the settings route"
 ```
 
