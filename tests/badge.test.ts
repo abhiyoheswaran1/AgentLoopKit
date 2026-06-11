@@ -137,6 +137,33 @@ describe('badge generation', () => {
     await expect(readFile(outPath, 'utf8')).rejects.toThrow();
   });
 
+  test('CLI rejects badge output paths with non-SVG extensions', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    const outPath = path.join(dir, '.agentloop/reports/review-status.txt');
+
+    const result = await execa(tsxPath, [cliPath, 'badge', '--out', outPath, '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'OUTPUT_PATH_INVALID',
+        message: `Badge output path must use .svg: ${outPath}`,
+        artifactType: 'badge',
+        requestedPath: outPath,
+        expectedDir: '.agentloop/reports',
+        expectedExtension: '.svg',
+        reason: 'wrong-extension',
+      },
+    });
+    await expect(readFile(outPath, 'utf8')).rejects.toThrow();
+  });
+
   test('CLI prints a structured JSON error for an unsupported badge source', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

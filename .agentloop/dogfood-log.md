@@ -2,6 +2,35 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Cover Invalid Artifact Output Extensions
+
+- Task contract: `.agentloop/tasks/2026-06-11-cover-invalid-artifact-output-extensions.md`
+- Trigger:
+  - The output-path resolver rejected wrong extensions, but the CLI regression suite only covered paths outside the configured artifact directories.
+  - Because public docs describe the extension requirement, the CLI boundary needed explicit test coverage.
+- Product change:
+  - Added CLI tests for `agentloop report --out` with a non-`.html` path inside `.agentloop/reports/`.
+  - Added CLI tests for `agentloop badge --out` with a non-`.svg` path inside `.agentloop/reports/`.
+  - Added CLI tests for `agentloop ci-summary --write --out` with a non-`.md` path inside `.agentloop/reports/`.
+  - Added CLI tests for `agentloop release-notes --write --out` with a non-`.md` path inside `.agentloop/handoffs/`.
+  - No production code changed; the existing resolver already returned `OUTPUT_PATH_INVALID` with `reason: wrong-extension`.
+  - Added an unreleased changelog note for the later `0.28.0` batch.
+- Verification completed:
+  - Focused test: `npm test -- tests/html-report.test.ts tests/badge.test.ts tests/ci-summary.test.ts tests/release-notes.test.ts`
+  - Full `npm test`
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run check:links`
+  - `npm run build`
+  - `git diff --check`
+  - `npx --yes projscan doctor --format markdown`
+- Verification report: `.agentloop/reports/2026-06-11-06-06-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-11-06-07-pr-summary.md`
+- Worked well:
+  - The new coverage confirmed the earlier safety implementation without widening scope or touching release metadata.
+- Improve:
+  - Keep future safety affordances covered at both directory and file-type boundaries when they write local artifacts.
+
 ## 2026-06-11: Constrain Explicit Artifact Output Paths
 
 - Task contract: `.agentloop/tasks/2026-06-11-constrain-explicit-artifact-output-paths.md`

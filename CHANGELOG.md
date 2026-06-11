@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added CLI regression coverage for invalid explicit artifact output extensions on `agentloop report`, `agentloop badge`, `agentloop ci-summary --write`, and `agentloop release-notes --write`.
 - Changed explicit output paths for `agentloop report`, `agentloop badge`, `agentloop ci-summary --write`, and `agentloop release-notes --write` so generated artifacts must stay inside their configured AgentLoop artifact directories, with `OUTPUT_PATH_INVALID` JSON errors for invalid paths.
 - Changed `agentloop ci-summary --out <path>` and `agentloop release-notes --out <path>` to fail fast unless `--write` is also passed, with `OUT_REQUIRES_WRITE` JSON errors for automation.
 - Added Baseframe Labs author metadata to the npm package and README.

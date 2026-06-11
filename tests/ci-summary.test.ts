@@ -241,6 +241,35 @@ describe('ci-summary command', () => {
     await expect(readFile(outPath, 'utf8')).rejects.toThrow();
   });
 
+  test('rejects CI summary output paths with non-Markdown extensions', async () => {
+    const dir = await createRepoWithEvidence();
+    const outPath = path.join(dir, '.agentloop/reports/manual-ci-summary.txt');
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'ci-summary', '--write', '--out', outPath, '--json'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'OUTPUT_PATH_INVALID',
+        message: `CI summary output path must use .md: ${outPath}`,
+        artifactType: 'ci-summary',
+        requestedPath: outPath,
+        expectedDir: '.agentloop/reports',
+        expectedExtension: '.md',
+        reason: 'wrong-extension',
+      },
+    });
+    await expect(readFile(outPath, 'utf8')).rejects.toThrow();
+  });
+
   test('status, report, badge, and gates ignore newer CI summary artifacts when locating verification reports', async () => {
     const dir = await createRepoWithEvidence();
     await writeFile(
