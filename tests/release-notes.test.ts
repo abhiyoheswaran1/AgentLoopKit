@@ -4,6 +4,7 @@ import { mkdir, readdir, readFile, rm, symlink, writeFile } from 'node:fs/promis
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { inlineCode } from '../src/core/markdown-format.js';
 import { generateReleaseNotes } from '../src/core/release-notes.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -333,6 +334,20 @@ describe('release-notes command', () => {
       },
     });
     expect(existsSync(outPath)).toBe(false);
+  });
+
+  test('prints written release note paths with Markdown-safe inline values', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+    const outPath = path.join(dir, '.agentloop/handoffs/release`notes.md');
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'release-notes', '--from', 'v1.2.2', '--to', 'HEAD', '--write', '--out', outPath],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain(`Release notes written: ${inlineCode(outPath)}`);
   });
 
   test('ignores verification and CI summary evidence from symlinked report roots outside the repo', async () => {

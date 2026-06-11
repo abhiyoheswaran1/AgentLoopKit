@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import prompts from 'prompts';
 import { TASK_TYPES } from '../../core/constants.js';
 import { AgentLoopError } from '../../core/errors.js';
+import { inlineCode } from '../../core/markdown-format.js';
 import { createTaskContractFile, TaskOutputPathError, TaskType } from '../../core/task-contract.js';
 import { loadWorkspaceForJsonCommand } from '../json-errors.js';
 
@@ -215,6 +216,6 @@ export function createTaskCommand() {
         console.log(JSON.stringify({ task: result }, null, 2));
         return;
       }
-      console.log(`Task contract created: ${result.path}`);
+      console.log(`Task contract created: ${inlineCode(result.path)}`);
     });
 }

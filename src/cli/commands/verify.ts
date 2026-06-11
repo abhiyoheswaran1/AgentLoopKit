@@ -4,6 +4,7 @@ import {
   OutputPathError,
   resolveExplicitArtifactPath,
 } from '../../core/artifacts.js';
+import { inlineCode } from '../../core/markdown-format.js';
 import { runVerification } from '../../core/verification.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
@@ -99,7 +100,9 @@ export function verifyCommand() {
       if (options.json) console.log(JSON.stringify(result, null, 2));
       else
         console.log(
-          `Verification report written: ${result.reportPath}\nOverall status: ${result.overallStatus}`,
+          `Verification report written: ${inlineCode(result.reportPath)}\nOverall status: ${inlineCode(
+            result.overallStatus,
+          )}`,
         );
       if (result.overallStatus === 'fail') process.exitCode = 1;
     });

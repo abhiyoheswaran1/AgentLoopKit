@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
 import { BADGE_SOURCES, writeEvidenceBadge } from '../../core/badge.js';
 import { AgentLoopError } from '../../core/errors.js';
+import { inlineCode } from '../../core/markdown-format.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function printJsonError(error: AgentLoopError, details: Record<string, unknown> = {}) {
@@ -79,10 +80,10 @@ export function badgeCommand() {
         } else {
           console.log(`# AgentLoopKit Badge
 
-Badge written: ${result.outPath}
-Source: ${result.source}
-Status: ${result.status}
-Message: ${result.message}`);
+Badge written: ${inlineCode(result.outPath)}
+Source: ${inlineCode(result.source)}
+Status: ${inlineCode(result.status)}
+Message: ${inlineCode(result.message)}`);
         }
       },
     );

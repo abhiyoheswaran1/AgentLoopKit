@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed CLI write-confirmation output for task creation, verification, handoffs, reports, badges, CI summaries, release notes, and agent installation to render generated paths, statuses, sources, messages, and counts with Markdown-safe inline-code delimiters.
 - Changed `agentloop task` human output to render task titles, statuses, paths, lifecycle messages, and task-doctor diagnostics with Markdown-safe inline-code delimiters.
 - Changed task-state CLI regression coverage to give aggregate subprocess-loop tests an explicit timeout budget, reducing false failures under full verification load.
 - Changed `agentloop doctor` Markdown output to render check statuses, names, messages, path-like values, overall status, strict mode, and next-action text with Markdown-safe inline-code delimiters.

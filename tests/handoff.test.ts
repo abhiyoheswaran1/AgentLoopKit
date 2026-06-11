@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { mkdir, readdir, symlink, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, realpath, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -70,6 +70,28 @@ describe('handoff command', () => {
     const output = JSON.parse(result.stdout);
     expect(output.outPath).toContain('.agentloop/handoffs');
     expect(existsSync(output.outPath)).toBe(false);
+  });
+
+  test('prints written summary paths with Markdown-safe inline values', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    config.paths.handoffsDir = '.agentloop/handoffs`safe';
+    await writeJson(path.join(dir, 'agentloop.config.json'), config);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'), '# Demo task\n');
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    const resolvedDir = await realpath(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'summarize', '--write'], { cwd: dir });
+    const expectedDirPrefix = path.join(resolvedDir, config.paths.handoffsDir);
+
+    expect(result.stdout).toContain(`Summary written: \`\`${expectedDirPrefix}`);
+    expect(result.stdout).not.toContain(`Summary written: ${expectedDirPrefix}`);
   });
 
   test('accepts --format json for summarize output', async () => {

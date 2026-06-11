@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
 import { getCiSummary } from '../../core/ci-summary.js';
+import { inlineCode } from '../../core/markdown-format.js';
 import {
   loadWorkspaceForJsonCommand,
   printOutputPathJsonError,
@@ -37,7 +38,7 @@ export function ciSummaryCommand() {
         console.log(JSON.stringify(result, null, 2));
       } else {
         console.log(result.markdown);
-        if (result.writtenPath) console.log(`\nCI summary written: ${result.writtenPath}`);
+        if (result.writtenPath) console.log(`\nCI summary written: ${inlineCode(result.writtenPath)}`);
       }
     });
 }

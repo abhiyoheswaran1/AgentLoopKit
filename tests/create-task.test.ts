@@ -5,6 +5,7 @@ import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import { TASK_TYPES } from '../src/core/constants.js';
 import { initializeAgentLoop } from '../src/core/init.js';
+import { inlineCode } from '../src/core/markdown-format.js';
 import { CLI_PROCESS_TIMEOUT_MS, makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -156,6 +157,36 @@ describe('create-task command', () => {
     expect(markdown).toContain('- git diff --check');
     expect(markdown).toContain('- pnpm test');
     expect(markdown).toContain('Revert the docs-only update.');
+  });
+
+  test('prints created task paths with Markdown-safe inline values', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+    const resolvedDir = await realpath(dir);
+    const taskPath = '.agentloop/tasks/manual`task.md';
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Manual output path',
+        '--type',
+        'docs',
+        '--out',
+        taskPath,
+      ],
+      { cwd: dir },
+    );
+
+    expect(result.stdout).toContain(
+      `Task contract created: ${inlineCode(path.join(resolvedDir, taskPath))}`,
+    );
   });
 
   test('accepts repeated risk note flags in non-interactive mode', async () => {

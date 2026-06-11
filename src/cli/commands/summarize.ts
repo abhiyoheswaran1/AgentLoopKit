@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { ArtifactPathError, OutputPathError } from '../../core/artifacts.js';
 import { AgentLoopError } from '../../core/errors.js';
+import { inlineCode } from '../../core/markdown-format.js';
 import { summarizeRepository } from '../../core/pr-summary.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
@@ -100,7 +101,7 @@ async function runSummaryCommand(options: Record<string, unknown>, defaultWrite:
     console.log(JSON.stringify(result, null, 2));
   } else {
     console.log(result.markdown);
-    if (writeOption) console.log(`\nSummary written: ${result.outPath}`);
+    if (writeOption) console.log(`\nSummary written: ${inlineCode(result.outPath)}`);
   }
 }
 

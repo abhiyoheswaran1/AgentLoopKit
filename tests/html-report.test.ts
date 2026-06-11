@@ -5,6 +5,7 @@ import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import { initializeAgentLoop } from '../src/core/init.js';
+import { inlineCode } from '../src/core/markdown-format.js';
 import { generateHtmlReport, writeHtmlReport } from '../src/core/html-report.js';
 import { makeTempDir, removeTempDir } from './helpers.js';
 
@@ -109,6 +110,28 @@ describe('HTML report generation', () => {
     expect(payload.sourcePaths.handoff).toBeUndefined();
     expect(payload.html).toBeUndefined();
     expect(await readFile(outPath, 'utf8')).toContain('CLI task');
+  });
+
+  test('CLI report command prints human confirmation values with Markdown-safe inline values', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-cli-task.md'),
+      '# CLI `task`\n\n- Status: in-progress\n',
+    );
+
+    const outPath = path.join(dir, '.agentloop/reports/custom`report.html');
+    const result = await execa(tsxPath, [cliPath, 'report', '--out', outPath], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain(`Report written: ${inlineCode(outPath)}`);
+    expect(result.stdout).toContain(`Task: ${inlineCode('CLI `task`')}`);
+    expect(result.stdout).toContain('Verification: `not available`');
   });
 
   test('CLI report command prints invalid config errors as JSON without writing', async () => {

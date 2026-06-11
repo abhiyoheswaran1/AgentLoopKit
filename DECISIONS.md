@@ -289,3 +289,7 @@ Release notes combine package metadata, git range labels, branch names, commit I
 ## 2026-06-11: Task Command Human Output Uses Safe Inline Formatting
 
 `agentloop task` prints local task titles, statuses, paths, and hygiene diagnostics that can come from repo files. Human output now renders those values with the shared inline-code formatter so backticks in task names, paths, status strings, messages, or recommendations cannot break Markdown structure. JSON output, task lifecycle behavior, task-doctor diagnostics, and supported status semantics stay unchanged.
+
+## 2026-06-11: CLI Write Confirmations Use Safe Inline Formatting
+
+Write confirmations are often pasted into handoffs, CI logs, and chat transcripts. Commands that create local artifacts now render generated paths, statuses, sources, messages, and counts with the shared inline-code formatter. This applies only to human output for task creation, verification, handoffs, HTML reports, badges, CI summaries, release notes, and agent installation. JSON payloads, output paths, artifact contents, write behavior, and exit codes stay unchanged.

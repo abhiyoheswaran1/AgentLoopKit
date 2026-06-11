@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { ArtifactPathError, OutputPathError } from '../../core/artifacts.js';
 import { writeHtmlReport } from '../../core/html-report.js';
+import { inlineCode } from '../../core/markdown-format.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function printArtifactPathJsonError(error: ArtifactPathError) {
@@ -81,10 +82,10 @@ export function reportCommand() {
         } else {
           console.log(`# AgentLoopKit HTML Report
 
-Report written: ${result.outPath}
-Task: ${result.metadata.taskTitle}
-Verification: ${result.metadata.verificationStatus}
-Changed files: ${result.metadata.changedFileCount}
+Report written: ${inlineCode(result.outPath)}
+Task: ${inlineCode(result.metadata.taskTitle)}
+Verification: ${inlineCode(result.metadata.verificationStatus)}
+Changed files: ${inlineCode(String(result.metadata.changedFileCount))}
 
 Next step: open the HTML file locally or attach it as a CI/PR artifact.`);
         }

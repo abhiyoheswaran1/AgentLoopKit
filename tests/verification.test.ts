@@ -1,8 +1,9 @@
 import path from 'node:path';
-import { access, mkdir, readdir, readFile, symlink, writeFile } from 'node:fs/promises';
+import { access, mkdir, readdir, readFile, realpath, symlink, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir } from './helpers.js';
 import { createDefaultConfig } from '../src/core/config.js';
+import { inlineCode } from '../src/core/markdown-format.js';
 import { runVerification } from '../src/core/verification.js';
 import { execa } from 'execa';
 
@@ -10,6 +11,19 @@ const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 let tempDirs: string[] = [];
+
+function unwrapInlineCode(value: string) {
+  const fence = value.match(/^`+/)?.[0] ?? '';
+  if (!fence || !value.endsWith(fence)) return value;
+  const unwrapped = value.slice(fence.length, -fence.length);
+  if (unwrapped.startsWith(' ') && unwrapped.endsWith(' ')) return unwrapped.slice(1, -1);
+  return unwrapped;
+}
+
+function extractWrittenVerificationReportPath(stdout: string) {
+  const rawPath = stdout.match(/Verification report written: (.+)/)?.[1];
+  return rawPath ? unwrapInlineCode(rawPath) : undefined;
+}
 
 describe('verification', () => {
   afterEach(async () => {
@@ -863,13 +877,39 @@ describe('verification', () => {
       [cliPath, 'verify', '--task', '.agentloop/tasks/demo-task.md'],
       { cwd: dir },
     );
-    const reportPath = result.stdout.match(/Verification report written: (.+)/)?.[1];
+    const reportPath = extractWrittenVerificationReportPath(result.stdout);
     expect(reportPath).toBeTruthy();
     const markdown = await readFile(reportPath as string, 'utf8');
     expect(markdown).toContain('## Task Context');
     expect(markdown).toContain('- Title: CLI task context');
     expect(markdown).toContain('- Task type: docs');
     expect(markdown).toContain('- Status: review');
+  });
+
+  test('CLI verify prints report path and status with Markdown-safe inline values', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"ok\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+    config.paths.reportsDir = '.agentloop/reports`safe';
+    await writeFile(path.join(dir, 'agentloop.config.json'), JSON.stringify(config, null, 2));
+    const resolvedDir = await realpath(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'verify'], { cwd: dir });
+    const expectedDirPrefix = path.join(resolvedDir, config.paths.reportsDir);
+
+    expect(result.stdout).toContain(`Verification report written: \`\`${expectedDirPrefix}`);
+    expect(result.stdout).toContain(`Overall status: ${inlineCode('pass')}`);
   });
 
   test('CLI verify prints invalid task paths as JSON errors', async () => {
@@ -1079,7 +1119,7 @@ describe('verification', () => {
       cwd: dir,
     });
 
-    const reportPath = result.stdout.match(/Verification report written: (.+)/)?.[1];
+    const reportPath = extractWrittenVerificationReportPath(result.stdout);
     expect(reportPath).toBeTruthy();
     const markdown = await readFile(reportPath as string, 'utf8');
     expect(markdown).toContain('- Status: unavailable');

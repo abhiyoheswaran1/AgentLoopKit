@@ -3,6 +3,7 @@ import { mkdir, readdir, readFile, realpath, stat, symlink, writeFile } from 'no
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { SUPPORTED_AGENTS } from '../src/core/constants.js';
+import { inlineCode } from '../src/core/markdown-format.js';
 import { CLI_PROCESS_TIMEOUT_MS, makeTempDir, removeTempDir } from './helpers.js';
 import {
   installAgentInstructions,
@@ -74,6 +75,19 @@ describe('agent installation', () => {
       'Codex',
     );
     await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toContain('Keep this.');
+  });
+
+  test('prints installed agent paths with Markdown-safe inline values', async () => {
+    const dir = await makeTempDir('agent`loop-');
+    tempDirs.push(dir);
+    await writeFile(path.join(dir, 'AGENTS.md'), '# Existing\n\nKeep this.');
+    const resolvedDir = await realpath(dir);
+    const agentFilePath = path.join(resolvedDir, '.agentloop/agents/codex.md');
+
+    const result = await execa(tsxPath, [cliPath, 'install-agent', 'codex'], { cwd: dir });
+
+    expect(result.stdout).toContain(`Agent instructions written: ${inlineCode(agentFilePath)}`);
+    expect(result.stdout).toContain('AGENTS.md now references the agent instructions.');
   });
 
   test('prints all installed agent paths as JSON when requested', async () => {

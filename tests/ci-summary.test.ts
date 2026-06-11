@@ -3,6 +3,7 @@ import { mkdir, readdir, readFile, rm, symlink, writeFile } from 'node:fs/promis
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
+import { inlineCode } from '../src/core/markdown-format.js';
 import { makeTempDir, removeTempDir } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -74,6 +75,19 @@ describe('ci-summary command', () => {
       '- Verification: `pass` - `.agentloop/reports/2026-06-10-11-00-verification-report.md`',
     );
     expect(markdown).not.toContain('TOKEN');
+  });
+
+  test('prints written CI summary paths with Markdown-safe inline values', async () => {
+    const dir = await createRepoWithEvidence();
+    const outPath = path.join(dir, '.agentloop/reports/ci`summary.md');
+
+    const result = await execa(tsxPath, [cliPath, 'ci-summary', '--write', '--out', outPath], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain(`CI summary written: ${inlineCode(outPath)}`);
   });
 
   test('writes markdown-safe CI metadata when values contain backticks', async () => {

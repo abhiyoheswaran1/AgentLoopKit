@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
+import { inlineCode } from '../../core/markdown-format.js';
 import { generateReleaseNotes } from '../../core/release-notes.js';
 import {
   loadWorkspaceForJsonCommand,
@@ -54,7 +55,7 @@ export function releaseNotesCommand() {
 
         console.log(result.markdown);
         if (result.writtenPath) {
-          console.log(`\nRelease notes written: ${result.writtenPath}`);
+          console.log(`\nRelease notes written: ${inlineCode(result.writtenPath)}`);
         } else {
           console.log('\nNo release notes file was written. Use --write to create one.');
         }

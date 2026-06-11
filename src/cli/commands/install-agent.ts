@@ -7,6 +7,7 @@ import {
 } from '../../core/agent-installation.js';
 import { resolveAgentLoopWorkspaceCwd } from '../../core/config.js';
 import { SUPPORTED_AGENTS } from '../../core/constants.js';
+import { inlineCode } from '../../core/markdown-format.js';
 import { printOutputPathJsonError } from '../json-errors.js';
 
 export function installAgentCommand() {
@@ -43,7 +44,7 @@ export function installAgentCommand() {
           );
           return;
         }
-        console.log(`Agent instructions written: ${results.length}`);
+        console.log(`Agent instructions written: ${inlineCode(String(results.length))}`);
         console.log('AGENTS.md now references all bundled agent instructions.');
         return;
       }
@@ -84,7 +85,7 @@ export function installAgentCommand() {
         console.log(JSON.stringify({ agent: { name: requestedAgent, ...result } }, null, 2));
         return;
       }
-      console.log(`Agent instructions written: ${result.agentFilePath}`);
+      console.log(`Agent instructions written: ${inlineCode(result.agentFilePath)}`);
       console.log('AGENTS.md now references the agent instructions.');
     });
 }

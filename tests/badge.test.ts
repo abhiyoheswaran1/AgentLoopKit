@@ -5,6 +5,7 @@ import { afterEach, describe, expect, test } from 'vitest';
 import { generateSvgBadge, writeEvidenceBadge } from '../src/core/badge.js';
 import { createDefaultConfig } from '../src/core/config.js';
 import { initializeAgentLoop } from '../src/core/init.js';
+import { inlineCode } from '../src/core/markdown-format.js';
 import { makeTempDir, removeTempDir } from './helpers.js';
 
 let tempDirs: string[] = [];
@@ -86,6 +87,30 @@ describe('badge generation', () => {
     const svg = await readFile(payload.outPath, 'utf8');
     expect(svg).toContain('gates');
     expect(svg).toContain(payload.status);
+  });
+
+  test('CLI prints badge confirmation values with Markdown-safe inline values', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-10-12-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass`ok\n',
+    );
+
+    const outPath = path.join(dir, '.agentloop/reports/agentloop`verification.svg');
+    const result = await execa(tsxPath, [cliPath, 'badge', '--out', outPath], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain(`Badge written: ${inlineCode(outPath)}`);
+    expect(result.stdout).toContain(`Source: ${inlineCode('verification')}`);
+    expect(result.stdout).toContain(`Status: ${inlineCode('pass')}`);
+    expect(result.stdout).toContain(`Message: ${inlineCode('pass')}`);
   });
 
   test('CLI prints invalid config errors as JSON without writing a badge', async () => {

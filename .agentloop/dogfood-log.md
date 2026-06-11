@@ -6432,3 +6432,24 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The shared Markdown formatter made the fix small and consistent with recent doctor, gates, status, and release-output hardening.
 - Improve:
   - Continue scanning remaining human-output surfaces such as badge/report write confirmations for raw path values.
+
+## 2026-06-11: CLI Write Confirmation Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-cli-write-confirmation-output.md`
+- Trigger:
+  - The continued hardening pass found raw generated paths and status/message values in human write-confirmation output.
+  - These outputs are commonly pasted into handoffs and CI logs, so backticks in local paths should not break Markdown.
+- Implementation:
+  - Wrapped human confirmation values for `create-task`, `verify`, `summarize`/`handoff`, `report`, `badge`, `ci-summary`, `release-notes`, and `install-agent`.
+  - Kept JSON output and artifact write behavior unchanged.
+  - Added regression coverage with backticks in generated paths and confirmation values.
+- Verification run:
+  - Red focused suites failed first across the affected command tests.
+  - Focused suites passed after implementation:
+    - `npm test -- tests/create-task.test.ts tests/verification.test.ts tests/handoff.test.ts tests/html-report.test.ts tests/badge.test.ts tests/ci-summary.test.ts tests/release-notes.test.ts tests/agent-installation.test.ts`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-11-20-16-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-20-22-pr-summary.md`.
+- What worked well:
+  - The shared inline-code formatter kept the implementation mechanical and consistent.
+- Improve:
+  - Continue scanning non-write human output in lower-traffic commands before the 0.28.0 batch release.
