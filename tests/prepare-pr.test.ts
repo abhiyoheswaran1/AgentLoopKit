@@ -118,5 +118,22 @@ describe('prepare-pr command', () => {
     expect(output.githubComment).toContain('## AgentLoopKit Review Readiness');
     expect(output.githubComment).toContain('This is a review-readiness score, not a code-quality score.');
     expect(output.shipReportPath).toMatch(/\.agentloop\/reports\/.+-ship-report\.md$/);
+    const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
+    expect(runs.runs.filter((run: { command: string }) => run.command === 'ship')).toHaveLength(1);
+  });
+
+  test('reuses a fresh ship run instead of writing duplicate run ledger entries', async () => {
+    const dir = await createPreparePrFixture();
+
+    const ship = JSON.parse((await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir })).stdout);
+    const prepared = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'prepare-pr', '--write', '--json'], { cwd: dir })).stdout,
+    );
+    const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
+    const shipRuns = runs.runs.filter((run: { command: string }) => run.command === 'ship');
+
+    expect(prepared.shipReportPath).toBe(ship.shipReportPath);
+    expect(shipRuns).toHaveLength(1);
+    expect(shipRuns[0].id).toBe(ship.run.id);
   });
 });

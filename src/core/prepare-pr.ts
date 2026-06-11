@@ -1,10 +1,13 @@
 import path from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { resolveCurrentTaskVerificationEvidence } from './evidence.js';
-import { writeTextFile } from './file-system.js';
+import { pathExists, writeTextFile } from './file-system.js';
+import { getGitStatus, GitFileStatus, parseGitStatus } from './git.js';
 import { inlineCode } from './markdown-format.js';
 import { resolveOutputArtifactPath } from './artifacts.js';
 import { createShipReport, ShipResult } from './ship.js';
+import { listRuns, readRun } from './runs.js';
 import { readTaskContract, TaskContract } from './task-state.js';
 
 export type PreparePrResult = {
@@ -17,6 +20,18 @@ export type PreparePrResult = {
   readiness: ShipResult['readiness'];
   changedFiles: ShipResult['changedFiles'];
 };
+
+type PreparePrShipEvidence = Pick<
+  ShipResult,
+  | 'timestamp'
+  | 'readiness'
+  | 'task'
+  | 'verification'
+  | 'verificationReportPath'
+  | 'shipReportPath'
+  | 'handoffPath'
+  | 'changedFiles'
+>;
 
 function sectionContent(markdown: string, heading: string) {
   const lines = markdown.split(/\r?\n/);
@@ -52,12 +67,50 @@ function renderChangedFiles(changedFiles: ShipResult['changedFiles']) {
     : '- No changed files detected.';
 }
 
-function verificationLine(ship: ShipResult) {
+function relativePath(cwd: string, filePath: string) {
+  return path.relative(cwd, filePath).split(path.sep).join('/') || '.';
+}
+
+function resolveMaybeRepoPath(cwd: string, filePath: string) {
+  return path.isAbsolute(filePath) ? filePath : path.resolve(cwd, filePath);
+}
+
+function extractOverallStatus(markdown: string | undefined): ShipResult['verification']['status'] {
+  const status = markdown?.match(/Overall status:\s*([a-z-]+)/i)?.[1]?.trim().toLowerCase();
+  if (status === 'pass' || status === 'fail') return status;
+  if (status) return 'unknown';
+  return 'missing';
+}
+
+function isGeneratedEvidencePath(filePath: string) {
+  return (
+    filePath.startsWith('.agentloop/reports/') ||
+    filePath.startsWith('.agentloop/runs/') ||
+    filePath.startsWith('.agentloop/handoffs/')
+  );
+}
+
+function meaningfulChangeKeys(changedFiles: GitFileStatus[]) {
+  return changedFiles
+    .filter((file) => !isGeneratedEvidencePath(file.path))
+    .map((file) => `${file.status} ${file.path}`)
+    .sort();
+}
+
+function sameMeaningfulChanges(left: GitFileStatus[], right: GitFileStatus[]) {
+  const leftKeys = meaningfulChangeKeys(left);
+  const rightKeys = meaningfulChangeKeys(right);
+  return (
+    leftKeys.length === rightKeys.length && leftKeys.every((key, index) => key === rightKeys[index])
+  );
+}
+
+function verificationLine(ship: PreparePrShipEvidence) {
   const report = ship.verificationReportPath ? ` (${ship.verificationReportPath})` : '';
   return `Overall status: ${ship.verification.status}${report}`;
 }
 
-function buildPrBody(input: { task: TaskContract | null; ship: ShipResult }) {
+function buildPrBody(input: { task: TaskContract | null; ship: PreparePrShipEvidence }) {
   const title = input.task?.title ?? 'AgentLoopKit review-ready changes';
   const taskContent = input.task?.content ?? '';
   const desiredOutcome = sectionContent(taskContent, 'Desired Outcome');
@@ -111,7 +164,7 @@ ${rollback || 'No rollback notes were recorded.'}
 `;
 }
 
-function buildGithubComment(ship: ShipResult) {
+function buildGithubComment(ship: PreparePrShipEvidence) {
   return `## AgentLoopKit Review Readiness
 
 - Score: ${ship.readiness.totalScore}/100
@@ -133,6 +186,53 @@ ${renderMarkdownList(ship.readiness.recommendedNextActions, 'Review the diff and
 `;
 }
 
+async function findReusableShipEvidence(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+}): Promise<PreparePrShipEvidence | undefined> {
+  const evidence = await resolveCurrentTaskVerificationEvidence(options);
+  if (!evidence.taskPath || !evidence.currentReportPath || evidence.staleReport) return undefined;
+
+  const taskPath = relativePath(options.cwd, evidence.taskPath);
+  const verificationReportPath = resolveMaybeRepoPath(options.cwd, evidence.currentReportPath);
+  const currentChangedFiles = await parseGitStatus(await getGitStatus(options.cwd));
+
+  for (const run of await listRuns(options.cwd)) {
+    if (run.command !== 'ship' || run.score === undefined) continue;
+    if (run.task?.path !== taskPath) continue;
+    if (!run.shipReportPath || !(await pathExists(resolveMaybeRepoPath(options.cwd, run.shipReportPath)))) {
+      continue;
+    }
+    if (
+      !run.verificationReportPath ||
+      resolveMaybeRepoPath(options.cwd, run.verificationReportPath) !== verificationReportPath
+    ) {
+      continue;
+    }
+
+    const record = await readRun(options.cwd, run.id);
+    if (!record.score || !sameMeaningfulChanges(record.changedFiles, currentChangedFiles)) continue;
+    const verificationMarkdown = await readFile(verificationReportPath, 'utf8');
+
+    return {
+      timestamp: run.createdAt,
+      readiness: record.score,
+      task: run.task,
+      verification: {
+        status: extractOverallStatus(verificationMarkdown),
+        fresh: true,
+        path: relativePath(options.cwd, verificationReportPath),
+      },
+      verificationReportPath,
+      shipReportPath: resolveMaybeRepoPath(options.cwd, run.shipReportPath),
+      handoffPath: run.handoffPath,
+      changedFiles: record.changedFiles,
+    };
+  }
+
+  return undefined;
+}
+
 export async function preparePullRequest(options: {
   cwd: string;
   config: AgentLoopConfig;
@@ -140,11 +240,13 @@ export async function preparePullRequest(options: {
   githubComment?: boolean;
   write?: boolean;
 }) {
-  const ship = await createShipReport({
-    cwd: options.cwd,
-    config: options.config,
-    timestamp: options.timestamp,
-  });
+  const ship =
+    (await findReusableShipEvidence(options)) ??
+    (await createShipReport({
+      cwd: options.cwd,
+      config: options.config,
+      timestamp: options.timestamp,
+    }));
   const evidence = await resolveCurrentTaskVerificationEvidence(options);
   const task = evidence.taskPath
     ? await readTaskContract({

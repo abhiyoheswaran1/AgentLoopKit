@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-01-49-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-01-49",
+  "createdAtEpochMs": 1781221801984,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-reuse-fresh-ship-run-in-prepare-pr.md",
+    "title": "Reuse fresh ship run in prepare-pr",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-01-43-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-01-49-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-01-49-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 10
+}

@@ -41,6 +41,34 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Consider surfacing a one-line stale-run hint later if teams start depending on run age in status.
   - Consider making `prepare-pr` reuse an existing fresh ship run instead of writing a second same-minute ship run when nothing changed.
 
+## 2026-06-12: Reuse Fresh Ship Run In Prepare PR
+
+- Task contract: `.agentloop/tasks/2026-06-12-reuse-fresh-ship-run-in-prepare-pr.md`
+- Trigger:
+  - Dogfooding showed `prepare-pr --write` could create a second same-minute ship run immediately after `agentloop ship`.
+  - The duplicate run was valid but noisy because it referenced the same task, verification report, and ship report.
+- Product change:
+  - `prepare-pr` now checks the local run ledger for a matching fresh ship run before creating a new one.
+  - Matching requires the same active task path, current verification report, existing ship report, and same non-generated changed-file set.
+  - Generated evidence under `.agentloop/reports/`, `.agentloop/runs/`, and `.agentloop/handoffs/` does not force a duplicate readiness run.
+- Verification:
+  - Red focused run: `npm test -- tests/prepare-pr.test.ts -t "reuses a fresh ship run"` failed with two ship runs.
+  - Green focused run: `npm test -- tests/prepare-pr.test.ts -t "reuses a fresh ship run"` passed.
+  - Focused suite `npm test -- tests/prepare-pr.test.ts tests/runs.test.ts` passed with 2 files and 8 tests.
+  - `npm run typecheck` passed.
+  - `npm run lint`, `npm run check:links`, `npm run build`, `node scripts/smoke-cli.mjs`, and `npm run smoke:release` passed.
+  - Full suite `npm test` passed with 47 files and 398 tests.
+  - Production dependency audit `npx pnpm@10.12.1 audit --prod` reported no known vulnerabilities.
+  - ProjScan `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - Final self-verify `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-12-reuse-fresh-ship-run-in-prepare-pr.md --task-commands --timeout-ms 300000 --write-run --json` passed and wrote `.agentloop/reports/2026-06-12-01-43-verification-report.md` plus run `.agentloop/runs/2026-06-12-01-49-verify/`.
+  - Final ship report scored 96/100 and wrote `.agentloop/reports/2026-06-12-01-49-ship-report.md` plus run `.agentloop/runs/2026-06-12-01-49-ship/`.
+  - Final `prepare-pr --write --json` wrote `.agentloop/handoffs/2026-06-12-01-49-pr-description.md`, reused `.agentloop/runs/2026-06-12-01-49-ship/`, and did not create a duplicate ship run.
+  - Final status brief showed `run="ship 96/100"` for the active task.
+- Worked well:
+  - The fix reuses existing run-ledger and ship-report data rather than adding a separate cache.
+- Improve:
+  - Add a JSON field later that tells callers whether `prepare-pr` reused or refreshed ship evidence.
+
 ## 2026-06-12: Opt-In Run Ledger Records For Verify And Handoff
 
 - Task contract: `.agentloop/tasks/2026-06-12-add-opt-in-run-ledger-entries-for-verify-and-handoff.md`
