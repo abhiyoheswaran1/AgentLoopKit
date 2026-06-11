@@ -5144,3 +5144,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep timeout validation strict; do not accept partial values such as `10abc`.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Error Output for Invalid Verify Task Paths
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-return-json-errors-for-invalid-verify-task-paths.md`
+- Trigger:
+  - `agentloop verify --task <bad path> --json` still wrote a normal verification result, while other explicit artifact-path commands returned structured JSON errors.
+- Implementation:
+  - Added JSON-mode task artifact validation to `verify`.
+  - Kept default non-JSON behavior: invalid task paths are reported as unavailable inside the verification report.
+  - Confirmed invalid JSON-mode task paths do not run configured commands and do not write reports.
+  - Documented the behavior in README, verification report docs, and the changelog.
+- Verification run:
+  - Red focused verification test failed because invalid JSON task paths exited `0`.
+  - Focused verification suite passed: 21 tests.
+  - `.agentloop/reports/2026-06-11-04-28-verification-report.md`, overall status pass.
+  - `.agentloop/handoffs/2026-06-11-04-30-pr-summary.md` captured the review handoff.
+  - Built CLI smoke confirmed `ARTIFACT_PATH_INVALID` and no command execution for invalid task paths.
+- What worked well:
+  - The existing artifact-path error shape fit `verify` without adding a new public error contract.
+- Improve:
+  - Consider extracting the repeated artifact-path JSON printer after the `0.28.0` batch if more commands need it.
+  - Keep this unreleased until the planned `0.28.0` batch.

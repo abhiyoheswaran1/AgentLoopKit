@@ -658,6 +658,93 @@ describe('verification', () => {
     expect(markdown).toContain('- Status: review');
   });
 
+  test('CLI verify prints invalid task paths as JSON errors', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: 'node -e "require(\'fs\').writeFileSync(\'verify-command-ran.txt\', \'yes\')"',
+            lint: '',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+    const invalidTaskPath = path.join(outsideDir, 'outside-task.md');
+    await writeFile(invalidTaskPath, '# Outside task\n');
+
+    const result = await execa(tsxPath, [cliPath, 'verify', '--task', invalidTaskPath, '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output).toEqual({
+      error: {
+        code: 'ARTIFACT_PATH_INVALID',
+        message: `Task artifact path must stay inside .agentloop/tasks: ${invalidTaskPath}`,
+        artifactType: 'task',
+        requestedPath: invalidTaskPath,
+        expectedDir: '.agentloop/tasks',
+        reason: 'outside-directory',
+      },
+    });
+    await expect(access(path.join(dir, 'verify-command-ran.txt'))).rejects.toThrow();
+    await expect(access(path.join(dir, '.agentloop/reports'))).rejects.toThrow();
+  });
+
+  test('CLI verify keeps invalid task paths human-readable by default', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: 'node -e "console.log(\\"ok\\")"',
+            lint: '',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+    const invalidTaskPath = path.join(outsideDir, 'outside-task.md');
+    await writeFile(invalidTaskPath, '# Outside task\n');
+
+    const result = await execa(tsxPath, [cliPath, 'verify', '--task', invalidTaskPath], {
+      cwd: dir,
+    });
+
+    const reportPath = result.stdout.match(/Verification report written: (.+)/)?.[1];
+    expect(reportPath).toBeTruthy();
+    const markdown = await readFile(reportPath as string, 'utf8');
+    expect(markdown).toContain('- Status: unavailable');
+    expect(markdown).toContain('Task path must point to a Markdown task contract.');
+  });
+
   test('CLI verify runs task verification commands with --task-commands', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

@@ -1,10 +1,31 @@
 import { Command } from 'commander';
+import { ArtifactPathError, resolveExplicitArtifactPath } from '../../core/artifacts.js';
 import { loadAgentLoopConfig } from '../../core/config.js';
 import { runVerification } from '../../core/verification.js';
 
 function collect(value: string, previous: string[]) {
   previous.push(value);
   return previous;
+}
+
+function printArtifactPathJsonError(error: ArtifactPathError) {
+  console.log(
+    JSON.stringify(
+      {
+        error: {
+          code: error.code,
+          message: error.message,
+          artifactType: error.artifactType,
+          requestedPath: error.requestedPath,
+          expectedDir: error.expectedDir,
+          reason: error.reason,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
 }
 
 export function verifyCommand() {
@@ -20,10 +41,27 @@ export function verifyCommand() {
     .option('--command <command>', 'custom command to run', collect, [])
     .action(async (options: Record<string, unknown>) => {
       const config = await loadAgentLoopConfig(process.cwd());
+      const taskPath = typeof options.task === 'string' ? options.task : undefined;
+      if (options.json && taskPath) {
+        try {
+          await resolveExplicitArtifactPath({
+            cwd: process.cwd(),
+            artifactType: 'task',
+            requestedPath: taskPath,
+            expectedDir: config.paths.tasksDir,
+          });
+        } catch (error) {
+          if (error instanceof ArtifactPathError) {
+            printArtifactPathJsonError(error);
+            return;
+          }
+          throw error;
+        }
+      }
       const result = await runVerification({
         cwd: process.cwd(),
         config,
-        taskPath: typeof options.task === 'string' ? options.task : undefined,
+        taskPath,
         taskCommands: options.taskCommands === true,
         skip: {
           build: options.build === false,
