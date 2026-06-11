@@ -4784,3 +4784,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider a shared JSON error shape for unsupported agent names if automation users need it.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Error Output for `install-agent`
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-json-error-output-for-unsupported-install-agent-agents.md`
+- Trigger:
+  - `install-agent --json` had machine-readable success output, but unsupported agent names still returned human-only stderr.
+- Implementation:
+  - Added a JSON error payload for unsupported `install-agent <agent> --json` values.
+  - Included `code`, `message`, `requestedAgent`, and `supportedAgents`.
+  - Kept default unsupported-agent output human-readable.
+  - Added regression coverage for JSON and default error paths.
+- Verification run:
+  - Red focused test failed because the command printed the human error to stderr.
+  - Focused agent-installation suite passed: 6 tests.
+  - `.agentloop/reports/2026-06-11-02-11-verification-report.md`, overall status pass.
+- What worked well:
+  - Mirroring the `create-task --json` error shape gave agents a predictable failure contract.
+- Improve:
+  - `summarize` uses `--report`; I first tried `--verification`. Consider adding an alias if this confusion repeats.
+  - Keep this unreleased until the planned `0.28.0` batch.

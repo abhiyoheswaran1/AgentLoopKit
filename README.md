@@ -272,7 +272,7 @@ For unsupported `--type` values, `create-task --json` returns a parseable error 
 `task doctor --json` checks the active task directory for missing, legacy, unsupported, or terminal status lines. It does not edit, archive, or delete task files.
 `list-templates --json` returns grouped bundled template names for agents that need to inspect available loops, policies, handoffs, and agent instructions.
 `version --json` returns the package version in a stable object for scripts that should not parse the plain version string.
-`install-agent <agent> --json` returns the instruction files written for one agent, and `install-agent all --json` returns every bundled agent entry.
+`install-agent <agent> --json` returns the instruction files written for one agent, and `install-agent all --json` returns every bundled agent entry. Unsupported agent names return a parseable JSON error with `supportedAgents` and write no files.
 
 Each contract records:
 

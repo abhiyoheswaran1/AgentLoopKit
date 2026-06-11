@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile, realpath, writeFile } from 'node:fs/promises';
+import { readFile, realpath, stat, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { SUPPORTED_AGENTS } from '../src/core/constants.js';
@@ -99,5 +99,47 @@ describe('agent installation', () => {
     await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toContain(
       '.agentloop/agents/github-copilot-cli.md',
     );
+  });
+
+  test('prints unsupported agent errors as JSON when requested', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'install-agent', 'vibes', '--json'], {
+      cwd: dir,
+      reject: false,
+      timeout: 5000,
+    });
+
+    expect(result.timedOut).toBe(false);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'UNSUPPORTED_AGENT',
+        message: 'Unsupported agent "vibes".',
+        requestedAgent: 'vibes',
+        supportedAgents: [...SUPPORTED_AGENTS, 'all'],
+      },
+    });
+    await expect(stat(path.join(dir, '.agentloop'))).rejects.toThrow();
+  });
+
+  test('keeps unsupported agent errors human-readable by default', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'install-agent', 'vibes'], {
+      cwd: dir,
+      reject: false,
+      timeout: 5000,
+    });
+
+    expect(result.timedOut).toBe(false);
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('agentloop: Unsupported agent "vibes".');
+    expect(result.stderr).toContain('Supported agents:');
+    await expect(stat(path.join(dir, '.agentloop'))).rejects.toThrow();
   });
 });

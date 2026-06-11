@@ -12,7 +12,8 @@ export function installAgentCommand() {
     .argument('<agent>', `one of: ${SUPPORTED_AGENTS.join(', ')}, all`)
     .option('--json', 'print machine-readable output')
     .action(async (agent: string, options: { json?: boolean }) => {
-      if (agent === 'all') {
+      const requestedAgent = agent.trim();
+      if (requestedAgent === 'all') {
         const results = await installAllAgentInstructions({ cwd: process.cwd() });
         if (options.json) {
           console.log(
@@ -33,14 +34,32 @@ export function installAgentCommand() {
         console.log('AGENTS.md now references all bundled agent instructions.');
         return;
       }
-      if (!isSupportedAgent(agent)) {
+      if (!isSupportedAgent(requestedAgent)) {
+        if (options.json) {
+          console.log(
+            JSON.stringify(
+              {
+                error: {
+                  code: 'UNSUPPORTED_AGENT',
+                  message: `Unsupported agent "${requestedAgent}".`,
+                  requestedAgent,
+                  supportedAgents: [...SUPPORTED_AGENTS, 'all'],
+                },
+              },
+              null,
+              2,
+            ),
+          );
+          process.exitCode = 1;
+          return;
+        }
         throw new Error(
-          `Unsupported agent "${agent}". Supported agents: ${SUPPORTED_AGENTS.join(', ')}, all`,
+          `Unsupported agent "${requestedAgent}". Supported agents: ${SUPPORTED_AGENTS.join(', ')}, all`,
         );
       }
-      const result = await installAgentInstructions({ cwd: process.cwd(), agent });
+      const result = await installAgentInstructions({ cwd: process.cwd(), agent: requestedAgent });
       if (options.json) {
-        console.log(JSON.stringify({ agent: { name: agent, ...result } }, null, 2));
+        console.log(JSON.stringify({ agent: { name: requestedAgent, ...result } }, null, 2));
         return;
       }
       console.log(`Agent instructions written: ${result.agentFilePath}`);

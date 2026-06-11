@@ -22,6 +22,7 @@
 - Added `agentloop list-templates --json` for machine-readable bundled template discovery.
 - Added `agentloop version --json` for machine-readable version checks.
 - Added `agentloop install-agent <agent> --json` and `agentloop install-agent all --json` for machine-readable agent setup results.
+- Added JSON error output for unsupported `agentloop install-agent <agent>` values when `--json` is requested.
 - Changed `npm run smoke:release` so the packed README may stay unpinned while stale exact version pins are still rejected.
 - Added `agentloop verify --task-commands` to explicitly run commands listed in a task contract's `Verification Commands` section.
 - Added a verification report note when `--task-commands` is requested but no runnable task commands are found.
