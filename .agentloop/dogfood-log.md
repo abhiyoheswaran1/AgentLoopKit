@@ -6518,3 +6518,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The same shared formatter now covers verification command labels, CI metadata, and task context consistently.
 - Improve:
   - Continue scanning lower-traffic Markdown outputs for raw local values before the 0.28.0 release batch.
+
+## 2026-06-11: Verification Report Metadata Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-verification-report-metadata-markdown.md`
+- Trigger:
+  - The roadmap hardening pass found that verification report top-level metadata still rendered repo and Git values directly into Markdown.
+  - A local repo folder or branch containing backticks could corrupt reviewer-facing evidence.
+- Implementation:
+  - Added a regression using a temporary repo directory with a backtick in its basename.
+  - Rendered timestamp, repo, branch, commit, and working-tree values with the shared inline-code formatter.
+  - Kept `Overall status` plain so downstream AgentLoop parsers keep reading existing and new reports.
+- Verification run:
+  - Red focused test failed first in `tests/verification.test.ts` because report metadata values were raw Markdown.
+  - Focused suite passed after implementation:
+    - `npm test -- tests/verification.test.ts`
+  - Broader local checks passed:
+    - `git diff --check`
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run check:links`
+    - `npx --yes projscan doctor --format markdown`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npm test`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-11-21-22-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-21-29-pr-summary.md`.
+- What worked well:
+  - Preserving `Overall status` as a parseable enum avoided unnecessary downstream parser churn.
+- Improve:
+  - Continue scanning `task-contract` and user-authored Markdown generation boundaries separately; those files intentionally contain user prose and need different rules than evidence summaries.

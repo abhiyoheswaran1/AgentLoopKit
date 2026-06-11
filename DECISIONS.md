@@ -301,3 +301,7 @@ Write confirmations are often pasted into handoffs, CI logs, and chat transcript
 ## 2026-06-11: Verification Task Context Uses Safe Inline Formatting
 
 Verification reports include task context from local task contracts and requested task paths. Those values can contain punctuation from filenames or task metadata, so task-context path, title, task type, and status values now render with the shared inline-code formatter. The change is presentation-only: task path safety, task metadata parsing, command execution, command results, and JSON output stay unchanged.
+
+## 2026-06-11: Verification Report Metadata Preserves Status Parsing
+
+Verification report headers include local repo and Git metadata that can contain Markdown-sensitive punctuation. Timestamp, repo, branch, commit, and working-tree values now render with the shared inline-code formatter. `Overall status` deliberately remains plain text because AgentLoopKit commands parse that line from existing reports; keeping it raw preserves compatibility while the value itself is an internal enum.

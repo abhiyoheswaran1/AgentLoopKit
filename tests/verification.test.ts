@@ -64,6 +64,39 @@ describe('verification', () => {
     expect(result.markdown).toContain('ok');
   });
 
+  test('formats report metadata values as safe inline Markdown', async () => {
+    const dir = await makeTempDir();
+    const repoDir = path.join(dir, 'demo`repo');
+    tempDirs.push(dir);
+    await mkdir(repoDir, { recursive: true });
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"ok\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: repoDir,
+      config,
+      reportTimestamp: '2026-06-09-12-32',
+      nowIso: '2026-06-09T12:32:00.000Z',
+    });
+
+    expect(result.markdown).toContain(`- Timestamp: ${inlineCode('2026-06-09T12:32:00.000Z')}`);
+    expect(result.markdown).toContain(`- Repo: ${inlineCode('demo`repo')}`);
+    expect(result.markdown).toContain(`- Git branch: ${inlineCode('not available')}`);
+    expect(result.markdown).toContain(`- Git commit: ${inlineCode('not available')}`);
+    expect(result.markdown).toContain(`- Working tree: ${inlineCode('clean or unavailable')}`);
+    expect(result.markdown).toContain('- Overall status: pass');
+  });
+
   test('writes verification reports to the parent AgentLoop root when run from a nested directory', async () => {
     const dir = await makeTempDir();
     const nested = path.join(dir, 'src', 'features');

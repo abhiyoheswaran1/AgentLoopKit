@@ -460,14 +460,15 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
   const commit = await getGitCommit(options.cwd);
   const status = await getGitStatus(options.cwd);
   const taskContext = await renderTaskContext(options.cwd, options.config, options.taskPath);
+  const workingTreeStatus = status.trim() ? 'dirty' : 'clean or unavailable';
 
   const markdown = `# Verification Report
 
-- Timestamp: ${nowIso}
-- Repo: ${path.basename(options.cwd)}
-- Git branch: ${branch || 'not available'}
-- Git commit: ${commit || 'not available'}
-- Working tree: ${status.trim() ? 'dirty' : 'clean or unavailable'}
+- Timestamp: ${inlineCode(nowIso)}
+- Repo: ${inlineCode(path.basename(options.cwd))}
+- Git branch: ${inlineCode(branch || 'not available')}
+- Git commit: ${inlineCode(commit || 'not available')}
+- Working tree: ${inlineCode(workingTreeStatus)}
 - Overall status: ${overallStatus}
 
 ${renderCiContext(ciContext)}

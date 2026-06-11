@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed verification report top-level timestamp, repo, git branch, git commit, and working-tree values to render with Markdown-safe inline-code delimiters while keeping overall status parseable.
 - Changed verification report task-context path, title, task type, and status values to render with Markdown-safe inline-code delimiters.
 - Changed `agentloop npm-status` Markdown output to render registry error text as a single Markdown-safe inline-code value while preserving exact structured error data in JSON output.
 - Changed CLI write-confirmation output for task creation, verification, handoffs, reports, badges, CI summaries, release notes, and agent installation to render generated paths, statuses, sources, messages, and counts with Markdown-safe inline-code delimiters.
