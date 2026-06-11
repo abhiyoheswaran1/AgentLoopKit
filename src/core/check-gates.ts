@@ -12,6 +12,7 @@ import {
   isInsideGitRepo,
   parseGitStatus,
 } from './git.js';
+import { inlineCode } from './markdown-format.js';
 import { inspectTaskDirectory } from './task-state.js';
 
 export type GateStatus = 'pass' | 'warn' | 'fail';
@@ -134,29 +135,33 @@ function chooseNextAction(gates: GateCheck[]) {
 function renderMarkdown(result: Omit<CheckGatesResult, 'markdown'>) {
   const gateLines = result.gates
     .map((item) => {
-      const suffix = item.path ? ` - ${item.path}` : '';
-      return `- [${item.status}] ${item.name}: ${item.message}${suffix}`;
+      const suffix = item.path ? ` - ${inlineCode(item.path)}` : '';
+      return `- [${inlineCode(item.status)}] ${inlineCode(item.name)}: ${inlineCode(
+        item.message,
+      )}${suffix}`;
     })
     .join('\n');
   const gitLine = result.git.isRepository
-    ? `${result.git.branch || 'unknown branch'}${result.git.commit ? ` @ ${result.git.commit}` : ''}`
-    : 'not inside a git repository';
+    ? `${inlineCode(result.git.branch || 'unknown branch')}${
+        result.git.commit ? ` @ ${inlineCode(result.git.commit)}` : ''
+      }`
+    : inlineCode('not inside a git repository');
   const gitLines = [
     `- Git: ${gitLine}`,
     ...(result.git.isRepository
       ? [
-          `- Git root: ${result.git.root}`,
-          `- Git target: ${result.git.targetIsRoot ? 'root directory' : 'subdirectory'}`,
+          `- Git root: ${inlineCode(result.git.root)}`,
+          `- Git target: ${inlineCode(result.git.targetIsRoot ? 'root directory' : 'subdirectory')}`,
         ]
       : []),
   ];
 
   return `# AgentLoopKit Gates
 
-- Overall status: ${result.overallStatus}
-- Strict mode: ${result.strict ? 'enabled (warnings fail)' : 'disabled'}
+- Overall status: ${inlineCode(result.overallStatus)}
+- Strict mode: ${inlineCode(result.strict ? 'enabled (warnings fail)' : 'disabled')}
 ${gitLines.join('\n')}
-- Changed files: ${result.git.changedFileCount}
+- Changed files: ${inlineCode(String(result.git.changedFileCount))}
 
 ## Gates
 
@@ -164,7 +169,7 @@ ${gateLines}
 
 ## Next Action
 
-Run \`${result.nextAction.command}\`.
+Run ${inlineCode(result.nextAction.command)}.
 
 ${result.nextAction.reason}
 `;

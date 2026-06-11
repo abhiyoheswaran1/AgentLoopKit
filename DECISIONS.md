@@ -269,3 +269,7 @@ Release notes combine package metadata, git range labels, branch names, commit I
 ## 2026-06-11: Artifact Inventory Markdown Uses Safe Inline Formatting
 
 `agentloop artifacts` inventories local evidence for humans, agents, and CI logs. It now renders task statuses, task titles, artifact titles, artifact paths, and verification statuses with the shared inline-code formatter. JSON output and artifact discovery stay unchanged.
+
+## 2026-06-11: Review Gate Markdown Uses Safe Inline Formatting
+
+`agentloop check-gates` is reviewer-facing evidence. It now renders gate statuses, gate names, gate messages, evidence paths, git labels, changed-file counts, and next-action commands with the shared inline-code formatter. JSON output, gate decisions, strict-mode behavior, and exit codes stay unchanged.

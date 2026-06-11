@@ -2,6 +2,32 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Harden Check-Gates Markdown Output
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-check-gates-markdown-output.md`
+- Trigger:
+  - The remaining Markdown-surface scan found that `agentloop check-gates` rendered gate statuses, gate names, gate messages, evidence paths, git metadata, changed-file counts, and next-action commands directly into Markdown.
+  - Review gate output is often pasted into agent handoffs and CI logs, so local values should not corrupt Markdown when they contain backticks.
+- Product change:
+  - Added regression coverage for a task title, task path, branch name, and next-action command containing backticks.
+  - Changed check-gates Markdown to use the shared inline-code formatter for gate lines, git context, overall status, strict mode, changed-file count, and next-action command.
+  - Preserved JSON output, gate decisions, strict-mode behavior, and exit codes.
+- Verification:
+  - Red focused test `npm test -- tests/check-gates.test.ts -t "renders markdown gate values"` failed before the renderer changed.
+  - Focused green suite `npm test -- tests/check-gates.test.ts` passed with 11 tests.
+  - Full suite `npm test` passed with 42 test files and 364 tests.
+  - Full self-verify `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-11-harden-check-gates-markdown-output.md --task-commands --timeout-ms 240000 --json` passed and wrote `.agentloop/reports/2026-06-11-18-00-verification-report.md`.
+  - CLI smoke `node scripts/smoke-cli.mjs` passed.
+  - Release smoke `npm run smoke:release` passed.
+  - Markdown link check `npm run check:links` passed.
+  - Production dependency audit `npx pnpm@10.12.1 audit --prod` reported no known vulnerabilities.
+  - ProjScan `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - Handoff summary generated at `.agentloop/handoffs/2026-06-11-18-06-pr-summary.md`.
+- Worked well:
+  - The change stayed in the renderer and did not touch gate evaluation.
+- Improve:
+  - Continue scanning remaining human Markdown surfaces before the planned `0.28.0` batch.
+
 ## 2026-06-11: Harden Artifacts Markdown Output
 
 - Task contract: `.agentloop/tasks/2026-06-11-harden-artifacts-markdown-output.md`

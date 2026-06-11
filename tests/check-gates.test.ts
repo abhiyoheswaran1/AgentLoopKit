@@ -269,10 +269,65 @@ describe('check-gates command', () => {
       ]),
     );
     expect(humanResult.exitCode).toBe(0);
-    expect(humanResult.stdout).toContain(`- Git root: ${await realpath(dir)}`);
-    expect(humanResult.stdout).toContain('- Git target: subdirectory');
+    expect(humanResult.stdout).toContain(`- Git root: \`${await realpath(dir)}\``);
+    expect(humanResult.stdout).toContain('- Git target: `subdirectory`');
     expect(humanResult.stdout).toContain(
-      '[warn] Git target: Current directory is a Git subdirectory. AgentLoopKit files live in the current directory, not the Git root.',
+      '[`warn`] `Git target`: `Current directory is a Git subdirectory. AgentLoopKit files live in the current directory, not the Git root.`',
+    );
+  });
+
+  test('renders markdown gate values with safe inline code when evidence contains backticks', async () => {
+    const dir = await createInitializedRepo();
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa(
+      'git',
+      ['-c', 'user.email=test@example.com', '-c', 'user.name=Test User', 'commit', '-m', 'init'],
+      { cwd: dir },
+    );
+    await execa('git', ['checkout', '-b', 'review`branch'], { cwd: dir });
+    await writeFile(path.join(dir, 'changed`file.ts'), 'export const changed = true;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-11-active`gate.md'),
+      '# Active `gate`\n\n- Status: in-progress\n',
+    );
+
+    const humanResult = await execa(tsxPath, [cliPath, 'check-gates'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(humanResult.exitCode).toBe(1);
+    expect(humanResult.stdout).toContain('- Overall status: `fail`');
+    expect(humanResult.stdout).toContain('- Git: ``review`branch``');
+    expect(humanResult.stdout).toContain(`- Git root: \`${await realpath(dir)}\``);
+    expect(humanResult.stdout).toContain('- Git target: `root directory`');
+    expect(humanResult.stdout).toContain('- Changed files: `');
+    expect(humanResult.stdout).toContain(
+      '- [`pass`] `Task contract`: `` Active `gate` `` - ``.agentloop/tasks/2026-06-11-active`gate.md``',
+    );
+    expect(humanResult.stdout).toContain(
+      '- [`fail`] `Verification report`: `No verification report found.`',
+    );
+    expect(humanResult.stdout).toContain(
+      'Run ``agentloop verify --task .agentloop/tasks/2026-06-11-active`gate.md``.',
+    );
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.git.branch).toBe('review`branch');
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'task-contract',
+          message: 'Active `gate`',
+          path: '.agentloop/tasks/2026-06-11-active`gate.md',
+        }),
+      ]),
+    );
+    expect(output.nextAction.command).toBe(
+      'agentloop verify --task .agentloop/tasks/2026-06-11-active`gate.md',
     );
   });
 
@@ -308,7 +363,7 @@ describe('check-gates command', () => {
     expect(output.nextAction.command).toBe('agentloop create-task');
     expect(humanResult.exitCode).toBe(1);
     expect(humanResult.stdout).toContain('# AgentLoopKit Gates');
-    expect(humanResult.stdout).toContain('[fail] Task contract');
+    expect(humanResult.stdout).toContain('[`fail`] `Task contract`');
     expect(humanResult.stdout).toContain('Run `agentloop create-task`.');
   });
 
@@ -404,7 +459,7 @@ describe('check-gates command', () => {
 
     expect(humanResult.exitCode).toBe(0);
     expect(humanResult.stdout).toContain(
-      '[warn] Task hygiene: Task folder has 1 hygiene diagnostic. Run `agentloop task doctor` for cleanup details.',
+      '[`warn`] `Task hygiene`: ``Task folder has 1 hygiene diagnostic. Run `agentloop task doctor` for cleanup details.``',
     );
     expect(humanResult.stdout).toContain('Run `agentloop task doctor`.');
   });

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed `agentloop check-gates` Markdown output to render gate, git, path, status, and next-action command values with Markdown-safe inline-code delimiters.
 - Changed `agentloop artifacts` Markdown output to render task, verification, handoff, HTML report, badge, CI summary, and release-note inventory values with Markdown-safe inline-code delimiters.
 - Changed `agentloop status` and `agentloop next` Markdown output to render project, git, task, report, command, and working-tree values with Markdown-safe inline-code delimiters.
 - Changed release notes to render package, version, range, branch, commit, and AgentLoop evidence values with Markdown-safe inline-code delimiters.
