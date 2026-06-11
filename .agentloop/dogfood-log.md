@@ -6682,3 +6682,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Keeping the raw fallback reason in JSON avoided automation churn while improving Markdown safety.
 - Improve:
   - Continue leaving authored changelog sections untouched unless a future task defines a more precise boundary.
+
+## 2026-06-11: Policy Command Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-policy-command-human-markdown.md`
+- Trigger:
+  - The roadmap hardening pass found that `agentloop policy list/status` rendered local policy titles, statuses, and paths directly into Markdown.
+  - Policy titles come from repo-local Markdown headings, and paths can contain backticks, so the command should treat those values as evidence, not trusted Markdown.
+- Implementation:
+  - Added a red regression in `tests/policy.test.ts` using a policy heading and filename containing backticks.
+  - Rendered policy list/status titles, statuses, and paths with the shared inline-code formatter.
+  - Preserved JSON output and raw `agentloop policy show` document output.
+- Verification run:
+  - Red focused test failed first in `tests/policy.test.ts` because the policy title/path were raw Markdown.
+  - Focused suite passed after implementation:
+    - `npm test -- tests/policy.test.ts`
+  - Broader local checks passed:
+    - `git diff --check`
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run check:links`
+    - `npx --yes projscan doctor --format markdown`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npm test`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-11-23-19-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-23-28-pr-summary.md`.
+- What worked well:
+  - `policy show` staying raw made the boundary clear: list/status are evidence output, show is document output.
+- Improve:
+  - The next product layer should turn these scattered evidence commands into one acceptance command: `agentloop ship`.

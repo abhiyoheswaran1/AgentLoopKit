@@ -321,3 +321,7 @@ Release notes include commit subjects from local Git history. Commit subjects ar
 ## 2026-06-11: Release Note Missing Refs Use Safe Inline Formatting
 
 Release notes include a fallback reason when a requested `--from` Git ref is missing. The requested ref is user-provided release input, so Markdown output formats only that ref with the shared inline-code helper while keeping the sentence readable. The structured `fallbackReason` stays raw for automation.
+
+## 2026-06-11: Policy List And Status Use Safe Inline Formatting
+
+`agentloop policy list/status` prints local policy titles, statuses, and paths. Titles come from repo-local Markdown headings and paths can include Markdown-sensitive punctuation, so human output renders those values with the shared inline-code formatter. JSON output remains raw for automation. `agentloop policy show` deliberately stays raw because that command is meant to display the policy Markdown document itself.

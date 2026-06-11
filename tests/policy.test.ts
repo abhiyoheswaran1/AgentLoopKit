@@ -3,6 +3,7 @@ import { mkdir, rm, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { inlineCode } from '../src/core/markdown-format.js';
 import { listPolicies, readPolicy, getPolicyStatus } from '../src/core/policy.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -240,6 +241,32 @@ describe('policy command', () => {
     expect(traversalResult.exitCode).toBe(1);
     expect(traversalResult.stderr).toContain('Policy not found');
     expect(traversalResult.stdout).toBe('');
+  });
+
+  test('formats policy list and status human output with safe inline Markdown', async () => {
+    const { dir } = await createPolicyFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/policies/custom`policy.md'),
+      '# Custom `Policy`\n\nRepo guidance.\n',
+    );
+
+    const listResult = await execa(tsxPath, [cliPath, 'policy', 'list'], { cwd: dir });
+    const statusResult = await execa(tsxPath, [cliPath, 'policy', 'status'], { cwd: dir });
+    const showResult = await execa(tsxPath, [cliPath, 'policy', 'show', 'custom`policy'], {
+      cwd: dir,
+    });
+
+    expect(listResult.stdout).toContain(`- ${inlineCode('Custom `Policy`')}`);
+    expect(listResult.stdout).toContain(
+      `  ${inlineCode('.agentloop/policies/custom`policy.md')}`,
+    );
+    expect(statusResult.stdout).toContain(
+      `- ${inlineCode('extra')}: ${inlineCode('Custom `Policy`')}`,
+    );
+    expect(statusResult.stdout).toContain(
+      `  ${inlineCode('.agentloop/policies/custom`policy.md')}`,
+    );
+    expect(showResult.stdout).toBe('# Custom `Policy`\n\nRepo guidance.');
   });
 
   test('prints missing policy errors as JSON when requested', async () => {

@@ -6,6 +6,7 @@ import {
   PolicyNotFoundError,
   readPolicy,
 } from '../../core/policy.js';
+import { inlineCode } from '../../core/markdown-format.js';
 import type { ListedPolicy, PolicyDocument, PolicyStatusReport } from '../../core/policy.js';
 import { loadWorkspaceForJsonCommand } from '../json-errors.js';
 
@@ -51,8 +52,8 @@ function printPolicyList(policies: ListedPolicy[], options: { json?: boolean }) 
 
   console.log('AgentLoopKit policies:');
   for (const policy of policies) {
-    console.log(`- ${policy.title}`);
-    console.log(`  ${policy.path}`);
+    console.log(`- ${inlineCode(policy.title)}`);
+    console.log(`  ${inlineCode(policy.path)}`);
   }
 }
 
@@ -77,8 +78,8 @@ function printPolicyStatus(report: PolicyStatusReport, options: { json?: boolean
   );
 
   for (const policy of report.policies) {
-    console.log(`- ${policy.status}: ${policy.title}`);
-    console.log(`  ${policy.path}`);
+    console.log(`- ${inlineCode(policy.status)}: ${inlineCode(policy.title)}`);
+    console.log(`  ${inlineCode(policy.path)}`);
   }
 
   const hasDrift =
