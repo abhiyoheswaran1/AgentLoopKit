@@ -21,6 +21,8 @@ Custom output path:
 agentloop badge --out .agentloop/reports/review-status.svg
 ```
 
+Explicit `--out` paths must stay inside `.agentloop/reports/` and end in `.svg`. With `--json`, invalid output paths return `OUTPUT_PATH_INVALID` with `requestedPath`, `expectedDir`, `expectedExtension`, and `reason`.
+
 JSON output:
 
 ```bash

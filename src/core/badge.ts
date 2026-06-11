@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { readFile, readdir, stat } from 'node:fs/promises';
+import { resolveOutputArtifactPath } from './artifacts.js';
 import { AgentLoopConfig } from './config.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import { checkGates, GateStatus } from './check-gates.js';
@@ -172,7 +173,15 @@ export async function writeEvidenceBadge(options: {
 
   const badge = generateSvgBadge({ label, message, status });
   const outPath =
-    options.outPath ??
+    (options.outPath
+      ? resolveOutputArtifactPath({
+          cwd: options.cwd,
+          artifactType: 'badge',
+          requestedPath: options.outPath,
+          expectedDir: options.config.paths.reportsDir,
+          expectedExtension: '.svg',
+        })
+      : undefined) ??
     path.join(options.cwd, options.config.paths.reportsDir, `agentloop-${source}.svg`);
   const absoluteOutPath = path.isAbsolute(outPath) ? outPath : path.resolve(options.cwd, outPath);
 

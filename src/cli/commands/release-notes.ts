@@ -1,6 +1,11 @@
 import { Command } from 'commander';
+import { OutputPathError } from '../../core/artifacts.js';
 import { generateReleaseNotes } from '../../core/release-notes.js';
-import { loadConfigForJsonCommand, validateOutRequiresWrite } from '../json-errors.js';
+import {
+  loadConfigForJsonCommand,
+  printOutputPathJsonError,
+  validateOutRequiresWrite,
+} from '../json-errors.js';
 
 export function releaseNotesCommand() {
   return new Command('release-notes')
@@ -23,15 +28,24 @@ export function releaseNotesCommand() {
         if (!validateOutRequiresWrite(options)) return;
         const config = await loadConfigForJsonCommand(process.cwd(), options.json);
         if (!config) return;
-        const result = await generateReleaseNotes({
-          cwd: process.cwd(),
-          config,
-          from: options.from,
-          to: options.to,
-          version: options.releaseVersion,
-          write: options.write,
-          outPath: options.out,
-        });
+        let result: Awaited<ReturnType<typeof generateReleaseNotes>>;
+        try {
+          result = await generateReleaseNotes({
+            cwd: process.cwd(),
+            config,
+            from: options.from,
+            to: options.to,
+            version: options.releaseVersion,
+            write: options.write,
+            outPath: options.out,
+          });
+        } catch (error) {
+          if (options.json && error instanceof OutputPathError) {
+            printOutputPathJsonError(error);
+            return;
+          }
+          throw error;
+        }
 
         if (options.json) {
           console.log(JSON.stringify(result, null, 2));

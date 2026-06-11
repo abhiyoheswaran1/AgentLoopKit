@@ -182,6 +182,35 @@ describe('release-notes command', () => {
     expect(existsSync(outPath)).toBe(false);
   });
 
+  test('rejects release-note output paths outside the handoffs directory', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+    const outPath = path.join(dir, 'outside-release-notes.md');
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'release-notes', '--write', '--out', outPath, '--json'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'OUTPUT_PATH_INVALID',
+        message: `Release notes output path must stay inside .agentloop/handoffs: ${outPath}`,
+        artifactType: 'release-notes',
+        requestedPath: outPath,
+        expectedDir: '.agentloop/handoffs',
+        expectedExtension: '.md',
+        reason: 'outside-directory',
+      },
+    });
+    expect(existsSync(outPath)).toBe(false);
+  });
+
   test('handles an explicit missing from ref without pretending the range was read', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: true });
 

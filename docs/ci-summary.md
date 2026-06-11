@@ -53,6 +53,7 @@ JSON output includes the same CI context, evidence paths, gate statuses, next ac
 
 CI summaries are review artifacts. They do not replace verification reports. Commands that need verification evidence keep reading `*-verification-report.md`, so a newer `*-ci-summary.md` will not change `status`, `check-gates`, `report`, `badge`, or `handoff` verification lookup.
 Use `--out` only with `--write`. If `--out` is passed without `--write`, AgentLoopKit exits before reading config or writing a file. With `--json`, it returns `OUT_REQUIRES_WRITE`.
+When `--write` is used, explicit `--out` paths must stay inside `.agentloop/reports/` and end in `.md`. With `--json`, invalid output paths return `OUTPUT_PATH_INVALID` with `requestedPath`, `expectedDir`, `expectedExtension`, and `reason`.
 With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` object and AgentLoopKit writes no CI summary.
 
 ## Safety

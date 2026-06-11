@@ -6,6 +6,7 @@ import { writeTextFile, pathExists } from './file-system.js';
 import {
   latestMarkdownFile,
   prSummaryPattern,
+  resolveOutputArtifactPath,
   verificationReportPattern,
 } from './artifacts.js';
 import { checkGates, CheckGatesResult } from './check-gates.js';
@@ -64,11 +65,6 @@ function extractOverallStatus(markdown: string) {
 function displayPath(cwd: string, filePath: string | undefined) {
   if (!filePath) return undefined;
   return path.relative(cwd, filePath).split(path.sep).join('/') || '.';
-}
-
-function resolveUserPath(cwd: string, filePath: string | undefined) {
-  if (!filePath) return undefined;
-  return path.isAbsolute(filePath) ? path.resolve(filePath) : path.resolve(cwd, filePath);
 }
 
 async function readTask(
@@ -229,7 +225,15 @@ export async function getCiSummary(options: {
   };
   const markdown = renderMarkdown(withoutMarkdown);
   const writtenPath = options.write
-    ? (resolveUserPath(options.cwd, options.outPath) ??
+    ? ((options.outPath
+        ? resolveOutputArtifactPath({
+            cwd: options.cwd,
+            artifactType: 'ci-summary',
+            requestedPath: options.outPath,
+            expectedDir: options.config.paths.reportsDir,
+            expectedExtension: '.md',
+          })
+        : undefined) ??
       path.join(options.cwd, options.config.paths.reportsDir, `${timestamp}-ci-summary.md`))
     : undefined;
 

@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { readFile, readdir, stat } from 'node:fs/promises';
-import { resolveExplicitArtifactPath } from './artifacts.js';
+import { resolveExplicitArtifactPath, resolveOutputArtifactPath } from './artifacts.js';
 import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
 import { pathExists, writeTextFile } from './file-system.js';
@@ -92,11 +92,6 @@ function normalizeDisplayPath(cwd: string, filePath: string | undefined) {
   if (!filePath) return undefined;
   const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(cwd, filePath);
   return path.relative(cwd, absolutePath).split(path.sep).join('/') || '.';
-}
-
-function resolveUserPath(cwd: string, filePath: string | undefined) {
-  if (!filePath) return undefined;
-  return path.isAbsolute(filePath) ? path.resolve(filePath) : path.resolve(cwd, filePath);
 }
 
 async function readMarkdownIfExists(filePath: string | undefined) {
@@ -330,7 +325,15 @@ export async function writeHtmlReport(options: WriteHtmlReportOptions): Promise<
     summaryMarkdown: summary.markdown,
   });
   const outPath =
-    resolveUserPath(cwd, options.outPath) ??
+    (options.outPath
+      ? resolveOutputArtifactPath({
+          cwd,
+          artifactType: 'report',
+          requestedPath: options.outPath,
+          expectedDir: options.config.paths.reportsDir,
+          expectedExtension: '.html',
+        })
+      : undefined) ??
     path.join(cwd, options.config.paths.reportsDir, `${timestamp}-agentloop-report.html`);
 
   await writeTextFile(outPath, report.html);

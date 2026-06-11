@@ -1,7 +1,8 @@
 import { Command } from 'commander';
+import { OutputPathError } from '../../core/artifacts.js';
 import { BADGE_SOURCES, writeEvidenceBadge } from '../../core/badge.js';
 import { AgentLoopError } from '../../core/errors.js';
-import { loadConfigForJsonCommand } from '../json-errors.js';
+import { loadConfigForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function printJsonError(error: AgentLoopError, details: Record<string, unknown> = {}) {
   console.log(
@@ -51,6 +52,10 @@ export function badgeCommand() {
               requestedSource: options.source ?? '',
               supportedSources: BADGE_SOURCES,
             });
+            return;
+          }
+          if (options.json && error instanceof OutputPathError) {
+            printOutputPathJsonError(error);
             return;
           }
           throw error;

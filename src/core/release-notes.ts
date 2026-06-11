@@ -2,7 +2,12 @@ import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { AgentLoopConfig } from './config.js';
-import { ciSummaryPattern, latestMarkdownFile, verificationReportPattern } from './artifacts.js';
+import {
+  ciSummaryPattern,
+  latestMarkdownFile,
+  resolveOutputArtifactPath,
+  verificationReportPattern,
+} from './artifacts.js';
 import { formatTimestamp } from './dates.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import { getGitBranch, getGitCommit } from './git.js';
@@ -44,11 +49,6 @@ type PackageMetadata = {
 function displayPath(cwd: string, filePath: string | undefined) {
   if (!filePath) return undefined;
   return path.relative(cwd, filePath).split(path.sep).join('/') || '.';
-}
-
-function resolveUserPath(cwd: string, filePath: string | undefined) {
-  if (!filePath) return undefined;
-  return path.isAbsolute(filePath) ? path.resolve(filePath) : path.resolve(cwd, filePath);
 }
 
 async function gitLines(cwd: string, args: string[]) {
@@ -313,7 +313,15 @@ export async function generateReleaseNotes(options: {
   };
   const markdown = renderMarkdown(withoutMarkdown);
   const writtenPath = options.write
-    ? (resolveUserPath(options.cwd, options.outPath) ??
+    ? ((options.outPath
+        ? resolveOutputArtifactPath({
+            cwd: options.cwd,
+            artifactType: 'release-notes',
+            requestedPath: options.outPath,
+            expectedDir: options.config.paths.handoffsDir,
+            expectedExtension: '.md',
+          })
+        : undefined) ??
       path.join(options.cwd, options.config.paths.handoffsDir, `${timestamp}-release-notes.md`))
     : undefined;
   if (writtenPath) await writeTextFile(writtenPath, markdown);

@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { existsSync, realpathSync } from 'node:fs';
 import { readdir, stat } from 'node:fs/promises';
 import { AgentLoopError } from './errors.js';
 import { pathExists } from './file-system.js';
@@ -11,6 +12,8 @@ export const generatedMarkdownPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-.+\.md$/
 
 export type ArtifactType = 'task' | 'verification' | 'handoff';
 export type ArtifactPathErrorReason = 'outside-directory' | 'not-markdown' | 'missing';
+export type OutputArtifactType = 'report' | 'badge' | 'ci-summary' | 'release-notes';
+export type OutputPathErrorReason = 'outside-directory' | 'wrong-extension';
 
 export class ArtifactPathError extends AgentLoopError {
   constructor(
@@ -31,9 +34,48 @@ const artifactLabels: Record<ArtifactType, string> = {
   handoff: 'Handoff',
 };
 
+const outputArtifactLabels: Record<OutputArtifactType, string> = {
+  report: 'Report',
+  badge: 'Badge',
+  'ci-summary': 'CI summary',
+  'release-notes': 'Release notes',
+};
+
+export class OutputPathError extends AgentLoopError {
+  constructor(
+    message: string,
+    public readonly artifactType: OutputArtifactType,
+    public readonly requestedPath: string,
+    public readonly expectedDir: string,
+    public readonly expectedExtension: string,
+    public readonly reason: OutputPathErrorReason,
+  ) {
+    super(message, 'OUTPUT_PATH_INVALID');
+    this.name = 'OutputPathError';
+  }
+}
+
 function isInside(parent: string, child: string) {
   const relative = path.relative(parent, child);
   return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+function normalizeExistingAncestor(filePath: string) {
+  let current = filePath;
+  const missingSegments: string[] = [];
+
+  while (!existsSync(current)) {
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    missingSegments.unshift(path.basename(current));
+    current = parent;
+  }
+
+  try {
+    return path.join(realpathSync.native(current), ...missingSegments);
+  } catch {
+    return filePath;
+  }
 }
 
 export async function resolveExplicitArtifactPath(options: {
@@ -76,6 +118,44 @@ export async function resolveExplicitArtifactPath(options: {
       options.requestedPath,
       options.expectedDir,
       'missing',
+    );
+  }
+
+  return absolutePath;
+}
+
+export function resolveOutputArtifactPath(options: {
+  cwd: string;
+  artifactType: OutputArtifactType;
+  requestedPath: string;
+  expectedDir: string;
+  expectedExtension: string;
+}) {
+  const absolutePath = path.isAbsolute(options.requestedPath)
+    ? path.resolve(options.requestedPath)
+    : path.resolve(options.cwd, options.requestedPath);
+  const expectedRoot = normalizeExistingAncestor(path.resolve(options.cwd, options.expectedDir));
+  const label = outputArtifactLabels[options.artifactType];
+
+  if (!isInside(expectedRoot, normalizeExistingAncestor(absolutePath))) {
+    throw new OutputPathError(
+      `${label} output path must stay inside ${options.expectedDir}: ${options.requestedPath}`,
+      options.artifactType,
+      options.requestedPath,
+      options.expectedDir,
+      options.expectedExtension,
+      'outside-directory',
+    );
+  }
+
+  if (!absolutePath.endsWith(options.expectedExtension)) {
+    throw new OutputPathError(
+      `${label} output path must use ${options.expectedExtension}: ${options.requestedPath}`,
+      options.artifactType,
+      options.requestedPath,
+      options.expectedDir,
+      options.expectedExtension,
+      'wrong-extension',
     );
   }
 

@@ -133,6 +133,34 @@ describe('HTML report generation', () => {
     expect(existsSync(outPath)).toBe(false);
   });
 
+  test('CLI report command rejects output paths outside the reports directory', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    const outPath = path.join(dir, 'outside-report.html');
+
+    const result = await execa(tsxPath, [cliPath, 'report', '--out', outPath, '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'OUTPUT_PATH_INVALID',
+        message: `Report output path must stay inside .agentloop/reports: ${outPath}`,
+        artifactType: 'report',
+        requestedPath: outPath,
+        expectedDir: '.agentloop/reports',
+        expectedExtension: '.html',
+        reason: 'outside-directory',
+      },
+    });
+    expect(existsSync(outPath)).toBe(false);
+  });
+
   test('CLI report command accepts --verification as an alias for --report', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

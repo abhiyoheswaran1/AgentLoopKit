@@ -1,7 +1,7 @@
 import { Command } from 'commander';
-import { ArtifactPathError } from '../../core/artifacts.js';
+import { ArtifactPathError, OutputPathError } from '../../core/artifacts.js';
 import { writeHtmlReport } from '../../core/html-report.js';
-import { loadConfigForJsonCommand } from '../json-errors.js';
+import { loadConfigForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function printArtifactPathJsonError(error: ArtifactPathError) {
   console.log(
@@ -57,6 +57,10 @@ export function reportCommand() {
         } catch (error) {
           if (options.json && error instanceof ArtifactPathError) {
             printArtifactPathJsonError(error);
+            return;
+          }
+          if (options.json && error instanceof OutputPathError) {
+            printOutputPathJsonError(error);
             return;
           }
           throw error;

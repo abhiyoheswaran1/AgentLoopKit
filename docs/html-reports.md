@@ -35,6 +35,8 @@ agentloop report --verification .agentloop/reports/2026-06-10-12-00-verification
 
 JSON output includes the written `outPath`, report metadata, and source paths. It does not embed the full HTML body.
 
+Explicit `--out` paths must stay inside `.agentloop/reports/` and end in `.html`. With `--json`, invalid output paths return `OUTPUT_PATH_INVALID` with `requestedPath`, `expectedDir`, `expectedExtension`, and `reason`.
+
 Explicit `--task`, `--verification`, and `--handoff` inputs must point to existing Markdown artifacts inside `.agentloop/tasks/`, `.agentloop/reports/`, and `.agentloop/handoffs/`. With `--json`, invalid input paths return:
 
 ```json

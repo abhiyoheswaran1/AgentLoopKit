@@ -2,6 +2,36 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Constrain Explicit Artifact Output Paths
+
+- Task contract: `.agentloop/tasks/2026-06-11-constrain-explicit-artifact-output-paths.md`
+- Trigger:
+  - `agentloop report --out`, `agentloop badge --out`, `agentloop ci-summary --write --out`, and `agentloop release-notes --write --out` accepted explicit paths outside their configured AgentLoop artifact directories.
+  - That weakened the local-first file-write model because generated artifacts could be directed anywhere the process had write access.
+- Product change:
+  - Added a shared `OutputPathError` and output artifact path resolver in `src/core/artifacts.ts`.
+  - Restricted report and badge outputs to `.agentloop/reports/` with `.html` and `.svg` extensions.
+  - Restricted written CI summaries to `.agentloop/reports/` with `.md` extension.
+  - Restricted written release notes to `.agentloop/handoffs/` with `.md` extension.
+  - JSON mode now returns `OUTPUT_PATH_INVALID` with `requestedPath`, `expectedDir`, `expectedExtension`, and `reason`.
+  - Updated docs and the unreleased changelog for the later `0.28.0` release batch.
+- Verification completed:
+  - Red focused test first: `npm test -- tests/html-report.test.ts tests/badge.test.ts tests/ci-summary.test.ts tests/release-notes.test.ts` failed because all four commands still exited 0 for outside output paths.
+  - Focused green test: `npm test -- tests/html-report.test.ts tests/badge.test.ts tests/ci-summary.test.ts tests/release-notes.test.ts`
+  - Full `npm test`
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run check:links`
+  - `npm run build`
+  - `git diff --check`
+  - `npx --yes projscan doctor --format markdown`
+- Verification report: `.agentloop/reports/2026-06-11-05-57-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-11-05-58-pr-summary.md`
+- Worked well:
+  - A shared resolver keeps path policy consistent across generated artifact commands and protects direct core callers too.
+- Improve:
+  - Consider adding explicit wrong-extension CLI tests if future work touches output path validation again.
+
 ## 2026-06-11: Require `--write` With `--out`
 
 - Task contract: `.agentloop/tasks/2026-06-11-require-write-when-output-path-is-provided.md`

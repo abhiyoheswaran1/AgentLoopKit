@@ -1,5 +1,6 @@
 import { loadAgentLoopConfig } from '../core/config.js';
 import type { AgentLoopConfig } from '../core/config.js';
+import { OutputPathError } from '../core/artifacts.js';
 import { AgentLoopError, ConfigError } from '../core/errors.js';
 
 export class CliOptionError extends AgentLoopError {
@@ -63,4 +64,25 @@ export function validateOutRequiresWrite(options: {
   }
 
   throw error;
+}
+
+export function printOutputPathJsonError(error: OutputPathError) {
+  console.log(
+    JSON.stringify(
+      {
+        error: {
+          code: error.code,
+          message: error.message,
+          artifactType: error.artifactType,
+          requestedPath: error.requestedPath,
+          expectedDir: error.expectedDir,
+          expectedExtension: error.expectedExtension,
+          reason: error.reason,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
 }
