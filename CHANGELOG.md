@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added Baseframe Labs author metadata to the npm package and README.
 - Changed `agentloop status` and `agentloop next` so unpinned open task contracts appear as `latestTask`, not `activeTask`, and the next action asks users to pin the task with `agentloop task set <path>`.
 - Added `deferred` as a supported task status for parked work that stays visible in `task list`, `status`, and `next`, while staying out of fallback task selection.
 - Added `deferredTasks` to `agentloop status --json` and `agentloop next --json`, plus Markdown output that shows parked deferred tasks separately from active work.

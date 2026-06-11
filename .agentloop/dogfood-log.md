@@ -2,6 +2,34 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Add Baseframe Labs Ownership Metadata
+
+- Task contract: `.agentloop/tasks/2026-06-11-add-baseframe-labs-ownership-metadata.md`
+- Trigger:
+  - AgentLoopKit now belongs under Baseframe Labs, but npm package metadata did not identify the public project owner.
+  - The README needed a concise user-facing Baseframe Labs mention without adding release history or internal planning notes.
+- Product change:
+  - Added `author.name` and `author.url` to `package.json`.
+  - Added a short Baseframe Labs line to the README introduction and linked Baseframe Labs in the "What It Is" section.
+  - Added Vitest coverage that fails if the package author metadata is removed.
+  - Recorded the change under `CHANGELOG.md` Unreleased for the later `0.28.0` release batch.
+- Verification completed:
+  - Red focused test first: `npm test -- tests/package-metadata.test.ts` failed because `package.json` had no `author` field.
+  - Focused green test: `npm test -- tests/package-metadata.test.ts`
+  - Full `npm test`
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run check:links`
+  - `npm run build`
+  - `git diff --check`
+  - `npx --yes projscan doctor --format markdown`
+- Verification report: `.agentloop/reports/2026-06-11-05-34-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-11-05-36-pr-summary.md`
+- Worked well:
+  - The package metadata test gives npm-facing ownership a small regression guard.
+- Improve:
+  - After the Baseframe Labs app page goes live, decide whether `homepage` should remain the GitHub README or move to the product page.
+
 ## 2026-06-10: Archive Completed Task Contracts
 
 - Task contract: `.agentloop/tasks/2026-06-10-archive-completed-task-contracts.md`

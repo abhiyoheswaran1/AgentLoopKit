@@ -2,6 +2,8 @@
 
 A drop-in engineering loop for coding agents.
 
+An open-source Baseframe Labs developer tool.
+
 Your coding agent can write code. AgentLoopKit gives it the repo habits reviewers need: scoped task contracts, safety rules, verification evidence, review summaries, and clean handoffs.
 
 Vibe coding produces code. Agentic engineering produces auditable work.
@@ -14,7 +16,7 @@ The screenshots and terminal demo in this README are generated from committed so
 
 ## What It Is
 
-AgentLoopKit is a repo-level toolkit for developers using Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and other coding agents.
+AgentLoopKit is a repo-level toolkit from [Baseframe Labs](https://www.baseframelabs.com/) for developers using Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and other coding agents.
 
 It does not replace your agent, IDE, or CLI. It gives those tools a repeatable engineering loop inside the repository they are editing.
 

@@ -30,6 +30,10 @@
     "cli"
   ],
   "license": "MIT",
+  "author": {
+    "name": "Baseframe Labs",
+    "url": "https://www.baseframelabs.com/"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/abhiyoheswaran1/AgentLoopKit.git"
