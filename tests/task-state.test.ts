@@ -178,6 +178,20 @@ describe('task state', () => {
     expect(await readFile(archivePath, 'utf8')).toBe('# Existing archive\n');
   });
 
+  test('rejects archive destinations that resolve outside the repo', async () => {
+    const { dir, config, taskPath } = await createTaskStateFixture();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    await symlink(outsideDir, path.join(dir, '.agentloop/tasks/archive'), 'dir');
+
+    await expect(archiveTask({ cwd: dir, config, taskPath })).rejects.toThrow(
+      'Task archive output path must stay inside .agentloop/tasks/archive',
+    );
+
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: proposed\n');
+    await expect(stat(path.join(outsideDir, '2026-06-09-demo.md'))).rejects.toThrow();
+  });
+
   test('rejects unsupported task statuses', async () => {
     const { dir, config, taskPath } = await createTaskStateFixture();
 
@@ -671,6 +685,34 @@ describe('task command', () => {
         reason: 'not-markdown',
       },
     });
+  });
+
+  test('prints unsafe archive destination errors as JSON without moving the task', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    await symlink(outsideDir, path.join(dir, '.agentloop/tasks/archive'), 'dir');
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'archive', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toMatchObject({
+      error: {
+        code: 'OUTPUT_PATH_INVALID',
+        artifactType: 'task-archive',
+        requestedPath: '.agentloop/tasks/archive/2026-06-09-demo.md',
+        expectedDir: '.agentloop/tasks/archive',
+        expectedExtension: '.md',
+        reason: 'outside-directory',
+      },
+    });
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: proposed\n');
+    await expect(stat(path.join(outsideDir, '2026-06-09-demo.md'))).rejects.toThrow();
   });
 
   test('keeps missing task path errors human-readable by default', async () => {

@@ -104,6 +104,20 @@ function resolveStatePath(cwd: string, config: AgentLoopConfig) {
   });
 }
 
+function resolveArchiveDestinationPath(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  taskFileName: string;
+}) {
+  return resolveOutputArtifactPath({
+    cwd: options.cwd,
+    artifactType: 'task-archive',
+    requestedPath: repoPath(options.config.paths.tasksDir, 'archive', options.taskFileName),
+    expectedDir: repoPath(options.config.paths.tasksDir, 'archive'),
+    expectedExtension: '.md',
+  });
+}
+
 function toStoredPath(cwd: string, absolutePath: string) {
   return path.relative(cwd, absolutePath).split(path.sep).join('/');
 }
@@ -281,7 +295,11 @@ export async function archiveTask(options: {
     throw new AgentLoopError(`Task contract is already archived: ${options.taskPath}`);
   }
 
-  const destinationPath = path.join(archiveRoot, path.basename(absolutePath));
+  const destinationPath = resolveArchiveDestinationPath({
+    cwd: options.cwd,
+    config: options.config,
+    taskFileName: path.basename(absolutePath),
+  });
   if (await pathExists(destinationPath)) {
     throw new AgentLoopError(
       `Archived task already exists: ${toStoredPath(options.cwd, destinationPath)}`,
@@ -290,7 +308,7 @@ export async function archiveTask(options: {
 
   const previousPath = toStoredPath(options.cwd, absolutePath);
   const activeTaskPath = await getActiveTaskPath(options);
-  await mkdir(archiveRoot, { recursive: true });
+  await mkdir(path.dirname(destinationPath), { recursive: true });
   await rename(absolutePath, destinationPath);
   if (activeTaskPath === absolutePath) {
     await clearActiveTask(options);

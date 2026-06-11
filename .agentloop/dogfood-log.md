@@ -5635,3 +5635,24 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Treating unsafe state reads as empty state keeps read-only commands safe and quiet.
 - Improve:
   - Add packed-release smoke coverage for the safety guards before cutting `0.28.0`.
+
+## 2026-06-11: Task Archive Symlink Guard
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-reject-task-archive-symlink-escapes.md`
+- Trigger:
+  - `agentloop task archive` resolved the source task safely but did not resolve a pre-existing `.agentloop/tasks/archive` symlink before moving the file.
+- Implementation:
+  - Added a repo-local task archive destination guard before archive existence checks, directory creation, and rename.
+  - Added JSON `OUTPUT_PATH_INVALID` handling for unsafe archive destinations.
+  - Updated README, changelog, decisions, and backlog.
+- Verification run:
+  - Red focused task-state tests failed first because core and CLI archive paths followed the symlink and exited successfully.
+  - Focused task-state suite passed after the guard: 1 file and 35 tests.
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-08-18-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-08-21-pr-summary.md`.
+  - Full `npx pnpm@10.12.1 test` passed: 36 files and 285 tests.
+  - `npx pnpm@10.12.1 lint`, `typecheck`, `check:links`, `build`, `git diff --check`, and `npx --yes projscan doctor --format markdown` passed.
+- What worked well:
+  - Reusing `resolveOutputArtifactPath` kept task archive errors consistent with reports, handoffs, init, and state writes.
+- Improve:
+  - Add packed-release smoke coverage for these filesystem safety guards before cutting `0.28.0`.

@@ -20,7 +20,8 @@ export type OutputArtifactType =
   | 'agent-instructions'
   | 'agents-md'
   | 'init-file'
-  | 'task-state';
+  | 'task-state'
+  | 'task-archive';
 export type OutputPathErrorReason = 'outside-directory' | 'wrong-extension';
 
 export class ArtifactPathError extends AgentLoopError {
@@ -52,6 +53,7 @@ const outputArtifactLabels: Record<OutputArtifactType, string> = {
   'agents-md': 'AGENTS.md',
   'init-file': 'Init file',
   'task-state': 'Task state',
+  'task-archive': 'Task archive',
 };
 
 export class OutputPathError extends AgentLoopError {

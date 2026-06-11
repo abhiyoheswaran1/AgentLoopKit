@@ -253,6 +253,7 @@ export function taskCommand() {
         task = await archiveTask({ cwd: process.cwd(), config, taskPath });
       } catch (error) {
         if (printTaskPathJsonError(error, options)) return;
+        if (printTaskOutputPathJsonError(error, options)) return;
         throw error;
       }
       printArchivedTask(task, options);

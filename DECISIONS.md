@@ -169,3 +169,7 @@ Repo-relative config paths are not enough when a directory already exists as a s
 ## 2026-06-11: Task State Stays Repo-Local
 
 `.agentloop/state.json` is a local active-task pointer, not a general state store. Task commands now resolve that state path before reading, writing, or clearing it. Unsafe read paths are treated as no active task, while unsafe writes and clears fail with `OUTPUT_PATH_INVALID` so a symlink cannot redirect task state outside the repo.
+
+## 2026-06-11: Task Archives Stay In The Task Directory
+
+`agentloop task archive` moves a task contract from the active task folder into `.agentloop/tasks/archive/`. The archive destination now resolves before the move. If the archive directory is a symlink outside the repo, AgentLoopKit rejects the archive and leaves the source task untouched.
