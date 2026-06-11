@@ -167,8 +167,31 @@ export function parseAgentLoopConfig(value: unknown): AgentLoopConfig {
   return parsed.data;
 }
 
+function isNodeErrorWithCode(error: unknown, code: string) {
+  return (
+    error !== null &&
+    typeof error === 'object' &&
+    'code' in error &&
+    (error as { code?: unknown }).code === code
+  );
+}
+
+function missingConfigError(filePath: string) {
+  return new ConfigError(
+    `AgentLoopKit config not found at ${filePath}. Run agentloop init in the repository you want to configure.`,
+  );
+}
+
 async function readAgentLoopConfigFile(filePath: string): Promise<AgentLoopConfig> {
-  const raw = await readFile(filePath, 'utf8');
+  let raw: string;
+  try {
+    raw = await readFile(filePath, 'utf8');
+  } catch (error) {
+    if (isNodeErrorWithCode(error, 'ENOENT')) {
+      throw missingConfigError(filePath);
+    }
+    throw error;
+  }
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw);
@@ -210,11 +233,12 @@ export async function loadAgentLoopWorkspace(cwd: string): Promise<AgentLoopWork
   const configPath = await findAgentLoopConfigPath(invocationCwd);
 
   if (!configPath) {
+    const expectedConfigPath = path.join(invocationCwd, CONFIG_FILE);
     return {
-      config: await loadAgentLoopConfig(invocationCwd),
+      config: await readAgentLoopConfigFile(expectedConfigPath),
       cwd: invocationCwd,
       invocationCwd,
-      configPath: path.join(invocationCwd, CONFIG_FILE),
+      configPath: expectedConfigPath,
       targetIsConfigRoot: true,
     };
   }

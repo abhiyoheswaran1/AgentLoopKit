@@ -53,6 +53,6 @@ Then initialize:
 agentloop init
 ```
 
-`doctor` validates `agentloop.config.json` with the same rules used by the CLI. Malformed JSON and schema-invalid values are both reported as invalid AgentLoopKit config. Commands that support `--json` return `CONFIG_ERROR` for those failures.
+`doctor` validates `agentloop.config.json` with the same rules used by the CLI. Missing configs, malformed JSON, and schema-invalid values are reported as AgentLoopKit config errors. Commands that support `--json` return `CONFIG_ERROR` for those failures.
 
 `doctor` also checks `.agentloop/manifest.json` and points stale or missing template metadata to `template-migrations.md`.

@@ -135,6 +135,40 @@ describe('status command', () => {
     });
   });
 
+  test('prints missing config errors as JSON before setup', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'CONFIG_ERROR',
+      message: expect.stringContaining('AgentLoopKit config not found'),
+    });
+    expect(output.error.message).toContain('agentloop init');
+  });
+
+  test('prints a clear missing config hint in human output before setup', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'status'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('agentloop: AgentLoopKit config not found');
+    expect(result.stderr).toContain('agentloop init');
+    expect(result.stderr).not.toContain('ENOENT');
+  });
+
   test('prints malformed config errors as JSON', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

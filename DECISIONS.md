@@ -229,3 +229,7 @@ Release helpers are evidence checks, not release authority. `release-check` warn
 ## 2026-06-11: Repo Commands Use The Nearest AgentLoop Root
 
 `agentloop init` remains current-directory setup because users need explicit control over where the harness lands. After setup, non-init repo commands search upward for the nearest `agentloop.config.json` and use that folder as the command workspace. This lets agents work from nested source folders while keeping task contracts, verification reports, handoffs, policies, and release evidence tied to the initialized repo root.
+
+## 2026-06-11: Missing Config Is A Setup Error
+
+Commands that require AgentLoop setup should not leak raw filesystem errors when `agentloop.config.json` is missing. The config loader now reports missing configs as `CONFIG_ERROR` with an `agentloop init` hint. This gives humans and automation one predictable setup-failure shape without adding automatic initialization or global config lookup.

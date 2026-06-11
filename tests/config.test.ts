@@ -134,4 +134,14 @@ describe('config', () => {
     expect(workspace.targetIsConfigRoot).toBe(false);
     expect(workspace.config.project.name).toBe('root-demo');
   });
+
+  test('reports missing workspace config as a config error', async () => {
+    const dir = await makeTempDir();
+    const nested = path.join(dir, 'src');
+    tempDirs.push(dir);
+    await mkdir(nested, { recursive: true });
+
+    await expect(loadAgentLoopWorkspace(nested)).rejects.toThrow(ConfigError);
+    await expect(loadAgentLoopWorkspace(nested)).rejects.toThrow('AgentLoopKit config not found');
+  });
 });

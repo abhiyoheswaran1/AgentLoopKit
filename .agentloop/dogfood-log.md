@@ -5959,3 +5959,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The fix keeps first-run setup explicit while making everyday commands easier for agents working in subdirectories.
 - Improve:
   - Add broader nested-cwd smoke coverage later for `handoff`, `check-gates`, `policy`, and `install-agent`.
+
+## 2026-06-11: Missing Config Setup Errors
+
+- Task contract: `.agentloop/tasks/2026-06-11-return-clear-errors-when-agentloop-config-is-missing.md`
+- Trigger:
+  - The continued product pass found a setup UX bug: JSON-capable commands run before `init` could leak raw filesystem errors instead of a stable AgentLoop error.
+  - Agents and scripts need parseable setup failures so they can tell the user to initialize the repo instead of parsing `ENOENT`.
+- Implementation:
+  - Normalized missing `agentloop.config.json` reads into `ConfigError`.
+  - Kept upward workspace discovery and `init` behavior unchanged.
+  - Updated configuration, status, task-contract docs, changelog, decisions, and backlog.
+- Verification run:
+  - Red focused tests failed first for missing config in the workspace loader, `status --json`, human `status`, and `create-task --json`.
+  - Focused suites passed after implementation:
+    - `tests/config.test.ts`
+    - `tests/status.test.ts`
+    - `tests/create-task.test.ts`
+  - Full release checks passed:
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm test`
+    - `npm run check:links`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+    - `npx --yes projscan doctor --format markdown`
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-13-41-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-13-43-pr-summary.md`.
+- What worked well:
+  - The fix improves both human and automation paths without adding setup side effects.
+- Improve:
+  - Add a small CLI smoke case for uninitialized `status --json` later so the behavior is covered outside unit tests.
