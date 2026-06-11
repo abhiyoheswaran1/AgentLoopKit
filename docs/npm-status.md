@@ -41,6 +41,19 @@ Human output includes:
 
 JSON output includes the same fields for scripts.
 
+With `--json`, invalid timeout values return:
+
+```json
+{
+  "error": {
+    "code": "NPM_STATUS_TIMEOUT_INVALID",
+    "message": "Timeout must be a positive integer.",
+    "requestedTimeout": "nope",
+    "reason": "not-positive-integer"
+  }
+}
+```
+
 ## Post-Publish Smoke Check
 
 Use `--expect-current` after npm publish:

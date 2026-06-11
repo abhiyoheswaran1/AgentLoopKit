@@ -5122,3 +5122,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider structured JSON for other init setup guards only when the CLI can test them without touching real user directories.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Error Output for Invalid npm-status Timeouts
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-return-json-errors-for-invalid-npm-status-timeouts.md`
+- Trigger:
+  - `agentloop npm-status --timeout-ms <value> --json` let Commander reject invalid timeout values before the command could return JSON.
+- Implementation:
+  - Moved timeout validation into the `npm-status` command action.
+  - Added JSON errors for non-integer, zero, and negative timeout values.
+  - Kept default non-JSON timeout failures on the human-readable stderr path.
+  - Documented the behavior in README, npm-status docs, and the changelog.
+- Verification run:
+  - Red focused npm-status tests failed because invalid timeout values produced no JSON body.
+  - Focused npm-status suite passed: 12 tests.
+  - `.agentloop/reports/2026-06-11-04-18-verification-report.md`, overall status pass.
+  - `.agentloop/handoffs/2026-06-11-04-21-pr-summary.md` captured the review handoff.
+  - Built CLI smoke confirmed `NPM_STATUS_TIMEOUT_INVALID` with `requestedTimeout: nope`.
+- What worked well:
+  - Release automation now receives a parseable input error before any registry check runs.
+- Improve:
+  - Keep timeout validation strict; do not accept partial values such as `10abc`.
+  - Keep this unreleased until the planned `0.28.0` batch.

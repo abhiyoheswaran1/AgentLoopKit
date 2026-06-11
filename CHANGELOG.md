@@ -32,6 +32,7 @@
 - Added JSON error output for invalid `agentloop create-task --out <path>` values when `--json` is requested.
 - Added JSON error output for invalid explicit artifact paths on `agentloop summarize`, `handoff`, and `report` when `--json` is requested.
 - Added JSON error output for missing or malformed `agentloop npm-status --registry-json` files when `--json` is requested.
+- Added JSON error output for invalid `agentloop npm-status --timeout-ms` values when `--json` is requested.
 - Added `--verification <path>` as an alias for `--report <path>` on `agentloop summarize` and `agentloop handoff`.
 - Added `--verification <path>` as an alias for `--report <path>` on `agentloop report`.
 - Changed the composite GitHub Action default `agentloopkit-version` to `latest`; workflows can still pin `<version>` for reproducibility.

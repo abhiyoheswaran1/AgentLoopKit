@@ -225,4 +225,57 @@ describe('npm status', () => {
       reason: 'invalid-json',
     });
   });
+
+  test('CLI prints invalid timeout values as JSON errors', async () => {
+    const dir = await createPackageFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'npm-status', '--timeout-ms', 'nope', '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    const json = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(json).toEqual({
+      error: {
+        code: 'NPM_STATUS_TIMEOUT_INVALID',
+        message: 'Timeout must be a positive integer.',
+        requestedTimeout: 'nope',
+        reason: 'not-positive-integer',
+      },
+    });
+  });
+
+  test('CLI rejects zero timeout values as JSON errors', async () => {
+    const dir = await createPackageFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'npm-status', '--timeout-ms', '0', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const json = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(json.error).toMatchObject({
+      code: 'NPM_STATUS_TIMEOUT_INVALID',
+      requestedTimeout: '0',
+      reason: 'not-positive-integer',
+    });
+  });
+
+  test('CLI keeps invalid timeout values human-readable by default', async () => {
+    const dir = await createPackageFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'npm-status', '--timeout-ms', 'nope'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('agentloop: Timeout must be a positive integer.');
+  });
 });

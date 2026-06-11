@@ -8,6 +8,7 @@ import {
 import { AgentLoopError } from '../../core/errors.js';
 
 type NpmRegistryJsonErrorReason = 'missing' | 'unreadable' | 'invalid-json';
+type NpmTimeoutErrorReason = 'not-positive-integer';
 
 class NpmRegistryJsonError extends Error {
   public readonly code = 'NPM_STATUS_REGISTRY_JSON_INVALID';
@@ -19,6 +20,16 @@ class NpmRegistryJsonError extends Error {
   ) {
     super(message);
     this.name = 'NpmRegistryJsonError';
+  }
+}
+
+class NpmTimeoutError extends Error {
+  public readonly code = 'NPM_STATUS_TIMEOUT_INVALID';
+  public readonly reason: NpmTimeoutErrorReason = 'not-positive-integer';
+
+  constructor(public readonly requestedTimeout: string) {
+    super('Timeout must be a positive integer.');
+    this.name = 'NpmTimeoutError';
   }
 }
 
@@ -40,10 +51,29 @@ function printRegistryJsonError(error: NpmRegistryJsonError) {
   process.exitCode = 1;
 }
 
-function parseTimeout(value: string) {
-  const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    throw new Error('timeout must be a positive integer');
+function printTimeoutError(error: NpmTimeoutError) {
+  console.log(
+    JSON.stringify(
+      {
+        error: {
+          code: error.code,
+          message: error.message,
+          requestedTimeout: error.requestedTimeout,
+          reason: error.reason,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
+}
+
+function parseTimeout(value: unknown) {
+  const rawValue = typeof value === 'string' ? value : '15000';
+  const parsed = Number(rawValue);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new NpmTimeoutError(rawValue);
   }
   return parsed;
 }
@@ -90,7 +120,7 @@ export function npmStatusCommand() {
       '--registry-json <path>',
       'read captured `npm view <package> version versions --json` output instead of running npm',
     )
-    .option('--timeout-ms <ms>', 'npm view timeout in milliseconds', parseTimeout, 15000)
+    .option('--timeout-ms <ms>', 'npm view timeout in milliseconds', '15000')
     .option('--expect-current', 'exit 1 unless npm latest matches the local version')
     .option('--json', 'print machine-readable output')
     .action(
@@ -99,16 +129,22 @@ export function npmStatusCommand() {
         packageName?: string;
         localVersion?: string;
         registryJson?: string;
-        timeoutMs: number;
+        timeoutMs: string;
         expectCurrent?: boolean;
         json?: boolean;
       }) => {
         let registryJson: string | undefined;
+        let timeoutMs: number;
         try {
+          timeoutMs = parseTimeout(options.timeoutMs);
           registryJson = options.registryJson
             ? await readRegistryJsonFile(options.registryJson)
             : undefined;
         } catch (error) {
+          if (options.json && error instanceof NpmTimeoutError) {
+            printTimeoutError(error);
+            return;
+          }
           if (options.json && error instanceof NpmRegistryJsonError) {
             printRegistryJsonError(error);
             return;
@@ -121,7 +157,7 @@ export function npmStatusCommand() {
           packageName: options.packageName,
           localVersion: options.localVersion,
           registryJson,
-          timeoutMs: options.timeoutMs,
+          timeoutMs,
         });
 
         if (options.json) {
