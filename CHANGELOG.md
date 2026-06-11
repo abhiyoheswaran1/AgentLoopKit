@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed PR summaries and handoffs to render non-empty diff stats inside Markdown-safe text fences while keeping the no-diff fallback readable.
 - Changed PR summaries and handoffs to render the top-level task context title with Markdown-safe inline-code delimiters while keeping verification status text parseable.
 - Changed verification report top-level timestamp, repo, git branch, git commit, and working-tree values to render with Markdown-safe inline-code delimiters while keeping overall status parseable.
 - Changed verification report task-context path, title, task type, and status values to render with Markdown-safe inline-code delimiters.

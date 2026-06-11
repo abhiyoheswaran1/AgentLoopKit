@@ -3,7 +3,7 @@ import { mkdir, utimes, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { generatePrSummary, summarizeRepository } from '../src/core/pr-summary.js';
 import { createDefaultConfig } from '../src/core/config.js';
-import { inlineCode } from '../src/core/markdown-format.js';
+import { fencedCodeBlock, inlineCode } from '../src/core/markdown-format.js';
 import { makeTempDir, removeTempDir } from './helpers.js';
 
 let tempDirs: string[] = [];
@@ -110,6 +110,21 @@ describe('PR summary generation', () => {
     expect(summary.markdown.split(safePathLine).length - 1).toBe(2);
     expect(summary.markdown).toContain('## Changed Files');
     expect(summary.markdown).toContain('## Change Areas');
+  });
+
+  test('formats diff stats as safe fenced Markdown when stat text contains backticks', () => {
+    const diffStat = ' src/weird`path.ts | 2 +-\n docs/notes.md | 1 ```';
+    const summary = generatePrSummary({
+      timestamp: '2026-06-11-22-00',
+      status: '',
+      changedFiles: [],
+      taskMarkdown: '# Harden diff stats',
+      verificationMarkdown: '# Verification Report\n\nOverall status: pass',
+      diffStat,
+    });
+
+    expect(summary.markdown).toContain(fencedCodeBlock('text', diffStat.trim()));
+    expect(summary.markdown).not.toContain('No diff stats available.');
   });
 
   test('uses latest timestamped verification report instead of reports README', async () => {

@@ -10,7 +10,7 @@ import {
   getLatestVerificationReportPath,
   resolveCurrentVerificationEvidence,
 } from './evidence.js';
-import { inlineCode } from './markdown-format.js';
+import { fencedCodeBlock, inlineCode } from './markdown-format.js';
 
 export type PrSummaryInput = {
   timestamp: string;
@@ -150,6 +150,11 @@ function renderReviewFocus(changedFiles: GitFileStatus[]) {
   return lines.join('\n');
 }
 
+function renderDiffStat(diffStat?: string) {
+  const trimmed = diffStat?.trim();
+  return trimmed ? fencedCodeBlock('text', trimmed) : 'No diff stats available.';
+}
+
 export function generatePrSummary(input: PrSummaryInput) {
   const taskTitle = extractLine(input.taskMarkdown, /^#\s+(.+)$/m, 'No task contract found.');
   const verification = extractLine(
@@ -182,7 +187,7 @@ ${
 ${renderChangeAreas(input.changedFiles)}
 
 ## Diff Stats
-${input.diffStat?.trim() || 'No diff stats available.'}
+${renderDiffStat(input.diffStat)}
 
 ## Behaviour Changed
 - Review changed files and task contract to confirm intended behavior.

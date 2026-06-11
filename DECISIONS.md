@@ -309,3 +309,7 @@ Verification report headers include local repo and Git metadata that can contain
 ## 2026-06-11: PR Summary Task Context Uses Safe Inline Formatting
 
 PR summaries and handoffs include the task title as reviewer-facing context. That title can come from a local task contract and may contain Markdown-sensitive punctuation, so the top-level `Task context` value now renders with the shared inline-code formatter. Verification status text remains plain because AgentLoopKit parses `Overall status: pass|fail|not-run` from existing reports and handoffs.
+
+## 2026-06-11: PR Summary Diff Stats Use Safe Text Fences
+
+PR summaries and handoffs include `git diff --stat` output as local review evidence. That output can contain repo paths with Markdown-sensitive punctuation, so non-empty diff stats now render inside an adaptive `text` code fence. The empty-state fallback remains plain text because it is fixed copy and reads better as prose.

@@ -6585,3 +6585,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The full suite caught the shared handoff expectation that the focused PR summary test alone did not cover.
 - Improve:
   - Continue looking for remaining lower-traffic Markdown outputs that mix local values with reviewer-facing evidence.
+
+## 2026-06-11: PR Summary Diff Stat Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-pr-summary-diff-stat-markdown.md`
+- Trigger:
+  - The roadmap hardening pass found that `git diff --stat` output was still inserted directly under the PR summary `Diff Stats` section.
+  - Diff stat text can include repo paths or punctuation that should be treated as evidence text, not Markdown structure.
+- Implementation:
+  - Added a red regression in `tests/pr-summary.test.ts` for diff stat text containing backticks and a triple-backtick run.
+  - Rendered non-empty diff stats inside the shared adaptive `text` code fence.
+  - Preserved the existing trimmed diff-stat behavior and kept `No diff stats available.` as plain fixed copy.
+- Verification run:
+  - Red focused test failed first in `tests/pr-summary.test.ts` because diff stats were raw Markdown.
+  - Focused suites passed after implementation:
+    - `npm test -- tests/pr-summary.test.ts`
+    - `npm test -- tests/pr-summary.test.ts tests/handoff.test.ts`
+  - Broader local checks passed:
+    - `git diff --check`
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run check:links`
+    - `npx --yes projscan doctor --format markdown`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npm test`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-11-22-05-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-22-12-pr-summary.md`.
+- What worked well:
+  - The final handoff visibly confirmed the new fenced diff-stat section.
+- Improve:
+  - Continue scanning remaining release and report surfaces for raw multi-line command or Git output.
