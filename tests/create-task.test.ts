@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile, realpath, stat } from 'node:fs/promises';
+import { mkdir, readFile, realpath, stat, symlink } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -367,6 +367,48 @@ describe('create-task command', () => {
       },
     });
     await expect(stat(outsidePath)).rejects.toThrow();
+  });
+
+  test('rejects output paths that traverse a symlinked task subdirectory', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    const requestedOut = '.agentloop/tasks/outside-link/escaped-task.md';
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await symlink(outsideDir, path.join(dir, '.agentloop/tasks/outside-link'), 'dir');
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Symlink escape',
+        '--type',
+        'bugfix',
+        '--out',
+        requestedOut,
+        '--json',
+      ],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'TASK_OUTPUT_PATH_OUTSIDE_TASKS_DIR',
+        message: 'Task output path must stay inside .agentloop/tasks.',
+        requestedOut,
+        tasksDir: '.agentloop/tasks',
+        reason: 'outside-tasks-dir',
+      },
+    });
+    await expect(stat(path.join(outsideDir, 'escaped-task.md'))).rejects.toThrow();
   });
 
   test('prints non-Markdown output path errors as JSON when requested', async () => {

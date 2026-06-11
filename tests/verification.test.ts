@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { access, mkdir, readFile, symlink, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir } from './helpers.js';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -616,6 +616,43 @@ describe('verification', () => {
     await expect(access(path.join(dir, 'outside-command-ran.txt'))).rejects.toThrow();
   });
 
+  test('does not read or run task commands through symlinked task subdirectories', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(outsideDir, 'outside-task.md'),
+      [
+        '# Outside Symlink Task',
+        '- Task type: feature',
+        '- Status: leaked',
+        '',
+        '## Verification Commands',
+        '- node -e "require(\'fs\').writeFileSync(\'symlink-command-ran.txt\', \'yes\')"',
+        '',
+      ].join('\n'),
+    );
+    await symlink(outsideDir, path.join(dir, '.agentloop/tasks/outside-link'), 'dir');
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: '.agentloop/tasks/outside-link/outside-task.md',
+      taskCommands: true,
+      reportTimestamp: '2026-06-10-12-08',
+      nowIso: '2026-06-10T12:08:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('not-run');
+    expect(result.taskCommands).toEqual({ requested: true, foundCount: 0, commands: [] });
+    expect(result.markdown).toContain('Task path must point to a Markdown task contract.');
+    expect(result.markdown).not.toContain('Outside Symlink Task');
+    expect(result.markdown).not.toContain('leaked');
+    await expect(access(path.join(dir, 'symlink-command-ran.txt'))).rejects.toThrow();
+  });
+
   test('CLI verify wires --task into the written report', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -684,6 +721,56 @@ describe('verification', () => {
     );
     const invalidTaskPath = path.join(outsideDir, 'outside-task.md');
     await writeFile(invalidTaskPath, '# Outside task\n');
+
+    const result = await execa(tsxPath, [cliPath, 'verify', '--task', invalidTaskPath, '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output).toEqual({
+      error: {
+        code: 'ARTIFACT_PATH_INVALID',
+        message: `Task artifact path must stay inside .agentloop/tasks: ${invalidTaskPath}`,
+        artifactType: 'task',
+        requestedPath: invalidTaskPath,
+        expectedDir: '.agentloop/tasks',
+        reason: 'outside-directory',
+      },
+    });
+    await expect(access(path.join(dir, 'verify-command-ran.txt'))).rejects.toThrow();
+    await expect(access(path.join(dir, '.agentloop/reports'))).rejects.toThrow();
+  });
+
+  test('CLI verify rejects task paths that traverse symlinked task subdirectories', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: 'node -e "require(\'fs\').writeFileSync(\'verify-command-ran.txt\', \'yes\')"',
+            lint: '',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+    await writeFile(path.join(outsideDir, 'outside-task.md'), '# Outside task\n');
+    await symlink(outsideDir, path.join(dir, '.agentloop/tasks/outside-link'), 'dir');
+    const invalidTaskPath = '.agentloop/tasks/outside-link/outside-task.md';
 
     const result = await execa(tsxPath, [cliPath, 'verify', '--task', invalidTaskPath, '--json'], {
       cwd: dir,

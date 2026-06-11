@@ -4,7 +4,7 @@ import { execa } from 'execa';
 import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
 import { getGitBranch, getGitCommit, getGitStatus } from './git.js';
-import { writeTextFile } from './file-system.js';
+import { isInsidePath, normalizeExistingAncestor, writeTextFile } from './file-system.js';
 
 export type VerificationCommandKey = 'test' | 'lint' | 'typecheck' | 'build' | 'custom' | 'task';
 
@@ -125,12 +125,12 @@ function resolveTaskPath(cwd: string, config: AgentLoopConfig, taskPath: string 
   const absolutePath = path.isAbsolute(cleanPath)
     ? path.resolve(cleanPath)
     : path.resolve(cwd, cleanPath);
-  const tasksRoot = path.resolve(cwd, config.paths.tasksDir);
+  const tasksRoot = normalizeExistingAncestor(path.resolve(cwd, config.paths.tasksDir));
 
   return {
     cleanPath,
     absolutePath,
-    safe: isMarkdownTaskPath(cleanPath) && isInside(tasksRoot, absolutePath),
+    safe: isMarkdownTaskPath(cleanPath) && isInsidePath(tasksRoot, normalizeExistingAncestor(absolutePath)),
   };
 }
 
@@ -307,11 +307,6 @@ function isMarkdownTaskPath(taskPath: string) {
     normalized.endsWith('.md') &&
     !segments.some((segment) => segment === '.env' || segment.startsWith('.env.'))
   );
-}
-
-function isInside(parent: string, child: string) {
-  const relative = path.relative(parent, child);
-  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
 async function renderTaskContext(

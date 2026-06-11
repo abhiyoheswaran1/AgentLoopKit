@@ -1,3 +1,4 @@
+import { existsSync, realpathSync } from 'node:fs';
 import { access, mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -25,6 +26,29 @@ export async function writeFileIfMissing(filePath: string, content: string) {
 export async function writeTextFile(filePath: string, content: string) {
   await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(filePath, content);
+}
+
+export function isInsidePath(parent: string, child: string) {
+  const relative = path.relative(parent, child);
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+export function normalizeExistingAncestor(filePath: string) {
+  let current = filePath;
+  const missingSegments: string[] = [];
+
+  while (!existsSync(current)) {
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    missingSegments.unshift(path.basename(current));
+    current = parent;
+  }
+
+  try {
+    return path.join(realpathSync.native(current), ...missingSegments);
+  } catch {
+    return filePath;
+  }
 }
 
 export async function listFilesRecursive(

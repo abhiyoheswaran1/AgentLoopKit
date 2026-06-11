@@ -2,7 +2,7 @@ import path from 'node:path';
 import { AgentLoopConfig } from './config.js';
 import { formatDate } from './dates.js';
 import { AgentLoopError } from './errors.js';
-import { writeTextFile } from './file-system.js';
+import { isInsidePath, normalizeExistingAncestor, writeTextFile } from './file-system.js';
 import { slugify } from './slug.js';
 
 export type TaskType =
@@ -121,14 +121,11 @@ export async function createTaskContractFile(options: {
   const absolutePath = path.isAbsolute(relativePath)
     ? path.resolve(relativePath)
     : path.resolve(options.cwd, relativePath);
-  const tasksRoot = path.resolve(options.cwd, options.config.paths.tasksDir);
-  const relativeToTasks = path.relative(tasksRoot, absolutePath);
+  const tasksRoot = normalizeExistingAncestor(
+    path.resolve(options.cwd, options.config.paths.tasksDir),
+  );
 
-  if (
-    relativeToTasks === '' ||
-    relativeToTasks.startsWith('..') ||
-    path.isAbsolute(relativeToTasks)
-  ) {
+  if (!isInsidePath(tasksRoot, normalizeExistingAncestor(absolutePath))) {
     throw new TaskOutputPathError(
       `Task output path must stay inside ${options.config.paths.tasksDir}.`,
       'TASK_OUTPUT_PATH_OUTSIDE_TASKS_DIR',

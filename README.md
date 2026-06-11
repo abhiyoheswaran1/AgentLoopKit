@@ -267,7 +267,7 @@ agentloop task clear
 ```
 
 `task list --json` gives agents a deterministic list with `path`, `title`, `status`, `active`, and `modifiedAt`. Listing tasks does not create or update `.agentloop/state.json`.
-`create-task --json` returns the created task path and Markdown content so agents do not need to parse the human success line. Invalid `--out` paths return parseable JSON errors with `requestedOut`, `tasksDir`, and `reason`.
+`create-task --json` returns the created task path and Markdown content so agents do not need to parse the human success line. `--out` paths must stay inside the configured task directory, including through existing symlinked ancestors. Invalid `--out` paths return parseable JSON errors with `requestedOut`, `tasksDir`, and `reason`.
 For unsupported `--type` values, `create-task --json` returns a parseable error with `supportedTaskTypes` and writes no task file.
 `task show --json` returns the selected task metadata and Markdown content without changing active state. Invalid task paths on `show`, `set`, `status`, and `archive` return parseable JSON errors with `requestedTask`, `tasksDir`, and `reason`.
 `task status --json` updates only the `- Status:` line. Supported values are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Unsupported status values return a parseable JSON error with `supportedStatuses` and write no task changes. Use `deferred` for parked work that should remain visible in `task list` but should not become the next unpinned task. Status is not verification evidence; run `agentloop verify` before claiming completion.
@@ -299,7 +299,7 @@ Each contract records:
 .agentloop/reports/YYYY-MM-DD-HH-mm-verification-report.md
 ```
 
-Pass `--task .agentloop/tasks/file.md` to include task title, type, status, and path in the report. The path must point to a Markdown task contract inside the configured task directory. Invalid paths are reported as unavailable instead of being read. Add `--task-commands` when you also want to run commands listed under that task contract's `Verification Commands` section. If no task commands are found, the report says so.
+Pass `--task .agentloop/tasks/file.md` to include task title, type, status, and path in the report. The path must point to a Markdown task contract inside the configured task directory, including through existing symlinked ancestors. Invalid paths are reported as unavailable instead of being read. Add `--task-commands` when you also want to run commands listed under that task contract's `Verification Commands` section. If no task commands are found, the report says so.
 
 `agentloop verify --task-commands --json` includes the selected task command strings in `taskCommands.commands` so CI and agents can inspect what task-defined checks ran without parsing Markdown.
 When `--json` is used with an invalid `--task` path, `verify` returns a parseable artifact-path error and does not run verification commands.

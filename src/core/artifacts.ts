@@ -1,8 +1,7 @@
 import path from 'node:path';
-import { existsSync, realpathSync } from 'node:fs';
 import { readdir, stat } from 'node:fs/promises';
 import { AgentLoopError } from './errors.js';
-import { pathExists } from './file-system.js';
+import { isInsidePath, normalizeExistingAncestor, pathExists } from './file-system.js';
 
 export const verificationReportPattern =
   /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report\.md$/;
@@ -55,29 +54,6 @@ export class OutputPathError extends AgentLoopError {
   }
 }
 
-function isInside(parent: string, child: string) {
-  const relative = path.relative(parent, child);
-  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
-}
-
-function normalizeExistingAncestor(filePath: string) {
-  let current = filePath;
-  const missingSegments: string[] = [];
-
-  while (!existsSync(current)) {
-    const parent = path.dirname(current);
-    if (parent === current) break;
-    missingSegments.unshift(path.basename(current));
-    current = parent;
-  }
-
-  try {
-    return path.join(realpathSync.native(current), ...missingSegments);
-  } catch {
-    return filePath;
-  }
-}
-
 export async function resolveExplicitArtifactPath(options: {
   cwd: string;
   artifactType: ArtifactType;
@@ -87,10 +63,10 @@ export async function resolveExplicitArtifactPath(options: {
   const absolutePath = path.isAbsolute(options.requestedPath)
     ? path.resolve(options.requestedPath)
     : path.resolve(options.cwd, options.requestedPath);
-  const expectedRoot = path.resolve(options.cwd, options.expectedDir);
+  const expectedRoot = normalizeExistingAncestor(path.resolve(options.cwd, options.expectedDir));
   const label = artifactLabels[options.artifactType];
 
-  if (!isInside(expectedRoot, absolutePath)) {
+  if (!isInsidePath(expectedRoot, normalizeExistingAncestor(absolutePath))) {
     throw new ArtifactPathError(
       `${label} artifact path must stay inside ${options.expectedDir}: ${options.requestedPath}`,
       options.artifactType,
@@ -137,7 +113,7 @@ export function resolveOutputArtifactPath(options: {
   const expectedRoot = normalizeExistingAncestor(path.resolve(options.cwd, options.expectedDir));
   const label = outputArtifactLabels[options.artifactType];
 
-  if (!isInside(expectedRoot, normalizeExistingAncestor(absolutePath))) {
+  if (!isInsidePath(expectedRoot, normalizeExistingAncestor(absolutePath))) {
     throw new OutputPathError(
       `${label} output path must stay inside ${options.expectedDir}: ${options.requestedPath}`,
       options.artifactType,

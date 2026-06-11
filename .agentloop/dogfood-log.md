@@ -2,6 +2,35 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Guard Task Path Symlink Escapes
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-guard-create-task-output-symlink-escapes.md`
+- Trigger:
+  - During the bug pass, `create-task --out` was found to reject lexical outside paths but not resolved symlink escapes.
+  - Diff review found the same issue for explicit task artifact reads, such as `verify --task`.
+  - A symlinked subdirectory inside `.agentloop/tasks/` could redirect a task write or task read outside the configured task directory.
+- Product change:
+  - Added symlink-aware existing-ancestor normalization to shared filesystem helpers.
+  - Reused the helper in artifact output validation.
+  - Updated task contract output validation to reject resolved paths outside the configured task directory.
+  - Updated explicit artifact path and verification task-path validation to reject symlink-escaped reads.
+  - Added CLI regression coverage for `create-task --out .agentloop/tasks/<symlink>/file.md --json`.
+  - Added verification regression coverage for `verify --task .agentloop/tasks/<symlink>/file.md --json` and task-command execution.
+  - Updated README, task-contract docs, verification docs, backlog, and the unreleased changelog.
+- Verification completed:
+  - Red focused test first: `npm test -- tests/create-task.test.ts` failed because the command exited `0` through the symlink.
+  - Red verification tests: `npm test -- tests/verification.test.ts` failed because verification read and ran through the symlink.
+  - Focused green tests: `npm test -- tests/create-task.test.ts` and `npm test -- tests/verification.test.ts`
+  - Adjacent artifact output tests: `npm test -- tests/html-report.test.ts tests/badge.test.ts tests/ci-summary.test.ts tests/release-notes.test.ts`
+  - AgentLoop task verification with `--task-commands`, including full `npm test`, lint, typecheck, markdown links, build, `git diff --check`, and `npx --yes projscan doctor --format markdown`
+- Verification report: `.agentloop/reports/2026-06-11-06-42-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-11-06-44-pr-summary.md`
+- Worked well:
+  - The red test reproduced a real write-through-symlink failure before production code changed.
+  - The fix reused the same containment model as output artifact paths instead of inventing a second rule.
+- Improve:
+  - Add packed-release smoke coverage for the symlink case if release smoke time stays acceptable.
+
 ## 2026-06-11: Point Gates To Task Doctor For Hygiene Warnings
 
 - Task contract: `.agentloop/tasks/2026-06-11-point-gates-to-task-doctor-for-hygiene-warnings.md`
