@@ -32,6 +32,10 @@ Verification reports, reviewer handoffs, and release notes use a shared Markdown
 
 `agentloop release-check` reads local package, changelog, AgentLoop evidence, and git release state before a maintainer publishes. Human Markdown output now formats package labels, git metadata, check names, check messages, paths, statuses, changed-file counts, and next-action commands with the shared inline-code helper. JSON output keeps raw values for automation.
 
+## 2026-06-11: Doctor Output Uses Shared Markdown Formatting
+
+`agentloop doctor` reports local setup checks, project detection, risk-file paths, and next steps for humans and agents. Human Markdown output now formats check statuses, check names, messages, path-like values, overall status, strict mode, and next-action text with the shared inline-code helper. JSON output keeps raw values for scripts.
+
 ## 2026-06-09: Preserve Existing AGENTS.md
 
 `init` appends a marked AgentLoopKit section when `AGENTS.md` already exists. It does not overwrite user instructions.

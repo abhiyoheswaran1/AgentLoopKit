@@ -108,10 +108,12 @@ describe('doctor', () => {
     });
 
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain(`- [pass] Git root: ${await realpath(dir)}`);
-    expect(result.stdout).toContain('- [warn] Git target: current directory is a Git subdirectory');
+    expect(result.stdout).toContain(`- [\`pass\`] \`Git root\`: \`${await realpath(dir)}\``);
     expect(result.stdout).toContain(
-      '- [warn] Git subdirectory target: AgentLoopKit files live in the current directory, not the Git root.',
+      '- [`warn`] `Git target`: `current directory is a Git subdirectory`',
+    );
+    expect(result.stdout).toContain(
+      '- [`warn`] `Git subdirectory target`: `AgentLoopKit files live in the current directory, not the Git root.`',
     );
   });
 
@@ -203,6 +205,70 @@ describe('doctor', () => {
     expect(result.markdown).not.toContain('do-not-print');
   });
 
+  test('doctor human output renders check values with safe inline code when paths contain backticks', async () => {
+    const parent = await makeTempDir();
+    const dir = path.join(parent, 'doctor`repo');
+    tempDirs.push(parent);
+    await mkdir(path.join(dir, 'src'), { recursive: true });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'src/auth`session.ts'), 'export const session = true;\n');
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify(
+        {
+          name: 'doctor-backtick-fixture',
+          version: '1.0.0',
+          scripts: {
+            test: 'echo test',
+            lint: 'echo lint',
+            typecheck: 'echo typecheck',
+            build: 'echo build',
+          },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const humanResult = await execa(tsxPath, [cliPath, 'doctor'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'doctor', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const expectedDir = await realpath(dir);
+
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain('- Overall status: `warn`');
+    expect(humanResult.stdout).toContain('- Strict mode: `disabled`');
+    expect(humanResult.stdout).toContain(
+      `- [\`pass\`] \`Current directory\`: \`\`${expectedDir}\`\``,
+    );
+    expect(humanResult.stdout).toContain(
+      '- [`warn`] `Risk files: auth`: ``1 detected: src/auth`session.ts``',
+    );
+    expect(humanResult.stdout).toContain(
+      '- Run `review risk files before starting autonomous work`: `Risk files were detected; protect sensitive areas in the task contract before editing.`',
+    );
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'Current directory',
+          status: 'pass',
+          message: expectedDir,
+        }),
+        expect.objectContaining({
+          name: 'Risk files: auth',
+          status: 'warn',
+          message: '1 detected: src/auth`session.ts',
+        }),
+      ]),
+    );
+  });
+
   test('warns when template manifest is stale, invalid, or newer than the CLI', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -283,7 +349,8 @@ describe('doctor', () => {
       status: 'warn',
       message: expectedMessage,
     });
-    expect(result.markdown).toContain(`[warn] Monorepo: ${expectedMessage}`);
+    expect(result.markdown).toContain('- [`warn`] `Monorepo`:');
+    expect(result.markdown).toContain(expectedMessage);
   });
 
   test('shows risk file categories with capped path examples', async () => {
@@ -339,7 +406,9 @@ describe('doctor', () => {
         message: '1 detected: .env.local',
       },
     ]);
-    expect(result.markdown).toContain('- [warn] Risk files: env files: 1 detected: .env.local');
+    expect(result.markdown).toContain(
+      '- [`warn`] `Risk files: env files`: `1 detected: .env.local`',
+    );
     expect(result.markdown).not.toContain('do-not-print');
   });
 

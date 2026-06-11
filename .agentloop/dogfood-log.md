@@ -2,6 +2,32 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Harden Doctor Markdown Output
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-doctor-markdown-output.md`
+- Trigger:
+  - The Markdown-surface scan found that `agentloop doctor` still rendered check statuses, names, messages, local paths, risk-file examples, strict mode, overall status, and next-action text directly into Markdown.
+  - Doctor output is often a first-run diagnostic pasted into agent context, so local values should not corrupt Markdown when they contain backticks.
+- Product change:
+  - Added regression coverage for a working directory path and risk-file path containing backticks.
+  - Changed doctor Markdown to use the shared inline-code formatter for check rows, overall status, strict mode, and next-step commands and reasons.
+  - Preserved JSON output, doctor checks, risk scanning, strict-mode semantics, and next-action selection.
+- Verification:
+  - Red focused test `npm test -- tests/doctor.test.ts -t "doctor human output renders"` failed before the renderer changed.
+  - Focused green suite `npm test -- tests/doctor.test.ts` passed with 13 tests.
+  - Full suite `npm test` passed with 42 test files and 367 tests.
+  - Full self-verify `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-11-harden-doctor-markdown-output.md --task-commands --timeout-ms 240000 --json` passed and wrote `.agentloop/reports/2026-06-11-19-10-verification-report.md`.
+  - CLI smoke `node scripts/smoke-cli.mjs` passed.
+  - Release smoke `npm run smoke:release` passed.
+  - Markdown link check `npm run check:links` passed.
+  - Production dependency audit `npx pnpm@10.12.1 audit --prod` reported no known vulnerabilities.
+  - ProjScan `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - Handoff summary generated at `.agentloop/handoffs/2026-06-11-19-15-pr-summary.md`.
+- Worked well:
+  - The change stayed in Markdown rendering and reused the existing formatter.
+- Improve:
+  - Continue scanning remaining human Markdown surfaces before the planned `0.28.0` batch.
+
 ## 2026-06-11: Harden Release-Check Markdown Output
 
 - Task contract: `.agentloop/tasks/2026-06-11-harden-release-check-markdown-output.md`

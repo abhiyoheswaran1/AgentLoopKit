@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed `agentloop doctor` Markdown output to render check statuses, names, messages, path-like values, overall status, strict mode, and next-action text with Markdown-safe inline-code delimiters.
 - Changed `agentloop release-check` Markdown output to render package labels, git metadata, check details, paths, status values, changed-file counts, and next-action commands with Markdown-safe inline-code delimiters.
 - Changed `agentloop ci-summary` Markdown output to render generated timestamps, evidence titles, evidence paths, gate details, status values, and next-action commands with Markdown-safe inline-code delimiters.
 - Changed `agentloop check-gates` Markdown output to render gate, git, path, status, and next-action command values with Markdown-safe inline-code delimiters.

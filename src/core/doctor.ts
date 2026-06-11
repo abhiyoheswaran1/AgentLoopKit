@@ -4,6 +4,7 @@ import { AGENTLOOP_MANIFEST_FILE, CONFIG_FILE, CURRENT_TEMPLATE_VERSION } from '
 import { loadAgentLoopConfig } from './config.js';
 import { pathExists, readTextIfExists } from './file-system.js';
 import { commandExists, getGitRoot, getGitStatus, isInsideGitRepo } from './git.js';
+import { inlineCode } from './markdown-format.js';
 import { detectPackageManager } from './package-manager.js';
 import { detectMonorepo, detectPackageScripts, detectProjectType } from './project-detection.js';
 import { detectRiskFileScan } from './safety.js';
@@ -171,12 +172,19 @@ function chooseDoctorNextActions(checks: DoctorCheck[]): DoctorNextAction[] {
 
 function renderNextActions(nextActions: DoctorNextAction[]) {
   if (!nextActions.length) {
-    return '## Next Steps\n\nNo doctor follow-up required. Create a task with `agentloop create-task` when you are ready to start work.\n';
+    return `## Next Steps
+
+No doctor follow-up required. Create a task with ${inlineCode(
+      'agentloop create-task',
+    )} when you are ready to start work.
+`;
   }
 
   return `## Next Steps
 
-${nextActions.map((item) => `- Run \`${item.command}\`: ${item.reason}`).join('\n')}
+${nextActions
+  .map((item) => `- Run ${inlineCode(item.command)}: ${inlineCode(item.reason)}`)
+  .join('\n')}
 `;
 }
 
@@ -396,13 +404,12 @@ export async function runDoctor(options: {
   const nextActions = chooseDoctorNextActions(checks);
   const markdown = `# AgentLoopKit Doctor
 
-- Overall status: ${overallStatus}
-- Strict mode: ${strict ? 'enabled' : 'disabled'}
+- Overall status: ${inlineCode(overallStatus)}
+- Strict mode: ${inlineCode(strict ? 'enabled' : 'disabled')}
 
 ${checks
   .map((item) => {
-    const icon = item.status === 'pass' ? '[pass]' : item.status === 'warn' ? '[warn]' : '[fail]';
-    return `- ${icon} ${item.name}: ${item.message}`;
+    return `- [${inlineCode(item.status)}] ${inlineCode(item.name)}: ${inlineCode(item.message)}`;
   })
   .join('\n')}
 
