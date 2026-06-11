@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added `agentloop ship`, a local review-readiness flow that writes a ship report, records a run ledger entry, and scores task clarity, scope control, verification evidence, evidence freshness, gates, handoff readiness, and risk flags without claiming to measure code quality.
+- Added `agentloop prepare-pr` to generate PR title/body text and GitHub-comment Markdown from local AgentLoopKit evidence without reading GitHub tokens or posting comments.
+- Added `.agentloop/runs/`, `agentloop runs`, `agentloop show-run`, and `agentloop intent <file>` for local run evidence and file-intent lookup.
+- Added `agentloop maintainer-check`, a read-only maintainer reviewability check for AI-assisted PRs.
 - Changed `agentloop policy list/status` human output to render policy titles, statuses, and paths with Markdown-safe inline-code delimiters while keeping JSON output and raw `policy show` content unchanged.
 - Changed release-note missing-ref fallback copy to render requested Git refs with Markdown-safe inline-code delimiters while preserving raw fallback reason data.
 - Changed release notes to render commit subjects with Markdown-safe inline-code delimiters while preserving raw commit subjects in JSON output.

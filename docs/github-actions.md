@@ -111,7 +111,76 @@ The verification report includes a `CI Context` section when GitHub Actions, Git
 
 `agentloop ci-summary --write` adds a small Markdown summary with the same allowlisted CI provenance plus current AgentLoop evidence and gate status. It does not call GitHub APIs, read secrets, run verification commands, or replace the verification report.
 
-## Recipe 3: Composite Action Wrapper
+## Recipe 3: PR Readiness Comment
+
+Use this when CI should post AgentLoopKit review-readiness Markdown on a pull request. AgentLoopKit generates the comment body. GitHub Actions posts it with the workflow token.
+
+```yaml
+name: AgentLoop PR Readiness
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install project dependencies
+        run: npm ci
+
+      - name: Install AgentLoopKit
+        run: npm install --no-save agentloopkit@latest
+
+      - name: Run AgentLoop verification
+        run: npx --no-install agentloop verify
+
+      - name: Generate AgentLoop PR comment
+        run: npx --no-install agentloop prepare-pr --github-comment > agentloop-pr-comment.md
+
+      - name: Post AgentLoop PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('agentloop-pr-comment.md', 'utf8');
+            const marker = '<!-- agentloopkit-review-readiness -->';
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const previous = comments.data.find((comment) => comment.body?.includes(marker));
+            const nextBody = `${marker}\n${body}`;
+            if (previous) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: previous.id,
+                body: nextBody,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: nextBody,
+              });
+            }
+```
+
+This recipe uses `pull-requests: write` only for the comment step. AgentLoopKit does not read GitHub tokens, call GitHub APIs, or post comments itself.
+
+## Recipe 4: Composite Action Wrapper
 
 Use the repo action when you want a shorter workflow step around the same npm package:
 
@@ -175,6 +244,9 @@ Run `agentloop init` and `agentloop create-task` before relying on CI gates.
 - `agentloop verify` exits non-zero when a configured command fails.
 - `agentloop badge` writes a local SVG badge from existing evidence.
 - `agentloop handoff` writes a deterministic reviewer summary.
+- `agentloop ship` writes a review-readiness ship report and a local run ledger entry.
+- `agentloop prepare-pr` generates PR copy and optional GitHub-comment Markdown.
+- `agentloop maintainer-check` exits non-zero only when required review evidence fails.
 - `agentloop report` writes a static HTML evidence artifact from local files.
 - `agentloop ci-summary` summarizes CI context and AgentLoop evidence without running checks.
 - `agentloop release-notes` drafts release notes from local package, changelog, git, task, verification, and CI-summary evidence.

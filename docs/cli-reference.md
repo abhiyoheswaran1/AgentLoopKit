@@ -115,6 +115,55 @@ Failed reports include a short failure summary with each failed command, exit co
 
 See [verification-reports.md](verification-reports.md).
 
+## Ship And Prepare PR
+
+```bash
+agentloop ship
+agentloop ship --json
+agentloop ship --run-verify
+agentloop ship --run-verify --task-commands
+
+agentloop prepare-pr
+agentloop prepare-pr --json
+agentloop prepare-pr --stdout
+agentloop prepare-pr --write
+agentloop prepare-pr --github-comment
+```
+
+`ship` runs the local review-readiness flow. It detects the active task, reads Git status and diff stats, checks current verification evidence, runs gates, writes or links a handoff, calculates a deterministic review-readiness score, writes a Markdown ship report under `.agentloop/reports/`, and records a run under `.agentloop/runs/`.
+
+The readiness score is evidence-based. It scores task clarity, scope control, verification evidence, evidence freshness, policy and gate compliance, handoff readiness, and risk flags. It does not claim to measure code quality.
+
+By default, `ship` reuses current verification evidence. Use `--run-verify` when you want it to run configured verification commands first. Use `--task-commands` with `--run-verify` to also run verification commands recorded in the task contract.
+
+`prepare-pr` generates a PR title and body from the active task, changed files, verification evidence, ship report, gates, risk notes, and rollback notes. `--github-comment` includes Markdown suitable for a PR comment. The CLI does not read GitHub tokens or post comments by itself.
+
+## Run Ledger And Intent
+
+```bash
+agentloop runs
+agentloop runs --json
+agentloop show-run <id>
+agentloop show-run <id> --json
+agentloop intent src/auth/callback.ts
+agentloop intent src/auth/callback.ts --json
+```
+
+`ship` records a local run folder under `.agentloop/runs/`. Each run stores metadata, score JSON, changed files JSON, diff stats, the ship report, and the generated PR summary when available.
+
+`intent <file>` reads the local run ledger and shows which previous AgentLoopKit runs changed that file. It uses local ledger metadata only.
+
+## Maintainer Check
+
+```bash
+agentloop maintainer-check
+agentloop maintainer-check --json
+```
+
+`maintainer-check` helps maintainers evaluate AI-assisted pull requests. It checks for a task contract, fresh verification evidence, handoff evidence, changed file count, dependency and lockfile changes, migrations, auth/security-sensitive files, and generated output files.
+
+It is read-only. It does not write reports, run verification commands, call GitHub APIs, read tokens, or upload files.
+
 ## Gate Checks
 
 ```bash

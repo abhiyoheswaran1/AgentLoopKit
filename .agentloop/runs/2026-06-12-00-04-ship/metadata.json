@@ -1,0 +1,15 @@
+{
+  "id": "2026-06-12-00-04-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-00-04",
+  "task": {
+    "path": ".agentloop/tasks/2026-06-11-build-local-acceptance-layer-commands.md",
+    "title": "Build local acceptance layer commands",
+    "status": "in-progress"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-11-23-57-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-00-04-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-00-04-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 31
+}

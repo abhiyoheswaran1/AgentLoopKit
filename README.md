@@ -4,7 +4,9 @@ A drop-in engineering loop for coding agents.
 
 An open-source Baseframe Labs developer tool.
 
-Your coding agent can write code. AgentLoopKit gives it the repo habits reviewers need: task contracts, safety rules, verification evidence, review summaries, and clean handoffs.
+Your coding agent can write code. AgentLoopKit helps you decide whether that code is reviewable, verifiable, and merge-ready.
+
+It gives Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and other coding agents a local acceptance layer: task contracts, safety rules, verification evidence, review-readiness scores, PR descriptions, and reviewer handoffs.
 
 Vibe coding produces code. Agentic engineering produces auditable work.
 
@@ -26,6 +28,7 @@ It does not replace your agent, IDE, or CLI. It gives those tools a repeatable l
 4. Verify with real commands.
 5. Review the diff.
 6. Hand off with evidence.
+7. Ship only when the work is reviewable.
 
 Run `init` inside an existing repository and AgentLoopKit creates:
 
@@ -77,13 +80,16 @@ pnpm agentloop init
 ## Core Workflow
 
 ```bash
-npx agentloopkit doctor
-npx agentloopkit create-task --title "Add settings page" --type feature
-npx agentloopkit task set .agentloop/tasks/<task-file>.md
-npx agentloopkit task status .agentloop/tasks/<task-file>.md in-progress
-npx agentloopkit verify
-npx agentloopkit handoff
-npx agentloopkit check-gates
+npx agentloopkit init
+agentloop create-task --title "Fix login redirect bug" --type bugfix \
+  --acceptance "Password-reset login redirects to the requested page" \
+  --verification "npm test -- auth"
+
+# Run Codex, Claude Code, Cursor, OpenCode, Gemini CLI, or another coding agent.
+
+agentloop verify --task-commands
+agentloop ship
+agentloop prepare-pr
 ```
 
 Use `agentloop status` or `agentloop next` when an agent needs the next local action without reading every file:
@@ -118,9 +124,15 @@ agentloopkit init
 | `agentloop status`               | Show active task, current report, dirty files, and next step |
 | `agentloop next`                 | Print only the next recommended loop action                  |
 | `agentloop verify`               | Run configured checks and write a verification report        |
+| `agentloop ship`                 | Score review readiness and write a ship report               |
+| `agentloop prepare-pr`           | Generate a PR title, body, and optional GitHub comment       |
 | `agentloop summarize`            | Preview a deterministic reviewer summary                     |
 | `agentloop handoff`              | Write a reviewer handoff summary                             |
 | `agentloop check-gates`          | Check review evidence without running tests                  |
+| `agentloop runs`                 | List local ship/run ledger entries                           |
+| `agentloop show-run <id>`        | Show one local run ledger entry                              |
+| `agentloop intent <file>`        | Show which runs touched a file and why                       |
+| `agentloop maintainer-check`     | Check whether an AI-assisted PR is reviewable                |
 | `agentloop artifacts`            | Inventory local task, report, handoff, and badge evidence    |
 | `agentloop report`               | Write a local static HTML evidence report                    |
 | `agentloop badge`                | Write a local SVG evidence badge                             |
@@ -167,6 +179,8 @@ AgentLoopKit is intentionally boring:
 - no destructive actions during install
 
 Env files are reported by path only. Verification commands run only when you explicitly run `agentloop verify`.
+
+`agentloop ship` reuses current verification evidence by default. Pass `--run-verify` when you want it to run verification as part of the readiness flow.
 
 ## More Docs
 

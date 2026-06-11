@@ -325,3 +325,9 @@ Release notes include a fallback reason when a requested `--from` Git ref is mis
 ## 2026-06-11: Policy List And Status Use Safe Inline Formatting
 
 `agentloop policy list/status` prints local policy titles, statuses, and paths. Titles come from repo-local Markdown headings and paths can include Markdown-sensitive punctuation, so human output renders those values with the shared inline-code formatter. JSON output remains raw for automation. `agentloop policy show` deliberately stays raw because that command is meant to display the policy Markdown document itself.
+
+## 2026-06-11: Ship Is A Local Acceptance Layer
+
+AgentLoopKit now treats review readiness as a local evidence problem. `agentloop ship` composes existing task, verification, gate, handoff, Git, and risk signals into a deterministic score and Markdown report. The score does not claim to measure code quality. It only states whether the work has enough local evidence for review.
+
+The run ledger lives under `.agentloop/runs/` instead of a database or cloud service. `intent <file>` reads that local ledger to explain which previous ship runs touched a file. GitHub comment output is Markdown only; the CLI does not require tokens or post comments itself.

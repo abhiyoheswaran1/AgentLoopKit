@@ -55,7 +55,26 @@ agentloop verify
 
 `verify` runs configured commands from `agentloop.config.json` and writes a Markdown report under `.agentloop/reports/`. Use `--task-commands` when you want to run verification commands recorded inside the active task.
 
-## 6. Write The Handoff
+## 6. Ship The Work
+
+```bash
+agentloop ship
+```
+
+`ship` checks the active task, changed files, verification freshness, gates, handoff readiness, and risk flags. It writes a ship report under `.agentloop/reports/` and records a local run under `.agentloop/runs/`.
+
+The review-readiness score is not a code-quality score. It tells reviewers which local evidence exists and what still needs attention.
+
+## 7. Prepare The PR
+
+```bash
+agentloop prepare-pr
+agentloop prepare-pr --github-comment
+```
+
+`prepare-pr` generates a PR title and body from the task contract, changed files, verification evidence, ship report, risk notes, and rollback notes. `--github-comment` prints Markdown that CI can post as a PR comment with normal GitHub Actions steps.
+
+## 8. Write The Handoff
 
 ```bash
 agentloop handoff
@@ -63,7 +82,7 @@ agentloop handoff
 
 `handoff` writes a deterministic reviewer summary under `.agentloop/handoffs/`. It reads git status, diff stats, the active task, and the latest verification report.
 
-## 7. Check Review Gates
+## 9. Check Review Gates
 
 ```bash
 agentloop check-gates
@@ -72,17 +91,19 @@ agentloop check-gates --strict
 
 Use default mode while developing. Use `--strict` in CI or before release when warning gates should fail.
 
-## 8. Inspect Evidence
+## 10. Inspect Evidence
 
 ```bash
 agentloop artifacts
 agentloop artifacts --type verification --latest
 agentloop artifacts --json
+agentloop runs
+agentloop intent src/auth/callback.ts
 ```
 
 `artifacts` inventories local evidence without reading artifact contents into the response.
 
-## 9. Check Release Readiness
+## 11. Check Release Readiness
 
 ```bash
 agentloop release-check
@@ -109,7 +130,8 @@ jobs:
           node-version: 24
       - run: npm ci
       - run: npx --yes agentloopkit@latest verify
-      - run: npx --yes agentloopkit@latest handoff
+      - run: npx --yes agentloopkit@latest ship
+      - run: npx --yes agentloopkit@latest prepare-pr --github-comment > agentloop-pr-comment.md
       - run: npx --yes agentloopkit@latest check-gates --strict
       - run: npx --yes agentloopkit@latest artifacts --json
 ```

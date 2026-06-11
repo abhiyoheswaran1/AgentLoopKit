@@ -303,6 +303,52 @@ async function smokeCli({ keep = false } = {}) {
     assert(Array.isArray(gates.gates), 'check-gates JSON did not include gates.');
     console.log(`Check-gates smoke passed with status ${gates.overallStatus}.`);
 
+    const ship = parseJson((await runAgentLoop(['ship', '--json'], { cwd: smokeRepo })).stdout, 'ship');
+    assert(ship.readiness?.totalScore >= 0, 'ship JSON did not include a readiness score.');
+    assert(ship.shipReportPath, 'ship JSON did not include shipReportPath.');
+    assert(await pathExists(ship.shipReportPath), 'ship report was not written.');
+    assert(ship.run?.id, 'ship JSON did not include run.id.');
+    console.log('Ship smoke passed.');
+
+    const runs = parseJson((await runAgentLoop(['runs', '--json'], { cwd: smokeRepo })).stdout, 'runs');
+    assert(
+      Array.isArray(runs.runs) && runs.runs.some((run) => run.id === ship.run.id),
+      'runs JSON did not include the ship run.',
+    );
+
+    const shownRun = parseJson(
+      (await runAgentLoop(['show-run', ship.run.id, '--json'], { cwd: smokeRepo })).stdout,
+      'show-run',
+    );
+    assert(shownRun.run?.metadata?.id === ship.run.id, 'show-run JSON did not include the run.');
+
+    const intent = parseJson(
+      (await runAgentLoop(['intent', taskPath, '--json'], { cwd: smokeRepo })).stdout,
+      'intent',
+    );
+    assert(Array.isArray(intent.runs), 'intent JSON did not include runs.');
+    console.log('Run ledger smoke passed.');
+
+    const preparedPr = parseJson(
+      (await runAgentLoop(['prepare-pr', '--json', '--github-comment'], { cwd: smokeRepo })).stdout,
+      'prepare-pr',
+    );
+    assert(preparedPr.titleSuggestion, 'prepare-pr JSON did not include titleSuggestion.');
+    assert(preparedPr.body?.includes('## Verification Evidence'), 'prepare-pr body missing verification section.');
+    assert(
+      preparedPr.githubComment?.includes('AgentLoopKit Review Readiness'),
+      'prepare-pr JSON did not include GitHub comment markdown.',
+    );
+    console.log('Prepare-pr smoke passed.');
+
+    const maintainer = parseJson(
+      (await runAgentLoop(['maintainer-check', '--json'], { cwd: smokeRepo })).stdout,
+      'maintainer-check',
+    );
+    assert(['pass', 'warn'].includes(maintainer.status), 'maintainer-check reported failure.');
+    assert(Array.isArray(maintainer.checks), 'maintainer-check JSON did not include checks.');
+    console.log(`Maintainer-check smoke passed with status ${maintainer.status}.`);
+
     const nestedStatus = parseJson(
       (await runAgentLoop(['status', '--json'], { cwd: nestedDir })).stdout,
       'nested status',

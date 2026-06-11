@@ -37,6 +37,13 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - verification reports with allowlisted CI context
 - local status command for active task, latest verification, dirty files, configured commands, and next action
 - local gate-check command for task, verification, handoff, harness, policy, and git evidence
+- local acceptance-layer command with `agentloop ship`
+- deterministic review-readiness scoring that does not claim to measure code quality
+- PR description generation with `agentloop prepare-pr`
+- GitHub-comment Markdown output without token handling inside the CLI
+- local run ledger under `.agentloop/runs/`
+- `agentloop runs`, `agentloop show-run`, and `agentloop intent <file>`
+- read-only maintainer reviewability check with `agentloop maintainer-check`
 - agent instruction installation, including `install-agent all`
 - template system for loops, gates, handoffs, agents, policies, tasks, and harness files
 - generated `.agentloop/README.md`
@@ -74,6 +81,7 @@ Included so far:
 - generated first-run harness guidance with a risk-aware task example and task-linked verification command
 - read-only `agentloop artifacts` command for local evidence inventory
 - cross-platform CLI smoke workflow for Ubuntu, macOS, and Windows
+- local acceptance-layer commands: `ship`, `prepare-pr`, `runs`, `show-run`, `intent`, and `maintainer-check`
 
 Before release, move `CHANGELOG.md` `## Unreleased` entries into a versioned `0.28.0` section and then run the normal release checklist.
 
@@ -102,6 +110,14 @@ agentloop next --json
 agentloop check-gates
 agentloop check-gates --json
 agentloop check-gates --strict
+agentloop ship
+agentloop ship --json
+agentloop prepare-pr
+agentloop prepare-pr --github-comment
+agentloop runs
+agentloop show-run <id>
+agentloop intent src/auth/callback.ts
+agentloop maintainer-check
 agentloop artifacts
 agentloop artifacts --json
 agentloop report

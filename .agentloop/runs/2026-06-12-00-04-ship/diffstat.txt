@@ -1,0 +1,13 @@
+ .agentloop/backlog.md         |  1 +
+ CHANGELOG.md                  |  4 +++
+ DECISIONS.md                  |  6 ++++
+ FINAL_HANDOFF.md              | 16 ++++++++++
+ README.md                     | 30 +++++++++++++-----
+ docs/cli-reference.md         | 49 ++++++++++++++++++++++++++++
+ docs/github-actions.md        | 74 ++++++++++++++++++++++++++++++++++++++++++-
+ examples/end-to-end/README.md | 32 ++++++++++++++++---
+ scripts/smoke-cli.mjs         | 46 +++++++++++++++++++++++++++
+ src/cli/index.ts              | 10 ++++++
+ src/core/completions.ts       |  6 ++++
+ tests/cli-docs-drift.test.ts  |  6 ++++
+ 12 files changed, 266 insertions(+), 14 deletions(-)

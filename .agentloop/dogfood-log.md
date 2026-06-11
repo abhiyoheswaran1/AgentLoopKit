@@ -6714,3 +6714,44 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `policy show` staying raw made the boundary clear: list/status are evidence output, show is document output.
 - Improve:
   - The next product layer should turn these scattered evidence commands into one acceptance command: `agentloop ship`.
+
+## 2026-06-12: Local Acceptance Layer Commands
+
+- Task contract: `.agentloop/tasks/2026-06-11-build-local-acceptance-layer-commands.md`
+- Trigger:
+  - The product direction shifted from toolkit primitives toward a local acceptance layer for agent-generated code.
+  - The new core promise is: make agent-generated code reviewable, verifiable, and merge-ready.
+- Implementation:
+  - Added deterministic review-readiness scoring.
+  - Added `agentloop ship` to compose task, Git, verification, gates, handoff, and risk evidence into a ship report.
+  - Added `agentloop prepare-pr` for PR title/body generation and GitHub-comment Markdown.
+  - Added `.agentloop/runs/`, `runs`, `show-run`, and `intent <file>`.
+  - Added read-only `maintainer-check`.
+  - Updated README, CLI reference, GitHub Actions docs, end-to-end example, completions, smoke tests, changelog, decisions, backlog, and final handoff.
+- Verification run:
+  - Red tests failed first for missing `readiness-score`, `ship`, `prepare-pr`, `runs`, and `maintainer-check`.
+  - Focused tests passed:
+    - `npm test -- tests/readiness-score.test.ts tests/ship.test.ts tests/prepare-pr.test.ts tests/runs.test.ts tests/maintainer-check.test.ts`
+  - Broader local checks passed:
+    - `git diff --check`
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run check:links`
+    - `npx --yes projscan doctor --format markdown`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npm test`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-11-23-57-verification-report.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-00-04-ship-report.md`.
+  - Dogfood run ledger entry: `.agentloop/runs/2026-06-12-00-04-ship/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-00-04-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-00-04-pr-description.md`.
+  - Dogfood maintainer-check returned `warn` because the change set is broad.
+- What worked well:
+  - `ship` gave one acceptance-layer report instead of forcing agents to manually connect status, gates, handoff, and verification evidence.
+  - `prepare-pr --github-comment` produced CI-postable Markdown without token handling inside AgentLoopKit.
+- Improve:
+  - Consider a future `ship --no-handoff` or `ship --reuse-handoff` mode if users want strictly read-only scoring.
+  - Consider ledger support for explicit `verify` and `handoff` runs after the `ship` flow settles.
