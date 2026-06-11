@@ -13,6 +13,7 @@ import {
   isInsideGitRepo,
   parseGitStatus,
 } from './git.js';
+import { inlineCode } from './markdown-format.js';
 
 export type ReleaseCheckStatus = 'pass' | 'warn' | 'fail';
 
@@ -263,21 +264,25 @@ function chooseNextAction(checks: ReleaseReadinessCheck[]) {
 function renderMarkdown(result: Omit<ReleaseCheckResult, 'markdown'>) {
   const checks = result.checks
     .map((item) => {
-      const suffix = item.path ? ` - ${item.path}` : '';
-      return `- [${item.status}] ${item.name}: ${item.message}${suffix}`;
+      const suffix = item.path ? ` - ${inlineCode(item.path)}` : '';
+      return `- [${inlineCode(item.status)}] ${inlineCode(item.name)}: ${inlineCode(
+        item.message,
+      )}${suffix}`;
     })
     .join('\n');
   const gitLine = result.git.isRepository
-    ? `${result.git.branch || 'unknown branch'}${result.git.commit ? ` @ ${result.git.commit}` : ''}`
-    : 'not inside a git repository';
+    ? `${inlineCode(result.git.branch || 'unknown branch')}${
+        result.git.commit ? ` @ ${inlineCode(result.git.commit)}` : ''
+      }`
+    : inlineCode('not inside a git repository');
 
   return `# AgentLoopKit Release Check
 
-- Overall status: ${result.overallStatus}
-- Strict mode: ${result.strict ? 'enabled (warnings fail)' : 'disabled'}
-- Package: \`${result.package.name}@${result.package.version}\`
+- Overall status: ${inlineCode(result.overallStatus)}
+- Strict mode: ${inlineCode(result.strict ? 'enabled (warnings fail)' : 'disabled')}
+- Package: ${inlineCode(`${result.package.name}@${result.package.version}`)}
 - Git: ${gitLine}
-- Changed files: ${result.git.changedFileCount}
+- Changed files: ${inlineCode(String(result.git.changedFileCount))}
 
 ## Checks
 
@@ -285,7 +290,7 @@ ${checks}
 
 ## Next Action
 
-Run \`${result.nextAction.command}\`.
+Run ${inlineCode(result.nextAction.command)}.
 
 ${result.nextAction.reason}
 

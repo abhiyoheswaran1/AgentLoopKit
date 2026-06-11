@@ -232,9 +232,73 @@ describe('release-check command', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toBe('');
     expect(result.stdout).toContain('# AgentLoopKit Release Check');
-    expect(result.stdout).toContain('[warn] Working tree');
+    expect(result.stdout).toContain('[`warn`] `Working tree`');
     expect(result.stdout).not.toContain('do-not-print');
     await expect(readdir(path.join(dir, '.agentloop/reports'))).resolves.toEqual(beforeReports);
     await expect(readdir(path.join(dir, '.agentloop/handoffs'))).resolves.toEqual(beforeHandoffs);
+  });
+
+  test('renders markdown check values with safe inline code when release data contains backticks', async () => {
+    const dir = await createReleaseRepo();
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify(
+        {
+          name: 'demo`pkg',
+          version: '1.2.3`rc',
+          scripts: {
+            test: 'echo test',
+            lint: 'echo lint',
+            typecheck: 'echo typecheck',
+            build: 'echo build',
+            'smoke:release': 'echo smoke',
+          },
+        },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(dir, 'CHANGELOG.md'),
+      '# Changelog\n\n## 1.2.3`rc\n\n- Prepared release evidence.\n',
+    );
+    await git(dir, ['add', 'package.json', 'CHANGELOG.md']);
+    await git(dir, ['commit', '-m', 'Prepare backtick release fixture']);
+    await git(dir, ['checkout', '-b', 'release`branch']);
+
+    const humanResult = await execa(tsxPath, [cliPath, 'release-check'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'release-check', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain('- Overall status: `pass`');
+    expect(humanResult.stdout).toContain('- Strict mode: `disabled`');
+    expect(humanResult.stdout).toContain('- Package: ``demo`pkg@1.2.3`rc``');
+    expect(humanResult.stdout).toContain('- Git: ``release`branch`` @ `');
+    expect(humanResult.stdout).toContain('- Changed files: `0`');
+    expect(humanResult.stdout).toContain(
+      '- [`pass`] `Package metadata`: ``package.json declares demo`pkg@1.2.3`rc`` - `package.json`',
+    );
+    expect(humanResult.stdout).toContain(
+      '- [`pass`] `Changelog section`: ``CHANGELOG.md includes 1.2.3`rc.`` - `CHANGELOG.md`',
+    );
+    expect(humanResult.stdout).toContain('Run `npm publish --access public`.');
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.package).toEqual({ name: 'demo`pkg', version: '1.2.3`rc' });
+    expect(output.git.branch).toBe('release`branch');
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'package-metadata',
+          message: 'package.json declares demo`pkg@1.2.3`rc',
+          path: 'package.json',
+        }),
+      ]),
+    );
   });
 });
