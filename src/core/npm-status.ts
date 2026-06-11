@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { execa } from 'execa';
 import { AgentLoopError } from './errors.js';
 import { pathExists } from './file-system.js';
+import { inlineCode } from './markdown-format.js';
 
 export type NpmCatchUpStatus = 'current' | 'catch-up-needed' | 'unknown';
 
@@ -163,17 +164,19 @@ function recommendation(status: NpmCatchUpStatus) {
 }
 
 function renderVersions(versions: string[]) {
-  return versions.length ? versions.map((version) => `\`${version}\``).join(', ') : 'not available';
+  return versions.length
+    ? versions.map((version) => inlineCode(version)).join(', ')
+    : 'not available';
 }
 
 function renderMarkdown(result: Omit<NpmStatusResult, 'markdown'>) {
-  const latest = result.registry.latest ? `\`${result.registry.latest}\`` : 'not available';
+  const latest = result.registry.latest ? inlineCode(result.registry.latest) : 'not available';
   const errorLine = result.source.error ? `\n- Registry error: ${result.source.error}` : '';
 
   return `# npm Status
 
-- Package: \`${result.packageName}\`
-- Local version: \`${result.localVersion}\`
+- Package: ${inlineCode(result.packageName)}
+- Local version: ${inlineCode(result.localVersion)}
 - npm latest: ${latest}
 - Registry contains local version: ${result.registry.hasLocalVersion ? 'yes' : 'no'}
 - Registry versions: ${renderVersions(result.registry.versions)}

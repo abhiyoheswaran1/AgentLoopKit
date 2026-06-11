@@ -74,6 +74,24 @@ describe('npm status', () => {
     expect(result.markdown).toContain('npm latest matches local package version');
   });
 
+  test('escapes npm-status version labels when versions contain backticks', async () => {
+    const dir = await createPackageFixture();
+
+    const result = await checkNpmStatus({
+      cwd: dir,
+      localVersion: '1.0.0`local',
+      registryJson: JSON.stringify({
+        version: '1.0.0`local',
+        versions: ['0.9.0`old', '1.0.0`local'],
+      }),
+    });
+
+    expect(result.markdown).toContain('- Local version: ``1.0.0`local``');
+    expect(result.markdown).toContain('- npm latest: ``1.0.0`local``');
+    expect(result.markdown).toContain('``0.9.0`old``');
+    expect(result.markdown).toContain('``1.0.0`local``');
+  });
+
   test('can check the AgentLoopKit package from a different current package', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

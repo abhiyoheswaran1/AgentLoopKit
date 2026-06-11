@@ -20,6 +20,10 @@ AgentLoopKit ships as a TypeScript Node CLI distributed through npm and npx. The
 
 Verification reports, reviewer handoffs, and release notes use a shared Markdown formatting helper for inline code and code fences. This keeps delimiter behavior consistent across evidence artifacts without adding a Markdown parser, sanitizer dependency, or broad rendering refactor.
 
+## 2026-06-11: npm Status Labels Use Shared Markdown Formatting
+
+`agentloop npm-status` reports package and version labels as release evidence. Those labels now use the same Markdown inline-code formatter as verification, handoff, and release-note artifacts. This keeps captured registry data readable when a version string contains backticks without changing registry lookup, package-name validation, or version validation.
+
 ## 2026-06-09: Preserve Existing AGENTS.md
 
 `init` appends a marked AgentLoopKit section when `AGENTS.md` already exists. It does not overwrite user instructions.

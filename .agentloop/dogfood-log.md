@@ -2,6 +2,29 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Harden npm Status Markdown Version Labels
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-npm-status-markdown-version-labels.md`
+- Trigger:
+  - After extracting shared Markdown formatting, a report-surface scan found that `npm-status` still rendered local, latest, and registry version labels with fixed inline backticks.
+  - Captured registry JSON is local evidence and can contain malformed strings.
+- Product change:
+  - Added a regression test for local, latest, and registry version strings containing backticks.
+  - Changed npm-status Markdown to use the shared inline-code formatter for package and version labels.
+  - Updated changelog, backlog, dogfood, and decision notes.
+- Verification:
+  - Red focused test: `npm test -- tests/npm-status.test.ts -t "escapes npm-status version labels"` failed before the renderer changed.
+  - Focused green test: `npm test -- tests/npm-status.test.ts -t "escapes npm-status version labels"` passed after the renderer change.
+  - Adjacent suite: `npm test -- tests/npm-status.test.ts` passed.
+  - Full suite: `npm test` passed with 42 test files and 357 tests.
+  - Full self-verify: `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-11-harden-npm-status-markdown-version-labels.md --task-commands --timeout-ms 240000 --json` passed and wrote `.agentloop/reports/2026-06-11-16-07-verification-report.md`.
+  - CLI smoke: `node scripts/smoke-cli.mjs` passed.
+  - Release smoke: `npm run smoke:release` passed.
+- Worked well:
+  - The change reused the shared Markdown helper and did not change registry lookup, package-name validation, version validation, or npm command execution.
+- Improve:
+  - Keep scanning report surfaces that include local or captured external evidence before cutting `0.28.0`.
+
 ## 2026-06-11: Extract Markdown Inline-Code Formatter
 
 - Task contract: `.agentloop/tasks/2026-06-11-extract-markdown-inline-code-formatter.md`
