@@ -6486,3 +6486,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Keeping JSON exact while normalizing human Markdown keeps both automation and reviewer readability intact.
 - Improve:
   - Continue scanning generated verification report task-context fields, which still include some raw task metadata.
+
+## 2026-06-11: Verification Task Context Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-verification-task-context-markdown.md`
+- Trigger:
+  - The roadmap hardening pass found that verification reports still rendered task context path, title, task type, and status directly into Markdown.
+  - Backticks in task filenames or metadata could corrupt the evidence section even though command labels and CI metadata were already safe.
+- Implementation:
+  - Added a regression task fixture with backticks in the task path, title, type, and status.
+  - Rendered readable task-context values with the shared inline-code formatter.
+  - Rendered unavailable task-context paths and statuses safely too.
+- Verification run:
+  - Red focused test failed first in `tests/verification.test.ts` for raw task-context metadata.
+  - Focused suite passed after implementation:
+    - `npm test -- tests/verification.test.ts`
+  - Broader local checks passed:
+    - `git diff --check`
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run check:links`
+    - `npx --yes projscan doctor --format markdown`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npm test`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-11-20-58-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-21-06-pr-summary.md`.
+- What worked well:
+  - The same shared formatter now covers verification command labels, CI metadata, and task context consistently.
+- Improve:
+  - Continue scanning lower-traffic Markdown outputs for raw local values before the 0.28.0 release batch.

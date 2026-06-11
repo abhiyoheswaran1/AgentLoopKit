@@ -297,3 +297,7 @@ Write confirmations are often pasted into handoffs, CI logs, and chat transcript
 ## 2026-06-11: npm Status Errors Use Safe Markdown Presentation
 
 `agentloop npm-status` can include npm registry stderr when the live registry check fails. That text is external command output, so Markdown reports now collapse whitespace and render the registry error as a safe inline-code value. The structured `source.error` value remains exact in JSON output so automation can inspect the original npm error without presentation changes.
+
+## 2026-06-11: Verification Task Context Uses Safe Inline Formatting
+
+Verification reports include task context from local task contracts and requested task paths. Those values can contain punctuation from filenames or task metadata, so task-context path, title, task type, and status values now render with the shared inline-code formatter. The change is presentation-only: task path safety, task metadata parsing, command execution, command results, and JSON output stay unchanged.

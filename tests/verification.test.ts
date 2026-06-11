@@ -540,13 +540,56 @@ describe('verification', () => {
     });
 
     expect(result.markdown).toContain('## Task Context');
-    expect(result.markdown).toContain('- Path: .agentloop/tasks/demo-task.md');
-    expect(result.markdown).toContain('- Title: Add billing webhook');
-    expect(result.markdown).toContain('- Task type: feature');
-    expect(result.markdown).toContain('- Status: in-progress');
+    expect(result.markdown).toContain(`- Path: ${inlineCode('.agentloop/tasks/demo-task.md')}`);
+    expect(result.markdown).toContain(`- Title: ${inlineCode('Add billing webhook')}`);
+    expect(result.markdown).toContain(`- Task type: ${inlineCode('feature')}`);
+    expect(result.markdown).toContain(`- Status: ${inlineCode('in-progress')}`);
     expect(result.markdown.indexOf('## Task Context')).toBeLessThan(
       result.markdown.indexOf('## Commands Run'),
     );
+  });
+
+  test('formats task context metadata as safe inline Markdown', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    const taskPath = '.agentloop/tasks/demo`task.md';
+    await writeFile(
+      path.join(dir, taskPath),
+      [
+        '# Add `billing` webhook',
+        '',
+        '- Created date: 2026-06-10',
+        '- Task type: feature`flag',
+        '- Status: review`ready',
+        '',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"ok\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath,
+      reportTimestamp: '2026-06-10-12-04',
+      nowIso: '2026-06-10T12:04:00.000Z',
+    });
+
+    expect(result.markdown).toContain(`- Path: ${inlineCode(taskPath)}`);
+    expect(result.markdown).toContain(`- Title: ${inlineCode('Add `billing` webhook')}`);
+    expect(result.markdown).toContain(`- Task type: ${inlineCode('feature`flag')}`);
+    expect(result.markdown).toContain(`- Status: ${inlineCode('review`ready')}`);
   });
 
   test('does not run task verification commands unless explicitly requested', async () => {
@@ -694,8 +737,8 @@ describe('verification', () => {
 
     expect(result.overallStatus).toBe('pass');
     expect(result.markdown).toContain('## Task Context');
-    expect(result.markdown).toContain('- Path: .agentloop/tasks/missing.md');
-    expect(result.markdown).toContain('- Status: unavailable');
+    expect(result.markdown).toContain(`- Path: ${inlineCode('.agentloop/tasks/missing.md')}`);
+    expect(result.markdown).toContain(`- Status: ${inlineCode('unavailable')}`);
     expect(result.markdown).toContain('Task file could not be read.');
   });
 
@@ -729,8 +772,8 @@ describe('verification', () => {
 
     expect(result.overallStatus).toBe('pass');
     expect(result.markdown).toContain('## Task Context');
-    expect(result.markdown).toContain('- Path: .env');
-    expect(result.markdown).toContain('- Status: unavailable');
+    expect(result.markdown).toContain(`- Path: ${inlineCode('.env')}`);
+    expect(result.markdown).toContain(`- Status: ${inlineCode('unavailable')}`);
     expect(result.markdown).toContain('Task path must point to a Markdown task contract.');
     expect(result.markdown).not.toContain('Secret Title');
     expect(result.markdown).not.toContain('leaked');
@@ -768,7 +811,7 @@ describe('verification', () => {
 
     expect(result.overallStatus).toBe('pass');
     expect(result.markdown).toContain('## Task Context');
-    expect(result.markdown).toContain('- Status: unavailable');
+    expect(result.markdown).toContain(`- Status: ${inlineCode('unavailable')}`);
     expect(result.markdown).toContain('Task path must point to a Markdown task contract.');
     expect(result.markdown).not.toContain('Outside Secret Task');
     expect(result.markdown).not.toContain('leaked');
@@ -881,9 +924,9 @@ describe('verification', () => {
     expect(reportPath).toBeTruthy();
     const markdown = await readFile(reportPath as string, 'utf8');
     expect(markdown).toContain('## Task Context');
-    expect(markdown).toContain('- Title: CLI task context');
-    expect(markdown).toContain('- Task type: docs');
-    expect(markdown).toContain('- Status: review');
+    expect(markdown).toContain(`- Title: ${inlineCode('CLI task context')}`);
+    expect(markdown).toContain(`- Task type: ${inlineCode('docs')}`);
+    expect(markdown).toContain(`- Status: ${inlineCode('review')}`);
   });
 
   test('CLI verify prints report path and status with Markdown-safe inline values', async () => {
@@ -1122,7 +1165,7 @@ describe('verification', () => {
     const reportPath = extractWrittenVerificationReportPath(result.stdout);
     expect(reportPath).toBeTruthy();
     const markdown = await readFile(reportPath as string, 'utf8');
-    expect(markdown).toContain('- Status: unavailable');
+    expect(markdown).toContain(`- Status: ${inlineCode('unavailable')}`);
     expect(markdown).toContain('Task path must point to a Markdown task contract.');
   });
 

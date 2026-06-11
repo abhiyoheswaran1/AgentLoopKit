@@ -388,8 +388,8 @@ async function renderTaskContext(
   const resolved = resolveTaskPath(cwd, config, taskPath);
   if (!resolved?.safe) {
     return `## Task Context
-- Path: ${taskPath.trim()}
-- Status: unavailable
+- Path: ${inlineCode(taskPath.trim())}
+- Status: ${inlineCode('unavailable')}
 - Note: Task path must point to a Markdown task contract.
 
 `;
@@ -398,10 +398,10 @@ async function renderTaskContext(
   try {
     const markdown = await readFile(resolved.absolutePath, 'utf8');
     const metadata = parseTaskMetadata(markdown);
-    const lines = [`- Path: ${resolved.cleanPath}`];
-    if (metadata.title) lines.push(`- Title: ${metadata.title}`);
-    if (metadata.type) lines.push(`- Task type: ${metadata.type}`);
-    if (metadata.status) lines.push(`- Status: ${metadata.status}`);
+    const lines = [`- Path: ${inlineCode(resolved.cleanPath)}`];
+    if (metadata.title) lines.push(`- Title: ${inlineCode(metadata.title)}`);
+    if (metadata.type) lines.push(`- Task type: ${inlineCode(metadata.type)}`);
+    if (metadata.status) lines.push(`- Status: ${inlineCode(metadata.status)}`);
 
     return `## Task Context
 ${lines.join('\n')}
@@ -409,8 +409,8 @@ ${lines.join('\n')}
 `;
   } catch {
     return `## Task Context
-- Path: ${resolved.cleanPath}
-- Status: unavailable
+- Path: ${inlineCode(resolved.cleanPath)}
+- Status: ${inlineCode('unavailable')}
 - Note: Task file could not be read.
 
 `;
