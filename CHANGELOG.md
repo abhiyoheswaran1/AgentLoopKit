@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Simplified public release and launch docs around the current trusted-publishing flow, and added packed-release smoke coverage that rejects unsupported install-channel claims or maintainer-only release chatter in normal public docs.
 - Added packed-release smoke coverage for symlinked init harness targets and symlinked task archive destinations.
 - Changed `agentloop task archive` so the archive destination must resolve inside the configured task directory. With `--json`, unsafe symlinked archive directories return `OUTPUT_PATH_INVALID` before moving the task file.
 - Changed `.agentloop/state.json` handling so task active-state reads ignore unsafe symlinked state paths, while `task set --json` and `task clear --json` return `OUTPUT_PATH_INVALID` before writing or removing state outside the current repo.

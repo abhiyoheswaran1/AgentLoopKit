@@ -106,9 +106,48 @@ describe('release smoke script helpers', () => {
     ).not.toThrow();
   });
 
+  test('rejects unsupported install-channel claims in public docs', () => {
+    expect(() =>
+      smoke.assertPublicDocsAvoidUnsupportedClaims([
+        {
+          filePath: 'docs/npm-publishing.md',
+          content: 'Users can run brew install agentloopkit through Homebrew.',
+        },
+      ]),
+    ).toThrow('docs/npm-publishing.md contains unsupported public claim: Homebrew claim');
+  });
+
+  test('rejects maintainer-only chatter in normal public docs', () => {
+    expect(() =>
+      smoke.assertPublicDocsAvoidUnsupportedClaims([
+        {
+          filePath: 'README.md',
+          content: 'Latest GitHub release: v0.27.0. npm still serves an old package.',
+        },
+      ]),
+    ).toThrow('README.md contains maintainer-only release chatter');
+  });
+
+  test('allows release history docs to discuss trusted publishing state', () => {
+    expect(() =>
+      smoke.assertPublicDocsAvoidUnsupportedClaims([
+        {
+          filePath: 'docs/release-status.md',
+          content: 'npm trusted publishing is configured for the release workflow.',
+        },
+      ]),
+    ).not.toThrow();
+  });
+
   test('current public docs avoid hardcoded AgentLoopKit version pins', async () => {
     const files = await smoke.collectPublicDocPinFiles(process.cwd());
 
     expect(() => smoke.assertPublicDocsDoNotPinVersions(files)).not.toThrow();
+  });
+
+  test('current public docs avoid unsupported channel claims and internal chatter', async () => {
+    const files = await smoke.collectPublicDocPinFiles(process.cwd());
+
+    expect(() => smoke.assertPublicDocsAvoidUnsupportedClaims(files)).not.toThrow();
   });
 });

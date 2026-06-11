@@ -33,6 +33,6 @@
   color: "b60205"
   description: Needs a test, build, or verification report before merge.
 
-- name: product-panel
+- name: planning
   color: "c5def5"
-  description: Internal product-panel, backlog, persona, or dogfood records.
+  description: Product planning, roadmap, backlog, or maintainer research records.

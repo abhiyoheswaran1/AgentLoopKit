@@ -1,75 +1,66 @@
 # Release Checklist Example
 
-Use this workflow only if a future GitHub release is current while npm still serves an older package.
+Use this workflow when maintainers are preparing a normal AgentLoopKit release and need a concise evidence trail before publishing.
 
-AgentLoopKit does not create tags, create GitHub releases, publish npm packages, read tokens, or call package registries for you. This checklist keeps release evidence in the repo so maintainers can decide the next safe manual step.
+AgentLoopKit does not create tags, create GitHub releases, publish npm packages, read tokens, or call package registries for you. This checklist keeps release evidence in the repo so maintainers can decide the next safe step.
 
 ## When to use it
 
 Use this workflow when:
 
-- GitHub has the current release tarball;
-- npm publish failed or is still blocked by authentication;
-- maintainers need a temporary GitHub tarball command for a documented incident;
-- maintainers need proof of verification before retrying npm publish.
+- `package.json` and `CHANGELOG.md` are ready for the intended version;
+- maintainers need proof that npm currently has the previous release;
+- maintainers need a repeatable local release gate;
+- maintainers need post-publish verification before updating docs.
 
-Do not use current `main` to backfill stale npm versions. If you need an older version, use the matching GitHub tag or release tarball for that version.
+Do not use current `main` to publish old versions. If you need an older version, use the matching GitHub tag or release tarball for that version.
 
-## Task contract
+## Task Contract
 
 ```bash
-agentloop create-task --type release --title "Document current release state" \
-  --problem-statement "GitHub release is current but npm still serves an older package" \
-  --desired-outcome "Maintainers can see verification, tarball, npm state, and next publish step" \
+agentloop create-task --type release --title "Prepare AgentLoopKit release" \
+  --problem-statement "Maintainers need package, verification, and registry evidence before publishing" \
+  --desired-outcome "The release has matching metadata, local verification, npm proof, and clear next steps" \
+  --likely-file CHANGELOG.md \
+  --likely-file package.json \
   --likely-file docs/release-status.md \
   --likely-file docs/npm-publishing.md \
   --likely-file FINAL_HANDOFF.md \
   --forbidden-file README.md \
-  --forbidden-file package.json \
-  --forbidden-file CHANGELOG.md \
-  --acceptance "Current GitHub release and npm latest are documented" \
-  --acceptance "Docs say not to backfill stale npm versions from current main" \
-  --verification "npm view agentloopkit version versions --json" \
+  --acceptance "package.json and CHANGELOG.md agree on the intended version" \
+  --acceptance "The full local release gate passes" \
+  --acceptance "Post-publish npm proof is recorded before claiming availability" \
+  --verification "agentloop npm-status --agentloopkit --expect-current" \
+  --verification "npm run smoke:release" \
   --verification "npx pnpm@10.12.1 check:links" \
   --verification "npx projscan doctor --format markdown" \
-  --rollback "Revert release-status documentation changes"
+  --rollback "Revert release metadata changes before publishing, or publish a corrective patch after a completed release"
 ```
 
-## Evidence to collect
+## Evidence To Collect
 
-- current package version in `package.json`
-- current GitHub release tag and asset name
-- tarball SHA-256 if available
-- `npm view agentloopkit version versions --json`
-- `agentloop npm-status --agentloopkit` or `agentloop npm-status --agentloopkit --registry-json <captured-json>`
-- package checks run
-- packed-tarball smoke result if a tarball exists
-- publish workflow URL and failure reason, if npm publish failed
-- next human action: trusted publishing setup or manual browser/OTP publish
+- current package version in `package.json`;
+- intended release version;
+- `CHANGELOG.md` section for the intended version;
+- `agentloop npm-status --agentloopkit --expect-current` before the version bump;
+- lint, typecheck, test, build, and packed-release smoke results;
+- packed tarball name and SHA-256;
+- GitHub release URL after publication;
+- npm version proof after publication;
+- Docker, GHCR, MCP Registry, or other channel workflow URLs when those workflows run.
 
-## Temporary install guidance
-
-When npm lags behind GitHub, docs may include a temporary tarball command:
-
-```bash
-npx --yes --package https://github.com/OWNER/REPO/releases/download/vX.Y.Z/agentloopkit-X.Y.Z.tgz agentloop version
-```
-
-Remove that fallback after `npm view agentloopkit version` reports the current release or a newer one.
-
-## Handoff checklist
+## Handoff Checklist
 
 Before stopping, write a handoff that states:
 
-- release tag;
-- npm latest;
-- npm versions listed by the registry;
-- verification commands and results;
-- `agentloop npm-status --agentloopkit` result;
-- whether npm publish was attempted;
-- why any publish failed;
-- exact next maintainer action;
-- rollback or correction path for stale docs.
+- intended release version;
+- local verification commands and results;
+- package tarball path and digest;
+- whether the GitHub release was created;
+- whether npm published through trusted publishing;
+- post-publish `agentloop npm-status --agentloopkit --expect-current` result;
+- exact next maintainer action if any step is incomplete;
+- rollback or corrective-release path.
 
 Do not claim npm availability until the registry proves it.
 

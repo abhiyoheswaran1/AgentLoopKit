@@ -5679,3 +5679,24 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Running the packed smoke script inside the task verification caught stale release-smoke expectations before the next release batch.
 - Improve:
   - Keep packed smoke focused on representative safety and packaging failures so it remains fast enough to run before release.
+
+## 2026-06-11: Public Release Docs Cleanup
+
+- Task contract: `.agentloop/tasks/2026-06-11-compact-public-release-docs-for-0-28-0-batch.md`
+- Trigger:
+  - Public maintainer docs still carried stale incident-style publishing history after trusted publishing, GHCR, and MCP Registry releases were working.
+  - The README was already clean, but release-adjacent docs and examples could train future contributors to reintroduce unsupported channel claims or old npm mismatch wording.
+- Implementation:
+  - Rewrote `docs/npm-publishing.md`, `docs/release-status.md`, `docs/launch-checklist.md`, `docs/release-checklist-example.md`, and `examples/release-checklist/README.md` around the current release path.
+  - Renamed the public GitHub label template from `product-panel` to `planning`.
+  - Added packed-release smoke helper coverage for unsupported install-channel claims and maintainer-only release chatter in normal public docs.
+- Verification run:
+  - Red focused release-smoke test first failed on stale release-checklist examples and then on a named unsupported channel in the new launch checklist.
+  - Focused release-smoke suite passed after docs cleanup: 1 file and 12 tests.
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-08-50-verification-report.md`.
+  - Full `npx pnpm@10.12.1 test` passed: 36 files and 289 tests.
+  - `npx pnpm@10.12.1 lint`, `typecheck`, `check:links`, `build`, `npm run smoke:release`, `git diff --check`, and `npx --yes projscan doctor --format markdown` passed.
+- What worked well:
+  - Putting the public-doc claim check inside packed-release smoke catches README/npm-package regressions before publish.
+- Improve:
+  - Consider adding a small dedicated public-doc lint script later if the smoke helper starts doing too many unrelated checks.

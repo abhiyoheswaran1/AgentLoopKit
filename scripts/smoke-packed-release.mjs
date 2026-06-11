@@ -28,6 +28,21 @@ const RELEASE_HISTORY_DOCS = new Set([
   'docs/release-status.md',
 ]);
 
+const UNSUPPORTED_PUBLIC_CLAIMS = [
+  { label: 'Homebrew claim', pattern: /\bHomebrew\b/i },
+  { label: 'brew install command', pattern: /\bbrew\s+install\b/i },
+  { label: 'retired Homebrew tap repo', pattern: /homebrew-agentloopkit/i },
+];
+
+const INTERNAL_CHATTER_CLAIMS = [
+  { label: 'product-panel process', pattern: /\bproduct[- ]panel\b/i },
+  { label: 'simulated feedback', pattern: /\bsimulated feedback\b/i },
+  { label: 'dogfood log', pattern: /\bdogfood log\b/i },
+  { label: 'stale npm mismatch wording', pattern: /\bnpm still serves\b/i },
+  { label: 'latest GitHub release wording', pattern: /\blatest GitHub release\b/i },
+  { label: 'npm latest remains wording', pattern: /\bnpm latest remains\b/i },
+];
+
 function toPosixPath(filePath) {
   return filePath.split(path.sep).join('/');
 }
@@ -90,12 +105,37 @@ export function assertPublicDocsDoNotPinVersions(files) {
   }
 }
 
+export function assertPublicDocsAvoidUnsupportedClaims(files) {
+  for (const file of files) {
+    const filePath = toPosixPath(file.filePath);
+    const unsupportedClaim = UNSUPPORTED_PUBLIC_CLAIMS.find((claim) =>
+      claim.pattern.test(file.content),
+    );
+
+    if (unsupportedClaim) {
+      throw new Error(
+        `${filePath} contains unsupported public claim: ${unsupportedClaim.label}. Only document channels after they are verified and intentionally supported.`,
+      );
+    }
+
+    if (RELEASE_HISTORY_DOCS.has(filePath)) {
+      continue;
+    }
+
+    const internalClaim = INTERNAL_CHATTER_CLAIMS.find((claim) => claim.pattern.test(file.content));
+    if (internalClaim) {
+      throw new Error(
+        `${filePath} contains maintainer-only release chatter: ${internalClaim.label}. Keep README and normal docs user-facing.`,
+      );
+    }
+  }
+}
+
 export async function collectPublicDocPinFiles(rootDir) {
   const relativeFiles = unique(
     (await Promise.all(PUBLIC_DOC_ROOTS.map((root) => collectMarkdownFiles(rootDir, root)))).flat(),
   )
     .map(toPosixPath)
-    .filter((filePath) => !RELEASE_HISTORY_DOCS.has(filePath))
     .sort();
 
   return Promise.all(
@@ -456,6 +496,10 @@ export async function runReleaseSmoke(options = {}) {
     const readme = await readPackedReadme({ tarballPath, extractDir });
     assertReadmePins(readme, metadata.version);
     console.log('README has no stale exact version pins.');
+    const publicDocFiles = await collectPublicDocPinFiles(cwd);
+    assertPublicDocsDoNotPinVersions(publicDocFiles);
+    assertPublicDocsAvoidUnsupportedClaims(publicDocFiles);
+    console.log('Public docs have no stale version pins or unsupported public claims.');
 
     await assertPackedVersion({ tarballPath, version: metadata.version, tempRoot });
     console.log('Packed binary version smoke passed.');
