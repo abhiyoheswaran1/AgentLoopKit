@@ -157,4 +157,72 @@ describe('npm status', () => {
     expect(json.localVersion).toBe(agentloopkitVersion);
     expect(json.source.command).toContain('captured npm view JSON');
   });
+
+  test('CLI prints missing captured registry files as JSON errors', async () => {
+    const dir = await createPackageFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'npm-status', '--registry-json', 'missing-npm-view.json', '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    const json = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(json).toEqual({
+      error: {
+        code: 'NPM_STATUS_REGISTRY_JSON_INVALID',
+        message: 'Captured npm registry JSON file was not found: missing-npm-view.json',
+        registryJson: 'missing-npm-view.json',
+        reason: 'missing',
+      },
+    });
+  });
+
+  test('CLI prints malformed captured registry JSON as JSON errors', async () => {
+    const dir = await createPackageFixture();
+    const registryPath = path.join(dir, 'npm-view.json');
+    await writeFile(registryPath, '{not-json');
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'npm-status', '--registry-json', registryPath, '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    const json = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(json).toEqual({
+      error: {
+        code: 'NPM_STATUS_REGISTRY_JSON_INVALID',
+        message: `Captured npm registry JSON file could not be parsed: ${registryPath}`,
+        registryJson: registryPath,
+        reason: 'invalid-json',
+      },
+    });
+  });
+
+  test('CLI prints invalid captured npm view JSON shape as JSON errors', async () => {
+    const dir = await createPackageFixture();
+    const registryPath = path.join(dir, 'npm-view.json');
+    await writeFile(registryPath, JSON.stringify({ versions: [] }));
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'npm-status', '--registry-json', registryPath, '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    const json = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(json.error).toMatchObject({
+      code: 'NPM_STATUS_REGISTRY_JSON_INVALID',
+      message: `Captured npm registry JSON file could not be parsed: ${registryPath}`,
+      registryJson: registryPath,
+      reason: 'invalid-json',
+    });
+  });
 });

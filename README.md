@@ -444,6 +444,8 @@ agentloop npm-status --registry-json npm-view.json
 
 Use it after a publish attempt before saying npm has caught up. In the AgentLoopKit repo, the default checks local `package.json`. From a temp release-smoke folder, use `--agentloopkit` so the command checks the published `agentloopkit` package and the running CLI version. It runs `npm view` unless you pass captured registry JSON. It does not publish packages, create tags, read tokens, read `.env` files, upload files, or change package metadata.
 
+With `--json`, missing or malformed `--registry-json` files return a parseable error with `registryJson` and `reason`.
+
 See `docs/npm-status.md`.
 
 ## MCP Server

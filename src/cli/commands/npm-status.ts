@@ -1,6 +1,44 @@
 import { readFile } from 'node:fs/promises';
 import { Command } from 'commander';
-import { checkNpmStatus, shouldFailNpmStatusExpectation } from '../../core/npm-status.js';
+import {
+  checkNpmStatus,
+  parseNpmViewJson,
+  shouldFailNpmStatusExpectation,
+} from '../../core/npm-status.js';
+import { AgentLoopError } from '../../core/errors.js';
+
+type NpmRegistryJsonErrorReason = 'missing' | 'unreadable' | 'invalid-json';
+
+class NpmRegistryJsonError extends Error {
+  public readonly code = 'NPM_STATUS_REGISTRY_JSON_INVALID';
+
+  constructor(
+    message: string,
+    public readonly registryJson: string,
+    public readonly reason: NpmRegistryJsonErrorReason,
+  ) {
+    super(message);
+    this.name = 'NpmRegistryJsonError';
+  }
+}
+
+function printRegistryJsonError(error: NpmRegistryJsonError) {
+  console.log(
+    JSON.stringify(
+      {
+        error: {
+          code: error.code,
+          message: error.message,
+          registryJson: error.registryJson,
+          reason: error.reason,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
+}
 
 function parseTimeout(value: string) {
   const parsed = Number.parseInt(value, 10);
@@ -8,6 +46,38 @@ function parseTimeout(value: string) {
     throw new Error('timeout must be a positive integer');
   }
   return parsed;
+}
+
+function registryJsonReadReason(error: unknown): NpmRegistryJsonErrorReason {
+  if (
+    error &&
+    typeof error === 'object' &&
+    'code' in error &&
+    (error as { code?: unknown }).code === 'ENOENT'
+  ) {
+    return 'missing';
+  }
+  return 'unreadable';
+}
+
+async function readRegistryJsonFile(filePath: string) {
+  try {
+    const content = await readFile(filePath, 'utf8');
+    parseNpmViewJson(content);
+    return content;
+  } catch (error) {
+    const reason =
+      error instanceof SyntaxError || error instanceof AgentLoopError
+        ? 'invalid-json'
+        : registryJsonReadReason(error);
+    const message =
+      reason === 'missing'
+        ? `Captured npm registry JSON file was not found: ${filePath}`
+        : reason === 'invalid-json'
+          ? `Captured npm registry JSON file could not be parsed: ${filePath}`
+          : `Captured npm registry JSON file could not be read: ${filePath}`;
+    throw new NpmRegistryJsonError(message, filePath, reason);
+  }
 }
 
 export function npmStatusCommand() {
@@ -33,9 +103,18 @@ export function npmStatusCommand() {
         expectCurrent?: boolean;
         json?: boolean;
       }) => {
-        const registryJson = options.registryJson
-          ? await readFile(options.registryJson, 'utf8')
-          : undefined;
+        let registryJson: string | undefined;
+        try {
+          registryJson = options.registryJson
+            ? await readRegistryJsonFile(options.registryJson)
+            : undefined;
+        } catch (error) {
+          if (options.json && error instanceof NpmRegistryJsonError) {
+            printRegistryJsonError(error);
+            return;
+          }
+          throw error;
+        }
         const result = await checkNpmStatus({
           cwd: process.cwd(),
           agentloopkit: options.agentloopkit,

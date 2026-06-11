@@ -62,6 +62,21 @@ agentloop npm-status --agentloopkit --registry-json npm-view.json --json
 
 In this mode, AgentLoopKit does not run `npm view`. It reads the captured file and reports the same status.
 
+With `--json`, invalid captured files return an error object:
+
+```json
+{
+  "error": {
+    "code": "NPM_STATUS_REGISTRY_JSON_INVALID",
+    "message": "Captured npm registry JSON file was not found: missing-npm-view.json",
+    "registryJson": "missing-npm-view.json",
+    "reason": "missing"
+  }
+}
+```
+
+Reasons are `missing`, `unreadable`, or `invalid-json`.
+
 ## Safety
 
 `npm-status` does not:

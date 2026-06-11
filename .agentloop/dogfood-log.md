@@ -5080,3 +5080,24 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider consolidating duplicate JSON-error printing helpers after the `0.28.0` batch if the next pass adds more structured errors.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Error Output for Invalid npm Registry Files
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-return-json-errors-for-invalid-npm-registry-files.md`
+- Trigger:
+  - `agentloop npm-status --registry-json <path> --json` used the global human error path for missing captured files and treated malformed captured JSON as an `unknown` status with exit code `0`.
+- Implementation:
+  - Added captured registry-file validation before `npm-status` compares versions.
+  - Added JSON errors for missing, unreadable, malformed, or wrong-shape captured npm view JSON files.
+  - Kept live `npm view` registry failures on the existing `unknown` status path.
+  - Documented the behavior in README, npm-status docs, and the changelog.
+- Verification run:
+  - Red focused npm-status tests failed for missing files, malformed JSON, and wrong-shape captured npm view JSON.
+  - Focused npm-status suite passed: 9 tests.
+  - `.agentloop/reports/2026-06-11-04-00-verification-report.md`, overall status pass.
+  - Built CLI smoke confirmed missing and malformed captured registry files return `NPM_STATUS_REGISTRY_JSON_INVALID` errors with non-zero exits.
+- What worked well:
+  - The release-safety command now tells automation whether the captured input file is missing, unreadable, or invalid.
+- Improve:
+  - Keep live npm registry errors as status evidence instead of command-argument errors.
+  - Keep this unreleased until the planned `0.28.0` batch.
