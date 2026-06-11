@@ -50,6 +50,31 @@ describe('release smoke script helpers', () => {
     ]);
   });
 
+  test('builds child process env without inheriting token-like variables', () => {
+    const env = smoke.buildChildEnv(
+      {
+        PATH: '/usr/bin',
+        HOME: '/Users/example',
+        TMP: '/tmp',
+        NPM_TOKEN: 'fixture',
+        NODE_AUTH_TOKEN: 'fixture',
+        GITHUB_TOKEN: 'fixture',
+      },
+      { AGENTLOOPKIT_SMOKE: '1' },
+    );
+
+    expect(env).toMatchObject({
+      PATH: '/usr/bin',
+      HOME: '/Users/example',
+      TMP: '/tmp',
+      AGENTLOOPKIT_SMOKE: '1',
+      FORCE_COLOR: '0',
+    });
+    expect(env).not.toHaveProperty('NPM_TOKEN');
+    expect(env).not.toHaveProperty('NODE_AUTH_TOKEN');
+    expect(env).not.toHaveProperty('GITHUB_TOKEN');
+  });
+
   test('accepts README pins for the packed package version', () => {
     const readme = [
       'npx --yes agentloopkit@0.24.4 version',

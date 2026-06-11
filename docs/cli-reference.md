@@ -215,7 +215,7 @@ agentloop npm-status --registry-json npm-view.json
 
 `release-check` checks local release readiness from package metadata, changelog entries, release scripts, git state, current verification evidence, reviewer handoff, and generated release notes. It warns when `CHANGELOG.md` still has `Unreleased` entries or when verification predates the current task. Use `--strict` when warnings should fail CI or a maintainer release gate.
 
-`npm-status` checks registry state without publishing. It validates package names before running `npm view --json <package> version versions`, unless you pass captured registry JSON.
+`npm-status` checks registry state without publishing. It validates package names before running `npm view --json <package> version versions`, unless you pass captured registry JSON. It refuses `.env` and `.env.*` paths for `--registry-json`.
 
 These commands do not create tags, publish packages, read tokens, read `.env` files, upload files, or change package metadata.
 

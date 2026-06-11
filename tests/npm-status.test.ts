@@ -225,6 +225,30 @@ describe('npm status', () => {
     });
   });
 
+  test('CLI refuses to read env files as captured registry JSON', async () => {
+    const dir = await createPackageFixture();
+    const envPath = path.join(dir, '.env');
+    await writeFile(envPath, 'NPM_TOKEN=do-not-read\n');
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'npm-status', '--registry-json', envPath, '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    const json = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(json).toEqual({
+      error: {
+        code: 'NPM_STATUS_REGISTRY_JSON_INVALID',
+        message: `Captured npm registry JSON file must not be an env file: ${envPath}`,
+        registryJson: envPath,
+        reason: 'env-file',
+      },
+    });
+  });
+
   test('CLI prints invalid captured npm view JSON shape as JSON errors', async () => {
     const dir = await createPackageFixture();
     const registryPath = path.join(dir, 'npm-view.json');

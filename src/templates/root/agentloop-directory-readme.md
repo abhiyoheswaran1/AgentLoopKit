@@ -124,7 +124,7 @@ Use `agentloop ci-summary --write` after verification and handoff when CI should
 
 Use `agentloop release-notes --write` before a release when CI or maintainers need a local release-note draft. It does not create tags, publish packages, call provider APIs, or read tokens.
 
-Use `agentloop npm-status --agentloopkit --expect-current` after AgentLoopKit npm publish when CI or maintainers need proof that npm latest matches the running AgentLoopKit package version. It does not publish packages, read tokens, read `.env` files, or change package metadata.
+Use `agentloop npm-status --agentloopkit --expect-current` after AgentLoopKit npm publish when CI or maintainers need proof that npm latest matches the running AgentLoopKit package version. It refuses `.env` paths for `--registry-json` and does not publish packages, read tokens, read `.env` files, or change package metadata.
 
 ## Directories
 

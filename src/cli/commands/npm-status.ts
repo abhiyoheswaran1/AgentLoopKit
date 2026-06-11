@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { Command } from 'commander';
 import {
   checkNpmStatus,
@@ -8,7 +9,7 @@ import {
 import { resolveAgentLoopWorkspaceCwd } from '../../core/config.js';
 import { AgentLoopError } from '../../core/errors.js';
 
-type NpmRegistryJsonErrorReason = 'missing' | 'unreadable' | 'invalid-json';
+type NpmRegistryJsonErrorReason = 'missing' | 'unreadable' | 'invalid-json' | 'env-file';
 type NpmTimeoutErrorReason = 'not-positive-integer';
 
 class NpmRegistryJsonError extends Error {
@@ -91,7 +92,20 @@ function registryJsonReadReason(error: unknown): NpmRegistryJsonErrorReason {
   return 'unreadable';
 }
 
+function isEnvFilePath(filePath: string) {
+  const basename = path.basename(filePath.replace(/\\/g, '/')).toLowerCase();
+  return basename === '.env' || basename.startsWith('.env.');
+}
+
 async function readRegistryJsonFile(filePath: string) {
+  if (isEnvFilePath(filePath)) {
+    throw new NpmRegistryJsonError(
+      `Captured npm registry JSON file must not be an env file: ${filePath}`,
+      filePath,
+      'env-file',
+    );
+  }
+
   try {
     const content = await readFile(filePath, 'utf8');
     parseNpmViewJson(content);

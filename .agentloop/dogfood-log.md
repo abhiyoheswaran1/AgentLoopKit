@@ -2,6 +2,47 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Product Hardening And Security Pass
+
+- Task contract: `.agentloop/tasks/2026-06-11-expand-smoke-coverage-for-setup-and-nested-command-flows.md`
+- Trigger:
+  - The maintainer set a focused goal to spend the next two hours improving the product, finding bugs, and running security passes.
+  - Recent workspace-discovery fixes needed packaged-CLI smoke coverage, not only unit tests.
+- Product change:
+  - Extended `scripts/smoke-cli.mjs` to cover missing config JSON errors and nested working-directory use for `status`, `create-task`, `verify`, `handoff`, `check-gates`, `policy`, and `install-agent`.
+  - Changed `scripts/smoke-packed-release.mjs` so child processes use an allowlisted environment instead of inheriting token-like variables from the parent shell.
+  - Changed `agentloop npm-status --registry-json` to reject `.env` and `.env.*` paths before reading captured registry JSON.
+  - Updated npm-status docs, CLI reference, generated harness guidance, changelog, and backlog.
+- Verification completed:
+  - Red focused checks:
+    - `npm test -- tests/distribution-artifacts.test.ts` failed before smoke coverage existed.
+    - `npm test -- tests/release-smoke.test.ts` failed before `buildChildEnv` existed.
+    - `npm test -- tests/npm-status.test.ts` failed because `.env` was read and reported as invalid JSON.
+  - Focused green checks:
+    - `npm test -- tests/distribution-artifacts.test.ts tests/release-smoke.test.ts tests/npm-status.test.ts`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+    - `npm run check:links`
+  - Full checks:
+    - `npm run lint`: pass.
+    - `npm run typecheck`: pass.
+    - `npm test`: 41 files, 349 tests passed.
+    - `npm run check:links`: pass, 889 Markdown files checked.
+    - `npx pnpm@10.12.1 audit --prod`: pass, no known production vulnerabilities.
+    - `npx --yes projscan doctor --format markdown`: A, 100/100.
+    - `git diff --check`: pass.
+    - `npm run build`: pass.
+    - `node scripts/smoke-cli.mjs`: pass.
+    - `npm run smoke:release`: pass.
+  - AgentLoop task verification with `--task-commands`: pass.
+- Verification report: `.agentloop/reports/2026-06-11-14-03-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-11-14-08-pr-summary.md`
+- Worked well:
+  - `projscan` caught a test fixture value that looked like a hardcoded secret before commit.
+  - The smoke script exposed a macOS `/var` versus `/private/var` realpath issue in the assertion, which was fixed inside the smoke helper.
+- Improve:
+  - Keep adding packaged-CLI smoke assertions for flows that users run through `npx`, especially when unit tests cover TypeScript sources only.
+
 ## 2026-06-11: Run 0.28.0 Launch-Quality Sprint
 
 - Task contract: `.agentloop/tasks/2026-06-11-run-0-28-0-launch-quality-sprint.md`

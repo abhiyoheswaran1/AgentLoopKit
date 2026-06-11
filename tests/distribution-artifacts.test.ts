@@ -139,4 +139,18 @@ describe('distribution artifacts', () => {
       /npm publish|pnpm publish|gh release|mcp-publisher|upload-artifact/i,
     );
   });
+
+  test('CLI smoke script covers setup errors and nested working directories', async () => {
+    const smokeScript = await readFile('scripts/smoke-cli.mjs', 'utf8');
+
+    expect(smokeScript).toContain('Missing config smoke passed.');
+    expect(smokeScript).toContain('Nested cwd smoke passed.');
+    expect(smokeScript).toContain("'status', '--json'");
+    expect(smokeScript).toContain("'create-task'");
+    expect(smokeScript).toContain("'verify'");
+    expect(smokeScript).toContain("'handoff'");
+    expect(smokeScript).toContain("'check-gates', '--json'");
+    expect(smokeScript).toContain("'policy', 'list', '--json'");
+    expect(smokeScript).toContain("'install-agent', 'codex', '--json'");
+  });
 });

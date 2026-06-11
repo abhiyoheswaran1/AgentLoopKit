@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* global console, process */
 import { spawn } from 'node:child_process';
+import { realpathSync } from 'node:fs';
 import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -39,6 +40,14 @@ function formatCommand(command, args) {
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+function realPathIfExists(filePath) {
+  try {
+    return realpathSync.native(filePath);
+  } catch {
+    return path.resolve(filePath);
+  }
 }
 
 async function pathExists(filePath) {
@@ -103,6 +112,16 @@ async function assertFileExists(root, relativePath) {
   assert(await pathExists(filePath), `Expected ${relativePath} to exist.`);
 }
 
+function assertPathInside(parent, child, label) {
+  const realParent = realPathIfExists(parent);
+  const realChild = realPathIfExists(child);
+  const relative = path.relative(realParent, realChild);
+  assert(
+    relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative)),
+    `${label} was written outside ${realParent}: ${realChild}`,
+  );
+}
+
 async function prepareSmokeRepo(tempRoot) {
   const smokeRepo = path.join(tempRoot, 'repo');
   await mkdir(smokeRepo, { recursive: true });
@@ -121,6 +140,8 @@ async function smokeCli({ keep = false } = {}) {
   const tempRoot = await mkdtemp(path.join(tmpdir(), 'agentloopkit-cli-smoke-'));
   try {
     const smokeRepo = await prepareSmokeRepo(tempRoot);
+    const uninitializedRepo = path.join(tempRoot, 'uninitialized');
+    await mkdir(uninitializedRepo, { recursive: true });
     console.log(`CLI smoke for ${packageJson.name}@${packageJson.version}`);
 
     const version = await runAgentLoop(['version'], { cwd: smokeRepo });
@@ -129,6 +150,22 @@ async function smokeCli({ keep = false } = {}) {
       `Expected version ${packageJson.version}, got ${version.stdout.trim() || '(no output)'}.`,
     );
     console.log('Version smoke passed.');
+
+    const missingConfig = await run(process.execPath, [cliPath, 'status', '--json'], {
+      cwd: uninitializedRepo,
+    });
+    assert(missingConfig.exitCode !== 0, 'status --json without config unexpectedly passed.');
+    const missingConfigJson = parseJson(missingConfig.stdout, 'missing config status');
+    assert(
+      missingConfigJson.error?.code === 'CONFIG_ERROR',
+      'Missing config status JSON did not include CONFIG_ERROR.',
+    );
+    assert(
+      missingConfigJson.error?.message?.includes('AgentLoopKit config not found') &&
+        missingConfigJson.error?.message?.includes('agentloop init'),
+      'Missing config status JSON did not include a useful init hint.',
+    );
+    console.log('Missing config smoke passed.');
 
     const dryRun = parseJson(
       (await runAgentLoop(['init', '--dry-run', '--json'], { cwd: smokeRepo })).stdout,
@@ -161,6 +198,9 @@ async function smokeCli({ keep = false } = {}) {
     assert(Array.isArray(doctor.checks), 'Doctor JSON did not include checks.');
     assert(doctor.serious.length === 0, 'Doctor reported serious setup failures.');
     console.log('Doctor smoke passed.');
+
+    const nestedDir = path.join(smokeRepo, 'src', 'features');
+    await mkdir(nestedDir, { recursive: true });
 
     const createdTask = parseJson(
       (
@@ -258,6 +298,129 @@ async function smokeCli({ keep = false } = {}) {
     assert(['pass', 'warn'].includes(gates.overallStatus), 'check-gates reported failure.');
     assert(Array.isArray(gates.gates), 'check-gates JSON did not include gates.');
     console.log(`Check-gates smoke passed with status ${gates.overallStatus}.`);
+
+    const nestedStatus = parseJson(
+      (await runAgentLoop(['status', '--json'], { cwd: nestedDir })).stdout,
+      'nested status',
+    );
+    assert(
+      nestedStatus.project?.name === 'agentloopkit-cli-smoke',
+      'nested status did not use the workspace root config.',
+    );
+
+    const nestedTaskPath = '.agentloop/tasks/nested-smoke-flow.md';
+    const nestedTask = parseJson(
+      (
+        await runAgentLoop(
+          [
+            'create-task',
+            '--title',
+            'Nested smoke flow',
+            '--type',
+            'tests',
+            '--out',
+            nestedTaskPath,
+            '--problem',
+            'Exercise nested cwd command handling in the built CLI.',
+            '--outcome',
+            'Nested commands write artifacts to the initialized workspace root.',
+            '--acceptance',
+            'Nested smoke commands resolve the root AgentLoopKit workspace.',
+            '--verify-command',
+            'node --version',
+            '--json',
+          ],
+          { cwd: nestedDir },
+        )
+      ).stdout,
+      'nested create-task',
+    );
+    assert(nestedTask.task?.path?.endsWith(nestedTaskPath), 'nested task path was not reported.');
+    await assertFileExists(smokeRepo, nestedTaskPath);
+
+    const nestedVerification = parseJson(
+      (
+        await runAgentLoop(
+          [
+            'verify',
+            '--task',
+            nestedTaskPath,
+            '--no-test',
+            '--no-lint',
+            '--no-typecheck',
+            '--no-build',
+            '--command',
+            'node --version',
+            '--json',
+          ],
+          { cwd: nestedDir },
+        )
+      ).stdout,
+      'nested verify',
+    );
+    assert(nestedVerification.overallStatus === 'pass', 'nested verify did not report pass.');
+    assert(nestedVerification.reportPath, 'nested verify JSON did not include reportPath.');
+    assertPathInside(smokeRepo, nestedVerification.reportPath, 'nested verify report');
+    assert(
+      await pathExists(nestedVerification.reportPath),
+      'nested verify report was not written.',
+    );
+
+    const nestedHandoff = parseJson(
+      (
+        await runAgentLoop(
+          [
+            'handoff',
+            '--task',
+            nestedTaskPath,
+            '--report',
+            nestedVerification.reportPath,
+            '--json',
+          ],
+          { cwd: nestedDir },
+        )
+      ).stdout,
+      'nested handoff',
+    );
+    assert(nestedHandoff.outPath, 'nested handoff JSON did not include outPath.');
+    assertPathInside(smokeRepo, nestedHandoff.outPath, 'nested handoff summary');
+    assert(await pathExists(nestedHandoff.outPath), 'nested handoff summary was not written.');
+
+    const nestedGates = parseJson(
+      (await runAgentLoop(['check-gates', '--json'], { cwd: nestedDir })).stdout,
+      'nested check-gates',
+    );
+    assert(
+      ['pass', 'warn'].includes(nestedGates.overallStatus),
+      'nested check-gates reported failure.',
+    );
+    assert(Array.isArray(nestedGates.gates), 'nested check-gates JSON did not include gates.');
+
+    const nestedPolicies = parseJson(
+      (await runAgentLoop(['policy', 'list', '--json'], { cwd: nestedDir })).stdout,
+      'nested policy list',
+    );
+    assert(Array.isArray(nestedPolicies.policies), 'nested policy list did not include policies.');
+    assert(nestedPolicies.policies.length > 0, 'nested policy list returned no policies.');
+
+    const nestedAgentInstall = parseJson(
+      (await runAgentLoop(['install-agent', 'codex', '--json'], { cwd: nestedDir })).stdout,
+      'nested install-agent',
+    );
+    const nestedAgentPath = nestedAgentInstall.agent?.agentFilePath;
+    assert(
+      nestedAgentInstall.agent?.name === 'codex' &&
+        typeof nestedAgentPath === 'string' &&
+        nestedAgentPath.endsWith(path.join('.agentloop', 'agents', 'codex.md')),
+      'nested install-agent did not report the codex guide path.',
+    );
+    assertPathInside(smokeRepo, nestedAgentPath, 'nested install-agent guide');
+    await assertFileExists(smokeRepo, '.agentloop/agents/codex.md');
+    assert(
+      !(await pathExists(path.join(nestedDir, '.agentloop'))),
+      'nested commands wrote a .agentloop directory under the invocation cwd.',
+    );
+    console.log('Nested cwd smoke passed.');
 
     console.log('CLI smoke passed.');
   } finally {

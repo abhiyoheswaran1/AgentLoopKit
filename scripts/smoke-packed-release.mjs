@@ -43,6 +43,31 @@ const INTERNAL_CHATTER_CLAIMS = [
   { label: 'npm latest remains wording', pattern: /\bnpm latest remains\b/i },
 ];
 
+const SAFE_ENV_KEYS = [
+  'APPDATA',
+  'CI',
+  'HOME',
+  'LOCALAPPDATA',
+  'NO_COLOR',
+  'PATH',
+  'PATHEXT',
+  'Path',
+  'SystemRoot',
+  'TEMP',
+  'TMP',
+  'USERPROFILE',
+  'WINDIR',
+];
+
+export function buildChildEnv(sourceEnv = process.env, explicitEnv = {}) {
+  const env = { FORCE_COLOR: '0' };
+  for (const key of SAFE_ENV_KEYS) {
+    const value = sourceEnv[key];
+    if (value) env[key] = value;
+  }
+  return { ...env, ...explicitEnv };
+}
+
 function toPosixPath(filePath) {
   return filePath.split(path.sep).join('/');
 }
@@ -65,7 +90,9 @@ async function collectMarkdownFiles(rootDir, relativePath) {
   }
 
   if (fileStat.isFile()) {
-    return isMarkdownFile(relativePath) && !isGeneratedAgentLoopArtifact(relativePath) ? [relativePath] : [];
+    return isMarkdownFile(relativePath) && !isGeneratedAgentLoopArtifact(relativePath)
+      ? [relativePath]
+      : [];
   }
   if (!fileStat.isDirectory()) {
     return [];
@@ -213,7 +240,7 @@ function runCommand(command, args, options = {}) {
   return new Promise((resolve) => {
     const child = spawn(command, args, {
       cwd: options.cwd,
-      env: { ...process.env, ...options.env },
+      env: buildChildEnv(process.env, options.env),
       stdio: ['ignore', 'pipe', 'pipe'],
     });
     let stdout = '';
@@ -295,7 +322,12 @@ async function assertPackedInit({ tarballPath, tempRoot }) {
     throw new Error(`packed init smoke failed: ${result.stderr || result.stdout}`);
   }
 
-  for (const filePath of ['.agentloop/README.md', 'AGENTS.md', 'AGENTLOOP.md', 'agentloop.config.json']) {
+  for (const filePath of [
+    '.agentloop/README.md',
+    'AGENTS.md',
+    'AGENTLOOP.md',
+    'agentloop.config.json',
+  ]) {
     if (!(await pathExists(path.join(cwd, filePath)))) {
       throw new Error(`packed init smoke did not create ${filePath}.`);
     }
@@ -475,7 +507,9 @@ async function assertHomeDryRunGuard({ tarballPath, tempRoot }) {
     throw new Error('packed init dry-run unexpectedly allowed the home directory.');
   }
   if (!result.stderr.includes('Refusing to initialize your home directory')) {
-    throw new Error(`packed init dry-run returned unexpected output: ${result.stderr || result.stdout}`);
+    throw new Error(
+      `packed init dry-run returned unexpected output: ${result.stderr || result.stdout}`,
+    );
   }
 }
 

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added built-CLI smoke coverage for missing setup errors and nested working-directory flows across `status`, `create-task`, `verify`, `handoff`, `check-gates`, `policy`, and `install-agent`.
+- Changed packed-release smoke checks to run child commands with an allowlisted environment instead of inheriting token-like variables from the parent shell.
+- Changed `agentloop npm-status --registry-json` to reject `.env` and `.env.*` paths before reading captured registry output.
 - Changed commands that require AgentLoop setup so missing `agentloop.config.json` is reported as a clear `CONFIG_ERROR` with an `agentloop init` hint instead of a raw filesystem error.
 - Changed non-init repo commands to search upward for the nearest `agentloop.config.json` and run against that initialized root, so `status`, `create-task`, `verify`, `handoff`, and related commands work from nested source folders without writing nested `.agentloop/` directories.
 - Added `agentloop doctor --strict` so CI or team setup gates can treat doctor warnings as failures.

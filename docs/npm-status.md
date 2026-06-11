@@ -75,6 +75,7 @@ agentloop npm-status --agentloopkit --registry-json npm-view.json --json
 ```
 
 In this mode, AgentLoopKit does not run `npm view`. It reads the captured file and reports the same status.
+It refuses `.env` and `.env.*` paths for `--registry-json`.
 
 With `--json`, invalid captured files return an error object:
 
@@ -89,7 +90,7 @@ With `--json`, invalid captured files return an error object:
 }
 ```
 
-Reasons are `missing`, `unreadable`, or `invalid-json`.
+Reasons are `missing`, `unreadable`, `invalid-json`, or `env-file`.
 
 ## Safety
 
