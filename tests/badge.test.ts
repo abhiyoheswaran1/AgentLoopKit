@@ -87,4 +87,48 @@ describe('badge generation', () => {
     expect(svg).toContain('gates');
     expect(svg).toContain(payload.status);
   });
+
+  test('CLI prints a structured JSON error for an unsupported badge source', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'badge', '--source', 'vibes', '--json'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    const payload = JSON.parse(result.stdout);
+    expect(payload).toEqual({
+      error: {
+        code: 'UNSUPPORTED_BADGE_SOURCE',
+        message: 'Unsupported badge source "vibes".',
+        requestedSource: 'vibes',
+        supportedSources: ['verification', 'gates'],
+      },
+    });
+  });
+
+  test('CLI keeps human-readable output for an unsupported badge source without JSON', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+
+    const result = await execa(tsxPath, [cliPath, 'badge', '--source', 'vibes'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain(
+      'agentloop: Unsupported badge source. Use one of: verification, gates.',
+    );
+  });
 });

@@ -393,6 +393,8 @@ agentloop badge --json
 
 The default badge reads the latest verification report and writes `.agentloop/reports/agentloop-verification.svg`. Gate badges read local gate status and write `.agentloop/reports/agentloop-gates.svg`. The command does not run tests, call a badge service, read `.env`, or upload anything.
 
+With `--json`, unsupported `--source` values return a parseable error with `supportedSources` and write no badge file.
+
 See `docs/badges.md` for badge sources and CI usage.
 
 ## CI Summaries

@@ -1,6 +1,24 @@
 import { Command } from 'commander';
 import { loadAgentLoopConfig } from '../../core/config.js';
-import { writeEvidenceBadge } from '../../core/badge.js';
+import { BADGE_SOURCES, writeEvidenceBadge } from '../../core/badge.js';
+import { AgentLoopError } from '../../core/errors.js';
+
+function printJsonError(error: AgentLoopError, details: Record<string, unknown> = {}) {
+  console.log(
+    JSON.stringify(
+      {
+        error: {
+          code: error.code,
+          message: error.message,
+          ...details,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
+}
 
 export function badgeCommand() {
   return new Command('badge')
@@ -12,13 +30,30 @@ export function badgeCommand() {
     .action(
       async (options: { source?: string; out?: string; strict?: boolean; json?: boolean }) => {
         const config = await loadAgentLoopConfig(process.cwd());
-        const result = await writeEvidenceBadge({
-          cwd: process.cwd(),
-          config,
-          source: options.source,
-          outPath: options.out,
-          strict: options.strict,
-        });
+        let result: Awaited<ReturnType<typeof writeEvidenceBadge>>;
+        try {
+          result = await writeEvidenceBadge({
+            cwd: process.cwd(),
+            config,
+            source: options.source,
+            outPath: options.out,
+            strict: options.strict,
+          });
+        } catch (error) {
+          if (
+            options.json &&
+            error instanceof AgentLoopError &&
+            error.code === 'UNSUPPORTED_BADGE_SOURCE'
+          ) {
+            printJsonError(error, {
+              message: `Unsupported badge source "${options.source ?? ''}".`,
+              requestedSource: options.source ?? '',
+              supportedSources: BADGE_SOURCES,
+            });
+            return;
+          }
+          throw error;
+        }
 
         if (options.json) {
           console.log(

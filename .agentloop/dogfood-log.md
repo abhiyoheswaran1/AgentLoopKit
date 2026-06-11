@@ -4959,3 +4959,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider the same JSON-error treatment for other task subcommands only where automation actually needs it.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Error Output for Unsupported Badge Source
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-json-error-output-for-unsupported-badge-source.md`
+- Trigger:
+  - `agentloop badge --json` returned structured success output, but unsupported `--source` values still used the global human error path.
+- Implementation:
+  - Added `UNSUPPORTED_BADGE_SOURCE` to badge source parsing.
+  - Added a JSON error response for `agentloop badge --source <source> --json`.
+  - Kept default non-JSON errors human-readable on stderr.
+  - Documented the behavior in README, badge docs, and the changelog.
+- Verification run:
+  - Red focused badge test failed because the command printed the human error to stderr.
+  - Focused badge suite passed: 5 tests.
+  - `.agentloop/reports/2026-06-11-03-13-verification-report.md`, overall status pass.
+- What worked well:
+  - The command now gives agents and CI the supported source list without changing badge generation.
+- Improve:
+  - Keep applying structured JSON errors command-by-command where automation has a concrete parsing need.
+  - Keep this unreleased until the planned `0.28.0` batch.

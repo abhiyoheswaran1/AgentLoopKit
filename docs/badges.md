@@ -29,6 +29,14 @@ agentloop badge --json
 
 JSON output includes `outPath`, `source`, `status`, `label`, `message`, and `sourcePath` when a source report exists. It does not embed SVG contents.
 
+Unsupported sources return a JSON error when you pass `--json`:
+
+```bash
+agentloop badge --source unknown --json
+```
+
+The error includes `code`, `message`, `requestedSource`, and `supportedSources`. AgentLoopKit writes no badge file for unsupported sources.
+
 ## Sources
 
 - `verification`: reads the latest timestamped verification report and writes `.agentloop/reports/agentloop-verification.svg`.

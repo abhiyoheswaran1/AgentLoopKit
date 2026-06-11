@@ -5,7 +5,8 @@ import { pathExists, writeTextFile } from './file-system.js';
 import { checkGates, GateStatus } from './check-gates.js';
 import { AgentLoopError } from './errors.js';
 
-export type BadgeSource = 'verification' | 'gates';
+export const BADGE_SOURCES = ['verification', 'gates'] as const;
+export type BadgeSource = (typeof BADGE_SOURCES)[number];
 export type BadgeStatus = GateStatus | 'missing' | 'not-run' | 'unknown';
 
 export type SvgBadgeInput = {
@@ -59,8 +60,11 @@ function textWidth(value: string) {
 
 function parseSource(source: string | undefined): BadgeSource {
   const clean = source?.trim().toLowerCase() || 'verification';
-  if (clean === 'verification' || clean === 'gates') return clean;
-  throw new AgentLoopError('Unsupported badge source. Use one of: verification, gates.');
+  if ((BADGE_SOURCES as readonly string[]).includes(clean)) return clean as BadgeSource;
+  throw new AgentLoopError(
+    'Unsupported badge source. Use one of: verification, gates.',
+    'UNSUPPORTED_BADGE_SOURCE',
+  );
 }
 
 async function latestVerificationReport(dir: string) {
