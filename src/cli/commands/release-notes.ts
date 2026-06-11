@@ -1,6 +1,6 @@
 import { Command } from 'commander';
-import { loadAgentLoopConfig } from '../../core/config.js';
 import { generateReleaseNotes } from '../../core/release-notes.js';
+import { loadConfigForJsonCommand } from '../json-errors.js';
 
 export function releaseNotesCommand() {
   return new Command('release-notes')
@@ -20,7 +20,8 @@ export function releaseNotesCommand() {
         out?: string;
         json?: boolean;
       }) => {
-        const config = await loadAgentLoopConfig(process.cwd());
+        const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+        if (!config) return;
         const result = await generateReleaseNotes({
           cwd: process.cwd(),
           config,

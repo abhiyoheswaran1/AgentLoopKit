@@ -1,7 +1,7 @@
 import { Command } from 'commander';
-import { loadAgentLoopConfig } from '../../core/config.js';
 import { ArtifactPathError } from '../../core/artifacts.js';
 import { summarizeRepository } from '../../core/pr-summary.js';
+import { loadConfigForJsonCommand } from '../json-errors.js';
 
 function printArtifactPathJsonError(error: ArtifactPathError) {
   console.log(
@@ -24,7 +24,9 @@ function printArtifactPathJsonError(error: ArtifactPathError) {
 }
 
 async function runSummaryCommand(options: Record<string, unknown>, defaultWrite: boolean) {
-  const config = await loadAgentLoopConfig(process.cwd());
+  const json = options.json === true || options.format === 'json';
+  const config = await loadConfigForJsonCommand(process.cwd(), json);
+  if (!config) return;
   const writeOption = typeof options.write === 'boolean' ? options.write : defaultWrite;
   const reportPath =
     typeof options.report === 'string'
@@ -42,13 +44,13 @@ async function runSummaryCommand(options: Record<string, unknown>, defaultWrite:
       write: writeOption,
     });
   } catch (error) {
-    if ((options.json || options.format === 'json') && error instanceof ArtifactPathError) {
+    if (json && error instanceof ArtifactPathError) {
       printArtifactPathJsonError(error);
       return;
     }
     throw error;
   }
-  if (options.json || options.format === 'json') {
+  if (json) {
     console.log(JSON.stringify(result, null, 2));
   } else {
     console.log(result.markdown);

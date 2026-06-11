@@ -88,6 +88,28 @@ describe('badge generation', () => {
     expect(svg).toContain(payload.status);
   });
 
+  test('CLI prints invalid config errors as JSON without writing a badge', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');
+
+    const outPath = path.join(dir, '.agentloop/reports/custom-badge.svg');
+    const result = await execa(tsxPath, [cliPath, 'badge', '--out', outPath, '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const payload = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(payload.error).toMatchObject({
+      code: 'CONFIG_ERROR',
+      message: expect.stringContaining('Invalid AgentLoopKit config'),
+    });
+    await expect(readFile(outPath, 'utf8')).rejects.toThrow();
+  });
+
   test('CLI prints a structured JSON error for an unsupported badge source', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

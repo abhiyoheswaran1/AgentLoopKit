@@ -1,7 +1,7 @@
 import { Command } from 'commander';
-import { loadAgentLoopConfig } from '../../core/config.js';
 import { BADGE_SOURCES, writeEvidenceBadge } from '../../core/badge.js';
 import { AgentLoopError } from '../../core/errors.js';
+import { loadConfigForJsonCommand } from '../json-errors.js';
 
 function printJsonError(error: AgentLoopError, details: Record<string, unknown> = {}) {
   console.log(
@@ -29,7 +29,8 @@ export function badgeCommand() {
     .option('--json', 'print machine-readable output')
     .action(
       async (options: { source?: string; out?: string; strict?: boolean; json?: boolean }) => {
-        const config = await loadAgentLoopConfig(process.cwd());
+        const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+        if (!config) return;
         let result: Awaited<ReturnType<typeof writeEvidenceBadge>>;
         try {
           result = await writeEvidenceBadge({

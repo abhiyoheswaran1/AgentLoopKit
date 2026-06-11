@@ -5188,3 +5188,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider applying the same helper to other config-loading commands in small, tested passes.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Config Errors for Evidence Commands
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-return-json-config-errors-for-evidence-commands.md`
+- Trigger:
+  - Evidence-producing JSON commands still used the global stderr path when `agentloop.config.json` was invalid.
+- Implementation:
+  - Added a shared config loader for JSON commands that prints `CONFIG_ERROR` and exits non-zero on invalid config.
+  - Applied it to `verify`, `summarize`, `handoff`, `report`, `badge`, `ci-summary`, and `release-notes`.
+  - Kept human output on the existing global stderr path.
+  - Confirmed invalid config prevents command execution and generated artifact writes.
+  - Documented the behavior in README, command docs, and the changelog.
+- Verification run:
+  - Red focused evidence tests failed because JSON stdout was empty for invalid config.
+  - Focused evidence suites passed: 53 tests.
+  - `.agentloop/reports/2026-06-11-04-50-verification-report.md`, overall status pass.
+  - `.agentloop/handoffs/2026-06-11-04-51-pr-summary.md` captured the review handoff.
+  - Built CLI smoke confirmed `CONFIG_ERROR` JSON for all seven evidence commands.
+- What worked well:
+  - The shared config loader removed repeated command-level try/catch code for this class of setup errors.
+- Improve:
+  - Reuse the loader in remaining config-loading commands in small passes, keeping command-specific JSON details intact.
+  - Keep this unreleased until the planned `0.28.0` batch.

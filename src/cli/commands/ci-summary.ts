@@ -1,6 +1,6 @@
 import { Command } from 'commander';
-import { loadAgentLoopConfig } from '../../core/config.js';
 import { getCiSummary } from '../../core/ci-summary.js';
+import { loadConfigForJsonCommand } from '../json-errors.js';
 
 export function ciSummaryCommand() {
   return new Command('ci-summary')
@@ -9,7 +9,8 @@ export function ciSummaryCommand() {
     .option('--out <path>', 'output Markdown path when using --write')
     .option('--json', 'print machine-readable output')
     .action(async (options: { write?: boolean; out?: string; json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+      if (!config) return;
       const result = await getCiSummary({
         cwd: process.cwd(),
         config,

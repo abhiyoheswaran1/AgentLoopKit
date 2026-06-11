@@ -52,6 +52,7 @@ JSON output includes the same CI context, evidence paths, gate statuses, next ac
 ```
 
 CI summaries are review artifacts. They do not replace verification reports. Commands that need verification evidence keep reading `*-verification-report.md`, so a newer `*-ci-summary.md` will not change `status`, `check-gates`, `report`, `badge`, or `handoff` verification lookup.
+With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` object and AgentLoopKit writes no CI summary.
 
 ## Safety
 

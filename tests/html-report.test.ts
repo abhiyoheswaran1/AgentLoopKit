@@ -111,6 +111,28 @@ describe('HTML report generation', () => {
     expect(await readFile(outPath, 'utf8')).toContain('CLI task');
   });
 
+  test('CLI report command prints invalid config errors as JSON without writing', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');
+
+    const outPath = path.join(dir, '.agentloop/reports/custom-report.html');
+    const result = await execa(tsxPath, [cliPath, 'report', '--out', outPath, '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const payload = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(payload.error).toMatchObject({
+      code: 'CONFIG_ERROR',
+      message: expect.stringContaining('Invalid AgentLoopKit config'),
+    });
+    expect(existsSync(outPath)).toBe(false);
+  });
+
   test('CLI report command accepts --verification as an alias for --report', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

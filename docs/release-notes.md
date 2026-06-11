@@ -38,6 +38,7 @@ Human output is Markdown. JSON output includes the same evidence paths and relea
 ```
 
 Without `--write`, the command prints the draft and does not create a file.
+With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` object and AgentLoopKit writes no release-notes file.
 
 ## Safety
 

@@ -72,6 +72,32 @@ describe('handoff command', () => {
     expect(existsSync(output.outPath)).toBe(false);
   });
 
+  test('prints invalid config errors as JSON for summarize and handoff without writing', async () => {
+    const dir = await createSummaryFixture();
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');
+
+    const summarizeResult = await execa(tsxPath, [cliPath, 'summarize', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const handoffResult = await execa(tsxPath, [cliPath, 'handoff', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    for (const result of [summarizeResult, handoffResult]) {
+      const output = JSON.parse(result.stdout);
+      expect(result.exitCode).toBe(1);
+      expect(result.stderr).toBe('');
+      expect(output.error).toMatchObject({
+        code: 'CONFIG_ERROR',
+        message: expect.stringContaining('Invalid AgentLoopKit config'),
+      });
+    }
+    const handoffs = await readdir(path.join(dir, '.agentloop/handoffs')).catch(() => []);
+    expect(handoffs).toEqual([]);
+  });
+
   test('accepts --verification as a summarize alias for --report', async () => {
     const dir = await createExplicitVerificationFixture();
 

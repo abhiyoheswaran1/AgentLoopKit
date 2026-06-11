@@ -300,6 +300,7 @@ Pass `--task .agentloop/tasks/file.md` to include task title, type, status, and 
 
 `agentloop verify --task-commands --json` includes the selected task command strings in `taskCommands.commands` so CI and agents can inspect what task-defined checks ran without parsing Markdown.
 When `--json` is used with an invalid `--task` path, `verify` returns a parseable artifact-path error and does not run verification commands.
+With `--json`, invalid `agentloop.config.json` files return a parseable `CONFIG_ERROR` object and `verify` does not run commands.
 
 It does not hide failures. Failed reports include a short failure summary with each failed command, exit code, and final useful output lines before the full command output. If long logs are truncated, the report keeps the first and last output so the final error stays visible. If no commands are configured, it writes a report saying nothing was verified.
 
@@ -383,6 +384,7 @@ agentloop report --verification .agentloop/reports/2026-06-10-12-00-verification
 
 The command does not run tests, call an LLM, fetch assets, read `.env` contents, or send data anywhere. It writes one local file under `.agentloop/reports/` by default. Use it after `verify` and `handoff` when you want a browser-readable artifact for a PR or CI upload.
 When you pass explicit `--task`, `--verification`, or `--handoff` paths with `--json`, the path must point to an existing Markdown artifact inside `.agentloop/tasks/`, `.agentloop/reports/`, or `.agentloop/handoffs/`. Invalid paths return a JSON error with `artifactType`, `requestedPath`, `expectedDir`, and `reason`.
+With `--json`, invalid `agentloop.config.json` files return a parseable `CONFIG_ERROR` object and no HTML report is written.
 
 See `docs/html-reports.md` for inputs, output paths, and safety behavior.
 
@@ -399,6 +401,7 @@ agentloop badge --json
 The default badge reads the latest verification report and writes `.agentloop/reports/agentloop-verification.svg`. Gate badges read local gate status and write `.agentloop/reports/agentloop-gates.svg`. The command does not run tests, call a badge service, read `.env`, or upload anything.
 
 With `--json`, unsupported `--source` values return a parseable error with `supportedSources` and write no badge file.
+Invalid `agentloop.config.json` files also return a parseable `CONFIG_ERROR` object and write no badge file.
 
 See `docs/badges.md` for badge sources and CI usage.
 
@@ -415,6 +418,7 @@ agentloop ci-summary --write
 In GitHub Actions, GitLab CI, and Buildkite it reports provider, workflow or pipeline, event, ref, commit, and run URL when those allowlisted fields are present. Unsupported CI providers report generic CI when `CI=true` is present. The command does not call provider APIs, read secrets, upload files, run tests, or dump arbitrary environment variables.
 
 Use `--write` when CI should upload a small Markdown summary alongside verification reports, HTML reports, badges, and handoffs. Verification consumers still read `*-verification-report.md`; CI summary artifacts do not replace verification evidence.
+With `--json`, invalid `agentloop.config.json` files return a parseable `CONFIG_ERROR` object and write no CI summary.
 
 See `docs/ci-summary.md`.
 
@@ -433,6 +437,7 @@ agentloop release-notes --write
 The command reads local package metadata, changelog entries, git history, changed files, working tree status, the active task, the latest verification report, and the latest CI summary when those artifacts exist. It does not create tags, publish packages, call GitHub or npm APIs, read tokens, upload files, or rewrite changelogs.
 
 Use it before creating a GitHub release so the release note draft includes the same evidence reviewers see in AgentLoop handoffs.
+With `--json`, invalid `agentloop.config.json` files return a parseable `CONFIG_ERROR` object and write no release-notes file.
 
 See `docs/release-notes.md`.
 

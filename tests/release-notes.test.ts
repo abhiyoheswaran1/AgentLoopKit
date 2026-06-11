@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -122,6 +122,26 @@ describe('release-notes command', () => {
     const output = JSON.parse(result.stdout);
     expect(output.version).toBe('9.9.9');
     expect(output.markdown).toContain('- Version: 9.9.9');
+  });
+
+  test('prints invalid config errors as JSON without writing release notes', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');
+
+    const result = await execa(tsxPath, [cliPath, 'release-notes', '--json', '--write'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    const handoffs = await readdir(path.join(dir, '.agentloop/handoffs'));
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'CONFIG_ERROR',
+      message: expect.stringContaining('Invalid AgentLoopKit config'),
+    });
+    expect(handoffs.some((file) => file.endsWith('-release-notes.md'))).toBe(false);
   });
 
   test('handles an explicit missing from ref without pretending the range was read', async () => {

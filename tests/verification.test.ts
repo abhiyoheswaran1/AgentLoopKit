@@ -707,6 +707,35 @@ describe('verification', () => {
     await expect(access(path.join(dir, '.agentloop/reports'))).rejects.toThrow();
   });
 
+  test('CLI verify prints invalid config errors as JSON without running commands', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify({
+        version: 2,
+        commands: {
+          test: 'node -e "require(\'fs\').writeFileSync(\'verify-command-ran.txt\', \'yes\')"',
+        },
+      }),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'verify', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'CONFIG_ERROR',
+      message: expect.stringContaining('Invalid AgentLoopKit config'),
+    });
+    await expect(access(path.join(dir, 'verify-command-ran.txt'))).rejects.toThrow();
+  });
+
   test('CLI verify keeps invalid task paths human-readable by default', async () => {
     const dir = await makeTempDir();
     const outsideDir = await makeTempDir();

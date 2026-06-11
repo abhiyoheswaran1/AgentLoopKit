@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { ArtifactPathError } from '../../core/artifacts.js';
-import { loadAgentLoopConfig } from '../../core/config.js';
 import { writeHtmlReport } from '../../core/html-report.js';
+import { loadConfigForJsonCommand } from '../json-errors.js';
 
 function printArtifactPathJsonError(error: ArtifactPathError) {
   console.log(
@@ -42,7 +42,8 @@ export function reportCommand() {
         json?: boolean;
       }) => {
         const reportPath = options.report ?? options.verification;
-        const config = await loadAgentLoopConfig(process.cwd());
+        const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+        if (!config) return;
         let result: Awaited<ReturnType<typeof writeHtmlReport>>;
         try {
           result = await writeHtmlReport({

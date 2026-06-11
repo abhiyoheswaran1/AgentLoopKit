@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -152,6 +152,26 @@ describe('ci-summary command', () => {
     expect(result.stdout).toContain('# AgentLoopKit CI Summary');
     expect(result.stdout).toContain('- Provider: Generic CI');
     expect(result.stdout).toContain('agentloop check-gates --strict');
+  });
+
+  test('prints invalid config errors as JSON without writing a CI summary', async () => {
+    const dir = await createRepoWithEvidence();
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');
+
+    const result = await execa(tsxPath, [cliPath, 'ci-summary', '--json', '--write'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const payload = JSON.parse(result.stdout);
+    const reports = await readdir(path.join(dir, '.agentloop/reports'));
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(payload.error).toMatchObject({
+      code: 'CONFIG_ERROR',
+      message: expect.stringContaining('Invalid AgentLoopKit config'),
+    });
+    expect(reports.some((file) => file.endsWith('-ci-summary.md'))).toBe(false);
   });
 
   test('status, report, badge, and gates ignore newer CI summary artifacts when locating verification reports', async () => {

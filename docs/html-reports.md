@@ -50,6 +50,8 @@ Explicit `--task`, `--verification`, and `--handoff` inputs must point to existi
 }
 ```
 
+With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` object and no HTML report is written.
+
 The command does not run verification commands. It does not call an LLM, fetch remote assets, read `.env` contents, upload files, or collect telemetry. It escapes Markdown-derived and git-derived text before writing HTML.
 
 Use HTML reports when a reviewer wants one browser-readable artifact. Keep the Markdown task contract, verification report, and handoff summary as the source evidence.

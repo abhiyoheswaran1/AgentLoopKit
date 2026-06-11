@@ -36,6 +36,7 @@ agentloop badge --source unknown --json
 ```
 
 The error includes `code`, `message`, `requestedSource`, and `supportedSources`. AgentLoopKit writes no badge file for unsupported sources.
+With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` object and AgentLoopKit writes no badge file.
 
 ## Sources
 

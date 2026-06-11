@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { ArtifactPathError, resolveExplicitArtifactPath } from '../../core/artifacts.js';
-import { loadAgentLoopConfig } from '../../core/config.js';
 import { runVerification } from '../../core/verification.js';
+import { loadConfigForJsonCommand } from '../json-errors.js';
 
 function collect(value: string, previous: string[]) {
   previous.push(value);
@@ -40,7 +40,8 @@ export function verifyCommand() {
     .option('--no-typecheck', 'skip typecheck command')
     .option('--command <command>', 'custom command to run', collect, [])
     .action(async (options: Record<string, unknown>) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json === true);
+      if (!config) return;
       const taskPath = typeof options.task === 'string' ? options.task : undefined;
       if (options.json && taskPath) {
         try {
