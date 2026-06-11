@@ -182,17 +182,17 @@ function renderEvidence(result: Omit<ReleaseNotesResult, 'markdown' | 'writtenPa
   const lines = [];
   lines.push(
     result.evidence.task
-      ? `- Task: ${result.evidence.task.title} (${result.evidence.task.status}) - ${result.evidence.task.path}`
+      ? `- Task: ${inlineCode(result.evidence.task.title)} (${inlineCode(result.evidence.task.status)}) - ${inlineCode(result.evidence.task.path)}`
       : '- Task: not found',
   );
   lines.push(
     result.evidence.verification
-      ? `- Verification: Overall status: ${result.evidence.verification.overallStatus} - ${result.evidence.verification.path}`
+      ? `- Verification: Overall status: ${inlineCode(result.evidence.verification.overallStatus)} - ${inlineCode(result.evidence.verification.path)}`
       : '- Verification: not found',
   );
   lines.push(
     result.evidence.ciSummary
-      ? `- CI summary: ${result.evidence.ciSummary.title} - ${result.evidence.ciSummary.path}`
+      ? `- CI summary: ${inlineCode(result.evidence.ciSummary.title)} - ${inlineCode(result.evidence.ciSummary.path)}`
       : '- CI summary: not found',
   );
   return lines.join('\n');
@@ -207,11 +207,11 @@ function renderMarkdown(result: Omit<ReleaseNotesResult, 'markdown' | 'writtenPa
   return `# Release Notes
 
 - Generated: ${result.timestamp}
-- Package: ${result.packageName}
-- Version: ${result.version}
-- Range: ${result.gitRange.label}
-- Branch: ${result.branch || 'unknown'}
-- Commit: ${result.commit || 'unknown'}
+- Package: ${inlineCode(result.packageName)}
+- Version: ${inlineCode(result.version)}
+- Range: ${inlineCode(result.gitRange.label)}
+- Branch: ${inlineCode(result.branch || 'unknown')}
+- Commit: ${inlineCode(result.commit || 'unknown')}
 
 ## Changelog
 ${changelogLines.join('\n')}

@@ -257,3 +257,7 @@ Commands that require AgentLoop setup should not leak raw filesystem errors when
 ## 2026-06-11: CI Metadata In Markdown Uses Safe Inline Formatting
 
 Verification reports and CI summaries include allowlisted CI fields such as workflow, event, ref, commit, run URL, and run attempt. Those values come from CI environment variables, so Markdown output now renders them with the shared inline-code formatter. Provider labels stay plain because they are fixed internal labels. The change does not expand environment access, call CI provider APIs, read secrets, or alter JSON output.
+
+## 2026-06-11: Release Note Metadata Uses Safe Inline Formatting
+
+Release notes combine package metadata, git range labels, branch names, commit IDs, and local AgentLoop evidence into reviewer-facing Markdown. Those values can contain punctuation from package files, refs, task titles, or artifact paths, so release-note metadata and evidence values now render with the shared inline-code formatter. This keeps Markdown evidence stable without changing git commands, JSON output, changelog parsing, publishing behavior, or external service access.

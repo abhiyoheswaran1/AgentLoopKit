@@ -85,15 +85,15 @@ describe('release-notes command', () => {
     expect(output.writtenPath).toMatch(/release-notes\.md$/);
     expect(existsSync(output.writtenPath)).toBe(true);
     expect(output.markdown).toContain('# Release Notes');
-    expect(output.markdown).toContain('- Version: 1.2.3');
-    expect(output.markdown).toContain('- Range: v1.2.2..HEAD');
+    expect(output.markdown).toContain('- Version: `1.2.3`');
+    expect(output.markdown).toContain('- Range: `v1.2.2..HEAD`');
     expect(output.markdown).toContain('- Added release-note generation.');
     expect(output.markdown).toContain('Add release note behavior');
     expect(output.markdown).toContain('src/index.ts');
     expect(output.markdown).toContain('Uncommitted changes detected');
     expect(output.markdown).toContain('.agentloop/tasks/2026-06-10-release-notes.md');
     expect(output.markdown).toContain('Prepare release notes');
-    expect(output.markdown).toContain('Overall status: pass');
+    expect(output.markdown).toContain('Overall status: `pass`');
     expect(output.markdown).toContain('Does not create tags, publish packages, call external APIs');
 
     const written = await readFile(output.writtenPath, 'utf8');
@@ -123,13 +123,57 @@ describe('release-notes command', () => {
     expect(output.markdown).toContain(`- \`\`?? ${dirtyPath}\`\``);
   });
 
+  test('escapes release-note metadata and AgentLoop evidence labels when values contain backticks', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: false });
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    const taskPath = '.agentloop/tasks/release`task.md';
+
+    await git(dir, ['tag', 'v1.2.2`old', 'HEAD~1']);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'demo`pkg',
+      version: '1.2.3`beta',
+      scripts: { test: 'echo ok' },
+    });
+    await writeFile(path.join(dir, taskPath), '# Release `task`\n\n- Status: review`ready\n');
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: taskPath,
+    });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-10-12-05-ci-summary.md'),
+      '# CI `summary`\n\n- Overall status: pass\n',
+    );
+
+    const output = await generateReleaseNotes({
+      cwd: dir,
+      config,
+      from: 'v1.2.2`old',
+      to: 'HEAD',
+      timestamp: '2026-06-11-15-31',
+    });
+
+    expect(output.packageName).toBe('demo`pkg');
+    expect(output.version).toBe('1.2.3`beta');
+    expect(output.gitRange.label).toBe('v1.2.2`old..HEAD');
+    expect(output.evidence.task?.path).toBe(taskPath);
+    expect(output.markdown).toContain('- Package: ``demo`pkg``');
+    expect(output.markdown).toContain('- Version: ``1.2.3`beta``');
+    expect(output.markdown).toContain('- Range: ``v1.2.2`old..HEAD``');
+    expect(output.markdown).toContain(
+      '- Task: `` Release `task` `` (``review`ready``) - ``.agentloop/tasks/release`task.md``',
+    );
+    expect(output.markdown).toContain(
+      '- CI summary: `` CI `summary` `` - `.agentloop/reports/2026-06-10-12-05-ci-summary.md`',
+    );
+  });
+
   test('handles missing previous tags honestly in markdown output', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: false });
 
     const result = await execa(tsxPath, [cliPath, 'release-notes'], { cwd: dir });
 
     expect(result.stdout).toContain('# Release Notes');
-    expect(result.stdout).toContain('- Version: 1.2.3');
+    expect(result.stdout).toContain('- Version: `1.2.3`');
     expect(result.stdout).toContain('No previous version tag was found');
     expect(result.stdout).toContain('No release notes file was written.');
   });
@@ -145,7 +189,7 @@ describe('release-notes command', () => {
 
     const output = JSON.parse(result.stdout);
     expect(output.version).toBe('9.9.9');
-    expect(output.markdown).toContain('- Version: 9.9.9');
+    expect(output.markdown).toContain('- Version: `9.9.9`');
   });
 
   test('prints invalid config errors as JSON without writing release notes', async () => {
@@ -329,7 +373,7 @@ describe('release-notes command', () => {
     });
 
     expect(result.stdout).toContain('Git ref "v9.9.9" was not found');
-    expect(result.stdout).toContain('- Range: HEAD (missing from: v9.9.9)');
+    expect(result.stdout).toContain('- Range: `HEAD (missing from: v9.9.9)`');
     expect(result.stdout).toContain('Add release note behavior');
     expect(result.stdout).toContain('No changed files detected for the selected range');
   });

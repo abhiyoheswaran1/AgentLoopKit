@@ -2,6 +2,32 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Harden Release-Note Metadata Markdown Output
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-release-note-metadata-markdown-output.md`
+- Trigger:
+  - The report-surface scan found that release notes rendered package names, versions, range labels, branch names, commit IDs, and AgentLoop evidence values directly into Markdown.
+  - Release-note output is reviewer-facing evidence, and refs, package metadata, task titles, and artifact paths can contain punctuation such as backticks.
+- Product change:
+  - Added a regression test for release-note metadata and AgentLoop evidence values containing backticks.
+  - Changed release-note metadata and evidence rendering to use the shared inline-code formatter.
+  - Preserved JSON output, git ref validation, range selection, changelog parsing, and publishing behavior.
+- Verification:
+  - Red focused test `npm test -- tests/release-notes.test.ts -t "escapes release-note metadata"` failed before the renderer changed.
+  - Focused green test passed after the renderer change.
+  - Adjacent suite `npm test -- tests/release-notes.test.ts` passed with 14 tests.
+  - Full suite `npm test` passed with 42 test files and 360 tests.
+  - Full self-verify `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-11-harden-release-note-metadata-markdown-output.md --task-commands --timeout-ms 240000 --json` passed and wrote `.agentloop/reports/2026-06-11-16-48-verification-report.md`.
+  - CLI smoke `node scripts/smoke-cli.mjs` passed.
+  - Release smoke `npm run smoke:release` passed.
+  - Markdown link check `npm run check:links` passed.
+  - Production dependency audit `npx pnpm@10.12.1 audit --prod` reported no known vulnerabilities.
+  - ProjScan `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The existing shared Markdown helper kept the change small and consistent with the CI metadata and path-label hardening.
+- Improve:
+  - Continue scanning status, gate, and artifact inventory Markdown before the `0.28.0` release batch.
+
 ## 2026-06-11: Harden CI Metadata Markdown Output
 
 - Task contract: `.agentloop/tasks/2026-06-11-harden-ci-metadata-markdown-output.md`
