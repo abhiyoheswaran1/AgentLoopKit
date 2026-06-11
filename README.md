@@ -271,6 +271,7 @@ For unsupported `--type` values, `create-task --json` returns a parseable error 
 `task status --json` updates only the `- Status:` line. Supported values are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Unsupported status values return a parseable JSON error with `supportedStatuses` and write no task changes. Use `deferred` for parked work that should remain visible in `task list` but should not become the next unpinned task. Status is not verification evidence; run `agentloop verify` before claiming completion.
 `task archive --json` moves one named Markdown contract into `.agentloop/tasks/archive/`, refuses to overwrite an existing archive file, and clears the active task pointer when it archives the active task. Archive after verification and handoff, not as a substitute for either.
 `task doctor --json` checks the active task directory for missing, legacy, unsupported, or terminal status lines. It does not edit, archive, or delete task files.
+With `--json`, invalid `agentloop.config.json` files return a parseable `CONFIG_ERROR` object for `create-task` and `task` subcommands, and no task files or active-task state are changed.
 `list-templates --json` returns grouped bundled template names for agents that need to inspect available loops, policies, handoffs, and agent instructions.
 `version --json` returns the package version in a stable object for scripts that should not parse the plain version string.
 `install-agent <agent> --json` returns the instruction files written for one agent, and `install-agent all --json` returns every bundled agent entry. Unsupported agent names return a parseable JSON error with `supportedAgents` and write no files.
@@ -489,6 +490,7 @@ agentloop policy status --json
 The command reads Markdown files from `.agentloop/policies/`. `policy status` reports `current`, `modified`, `missing`, and `extra` files by comparing local Markdown with bundled templates. It does not enforce compliance, scan source code, fetch remote policy packs, or mutate policy files.
 
 With `--json`, missing policy directories return a parseable setup error with `policiesDir` and `nextCommand`. Missing `policy show` names return a parseable error with `requestedPolicy` and `availablePolicies`.
+Invalid `agentloop.config.json` files return a parseable `CONFIG_ERROR` object for policy JSON commands.
 
 Local policy files are repo guidance. A `modified` policy can be intentional; review it like code instead of overwriting it to match the bundled template.
 

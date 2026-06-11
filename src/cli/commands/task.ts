@@ -1,5 +1,4 @@
 import { Command } from 'commander';
-import { loadAgentLoopConfig } from '../../core/config.js';
 import { AgentLoopError } from '../../core/errors.js';
 import {
   archiveTask,
@@ -20,6 +19,7 @@ import type {
   TaskContract,
   TaskDoctorResult,
 } from '../../core/task-state.js';
+import { loadConfigForJsonCommand } from '../json-errors.js';
 
 function printTask(
   task: Awaited<ReturnType<typeof getActiveTask>> | null,
@@ -157,7 +157,8 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('List task contracts')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+      if (!config) return;
       const tasks = await listTasks({ cwd: process.cwd(), config });
       printTasks(tasks, options);
     });
@@ -168,7 +169,8 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Show a task contract')
     .action(async (taskPath: string, options: { json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+      if (!config) return;
       let task: TaskContract;
       try {
         task = await readTaskContract({ cwd: process.cwd(), config, taskPath });
@@ -185,7 +187,8 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Set the active task contract')
     .action(async (taskPath: string, options: { json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+      if (!config) return;
       let activeTask: ActiveTask;
       try {
         activeTask = await setActiveTask({ cwd: process.cwd(), config, taskPath });
@@ -203,7 +206,8 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Update a task contract status')
     .action(async (taskPath: string, status: string, options: { json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+      if (!config) return;
       let task: ActiveTask;
       try {
         task = await updateTaskStatus({ cwd: process.cwd(), config, taskPath, status });
@@ -232,7 +236,8 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Archive a task contract')
     .action(async (taskPath: string, options: { json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+      if (!config) return;
       let task: ArchivedTask;
       try {
         task = await archiveTask({ cwd: process.cwd(), config, taskPath });
@@ -248,7 +253,8 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Check task folder hygiene')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+      if (!config) return;
       const result = await inspectTaskDirectory({ cwd: process.cwd(), config });
       printTaskDoctor(result, options);
     });
@@ -258,7 +264,8 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Print the active task contract')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+      if (!config) return;
       const activeTask = await getActiveTask({ cwd: process.cwd(), config });
       printTask(activeTask ?? null, options);
     });
@@ -268,7 +275,8 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Clear the active task pointer')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+      if (!config) return;
       await clearActiveTask({ cwd: process.cwd(), config });
       printTask(null, options);
     });

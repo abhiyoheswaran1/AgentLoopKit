@@ -5211,3 +5211,24 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Reuse the loader in remaining config-loading commands in small passes, keeping command-specific JSON details intact.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Config Errors for Task and Policy Commands
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-return-json-config-errors-for-task-and-policy-commands.md`
+- Trigger:
+  - `create-task --json`, `task ... --json`, and `policy ... --json` still used the global human stderr path when `agentloop.config.json` was invalid.
+- Implementation:
+  - Reused the shared JSON config loader in `create-task`, all task subcommands, and policy subcommands.
+  - Kept non-JSON failures on the existing human stderr path.
+  - Confirmed invalid config prevents task creation, task status changes, task archiving, active-task clearing, and policy reads.
+  - Documented the behavior in README, task-contract docs, policy docs, and the changelog.
+- Verification run:
+  - Red focused task and policy tests failed because JSON stdout was empty for invalid config.
+  - Focused create-task, task-state, and policy suites passed: 49 tests.
+  - `.agentloop/reports/2026-06-11-05-03-verification-report.md`, overall status pass.
+  - Built CLI smoke confirmed `CONFIG_ERROR` JSON for `task list --json`.
+- What worked well:
+  - The existing helper fit the remaining config-loading JSON commands without changing command-specific error details.
+- Improve:
+  - Keep the global error handler human-readable and continue handling machine-readable setup failures at command boundaries.
+  - Keep this unreleased until the planned `0.28.0` batch.

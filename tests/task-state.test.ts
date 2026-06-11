@@ -376,6 +376,51 @@ describe('task command', () => {
     });
   });
 
+  test('prints invalid config errors as JSON for task subcommands without mutating task state', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/2026-06-09-demo.md',
+    });
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');
+
+    const commands = [
+      ['task', 'list', '--json'],
+      ['task', 'show', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
+      ['task', 'set', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
+      ['task', 'status', '.agentloop/tasks/2026-06-09-demo.md', 'review', '--json'],
+      ['task', 'archive', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
+      ['task', 'doctor', '--json'],
+      ['task', 'current', '--json'],
+      ['task', 'clear', '--json'],
+    ];
+
+    for (const args of commands) {
+      const result = await execa(tsxPath, [cliPath, ...args], {
+        cwd: dir,
+        reject: false,
+      });
+
+      expect(result.exitCode).toBe(1);
+      expect(result.stderr).toBe('');
+      expect(JSON.parse(result.stdout)).toMatchObject({
+        error: {
+          code: 'CONFIG_ERROR',
+          message: expect.stringContaining('Invalid AgentLoopKit config'),
+        },
+      });
+    }
+
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: proposed\n');
+    expect(JSON.parse(await readFile(path.join(dir, '.agentloop/state.json'), 'utf8'))).toEqual({
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/2026-06-09-demo.md',
+    });
+    await expect(
+      stat(path.join(dir, '.agentloop/tasks/archive/2026-06-09-demo.md')),
+    ).rejects.toThrow();
+  });
+
   test('shows task contract content from the CLI without writing state', async () => {
     const { dir } = await createTaskStateFixture();
 

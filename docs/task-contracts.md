@@ -50,5 +50,6 @@ Use `agentloop task show --json` when an agent needs the selected contract conte
 Use `agentloop task status --json` when an agent needs to update the contract state without hand-editing Markdown. Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Unsupported status values return a parseable JSON error with `supportedStatuses` and leave the task file unchanged. Use `deferred` for parked work that should remain visible but not become `latestTask` in `status` or `next`.
 Use `agentloop task archive --json` after verification and handoff when a finished contract should leave the normal task list but remain available as Markdown history.
 Use `agentloop task doctor --json` to find task contracts that still need status cleanup or archiving. The command is read-only and ignores files already moved into `.agentloop/tasks/archive/`.
+With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` object for `create-task` and task subcommands. AgentLoopKit does not create task files, update task status, archive tasks, or clear active-task state when config loading fails.
 
 Agents should use the contract as the boundary for implementation and review.

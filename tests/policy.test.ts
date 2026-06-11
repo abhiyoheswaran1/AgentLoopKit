@@ -242,6 +242,33 @@ describe('policy command', () => {
     });
   });
 
+  test('prints invalid config errors as JSON for policy subcommands', async () => {
+    const { dir } = await createPolicyFixture();
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');
+
+    const commands = [
+      ['policy', 'list', '--json'],
+      ['policy', 'status', '--json'],
+      ['policy', 'show', 'security', '--json'],
+    ];
+
+    for (const args of commands) {
+      const result = await execa(tsxPath, [cliPath, ...args], {
+        cwd: dir,
+        reject: false,
+      });
+
+      expect(result.exitCode).toBe(1);
+      expect(result.stderr).toBe('');
+      expect(JSON.parse(result.stdout)).toMatchObject({
+        error: {
+          code: 'CONFIG_ERROR',
+          message: expect.stringContaining('Invalid AgentLoopKit config'),
+        },
+      });
+    }
+  });
+
   test('keeps missing policy errors human-readable by default', async () => {
     const { dir } = await createPolicyFixture();
 

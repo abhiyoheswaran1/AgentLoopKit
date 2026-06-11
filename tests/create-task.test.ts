@@ -267,6 +267,38 @@ describe('create-task command', () => {
     expect(result.stdout).not.toContain('Task contract created:');
   });
 
+  test('prints invalid config errors as JSON without creating a task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'agentloop.config.json'), { version: 2 });
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Invalid config',
+        '--type',
+        'bugfix',
+        '--out',
+        '.agentloop/tasks/invalid-config.md',
+        '--json',
+      ],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toMatchObject({
+      error: {
+        code: 'CONFIG_ERROR',
+        message: expect.stringContaining('Invalid AgentLoopKit config'),
+      },
+    });
+    await expect(stat(path.join(dir, '.agentloop/tasks/invalid-config.md'))).rejects.toThrow();
+  });
+
   test('rejects output paths outside the configured tasks directory', async () => {
     const dir = await makeTempDir();
     const outsideDir = await makeTempDir();

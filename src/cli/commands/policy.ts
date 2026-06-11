@@ -1,5 +1,4 @@
 import { Command } from 'commander';
-import { loadAgentLoopConfig } from '../../core/config.js';
 import {
   PolicyDirectoryMissingError,
   getPolicyStatus,
@@ -8,6 +7,7 @@ import {
   readPolicy,
 } from '../../core/policy.js';
 import type { ListedPolicy, PolicyDocument, PolicyStatusReport } from '../../core/policy.js';
+import { loadConfigForJsonCommand } from '../json-errors.js';
 
 function printJsonError(error: Error & { code?: string }, details: Record<string, unknown> = {}) {
   console.log(
@@ -97,7 +97,8 @@ export function policyCommand() {
     .description('List local policies under .agentloop/policies')
     .option('--json', 'print machine-readable output')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+      if (!config) return;
       let policies: ListedPolicy[];
       try {
         policies = await listPolicies({ cwd: process.cwd(), config });
@@ -113,7 +114,8 @@ export function policyCommand() {
     .description('Show local policy template status')
     .option('--json', 'print machine-readable output')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+      if (!config) return;
       let status: PolicyStatusReport;
       try {
         status = await getPolicyStatus({ cwd: process.cwd(), config });
@@ -130,7 +132,8 @@ export function policyCommand() {
     .description('Show a local policy')
     .option('--json', 'print machine-readable output')
     .action(async (policyName: string, options: { json?: boolean }) => {
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
+      if (!config) return;
       let policy: PolicyDocument;
       try {
         policy = await readPolicy({ cwd: process.cwd(), config, policyName });

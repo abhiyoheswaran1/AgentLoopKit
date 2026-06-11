@@ -1,13 +1,13 @@
 import { Command } from 'commander';
 import prompts from 'prompts';
 import { TASK_TYPES } from '../../core/constants.js';
-import { loadAgentLoopConfig } from '../../core/config.js';
 import { AgentLoopError } from '../../core/errors.js';
 import {
   createTaskContractFile,
   TaskOutputPathError,
   TaskType,
 } from '../../core/task-contract.js';
+import { loadConfigForJsonCommand } from '../json-errors.js';
 
 function lines(value: string | undefined, previous: string[]) {
   const current = value
@@ -174,7 +174,8 @@ export function createTaskCommand() {
         throw error;
       }
       const title = typeof options.title === 'string' ? options.title : undefined;
-      const config = await loadAgentLoopConfig(process.cwd());
+      const config = await loadConfigForJsonCommand(process.cwd(), options.json === true);
+      if (!config) return;
       const input =
         title && type
           ? {
