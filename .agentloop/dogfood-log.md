@@ -4804,3 +4804,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - `summarize` uses `--report`; I first tried `--verification`. Consider adding an alias if this confusion repeats.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: `--verification` Alias for `summarize` and `handoff`
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-verification-alias-for-summarize-and-handoff.md`
+- Trigger:
+  - During dogfooding, I tried `summarize --verification <report>` even though the command only accepted `--report`.
+- Implementation:
+  - Added `--verification <path>` as an alias for `--report <path>` on `summarize` and `handoff`.
+  - Kept `--report` supported and preferred.
+  - Added CLI coverage for both commands using a non-latest manual verification report path.
+- Verification run:
+  - Red focused tests failed because Commander rejected `--verification`.
+  - First green run showed the test fixture used a status value outside the existing parser pattern; the fixture now uses `custom-pass`.
+  - Focused handoff suite passed: 5 tests.
+  - `.agentloop/reports/2026-06-11-02-17-verification-report.md`, overall status pass.
+- What worked well:
+  - The new alias immediately worked for this handoff generation.
+- Improve:
+  - Keep `--report` as the canonical documented term where possible so the CLI stays compact.
+  - Keep this unreleased until the planned `0.28.0` batch.

@@ -521,7 +521,7 @@ The summary groups changed files into review areas such as source, tests, docs, 
 
 It does not call an LLM.
 
-Use `agentloop summarize` to preview the same output without writing a handoff file. `agentloop summarize --write` remains available for scripts.
+Use `agentloop summarize` to preview the same output without writing a handoff file. `agentloop summarize --write` remains available for scripts. Both `summarize` and `handoff` accept `--verification <path>` as an alias for `--report <path>`.
 
 ## Safety Principles
 

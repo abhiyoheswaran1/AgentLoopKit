@@ -26,6 +26,15 @@ async function createSummaryFixture() {
   return dir;
 }
 
+async function createExplicitVerificationFixture() {
+  const dir = await createSummaryFixture();
+  await writeFile(
+    path.join(dir, '.agentloop/reports/manual-verification.md'),
+    '# Verification Report\n\nOverall status: custom-pass\n',
+  );
+  return dir;
+}
+
 async function createExplicitTaskFixture() {
   const dir = await createSummaryFixture();
   await writeFile(path.join(dir, '.agentloop/tasks/2026-06-09-newer.md'), '# Newer task\n');
@@ -61,6 +70,34 @@ describe('handoff command', () => {
     const output = JSON.parse(result.stdout);
     expect(output.outPath).toContain('.agentloop/handoffs');
     expect(existsSync(output.outPath)).toBe(false);
+  });
+
+  test('accepts --verification as a summarize alias for --report', async () => {
+    const dir = await createExplicitVerificationFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'summarize', '--verification', '.agentloop/reports/manual-verification.md', '--json'],
+      { cwd: dir },
+    );
+
+    const output = JSON.parse(result.stdout);
+    expect(output.markdown).toContain('Overall status: custom-pass');
+    expect(existsSync(output.outPath)).toBe(false);
+  });
+
+  test('accepts --verification as a handoff alias for --report', async () => {
+    const dir = await createExplicitVerificationFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'handoff', '--verification', '.agentloop/reports/manual-verification.md', '--json'],
+      { cwd: dir },
+    );
+
+    const output = JSON.parse(result.stdout);
+    expect(output.markdown).toContain('Overall status: custom-pass');
+    expect(existsSync(output.outPath)).toBe(true);
   });
 
   test('uses explicit active task state when writing handoff', async () => {

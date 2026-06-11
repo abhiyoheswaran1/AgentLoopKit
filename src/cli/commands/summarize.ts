@@ -5,11 +5,17 @@ import { summarizeRepository } from '../../core/pr-summary.js';
 async function runSummaryCommand(options: Record<string, unknown>, defaultWrite: boolean) {
   const config = await loadAgentLoopConfig(process.cwd());
   const writeOption = typeof options.write === 'boolean' ? options.write : defaultWrite;
+  const reportPath =
+    typeof options.report === 'string'
+      ? options.report
+      : typeof options.verification === 'string'
+        ? options.verification
+        : undefined;
   const result = await summarizeRepository({
     cwd: process.cwd(),
     config,
     taskPath: typeof options.task === 'string' ? options.task : undefined,
-    reportPath: typeof options.report === 'string' ? options.report : undefined,
+    reportPath,
     write: writeOption,
   });
   if (options.json || options.format === 'json') {
@@ -25,6 +31,7 @@ export function summarizeCommand() {
     .description('Generate a deterministic PR/reviewer summary')
     .option('--task <path>', 'task contract path')
     .option('--report <path>', 'verification report path')
+    .option('--verification <path>', 'alias for --report')
     .option('--format <format>', 'markdown or json', 'markdown')
     .option('--write', 'write summary to .agentloop/handoffs')
     .option('--json', 'print JSON output')
@@ -36,6 +43,7 @@ export function handoffCommand() {
     .description('Generate and write a deterministic reviewer handoff')
     .option('--task <path>', 'task contract path')
     .option('--report <path>', 'verification report path')
+    .option('--verification <path>', 'alias for --report')
     .option('--format <format>', 'markdown or json', 'markdown')
     .option('--no-write', 'print handoff without writing a file')
     .option('--json', 'print JSON output')
