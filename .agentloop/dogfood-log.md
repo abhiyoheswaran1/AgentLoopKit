@@ -6650,3 +6650,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The existing shared inline-code helper made release-note commit hardening a one-line renderer change.
 - Improve:
   - Continue scanning release-note changelog/fallback boundaries separately; changelog content is authored Markdown and should not be blindly escaped.
+
+## 2026-06-11: Release Note Missing Ref Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-release-note-missing-ref-markdown.md`
+- Trigger:
+  - The roadmap hardening pass found that `agentloop release-notes` rendered missing `--from` refs directly inside fallback Markdown copy.
+  - Git refs are validated but can still contain backticks, so the rendered fallback should treat the ref as an evidence value.
+- Implementation:
+  - Added a red regression in `tests/release-notes.test.ts` with missing ref `v1.2.2\`missing`.
+  - Rendered only the requested missing ref with the shared inline-code formatter.
+  - Preserved raw structured `fallbackReason` data and kept the fixed no-previous-tag fallback as plain prose.
+- Verification run:
+  - Red focused test failed first in `tests/release-notes.test.ts` because the missing ref was raw Markdown.
+  - Focused suite passed after implementation:
+    - `npm test -- tests/release-notes.test.ts`
+  - Broader local checks passed:
+    - `git diff --check`
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run check:links`
+    - `npx --yes projscan doctor --format markdown`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npm test`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-11-22-54-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-23-03-pr-summary.md`.
+- What worked well:
+  - Keeping the raw fallback reason in JSON avoided automation churn while improving Markdown safety.
+- Improve:
+  - Continue leaving authored changelog sections untouched unless a future task defines a more precise boundary.

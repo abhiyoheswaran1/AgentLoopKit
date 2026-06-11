@@ -317,3 +317,7 @@ PR summaries and handoffs include `git diff --stat` output as local review evide
 ## 2026-06-11: Release Note Commit Subjects Use Safe Inline Formatting
 
 Release notes include commit subjects from local Git history. Commit subjects are evidence values, not trusted Markdown, so each rendered commit line now uses the shared inline-code formatter. The structured `commits` array remains raw for automation and release tooling.
+
+## 2026-06-11: Release Note Missing Refs Use Safe Inline Formatting
+
+Release notes include a fallback reason when a requested `--from` Git ref is missing. The requested ref is user-provided release input, so Markdown output formats only that ref with the shared inline-code helper while keeping the sentence readable. The structured `fallbackReason` stays raw for automation.

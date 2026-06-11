@@ -146,6 +146,28 @@ describe('release-notes command', () => {
     expect(output.markdown).not.toContain('- No commits found for the selected range.');
   });
 
+  test('escapes missing release-note git refs in fallback Markdown', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: false });
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    const missingRef = 'v1.2.2`missing';
+
+    const output = await generateReleaseNotes({
+      cwd: dir,
+      config,
+      from: missingRef,
+      to: 'HEAD',
+      timestamp: '2026-06-11-22-45',
+    });
+
+    expect(output.gitRange.fallbackReason).toBe(
+      `Git ref "${missingRef}" was not found; using available local context.`,
+    );
+    expect(output.markdown).toContain(
+      `- Git ref ${inlineCode(missingRef)} was not found; using available local context.`,
+    );
+    expect(output.markdown).not.toContain(`- Git ref "${missingRef}" was not found`);
+  });
+
   test('escapes release-note metadata and AgentLoop evidence labels when values contain backticks', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: false });
     const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
@@ -409,7 +431,7 @@ describe('release-notes command', () => {
       cwd: dir,
     });
 
-    expect(result.stdout).toContain('Git ref "v9.9.9" was not found');
+    expect(result.stdout).toContain(`Git ref ${inlineCode('v9.9.9')} was not found`);
     expect(result.stdout).toContain('- Range: `HEAD (missing from: v9.9.9)`');
     expect(result.stdout).toContain('Add release note behavior');
     expect(result.stdout).toContain('No changed files detected for the selected range');

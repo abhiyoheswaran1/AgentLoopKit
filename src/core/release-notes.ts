@@ -163,6 +163,14 @@ function renderList(lines: string[], empty: string) {
   return lines.length ? lines.map((line) => `- ${inlineCode(line)}`).join('\n') : `- ${empty}`;
 }
 
+function renderFallbackReason(reason: string) {
+  const missingRef = reason.match(
+    /^Git ref "(.+)" was not found; using available local context\.$/,
+  );
+  if (!missingRef) return reason;
+  return `Git ref ${inlineCode(missingRef[1] ?? '')} was not found; using available local context.`;
+}
+
 function renderChangedFiles(files: Array<{ status: string; path: string }>) {
   return files.length
     ? files.map((file) => `- ${file.status} ${inlineCode(file.path)}`).join('\n')
@@ -200,7 +208,9 @@ function renderEvidence(result: Omit<ReleaseNotesResult, 'markdown' | 'writtenPa
 
 function renderMarkdown(result: Omit<ReleaseNotesResult, 'markdown' | 'writtenPath'>) {
   const changelogLines = [
-    ...(result.gitRange.fallbackReason ? [`- ${result.gitRange.fallbackReason}`] : []),
+    ...(result.gitRange.fallbackReason
+      ? [`- ${renderFallbackReason(result.gitRange.fallbackReason)}`]
+      : []),
     result.changelogSection || '- No matching CHANGELOG.md section found.',
   ];
 

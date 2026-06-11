@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed release-note missing-ref fallback copy to render requested Git refs with Markdown-safe inline-code delimiters while preserving raw fallback reason data.
 - Changed release notes to render commit subjects with Markdown-safe inline-code delimiters while preserving raw commit subjects in JSON output.
 - Changed PR summaries and handoffs to render non-empty diff stats inside Markdown-safe text fences while keeping the no-diff fallback readable.
 - Changed PR summaries and handoffs to render the top-level task context title with Markdown-safe inline-code delimiters while keeping verification status text parseable.
