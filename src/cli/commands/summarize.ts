@@ -1,7 +1,11 @@
 import { Command } from 'commander';
 import { ArtifactPathError } from '../../core/artifacts.js';
+import { AgentLoopError } from '../../core/errors.js';
 import { summarizeRepository } from '../../core/pr-summary.js';
 import { loadConfigForJsonCommand } from '../json-errors.js';
+
+const SUPPORTED_OUTPUT_FORMATS = ['markdown', 'json'] as const;
+type OutputFormat = (typeof SUPPORTED_OUTPUT_FORMATS)[number];
 
 function printArtifactPathJsonError(error: ArtifactPathError) {
   console.log(
@@ -23,8 +27,46 @@ function printArtifactPathJsonError(error: ArtifactPathError) {
   process.exitCode = 1;
 }
 
+function printOutputFormatJsonError(requestedFormat: string) {
+  console.log(
+    JSON.stringify(
+      {
+        error: {
+          code: 'UNSUPPORTED_OUTPUT_FORMAT',
+          message: `Unsupported output format "${requestedFormat}".`,
+          requestedFormat,
+          supportedFormats: SUPPORTED_OUTPUT_FORMATS,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
+}
+
+function resolveOutputFormat(options: Record<string, unknown>): OutputFormat | undefined {
+  const requestedFormat = typeof options.format === 'string' ? options.format.trim() : 'markdown';
+  if ((SUPPORTED_OUTPUT_FORMATS as readonly string[]).includes(requestedFormat)) {
+    return requestedFormat as OutputFormat;
+  }
+
+  const wantsJson = options.json === true;
+  if (wantsJson) {
+    printOutputFormatJsonError(requestedFormat);
+    return undefined;
+  }
+
+  throw new AgentLoopError(
+    `Unsupported output format "${requestedFormat}". Use one of: ${SUPPORTED_OUTPUT_FORMATS.join(', ')}.`,
+    'UNSUPPORTED_OUTPUT_FORMAT',
+  );
+}
+
 async function runSummaryCommand(options: Record<string, unknown>, defaultWrite: boolean) {
-  const json = options.json === true || options.format === 'json';
+  const format = resolveOutputFormat(options);
+  if (!format) return;
+  const json = options.json === true || format === 'json';
   const config = await loadConfigForJsonCommand(process.cwd(), json);
   if (!config) return;
   const writeOption = typeof options.write === 'boolean' ? options.write : defaultWrite;

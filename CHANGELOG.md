@@ -37,6 +37,7 @@
 - Added JSON error output for invalid config on `agentloop status`, `next`, and `check-gates` when `--json` is requested.
 - Added JSON error output for invalid config on `agentloop verify`, `summarize`, `handoff`, `report`, `badge`, `ci-summary`, and `release-notes` when `--json` is requested.
 - Added JSON error output for invalid config on `agentloop create-task`, `task`, and `policy` commands when `--json` is requested.
+- Added unsupported-format validation for `agentloop summarize` and `agentloop handoff`, with JSON errors when `--json` is requested.
 - Added `--verification <path>` as an alias for `--report <path>` on `agentloop summarize` and `agentloop handoff`.
 - Added `--verification <path>` as an alias for `--report <path>` on `agentloop report`.
 - Changed the composite GitHub Action default `agentloopkit-version` to `latest`; workflows can still pin `<version>` for reproducibility.

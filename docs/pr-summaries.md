@@ -37,6 +37,7 @@ Use `agentloop summarize` to preview the same deterministic summary without writ
 
 Explicit `--task` and `--verification` inputs must point to existing Markdown artifacts inside `.agentloop/tasks/` and `.agentloop/reports/`. With `--json`, invalid input paths return a structured `ARTIFACT_PATH_INVALID` error and `handoff` does not write a summary.
 With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` object and `handoff` does not write a summary.
+Supported output formats are `markdown` and `json`. Unsupported `--format` values fail before writing handoff files. With `--json`, they return `UNSUPPORTED_OUTPUT_FORMAT` with `requestedFormat` and `supportedFormats`.
 
 Use `agentloop task list` and `agentloop task show <path>` before handoff when the repo has several task contracts and you need to choose which one to pin.
 

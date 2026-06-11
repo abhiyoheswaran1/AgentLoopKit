@@ -72,6 +72,61 @@ describe('handoff command', () => {
     expect(existsSync(output.outPath)).toBe(false);
   });
 
+  test('accepts --format json for summarize output', async () => {
+    const dir = await createSummaryFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'summarize', '--format', 'json'], {
+      cwd: dir,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(output.markdown).toContain('# PR Summary');
+    expect(output.outPath).toContain('.agentloop/handoffs');
+    expect(existsSync(output.outPath)).toBe(false);
+  });
+
+  test('rejects unsupported summarize formats without writing', async () => {
+    const dir = await createSummaryFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'summarize', '--format', 'xml'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const handoffs = await readdir(path.join(dir, '.agentloop/handoffs')).catch(() => []);
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('Unsupported output format "xml"');
+    expect(result.stderr).toContain('markdown, json');
+    expect(handoffs).toEqual([]);
+  });
+
+  test('prints unsupported handoff format errors as JSON without writing', async () => {
+    const dir = await createSummaryFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'handoff', '--format', 'xml', '--json'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    const handoffs = await readdir(path.join(dir, '.agentloop/handoffs')).catch(() => []);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'UNSUPPORTED_OUTPUT_FORMAT',
+        message: 'Unsupported output format "xml".',
+        requestedFormat: 'xml',
+        supportedFormats: ['markdown', 'json'],
+      },
+    });
+    expect(handoffs).toEqual([]);
+  });
+
   test('prints invalid config errors as JSON for summarize and handoff without writing', async () => {
     const dir = await createSummaryFixture();
     await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');

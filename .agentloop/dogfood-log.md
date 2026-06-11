@@ -5232,3 +5232,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep the global error handler human-readable and continue handling machine-readable setup failures at command boundaries.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Summarize and Handoff Format Validation
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-validate-summarize-and-handoff-output-formats.md`
+- Trigger:
+  - `summarize` and `handoff` documented `--format` as `markdown` or `json`, but unsupported values fell back to Markdown.
+- Implementation:
+  - Added explicit output-format validation for `summarize` and `handoff`.
+  - Kept `--format markdown`, `--format json`, and `--json` behavior unchanged.
+  - Added JSON-mode `UNSUPPORTED_OUTPUT_FORMAT` errors with `requestedFormat` and `supportedFormats`.
+  - Confirmed invalid handoff formats do not write handoff artifacts.
+  - Documented the behavior in README, PR summary docs, and the changelog.
+- Verification run:
+  - Red focused handoff tests failed because unsupported formats exited `0`.
+  - Focused handoff suite passed: 11 tests.
+  - `.agentloop/reports/2026-06-11-05-15-verification-report.md`, overall status pass.
+  - Built CLI smoke confirmed `handoff --format xml --json` returns `UNSUPPORTED_OUTPUT_FORMAT` and writes no handoff.
+- What worked well:
+  - Validating format before config loading keeps bad input from doing any artifact work.
+- Improve:
+  - Keep command-specific JSON errors explicit when the error includes useful fields beyond `code` and `message`.
+  - Keep this unreleased until the planned `0.28.0` batch.

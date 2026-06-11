@@ -545,6 +545,7 @@ It does not call an LLM.
 
 Use `agentloop summarize` to preview the same output without writing a handoff file. `agentloop summarize --write` remains available for scripts. Both `summarize` and `handoff` accept `--verification <path>` as an alias for `--report <path>`.
 When you pass explicit `--task` or `--verification` paths with `--json`, the path must point to an existing Markdown artifact inside `.agentloop/tasks/` or `.agentloop/reports/`. Invalid paths return a JSON error with `artifactType`, `requestedPath`, `expectedDir`, and `reason`.
+Supported output formats are `markdown` and `json`. Unsupported `--format` values fail before writing handoff files; with `--json`, they return `UNSUPPORTED_OUTPUT_FORMAT`.
 
 ## Safety Principles
 
