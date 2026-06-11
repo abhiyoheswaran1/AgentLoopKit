@@ -122,5 +122,12 @@ export function parseAgentLoopConfig(value: unknown): AgentLoopConfig {
 export async function loadAgentLoopConfig(cwd: string): Promise<AgentLoopConfig> {
   const filePath = path.join(cwd, CONFIG_FILE);
   const raw = await readFile(filePath, 'utf8');
-  return parseAgentLoopConfig(JSON.parse(raw));
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new ConfigError(`Invalid AgentLoopKit config: ${detail}`);
+  }
+  return parseAgentLoopConfig(parsed);
 }

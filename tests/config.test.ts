@@ -1,7 +1,22 @@
-import { describe, expect, test } from 'vitest';
-import { createDefaultConfig, parseAgentLoopConfig } from '../src/core/config.js';
+import path from 'node:path';
+import { writeFile } from 'node:fs/promises';
+import { afterEach, describe, expect, test } from 'vitest';
+import {
+  createDefaultConfig,
+  loadAgentLoopConfig,
+  parseAgentLoopConfig,
+} from '../src/core/config.js';
+import { ConfigError } from '../src/core/errors.js';
+import { makeTempDir, removeTempDir } from './helpers.js';
+
+let tempDirs: string[] = [];
 
 describe('config', () => {
+  afterEach(async () => {
+    await Promise.all(tempDirs.map(removeTempDir));
+    tempDirs = [];
+  });
+
   test('creates defaults for a detected project', () => {
     const config = createDefaultConfig({
       name: 'demo',
@@ -21,5 +36,14 @@ describe('config', () => {
 
   test('rejects invalid config versions', () => {
     expect(() => parseAgentLoopConfig({ version: 2 })).toThrow(/version/i);
+  });
+
+  test('rejects malformed config JSON as a config error', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{not-json');
+
+    await expect(loadAgentLoopConfig(dir)).rejects.toThrow(ConfigError);
+    await expect(loadAgentLoopConfig(dir)).rejects.toThrow('Invalid AgentLoopKit config');
   });
 });

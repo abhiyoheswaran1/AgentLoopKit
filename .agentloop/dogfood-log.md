@@ -5254,3 +5254,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep command-specific JSON errors explicit when the error includes useful fields beyond `code` and `message`.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Malformed Config JSON Errors
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-return-config-errors-for-malformed-json-config.md`
+- Trigger:
+  - JSON commands documented invalid `agentloop.config.json` as `CONFIG_ERROR`, but malformed JSON still surfaced as a raw `SyntaxError`.
+- Implementation:
+  - Normalized `JSON.parse` failures in `loadAgentLoopConfig` to `ConfigError`.
+  - Kept schema-invalid config behavior unchanged.
+  - Confirmed `status --json` returns `CONFIG_ERROR` for malformed config.
+  - Confirmed default human output keeps a clear `agentloop: Invalid AgentLoopKit config` message.
+  - Documented the behavior in configuration docs and the changelog.
+- Verification run:
+  - Red focused config and status tests failed because malformed JSON threw `SyntaxError`.
+  - Focused config and status suites passed: 17 tests.
+  - `.agentloop/reports/2026-06-11-05-24-verification-report.md`, overall status pass.
+  - Built CLI smoke confirmed malformed config returns `CONFIG_ERROR` JSON.
+- What worked well:
+  - Fixing the loader updated all command-level `ConfigError` handlers without command-by-command patches.
+- Improve:
+  - Keep config parse errors normalized at the loader boundary so commands can stay small.
+  - Keep this unreleased until the planned `0.28.0` batch.

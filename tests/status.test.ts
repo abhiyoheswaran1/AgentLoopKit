@@ -77,6 +77,42 @@ describe('status command', () => {
     });
   });
 
+  test('prints malformed config errors as JSON', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{not-json');
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'CONFIG_ERROR',
+      message: expect.stringContaining('Invalid AgentLoopKit config'),
+    });
+  });
+
+  test('keeps malformed config errors human-readable by default', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'agentloop.config.json'), '{not-json');
+
+    const result = await execa(tsxPath, [cliPath, 'status'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('agentloop: Invalid AgentLoopKit config');
+  });
+
   test('prints git target warning when status runs from a git repository subdirectory', async () => {
     const dir = await makeTempDir();
     const packageDir = path.join(dir, 'packages', 'web');
