@@ -177,3 +177,7 @@ Repo-relative config paths are not enough when a directory already exists as a s
 ## 2026-06-11: Read-Only Artifact Discovery Stays Repo-Local
 
 Read-only commands are still part of the repo trust boundary. Task listing, status, gates, handoff fallback, HTML reports, badges, CI summaries, release notes, MCP tools, and policy inspection now ignore configured task, report, handoff, or policy roots when those roots resolve outside the current repo through symlinks. These paths behave like missing local artifacts instead of reading outside content, while explicit artifact paths and writes keep their stricter structured errors.
+
+## 2026-06-11: Review Gates Require Repo-Local Files
+
+`agentloop check-gates` should not let outside files satisfy repo harness or safety-policy evidence. Required root files, harness files, and policy files now count as present only when the resolved path stays inside the current repo. Unsafe symlinked files are reported as missing, preserving warning-only default gate behavior while keeping review evidence repo-local.

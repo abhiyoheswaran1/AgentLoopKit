@@ -106,6 +106,62 @@ describe('check-gates command', () => {
     );
   });
 
+  test('treats required harness and policy symlinks outside the repo as missing', async () => {
+    const dir = await createInitializedRepo();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+      '# Demo task\n\n- Status: in-progress\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+    await writeFile(path.join(outsideDir, 'AGENTS.md'), '# Outside agents\n\noutside-secret\n');
+    await writeFile(
+      path.join(outsideDir, 'secrets-policy.md'),
+      '# Outside policy\n\noutside-secret\n',
+    );
+    await rm(path.join(dir, 'AGENTS.md'), { force: true });
+    await rm(path.join(dir, '.agentloop/policies/secrets-policy.md'), { force: true });
+    await symlink(path.join(outsideDir, 'AGENTS.md'), path.join(dir, 'AGENTS.md'), 'file');
+    await symlink(
+      path.join(outsideDir, 'secrets-policy.md'),
+      path.join(dir, '.agentloop/policies/secrets-policy.md'),
+      'file',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.stdout).not.toContain('outside-secret');
+    const output = JSON.parse(result.stdout);
+    expect(output.overallStatus).toBe('warn');
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'repo-harness',
+          status: 'warn',
+          message: 'Missing harness files: AGENTS.md.',
+        }),
+        expect.objectContaining({
+          id: 'safety-policies',
+          status: 'warn',
+          message: 'Missing policy files: .agentloop/policies/secrets-policy.md.',
+        }),
+      ]),
+    );
+  });
+
   test('prints invalid config errors as JSON', async () => {
     const dir = await createInitializedRepo();
     await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');

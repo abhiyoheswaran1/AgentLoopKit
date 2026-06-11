@@ -2,7 +2,7 @@ import path from 'node:path';
 import { readFile, realpath } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { latestMarkdownFile, prSummaryPattern, verificationReportPattern } from './artifacts.js';
-import { pathExists } from './file-system.js';
+import { pathExists, resolvesInsidePath } from './file-system.js';
 import {
   getGitBranch,
   getGitCommit,
@@ -70,7 +70,8 @@ function relativePath(cwd: string, filePath: string) {
 async function missingFiles(cwd: string, files: string[]) {
   const missing: string[] = [];
   for (const file of files) {
-    if (!(await pathExists(path.join(cwd, file)))) missing.push(file);
+    const filePath = path.join(cwd, file);
+    if (!(await pathExists(filePath)) || !resolvesInsidePath(cwd, filePath)) missing.push(file);
   }
   return missing;
 }

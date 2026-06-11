@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed `agentloop check-gates` so required root, harness, and policy files only satisfy review gates when their resolved path stays inside the current repo; unsafe symlinked files are treated as missing.
 - Changed read-only artifact discovery so task lists, status, gates, handoff fallbacks, HTML reports, badges, CI summaries, release notes, MCP tools, and policy reads ignore configured task, report, handoff, or policy roots that resolve outside the current repo through symlinks.
 - Simplified public release and launch docs around the current trusted-publishing flow, and added packed-release smoke coverage that rejects unsupported install-channel claims or maintainer-only release chatter in normal public docs.
 - Added packed-release smoke coverage for symlinked init harness targets and symlinked task archive destinations.

@@ -5726,3 +5726,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep any future read-only artifact feature on the shared latest-artifact helper or an equivalent repo-bound guard.
   - Continue batching this work into the planned `0.28.0` release instead of cutting a patch for every bug-pass slice.
+
+## 2026-06-11: Check-Gates Required File Symlink Guard
+
+- Task contract: `.agentloop/tasks/2026-06-11-treat-unsafe-gate-file-symlinks-as-missing.md`
+- Trigger:
+  - After read-only artifact root guards, `check-gates` still used simple existence checks for required root, harness, and policy files.
+  - A required file such as `AGENTS.md` or `.agentloop/policies/secrets-policy.md` could be a symlink to an outside file and still satisfy the review gate.
+- Implementation:
+  - Changed `check-gates` required-file checks to count a file as present only when its resolved path stays inside the current repo.
+  - Preserved existing gate severity: unsafe required files are reported as missing, producing the same warning behavior as absent harness or policy files.
+  - Added a regression test covering an outside `AGENTS.md` symlink and an outside policy-file symlink.
+  - Updated README, changelog, decisions, and backlog without a version bump or release.
+- Verification run:
+  - Red focused `check-gates` test failed first because the gate stayed `pass`.
+  - Focused `npx pnpm@10.12.1 test tests/check-gates.test.ts` passed after the fix: 1 file and 9 tests.
+  - Full `npx pnpm@10.12.1 test` passed: 36 files and 297 tests.
+  - `npx pnpm@10.12.1 lint`, `typecheck`, `check:links`, `npm run build`, `npm run smoke:release`, and `npx --yes projscan doctor --format markdown` passed.
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-09-23-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-09-27-pr-summary.md`.
+- What worked well:
+  - Reusing `resolvesInsidePath` kept the check consistent with the other repo-local read and write guards.
+- Improve:
+  - Watch for any other pass/fail gates that use existence checks without repo-bound resolution.
