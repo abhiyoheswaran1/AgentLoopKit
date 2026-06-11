@@ -85,4 +85,23 @@ describe('distribution artifacts', () => {
     expect(workflow).toContain('docker/build-push-action');
     expect(workflow).toContain('push: true');
   });
+
+  test('CLI smoke workflow builds before running the local smoke script on every OS', async () => {
+    const workflow = await readFile('.github/workflows/smoke.yml', 'utf8');
+
+    expect(workflow).toContain('ubuntu-latest');
+    expect(workflow).toContain('macos-latest');
+    expect(workflow).toContain('windows-latest');
+    expect(workflow).toContain('pnpm/action-setup@v6');
+    expect(workflow).toContain('version: 10.12.1');
+    expect(workflow).toContain('actions/setup-node@v6');
+    expect(workflow).toContain('pnpm install --frozen-lockfile');
+
+    const buildStep = workflow.indexOf('pnpm build');
+    const smokeStep = workflow.indexOf('node scripts/smoke-cli.mjs');
+
+    expect(buildStep).toBeGreaterThan(-1);
+    expect(smokeStep).toBeGreaterThan(buildStep);
+    expect(workflow).not.toMatch(/npm publish|pnpm publish|gh release|mcp-publisher|upload-artifact/i);
+  });
 });
