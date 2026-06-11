@@ -3,6 +3,7 @@ import { lstat, mkdir, readFile, stat, symlink, utimes, writeFile } from 'node:f
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { inlineCode } from '../src/core/markdown-format.js';
 import {
   archiveTask,
   clearActiveTask,
@@ -12,7 +13,7 @@ import {
   setActiveTask,
   updateTaskStatus,
 } from '../src/core/task-state.js';
-import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
+import { CLI_PROCESS_TIMEOUT_MS, makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
@@ -348,6 +349,47 @@ describe('task command', () => {
     await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
   });
 
+  test('prints task lifecycle human output with Markdown-safe inline values', async () => {
+    const { dir } = await createTaskStateFixture();
+    const taskPath = '.agentloop/tasks/2026-06-09-active`task.md';
+    await writeFile(
+      path.join(dir, taskPath),
+      '# Active `task`\n\n- Status: review`ready\n',
+    );
+
+    const setResult = await execa(tsxPath, [cliPath, 'task', 'set', taskPath], { cwd: dir });
+    expect(setResult.stdout).toContain(
+      `Active task: ${inlineCode('Active `task`')} (${inlineCode('review`ready')})`,
+    );
+    expect(setResult.stdout).toContain(inlineCode(taskPath));
+
+    const listResult = await execa(tsxPath, [cliPath, 'task', 'list'], { cwd: dir });
+    expect(listResult.stdout).toContain(
+      `* ${inlineCode('Active `task`')} (${inlineCode('review`ready')}) active`,
+    );
+    expect(listResult.stdout).toContain(`  ${inlineCode(taskPath)}`);
+
+    const statusResult = await execa(
+      tsxPath,
+      [cliPath, 'task', 'status', taskPath, 'review'],
+      { cwd: dir },
+    );
+    expect(statusResult.stdout).toContain(
+      `Updated task status: ${inlineCode('Active `task`')} (${inlineCode('review')})`,
+    );
+    expect(statusResult.stdout).toContain(inlineCode(taskPath));
+
+    const archiveResult = await execa(tsxPath, [cliPath, 'task', 'archive', taskPath], {
+      cwd: dir,
+    });
+    expect(archiveResult.stdout).toContain(
+      `Archived task: ${inlineCode('Active `task`')} (${inlineCode('review')})`,
+    );
+    expect(archiveResult.stdout).toContain(
+      `${inlineCode(taskPath)} -> ${inlineCode('.agentloop/tasks/archive/2026-06-09-active`task.md')}`,
+    );
+  });
+
   test('reports task folder hygiene diagnostics from the CLI without writing state', async () => {
     const { dir } = await createTaskStateFixture();
     await writeFile(
@@ -422,10 +464,49 @@ describe('task command', () => {
     const result = await execa(tsxPath, [cliPath, 'task', 'doctor'], { cwd: dir });
 
     expect(result.stdout).toContain('# AgentLoopKit Task Doctor');
-    expect(result.stdout).toContain('Status: warn');
-    expect(result.stdout).toContain('terminal-task-in-active-folder');
-    expect(result.stdout).toContain('legacy-task-status');
-    expect(result.stdout).toContain('agentloop task archive .agentloop/tasks/2026-06-09-done.md');
+    expect(result.stdout).toContain('Status: `warn`');
+    expect(result.stdout).toContain('`terminal-task-in-active-folder`');
+    expect(result.stdout).toContain('`legacy-task-status`');
+    expect(result.stdout).toContain(
+      'Run `agentloop task archive .agentloop/tasks/2026-06-09-done.md`',
+    );
+  });
+
+  test('prints task doctor diagnostics with Markdown-safe inline values', async () => {
+    const { dir } = await createTaskStateFixture();
+    const legacyTaskPath = '.agentloop/tasks/2026-06-09-legacy`task.md';
+    await writeFile(
+      path.join(dir, legacyTaskPath),
+      '# Legacy `task`\n\n- Status: review`ready\n',
+    );
+
+    const markdownResult = await execa(tsxPath, [cliPath, 'task', 'doctor'], { cwd: dir });
+    expect(markdownResult.stdout).toContain(`Status: ${inlineCode('warn')}`);
+    expect(markdownResult.stdout).toContain(
+      `- [${inlineCode('warn')}] ${inlineCode('unsupported-task-status')}: ${inlineCode(
+        'Legacy `task`',
+      )}`,
+    );
+    expect(markdownResult.stdout).toContain(`  Path: ${inlineCode(legacyTaskPath)}`);
+    expect(markdownResult.stdout).toContain(`  Status: ${inlineCode('review`ready')}`);
+    expect(markdownResult.stdout).toContain(
+      `  ${inlineCode('Task contract uses unsupported status "review`ready".')}`,
+    );
+    expect(markdownResult.stdout).toContain(
+      `  Recommendation: ${inlineCode(
+        `Run \`agentloop task status ${legacyTaskPath} proposed\` or another supported status.`,
+      )}`,
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'task', 'doctor', '--json'], { cwd: dir });
+    expect(JSON.parse(jsonResult.stdout).taskDoctor.diagnostics).toContainEqual(
+      expect.objectContaining({
+        id: 'unsupported-task-status',
+        path: legacyTaskPath,
+        status: 'review`ready',
+        message: 'Task contract uses unsupported status "review`ready".',
+      }),
+    );
   });
 
   test('passes task doctor when active task files use supported non-terminal statuses', async () => {
@@ -461,50 +542,55 @@ describe('task command', () => {
     });
   });
 
-  test('prints invalid config errors as JSON for task subcommands without mutating task state', async () => {
-    const { dir, taskPath } = await createTaskStateFixture();
-    await writeJson(path.join(dir, '.agentloop/state.json'), {
-      version: 1,
-      activeTaskPath: '.agentloop/tasks/2026-06-09-demo.md',
-    });
-    await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');
-
-    const commands = [
-      ['task', 'list', '--json'],
-      ['task', 'show', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
-      ['task', 'set', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
-      ['task', 'status', '.agentloop/tasks/2026-06-09-demo.md', 'review', '--json'],
-      ['task', 'archive', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
-      ['task', 'doctor', '--json'],
-      ['task', 'current', '--json'],
-      ['task', 'clear', '--json'],
-    ];
-
-    for (const args of commands) {
-      const result = await execa(tsxPath, [cliPath, ...args], {
-        cwd: dir,
-        reject: false,
+  test(
+    'prints invalid config errors as JSON for task subcommands without mutating task state',
+    async () => {
+      const { dir, taskPath } = await createTaskStateFixture();
+      await writeJson(path.join(dir, '.agentloop/state.json'), {
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-09-demo.md',
       });
+      await writeFile(path.join(dir, 'agentloop.config.json'), '{"version":2}');
 
-      expect(result.exitCode).toBe(1);
-      expect(result.stderr).toBe('');
-      expect(JSON.parse(result.stdout)).toMatchObject({
-        error: {
-          code: 'CONFIG_ERROR',
-          message: expect.stringContaining('Invalid AgentLoopKit config'),
-        },
+      const commands = [
+        ['task', 'list', '--json'],
+        ['task', 'show', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
+        ['task', 'set', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
+        ['task', 'status', '.agentloop/tasks/2026-06-09-demo.md', 'review', '--json'],
+        ['task', 'archive', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
+        ['task', 'doctor', '--json'],
+        ['task', 'current', '--json'],
+        ['task', 'clear', '--json'],
+      ];
+
+      for (const args of commands) {
+        const result = await execa(tsxPath, [cliPath, ...args], {
+          cwd: dir,
+          reject: false,
+          timeout: CLI_PROCESS_TIMEOUT_MS,
+        });
+
+        expect(result.exitCode).toBe(1);
+        expect(result.stderr).toBe('');
+        expect(JSON.parse(result.stdout)).toMatchObject({
+          error: {
+            code: 'CONFIG_ERROR',
+            message: expect.stringContaining('Invalid AgentLoopKit config'),
+          },
+        });
+      }
+
+      expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: proposed\n');
+      expect(JSON.parse(await readFile(path.join(dir, '.agentloop/state.json'), 'utf8'))).toEqual({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-09-demo.md',
       });
-    }
-
-    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: proposed\n');
-    expect(JSON.parse(await readFile(path.join(dir, '.agentloop/state.json'), 'utf8'))).toEqual({
-      version: 1,
-      activeTaskPath: '.agentloop/tasks/2026-06-09-demo.md',
-    });
-    await expect(
-      stat(path.join(dir, '.agentloop/tasks/archive/2026-06-09-demo.md')),
-    ).rejects.toThrow();
-  });
+      await expect(
+        stat(path.join(dir, '.agentloop/tasks/archive/2026-06-09-demo.md')),
+      ).rejects.toThrow();
+    },
+    CLI_PROCESS_TIMEOUT_MS * 8 + 5_000,
+  );
 
   test('shows task contract content from the CLI without writing state', async () => {
     const { dir } = await createTaskStateFixture();

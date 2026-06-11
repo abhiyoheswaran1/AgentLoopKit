@@ -6409,3 +6409,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The fix improves both human and automation paths without adding setup side effects.
 - Improve:
   - Add a small CLI smoke case for uninitialized `status --json` later so the behavior is covered outside unit tests.
+
+## 2026-06-11: Task Command Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-task-command-markdown-output.md`
+- Trigger:
+  - The continued hardening pass found that `agentloop task` lifecycle output and `task doctor` diagnostics still rendered local task values raw.
+  - Backticks in task titles, statuses, paths, messages, or recommendations could make reviewer-facing Markdown harder to read.
+- Implementation:
+  - Wrapped `task list`, `task current`, `task set`, `task status`, `task archive`, and `task doctor` human-output values with the shared inline-code formatter.
+  - Kept JSON output and task state behavior unchanged.
+  - Added regression coverage for task titles, paths, statuses, and recommendations containing backticks.
+- Verification run:
+  - Red focused tests failed first in `tests/task-state.test.ts` for raw lifecycle output and raw task-doctor output.
+  - Focused suite passed after implementation:
+    - `npm test -- tests/task-state.test.ts`
+  - Dogfood verification initially produced `.agentloop/reports/2026-06-11-19-33-verification-report.md` with one false timeout in the aggregate invalid-config task subcommand test.
+  - The test now uses the shared CLI subprocess timeout per command and an explicit aggregate timeout for the eight-command loop.
+  - Dogfood verification passed after the timeout fix: `.agentloop/reports/2026-06-11-19-46-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-19-54-pr-summary.md`.
+- What worked well:
+  - The shared Markdown formatter made the fix small and consistent with recent doctor, gates, status, and release-output hardening.
+- Improve:
+  - Continue scanning remaining human-output surfaces such as badge/report write confirmations for raw path values.

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Changed `agentloop task` human output to render task titles, statuses, paths, lifecycle messages, and task-doctor diagnostics with Markdown-safe inline-code delimiters.
+- Changed task-state CLI regression coverage to give aggregate subprocess-loop tests an explicit timeout budget, reducing false failures under full verification load.
 - Changed `agentloop doctor` Markdown output to render check statuses, names, messages, path-like values, overall status, strict mode, and next-action text with Markdown-safe inline-code delimiters.
 - Changed `agentloop release-check` Markdown output to render package labels, git metadata, check details, paths, status values, changed-file counts, and next-action commands with Markdown-safe inline-code delimiters.
 - Changed `agentloop ci-summary` Markdown output to render generated timestamps, evidence titles, evidence paths, gate details, status values, and next-action commands with Markdown-safe inline-code delimiters.

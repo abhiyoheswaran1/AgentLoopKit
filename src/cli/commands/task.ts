@@ -20,6 +20,7 @@ import type {
   TaskContract,
   TaskDoctorResult,
 } from '../../core/task-state.js';
+import { inlineCode } from '../../core/markdown-format.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function printTask(
@@ -35,8 +36,8 @@ function printTask(
     console.log('Run `agentloop task set <path>` to pin one.');
     return;
   }
-  console.log(`Active task: ${task.title} (${task.status})`);
-  console.log(task.path);
+  console.log(`Active task: ${inlineCode(task.title)} (${inlineCode(task.status)})`);
+  console.log(inlineCode(task.path));
 }
 
 function printTasks(tasks: ListedTask[], options: { json?: boolean }) {
@@ -53,8 +54,8 @@ function printTasks(tasks: ListedTask[], options: { json?: boolean }) {
   for (const task of tasks) {
     const marker = task.active ? '*' : '-';
     const activeLabel = task.active ? ' active' : '';
-    console.log(`${marker} ${task.title} (${task.status})${activeLabel}`);
-    console.log(`  ${task.path}`);
+    console.log(`${marker} ${inlineCode(task.title)} (${inlineCode(task.status)})${activeLabel}`);
+    console.log(`  ${inlineCode(task.path)}`);
   }
 }
 
@@ -71,8 +72,8 @@ function printUpdatedTask(task: ActiveTask, options: { json?: boolean }) {
     console.log(JSON.stringify({ task }, null, 2));
     return;
   }
-  console.log(`Updated task status: ${task.title} (${task.status})`);
-  console.log(task.path);
+  console.log(`Updated task status: ${inlineCode(task.title)} (${inlineCode(task.status)})`);
+  console.log(inlineCode(task.path));
 }
 
 function printArchivedTask(task: ArchivedTask, options: { json?: boolean }) {
@@ -80,8 +81,8 @@ function printArchivedTask(task: ArchivedTask, options: { json?: boolean }) {
     console.log(JSON.stringify({ task }, null, 2));
     return;
   }
-  console.log(`Archived task: ${task.title} (${task.status})`);
-  console.log(`${task.previousPath} -> ${task.path}`);
+  console.log(`Archived task: ${inlineCode(task.title)} (${inlineCode(task.status)})`);
+  console.log(`${inlineCode(task.previousPath)} -> ${inlineCode(task.path)}`);
 }
 
 function printTaskDoctor(result: TaskDoctorResult, options: { json?: boolean }) {
@@ -92,9 +93,9 @@ function printTaskDoctor(result: TaskDoctorResult, options: { json?: boolean }) 
 
   console.log('# AgentLoopKit Task Doctor');
   console.log('');
-  console.log(`Status: ${result.overallStatus}`);
-  console.log(`Checked: ${result.counts.checked}`);
-  console.log(`Diagnostics: ${result.counts.diagnostics}`);
+  console.log(`Status: ${inlineCode(result.overallStatus)}`);
+  console.log(`Checked: ${inlineCode(String(result.counts.checked))}`);
+  console.log(`Diagnostics: ${inlineCode(String(result.counts.diagnostics))}`);
 
   if (result.diagnostics.length === 0) {
     console.log('');
@@ -104,11 +105,15 @@ function printTaskDoctor(result: TaskDoctorResult, options: { json?: boolean }) 
 
   console.log('');
   for (const diagnostic of result.diagnostics) {
-    console.log(`- [${diagnostic.severity}] ${diagnostic.id}: ${diagnostic.title}`);
-    console.log(`  Path: ${diagnostic.path}`);
-    console.log(`  Status: ${diagnostic.status}`);
-    console.log(`  ${diagnostic.message}`);
-    console.log(`  Recommendation: ${diagnostic.recommendation}`);
+    console.log(
+      `- [${inlineCode(diagnostic.severity)}] ${inlineCode(diagnostic.id)}: ${inlineCode(
+        diagnostic.title,
+      )}`,
+    );
+    console.log(`  Path: ${inlineCode(diagnostic.path)}`);
+    console.log(`  Status: ${inlineCode(diagnostic.status)}`);
+    console.log(`  ${inlineCode(diagnostic.message)}`);
+    console.log(`  Recommendation: ${inlineCode(diagnostic.recommendation)}`);
   }
 
   console.log('');

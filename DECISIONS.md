@@ -285,3 +285,7 @@ Release notes combine package metadata, git range labels, branch names, commit I
 ## 2026-06-11: Review Gate Markdown Uses Safe Inline Formatting
 
 `agentloop check-gates` is reviewer-facing evidence. It now renders gate statuses, gate names, gate messages, evidence paths, git labels, changed-file counts, and next-action commands with the shared inline-code formatter. JSON output, gate decisions, strict-mode behavior, and exit codes stay unchanged.
+
+## 2026-06-11: Task Command Human Output Uses Safe Inline Formatting
+
+`agentloop task` prints local task titles, statuses, paths, and hygiene diagnostics that can come from repo files. Human output now renders those values with the shared inline-code formatter so backticks in task names, paths, status strings, messages, or recommendations cannot break Markdown structure. JSON output, task lifecycle behavior, task-doctor diagnostics, and supported status semantics stay unchanged.
