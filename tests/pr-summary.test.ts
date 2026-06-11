@@ -3,6 +3,7 @@ import { mkdir, utimes, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { generatePrSummary, summarizeRepository } from '../src/core/pr-summary.js';
 import { createDefaultConfig } from '../src/core/config.js';
+import { inlineCode } from '../src/core/markdown-format.js';
 import { makeTempDir, removeTempDir } from './helpers.js';
 
 let tempDirs: string[] = [];
@@ -30,6 +31,22 @@ describe('PR summary generation', () => {
     expect(summary.markdown).toContain('- M `src/index.ts`');
     expect(summary.markdown).toContain('Overall status: pass');
     expect(summary.markdown).toContain('2 files changed');
+  });
+
+  test('formats task context metadata as safe inline Markdown', () => {
+    const summary = generatePrSummary({
+      timestamp: '2026-06-11-21-40',
+      status: '',
+      changedFiles: [],
+      taskMarkdown: '# Add `settings` page\n\n- Status: in-progress\n',
+      verificationMarkdown: '# Verification Report\n\nOverall status: pass',
+      diffStat: '',
+    });
+
+    expect(summary.markdown).toContain(
+      `- Task context: ${inlineCode('Add `settings` page')}`,
+    );
+    expect(summary.markdown).toContain('- Verification status: Overall status: pass');
   });
 
   test('classifies changed files by review area and adds focus hints', () => {
@@ -159,7 +176,7 @@ describe('PR summary generation', () => {
 
     const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
 
-    expect(summary.markdown).toContain('Task context: Open task');
+    expect(summary.markdown).toContain(`Task context: ${inlineCode('Open task')}`);
     expect(summary.markdown).not.toContain('Task context: Done task');
   });
 
@@ -177,7 +194,7 @@ describe('PR summary generation', () => {
 
     const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
 
-    expect(summary.markdown).toContain('Task context: Newer task');
+    expect(summary.markdown).toContain(`Task context: ${inlineCode('Newer task')}`);
   });
 
   test('uses explicit active task state before latest task fallback', async () => {
@@ -201,6 +218,6 @@ describe('PR summary generation', () => {
 
     const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
 
-    expect(summary.markdown).toContain('Task context: Explicit task');
+    expect(summary.markdown).toContain(`Task context: ${inlineCode('Explicit task')}`);
   });
 });

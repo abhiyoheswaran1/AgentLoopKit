@@ -305,3 +305,7 @@ Verification reports include task context from local task contracts and requeste
 ## 2026-06-11: Verification Report Metadata Preserves Status Parsing
 
 Verification report headers include local repo and Git metadata that can contain Markdown-sensitive punctuation. Timestamp, repo, branch, commit, and working-tree values now render with the shared inline-code formatter. `Overall status` deliberately remains plain text because AgentLoopKit commands parse that line from existing reports; keeping it raw preserves compatibility while the value itself is an internal enum.
+
+## 2026-06-11: PR Summary Task Context Uses Safe Inline Formatting
+
+PR summaries and handoffs include the task title as reviewer-facing context. That title can come from a local task contract and may contain Markdown-sensitive punctuation, so the top-level `Task context` value now renders with the shared inline-code formatter. Verification status text remains plain because AgentLoopKit parses `Overall status: pass|fail|not-run` from existing reports and handoffs.

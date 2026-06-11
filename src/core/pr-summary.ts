@@ -165,7 +165,7 @@ export function generatePrSummary(input: PrSummaryInput) {
   const markdown = `# PR Summary
 
 - Generated: ${input.timestamp}
-- Task context: ${taskTitle}
+- Task context: ${inlineCode(taskTitle)}
 - Verification status: ${verificationLine}
 
 ## Summary

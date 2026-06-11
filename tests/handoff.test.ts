@@ -4,6 +4,7 @@ import { mkdir, readdir, realpath, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { inlineCode } from '../src/core/markdown-format.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -209,7 +210,7 @@ describe('handoff command', () => {
     const result = await execa(tsxPath, [cliPath, 'handoff', '--json'], { cwd: dir });
 
     const output = JSON.parse(result.stdout);
-    expect(output.markdown).toContain('Task context: Demo task');
+    expect(output.markdown).toContain(`Task context: ${inlineCode('Demo task')}`);
     expect(output.markdown).not.toContain('Task context: Newer task');
   });
 

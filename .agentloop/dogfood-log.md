@@ -6550,3 +6550,38 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Preserving `Overall status` as a parseable enum avoided unnecessary downstream parser churn.
 - Improve:
   - Continue scanning `task-contract` and user-authored Markdown generation boundaries separately; those files intentionally contain user prose and need different rules than evidence summaries.
+
+## 2026-06-11: PR Summary Task Context Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-pr-summary-task-metadata-markdown.md`
+- Trigger:
+  - The roadmap hardening pass found that PR summaries and handoffs still rendered the top task title directly into Markdown.
+  - A task title containing backticks could corrupt reviewer-facing handoff metadata even though changed-file paths were already safe.
+- Implementation:
+  - Added a red regression in `tests/pr-summary.test.ts` for a task title containing backticks.
+  - Rendered the top `Task context` value with the shared inline-code formatter.
+  - Updated the handoff regression expectation because `handoff` shares the PR summary renderer.
+  - Kept verification status text plain so `Overall status: pass|fail|not-run` remains parseable.
+- Verification run:
+  - Red focused test failed first in `tests/pr-summary.test.ts` because the task title was raw Markdown.
+  - Focused suites passed after implementation:
+    - `npm test -- tests/pr-summary.test.ts`
+    - `npm test -- tests/pr-summary.test.ts tests/handoff.test.ts`
+  - Broader local checks passed:
+    - `git diff --check`
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run check:links`
+    - `npx --yes projscan doctor --format markdown`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npm test`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-11-21-45-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-21-53-pr-summary.md`.
+- What worked well:
+  - The shared formatter kept the behavior change to one renderer line.
+  - The full suite caught the shared handoff expectation that the focused PR summary test alone did not cover.
+- Improve:
+  - Continue looking for remaining lower-traffic Markdown outputs that mix local values with reviewer-facing evidence.
