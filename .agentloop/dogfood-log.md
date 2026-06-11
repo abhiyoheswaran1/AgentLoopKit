@@ -5749,3 +5749,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Reusing `resolvesInsidePath` kept the check consistent with the other repo-local read and write guards.
 - Improve:
   - Watch for any other pass/fail gates that use existence checks without repo-bound resolution.
+
+## 2026-06-11: Create-Task Risk Note Flags
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-create-task-risk-note-flags.md`
+- Trigger:
+  - Dogfooding showed that agents can fill most task contract fields non-interactively, but Risk Notes still required manual editing.
+  - `agentloop create-task --risk` was the natural command shape, but Commander rejected it as an unknown option.
+- Implementation:
+  - Added repeatable `create-task --risk` and `--risk-note` flags.
+  - Passed parsed risk notes into the existing task contract renderer without changing task headings or defaults.
+  - Added focused CLI coverage for help output and repeated risk-note flags.
+  - Updated README, changelog, decisions, and backlog without a version bump or release.
+- Verification run:
+  - Red focused `create-task` tests failed first because the help text and flags were missing.
+  - Focused `npx pnpm@10.12.1 test tests/create-task.test.ts` passed after the fix: 1 file and 14 tests.
+  - Full `npx pnpm@10.12.1 test` passed: 36 files and 298 tests.
+  - `npx pnpm@10.12.1 lint`, `typecheck`, `check:links`, `npm run build`, `npm run smoke:release`, and `npx --yes projscan doctor --format markdown` passed.
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-09-36-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-09-40-pr-summary.md`.
+- What worked well:
+  - Keeping Risk Notes as plain task-contract bullets avoided new concepts while making non-interactive task creation complete.
+- Improve:
+  - If users need richer risk modeling later, add it as a separate policy feature instead of overloading `create-task`.

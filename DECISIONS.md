@@ -181,3 +181,7 @@ Read-only commands are still part of the repo trust boundary. Task listing, stat
 ## 2026-06-11: Review Gates Require Repo-Local Files
 
 `agentloop check-gates` should not let outside files satisfy repo harness or safety-policy evidence. Required root files, harness files, and policy files now count as present only when the resolved path stays inside the current repo. Unsafe symlinked files are reported as missing, preserving warning-only default gate behavior while keeping review evidence repo-local.
+
+## 2026-06-11: Risk Notes Are First-Class Task Inputs
+
+Task contracts already include a Risk Notes section, but non-interactive task creation could not fill it. `agentloop create-task` now accepts repeatable `--risk` and `--risk-note` flags that populate the existing section without changing task headings, adding risk scoring, or turning AgentLoopKit into a policy engine.

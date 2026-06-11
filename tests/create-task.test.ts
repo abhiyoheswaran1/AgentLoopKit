@@ -21,6 +21,8 @@ describe('create-task command', () => {
     const result = await execa(tsxPath, [cliPath, 'create-task', '--help']);
 
     expect(result.stdout).toContain('Supported task types:');
+    expect(result.stdout).toContain('--risk <text>');
+    expect(result.stdout).toContain('--risk-note <text>');
     for (const type of TASK_TYPES) {
       expect(result.stdout).toContain(type);
     }
@@ -132,6 +134,48 @@ describe('create-task command', () => {
     expect(markdown).toContain('- git diff --check');
     expect(markdown).toContain('- pnpm test');
     expect(markdown).toContain('Revert the docs-only update.');
+  });
+
+  test('accepts repeated risk note flags in non-interactive mode', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Capture risk notes',
+        '--type',
+        'bugfix',
+        '--out',
+        '.agentloop/tasks/capture-risk-notes.md',
+        '--risk',
+        'Touches release automation',
+        '--risk-note',
+        'Requires reviewer check for generated files',
+        '--risk',
+        'Rollback depends on reverting one commit',
+      ],
+      { cwd: dir },
+    );
+
+    const markdown = await readFile(
+      path.join(dir, '.agentloop/tasks/capture-risk-notes.md'),
+      'utf8',
+    );
+    expect(markdown).toContain('## Risk Notes');
+    expect(markdown).toContain('- Touches release automation');
+    expect(markdown).toContain('- Requires reviewer check for generated files');
+    expect(markdown).toContain('- Rollback depends on reverting one commit');
+    expect(markdown).not.toContain(
+      '- Re-check protected areas before changing migrations, auth, secrets, billing, deployment, or public APIs.',
+    );
   });
 
   test('accepts test-generation as a non-interactive task type', async () => {

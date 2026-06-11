@@ -250,6 +250,7 @@ agentloop create-task --type feature --title "Add settings page" \
   --forbidden-file migrations/ \
   --acceptance "Settings can be saved" \
   --verification "pnpm test" \
+  --risk "Touches account preferences" \
   --rollback "Remove the settings route"
 ```
 
@@ -269,7 +270,7 @@ agentloop task clear
 ```
 
 `task list --json` gives agents a deterministic list with `path`, `title`, `status`, `active`, and `modifiedAt`. Listing tasks does not create or update `.agentloop/state.json`.
-`create-task --json` returns the created task path and Markdown content so agents do not need to parse the human success line. `--out` paths must stay inside the configured task directory, including through existing symlinked ancestors. Invalid `--out` paths return parseable JSON errors with `requestedOut`, `tasksDir`, and `reason`.
+`create-task --json` returns the created task path and Markdown content so agents do not need to parse the human success line. `--risk` and `--risk-note` are repeatable and fill the contract's Risk Notes section. `--out` paths must stay inside the configured task directory, including through existing symlinked ancestors. Invalid `--out` paths return parseable JSON errors with `requestedOut`, `tasksDir`, and `reason`.
 For unsupported `--type` values, `create-task --json` returns a parseable error with `supportedTaskTypes` and writes no task file.
 `task show --json` returns the selected task metadata and Markdown content without changing active state. Invalid task paths on `show`, `set`, `status`, and `archive` return parseable JSON errors with `requestedTask`, `tasksDir`, and `reason`. Existing symlinked ancestors must still resolve inside the configured task directory.
 `task status --json` updates only the `- Status:` line. Supported values are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Unsupported status values return a parseable JSON error with `supportedStatuses` and write no task changes. Use `deferred` for parked work that should remain visible in `task list` but should not become the next unpinned task. Status is not verification evidence; run `agentloop verify` before claiming completion.
@@ -291,6 +292,7 @@ Each contract records:
 - files not to touch
 - acceptance criteria
 - verification commands
+- risk notes
 - rollback notes
 
 ## Verification Reports

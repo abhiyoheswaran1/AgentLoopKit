@@ -30,6 +30,7 @@ export type TaskContractInput = {
   forbiddenFiles?: string[];
   acceptanceCriteria?: string[];
   verificationCommands?: string[];
+  riskNotes?: string[];
   rollbackNotes?: string;
 };
 
@@ -95,7 +96,10 @@ ${list(input.verificationCommands, 'No verification command recorded.')}
 - Record any architecture decision in DECISIONS.md.
 
 ## Risk Notes
-- Re-check protected areas before changing migrations, auth, secrets, billing, deployment, or public APIs.
+${list(
+  input.riskNotes,
+  'Re-check protected areas before changing migrations, auth, secrets, billing, deployment, or public APIs.',
+)}
 
 ## Rollback Notes
 ${input.rollbackNotes || 'Document how to revert or disable this change.'}

@@ -151,6 +151,8 @@ export function createTaskCommand() {
     .option('--acceptance <text>', 'acceptance criterion; repeat or use newlines', lines, [])
     .option('--verify-command <command>', 'verification command; repeat or use newlines', lines, [])
     .option('--verification <command>', 'verification command; repeat or use newlines', lines, [])
+    .option('--risk <text>', 'risk note; repeat or use newlines', lines, [])
+    .option('--risk-note <text>', 'risk note; repeat or use newlines', lines, [])
     .option('--rollback <text>', 'rollback notes')
     .option('--json', 'print machine-readable output')
     .addHelpText('after', supportedTaskTypesHelp())
@@ -190,6 +192,7 @@ export function createTaskCommand() {
               forbiddenFiles: listOption(options, 'forbiddenFile'),
               acceptanceCriteria: listOption(options, 'acceptance'),
               verificationCommands: listOption(options, 'verifyCommand', 'verification'),
+              riskNotes: listOption(options, 'risk', 'riskNote'),
               rollbackNotes: stringOption(options, 'rollback'),
             }
           : await collectInteractive({ title, type });
