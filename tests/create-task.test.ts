@@ -296,4 +296,82 @@ describe('create-task command', () => {
     expect(result.stderr).toContain('Task output path must stay inside .agentloop/tasks');
     await expect(stat(outsidePath)).rejects.toThrow();
   });
+
+  test('prints outside output path errors as JSON when requested', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    const outsidePath = path.join(outsideDir, 'outside-task.md');
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Outside write',
+        '--type',
+        'bugfix',
+        '--out',
+        outsidePath,
+        '--json',
+      ],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'TASK_OUTPUT_PATH_OUTSIDE_TASKS_DIR',
+        message: 'Task output path must stay inside .agentloop/tasks.',
+        requestedOut: outsidePath,
+        tasksDir: '.agentloop/tasks',
+        reason: 'outside-tasks-dir',
+      },
+    });
+    await expect(stat(outsidePath)).rejects.toThrow();
+  });
+
+  test('prints non-Markdown output path errors as JSON when requested', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Text task',
+        '--type',
+        'docs',
+        '--out',
+        '.agentloop/tasks/text-task.txt',
+        '--json',
+      ],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'TASK_OUTPUT_PATH_NOT_MARKDOWN',
+        message: 'Task output path must be a Markdown file.',
+        requestedOut: '.agentloop/tasks/text-task.txt',
+        tasksDir: '.agentloop/tasks',
+        reason: 'not-markdown',
+      },
+    });
+    await expect(stat(path.join(dir, '.agentloop/tasks/text-task.txt'))).rejects.toThrow();
+  });
 });

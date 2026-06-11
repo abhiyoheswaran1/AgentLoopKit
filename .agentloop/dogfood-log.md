@@ -5039,3 +5039,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider clearer human wording for outside-root and non-Markdown paths in a separate compatibility-aware change.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Error Output for Invalid Create-Task Output Paths
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-json-error-output-for-invalid-create-task-output-paths.md`
+- Trigger:
+  - `agentloop create-task --json` returned structured success output, but invalid `--out` paths still used the global human error path.
+- Implementation:
+  - Added a `TaskOutputPathError` carrying `requestedOut`, `tasksDir`, and `reason`.
+  - Added JSON error handling for outside-directory and non-Markdown output paths.
+  - Kept default invalid-output-path errors human-readable on stderr.
+  - Documented the behavior in README, task-contract docs, and the changelog.
+- Verification run:
+  - Red focused create-task tests failed because invalid output paths printed human errors to stderr.
+  - Focused create-task suite passed: 10 tests.
+  - `.agentloop/reports/2026-06-11-03-41-verification-report.md`, overall status pass.
+- What worked well:
+  - The structured error gives agents a recovery reason without changing write safety.
+- Improve:
+  - Keep `create-task` path validation strict; do not auto-correct or rewrite unsafe output paths.
+  - Keep this unreleased until the planned `0.28.0` batch.

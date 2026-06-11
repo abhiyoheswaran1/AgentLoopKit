@@ -3,7 +3,11 @@ import prompts from 'prompts';
 import { TASK_TYPES } from '../../core/constants.js';
 import { loadAgentLoopConfig } from '../../core/config.js';
 import { AgentLoopError } from '../../core/errors.js';
-import { createTaskContractFile, TaskType } from '../../core/task-contract.js';
+import {
+  createTaskContractFile,
+  TaskOutputPathError,
+  TaskType,
+} from '../../core/task-contract.js';
 
 function lines(value: string | undefined, previous: string[]) {
   const current = value
@@ -188,12 +192,25 @@ export function createTaskCommand() {
               rollbackNotes: stringOption(options, 'rollback'),
             }
           : await collectInteractive({ title, type });
-      const result = await createTaskContractFile({
-        cwd: process.cwd(),
-        config,
-        input,
-        out: typeof options.out === 'string' ? options.out : undefined,
-      });
+      let result: Awaited<ReturnType<typeof createTaskContractFile>>;
+      try {
+        result = await createTaskContractFile({
+          cwd: process.cwd(),
+          config,
+          input,
+          out: typeof options.out === 'string' ? options.out : undefined,
+        });
+      } catch (error) {
+        if (options.json && error instanceof TaskOutputPathError) {
+          printJsonError(error, {
+            requestedOut: error.requestedOut,
+            tasksDir: error.tasksDir,
+            reason: error.reason,
+          });
+          return;
+        }
+        throw error;
+      }
       if (options.json) {
         console.log(JSON.stringify({ task: result }, null, 2));
         return;

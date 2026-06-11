@@ -33,6 +33,21 @@ export type TaskContractInput = {
   rollbackNotes?: string;
 };
 
+export type TaskOutputPathErrorReason = 'outside-tasks-dir' | 'not-markdown';
+
+export class TaskOutputPathError extends AgentLoopError {
+  constructor(
+    message: string,
+    code: string,
+    public readonly requestedOut: string,
+    public readonly tasksDir: string,
+    public readonly reason: TaskOutputPathErrorReason,
+  ) {
+    super(message, code);
+    this.name = 'TaskOutputPathError';
+  }
+}
+
 function list(values: string[] | undefined, fallback = 'None recorded yet.') {
   const clean = values?.map((value) => value.trim()).filter(Boolean) ?? [];
   if (clean.length === 0) return `- ${fallback}`;
@@ -114,12 +129,22 @@ export async function createTaskContractFile(options: {
     relativeToTasks.startsWith('..') ||
     path.isAbsolute(relativeToTasks)
   ) {
-    throw new AgentLoopError(
+    throw new TaskOutputPathError(
       `Task output path must stay inside ${options.config.paths.tasksDir}.`,
+      'TASK_OUTPUT_PATH_OUTSIDE_TASKS_DIR',
+      relativePath,
+      options.config.paths.tasksDir,
+      'outside-tasks-dir',
     );
   }
   if (!absolutePath.endsWith('.md')) {
-    throw new AgentLoopError('Task output path must be a Markdown file.');
+    throw new TaskOutputPathError(
+      'Task output path must be a Markdown file.',
+      'TASK_OUTPUT_PATH_NOT_MARKDOWN',
+      relativePath,
+      options.config.paths.tasksDir,
+      'not-markdown',
+    );
   }
 
   const markdown = generateTaskContract({ ...options.input, createdDate });
