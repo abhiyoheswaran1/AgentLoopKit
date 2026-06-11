@@ -3,7 +3,7 @@ import { mkdir, readdir, readFile, realpath, stat, symlink, writeFile } from 'no
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { SUPPORTED_AGENTS } from '../src/core/constants.js';
-import { makeTempDir, removeTempDir } from './helpers.js';
+import { CLI_PROCESS_TIMEOUT_MS, makeTempDir, removeTempDir } from './helpers.js';
 import {
   installAgentInstructions,
   installAllAgentInstructions,
@@ -93,9 +93,9 @@ describe('agent installation', () => {
         agentsPath: path.join(resolvedDir, 'AGENTS.md'),
       })),
     });
-    await expect(readFile(path.join(dir, '.agentloop/agents/generic.md'), 'utf8')).resolves.toContain(
-      'Generic Coding Agent',
-    );
+    await expect(
+      readFile(path.join(dir, '.agentloop/agents/generic.md'), 'utf8'),
+    ).resolves.toContain('Generic Coding Agent');
     await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toContain(
       '.agentloop/agents/github-copilot-cli.md',
     );
@@ -108,7 +108,7 @@ describe('agent installation', () => {
     const result = await execa(tsxPath, [cliPath, 'install-agent', 'vibes', '--json'], {
       cwd: dir,
       reject: false,
-      timeout: 5000,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
     });
 
     expect(result.timedOut).toBe(false);
@@ -187,7 +187,7 @@ describe('agent installation', () => {
     const result = await execa(tsxPath, [cliPath, 'install-agent', 'vibes'], {
       cwd: dir,
       reject: false,
-      timeout: 5000,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
     });
 
     expect(result.timedOut).toBe(false);

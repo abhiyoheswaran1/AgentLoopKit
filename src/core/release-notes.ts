@@ -12,6 +12,7 @@ import {
 import { formatTimestamp } from './dates.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import { getGitBranch, getGitCommit } from './git.js';
+import { inlineCode } from './markdown-format.js';
 import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 
 export type ReleaseNotesResult = {
@@ -160,21 +161,6 @@ function validateGitRef(optionName: string, ref: string) {
 
 function renderList(lines: string[], empty: string) {
   return lines.length ? lines.map((line) => `- ${line}`).join('\n') : `- ${empty}`;
-}
-
-function longestBacktickRun(value: string) {
-  const runs = value.match(/`+/g) ?? [];
-  return runs.reduce((longest, run) => Math.max(longest, run.length), 0);
-}
-
-function inlineCode(content: string) {
-  const fence = '`'.repeat(Math.max(1, longestBacktickRun(content) + 1));
-  const needsPadding =
-    content.startsWith('`') ||
-    content.endsWith('`') ||
-    content.startsWith(' ') ||
-    content.endsWith(' ');
-  return `${fence}${needsPadding ? ` ${content} ` : content}${fence}`;
 }
 
 function renderChangedFiles(files: Array<{ status: string; path: string }>) {

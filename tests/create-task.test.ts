@@ -5,7 +5,7 @@ import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import { TASK_TYPES } from '../src/core/constants.js';
 import { initializeAgentLoop } from '../src/core/init.js';
-import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
+import { CLI_PROCESS_TIMEOUT_MS, makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
@@ -250,7 +250,7 @@ describe('create-task command', () => {
         '--out',
         '.agentloop/tasks/typo.md',
       ],
-      { cwd: dir, reject: false, timeout: 5000 },
+      { cwd: dir, reject: false, timeout: CLI_PROCESS_TIMEOUT_MS },
     );
 
     expect(result.timedOut).toBe(false);
@@ -281,7 +281,7 @@ describe('create-task command', () => {
         '.agentloop/tasks/typo.md',
         '--json',
       ],
-      { cwd: dir, reject: false, timeout: 5000 },
+      { cwd: dir, reject: false, timeout: CLI_PROCESS_TIMEOUT_MS },
     );
 
     expect(result.timedOut).toBe(false);

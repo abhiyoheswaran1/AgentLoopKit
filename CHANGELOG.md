@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Refactored Markdown inline-code and code-fence formatting into a shared tested helper used by verification reports, PR summaries, and release notes.
+- Changed CLI subprocess regression tests to use a shared timeout budget so full-suite load does not create false timeout failures.
 - Changed release notes to render changed-file and working-tree path labels with Markdown-safe inline-code delimiters when paths contain backticks.
 - Changed PR summaries and handoffs to render changed-file paths with Markdown-safe inline-code delimiters when paths contain backticks.
 - Changed verification report command labels to use Markdown-safe inline-code delimiters when command strings contain backticks.

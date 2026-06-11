@@ -2,6 +2,8 @@ import { mkdtemp, rm, writeFile, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
+export const CLI_PROCESS_TIMEOUT_MS = 20_000;
+
 export async function makeTempDir(prefix = 'agentloopkit-') {
   return mkdtemp(path.join(tmpdir(), prefix));
 }

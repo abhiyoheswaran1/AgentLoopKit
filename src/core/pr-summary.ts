@@ -10,6 +10,7 @@ import {
   getLatestVerificationReportPath,
   resolveCurrentVerificationEvidence,
 } from './evidence.js';
+import { inlineCode } from './markdown-format.js';
 
 export type PrSummaryInput = {
   timestamp: string;
@@ -105,21 +106,6 @@ function classifyChangedFiles(changedFiles: GitFileStatus[]) {
   }
 
   return [...areas.filter((area) => area.files.length), ...(other.files.length ? [other] : [])];
-}
-
-function longestBacktickRun(value: string) {
-  const runs = value.match(/`+/g) ?? [];
-  return runs.reduce((longest, run) => Math.max(longest, run.length), 0);
-}
-
-function inlineCode(content: string) {
-  const fence = '`'.repeat(Math.max(1, longestBacktickRun(content) + 1));
-  const needsPadding =
-    content.startsWith('`') ||
-    content.endsWith('`') ||
-    content.startsWith(' ') ||
-    content.endsWith(' ');
-  return `${fence}${needsPadding ? ` ${content} ` : content}${fence}`;
 }
 
 function renderChangedFileLine(file: GitFileStatus) {

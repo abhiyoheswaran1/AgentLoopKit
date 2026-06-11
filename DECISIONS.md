@@ -16,6 +16,10 @@ AgentLoopKit ships as a TypeScript Node CLI distributed through npm and npx. The
 
 `agentloop release-notes` keeps changed-file and working-tree paths as release evidence, but Markdown path labels use inline-code delimiters longer than any backtick run in the path. This keeps release drafts readable when a repository path contains backticks without changing git range selection, status parsing, or publishing behavior.
 
+## 2026-06-11: Share Markdown Delimiter Logic
+
+Verification reports, reviewer handoffs, and release notes use a shared Markdown formatting helper for inline code and code fences. This keeps delimiter behavior consistent across evidence artifacts without adding a Markdown parser, sanitizer dependency, or broad rendering refactor.
+
 ## 2026-06-09: Preserve Existing AGENTS.md
 
 `init` appends a marked AgentLoopKit section when `AGENTS.md` already exists. It does not overwrite user instructions.

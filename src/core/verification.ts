@@ -6,6 +6,7 @@ import { resolveOutputArtifactPath } from './artifacts.js';
 import { formatTimestamp } from './dates.js';
 import { getGitBranch, getGitCommit, getGitStatus } from './git.js';
 import { isInsidePath, normalizeExistingAncestor, writeTextFile } from './file-system.js';
+import { fencedCodeBlock, inlineCode } from './markdown-format.js';
 
 export type VerificationCommandKey = 'test' | 'lint' | 'typecheck' | 'build' | 'custom' | 'task';
 
@@ -78,28 +79,6 @@ function failureSnippet(output: string, maxLines = 12, maxChars = 2000) {
   if (tail.length <= maxChars) return tail;
   return `${tail.slice(0, maxChars)}
 [failure summary truncated]`;
-}
-
-function longestBacktickRun(value: string) {
-  const runs = value.match(/`+/g) ?? [];
-  return runs.reduce((longest, run) => Math.max(longest, run.length), 0);
-}
-
-function fencedCodeBlock(info: string, content: string) {
-  const fence = '`'.repeat(Math.max(3, longestBacktickRun(content) + 1));
-  return `${fence}${info}
-${content}
-${fence}`;
-}
-
-function inlineCode(content: string) {
-  const fence = '`'.repeat(Math.max(1, longestBacktickRun(content) + 1));
-  const needsPadding =
-    content.startsWith('`') ||
-    content.endsWith('`') ||
-    content.startsWith(' ') ||
-    content.endsWith(' ');
-  return `${fence}${needsPadding ? ` ${content} ` : content}${fence}`;
 }
 
 function renderFailureSummary(results: VerificationCommandResult[]) {

@@ -2,6 +2,31 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Extract Markdown Inline-Code Formatter
+
+- Task contract: `.agentloop/tasks/2026-06-11-extract-markdown-inline-code-formatter.md`
+- Trigger:
+  - Verification reports, PR summaries, and release notes had the same backtick-aware inline-code rendering logic after the Markdown-hardening pass.
+  - The duplicated code raised maintenance risk without adding product value.
+- Product change:
+  - Added `src/core/markdown-format.ts` with shared `inlineCode`, `fencedCodeBlock`, and `longestBacktickRun` helpers.
+  - Added a focused test suite for normal labels, labels containing backticks, and padding edge cases.
+  - Updated verification reports, PR summaries, and release notes to use the shared helper.
+- Verification:
+  - Red helper test: `npm test -- tests/markdown-format.test.ts` failed before the helper module existed.
+  - Helper suite: `npm test -- tests/markdown-format.test.ts` passed.
+  - Adjacent suites: `npm test -- tests/verification.test.ts tests/pr-summary.test.ts tests/release-notes.test.ts` passed.
+  - A full-suite run exposed a false timeout in CLI subprocess error tests that used a hard 5-second limit. The affected `agent-installation` and `create-task` tests now use a shared `CLI_PROCESS_TIMEOUT_MS`.
+  - Affected CLI test suites: `npm test -- tests/agent-installation.test.ts tests/create-task.test.ts` passed.
+  - Full suite: `npm test` passed with 42 test files and 356 tests.
+  - Full self-verify: `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-11-extract-markdown-inline-code-formatter.md --task-commands --timeout-ms 240000 --json` passed and wrote `.agentloop/reports/2026-06-11-15-51-verification-report.md`.
+  - CLI smoke: `node scripts/smoke-cli.mjs` passed.
+  - Release smoke: `npm run smoke:release` passed.
+- Worked well:
+  - The refactor stayed behind existing renderers and did not change command execution, git parsing, artifact writes, or report formats beyond using the same delimiter function.
+- Improve:
+  - Keep future Markdown helpers small and evidence-oriented. Avoid introducing a Markdown parser unless a real rendering need appears.
+
 ## 2026-06-11: Harden Release-Note File Path Labels
 
 - Task contract: `.agentloop/tasks/2026-06-11-harden-release-note-file-path-labels.md`
