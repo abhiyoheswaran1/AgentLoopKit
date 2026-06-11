@@ -30,7 +30,8 @@ The config controls:
 
 Path values under `paths` must be local repo-relative paths. AgentLoopKit rejects:
 
-- absolute paths, including POSIX, Windows drive, and UNC-style paths
+- absolute paths, including POSIX and UNC-style paths
+- Windows drive-qualified paths such as `C:\agentloop\reports` or `C:agentloop\reports`
 - parent traversal segments such as `../outside` or `.agentloop/../outside`
 - null bytes
 

@@ -32,7 +32,8 @@ function configPathIssue(configPath: string) {
   if (
     path.isAbsolute(configPath) ||
     path.posix.isAbsolute(configPath) ||
-    path.win32.isAbsolute(configPath)
+    path.win32.isAbsolute(configPath) ||
+    /^[A-Za-z]:/.test(configPath)
   ) {
     return 'absolute';
   }

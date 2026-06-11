@@ -45,27 +45,27 @@
       "properties": {
         "root": {
           "type": "string",
-          "description": "A non-empty repo-relative path; absolute paths, parent traversal segments, and null bytes are rejected.",
+          "description": "A non-empty repo-relative path; absolute or Windows drive-qualified paths, parent traversal segments, and null bytes are rejected.",
           "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$"
         },
         "agentloopDir": {
           "type": "string",
-          "description": "A non-empty repo-relative path; absolute paths, parent traversal segments, and null bytes are rejected.",
+          "description": "A non-empty repo-relative path; absolute or Windows drive-qualified paths, parent traversal segments, and null bytes are rejected.",
           "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$"
         },
         "tasksDir": {
           "type": "string",
-          "description": "A non-empty repo-relative path; absolute paths, parent traversal segments, and null bytes are rejected.",
+          "description": "A non-empty repo-relative path; absolute or Windows drive-qualified paths, parent traversal segments, and null bytes are rejected.",
           "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$"
         },
         "reportsDir": {
           "type": "string",
-          "description": "A non-empty repo-relative path; absolute paths, parent traversal segments, and null bytes are rejected.",
+          "description": "A non-empty repo-relative path; absolute or Windows drive-qualified paths, parent traversal segments, and null bytes are rejected.",
           "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$"
         },
         "handoffsDir": {
           "type": "string",
-          "description": "A non-empty repo-relative path; absolute paths, parent traversal segments, and null bytes are rejected.",
+          "description": "A non-empty repo-relative path; absolute or Windows drive-qualified paths, parent traversal segments, and null bytes are rejected.",
           "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$"
         }
       }

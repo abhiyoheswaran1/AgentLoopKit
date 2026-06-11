@@ -59,6 +59,15 @@ describe('config', () => {
         },
       }),
     ).toThrow(/repo-relative/i);
+    expect(() =>
+      parseAgentLoopConfig({
+        ...config,
+        paths: {
+          ...config.paths,
+          reportsDir: 'C:agentloop\\reports',
+        },
+      }),
+    ).toThrow(/repo-relative/i);
   });
 
   test('rejects config paths with parent traversal', () => {

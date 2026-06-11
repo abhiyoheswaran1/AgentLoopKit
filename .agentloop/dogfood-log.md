@@ -5524,3 +5524,24 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep future config path customization simple and repo-local; do not introduce arbitrary filesystem output targets.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Drive-Qualified Config Path Parity
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-reject-drive-qualified-config-paths.md`
+- Trigger:
+  - The shipped JSON schema rejected Windows drive-qualified paths such as `C:agentloop\reports`, but runtime config validation accepted them because `path.win32.isAbsolute` returns `false` for drive-relative paths.
+- Implementation:
+  - Added a focused runtime check for leading Windows drive prefixes in config path values.
+  - Added a failing-first config test for `C:agentloop\reports`.
+  - Updated README, configuration docs, changelog, decisions, schema descriptions, and backlog wording to name drive-qualified paths explicitly.
+- Verification run:
+  - Red focused config/schema tests failed because `C:agentloop\reports` was accepted.
+  - Focused config/schema tests passed after the runtime validator fix.
+  - Full `npm test`, `npm run lint`, `npm run typecheck`, `npm run check:links`, `npm run build`, `git diff --check`, and `npx --yes projscan doctor --format markdown` passed.
+  - Dogfood report: `.agentloop/reports/2026-06-11-07-19-verification-report.md`, overall status pass.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-07-20-pr-summary.md`.
+- What worked well:
+  - The existing schema pattern already encoded the intended safety rule, so the fix stayed limited to parser parity and wording.
+- Improve:
+  - Keep schema descriptions and runtime validation examples in sync whenever config path rules change.
+  - Keep this unreleased until the planned `0.28.0` batch.
