@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { generateReleaseNotes } from '../../core/release-notes.js';
-import { loadConfigForJsonCommand } from '../json-errors.js';
+import { loadConfigForJsonCommand, validateOutRequiresWrite } from '../json-errors.js';
 
 export function releaseNotesCommand() {
   return new Command('release-notes')
@@ -20,6 +20,7 @@ export function releaseNotesCommand() {
         out?: string;
         json?: boolean;
       }) => {
+        if (!validateOutRequiresWrite(options)) return;
         const config = await loadConfigForJsonCommand(process.cwd(), options.json);
         if (!config) return;
         const result = await generateReleaseNotes({

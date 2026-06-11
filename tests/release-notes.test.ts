@@ -144,6 +144,44 @@ describe('release-notes command', () => {
     expect(handoffs.some((file) => file.endsWith('-release-notes.md'))).toBe(false);
   });
 
+  test('prints JSON errors when --out is provided without --write', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+    const outPath = path.join(dir, '.agentloop/handoffs/manual-release-notes.md');
+
+    const result = await execa(tsxPath, [cliPath, 'release-notes', '--out', outPath, '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'OUT_REQUIRES_WRITE',
+        message: '--out requires --write.',
+        option: 'out',
+        requiredOption: 'write',
+        requestedPath: outPath,
+      },
+    });
+    expect(existsSync(outPath)).toBe(false);
+  });
+
+  test('keeps --out without --write errors human-readable by default', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+    const outPath = path.join(dir, '.agentloop/handoffs/manual-release-notes.md');
+
+    const result = await execa(tsxPath, [cliPath, 'release-notes', '--out', outPath], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('agentloop: --out requires --write.');
+    expect(existsSync(outPath)).toBe(false);
+  });
+
   test('handles an explicit missing from ref without pretending the range was read', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: true });
 

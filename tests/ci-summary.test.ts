@@ -174,6 +174,44 @@ describe('ci-summary command', () => {
     expect(reports.some((file) => file.endsWith('-ci-summary.md'))).toBe(false);
   });
 
+  test('prints JSON errors when --out is provided without --write', async () => {
+    const dir = await createRepoWithEvidence();
+    const outPath = path.join(dir, '.agentloop/reports/manual-ci-summary.md');
+
+    const result = await execa(tsxPath, [cliPath, 'ci-summary', '--out', outPath, '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'OUT_REQUIRES_WRITE',
+        message: '--out requires --write.',
+        option: 'out',
+        requiredOption: 'write',
+        requestedPath: outPath,
+      },
+    });
+    await expect(readFile(outPath, 'utf8')).rejects.toThrow();
+  });
+
+  test('keeps --out without --write errors human-readable by default', async () => {
+    const dir = await createRepoWithEvidence();
+    const outPath = path.join(dir, '.agentloop/reports/manual-ci-summary.md');
+
+    const result = await execa(tsxPath, [cliPath, 'ci-summary', '--out', outPath], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('agentloop: --out requires --write.');
+    await expect(readFile(outPath, 'utf8')).rejects.toThrow();
+  });
+
   test('status, report, badge, and gates ignore newer CI summary artifacts when locating verification reports', async () => {
     const dir = await createRepoWithEvidence();
     await writeFile(

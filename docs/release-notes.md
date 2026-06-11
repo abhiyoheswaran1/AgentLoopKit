@@ -38,6 +38,7 @@ Human output is Markdown. JSON output includes the same evidence paths and relea
 ```
 
 Without `--write`, the command prints the draft and does not create a file.
+Use `--out` only with `--write`. If `--out` is passed without `--write`, AgentLoopKit exits before reading config or writing a file. With `--json`, it returns `OUT_REQUIRES_WRITE`.
 With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` object and AgentLoopKit writes no release-notes file.
 
 ## Safety

@@ -2,6 +2,35 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Require `--write` With `--out`
+
+- Task contract: `.agentloop/tasks/2026-06-11-require-write-when-output-path-is-provided.md`
+- Trigger:
+  - `agentloop ci-summary --out <path>` and `agentloop release-notes --out <path>` accepted an output path but wrote nothing unless `--write` was also passed.
+  - That silent ignore could mislead CI scripts or agents into thinking a requested artifact existed.
+- Product change:
+  - Added a shared CLI option validator for `--out`/`--write`.
+  - `ci-summary` and `release-notes` now fail before reading config or writing files when `--out` is passed without `--write`.
+  - JSON mode returns `OUT_REQUIRES_WRITE` with the requested path and required option.
+  - Human mode keeps the error on stderr through the existing top-level CLI error handler.
+  - Updated CI-summary and release-notes docs plus the unreleased changelog.
+- Verification completed:
+  - Red focused test first: `npm test -- tests/ci-summary.test.ts tests/release-notes.test.ts` failed because both commands exited 0 while ignoring `--out`.
+  - Focused green test: `npm test -- tests/ci-summary.test.ts tests/release-notes.test.ts`
+  - Full `npm test`
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run check:links`
+  - `npm run build`
+  - `git diff --check`
+  - `npx --yes projscan doctor --format markdown`
+- Verification report: `.agentloop/reports/2026-06-11-05-44-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-11-05-45-pr-summary.md`
+- Worked well:
+  - The same validator can cover future write-only output options without duplicating JSON error rendering.
+- Improve:
+  - Audit `badge --out` and `report --out` separately for whether they should keep arbitrary explicit output paths or require configured artifact directories.
+
 ## 2026-06-11: Add Baseframe Labs Ownership Metadata
 
 - Task contract: `.agentloop/tasks/2026-06-11-add-baseframe-labs-ownership-metadata.md`

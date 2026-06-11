@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { getCiSummary } from '../../core/ci-summary.js';
-import { loadConfigForJsonCommand } from '../json-errors.js';
+import { loadConfigForJsonCommand, validateOutRequiresWrite } from '../json-errors.js';
 
 export function ciSummaryCommand() {
   return new Command('ci-summary')
@@ -9,6 +9,7 @@ export function ciSummaryCommand() {
     .option('--out <path>', 'output Markdown path when using --write')
     .option('--json', 'print machine-readable output')
     .action(async (options: { write?: boolean; out?: string; json?: boolean }) => {
+      if (!validateOutRequiresWrite(options)) return;
       const config = await loadConfigForJsonCommand(process.cwd(), options.json);
       if (!config) return;
       const result = await getCiSummary({
