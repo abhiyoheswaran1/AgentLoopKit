@@ -2,6 +2,27 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Harden PR Summary Changed-File Paths
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-pr-summary-changed-file-paths.md`
+- Trigger:
+  - After hardening verification report Markdown delimiters, a handoff review found that PR summaries still rendered git file paths with fixed inline backticks.
+  - Repository paths are local evidence and can legally include backticks.
+- Product change:
+  - Added a regression test for a changed file path containing a backtick.
+  - Changed PR summary `Changed Files` and `Change Areas` path labels to use inline-code delimiters longer than any backtick run in the path.
+  - Updated PR summary docs, changelog, backlog, and decision notes.
+- Verification:
+  - Red focused test: `npm test -- tests/pr-summary.test.ts -t "escapes changed file paths"` failed before the path renderer changed.
+  - Focused green test: `npm test -- tests/pr-summary.test.ts -t "escapes changed file paths"` passed after the renderer change.
+  - Adjacent suite: `npm test -- tests/pr-summary.test.ts` passed.
+  - Full self-verify: `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-11-harden-pr-summary-changed-file-paths.md --task-commands --timeout-ms 120000 --json` passed and wrote `.agentloop/reports/2026-06-11-15-06-verification-report.md`.
+  - Release smoke: `npm run smoke:release` passed.
+- Worked well:
+  - The fix stayed in the deterministic summary renderer and did not change git status parsing or file-area classification.
+- Improve:
+  - Review release-note changed-file rendering for the same delimiter pattern in a later focused slice.
+
 ## 2026-06-11: Harden Verification Report Command Code Spans
 
 - Task contract: `.agentloop/tasks/2026-06-11-harden-verification-report-command-code-spans.md`

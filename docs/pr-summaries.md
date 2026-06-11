@@ -33,6 +33,8 @@ No LLM is required.
 
 AgentLoopKit classifies files by path only. It does not read file contents, `.env` contents, or credentials to create change-area hints.
 
+Changed-file paths are kept as evidence, but path labels use Markdown inline-code delimiters long enough to contain paths that include backticks. A repository path cannot close its own path label by including ` in the filename.
+
 Use `agentloop summarize` to preview the same deterministic summary without writing a file. `agentloop summarize --write` remains available for scripts that already use it.
 
 Explicit `--task` and `--verification` inputs must point to existing Markdown artifacts inside `.agentloop/tasks/` and `.agentloop/reports/`. With `--json`, invalid input paths return a structured `ARTIFACT_PATH_INVALID` error and `handoff` does not write a summary.

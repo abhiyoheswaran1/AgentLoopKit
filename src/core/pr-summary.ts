@@ -107,6 +107,25 @@ function classifyChangedFiles(changedFiles: GitFileStatus[]) {
   return [...areas.filter((area) => area.files.length), ...(other.files.length ? [other] : [])];
 }
 
+function longestBacktickRun(value: string) {
+  const runs = value.match(/`+/g) ?? [];
+  return runs.reduce((longest, run) => Math.max(longest, run.length), 0);
+}
+
+function inlineCode(content: string) {
+  const fence = '`'.repeat(Math.max(1, longestBacktickRun(content) + 1));
+  const needsPadding =
+    content.startsWith('`') ||
+    content.endsWith('`') ||
+    content.startsWith(' ') ||
+    content.endsWith(' ');
+  return `${fence}${needsPadding ? ` ${content} ` : content}${fence}`;
+}
+
+function renderChangedFileLine(file: GitFileStatus) {
+  return `- ${file.status} ${inlineCode(file.path)}`;
+}
+
 function renderChangeAreas(changedFiles: GitFileStatus[]) {
   if (!changedFiles.length) return '- No changed files detected.';
 
@@ -114,7 +133,7 @@ function renderChangeAreas(changedFiles: GitFileStatus[]) {
   return areas
     .map((area) => {
       return `### ${area.title}
-${area.files.map((file) => `- ${file.status} \`${file.path}\``).join('\n')}`;
+${area.files.map(renderChangedFileLine).join('\n')}`;
     })
     .join('\n\n');
 }
@@ -169,7 +188,7 @@ This summary was generated deterministically from git status, the latest task co
 ## Changed Files
 ${
   input.changedFiles.length
-    ? input.changedFiles.map((file) => `- ${file.status} \`${file.path}\``).join('\n')
+    ? input.changedFiles.map(renderChangedFileLine).join('\n')
     : '- No changed files detected.'
 }
 

@@ -78,6 +78,23 @@ describe('PR summary generation', () => {
     );
   });
 
+  test('escapes changed file paths when paths contain backticks', () => {
+    const trickyPath = 'src/weird`path.ts';
+    const summary = generatePrSummary({
+      timestamp: '2026-06-11-15-00',
+      status: '',
+      changedFiles: [{ status: 'M', path: trickyPath }],
+      taskMarkdown: '# Harden PR summary paths',
+      verificationMarkdown: '# Verification Report\n\nOverall status: pass',
+      diffStat: '1 file changed',
+    });
+    const safePathLine = `- M \`\`${trickyPath}\`\``;
+
+    expect(summary.markdown.split(safePathLine).length - 1).toBe(2);
+    expect(summary.markdown).toContain('## Changed Files');
+    expect(summary.markdown).toContain('## Change Areas');
+  });
+
   test('uses latest timestamped verification report instead of reports README', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

@@ -8,6 +8,10 @@ AgentLoopKit ships as a TypeScript Node CLI distributed through npm and npx. The
 
 `agentloop summarize` uses git status, diff stats, task contracts, verification reports, and config. It does not call an LLM. Reviewers should be able to reproduce the summary from repo state.
 
+## 2026-06-11: Handoff Path Labels Adapt To Repo Paths
+
+`agentloop summarize` and `agentloop handoff` keep changed-file paths as git evidence, but Markdown path labels use inline-code delimiters longer than any backtick run in the path. This keeps reviewer handoffs readable when a repository path contains backticks without changing git parsing, file classification, or the path text.
+
 ## 2026-06-09: Preserve Existing AGENTS.md
 
 `init` appends a marked AgentLoopKit section when `AGENTS.md` already exists. It does not overwrite user instructions.
