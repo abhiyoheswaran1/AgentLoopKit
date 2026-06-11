@@ -265,3 +265,7 @@ Release notes combine package metadata, git range labels, branch names, commit I
 ## 2026-06-11: Status And Next Markdown Use Safe Inline Formatting
 
 `agentloop status` and `agentloop next` give agents and humans the current loop state. They now render local project, git, task, report, command, and working-tree values with the shared inline-code formatter. JSON and brief output stay unchanged, and verification status parsing still accepts the existing normalized status values.
+
+## 2026-06-11: Artifact Inventory Markdown Uses Safe Inline Formatting
+
+`agentloop artifacts` inventories local evidence for humans, agents, and CI logs. It now renders task statuses, task titles, artifact titles, artifact paths, and verification statuses with the shared inline-code formatter. JSON output and artifact discovery stay unchanged.

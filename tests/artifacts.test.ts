@@ -105,6 +105,55 @@ async function createRepoWithArtifacts() {
   return dir;
 }
 
+async function createRepoWithMarkdownEdgeArtifacts() {
+  const dir = await makeTempDir();
+  tempDirs.push(dir);
+  await writeConfig(dir);
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/tasks/2026-06-11-active`task.md',
+    '# Active `task`\n\n- Status: review`ready\n',
+    '2026-06-11T09:00:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/reports/2026-06-11-10-00-verification-report.md',
+    '# Verification `report`\n\nOverall status: pass`ok\n',
+    '2026-06-11T10:00:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/handoffs/2026-06-11-10-05-pr-summary.md',
+    '# Handoff `summary`\n',
+    '2026-06-11T10:05:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/reports/agentloop`report.html',
+    '<!doctype html><title>AgentLoopKit Report</title>',
+    '2026-06-11T10:10:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/reports/agentloop`verification.svg',
+    '<svg role="img"></svg>',
+    '2026-06-11T10:15:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/reports/2026-06-11-10-20-ci-summary.md',
+    '# CI `summary`\n',
+    '2026-06-11T10:20:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/handoffs/2026-06-11-10-25-release-notes.md',
+    '# Release `notes`\n',
+    '2026-06-11T10:25:00.000Z',
+  );
+  return dir;
+}
+
 async function snapshotTree(root: string): Promise<TreeSnapshotEntry[]> {
   if (!existsSync(root)) return [];
   const entries: TreeSnapshotEntry[] = [];
@@ -217,30 +266,91 @@ describe('artifacts command', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toBe('');
     expect(result.stdout).toContain('# AgentLoopKit Artifacts');
-    expect(result.stdout).toContain('- Tasks: 2 total (in-progress: 1, proposed: 1)');
+    expect(result.stdout).toContain('- Tasks: 2 total (`in-progress`: 1, `proposed`: 1)');
     expect(result.stdout).toContain(
-      '- Latest task: New task (in-progress) - .agentloop/tasks/2026-06-11-new-task.md',
+      '- Latest task: `New task` (`in-progress`) - `.agentloop/tasks/2026-06-11-new-task.md`',
     );
     expect(result.stdout).toContain('- Verification reports: 2');
     expect(result.stdout).toContain(
-      '- Latest verification: pass - .agentloop/reports/2026-06-10-10-00-verification-report.md',
+      '- Latest verification: `pass` - `.agentloop/reports/2026-06-10-10-00-verification-report.md`',
     );
     expect(result.stdout).toContain(
-      '- Latest handoff: Latest Handoff - .agentloop/handoffs/2026-06-10-10-05-pr-summary.md',
+      '- Latest handoff: `Latest Handoff` - `.agentloop/handoffs/2026-06-10-10-05-pr-summary.md`',
     );
     expect(result.stdout).toContain(
-      '- Latest HTML report: .agentloop/reports/2026-06-10-10-10-agentloop-report.html',
+      '- Latest HTML report: `.agentloop/reports/2026-06-10-10-10-agentloop-report.html`',
     );
     expect(result.stdout).toContain(
-      '- Latest badge: .agentloop/reports/agentloop-verification.svg',
+      '- Latest badge: `.agentloop/reports/agentloop-verification.svg`',
     );
     expect(result.stdout).toContain(
-      '- Latest CI summary: AgentLoopKit CI Summary - .agentloop/reports/2026-06-10-10-20-ci-summary.md',
+      '- Latest CI summary: `AgentLoopKit CI Summary` - `.agentloop/reports/2026-06-10-10-20-ci-summary.md`',
     );
     expect(result.stdout).toContain(
-      '- Latest release notes: Release Notes - .agentloop/handoffs/2026-06-10-10-25-release-notes.md',
+      '- Latest release notes: `Release Notes` - `.agentloop/handoffs/2026-06-10-10-25-release-notes.md`',
     );
     expect(result.stdout).not.toContain('do-not-print-this-fixture');
+  });
+
+  test('renders markdown inventory values with safe inline code when artifact metadata contains backticks', async () => {
+    const dir = await createRepoWithMarkdownEdgeArtifacts();
+
+    const fullResult = await execa(tsxPath, [cliPath, 'artifacts'], {
+      cwd: dir,
+      reject: false,
+    });
+    const latestTaskResult = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--type', 'task', '--latest'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(fullResult.exitCode).toBe(0);
+    expect(fullResult.stderr).toBe('');
+    expect(fullResult.stdout).toContain('- Tasks: 1 total (``review`ready``: 1)');
+    expect(fullResult.stdout).toContain(
+      '- Latest task: `` Active `task` `` (``review`ready``) - ``.agentloop/tasks/2026-06-11-active`task.md``',
+    );
+    expect(fullResult.stdout).toContain(
+      '- Latest verification: `pass` - `.agentloop/reports/2026-06-11-10-00-verification-report.md`',
+    );
+    expect(fullResult.stdout).toContain(
+      '- Latest handoff: `` Handoff `summary` `` - `.agentloop/handoffs/2026-06-11-10-05-pr-summary.md`',
+    );
+    expect(fullResult.stdout).toContain(
+      '- Latest HTML report: ``.agentloop/reports/agentloop`report.html``',
+    );
+    expect(fullResult.stdout).toContain(
+      '- Latest badge: ``.agentloop/reports/agentloop`verification.svg``',
+    );
+    expect(fullResult.stdout).toContain(
+      '- Latest CI summary: `` CI `summary` `` - `.agentloop/reports/2026-06-11-10-20-ci-summary.md`',
+    );
+    expect(fullResult.stdout).toContain(
+      '- Latest release notes: `` Release `notes` `` - `.agentloop/handoffs/2026-06-11-10-25-release-notes.md`',
+    );
+    expect(latestTaskResult.exitCode).toBe(0);
+    expect(latestTaskResult.stdout).toContain('# AgentLoopKit Artifacts');
+    expect(latestTaskResult.stdout).toContain(
+      '- Latest task: `` Active `task` `` (``review`ready``) - ``.agentloop/tasks/2026-06-11-active`task.md``',
+    );
+    const inventory = JSON.parse(jsonResult.stdout);
+    expect(inventory.tasks.latest).toMatchObject({
+      path: '.agentloop/tasks/2026-06-11-active`task.md',
+      title: 'Active `task`',
+      status: 'review`ready',
+    });
+    expect(inventory.verificationReports.latest).toMatchObject({
+      title: 'Verification `report`',
+      overallStatus: 'pass',
+    });
   });
 
   test('filters JSON inventory by artifact type', async () => {
@@ -361,7 +471,7 @@ describe('artifacts command', () => {
     expect(result.stderr).toBe('');
     expect(result.stdout).toBe(`# AgentLoopKit Artifacts
 
-- Latest verification: pass - .agentloop/reports/2026-06-10-10-00-verification-report.md
+- Latest verification: \`pass\` - \`.agentloop/reports/2026-06-10-10-00-verification-report.md\`
 `);
   });
 
@@ -394,14 +504,10 @@ Next step: run \`agentloop report\` to create a local HTML report.
     tempDirs.push(dir);
     await writeConfig(dir);
 
-    const result = await execa(
-      tsxPath,
-      [cliPath, 'artifacts', '--type', 'handoff', '--latest'],
-      {
-        cwd: dir,
-        reject: false,
-      },
-    );
+    const result = await execa(tsxPath, [cliPath, 'artifacts', '--type', 'handoff', '--latest'], {
+      cwd: dir,
+      reject: false,
+    });
 
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toBe('');

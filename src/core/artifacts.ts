@@ -8,6 +8,7 @@ import {
   pathExists,
   resolvesInsidePath,
 } from './file-system.js';
+import { inlineCode } from './markdown-format.js';
 
 export const verificationReportPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report\.md$/;
 export const prSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-pr-summary\.md$/;
@@ -522,15 +523,17 @@ export async function getArtifactInventory(options: {
 function formatTaskCounts(byStatus: Record<string, number>) {
   const entries = Object.entries(byStatus).sort(([left], [right]) => left.localeCompare(right));
   if (!entries.length) return '';
-  return ` (${entries.map(([status, count]) => `${status}: ${count}`).join(', ')})`;
+  return ` (${entries.map(([status, count]) => `${inlineCode(status)}: ${count}`).join(', ')})`;
 }
 
 function formatNamedArtifact(label: string, artifact: ArtifactInventoryNamedArtifact | null) {
-  return artifact ? `- ${label}: ${artifact.title} - ${artifact.path}` : `- ${label}: not found`;
+  return artifact
+    ? `- ${label}: ${inlineCode(artifact.title)} - ${inlineCode(artifact.path)}`
+    : `- ${label}: not found`;
 }
 
 function formatPathArtifact(label: string, artifact: ArtifactInventoryPathArtifact | null) {
-  return artifact ? `- ${label}: ${artifact.path}` : `- ${label}: not found`;
+  return artifact ? `- ${label}: ${inlineCode(artifact.path)}` : `- ${label}: not found`;
 }
 
 function selectedArtifactTypes(options: ArtifactInventoryRenderOptions) {
@@ -614,11 +617,15 @@ function formatTypeLatestLine(inventory: ArtifactInventory, type: ArtifactInvent
   switch (type) {
     case 'task':
       return inventory.tasks.latest
-        ? `- Latest task: ${inventory.tasks.latest.title} (${inventory.tasks.latest.status}) - ${inventory.tasks.latest.path}`
+        ? `- Latest task: ${inlineCode(inventory.tasks.latest.title)} (${inlineCode(
+            inventory.tasks.latest.status,
+          )}) - ${inlineCode(inventory.tasks.latest.path)}`
         : '- Latest task: not found';
     case 'verification':
       return inventory.verificationReports.latest
-        ? `- Latest verification: ${inventory.verificationReports.latest.overallStatus} - ${inventory.verificationReports.latest.path}`
+        ? `- Latest verification: ${inlineCode(
+            inventory.verificationReports.latest.overallStatus,
+          )} - ${inlineCode(inventory.verificationReports.latest.path)}`
         : '- Latest verification: not found';
     case 'handoff':
       return formatNamedArtifact('Latest handoff', inventory.handoffs.latest);
@@ -690,13 +697,17 @@ export function renderArtifactInventoryMarkdown(
 - Tasks: ${inventory.tasks.count} total${formatTaskCounts(inventory.tasks.byStatus)}
 ${
   inventory.tasks.latest
-    ? `- Latest task: ${inventory.tasks.latest.title} (${inventory.tasks.latest.status}) - ${inventory.tasks.latest.path}`
+    ? `- Latest task: ${inlineCode(inventory.tasks.latest.title)} (${inlineCode(
+        inventory.tasks.latest.status,
+      )}) - ${inlineCode(inventory.tasks.latest.path)}`
     : '- Latest task: not found'
 }
 - Verification reports: ${inventory.verificationReports.count}
 ${
   inventory.verificationReports.latest
-    ? `- Latest verification: ${inventory.verificationReports.latest.overallStatus} - ${inventory.verificationReports.latest.path}`
+    ? `- Latest verification: ${inlineCode(
+        inventory.verificationReports.latest.overallStatus,
+      )} - ${inlineCode(inventory.verificationReports.latest.path)}`
     : '- Latest verification: not found'
 }
 - Handoffs: ${inventory.handoffs.count}

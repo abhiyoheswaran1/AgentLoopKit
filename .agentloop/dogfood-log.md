@@ -2,6 +2,33 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Harden Artifacts Markdown Output
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-artifacts-markdown-output.md`
+- Trigger:
+  - The remaining Markdown-surface scan found that `agentloop artifacts` rendered task statuses, task titles, artifact titles, artifact paths, and verification statuses directly into Markdown.
+  - The output is meant for humans, agents, and CI logs, so local artifact metadata should not break Markdown when it contains backticks.
+- Product change:
+  - Added a regression test for artifact titles, task statuses, task paths, HTML report paths, and badge paths containing backticks.
+  - Changed artifact inventory Markdown to use the shared inline-code formatter for task counts, latest task lines, verification lines, named artifact lines, and path artifact lines.
+  - Preserved JSON output and artifact discovery behavior.
+- Verification:
+  - Red focused test `npm test -- tests/artifacts.test.ts -t "renders markdown inventory values"` failed before the renderer changed.
+  - Focused green suite `npm test -- tests/artifacts.test.ts` passed with 14 tests.
+  - Full suite `npm test` passed with 42 test files and 363 tests.
+  - Full self-verify `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-11-harden-artifacts-markdown-output.md --task-commands --timeout-ms 240000 --json` passed and wrote `.agentloop/reports/2026-06-11-17-34-verification-report.md`.
+  - Handoff summary generated at `.agentloop/handoffs/2026-06-11-17-40-pr-summary.md`.
+  - CLI smoke `node scripts/smoke-cli.mjs` passed after a fresh serial build.
+  - Release smoke `npm run smoke:release` passed.
+  - Markdown link check `npm run check:links` passed.
+  - Production dependency audit `npx pnpm@10.12.1 audit --prod` reported no known vulnerabilities.
+  - ProjScan `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The existing shared Markdown formatter handled this surface without adding a parser or changing artifact data.
+- Improve:
+  - Continue scanning `check-gates` human output after this slice lands.
+  - Avoid running `node scripts/smoke-cli.mjs` in parallel with commands that rebuild and clean `dist`.
+
 ## 2026-06-11: Harden Status And Next Markdown Output
 
 - Task contract: `.agentloop/tasks/2026-06-11-harden-status-next-markdown-output.md`
