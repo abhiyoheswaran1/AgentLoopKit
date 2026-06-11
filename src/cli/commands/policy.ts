@@ -7,7 +7,7 @@ import {
   readPolicy,
 } from '../../core/policy.js';
 import type { ListedPolicy, PolicyDocument, PolicyStatusReport } from '../../core/policy.js';
-import { loadConfigForJsonCommand } from '../json-errors.js';
+import { loadWorkspaceForJsonCommand } from '../json-errors.js';
 
 function printJsonError(error: Error & { code?: string }, details: Record<string, unknown> = {}) {
   console.log(
@@ -97,11 +97,11 @@ export function policyCommand() {
     .description('List local policies under .agentloop/policies')
     .option('--json', 'print machine-readable output')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
       let policies: ListedPolicy[];
       try {
-        policies = await listPolicies({ cwd: process.cwd(), config });
+        policies = await listPolicies({ cwd: workspace.cwd, config: workspace.config });
       } catch (error) {
         if (printMissingPolicyDirectoryError(error, options)) return;
         throw error;
@@ -114,11 +114,11 @@ export function policyCommand() {
     .description('Show local policy template status')
     .option('--json', 'print machine-readable output')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
       let status: PolicyStatusReport;
       try {
-        status = await getPolicyStatus({ cwd: process.cwd(), config });
+        status = await getPolicyStatus({ cwd: workspace.cwd, config: workspace.config });
       } catch (error) {
         if (printMissingPolicyDirectoryError(error, options)) return;
         throw error;
@@ -132,11 +132,11 @@ export function policyCommand() {
     .description('Show a local policy')
     .option('--json', 'print machine-readable output')
     .action(async (policyName: string, options: { json?: boolean }) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
       let policy: PolicyDocument;
       try {
-        policy = await readPolicy({ cwd: process.cwd(), config, policyName });
+        policy = await readPolicy({ cwd: workspace.cwd, config: workspace.config, policyName });
       } catch (error) {
         if (printMissingPolicyDirectoryError(error, options)) return;
         if (options.json && error instanceof PolicyNotFoundError) {

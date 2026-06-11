@@ -5924,3 +5924,38 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Add option-level CLI/docs drift coverage so new public flags such as `--strict`, `--brief`, and `--timeout-ms` cannot be missed in docs.
   - Consider a config-level verification timeout later if users repeatedly pass the same `--timeout-ms`.
+
+## 2026-06-11: Parent Config Workspace Discovery
+
+- Task contract: `.agentloop/tasks/2026-06-11-run-agentloopkit-commands-from-repo-subdirectories.md`
+- Trigger:
+  - The continued product pass found a real workflow bug: after root setup, agents can work from nested folders where `agentloop.config.json` is not present.
+  - Commands such as `status`, `create-task`, and `verify` should still use the initialized AgentLoop root instead of failing or writing nested artifacts.
+- Implementation:
+  - Added a workspace loader that searches upward for the nearest `agentloop.config.json`.
+  - Kept `agentloop init` current-directory based.
+  - Rewired non-init repo commands to use the discovered workspace root for local evidence, policies, release helpers, MCP state, and npm-status package metadata.
+  - Updated README, CLI reference, configuration, status, task, verification, and npm-status docs.
+- Verification run:
+  - Red focused tests failed first for nested `status`, `create-task`, `verify`, and `doctor`.
+  - Focused suites passed after implementation:
+    - `tests/config.test.ts`
+    - `tests/status.test.ts`
+    - `tests/create-task.test.ts`
+    - `tests/verification.test.ts`
+    - `tests/doctor.test.ts`
+  - Full release checks passed:
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm test`
+    - `npm run check:links`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+    - `npx --yes projscan doctor --format markdown`
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-13-24-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-13-26-pr-summary.md`.
+- What worked well:
+  - The fix keeps first-run setup explicit while making everyday commands easier for agents working in subdirectories.
+- Improve:
+  - Add broader nested-cwd smoke coverage later for `handoff`, `check-gates`, `policy`, and `install-agent`.

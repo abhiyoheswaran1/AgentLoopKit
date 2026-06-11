@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { ArtifactPathError, OutputPathError } from '../../core/artifacts.js';
 import { writeHtmlReport } from '../../core/html-report.js';
-import { loadConfigForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
+import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function printArtifactPathJsonError(error: ArtifactPathError) {
   console.log(
@@ -42,13 +42,13 @@ export function reportCommand() {
         json?: boolean;
       }) => {
         const reportPath = options.report ?? options.verification;
-        const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-        if (!config) return;
+        const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+        if (!workspace) return;
         let result: Awaited<ReturnType<typeof writeHtmlReport>>;
         try {
           result = await writeHtmlReport({
-            cwd: process.cwd(),
-            config,
+            cwd: workspace.cwd,
+            config: workspace.config,
             taskPath: options.task,
             reportPath,
             handoffPath: options.handoff,

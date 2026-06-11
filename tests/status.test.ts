@@ -57,6 +57,30 @@ describe('status command', () => {
     );
   });
 
+  test('discovers parent AgentLoop config when run from a nested directory', async () => {
+    const dir = await makeTempDir();
+    const nested = path.join(dir, 'src', 'features');
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await mkdir(nested, { recursive: true });
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify({ name: 'root-demo', scripts: { test: 'vitest' } }, null, 2),
+    );
+    await initializeAgentLoop({ cwd: dir });
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: nested,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const status = JSON.parse(result.stdout);
+    expect(status.project.name).toBe('root-demo');
+    expect(status.git.root).toBe(await realpath(dir));
+    expect(status.git.targetIsRoot).toBe(true);
+  });
+
   test('ignores symlinked task and report roots that resolve outside the repo', async () => {
     const dir = await makeTempDir();
     const outsideTasks = await makeTempDir();

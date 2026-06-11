@@ -66,6 +66,33 @@ describe('doctor', () => {
     expect(result.markdown).not.toContain('AgentLoopKit files live in the current directory');
   });
 
+  test('doctor uses parent AgentLoop config root when run from a nested directory', async () => {
+    const dir = await makeTempDir();
+    const nested = path.join(dir, 'src', 'features');
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await mkdir(nested, { recursive: true });
+    await initializeAgentLoop({ cwd: dir });
+
+    const result = await execa(tsxPath, [cliPath, 'doctor', '--json'], {
+      cwd: nested,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const doctor = JSON.parse(result.stdout);
+    expect(doctor.git).toEqual({
+      isRepository: true,
+      root: await realpath(dir),
+      targetIsRoot: true,
+    });
+    expect(doctor.checks).toContainEqual({
+      name: 'AGENTS.md',
+      status: 'pass',
+      message: 'found',
+    });
+  });
+
   test('doctor human output warns when target is a git repository subdirectory', async () => {
     const dir = await makeTempDir();
     const packageDir = path.join(dir, 'packages', 'web');

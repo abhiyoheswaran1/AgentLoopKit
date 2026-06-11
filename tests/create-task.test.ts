@@ -4,6 +4,7 @@ import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import { TASK_TYPES } from '../src/core/constants.js';
+import { initializeAgentLoop } from '../src/core/init.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -88,6 +89,27 @@ describe('create-task command', () => {
     expect(markdown).toContain('- Second criterion is preserved');
     expect(markdown).toContain('- pnpm test');
     expect(markdown).toContain('- pnpm build');
+  });
+
+  test('writes task contracts to the parent AgentLoop root when run from a nested directory', async () => {
+    const dir = await makeTempDir();
+    const nested = path.join(dir, 'src', 'features');
+    tempDirs.push(dir);
+    await mkdir(nested, { recursive: true });
+    await writeJson(path.join(dir, 'package.json'), { name: 'root-demo' });
+    await initializeAgentLoop({ cwd: dir });
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'create-task', '--title', 'Nested command task', '--type', 'bugfix', '--json'],
+      { cwd: nested, reject: false },
+    );
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.task.path).toContain(path.join(dir, '.agentloop', 'tasks'));
+    expect(output.task.path).not.toContain(path.join(nested, '.agentloop'));
+    await expect(readFile(output.task.path, 'utf8')).resolves.toContain('# Nested command task');
   });
 
   test('accepts task-contract field aliases in non-interactive mode', async () => {

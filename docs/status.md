@@ -2,6 +2,8 @@
 
 `agentloop status` shows the current repo-level engineering loop state without running checks.
 
+You can run it from a nested folder after root setup. AgentLoopKit searches upward for `agentloop.config.json` and reports status for that initialized root.
+
 It reads:
 
 - `agentloop.config.json`

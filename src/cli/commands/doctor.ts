@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { resolveAgentLoopWorkspaceCwd } from '../../core/config.js';
 import { runDoctor } from '../../core/doctor.js';
 
 export function doctorCommand() {
@@ -7,7 +8,8 @@ export function doctorCommand() {
     .option('--json', 'print machine-readable output')
     .option('--strict', 'treat warnings as failures')
     .action(async (options: { json?: boolean; strict?: boolean }) => {
-      const result = await runDoctor({ cwd: process.cwd(), strict: options.strict });
+      const cwd = await resolveAgentLoopWorkspaceCwd(process.cwd());
+      const result = await runDoctor({ cwd, strict: options.strict });
       if (options.json) {
         console.log(JSON.stringify(result, null, 2));
       } else {

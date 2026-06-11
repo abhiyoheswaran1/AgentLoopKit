@@ -5,6 +5,7 @@ import {
   parseNpmViewJson,
   shouldFailNpmStatusExpectation,
 } from '../../core/npm-status.js';
+import { resolveAgentLoopWorkspaceCwd } from '../../core/config.js';
 import { AgentLoopError } from '../../core/errors.js';
 
 type NpmRegistryJsonErrorReason = 'missing' | 'unreadable' | 'invalid-json';
@@ -152,7 +153,7 @@ export function npmStatusCommand() {
           throw error;
         }
         const result = await checkNpmStatus({
-          cwd: process.cwd(),
+          cwd: await resolveAgentLoopWorkspaceCwd(process.cwd()),
           agentloopkit: options.agentloopkit,
           packageName: options.packageName,
           localVersion: options.localVersion,

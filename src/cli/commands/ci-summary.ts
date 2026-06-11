@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
 import { getCiSummary } from '../../core/ci-summary.js';
 import {
-  loadConfigForJsonCommand,
+  loadWorkspaceForJsonCommand,
   printOutputPathJsonError,
   validateOutRequiresWrite,
 } from '../json-errors.js';
@@ -15,13 +15,13 @@ export function ciSummaryCommand() {
     .option('--json', 'print machine-readable output')
     .action(async (options: { write?: boolean; out?: string; json?: boolean }) => {
       if (!validateOutRequiresWrite(options)) return;
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
       let result: Awaited<ReturnType<typeof getCiSummary>>;
       try {
         result = await getCiSummary({
-          cwd: process.cwd(),
-          config,
+          cwd: workspace.cwd,
+          config: workspace.config,
           write: options.write,
           outPath: options.out,
         });

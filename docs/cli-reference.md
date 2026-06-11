@@ -11,6 +11,8 @@ The examples below use `agentloop`. Replace it with `npx agentloopkit` when you 
 
 For a complete command sequence, see the [End-to-end workflow](../examples/end-to-end/README.md).
 
+`init` uses the current directory as the setup target. Other repo commands search upward for the nearest `agentloop.config.json` and use that folder as the AgentLoop root. This lets agents run `status`, `create-task`, `verify`, `handoff`, and related commands from nested source folders after root setup.
+
 ## Init
 
 ```bash

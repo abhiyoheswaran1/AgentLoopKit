@@ -20,7 +20,7 @@ import type {
   TaskContract,
   TaskDoctorResult,
 } from '../../core/task-state.js';
-import { loadConfigForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
+import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function printTask(
   task: Awaited<ReturnType<typeof getActiveTask>> | null,
@@ -166,9 +166,9 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('List task contracts')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
-      const tasks = await listTasks({ cwd: process.cwd(), config });
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
+      const tasks = await listTasks({ cwd: workspace.cwd, config: workspace.config });
       printTasks(tasks, options);
     });
 
@@ -178,11 +178,11 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Show a task contract')
     .action(async (taskPath: string, options: { json?: boolean }) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
       let task: TaskContract;
       try {
-        task = await readTaskContract({ cwd: process.cwd(), config, taskPath });
+        task = await readTaskContract({ cwd: workspace.cwd, config: workspace.config, taskPath });
       } catch (error) {
         if (printTaskPathJsonError(error, options)) return;
         throw error;
@@ -196,11 +196,15 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Set the active task contract')
     .action(async (taskPath: string, options: { json?: boolean }) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
       let activeTask: ActiveTask;
       try {
-        activeTask = await setActiveTask({ cwd: process.cwd(), config, taskPath });
+        activeTask = await setActiveTask({
+          cwd: workspace.cwd,
+          config: workspace.config,
+          taskPath,
+        });
       } catch (error) {
         if (printTaskPathJsonError(error, options)) return;
         if (printTaskOutputPathJsonError(error, options)) return;
@@ -216,11 +220,16 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Update a task contract status')
     .action(async (taskPath: string, status: string, options: { json?: boolean }) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
       let task: ActiveTask;
       try {
-        task = await updateTaskStatus({ cwd: process.cwd(), config, taskPath, status });
+        task = await updateTaskStatus({
+          cwd: workspace.cwd,
+          config: workspace.config,
+          taskPath,
+          status,
+        });
       } catch (error) {
         if (printTaskPathJsonError(error, options)) return;
         if (
@@ -246,11 +255,11 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Archive a task contract')
     .action(async (taskPath: string, options: { json?: boolean }) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
       let task: ArchivedTask;
       try {
-        task = await archiveTask({ cwd: process.cwd(), config, taskPath });
+        task = await archiveTask({ cwd: workspace.cwd, config: workspace.config, taskPath });
       } catch (error) {
         if (printTaskPathJsonError(error, options)) return;
         if (printTaskOutputPathJsonError(error, options)) return;
@@ -264,9 +273,9 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Check task folder hygiene')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
-      const result = await inspectTaskDirectory({ cwd: process.cwd(), config });
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
+      const result = await inspectTaskDirectory({ cwd: workspace.cwd, config: workspace.config });
       printTaskDoctor(result, options);
     });
 
@@ -275,9 +284,9 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Print the active task contract')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
-      const activeTask = await getActiveTask({ cwd: process.cwd(), config });
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
+      const activeTask = await getActiveTask({ cwd: workspace.cwd, config: workspace.config });
       printTask(activeTask ?? null, options);
     });
 
@@ -286,10 +295,10 @@ export function taskCommand() {
     .option('--json', 'print machine-readable output')
     .description('Clear the active task pointer')
     .action(async (options: { json?: boolean }) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
       try {
-        await clearActiveTask({ cwd: process.cwd(), config });
+        await clearActiveTask({ cwd: workspace.cwd, config: workspace.config });
       } catch (error) {
         if (printTaskOutputPathJsonError(error, options)) return;
         throw error;

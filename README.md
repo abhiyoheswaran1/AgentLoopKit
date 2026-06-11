@@ -48,6 +48,8 @@ npx agentloopkit init
 
 `init` writes files into the current directory. `--dry-run` previews the same plan and writes nothing.
 
+After setup, non-init commands search upward for the nearest `agentloop.config.json` and use that folder as the AgentLoop root. You can run `agentloop status`, `agentloop verify`, or `agentloop handoff` from a nested source folder and still write tasks, reports, and handoffs to the initialized repo root.
+
 Do not run `init` from your home directory unless you intend to configure your home folder. If you want local agent guidance but do not want to commit the generated files, use local-only mode:
 
 ```bash

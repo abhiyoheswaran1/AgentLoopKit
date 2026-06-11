@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
 import { BADGE_SOURCES, writeEvidenceBadge } from '../../core/badge.js';
 import { AgentLoopError } from '../../core/errors.js';
-import { loadConfigForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
+import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function printJsonError(error: AgentLoopError, details: Record<string, unknown> = {}) {
   console.log(
@@ -30,13 +30,13 @@ export function badgeCommand() {
     .option('--json', 'print machine-readable output')
     .action(
       async (options: { source?: string; out?: string; strict?: boolean; json?: boolean }) => {
-        const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-        if (!config) return;
+        const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+        if (!workspace) return;
         let result: Awaited<ReturnType<typeof writeEvidenceBadge>>;
         try {
           result = await writeEvidenceBadge({
-            cwd: process.cwd(),
-            config,
+            cwd: workspace.cwd,
+            config: workspace.config,
             source: options.source,
             outPath: options.out,
             strict: options.strict,

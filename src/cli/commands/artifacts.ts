@@ -8,7 +8,7 @@ import {
 } from '../../core/artifacts.js';
 import {
   CliOptionError,
-  loadConfigForJsonCommand,
+  loadWorkspaceForJsonCommand,
   printAgentLoopJsonError,
 } from '../json-errors.js';
 
@@ -47,9 +47,12 @@ export function artifactsCommand() {
     .action(async (options: ArtifactsCommandOptions) => {
       if (!validateArtifactType(options)) return;
 
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
-      const inventory = await getArtifactInventory({ cwd: process.cwd(), config });
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
+      const inventory = await getArtifactInventory({
+        cwd: workspace.cwd,
+        config: workspace.config,
+      });
       const renderOptions = {
         type: options.type && isArtifactInventoryType(options.type) ? options.type : undefined,
         latest: options.latest,

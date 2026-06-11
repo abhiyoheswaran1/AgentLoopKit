@@ -18,7 +18,7 @@ By default, the command runs:
 npm view --json <package> version versions
 ```
 
-It compares that registry output with `package.json` in the current directory.
+It compares that registry output with `package.json` at the nearest parent AgentLoop root when one exists, otherwise the current directory.
 AgentLoopKit validates the package name before running npm so option-shaped values, aliases, file paths, and URLs are rejected.
 
 Use `--agentloopkit` when you are checking AgentLoopKit itself from a release smoke directory, CI workspace, or another folder:

@@ -5,7 +5,7 @@ import {
   resolveExplicitArtifactPath,
 } from '../../core/artifacts.js';
 import { runVerification } from '../../core/verification.js';
-import { loadConfigForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
+import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function collect(value: string, previous: string[]) {
   previous.push(value);
@@ -54,16 +54,16 @@ export function verifyCommand() {
     .option('--command <command>', 'custom command to run', collect, [])
     .option('--timeout-ms <ms>', 'per-command timeout in milliseconds')
     .action(async (options: Record<string, unknown>) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json === true);
-      if (!config) return;
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json === true);
+      if (!workspace) return;
       const taskPath = typeof options.task === 'string' ? options.task : undefined;
       if (options.json && taskPath) {
         try {
           await resolveExplicitArtifactPath({
-            cwd: process.cwd(),
+            cwd: workspace.cwd,
             artifactType: 'task',
             requestedPath: taskPath,
-            expectedDir: config.paths.tasksDir,
+            expectedDir: workspace.config.paths.tasksDir,
           });
         } catch (error) {
           if (error instanceof ArtifactPathError) {
@@ -76,8 +76,8 @@ export function verifyCommand() {
       let result: Awaited<ReturnType<typeof runVerification>>;
       try {
         result = await runVerification({
-          cwd: process.cwd(),
-          config,
+          cwd: workspace.cwd,
+          config: workspace.config,
           taskPath,
           taskCommands: options.taskCommands === true,
           skip: {

@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { ArtifactPathError, OutputPathError } from '../../core/artifacts.js';
 import { AgentLoopError } from '../../core/errors.js';
 import { summarizeRepository } from '../../core/pr-summary.js';
-import { loadConfigForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
+import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 const SUPPORTED_OUTPUT_FORMATS = ['markdown', 'json'] as const;
 type OutputFormat = (typeof SUPPORTED_OUTPUT_FORMATS)[number];
@@ -67,8 +67,8 @@ async function runSummaryCommand(options: Record<string, unknown>, defaultWrite:
   const format = resolveOutputFormat(options);
   if (!format) return;
   const json = options.json === true || format === 'json';
-  const config = await loadConfigForJsonCommand(process.cwd(), json);
-  if (!config) return;
+  const workspace = await loadWorkspaceForJsonCommand(process.cwd(), json);
+  if (!workspace) return;
   const writeOption = typeof options.write === 'boolean' ? options.write : defaultWrite;
   const reportPath =
     typeof options.report === 'string'
@@ -79,8 +79,8 @@ async function runSummaryCommand(options: Record<string, unknown>, defaultWrite:
   let result: Awaited<ReturnType<typeof summarizeRepository>>;
   try {
     result = await summarizeRepository({
-      cwd: process.cwd(),
-      config,
+      cwd: workspace.cwd,
+      config: workspace.config,
       taskPath: typeof options.task === 'string' ? options.task : undefined,
       reportPath,
       write: writeOption,

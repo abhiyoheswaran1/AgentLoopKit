@@ -10,6 +10,8 @@ npx agentloopkit init
 
 `init` writes files into the current directory. The output shows the target folder, detected project type, package manager, Git status, Git root, configured commands, and file counts. When the target is a Git subdirectory, `init` warns that files will be written there instead of the Git root. Use `--dry-run` first when you want to see the same plan without writing files.
 
+After setup, repo commands search upward for the nearest `agentloop.config.json`. You can run `status`, `create-task`, `verify`, and `handoff` from nested folders, and AgentLoopKit still uses the initialized root.
+
 Do not run non-dry `init` from `~` unless you intentionally want AgentLoopKit files in your home directory. AgentLoopKit refuses that by default; pass `--force` only when you mean it.
 
 Use local-only mode when you want the harness in your clone but do not want to commit it:
@@ -29,7 +31,7 @@ npx agentloopkit doctor
 
 `doctor` detects common monorepo markers such as `pnpm-workspace.yaml`, package `workspaces`, Turbo, Nx, Lerna, and Rush config files. It reports them as warnings and suggests package-specific verification commands so you can confirm whether root-level checks are enough for the task.
 
-`doctor` reports the Git root and whether the current directory is the Git root. If you run it from a package subdirectory, it warns that AgentLoopKit files live in the current directory, not the Git root.
+`doctor` reports the Git root and whether the AgentLoop target is the Git root. If a parent AgentLoop config exists, `doctor` uses that initialized root even when your shell is in a nested folder.
 
 `doctor` also checks `.agentloop/manifest.json`, which records the template generation used by `init`. Missing, stale, invalid, or newer manifests are warnings, not failures. See `template-migrations.md` before copying newer generated guidance into an existing repo.
 

@@ -2,6 +2,8 @@
 
 AgentLoopKit stores repo settings in `agentloop.config.json`.
 
+`agentloop init` writes this file into the current directory. After that, repo commands search upward from the shell's current folder for the nearest `agentloop.config.json` and use that folder as the AgentLoop root. This keeps nested command sessions tied to the initialized root instead of creating `.agentloop/` folders inside `src/`, `packages/web/`, or other child directories.
+
 The package ships a JSON schema:
 
 ```text

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed non-init repo commands to search upward for the nearest `agentloop.config.json` and run against that initialized root, so `status`, `create-task`, `verify`, `handoff`, and related commands work from nested source folders without writing nested `.agentloop/` directories.
 - Added `agentloop doctor --strict` so CI or team setup gates can treat doctor warnings as failures.
 - Added `agentloop status --brief` for compact task, verification, working-tree, and next-action output.
 - Added `agentloop verify --timeout-ms <ms>` so stuck or watcher-style commands fail with clear timeout evidence instead of hanging indefinitely.

@@ -50,6 +50,37 @@ describe('verification', () => {
     expect(result.markdown).toContain('ok');
   });
 
+  test('writes verification reports to the parent AgentLoop root when run from a nested directory', async () => {
+    const dir = await makeTempDir();
+    const nested = path.join(dir, 'src', 'features');
+    tempDirs.push(dir);
+    await mkdir(nested, { recursive: true });
+    const config = createDefaultConfig({
+      name: 'root-demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"nested-ok\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+    await writeFile(path.join(dir, 'agentloop.config.json'), JSON.stringify(config, null, 2));
+
+    const result = await execa(tsxPath, [cliPath, 'verify', '--json'], {
+      cwd: nested,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.reportPath).toContain(path.join(dir, '.agentloop', 'reports'));
+    expect(output.reportPath).not.toContain(path.join(nested, '.agentloop'));
+    await expect(readFile(output.reportPath, 'utf8')).resolves.toContain('nested-ok');
+  });
+
   test('reports no verification when no commands are configured', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

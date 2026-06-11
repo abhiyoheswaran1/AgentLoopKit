@@ -2,12 +2,8 @@ import { Command } from 'commander';
 import prompts from 'prompts';
 import { TASK_TYPES } from '../../core/constants.js';
 import { AgentLoopError } from '../../core/errors.js';
-import {
-  createTaskContractFile,
-  TaskOutputPathError,
-  TaskType,
-} from '../../core/task-contract.js';
-import { loadConfigForJsonCommand } from '../json-errors.js';
+import { createTaskContractFile, TaskOutputPathError, TaskType } from '../../core/task-contract.js';
+import { loadWorkspaceForJsonCommand } from '../json-errors.js';
 
 function lines(value: string | undefined, previous: string[]) {
   const current = value
@@ -176,8 +172,8 @@ export function createTaskCommand() {
         throw error;
       }
       const title = typeof options.title === 'string' ? options.title : undefined;
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json === true);
-      if (!config) return;
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json === true);
+      if (!workspace) return;
       const input =
         title && type
           ? {
@@ -199,8 +195,8 @@ export function createTaskCommand() {
       let result: Awaited<ReturnType<typeof createTaskContractFile>>;
       try {
         result = await createTaskContractFile({
-          cwd: process.cwd(),
-          config,
+          cwd: workspace.cwd,
+          config: workspace.config,
           input,
           out: typeof options.out === 'string' ? options.out : undefined,
         });

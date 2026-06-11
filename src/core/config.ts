@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
 import { CONFIG_FILE } from './constants.js';
@@ -101,6 +101,14 @@ export type PackageManager = z.infer<typeof PackageManagerSchema>;
 export type CommandConfig = z.infer<typeof CommandConfigSchema>;
 export type AgentLoopConfig = z.infer<typeof AgentLoopConfigSchema>;
 
+export type AgentLoopWorkspace = {
+  config: AgentLoopConfig;
+  cwd: string;
+  invocationCwd: string;
+  configPath: string;
+  targetIsConfigRoot: boolean;
+};
+
 export type DefaultConfigInput = {
   name?: string;
   type?: ProjectType;
@@ -159,8 +167,7 @@ export function parseAgentLoopConfig(value: unknown): AgentLoopConfig {
   return parsed.data;
 }
 
-export async function loadAgentLoopConfig(cwd: string): Promise<AgentLoopConfig> {
-  const filePath = path.join(cwd, CONFIG_FILE);
+async function readAgentLoopConfigFile(filePath: string): Promise<AgentLoopConfig> {
   const raw = await readFile(filePath, 'utf8');
   let parsed: unknown;
   try {
@@ -170,4 +177,60 @@ export async function loadAgentLoopConfig(cwd: string): Promise<AgentLoopConfig>
     throw new ConfigError(`Invalid AgentLoopKit config: ${detail}`);
   }
   return parseAgentLoopConfig(parsed);
+}
+
+export async function loadAgentLoopConfig(cwd: string): Promise<AgentLoopConfig> {
+  return readAgentLoopConfigFile(path.join(cwd, CONFIG_FILE));
+}
+
+async function fileExists(filePath: string) {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function findAgentLoopConfigPath(cwd: string) {
+  let current = path.resolve(cwd);
+
+  while (true) {
+    const candidate = path.join(current, CONFIG_FILE);
+    if (await fileExists(candidate)) return candidate;
+
+    const parent = path.dirname(current);
+    if (parent === current) return undefined;
+    current = parent;
+  }
+}
+
+export async function loadAgentLoopWorkspace(cwd: string): Promise<AgentLoopWorkspace> {
+  const invocationCwd = path.resolve(cwd);
+  const configPath = await findAgentLoopConfigPath(invocationCwd);
+
+  if (!configPath) {
+    return {
+      config: await loadAgentLoopConfig(invocationCwd),
+      cwd: invocationCwd,
+      invocationCwd,
+      configPath: path.join(invocationCwd, CONFIG_FILE),
+      targetIsConfigRoot: true,
+    };
+  }
+
+  const workspaceCwd = path.dirname(configPath);
+  return {
+    config: await readAgentLoopConfigFile(configPath),
+    cwd: workspaceCwd,
+    invocationCwd,
+    configPath,
+    targetIsConfigRoot: path.resolve(workspaceCwd) === invocationCwd,
+  };
+}
+
+export async function resolveAgentLoopWorkspaceCwd(cwd: string) {
+  const invocationCwd = path.resolve(cwd);
+  const configPath = await findAgentLoopConfigPath(invocationCwd);
+  return configPath ? path.dirname(configPath) : invocationCwd;
 }

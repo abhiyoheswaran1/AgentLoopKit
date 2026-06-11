@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
 import { generateReleaseNotes } from '../../core/release-notes.js';
 import {
-  loadConfigForJsonCommand,
+  loadWorkspaceForJsonCommand,
   printOutputPathJsonError,
   validateOutRequiresWrite,
 } from '../json-errors.js';
@@ -26,13 +26,13 @@ export function releaseNotesCommand() {
         json?: boolean;
       }) => {
         if (!validateOutRequiresWrite(options)) return;
-        const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-        if (!config) return;
+        const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+        if (!workspace) return;
         let result: Awaited<ReturnType<typeof generateReleaseNotes>>;
         try {
           result = await generateReleaseNotes({
-            cwd: process.cwd(),
-            config,
+            cwd: workspace.cwd,
+            config: workspace.config,
             from: options.from,
             to: options.to,
             version: options.releaseVersion,

@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { loadAgentLoopConfig } from '../../core/config.js';
+import { loadAgentLoopWorkspace } from '../../core/config.js';
 import { ConfigError } from '../../core/errors.js';
 import { getAgentLoopStatus } from '../../core/status.js';
 import { printAgentLoopJsonError } from '../json-errors.js';
@@ -10,9 +10,9 @@ export function statusCommand() {
     .option('--json', 'print machine-readable output')
     .option('--brief', 'print compact human-readable output')
     .action(async (options: { json?: boolean; brief?: boolean }) => {
-      let config: Awaited<ReturnType<typeof loadAgentLoopConfig>>;
+      let workspace: Awaited<ReturnType<typeof loadAgentLoopWorkspace>>;
       try {
-        config = await loadAgentLoopConfig(process.cwd());
+        workspace = await loadAgentLoopWorkspace(process.cwd());
       } catch (error) {
         if (options.json && error instanceof ConfigError) {
           printAgentLoopJsonError(error);
@@ -20,7 +20,7 @@ export function statusCommand() {
         }
         throw error;
       }
-      const result = await getAgentLoopStatus({ cwd: process.cwd(), config });
+      const result = await getAgentLoopStatus({ cwd: workspace.cwd, config: workspace.config });
       if (options.json) {
         console.log(JSON.stringify(result, null, 2));
       } else if (options.brief) {

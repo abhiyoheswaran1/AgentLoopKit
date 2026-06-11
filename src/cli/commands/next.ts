@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { loadAgentLoopConfig } from '../../core/config.js';
+import { loadAgentLoopWorkspace } from '../../core/config.js';
 import { ConfigError } from '../../core/errors.js';
 import { AgentLoopStatusResult, getAgentLoopStatus } from '../../core/status.js';
 import { printAgentLoopJsonError } from '../json-errors.js';
@@ -15,7 +15,9 @@ type NextActionResult = {
   commands: AgentLoopStatusResult['commands'];
 };
 
-function formatTask(task: AgentLoopStatusResult['activeTask'] | AgentLoopStatusResult['latestTask']) {
+function formatTask(
+  task: AgentLoopStatusResult['activeTask'] | AgentLoopStatusResult['latestTask'],
+) {
   if (!task) return 'none';
   return `${task.title} (${task.status}) - ${task.path}`;
 }
@@ -75,9 +77,9 @@ export function nextCommand() {
     .description('Show the next recommended loop action')
     .option('--json', 'print machine-readable output')
     .action(async (options: { json?: boolean }) => {
-      let config: Awaited<ReturnType<typeof loadAgentLoopConfig>>;
+      let workspace: Awaited<ReturnType<typeof loadAgentLoopWorkspace>>;
       try {
-        config = await loadAgentLoopConfig(process.cwd());
+        workspace = await loadAgentLoopWorkspace(process.cwd());
       } catch (error) {
         if (options.json && error instanceof ConfigError) {
           printAgentLoopJsonError(error);
@@ -85,7 +87,7 @@ export function nextCommand() {
         }
         throw error;
       }
-      const status = await getAgentLoopStatus({ cwd: process.cwd(), config });
+      const status = await getAgentLoopStatus({ cwd: workspace.cwd, config: workspace.config });
       const result = toNextActionResult(status);
 
       if (options.json) {

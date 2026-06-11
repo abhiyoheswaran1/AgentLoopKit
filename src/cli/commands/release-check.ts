@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { checkReleaseReadiness } from '../../core/release-check.js';
-import { loadConfigForJsonCommand } from '../json-errors.js';
+import { loadWorkspaceForJsonCommand } from '../json-errors.js';
 
 export function releaseCheckCommand() {
   return new Command('release-check')
@@ -8,11 +8,11 @@ export function releaseCheckCommand() {
     .option('--json', 'print machine-readable output')
     .option('--strict', 'treat warning checks as failures')
     .action(async (options: { json?: boolean; strict?: boolean }) => {
-      const config = await loadConfigForJsonCommand(process.cwd(), options.json);
-      if (!config) return;
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
       const result = await checkReleaseReadiness({
-        cwd: process.cwd(),
-        config,
+        cwd: workspace.cwd,
+        config: workspace.config,
         strict: options.strict,
       });
 

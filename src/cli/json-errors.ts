@@ -1,5 +1,5 @@
-import { loadAgentLoopConfig } from '../core/config.js';
-import type { AgentLoopConfig } from '../core/config.js';
+import { loadAgentLoopWorkspace } from '../core/config.js';
+import type { AgentLoopConfig, AgentLoopWorkspace } from '../core/config.js';
 import { OutputPathError } from '../core/artifacts.js';
 import { AgentLoopError, ConfigError } from '../core/errors.js';
 
@@ -35,8 +35,16 @@ export async function loadConfigForJsonCommand(
   cwd: string,
   json: boolean | undefined,
 ): Promise<AgentLoopConfig | undefined> {
+  const workspace = await loadWorkspaceForJsonCommand(cwd, json);
+  return workspace?.config;
+}
+
+export async function loadWorkspaceForJsonCommand(
+  cwd: string,
+  json: boolean | undefined,
+): Promise<AgentLoopWorkspace | undefined> {
   try {
-    return await loadAgentLoopConfig(cwd);
+    return await loadAgentLoopWorkspace(cwd);
   } catch (error) {
     if (json && error instanceof ConfigError) {
       printAgentLoopJsonError(error);

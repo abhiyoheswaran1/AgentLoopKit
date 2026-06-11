@@ -225,3 +225,7 @@ Release helpers are evidence checks, not release authority. `release-check` warn
 ## 2026-06-11: Doctor Scans Are Bounded
 
 `agentloop doctor` should return promptly in large repositories. Risk-file detection now uses bounded traversal and reports when the scan stops early. The warning tells maintainers to run targeted checks instead of presenting a partial scan as complete coverage.
+
+## 2026-06-11: Repo Commands Use The Nearest AgentLoop Root
+
+`agentloop init` remains current-directory setup because users need explicit control over where the harness lands. After setup, non-init repo commands search upward for the nearest `agentloop.config.json` and use that folder as the command workspace. This lets agents work from nested source folders while keeping task contracts, verification reports, handoffs, policies, and release evidence tied to the initialized repo root.

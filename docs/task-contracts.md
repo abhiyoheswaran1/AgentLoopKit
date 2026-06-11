@@ -2,6 +2,8 @@
 
 Task contracts turn fuzzy requests into scoped work.
 
+After root setup, `create-task` and `task` subcommands can run from nested folders. They search upward for the nearest `agentloop.config.json` and use that root's configured task directory.
+
 Create one with:
 
 ```bash
