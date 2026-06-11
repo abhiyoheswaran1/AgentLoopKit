@@ -28,6 +28,18 @@ export type PolicyStatusReport = {
   summary: PolicyStatusSummary;
 };
 
+export class PolicyDirectoryMissingError extends AgentLoopError {
+  public readonly nextCommand = 'agentloop init';
+
+  constructor(public readonly policiesDir: string) {
+    super(
+      `No AgentLoopKit policy files found. Run \`agentloop init\` to generate ${policiesDir}/.`,
+      'POLICY_DIRECTORY_MISSING',
+    );
+    this.name = 'PolicyDirectoryMissingError';
+  }
+}
+
 export class PolicyNotFoundError extends AgentLoopError {
   constructor(
     public readonly requestedPolicy: string,
@@ -40,6 +52,10 @@ export class PolicyNotFoundError extends AgentLoopError {
 
 function policyRoot(cwd: string, config: AgentLoopConfig) {
   return path.resolve(cwd, config.paths.agentloopDir, 'policies');
+}
+
+function policyDisplayPath(config: AgentLoopConfig) {
+  return `${config.paths.agentloopDir}/policies`;
 }
 
 function toStoredPath(cwd: string, absolutePath: string) {
@@ -62,12 +78,10 @@ function normalizeContent(content: string) {
   return content.replace(/\r\n/g, '\n');
 }
 
-async function ensurePolicyRoot(root: string) {
+async function ensurePolicyRoot(root: string, policiesDir: string) {
   const rootStat = await stat(root).catch(() => undefined);
   if (!rootStat?.isDirectory()) {
-    throw new AgentLoopError(
-      'No AgentLoopKit policy files found. Run `agentloop init` to generate .agentloop/policies/.',
-    );
+    throw new PolicyDirectoryMissingError(policiesDir);
   }
 }
 
@@ -96,7 +110,7 @@ export async function listPolicies(options: {
   config: AgentLoopConfig;
 }): Promise<ListedPolicy[]> {
   const root = policyRoot(options.cwd, options.config);
-  await ensurePolicyRoot(root);
+  await ensurePolicyRoot(root, policyDisplayPath(options.config));
   const policies = await readMarkdownFiles(root);
 
   return policies.map((policy) => ({
@@ -137,7 +151,7 @@ export async function getPolicyStatus(options: {
   config: AgentLoopConfig;
 }): Promise<PolicyStatusReport> {
   const root = policyRoot(options.cwd, options.config);
-  await ensurePolicyRoot(root);
+  await ensurePolicyRoot(root, policyDisplayPath(options.config));
 
   const templateRoot = path.join(getTemplateRoot(), 'policies');
   const [localPolicies, templatePolicies] = await Promise.all([

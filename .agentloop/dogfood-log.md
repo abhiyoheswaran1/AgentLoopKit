@@ -4999,3 +4999,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider shared JSON-error helpers only if duplication starts making command modules harder to maintain.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Error Output for Missing Policy Directory
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-json-error-output-for-missing-policy-directory.md`
+- Trigger:
+  - `agentloop policy list/status/show --json` had structured success output, but missing `.agentloop/policies/` setup errors still used the global human error path.
+- Implementation:
+  - Added a `POLICY_DIRECTORY_MISSING` setup error with `policiesDir` and `nextCommand`.
+  - Added JSON setup-error handling for `policy list`, `policy status`, and `policy show`.
+  - Kept default setup errors human-readable on stderr.
+  - Documented the behavior in README, policy docs, and the changelog.
+- Verification run:
+  - Red focused policy tests failed because `policy list --json` and `policy status --json` printed the human error to stderr.
+  - Focused policy suite passed: 11 tests.
+  - `.agentloop/reports/2026-06-11-03-25-verification-report.md`, overall status pass.
+- What worked well:
+  - The command now gives agents the setup fix without auto-running `init` or mutating files.
+- Improve:
+  - Keep setup errors explicit and local; do not let read-only commands repair missing generated files.
+  - Keep this unreleased until the planned `0.28.0` batch.

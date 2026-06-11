@@ -29,6 +29,14 @@ async function createPolicyFixture() {
   return { dir, config };
 }
 
+async function createUninitializedPolicyFixture() {
+  const dir = await makeTempDir();
+  tempDirs.push(dir);
+  const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+  await writeJson(path.join(dir, 'agentloop.config.json'), config);
+  return dir;
+}
+
 describe('policy reader', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
@@ -245,6 +253,61 @@ describe('policy command', () => {
     expect(result.exitCode).toBe(1);
     expect(result.stdout).toBe('');
     expect(result.stderr).toContain('agentloop: Policy not found: secrets');
+  });
+
+  test('prints missing policy directory errors as JSON for list', async () => {
+    const dir = await createUninitializedPolicyFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'policy', 'list', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'POLICY_DIRECTORY_MISSING',
+        message:
+          'No AgentLoopKit policy files found. Run `agentloop init` to generate .agentloop/policies/.',
+        policiesDir: '.agentloop/policies',
+        nextCommand: 'agentloop init',
+      },
+    });
+  });
+
+  test('prints missing policy directory errors as JSON for status', async () => {
+    const dir = await createUninitializedPolicyFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'policy', 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'POLICY_DIRECTORY_MISSING',
+        message:
+          'No AgentLoopKit policy files found. Run `agentloop init` to generate .agentloop/policies/.',
+        policiesDir: '.agentloop/policies',
+        nextCommand: 'agentloop init',
+      },
+    });
+  });
+
+  test('keeps missing policy directory errors human-readable by default', async () => {
+    const dir = await createUninitializedPolicyFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'policy', 'list'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('agentloop: No AgentLoopKit policy files found.');
   });
 
   test('prints policy status from the CLI as JSON', async () => {

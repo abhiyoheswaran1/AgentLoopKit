@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { loadAgentLoopConfig } from '../../core/config.js';
 import {
+  PolicyDirectoryMissingError,
   getPolicyStatus,
   listPolicies,
   PolicyNotFoundError,
@@ -23,6 +24,17 @@ function printJsonError(error: Error & { code?: string }, details: Record<string
     ),
   );
   process.exitCode = 1;
+}
+
+function printMissingPolicyDirectoryError(error: unknown, options: { json?: boolean }) {
+  if (options.json && error instanceof PolicyDirectoryMissingError) {
+    printJsonError(error, {
+      policiesDir: error.policiesDir,
+      nextCommand: error.nextCommand,
+    });
+    return true;
+  }
+  return false;
 }
 
 function printPolicyList(policies: ListedPolicy[], options: { json?: boolean }) {
@@ -86,7 +98,13 @@ export function policyCommand() {
     .option('--json', 'print machine-readable output')
     .action(async (options: { json?: boolean }) => {
       const config = await loadAgentLoopConfig(process.cwd());
-      const policies = await listPolicies({ cwd: process.cwd(), config });
+      let policies: ListedPolicy[];
+      try {
+        policies = await listPolicies({ cwd: process.cwd(), config });
+      } catch (error) {
+        if (printMissingPolicyDirectoryError(error, options)) return;
+        throw error;
+      }
       printPolicyList(policies, options);
     });
 
@@ -96,7 +114,13 @@ export function policyCommand() {
     .option('--json', 'print machine-readable output')
     .action(async (options: { json?: boolean }) => {
       const config = await loadAgentLoopConfig(process.cwd());
-      const status = await getPolicyStatus({ cwd: process.cwd(), config });
+      let status: PolicyStatusReport;
+      try {
+        status = await getPolicyStatus({ cwd: process.cwd(), config });
+      } catch (error) {
+        if (printMissingPolicyDirectoryError(error, options)) return;
+        throw error;
+      }
       printPolicyStatus(status, options);
     });
 
@@ -111,6 +135,7 @@ export function policyCommand() {
       try {
         policy = await readPolicy({ cwd: process.cwd(), config, policyName });
       } catch (error) {
+        if (printMissingPolicyDirectoryError(error, options)) return;
         if (options.json && error instanceof PolicyNotFoundError) {
           printJsonError(error, {
             requestedPolicy: error.requestedPolicy,
