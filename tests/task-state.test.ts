@@ -404,6 +404,87 @@ describe('task command', () => {
     await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
   });
 
+  test('prints missing task path errors as JSON when requested', async () => {
+    const { dir } = await createTaskStateFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'show', '.agentloop/tasks/missing.md', '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'TASK_CONTRACT_NOT_FOUND',
+        message: 'Task contract not found: .agentloop/tasks/missing.md',
+        requestedTask: '.agentloop/tasks/missing.md',
+        tasksDir: '.agentloop/tasks',
+        reason: 'not-found',
+      },
+    });
+  });
+
+  test('prints outside task path errors as JSON when requested', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(path.join(dir, 'notes.md'), '# Notes\n');
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'set', 'notes.md', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'TASK_PATH_OUTSIDE_TASKS_DIR',
+        message: 'Active task must be inside .agentloop/tasks.',
+        requestedTask: 'notes.md',
+        tasksDir: '.agentloop/tasks',
+        reason: 'outside-tasks-dir',
+      },
+    });
+  });
+
+  test('prints non-Markdown task path errors as JSON when requested', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(path.join(dir, '.agentloop/tasks/not-markdown.txt'), 'not markdown\n');
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'archive', '.agentloop/tasks/not-markdown.txt', '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'TASK_PATH_NOT_MARKDOWN',
+        message: 'Active task must be a Markdown file.',
+        requestedTask: '.agentloop/tasks/not-markdown.txt',
+        tasksDir: '.agentloop/tasks',
+        reason: 'not-markdown',
+      },
+    });
+  });
+
+  test('keeps missing task path errors human-readable by default', async () => {
+    const { dir } = await createTaskStateFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'show', '.agentloop/tasks/missing.md'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('agentloop: Task contract not found: .agentloop/tasks/missing.md');
+  });
+
   test('updates task status from the CLI', async () => {
     const { dir, taskPath } = await createTaskStateFixture();
 

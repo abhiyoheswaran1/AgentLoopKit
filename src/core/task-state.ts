@@ -65,6 +65,21 @@ export const TASK_STATUSES = [
 
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 
+export type TaskPathErrorReason = 'outside-tasks-dir' | 'not-markdown' | 'not-found';
+
+export class TaskPathError extends AgentLoopError {
+  constructor(
+    message: string,
+    code: string,
+    public readonly requestedTask: string,
+    public readonly tasksDir: string,
+    public readonly reason: TaskPathErrorReason,
+  ) {
+    super(message, code);
+    this.name = 'TaskPathError';
+  }
+}
+
 const TERMINAL_TASK_STATUSES = new Set(['done', 'completed', 'verified']);
 const NON_FALLBACK_TASK_STATUSES = new Set(['deferred', ...TERMINAL_TASK_STATUSES]);
 const LEGACY_TASK_STATUSES = new Set(['completed', 'verified']);
@@ -122,16 +137,34 @@ async function resolveTaskPath(options: {
 
   if (!isInside(root, absolutePath)) {
     if (!options.strict) return undefined;
-    throw new AgentLoopError(`Active task must be inside ${displayRoot}.`);
+    throw new TaskPathError(
+      `Active task must be inside ${displayRoot}.`,
+      'TASK_PATH_OUTSIDE_TASKS_DIR',
+      options.taskPath,
+      displayRoot,
+      'outside-tasks-dir',
+    );
   }
   if (!absolutePath.endsWith('.md')) {
     if (!options.strict) return undefined;
-    throw new AgentLoopError('Active task must be a Markdown file.');
+    throw new TaskPathError(
+      'Active task must be a Markdown file.',
+      'TASK_PATH_NOT_MARKDOWN',
+      options.taskPath,
+      displayRoot,
+      'not-markdown',
+    );
   }
   const fileStat = await stat(absolutePath).catch(() => undefined);
   if (!fileStat?.isFile()) {
     if (!options.strict) return undefined;
-    throw new AgentLoopError(`Task contract not found: ${options.taskPath}`);
+    throw new TaskPathError(
+      `Task contract not found: ${options.taskPath}`,
+      'TASK_CONTRACT_NOT_FOUND',
+      options.taskPath,
+      displayRoot,
+      'not-found',
+    );
   }
   return absolutePath;
 }

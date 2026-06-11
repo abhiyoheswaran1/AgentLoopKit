@@ -9,6 +9,7 @@ import {
   listTasks,
   readTaskContract,
   setActiveTask,
+  TaskPathError,
   TASK_STATUSES,
   updateTaskStatus,
 } from '../../core/task-state.js';
@@ -134,6 +135,18 @@ function printJsonError(error: AgentLoopError, details: Record<string, unknown> 
   process.exitCode = 1;
 }
 
+function printTaskPathJsonError(error: unknown, options: { json?: boolean }) {
+  if (options.json && error instanceof TaskPathError) {
+    printJsonError(error, {
+      requestedTask: error.requestedTask,
+      tasksDir: error.tasksDir,
+      reason: error.reason,
+    });
+    return true;
+  }
+  return false;
+}
+
 export function taskCommand() {
   const command = new Command('task').description(
     'List, inspect, update, or archive task contracts',
@@ -156,7 +169,13 @@ export function taskCommand() {
     .description('Show a task contract')
     .action(async (taskPath: string, options: { json?: boolean }) => {
       const config = await loadAgentLoopConfig(process.cwd());
-      const task = await readTaskContract({ cwd: process.cwd(), config, taskPath });
+      let task: TaskContract;
+      try {
+        task = await readTaskContract({ cwd: process.cwd(), config, taskPath });
+      } catch (error) {
+        if (printTaskPathJsonError(error, options)) return;
+        throw error;
+      }
       printTaskContract(task, options);
     });
 
@@ -167,7 +186,13 @@ export function taskCommand() {
     .description('Set the active task contract')
     .action(async (taskPath: string, options: { json?: boolean }) => {
       const config = await loadAgentLoopConfig(process.cwd());
-      const activeTask = await setActiveTask({ cwd: process.cwd(), config, taskPath });
+      let activeTask: ActiveTask;
+      try {
+        activeTask = await setActiveTask({ cwd: process.cwd(), config, taskPath });
+      } catch (error) {
+        if (printTaskPathJsonError(error, options)) return;
+        throw error;
+      }
       printTask(activeTask, options);
     });
 
@@ -183,6 +208,7 @@ export function taskCommand() {
       try {
         task = await updateTaskStatus({ cwd: process.cwd(), config, taskPath, status });
       } catch (error) {
+        if (printTaskPathJsonError(error, options)) return;
         if (
           options.json &&
           error instanceof AgentLoopError &&
@@ -207,7 +233,13 @@ export function taskCommand() {
     .description('Archive a task contract')
     .action(async (taskPath: string, options: { json?: boolean }) => {
       const config = await loadAgentLoopConfig(process.cwd());
-      const task = await archiveTask({ cwd: process.cwd(), config, taskPath });
+      let task: ArchivedTask;
+      try {
+        task = await archiveTask({ cwd: process.cwd(), config, taskPath });
+      } catch (error) {
+        if (printTaskPathJsonError(error, options)) return;
+        throw error;
+      }
       printArchivedTask(task, options);
     });
 

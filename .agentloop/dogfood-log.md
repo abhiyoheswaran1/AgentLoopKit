@@ -5019,3 +5019,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep setup errors explicit and local; do not let read-only commands repair missing generated files.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Error Output for Invalid Task Paths
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-json-error-output-for-invalid-task-paths.md`
+- Trigger:
+  - `agentloop task show/set/status/archive --json` returned structured success output, but invalid task paths still used the global human error path.
+- Implementation:
+  - Added a `TaskPathError` carrying `requestedTask`, `tasksDir`, and `reason`.
+  - Added JSON error handling for missing, outside-directory, and non-Markdown task paths.
+  - Kept default invalid-path errors human-readable on stderr.
+  - Documented the behavior in README, task-contract docs, and the changelog.
+- Verification run:
+  - Red focused task-state tests failed because invalid path commands printed human errors to stderr.
+  - Focused task-state suite passed: 25 tests.
+  - `.agentloop/reports/2026-06-11-03-33-verification-report.md`, overall status pass.
+- What worked well:
+  - The structured error gives agents a recovery reason without loosening task path safety.
+- Improve:
+  - Consider clearer human wording for outside-root and non-Markdown paths in a separate compatibility-aware change.
+  - Keep this unreleased until the planned `0.28.0` batch.
