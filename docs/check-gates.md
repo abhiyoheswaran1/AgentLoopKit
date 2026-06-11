@@ -7,6 +7,7 @@ It inspects local files only:
 - task contract
 - generated verification report
 - generated handoff summary
+- task-folder hygiene diagnostics from `agentloop task doctor`
 - repo harness files
 - core safety policies
 - git working tree, root, and target context
@@ -26,6 +27,7 @@ Statuses:
 - `fail`: core evidence is missing or failed
 
 The command exits with code `1` when any gate fails. Warnings keep exit code `0`.
+Task-folder hygiene issues are warnings by default. Run `agentloop task doctor` for the detailed cleanup list.
 
 Use `--strict` when CI should fail on warnings:
 

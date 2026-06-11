@@ -134,7 +134,7 @@ npx agentloopkit release-notes
 npx agentloopkit npm-status
 ```
 
-`check-gates` does not run tests. It checks whether task, verification, handoff, harness, policy, and git evidence exists before review.
+`check-gates` does not run tests. It checks whether task, verification, handoff, task-folder hygiene, harness, policy, and git evidence exists before review.
 Use `--strict` in CI when warning gates should fail.
 `report` writes a local static HTML evidence page after `verify` and `handoff`.
 `badge` writes a local SVG status badge from existing verification or gate evidence.

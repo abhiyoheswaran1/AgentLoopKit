@@ -2,6 +2,36 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Add Task Hygiene Gate
+
+- Task contract: `.agentloop/tasks/2026-06-11-add-task-hygiene-gate.md`
+- Trigger:
+  - `agentloop task doctor` reports stale, missing, legacy, unsupported, and terminal task-status issues, but `agentloop check-gates` did not surface those diagnostics during review evidence checks.
+  - Reviewers and agents could pass gate evidence while the active task folder still needed cleanup.
+- Product change:
+  - Added a read-only `task-hygiene` gate to `agentloop check-gates`.
+  - The gate passes when `agentloop task doctor` has no diagnostics.
+  - The gate warns when task-folder diagnostics exist and points users to `agentloop task doctor`.
+  - Default gates keep warning exit behavior; `--strict` fails when task hygiene warns.
+  - Updated README, gate docs, getting-started docs, badge docs, and generated harness wording.
+  - No task files are archived, deleted, rewritten, or auto-fixed by the gate.
+- Verification completed:
+  - Red focused test first: `npm test -- tests/check-gates.test.ts tests/task-state.test.ts` failed because `task-hygiene` did not exist and terminal task diagnostics did not affect gate status.
+  - Focused green test: `npm test -- tests/check-gates.test.ts tests/task-state.test.ts`
+  - Full `npm test`
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run check:links`
+  - `npm run build`
+  - `git diff --check`
+  - `npx --yes projscan doctor --format markdown`
+- Verification report: `.agentloop/reports/2026-06-11-06-17-verification-report.md`
+- Handoff summary: `.agentloop/handoffs/2026-06-11-06-18-pr-summary.md`
+- Worked well:
+  - Reusing `inspectTaskDirectory` kept `check-gates` aligned with the existing task doctor behavior without a second parser.
+- Improve:
+  - Consider exposing diagnostic counts in `ci-summary` gate sections if CI users need a compact task-hygiene signal.
+
 ## 2026-06-11: Cover Invalid Artifact Output Extensions
 
 - Task contract: `.agentloop/tasks/2026-06-11-cover-invalid-artifact-output-extensions.md`

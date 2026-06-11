@@ -43,7 +43,7 @@ With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` obj
 ## Sources
 
 - `verification`: reads the latest timestamped verification report and writes `.agentloop/reports/agentloop-verification.svg`.
-- `gates`: checks local task, verification, handoff, harness, policy, and git evidence, then writes `.agentloop/reports/agentloop-gates.svg`.
+- `gates`: checks local task, verification, handoff, task-folder hygiene, harness, policy, and git evidence, then writes `.agentloop/reports/agentloop-gates.svg`.
 
 The command does not run project verification commands. It does not call a remote badge service, fetch assets, read `.env` contents, upload files, or collect telemetry.
 

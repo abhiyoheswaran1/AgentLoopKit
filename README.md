@@ -146,7 +146,7 @@ pnpm build
 | `agentloop task doctor`                 | Check task folder hygiene without mutating task files                          |
 | `agentloop status`                      | Show pinned task, latest open task, parked tasks, latest report, next step     |
 | `agentloop next`                        | Print only the next recommended loop action                                    |
-| `agentloop check-gates`                 | Check task, verification, handoff, harness, policy, and git evidence           |
+| `agentloop check-gates`                 | Check task, verification, handoff, hygiene, harness, policy, and git evidence  |
 | `agentloop check-gates --strict`        | Treat warning gates as failures for CI                                         |
 | `agentloop verify`                      | Run configured checks and write a verification report                          |
 | `agentloop summarize`                   | Generate a deterministic PR or reviewer summary                                |
@@ -356,6 +356,7 @@ See `docs/status.md` for output fields and next-action rules.
 - a task contract
 - a generated verification report
 - a generated handoff summary
+- task-folder hygiene diagnostics
 - repo harness files
 - core safety policies
 - git working tree, root, and target context

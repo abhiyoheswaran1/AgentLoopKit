@@ -56,6 +56,11 @@ describe('check-gates command', () => {
         expect.objectContaining({ id: 'task-contract', status: 'pass' }),
         expect.objectContaining({ id: 'verification-report', status: 'pass' }),
         expect.objectContaining({ id: 'handoff-summary', status: 'pass' }),
+        expect.objectContaining({
+          id: 'task-hygiene',
+          status: 'pass',
+          message: 'Task folder hygiene checks passed.',
+        }),
         expect.objectContaining({ id: 'repo-harness', status: 'pass' }),
         expect.objectContaining({ id: 'safety-policies', status: 'pass' }),
         expect.objectContaining({ id: 'git-context', status: 'pass' }),
@@ -198,6 +203,66 @@ describe('check-gates command', () => {
           path: '.agentloop/tasks/2026-06-09-open-task.md',
         }),
       ]),
+    );
+  });
+
+  test('warns about task folder hygiene diagnostics without failing default gates', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-active-task.md'),
+      '# Active task\n\n- Status: in-progress\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-finished-task.md'),
+      '# Finished task\n\n- Status: done\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+
+    const defaultResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const strictResult = await execa(tsxPath, [cliPath, 'check-gates', '--strict', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const humanResult = await execa(tsxPath, [cliPath, 'check-gates'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(defaultResult.exitCode).toBe(0);
+    const output = JSON.parse(defaultResult.stdout);
+    expect(output.overallStatus).toBe('warn');
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'task-hygiene',
+          status: 'warn',
+          message:
+            'Task folder has 1 hygiene diagnostic. Run `agentloop task doctor` for cleanup details.',
+        }),
+      ]),
+    );
+
+    expect(strictResult.exitCode).toBe(1);
+    expect(JSON.parse(strictResult.stdout)).toMatchObject({
+      strict: true,
+      overallStatus: 'fail',
+    });
+
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain(
+      '[warn] Task hygiene: Task folder has 1 hygiene diagnostic. Run `agentloop task doctor` for cleanup details.',
     );
   });
 

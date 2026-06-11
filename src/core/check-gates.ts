@@ -11,7 +11,7 @@ import {
   isInsideGitRepo,
   parseGitStatus,
 } from './git.js';
-import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
+import { getActiveTaskPath, getFallbackTaskPath, inspectTaskDirectory } from './task-state.js';
 
 export type GateStatus = 'pass' | 'warn' | 'fail';
 
@@ -223,6 +223,20 @@ export async function checkGates(options: {
   } else {
     gates.push(gate('handoff-summary', 'Handoff summary', 'warn', 'No handoff summary found.'));
   }
+
+  const taskDoctor = await inspectTaskDirectory(options);
+  gates.push(
+    gate(
+      'task-hygiene',
+      'Task hygiene',
+      taskDoctor.overallStatus,
+      taskDoctor.counts.diagnostics
+        ? `Task folder has ${taskDoctor.counts.diagnostics} hygiene diagnostic${
+            taskDoctor.counts.diagnostics === 1 ? '' : 's'
+          }. Run \`agentloop task doctor\` for cleanup details.`
+        : 'Task folder hygiene checks passed.',
+    ),
+  );
 
   const missingHarness = await missingFiles(options.cwd, [
     ...requiredRootFiles,
