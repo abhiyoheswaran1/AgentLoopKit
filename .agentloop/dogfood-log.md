@@ -4939,3 +4939,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Putting the rule in `AGENTS.md` gives future coding-agent sessions the instruction before release tooling is touched.
 - Improve:
   - When the maintainer asks for release prep, move Unreleased notes into `0.28.0`, bump package metadata once, and use trusted publishing.
+
+## 2026-06-11: JSON Error Output for Unsupported Task Status
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-add-json-error-output-for-unsupported-task-status.md`
+- Trigger:
+  - `agentloop task status --json` had structured success output, but unsupported status values still used the global human error path.
+- Implementation:
+  - Added an `UNSUPPORTED_TASK_STATUS` error code in task-state parsing.
+  - Added a JSON error response for `agentloop task status <path> <status> --json`.
+  - Kept the default non-JSON error on stderr.
+  - Documented the behavior in README and task-contract docs.
+- Verification run:
+  - Red focused task-state test failed because the command printed the human error to stderr.
+  - Focused task-state suite passed: 21 tests.
+  - `.agentloop/reports/2026-06-11-03-04-verification-report.md`, overall status pass.
+- What worked well:
+  - The change keeps agents from parsing human error text and does not alter task Markdown behavior.
+- Improve:
+  - Consider the same JSON-error treatment for other task subcommands only where automation actually needs it.
+  - Keep this unreleased until the planned `0.28.0` batch.

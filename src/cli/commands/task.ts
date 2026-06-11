@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { loadAgentLoopConfig } from '../../core/config.js';
+import { AgentLoopError } from '../../core/errors.js';
 import {
   archiveTask,
   clearActiveTask,
@@ -8,6 +9,7 @@ import {
   listTasks,
   readTaskContract,
   setActiveTask,
+  TASK_STATUSES,
   updateTaskStatus,
 } from '../../core/task-state.js';
 import type {
@@ -115,6 +117,23 @@ function printTaskDoctor(result: TaskDoctorResult, options: { json?: boolean }) 
   );
 }
 
+function printJsonError(error: AgentLoopError, details: Record<string, unknown> = {}) {
+  console.log(
+    JSON.stringify(
+      {
+        error: {
+          code: error.code,
+          message: error.message,
+          ...details,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
+}
+
 export function taskCommand() {
   const command = new Command('task').description(
     'List, inspect, update, or archive task contracts',
@@ -160,7 +179,24 @@ export function taskCommand() {
     .description('Update a task contract status')
     .action(async (taskPath: string, status: string, options: { json?: boolean }) => {
       const config = await loadAgentLoopConfig(process.cwd());
-      const task = await updateTaskStatus({ cwd: process.cwd(), config, taskPath, status });
+      let task: ActiveTask;
+      try {
+        task = await updateTaskStatus({ cwd: process.cwd(), config, taskPath, status });
+      } catch (error) {
+        if (
+          options.json &&
+          error instanceof AgentLoopError &&
+          error.code === 'UNSUPPORTED_TASK_STATUS'
+        ) {
+          printJsonError(error, {
+            message: `Unsupported task status "${status}".`,
+            requestedStatus: status,
+            supportedStatuses: TASK_STATUSES,
+          });
+          return;
+        }
+        throw error;
+      }
       printUpdatedTask(task, options);
     });
 

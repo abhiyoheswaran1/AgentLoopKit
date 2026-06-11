@@ -149,6 +149,7 @@ function parseTaskStatus(status: string): TaskStatus {
   if ((TASK_STATUSES as readonly string[]).includes(clean)) return clean as TaskStatus;
   throw new AgentLoopError(
     `Unsupported task status "${status}". Use one of: ${TASK_STATUSES.join(', ')}.`,
+    'UNSUPPORTED_TASK_STATUS',
   );
 }
 

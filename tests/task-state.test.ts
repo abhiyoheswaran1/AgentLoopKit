@@ -442,6 +442,44 @@ describe('task command', () => {
     expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: deferred\n');
   });
 
+  test('prints unsupported task status errors as JSON when requested', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'status', '.agentloop/tasks/2026-06-09-demo.md', 'waiting', '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'UNSUPPORTED_TASK_STATUS',
+        message: 'Unsupported task status "waiting".',
+        requestedStatus: 'waiting',
+        supportedStatuses: ['proposed', 'in-progress', 'blocked', 'deferred', 'review', 'done'],
+      },
+    });
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: proposed\n');
+  });
+
+  test('keeps unsupported task status errors human-readable by default', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'status', '.agentloop/tasks/2026-06-09-demo.md', 'waiting'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('agentloop: Unsupported task status "waiting".');
+    expect(result.stderr).toContain('Use one of: proposed, in-progress, blocked, deferred, review, done.');
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: proposed\n');
+  });
+
   test('archives a task contract from the CLI', async () => {
     const { dir, taskPath } = await createTaskStateFixture();
     await execa(tsxPath, [cliPath, 'task', 'set', '.agentloop/tasks/2026-06-09-demo.md'], {
