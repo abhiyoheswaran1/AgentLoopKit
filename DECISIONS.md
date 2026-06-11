@@ -157,3 +157,7 @@ AgentLoopKit config paths are local repo paths, not arbitrary filesystem targets
 ## 2026-06-11: Artifact Roots Must Resolve Inside The Repo
 
 Repo-relative config paths are not enough when a directory already exists as a symlink. Generated task, report, badge, CI-summary, release-note, and handoff outputs now resolve the configured artifact root before writing. If the root points outside the current repo, AgentLoopKit rejects the write instead of following the symlink. This keeps local AgentLoop evidence tied to the repository and avoids surprising filesystem writes.
+
+## 2026-06-11: Agent Instruction Writes Stay Repo-Local
+
+`agentloop install-agent` writes Markdown guidance for coding agents, so it follows the same repo-local rule as generated evidence. The command resolves `.agentloop/agents/*.md` and `AGENTS.md` before reading or writing. If either path points outside the repo through a symlink, AgentLoopKit rejects the command and leaves the outside target unchanged.

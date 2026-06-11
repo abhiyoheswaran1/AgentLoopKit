@@ -11,7 +11,14 @@ export const generatedMarkdownPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-.+\.md$/
 
 export type ArtifactType = 'task' | 'verification' | 'handoff';
 export type ArtifactPathErrorReason = 'outside-directory' | 'not-markdown' | 'missing';
-export type OutputArtifactType = 'report' | 'handoff' | 'badge' | 'ci-summary' | 'release-notes';
+export type OutputArtifactType =
+  | 'report'
+  | 'handoff'
+  | 'badge'
+  | 'ci-summary'
+  | 'release-notes'
+  | 'agent-instructions'
+  | 'agents-md';
 export type OutputPathErrorReason = 'outside-directory' | 'wrong-extension';
 
 export class ArtifactPathError extends AgentLoopError {
@@ -39,6 +46,8 @@ const outputArtifactLabels: Record<OutputArtifactType, string> = {
   badge: 'Badge',
   'ci-summary': 'CI summary',
   'release-notes': 'Release notes',
+  'agent-instructions': 'Agent instructions',
+  'agents-md': 'AGENTS.md',
 };
 
 export class OutputPathError extends AgentLoopError {

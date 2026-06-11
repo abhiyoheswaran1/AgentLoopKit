@@ -236,7 +236,7 @@ agentloop install-agent gemini-cli
 agentloop install-agent github-copilot-cli
 ```
 
-AgentLoopKit only writes safe repo-local Markdown instructions when exact third-party config conventions are uncertain.
+AgentLoopKit only writes safe repo-local Markdown instructions when exact third-party config conventions are uncertain. If `.agentloop/agents/` or `AGENTS.md` resolves outside the current repo through a symlink, `install-agent --json` returns `OUTPUT_PATH_INVALID` and writes no files.
 
 ## Task Contracts
 
@@ -278,7 +278,7 @@ For unsupported `--type` values, `create-task --json` returns a parseable error 
 With `--json`, invalid `agentloop.config.json` files return a parseable `CONFIG_ERROR` object for `create-task` and `task` subcommands, and no task files or active-task state are changed.
 `list-templates --json` returns grouped bundled template names for agents that need to inspect available loops, policies, handoffs, and agent instructions.
 `version --json` returns the package version in a stable object for scripts that should not parse the plain version string.
-`install-agent <agent> --json` returns the instruction files written for one agent, and `install-agent all --json` returns every bundled agent entry. Unsupported agent names return a parseable JSON error with `supportedAgents` and write no files.
+`install-agent <agent> --json` returns the instruction files written for one agent, and `install-agent all --json` returns every bundled agent entry. Unsupported agent names return a parseable JSON error with `supportedAgents` and write no files. Agent instruction outputs and `AGENTS.md` must resolve inside the current repo.
 
 Each contract records:
 

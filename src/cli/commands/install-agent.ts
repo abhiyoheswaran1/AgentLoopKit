@@ -1,10 +1,12 @@
 import { Command } from 'commander';
+import { OutputPathError } from '../../core/artifacts.js';
 import {
   installAgentInstructions,
   installAllAgentInstructions,
   isSupportedAgent,
 } from '../../core/agent-installation.js';
 import { SUPPORTED_AGENTS } from '../../core/constants.js';
+import { printOutputPathJsonError } from '../json-errors.js';
 
 export function installAgentCommand() {
   return new Command('install-agent')
@@ -14,7 +16,16 @@ export function installAgentCommand() {
     .action(async (agent: string, options: { json?: boolean }) => {
       const requestedAgent = agent.trim();
       if (requestedAgent === 'all') {
-        const results = await installAllAgentInstructions({ cwd: process.cwd() });
+        let results: Awaited<ReturnType<typeof installAllAgentInstructions>>;
+        try {
+          results = await installAllAgentInstructions({ cwd: process.cwd() });
+        } catch (error) {
+          if (options.json && error instanceof OutputPathError) {
+            printOutputPathJsonError(error);
+            return;
+          }
+          throw error;
+        }
         if (options.json) {
           console.log(
             JSON.stringify(
@@ -57,7 +68,16 @@ export function installAgentCommand() {
           `Unsupported agent "${requestedAgent}". Supported agents: ${SUPPORTED_AGENTS.join(', ')}, all`,
         );
       }
-      const result = await installAgentInstructions({ cwd: process.cwd(), agent: requestedAgent });
+      let result: Awaited<ReturnType<typeof installAgentInstructions>>;
+      try {
+        result = await installAgentInstructions({ cwd: process.cwd(), agent: requestedAgent });
+      } catch (error) {
+        if (options.json && error instanceof OutputPathError) {
+          printOutputPathJsonError(error);
+          return;
+        }
+        throw error;
+      }
       if (options.json) {
         console.log(JSON.stringify({ agent: { name: requestedAgent, ...result } }, null, 2));
         return;

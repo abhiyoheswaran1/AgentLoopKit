@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed `agentloop install-agent` so `.agentloop/agents/*.md` and `AGENTS.md` must resolve inside the current repo before the command reads or writes them. With `--json`, unsafe symlinked targets now return `OUTPUT_PATH_INVALID` and no agent files are written.
 - Changed generated artifact writes so configured task, report, and handoff roots must resolve inside the current repo even when those directories already exist as symlinks. `verify --json`, `handoff --json`, `report --json`, `badge --json`, `ci-summary --json --write`, and `release-notes --json --write` now return `OUTPUT_PATH_INVALID` before writing outside the repo.
 - Changed `agentloop.config.json` validation so configured AgentLoopKit paths must be non-empty repo-relative paths, rejecting absolute paths, Windows drive-qualified paths, parent traversal, and null bytes before artifact commands read or write configured locations.
 - Changed task artifact path validation to resolve existing symlinked ancestors before writing or reading task files, so `agentloop create-task --out <path>` and explicit task paths such as `agentloop verify --task <path>` cannot be redirected outside the configured task directory.

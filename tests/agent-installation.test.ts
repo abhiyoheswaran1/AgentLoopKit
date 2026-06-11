@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile, realpath, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, realpath, stat, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { SUPPORTED_AGENTS } from '../src/core/constants.js';
@@ -123,6 +123,61 @@ describe('agent installation', () => {
       },
     });
     await expect(stat(path.join(dir, '.agentloop'))).rejects.toThrow();
+  });
+
+  test('rejects agent instruction writes when the agents directory resolves outside the repo', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await mkdir(path.join(dir, '.agentloop'), { recursive: true });
+    await symlink(outsideDir, path.join(dir, '.agentloop/agents'), 'dir');
+
+    const result = await execa(tsxPath, [cliPath, 'install-agent', 'codex', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'OUTPUT_PATH_INVALID',
+      artifactType: 'agent-instructions',
+      expectedDir: '.agentloop/agents',
+      expectedExtension: '.md',
+      reason: 'outside-directory',
+    });
+    expect(output.error.requestedPath).toBe('.agentloop/agents/codex.md');
+    expect(await readdir(outsideDir)).toEqual([]);
+    await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).rejects.toThrow();
+  });
+
+  test('rejects AGENTS.md updates when the root instructions file resolves outside the repo', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    const outsideAgents = path.join(outsideDir, 'AGENTS.md');
+    await writeFile(outsideAgents, '# Outside instructions\n');
+    await symlink(outsideAgents, path.join(dir, 'AGENTS.md'), 'file');
+
+    const result = await execa(tsxPath, [cliPath, 'install-agent', 'codex', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'OUTPUT_PATH_INVALID',
+      artifactType: 'agents-md',
+      expectedDir: '.',
+      expectedExtension: '.md',
+      reason: 'outside-directory',
+    });
+    expect(output.error.requestedPath).toBe('AGENTS.md');
+    expect(await readFile(outsideAgents, 'utf8')).toBe('# Outside instructions\n');
+    await expect(readFile(path.join(dir, '.agentloop/agents/codex.md'), 'utf8')).rejects.toThrow();
   });
 
   test('keeps unsupported agent errors human-readable by default', async () => {

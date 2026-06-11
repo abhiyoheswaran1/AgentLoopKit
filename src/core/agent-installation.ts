@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { resolveOutputArtifactPath } from './artifacts.js';
 import { SUPPORTED_AGENTS } from './constants.js';
 import { readTextIfExists, writeTextFile } from './file-system.js';
 import { readTemplate } from './template-renderer.js';
@@ -20,13 +21,25 @@ const displayNames: Record<SupportedAgent, string> = {
 };
 
 export async function installAgentInstructions(options: { cwd: string; agent: SupportedAgent }) {
-  const agentFilePath = path.join(options.cwd, '.agentloop', 'agents', `${options.agent}.md`);
+  const agentFilePath = resolveOutputArtifactPath({
+    cwd: options.cwd,
+    artifactType: 'agent-instructions',
+    requestedPath: path.join('.agentloop', 'agents', `${options.agent}.md`),
+    expectedDir: path.join('.agentloop', 'agents'),
+    expectedExtension: '.md',
+  });
+  const agentsPath = resolveOutputArtifactPath({
+    cwd: options.cwd,
+    artifactType: 'agents-md',
+    requestedPath: 'AGENTS.md',
+    expectedDir: '.',
+    expectedExtension: '.md',
+  });
   const content = await readTemplate(`agents/${options.agent}.md`, {
     agentName: displayNames[options.agent],
   });
   await writeTextFile(agentFilePath, content);
 
-  const agentsPath = path.join(options.cwd, 'AGENTS.md');
   const existing = await readTextIfExists(agentsPath);
   const marker = `<!-- agentloopkit-agent:${options.agent} -->`;
   if (!existing.includes(marker)) {

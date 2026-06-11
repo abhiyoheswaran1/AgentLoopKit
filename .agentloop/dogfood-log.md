@@ -5568,3 +5568,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider a later pass for non-artifact writes such as agent installation and local-only exclude files.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Install-Agent Symlink Guard
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-reject-install-agent-symlink-escapes.md`
+- Trigger:
+  - `install-agent` could write through `.agentloop/agents` or `AGENTS.md` when either path was a symlink to a location outside the repo.
+- Implementation:
+  - Reused the output-path guard for `.agentloop/agents/*.md` and `AGENTS.md`.
+  - Validated both target paths before reading or writing, so an unsafe `AGENTS.md` symlink cannot leave a partially written agent file behind.
+  - Added JSON `OUTPUT_PATH_INVALID` handling for `install-agent <agent>` and `install-agent all`.
+  - Documented the behavior in README, changelog, decisions, and backlog.
+- Verification run:
+  - Red focused install-agent tests failed because the CLI exited `0` and followed symlinked targets.
+  - Focused install-agent suite passed after the guard: 1 file and 8 tests.
+  - Full `npx pnpm@10.12.1 test` passed: 36 files and 277 tests.
+  - `npx pnpm@10.12.1 lint`, `typecheck`, `check:links`, `build`, `git diff --check`, and `npx --yes projscan doctor --format markdown` passed.
+  - Dogfood report: `.agentloop/reports/2026-06-11-07-47-verification-report.md`, overall status pass.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-07-49-pr-summary.md`.
+- What worked well:
+  - The existing output-path error shape fit install-agent without adding a second JSON error contract.
+- Improve:
+  - Review `init` writes next, especially pre-existing `.agentloop` or root Markdown symlinks.
+  - Keep this unreleased until the planned `0.28.0` batch.
