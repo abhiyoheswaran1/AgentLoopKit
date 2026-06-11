@@ -4902,3 +4902,23 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - The `command` input remains free-form by design; keep documenting it as static trusted workflow configuration.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Verification JSON Task Command Details
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-expose-task-command-details-in-verify-json.md`
+- Trigger:
+  - `agentloop verify --task-commands --json` exposed whether task commands were requested and how many were found, but not the selected command strings.
+- Implementation:
+  - Added `taskCommands.commands` to the verification result.
+  - Kept task command execution opt-in through `--task-commands`.
+  - Added core and CLI tests for populated and empty task command lists.
+  - Documented the JSON field in README and verification report docs.
+- Verification run:
+  - Red focused verification tests failed because `taskCommands.commands` was absent.
+  - Focused verification suite passed: 19 tests.
+  - `.agentloop/reports/2026-06-11-02-50-verification-report.md`, overall status pass.
+- What worked well:
+  - The data already existed during command selection, so the change did not alter execution behavior.
+- Improve:
+  - Keep task-defined command execution explicit and reviewed; do not make task Markdown executable by default.
+  - Keep this unreleased until the planned `0.28.0` batch.

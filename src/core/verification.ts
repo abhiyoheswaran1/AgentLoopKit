@@ -46,6 +46,7 @@ export type VerificationResult = {
   taskCommands: {
     requested: boolean;
     foundCount: number;
+    commands: string[];
   };
   ciContext?: VerificationCiContext;
   markdown: string;
@@ -152,6 +153,7 @@ type VerificationCommandSelection = {
   commands: Array<[VerificationCommandKey, string]>;
   taskCommandsRequested: boolean;
   taskCommandsFound: number;
+  taskCommands: string[];
 };
 
 async function commandEntries(
@@ -174,9 +176,10 @@ async function commandEntries(
     if (command.trim()) active.push(['custom', command.trim()]);
   }
   let taskCommandsFound = 0;
+  let taskCommands: string[] = [];
   if (options.taskCommands) {
     const markdown = await readSafeTaskMarkdown(options.cwd, config, options.taskPath);
-    const taskCommands = markdown ? parseTaskVerificationCommands(markdown) : [];
+    taskCommands = markdown ? parseTaskVerificationCommands(markdown) : [];
     taskCommandsFound = taskCommands.length;
     for (const command of taskCommands) {
       active.push(['task', command]);
@@ -187,6 +190,7 @@ async function commandEntries(
     commands: active,
     taskCommandsRequested: options.taskCommands === true,
     taskCommandsFound,
+    taskCommands,
   };
 }
 
@@ -445,6 +449,7 @@ ${
     taskCommands: {
       requested: commandSelection.taskCommandsRequested,
       foundCount: commandSelection.taskCommandsFound,
+      commands: commandSelection.taskCommands,
     },
     ciContext,
     markdown,

@@ -32,6 +32,7 @@
 - Added `agentloop verify --task-commands` to explicitly run commands listed in a task contract's `Verification Commands` section.
 - Added a verification report note when `--task-commands` is requested but no runnable task commands are found.
 - Added `taskCommands.requested` and `taskCommands.foundCount` to `agentloop verify --json`.
+- Added `taskCommands.commands` to `agentloop verify --task-commands --json` so automation can inspect selected task-defined commands without parsing Markdown.
 - Added Vitest coverage that rejects hardcoded AgentLoopKit version pins in normal public docs and examples while allowing release-history evidence files.
 - Replaced stale current-version pins in user-facing README, MCP, distribution, CI docs, and examples with `@latest` or `<version>` placeholders.
 - Added regression coverage for missing Git executable behavior in local Git helpers and `agentloop init`.

@@ -388,7 +388,7 @@ describe('verification', () => {
     });
 
     expect(result.overallStatus).toBe('not-run');
-    expect(result.taskCommands).toEqual({ requested: false, foundCount: 0 });
+    expect(result.taskCommands).toEqual({ requested: false, foundCount: 0, commands: [] });
     await expect(access(path.join(dir, 'task-command-ran.txt'))).rejects.toThrow();
   });
 
@@ -421,7 +421,13 @@ describe('verification', () => {
     });
 
     expect(result.overallStatus).toBe('pass');
-    expect(result.taskCommands).toEqual({ requested: true, foundCount: 1 });
+    expect(result.taskCommands).toEqual({
+      requested: true,
+      foundCount: 1,
+      commands: [
+        'node -e "require(\'fs\').writeFileSync(\'task-command-ran.txt\', \'yes\'); console.log(\'task-check\')"',
+      ],
+    });
     expect(result.commands).toEqual([
       expect.objectContaining({
         key: 'task',
@@ -464,7 +470,7 @@ describe('verification', () => {
     });
 
     expect(result.overallStatus).toBe('not-run');
-    expect(result.taskCommands).toEqual({ requested: true, foundCount: 0 });
+    expect(result.taskCommands).toEqual({ requested: true, foundCount: 0, commands: [] });
     expect(result.markdown).toContain('## Task Commands');
     expect(result.markdown).toContain(
       'Task verification commands were requested, but none were found in the task contract.',
@@ -604,7 +610,7 @@ describe('verification', () => {
     });
 
     expect(result.overallStatus).toBe('not-run');
-    expect(result.taskCommands).toEqual({ requested: true, foundCount: 0 });
+    expect(result.taskCommands).toEqual({ requested: true, foundCount: 0, commands: [] });
     expect(result.markdown).toContain('Task path must point to a Markdown task contract.');
     expect(result.markdown).not.toContain('Outside Command Task');
     await expect(access(path.join(dir, 'outside-command-ran.txt'))).rejects.toThrow();
@@ -696,7 +702,11 @@ describe('verification', () => {
     );
     const output = JSON.parse(result.stdout);
     expect(output.overallStatus).toBe('pass');
-    expect(output.taskCommands).toEqual({ requested: true, foundCount: 1 });
+    expect(output.taskCommands).toEqual({
+      requested: true,
+      foundCount: 1,
+      commands: ['node -e "console.log(\'cli-task-check\')"'],
+    });
     expect(output.commands).toEqual([
       expect.objectContaining({
         key: 'task',
