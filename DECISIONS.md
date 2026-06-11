@@ -165,3 +165,7 @@ Repo-relative config paths are not enough when a directory already exists as a s
 ## 2026-06-11: Init Preflights Repo-Local Targets
 
 `agentloop init` creates the repo harness, so it now preflights every generated target before writing `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, or `agentloop.config.json`. If an existing symlink would redirect one of those targets outside the current repo, init rejects the run before partial harness files are created.
+
+## 2026-06-11: Task State Stays Repo-Local
+
+`.agentloop/state.json` is a local active-task pointer, not a general state store. Task commands now resolve that state path before reading, writing, or clearing it. Unsafe read paths are treated as no active task, while unsafe writes and clears fail with `OUTPUT_PATH_INVALID` so a symlink cannot redirect task state outside the repo.

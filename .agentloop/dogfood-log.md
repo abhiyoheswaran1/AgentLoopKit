@@ -5613,3 +5613,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The existing `OutputPathError` shape covered init without adding a new error contract.
 - Improve:
   - Consider adding packed-release smoke coverage for symlinked init targets before the `0.28.0` release batch.
+
+## 2026-06-11: Task State Symlink Guard
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-reject-task-state-symlink-escapes.md`
+- Trigger:
+  - Task pinning uses `.agentloop/state.json`, and a pre-existing symlinked state file or configured state directory could redirect active-task state outside the repo.
+- Implementation:
+  - Added a repo-local task-state output guard for `.agentloop/state.json`.
+  - Made unsafe task-state reads behave like no active task, so `task current`, `status`, and `list` do not read outside repo state.
+  - Made unsafe task-state writes and clears fail with `OUTPUT_PATH_INVALID` in JSON mode.
+  - Updated README, changelog, decisions, and backlog.
+- Verification run:
+  - Red focused task-state tests failed first because `task set`, `task current`, and `task clear` followed unsafe state symlinks.
+  - Focused task-state suite passed after the guard: 1 file and 33 tests.
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-08-09-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-08-12-pr-summary.md`.
+  - Full `npx pnpm@10.12.1 test` passed: 36 files and 283 tests.
+  - `npx pnpm@10.12.1 lint`, `typecheck`, `check:links`, `build`, `git diff --check`, and `npx --yes projscan doctor --format markdown` passed.
+- What worked well:
+  - Treating unsafe state reads as empty state keeps read-only commands safe and quiet.
+- Improve:
+  - Add packed-release smoke coverage for the safety guards before cutting `0.28.0`.

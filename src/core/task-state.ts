@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { mkdir, readdir, readFile, rename, rm, stat } from 'node:fs/promises';
+import { OutputPathError, resolveOutputArtifactPath } from './artifacts.js';
 import { AgentLoopConfig } from './config.js';
 import { AgentLoopError } from './errors.js';
 import {
@@ -89,8 +90,18 @@ const TERMINAL_TASK_STATUSES = new Set(['done', 'completed', 'verified']);
 const NON_FALLBACK_TASK_STATUSES = new Set(['deferred', ...TERMINAL_TASK_STATUSES]);
 const LEGACY_TASK_STATUSES = new Set(['completed', 'verified']);
 
-function statePath(cwd: string, config: AgentLoopConfig) {
-  return path.join(cwd, config.paths.agentloopDir, 'state.json');
+function repoPath(...segments: string[]) {
+  return segments.join('/');
+}
+
+function resolveStatePath(cwd: string, config: AgentLoopConfig) {
+  return resolveOutputArtifactPath({
+    cwd,
+    artifactType: 'task-state',
+    requestedPath: repoPath(config.paths.agentloopDir, 'state.json'),
+    expectedDir: config.paths.agentloopDir,
+    expectedExtension: '.json',
+  });
 }
 
 function toStoredPath(cwd: string, absolutePath: string) {
@@ -102,7 +113,13 @@ function tasksRoot(cwd: string, config: AgentLoopConfig) {
 }
 
 async function readState(cwd: string, config: AgentLoopConfig): Promise<TaskState> {
-  const filePath = statePath(cwd, config);
+  let filePath: string;
+  try {
+    filePath = resolveStatePath(cwd, config);
+  } catch (error) {
+    if (error instanceof OutputPathError) return { version: 1 };
+    throw error;
+  }
   if (!(await pathExists(filePath))) return { version: 1 };
   const raw = await readFile(filePath, 'utf8');
   try {
@@ -120,7 +137,7 @@ async function readState(cwd: string, config: AgentLoopConfig): Promise<TaskStat
 }
 
 async function writeState(cwd: string, config: AgentLoopConfig, state: TaskState) {
-  await writeTextFile(statePath(cwd, config), `${JSON.stringify(state, null, 2)}\n`);
+  await writeTextFile(resolveStatePath(cwd, config), `${JSON.stringify(state, null, 2)}\n`);
 }
 
 async function resolveTaskPath(options: {
@@ -309,7 +326,7 @@ export async function getFallbackTaskPath(options: { cwd: string; config: AgentL
 }
 
 export async function clearActiveTask(options: { cwd: string; config: AgentLoopConfig }) {
-  await rm(statePath(options.cwd, options.config), { force: true });
+  await rm(resolveStatePath(options.cwd, options.config), { force: true });
 }
 
 export async function listTasks(options: {

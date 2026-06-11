@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed `.agentloop/state.json` handling so task active-state reads ignore unsafe symlinked state paths, while `task set --json` and `task clear --json` return `OUTPUT_PATH_INVALID` before writing or removing state outside the current repo.
 - Changed `agentloop init` so generated harness targets must resolve inside the current repo before any init files are written. With `--json`, unsafe symlinked `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, or config targets return `OUTPUT_PATH_INVALID`.
 - Changed `agentloop install-agent` so `.agentloop/agents/*.md` and `AGENTS.md` must resolve inside the current repo before the command reads or writes them. With `--json`, unsafe symlinked targets now return `OUTPUT_PATH_INVALID` and no agent files are written.
 - Changed generated artifact writes so configured task, report, and handoff roots must resolve inside the current repo even when those directories already exist as symlinks. `verify --json`, `handoff --json`, `report --json`, `badge --json`, `ci-summary --json --write`, and `release-notes --json --write` now return `OUTPUT_PATH_INVALID` before writing outside the repo.

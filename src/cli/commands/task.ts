@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { OutputPathError } from '../../core/artifacts.js';
 import { AgentLoopError } from '../../core/errors.js';
 import {
   archiveTask,
@@ -19,7 +20,7 @@ import type {
   TaskContract,
   TaskDoctorResult,
 } from '../../core/task-state.js';
-import { loadConfigForJsonCommand } from '../json-errors.js';
+import { loadConfigForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function printTask(
   task: Awaited<ReturnType<typeof getActiveTask>> | null,
@@ -147,6 +148,14 @@ function printTaskPathJsonError(error: unknown, options: { json?: boolean }) {
   return false;
 }
 
+function printTaskOutputPathJsonError(error: unknown, options: { json?: boolean }) {
+  if (options.json && error instanceof OutputPathError) {
+    printOutputPathJsonError(error);
+    return true;
+  }
+  return false;
+}
+
 export function taskCommand() {
   const command = new Command('task').description(
     'List, inspect, update, or archive task contracts',
@@ -194,6 +203,7 @@ export function taskCommand() {
         activeTask = await setActiveTask({ cwd: process.cwd(), config, taskPath });
       } catch (error) {
         if (printTaskPathJsonError(error, options)) return;
+        if (printTaskOutputPathJsonError(error, options)) return;
         throw error;
       }
       printTask(activeTask, options);
@@ -277,7 +287,12 @@ export function taskCommand() {
     .action(async (options: { json?: boolean }) => {
       const config = await loadConfigForJsonCommand(process.cwd(), options.json);
       if (!config) return;
-      await clearActiveTask({ cwd: process.cwd(), config });
+      try {
+        await clearActiveTask({ cwd: process.cwd(), config });
+      } catch (error) {
+        if (printTaskOutputPathJsonError(error, options)) return;
+        throw error;
+      }
       printTask(null, options);
     });
 

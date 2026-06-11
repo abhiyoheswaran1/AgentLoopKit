@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, readFile, stat, symlink, utimes, writeFile } from 'node:fs/promises';
+import { lstat, mkdir, readFile, stat, symlink, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -238,6 +238,36 @@ describe('task state', () => {
       version: 1,
       activeTaskPath: '.agentloop/tasks/outside-link/outside-task.md',
     });
+
+    expect(await getActiveTaskPath({ cwd: dir, config })).toBeUndefined();
+  });
+
+  test('rejects active task state writes when the state directory resolves outside the repo', async () => {
+    const { dir, config, taskPath } = await createTaskStateFixture();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    const escapedConfig = {
+      ...config,
+      paths: { ...config.paths, agentloopDir: '.agentloop-state' },
+    };
+    await symlink(outsideDir, path.join(dir, '.agentloop-state'), 'dir');
+
+    await expect(setActiveTask({ cwd: dir, config: escapedConfig, taskPath })).rejects.toThrow(
+      'Task state output path must stay inside .agentloop-state',
+    );
+    await expect(stat(path.join(outsideDir, 'state.json'))).rejects.toThrow();
+  });
+
+  test('ignores active task state when state.json resolves outside the repo', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    const outsideState = path.join(outsideDir, 'state.json');
+    await writeJson(outsideState, {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/2026-06-09-demo.md',
+    });
+    await symlink(outsideState, path.join(dir, '.agentloop/state.json'), 'file');
 
     expect(await getActiveTaskPath({ cwd: dir, config })).toBeUndefined();
   });
@@ -559,6 +589,65 @@ describe('task command', () => {
       },
     });
     await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
+  });
+
+  test('prints unsafe task state write errors as JSON when requested', async () => {
+    const { dir } = await createTaskStateFixture();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    const outsideState = path.join(outsideDir, 'state.json');
+    await writeFile(outsideState, '{"version":1}\n');
+    await symlink(outsideState, path.join(dir, '.agentloop/state.json'), 'file');
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'set', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toMatchObject({
+      error: {
+        code: 'OUTPUT_PATH_INVALID',
+        artifactType: 'task-state',
+        requestedPath: '.agentloop/state.json',
+        expectedDir: '.agentloop',
+        expectedExtension: '.json',
+        reason: 'outside-directory',
+      },
+    });
+    expect(await readFile(outsideState, 'utf8')).toBe('{"version":1}\n');
+  });
+
+  test('prints unsafe task state clear errors as JSON without removing the symlink', async () => {
+    const { dir } = await createTaskStateFixture();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(outsideDir);
+    const outsideState = path.join(outsideDir, 'state.json');
+    const stateLink = path.join(dir, '.agentloop/state.json');
+    await writeFile(outsideState, '{"version":1}\n');
+    await symlink(outsideState, stateLink, 'file');
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'clear', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toMatchObject({
+      error: {
+        code: 'OUTPUT_PATH_INVALID',
+        artifactType: 'task-state',
+        requestedPath: '.agentloop/state.json',
+        expectedDir: '.agentloop',
+        expectedExtension: '.json',
+        reason: 'outside-directory',
+      },
+    });
+    expect((await lstat(stateLink)).isSymbolicLink()).toBe(true);
+    expect(await readFile(outsideState, 'utf8')).toBe('{"version":1}\n');
   });
 
   test('prints non-Markdown task path errors as JSON when requested', async () => {

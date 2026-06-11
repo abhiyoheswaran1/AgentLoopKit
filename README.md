@@ -217,7 +217,7 @@ agentloop.config.json
 
 The package ships `schema/agentloop.config.schema.json` for editors and config validation. Generated configs use the GitHub raw schema URL for editor support; the CLI validates config locally and does not fetch that URL at runtime. SchemaStore also maps `agentloop.config.json` to that schema, so compatible editors can discover it without extra setup.
 
-Configured AgentLoopKit paths must be local repo-relative paths. Absolute paths, Windows drive-qualified paths, parent traversal such as `../outside`, and null bytes are rejected before AgentLoopKit reads or writes configured artifacts. During `init`, generated files such as `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, and `agentloop.config.json` must also resolve inside the current repo. Existing symlinks in configured task, report, and handoff directories must still resolve inside the current repo before AgentLoopKit writes generated files.
+Configured AgentLoopKit paths must be local repo-relative paths. Absolute paths, Windows drive-qualified paths, parent traversal such as `../outside`, and null bytes are rejected before AgentLoopKit reads or writes configured artifacts. During `init`, generated files such as `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, and `agentloop.config.json` must also resolve inside the current repo. Existing symlinks in configured task, report, handoff, and task-state paths must still resolve inside the current repo before AgentLoopKit reads or writes generated files.
 
 See `docs/configuration.md` for config fields and schema notes.
 
