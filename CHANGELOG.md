@@ -28,6 +28,7 @@
 - Changed the composite GitHub Action default `agentloopkit-version` to `latest`; workflows can still pin `<version>` for reproducibility.
 - Added GitHub Action guidance warning maintainers not to pass untrusted pull request or user input to the composite action `command`.
 - Changed the composite GitHub Action install step to pass `agentloopkit-version` through an environment variable instead of direct shell interpolation.
+- Documented the maintainer rule to accumulate active development for the planned `0.28.0` batch instead of cutting a release for every small improvement.
 - Changed `npm run smoke:release` so the packed README may stay unpinned while stale exact version pins are still rejected.
 - Added `agentloop verify --task-commands` to explicitly run commands listed in a task contract's `Verification Commands` section.
 - Added a verification report note when `--task-commands` is requested but no runnable task commands are found.

@@ -4922,3 +4922,20 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep task-defined command execution explicit and reviewed; do not make task Markdown executable by default.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: 0.28.0 Batch Release Policy
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-document-0-28-0-batch-release-policy.md`
+- Trigger:
+  - The maintainer asked to stop cutting a new version for every small improvement and batch current work into `0.28.0`.
+- Implementation:
+  - Added the no-version-spam rule to `AGENTS.md` and `AGENTLOOP.md`.
+  - Updated release status, npm publishing docs, roadmap, and changelog.
+  - Kept README free of internal release-process notes.
+- Verification run:
+  - Confirmed README has no `0.28.0` or internal release-cadence text.
+  - `.agentloop/reports/2026-06-11-02-56-verification-report.md`, overall status pass.
+- What worked well:
+  - Putting the rule in `AGENTS.md` gives future coding-agent sessions the instruction before release tooling is touched.
+- Improve:
+  - When the maintainer asks for release prep, move Unreleased notes into `0.28.0`, bump package metadata once, and use trusted publishing.

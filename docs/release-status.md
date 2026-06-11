@@ -16,6 +16,7 @@ Last checked: June 10, 2026.
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 - npm latest: `0.27.0`
 - npm versions: `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, `0.26.5`, `0.27.0`
+- Current `main` is accumulating unreleased work for the planned `0.28.0` batch. Do not publish or bump versions until the maintainer asks for release prep.
 
 Run the local registry check at any time:
 
@@ -59,6 +60,7 @@ The maintainer then completed browser authentication and published `0.24.0` manu
 
 Use the GitHub Actions publish workflow for the next release after release metadata is prepared:
 
+- The next planned release is `0.28.0`; batch the current unreleased work instead of cutting a version for every small improvement.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - `.github/workflows/publish.yml` has `id-token: write`.
 - `package.json` and `CHANGELOG.md` agree on the next version.

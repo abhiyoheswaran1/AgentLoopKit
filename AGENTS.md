@@ -23,6 +23,7 @@ Before changing code:
 - Run `agentloop ci-summary --write` in CI when reviewers need a compact provenance and evidence summary.
 - Run `agentloop release-notes --write` before a release when reviewers need local release-note evidence.
 - Run `agentloop npm-status` before claiming npm availability in release notes or docs.
+- Do not bump package versions, create tags, publish npm, publish GitHub Releases, publish GHCR, or publish MCP Registry entries during active implementation. Accumulate current unreleased work for the planned `0.28.0` batch until the maintainer explicitly asks for release prep.
 - Follow the Specify, Constrain, Plan, Implement, Verify, Review, Handoff loop.
 - Keep changes small and tied to the task contract.
 - Do not run destructive git or filesystem commands unless the user asks for them.

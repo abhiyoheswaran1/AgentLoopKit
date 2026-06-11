@@ -42,3 +42,7 @@ Local files under `.agentloop/policies/` are the repo's policy source of truth. 
 Agents may work autonomously inside the task contract. They should stop and ask before changing protected areas, adding dependencies, introducing breaking public APIs, or taking destructive actions.
 
 No agent should claim completion without verification evidence or a clear statement of what was not verified.
+
+## Release Cadence
+
+Current development after `0.27.0` should accumulate as unreleased work for the planned `0.28.0` batch. Do not bump package versions, create tags, publish npm, publish GitHub Releases, publish GHCR, or publish MCP Registry entries unless the maintainer explicitly asks for release prep.

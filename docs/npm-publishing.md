@@ -59,6 +59,7 @@ Current facts:
 - MCP Registry metadata for `io.github.abhiyoheswaran1/agentloopkit` published after npm verification.
 - GHCR distribution is live for `0.27.0`.
 - Future releases should continue publishing from GitHub Releases through trusted publishing.
+- Current `main` is accumulating unreleased work for the planned `0.28.0` batch. Do not publish or bump versions until the maintainer asks for release prep.
 
 Historical rule:
 
