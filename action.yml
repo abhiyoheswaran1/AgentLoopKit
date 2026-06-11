@@ -3,7 +3,7 @@ description: Run AgentLoopKit commands in GitHub Actions.
 
 inputs:
   command:
-    description: AgentLoopKit command arguments, for example "check-gates --strict".
+    description: AgentLoopKit command arguments, for example "check-gates --strict". Do not pass untrusted pull request or user input to command.
     required: true
   agentloopkit-version:
     description: npm package version to install.

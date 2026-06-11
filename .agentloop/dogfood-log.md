@@ -4864,3 +4864,22 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep release-tag examples pinned with `<version>` where reproducibility matters.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: GitHub Action Command Input Safety
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-document-github-action-command-input-safety.md`
+- Trigger:
+  - The composite GitHub Action passes `command` into a shell command, so workflow authors need a clear trust-boundary warning.
+- Implementation:
+  - Added the warning to `action.yml`.
+  - Added the same guidance to the GitHub Actions docs and example workflow README.
+  - Added distribution artifact coverage so the warning stays in action metadata and public CI docs.
+- Verification run:
+  - Red focused test failed because the warning was absent from `action.yml`.
+  - Focused distribution artifact suite passed: 5 tests.
+  - `.agentloop/reports/2026-06-11-02-38-verification-report.md`, overall status pass.
+- What worked well:
+  - The change keeps the action lightweight while making the trust boundary visible where users copy workflow snippets.
+- Improve:
+  - If teams ask for stronger protection later, consider a safer structured command mode instead of free-form command text.
+  - Keep this unreleased until the planned `0.28.0` batch.

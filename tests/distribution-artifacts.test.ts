@@ -45,6 +45,17 @@ describe('distribution artifacts', () => {
     expect(action).not.toContain('upload-artifact');
   });
 
+  test('GitHub Action docs warn against untrusted command input', async () => {
+    const action = await readFile('action.yml', 'utf8');
+    const docs = await readFile('docs/github-actions.md', 'utf8');
+    const example = await readFile('examples/github-actions/README.md', 'utf8');
+    const requiredWarning = 'Do not pass untrusted pull request or user input to command.';
+
+    expect(action).toContain(requiredWarning);
+    expect(docs).toContain(requiredWarning);
+    expect(example).toContain(requiredWarning);
+  });
+
   test('Docker image builds from the local package and defaults to agentloop version', async () => {
     const dockerfile = await readFile('Dockerfile', 'utf8');
     const workflow = await readFile('.github/workflows/docker.yml', 'utf8');
