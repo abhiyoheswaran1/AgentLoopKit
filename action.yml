@@ -6,7 +6,7 @@ inputs:
     description: AgentLoopKit command arguments, for example "check-gates --strict". Do not pass untrusted pull request or user input to command.
     required: true
   agentloopkit-version:
-    description: npm package version to install.
+    description: npm package version to install. Do not pass untrusted pull request or user input to agentloopkit-version.
     required: false
     default: 'latest'
   working-directory:
@@ -19,7 +19,9 @@ runs:
   steps:
     - name: Install AgentLoopKit
       shell: bash
-      run: npm install --no-save "agentloopkit@${{ inputs.agentloopkit-version }}"
+      env:
+        AGENTLOOPKIT_VERSION: ${{ inputs.agentloopkit-version }}
+      run: npm install --no-save "agentloopkit@${AGENTLOOPKIT_VERSION}"
 
     - name: Run AgentLoopKit
       shell: bash

@@ -118,6 +118,7 @@ Use the repo action when you want a shorter workflow step around the same npm pa
 The action defaults to npm `latest`. Set `agentloopkit-version` when you want CI to use a reviewed package version.
 
 Keep `command` static and trusted. Do not pass untrusted pull request or user input to command.
+Keep `agentloopkit-version` static and trusted. Do not pass untrusted pull request or user input to agentloopkit-version.
 
 ```yaml
 name: AgentLoop Action
@@ -195,5 +196,6 @@ npx --no-install agentloop check-gates --strict
 - Do not print secret values.
 - `agentloop verify` and `agentloop ci-summary` do not dump arbitrary environment variables. They only record allowlisted CI provenance fields.
 - Do not pass untrusted pull request or user input to command.
+- Do not pass untrusted pull request or user input to agentloopkit-version.
 - Do not grant write permissions unless another workflow step needs them.
 - Do not let CI commit generated reports unless maintainers explicitly want that behavior.

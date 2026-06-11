@@ -4883,3 +4883,22 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - If teams ask for stronger protection later, consider a safer structured command mode instead of free-form command text.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: GitHub Action Package Version Input Hardening
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-harden-github-action-package-version-input.md`
+- Trigger:
+  - The composite action embedded `agentloopkit-version` directly in an npm install shell command.
+- Implementation:
+  - Changed the install step to pass `agentloopkit-version` through `AGENTLOOPKIT_VERSION`.
+  - Added action metadata and docs warnings that `agentloopkit-version` must stay static and trusted.
+  - Added distribution artifact coverage for the safer install shape and docs warning.
+- Verification run:
+  - Red focused tests failed because the action still embedded `${{ inputs.agentloopkit-version }}` in the npm command and lacked the warning.
+  - Focused distribution artifact suite passed: 7 tests.
+  - `.agentloop/reports/2026-06-11-02-44-verification-report.md`, overall status pass.
+- What worked well:
+  - The action kept the same public input while removing one direct shell interpolation point.
+- Improve:
+  - The `command` input remains free-form by design; keep documenting it as static trusted workflow configuration.
+  - Keep this unreleased until the planned `0.28.0` batch.

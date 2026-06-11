@@ -71,6 +71,7 @@ Use the repo action when you only need to run one AgentLoopKit command:
 
 Replace `<version>` with the AgentLoopKit release you have reviewed and want this workflow to use.
 Keep `command` static and trusted. Do not pass untrusted pull request or user input to command.
+Keep `agentloopkit-version` static and trusted. Do not pass untrusted pull request or user input to agentloopkit-version.
 
 ```yaml
 name: AgentLoop Action

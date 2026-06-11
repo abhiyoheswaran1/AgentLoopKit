@@ -38,11 +38,16 @@ describe('distribution artifacts', () => {
     expect(action).toContain('agentloopkit-version');
     expect(action).toContain("default: 'latest'");
     expect(action).not.toMatch(/default: ['"]\d+\.\d+\.\d+['"]/);
-    expect(action).toContain(
-      'npm install --no-save "agentloopkit@${{ inputs.agentloopkit-version }}"',
-    );
     expect(action).toContain('npx --no-install agentloop ${{ inputs.command }}');
     expect(action).not.toContain('upload-artifact');
+  });
+
+  test('GitHub Action avoids direct shell interpolation for package version input', async () => {
+    const action = await readFile('action.yml', 'utf8');
+
+    expect(action).toContain('AGENTLOOPKIT_VERSION: ${{ inputs.agentloopkit-version }}');
+    expect(action).toContain('npm install --no-save "agentloopkit@${AGENTLOOPKIT_VERSION}"');
+    expect(action).not.toContain('agentloopkit@${{ inputs.agentloopkit-version }}');
   });
 
   test('GitHub Action docs warn against untrusted command input', async () => {
@@ -50,6 +55,18 @@ describe('distribution artifacts', () => {
     const docs = await readFile('docs/github-actions.md', 'utf8');
     const example = await readFile('examples/github-actions/README.md', 'utf8');
     const requiredWarning = 'Do not pass untrusted pull request or user input to command.';
+
+    expect(action).toContain(requiredWarning);
+    expect(docs).toContain(requiredWarning);
+    expect(example).toContain(requiredWarning);
+  });
+
+  test('GitHub Action docs warn against untrusted package version input', async () => {
+    const action = await readFile('action.yml', 'utf8');
+    const docs = await readFile('docs/github-actions.md', 'utf8');
+    const example = await readFile('examples/github-actions/README.md', 'utf8');
+    const requiredWarning =
+      'Do not pass untrusted pull request or user input to agentloopkit-version.';
 
     expect(action).toContain(requiredWarning);
     expect(docs).toContain(requiredWarning);
