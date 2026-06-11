@@ -220,8 +220,8 @@ describe('status command', () => {
     });
 
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain(`- Git root: ${await realpath(dir)}`);
-    expect(result.stdout).toContain('- Git target: subdirectory');
+    expect(result.stdout).toContain(`- Git root: \`${await realpath(dir)}\``);
+    expect(result.stdout).toContain('- Git target: `subdirectory`');
     expect(result.stdout).toContain(
       '- Git target warning: AgentLoopKit files live in the current directory, not the Git root.',
     );
@@ -237,6 +237,56 @@ describe('status command', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('# AgentLoopKit Status');
     expect(result.stdout).toContain('agentloop create-task');
+  });
+
+  test('renders status markdown values with safe inline code when task data contains backticks', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify({ name: 'demo`pkg', scripts: { test: 'vitest' } }, null, 2),
+    );
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-active`task.md'),
+      '# Active `task`\n\n- Status: review`ready\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-09-active`task.md',
+      }),
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass`ok\n',
+    );
+
+    const humanResult = await execa(tsxPath, [cliPath, 'status'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain('- Project: ``demo`pkg`` (`node`)');
+    expect(humanResult.stdout).toContain(
+      '- Active task: `` Active `task` `` (``review`ready``) - ``.agentloop/tasks/2026-06-09-active`task.md``',
+    );
+    expect(humanResult.stdout).toContain(
+      '- Latest verification: `pass` - `.agentloop/reports/2026-06-09-12-30-verification-report.md`',
+    );
+    const status = JSON.parse(jsonResult.stdout);
+    expect(status.project.name).toBe('demo`pkg');
+    expect(status.activeTask.title).toBe('Active `task`');
+    expect(status.activeTask.path).toBe('.agentloop/tasks/2026-06-09-active`task.md');
+    expect(status.latestReport.overallStatus).toBe('pass');
   });
 
   test('prints compact status with --brief', async () => {
@@ -317,9 +367,9 @@ describe('status command', () => {
     expect(status.nextAction.reason).toContain('No active task is pinned');
     expect(markdownResult.stdout).toContain('Active task: none pinned.');
     expect(markdownResult.stdout).toContain(
-      'Latest open task: Fix login (in progress) - .agentloop/tasks/2026-06-09-fix-login.md',
+      'Latest open task: `Fix login` (`in progress`) - `.agentloop/tasks/2026-06-09-fix-login.md`',
     );
-    expect(markdownResult.stdout).toContain('Latest verification: fail');
+    expect(markdownResult.stdout).toContain('Latest verification: `fail`');
     expect(markdownResult.stdout).toContain(
       'Run `agentloop task set .agentloop/tasks/2026-06-09-fix-login.md`.',
     );
@@ -470,7 +520,7 @@ describe('status command', () => {
     expect(status.nextAction.command).toBe('agentloop create-task');
     expect(status.nextAction.reason).toContain('1 deferred task contract is parked');
     expect(markdownResult.stdout).toContain('Active task: none active; 1 deferred task parked.');
-    expect(markdownResult.stdout).toContain('Deferred tasks: 1 parked - Deferred task');
+    expect(markdownResult.stdout).toContain('Deferred tasks: 1 parked - `Deferred task`');
   });
 
   test('prefers explicit active task state over modified time fallback', async () => {

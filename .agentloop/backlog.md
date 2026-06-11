@@ -19,113 +19,115 @@ Prefer high-value, low-complexity improvements. Safety and trust override the sc
 
 ## Candidate Scoring
 
-| Item                                | Stars | Usefulness | Explain | Compatibility | Simplicity | Maintenance | Trust | Optionality | Total |
-| ----------------------------------- | ----: | ---------: | ------: | ------------: | ---------: | ----------: | ----: | ----------: | ----: |
-| Generate `.agentloop/README.md`     |     4 |          5 |       5 |             4 |          5 |           5 |     3 |           2 |    34 |
-| README launch visuals               |     5 |          4 |       5 |             3 |          4 |           4 |     4 |           2 |    31 |
-| `install-agent all`                 |     4 |          4 |       5 |             5 |          5 |           5 |     3 |           2 |    34 |
-| GitHub Actions publish workflow     |     3 |          4 |       4 |             2 |          5 |           4 |     5 |           3 |    31 |
-| Publish workflow retry path         |     3 |          4 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| CI Node 24 runtime opt-in           |     2 |          4 |       5 |             2 |          5 |           5 |     4 |           2 |    29 |
-| GitHub Actions v6 upgrade           |     2 |          4 |       5 |             2 |          4 |           4 |     4 |           2 |    27 |
-| Good first contributor path         |     3 |          4 |       5 |             3 |          5 |           5 |     4 |           2 |    31 |
-| Contributor playbook examples       |     3 |          4 |       5 |             3 |          5 |           5 |     4 |           2 |    31 |
-| npm publish recovery docs           |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| Prepare 0.2.1 release candidate     |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Repair npm publish authorization    |     3 |          5 |       5 |             2 |          4 |           5 |     5 |           3 |    32 |
-| `agentloop handoff`                 |     4 |          4 |       5 |             4 |          5 |           5 |     4 |           2 |    33 |
-| `agentloop status`                  |     4 |          4 |       5 |             4 |          3 |           3 |     4 |           3 |    31 |
-| Accumulate repeated task flags      |     2 |          4 |       4 |             3 |          4 |           5 |     3 |           2 |    27 |
-| Add create-task area flags          |     2 |          4 |       4 |             3 |          4 |           5 |     3 |           2 |    27 |
-| Complete create-task aliases        |     3 |          4 |       5 |             4 |          5 |           5 |     4 |           2 |    32 |
-| Improve active task detection       |     3 |          4 |       4 |             4 |          3 |           4 |     3 |           2 |    27 |
-| Explicit active task pointer        |     4 |          5 |       5 |             5 |          4 |           4 |     4 |           3 |    34 |
-| Prepare 0.4.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Add `agentloop task list`           |     3 |          4 |       5 |             5 |          4 |           4 |     4 |           2 |    33 |
-| Prepare 0.5.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Add `agentloop task show`           |     3 |          4 |       5 |             5 |          5 |           5 |     4 |           2 |    33 |
-| Prepare 0.6.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Refresh README visuals for 0.6.0    |     5 |          4 |       5 |             4 |          5 |           5 |     4 |           2 |    34 |
-| Monorepo doctor awareness           |     4 |          4 |       5 |             4 |          5 |           5 |     4 |           3 |    35 |
-| Prepare 0.7.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Document 0.7.0 release status       |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| Per-package monorepo guidance       |     4 |          4 |       5 |             4 |          5 |           5 |     4 |           3 |    34 |
-| Monorepo doctor suggestions         |     4 |          4 |       5 |             4 |          5 |           5 |     4 |           3 |    34 |
-| Markdown link checking              |     3 |          4 |       5 |             3 |          5 |           5 |     5 |           2 |    32 |
-| Prepare 0.8.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Document 0.8.0 release status       |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| Task status transitions             |     4 |          4 |       5 |             5 |          5 |           5 |     4 |           2 |    34 |
-| Prepare 0.9.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Document 0.9.0 release status       |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| Shell completions                   |     3 |          4 |       5 |             4 |          5 |           5 |     3 |           2 |    31 |
-| PowerShell completions              |     3 |          4 |       5 |             5 |          5 |           5 |     4 |           2 |    33 |
-| Prepare 0.23.0 release              |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Prepare 0.24.0 release              |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| README VHS demo refresh             |     5 |          4 |       5 |             4 |          5 |           5 |     4 |           2 |    34 |
-| Local-only harness mode             |     4 |          5 |       5 |             5 |          4 |           5 |     5 |           3 |    36 |
-| Prepare 0.10.0 release metadata     |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Document 0.10.0 release status      |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| Task archive command                |     3 |          4 |       5 |             5 |          4 |           5 |     4 |           2 |    32 |
-| Prepare 0.11.0 release metadata     |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Document 0.11.0 release status      |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| create-task JSON output             |     3 |          4 |       5 |             5 |          5 |           5 |     4 |           2 |    34 |
-| Prepare 0.12.0 release metadata     |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Document 0.12.0 release status      |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| `agentloop check-gates`             |     4 |          4 |       5 |             5 |          4 |           5 |     5 |           3 |    35 |
-| Prepare 0.13.0 release metadata     |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Document 0.13.0 release status      |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| `check-gates --strict`              |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
-| Prepare 0.14.0 release metadata     |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Document 0.14.0 release status      |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| GitHub Actions usage recipes        |     4 |          5 |       5 |             4 |          5 |           5 |     5 |           3 |    37 |
-| GitLab and Buildkite CI examples    |     3 |          4 |       5 |             4 |          5 |           5 |     4 |           2 |    32 |
-| GitLab and Buildkite CI provenance  |     3 |          4 |       5 |             5 |          4 |           5 |     5 |           2 |    33 |
-| Security-review example             |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
-| Doctor risk-file heuristics docs    |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
-| Framework-specific task recipes     |     4 |          5 |       5 |             5 |          5 |           5 |     4 |           3 |    36 |
-| Dependency-upgrade workflow example |     4 |          5 |       5 |             5 |          5 |           5 |     5 |           3 |    37 |
-| Release-checklist example           |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| `agentloop npm-status`              |     4 |          5 |       5 |             4 |          5 |           5 |     5 |           3 |    36 |
-| Stack-specific starter recipes      |     4 |          5 |       5 |             4 |          5 |           4 |     4 |           3 |    34 |
-| CI context in verification reports  |     3 |          4 |       5 |             4 |          5 |           5 |     5 |           3 |    35 |
-| Local CI summary command            |     4 |          4 |       5 |             5 |          4 |           5 |     5 |           3 |    35 |
-| Release notes handoff command       |     4 |          4 |       5 |             5 |          4 |           5 |     5 |           3 |    35 |
-| `agentloop next`                    |     4 |          5 |       5 |             5 |          5 |           5 |     5 |           3 |    37 |
-| Publish metadata guard              |     3 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    33 |
-| Verify task context                 |     3 |          5 |       5 |             5 |          5 |           5 |     5 |           3 |    36 |
-| README visual refresh               |     4 |          4 |       5 |             5 |          4 |           4 |     4 |           3 |    33 |
-| Prepare 0.22.0 release              |     4 |          5 |       5 |             4 |          5 |           5 |     5 |           3 |    36 |
-| Record 0.22.0 release status        |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| Current tarball install guidance    |     3 |          5 |       5 |             4 |          5 |           5 |     4 |           2 |    33 |
-| Refresh final handoff               |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           2 |    31 |
-| Release status page                 |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           2 |    33 |
-| Refresh roadmap for v0.23.0         |     2 |          4 |       5 |             3 |          5 |           5 |     4 |           2 |    30 |
-| Current release state clarity       |     2 |          5 |       5 |             3 |          5 |           5 |     5 |           2 |    32 |
-| Prepare 0.15.0 release metadata     |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Document 0.15.0 release status      |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| Doctor risk file details            |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
-| Schema URL trust fix                |     2 |          4 |       5 |             3 |          5 |           5 |     5 |           2 |    31 |
-| Prepare 0.15.1 patch release        |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Document 0.15.1 release status      |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
-| Refresh public roadmap              |     3 |          4 |       5 |             3 |          5 |           5 |     4 |           3 |    32 |
-| PR summary change areas             |     4 |          5 |       5 |             5 |          5 |           5 |     5 |           3 |    37 |
-| Local static HTML report export     |     4 |          4 |       5 |             5 |          4 |           4 |     4 |           3 |    35 |
-| Local evidence badges               |     4 |          4 |       5 |             5 |          5 |           5 |     4 |           3 |    35 |
-| Prepare 0.16.0 npm catch-up         |     4 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    35 |
-| Template version guidance           |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           3 |    35 |
-| Local policy inspection             |     4 |          4 |       5 |             5 |          5 |           5 |     5 |           3 |    36 |
-| Local policy drift status           |     4 |          4 |       5 |             5 |          5 |           5 |     5 |           3 |    36 |
-| Prepare 0.17.0 release metadata     |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
-| Failed status next action           |     3 |          4 |       5 |             4 |          5 |           5 |     5 |           2 |    34 |
-| Better failed-command excerpts      |     3 |          4 |       4 |             4 |          5 |           5 |     4 |           2 |    31 |
-| Contributor template polish         |     3 |          4 |       5 |             4 |          5 |           5 |     4 |           2 |    32 |
-| Static HTML report                  |     3 |          3 |       3 |             3 |          2 |           2 |     3 |           4 |    23 |
-| Cloud dashboard                     |     3 |          2 |       3 |             2 |          1 |           1 |     2 |           5 |    19 |
+| Item                                 | Stars | Usefulness | Explain | Compatibility | Simplicity | Maintenance | Trust | Optionality | Total |
+| ------------------------------------ | ----: | ---------: | ------: | ------------: | ---------: | ----------: | ----: | ----------: | ----: |
+| Markdown-safe status and next output |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
+| Generate `.agentloop/README.md`      |     4 |          5 |       5 |             4 |          5 |           5 |     3 |           2 |    34 |
+| README launch visuals                |     5 |          4 |       5 |             3 |          4 |           4 |     4 |           2 |    31 |
+| `install-agent all`                  |     4 |          4 |       5 |             5 |          5 |           5 |     3 |           2 |    34 |
+| GitHub Actions publish workflow      |     3 |          4 |       4 |             2 |          5 |           4 |     5 |           3 |    31 |
+| Publish workflow retry path          |     3 |          4 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| CI Node 24 runtime opt-in            |     2 |          4 |       5 |             2 |          5 |           5 |     4 |           2 |    29 |
+| GitHub Actions v6 upgrade            |     2 |          4 |       5 |             2 |          4 |           4 |     4 |           2 |    27 |
+| Good first contributor path          |     3 |          4 |       5 |             3 |          5 |           5 |     4 |           2 |    31 |
+| Contributor playbook examples        |     3 |          4 |       5 |             3 |          5 |           5 |     4 |           2 |    31 |
+| npm publish recovery docs            |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| Prepare 0.2.1 release candidate      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Repair npm publish authorization     |     3 |          5 |       5 |             2 |          4 |           5 |     5 |           3 |    32 |
+| `agentloop handoff`                  |     4 |          4 |       5 |             4 |          5 |           5 |     4 |           2 |    33 |
+| `agentloop status`                   |     4 |          4 |       5 |             4 |          3 |           3 |     4 |           3 |    31 |
+| Accumulate repeated task flags       |     2 |          4 |       4 |             3 |          4 |           5 |     3 |           2 |    27 |
+| Add create-task area flags           |     2 |          4 |       4 |             3 |          4 |           5 |     3 |           2 |    27 |
+| Complete create-task aliases         |     3 |          4 |       5 |             4 |          5 |           5 |     4 |           2 |    32 |
+| Improve active task detection        |     3 |          4 |       4 |             4 |          3 |           4 |     3 |           2 |    27 |
+| Explicit active task pointer         |     4 |          5 |       5 |             5 |          4 |           4 |     4 |           3 |    34 |
+| Prepare 0.4.0 release metadata       |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Add `agentloop task list`            |     3 |          4 |       5 |             5 |          4 |           4 |     4 |           2 |    33 |
+| Prepare 0.5.0 release metadata       |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Add `agentloop task show`            |     3 |          4 |       5 |             5 |          5 |           5 |     4 |           2 |    33 |
+| Prepare 0.6.0 release metadata       |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Refresh README visuals for 0.6.0     |     5 |          4 |       5 |             4 |          5 |           5 |     4 |           2 |    34 |
+| Monorepo doctor awareness            |     4 |          4 |       5 |             4 |          5 |           5 |     4 |           3 |    35 |
+| Prepare 0.7.0 release metadata       |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Document 0.7.0 release status        |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| Per-package monorepo guidance        |     4 |          4 |       5 |             4 |          5 |           5 |     4 |           3 |    34 |
+| Monorepo doctor suggestions          |     4 |          4 |       5 |             4 |          5 |           5 |     4 |           3 |    34 |
+| Markdown link checking               |     3 |          4 |       5 |             3 |          5 |           5 |     5 |           2 |    32 |
+| Prepare 0.8.0 release metadata       |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Document 0.8.0 release status        |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| Task status transitions              |     4 |          4 |       5 |             5 |          5 |           5 |     4 |           2 |    34 |
+| Prepare 0.9.0 release metadata       |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Document 0.9.0 release status        |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| Shell completions                    |     3 |          4 |       5 |             4 |          5 |           5 |     3 |           2 |    31 |
+| PowerShell completions               |     3 |          4 |       5 |             5 |          5 |           5 |     4 |           2 |    33 |
+| Prepare 0.23.0 release               |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Prepare 0.24.0 release               |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| README VHS demo refresh              |     5 |          4 |       5 |             4 |          5 |           5 |     4 |           2 |    34 |
+| Local-only harness mode              |     4 |          5 |       5 |             5 |          4 |           5 |     5 |           3 |    36 |
+| Prepare 0.10.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Document 0.10.0 release status       |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| Task archive command                 |     3 |          4 |       5 |             5 |          4 |           5 |     4 |           2 |    32 |
+| Prepare 0.11.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Document 0.11.0 release status       |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| create-task JSON output              |     3 |          4 |       5 |             5 |          5 |           5 |     4 |           2 |    34 |
+| Prepare 0.12.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Document 0.12.0 release status       |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| `agentloop check-gates`              |     4 |          4 |       5 |             5 |          4 |           5 |     5 |           3 |    35 |
+| Prepare 0.13.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Document 0.13.0 release status       |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| `check-gates --strict`               |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
+| Prepare 0.14.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Document 0.14.0 release status       |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| GitHub Actions usage recipes         |     4 |          5 |       5 |             4 |          5 |           5 |     5 |           3 |    37 |
+| GitLab and Buildkite CI examples     |     3 |          4 |       5 |             4 |          5 |           5 |     4 |           2 |    32 |
+| GitLab and Buildkite CI provenance   |     3 |          4 |       5 |             5 |          4 |           5 |     5 |           2 |    33 |
+| Security-review example              |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
+| Doctor risk-file heuristics docs     |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
+| Framework-specific task recipes      |     4 |          5 |       5 |             5 |          5 |           5 |     4 |           3 |    36 |
+| Dependency-upgrade workflow example  |     4 |          5 |       5 |             5 |          5 |           5 |     5 |           3 |    37 |
+| Release-checklist example            |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| `agentloop npm-status`               |     4 |          5 |       5 |             4 |          5 |           5 |     5 |           3 |    36 |
+| Stack-specific starter recipes       |     4 |          5 |       5 |             4 |          5 |           4 |     4 |           3 |    34 |
+| CI context in verification reports   |     3 |          4 |       5 |             4 |          5 |           5 |     5 |           3 |    35 |
+| Local CI summary command             |     4 |          4 |       5 |             5 |          4 |           5 |     5 |           3 |    35 |
+| Release notes handoff command        |     4 |          4 |       5 |             5 |          4 |           5 |     5 |           3 |    35 |
+| `agentloop next`                     |     4 |          5 |       5 |             5 |          5 |           5 |     5 |           3 |    37 |
+| Publish metadata guard               |     3 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    33 |
+| Verify task context                  |     3 |          5 |       5 |             5 |          5 |           5 |     5 |           3 |    36 |
+| README visual refresh                |     4 |          4 |       5 |             5 |          4 |           4 |     4 |           3 |    33 |
+| Prepare 0.22.0 release               |     4 |          5 |       5 |             4 |          5 |           5 |     5 |           3 |    36 |
+| Record 0.22.0 release status         |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| Current tarball install guidance     |     3 |          5 |       5 |             4 |          5 |           5 |     4 |           2 |    33 |
+| Refresh final handoff                |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           2 |    31 |
+| Release status page                  |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           2 |    33 |
+| Refresh roadmap for v0.23.0          |     2 |          4 |       5 |             3 |          5 |           5 |     4 |           2 |    30 |
+| Current release state clarity        |     2 |          5 |       5 |             3 |          5 |           5 |     5 |           2 |    32 |
+| Prepare 0.15.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Document 0.15.0 release status       |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| Doctor risk file details             |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
+| Schema URL trust fix                 |     2 |          4 |       5 |             3 |          5 |           5 |     5 |           2 |    31 |
+| Prepare 0.15.1 patch release         |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Document 0.15.1 release status       |     2 |          5 |       5 |             2 |          5 |           5 |     5 |           3 |    32 |
+| Refresh public roadmap               |     3 |          4 |       5 |             3 |          5 |           5 |     4 |           3 |    32 |
+| PR summary change areas              |     4 |          5 |       5 |             5 |          5 |           5 |     5 |           3 |    37 |
+| Local static HTML report export      |     4 |          4 |       5 |             5 |          4 |           4 |     4 |           3 |    35 |
+| Local evidence badges                |     4 |          4 |       5 |             5 |          5 |           5 |     4 |           3 |    35 |
+| Prepare 0.16.0 npm catch-up          |     4 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    35 |
+| Template version guidance            |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           3 |    35 |
+| Local policy inspection              |     4 |          4 |       5 |             5 |          5 |           5 |     5 |           3 |    36 |
+| Local policy drift status            |     4 |          4 |       5 |             5 |          5 |           5 |     5 |           3 |    36 |
+| Prepare 0.17.0 release metadata      |     3 |          5 |       5 |             3 |          5 |           5 |     5 |           3 |    34 |
+| Failed status next action            |     3 |          4 |       5 |             4 |          5 |           5 |     5 |           2 |    34 |
+| Better failed-command excerpts       |     3 |          4 |       4 |             4 |          5 |           5 |     4 |           2 |    31 |
+| Contributor template polish          |     3 |          4 |       5 |             4 |          5 |           5 |     4 |           2 |    32 |
+| Static HTML report                   |     3 |          3 |       3 |             3 |          2 |           2 |     3 |           4 |    23 |
+| Cloud dashboard                      |     3 |          2 |       3 |             2 |          1 |           1 |     2 |           5 |    19 |
 
 ## Backlog Items
 
 | Item                                  | Source persona          | Problem                                                                                                                                                                          | Proposed solution                                                                                                                                                                           | Priority | Effort | Adoption impact | Risk   | Decision | Notes                                                                                                                                                            |
 | ------------------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Markdown-safe status and next output  | Samir, Lina, Tom        | `status` and `next` rendered local task, report, git, project, command, and working-tree values directly into Markdown.                                                          | Render those values with the shared inline-code helper while preserving JSON output, brief output, and next-action selection.                                                               | P1       | S      | medium          | low    | do now   | Implemented during the planned 0.28.0 batch. No task-selection, git parser, verification parser, version bump, or release change.                                |
 | Markdown-safe release-note metadata   | Samir, Elias, Tom       | Release notes rendered package metadata, git range labels, branch names, commit IDs, and AgentLoop evidence values directly into Markdown.                                       | Render release-note metadata and AgentLoop evidence values with the shared inline-code helper while preserving JSON output and git range behavior.                                          | P1       | S      | medium          | low    | do now   | Implemented during the planned 0.28.0 batch. No publishing, tag mutation, API calls, version bump, or release.                                                   |
 | Markdown-safe CI metadata             | Samir, Platform, Tom    | Verification reports and CI summaries rendered allowlisted CI environment values directly into Markdown, so backticks in workflow names or refs could corrupt reviewer evidence. | Render CI metadata values with the shared Markdown-safe inline-code helper while keeping provider labels plain and not expanding environment access.                                        | P1       | S      | medium          | low    | do now   | Implemented during the planned 0.28.0 batch. No CI provider APIs, telemetry, secret reads, workflow changes, version bump, or release.                           |
 | Built CLI setup/nested smoke coverage | Dogfood, Lina, Samir    | Unit tests covered missing config and nested workspace discovery, but the built CLI smoke script did not exercise those user-facing flows.                                       | Extend `scripts/smoke-cli.mjs` to cover uninitialized `status --json` and nested `status`, `create-task`, `verify`, `handoff`, `check-gates`, `policy`, and `install-agent`.                | P1       | S      | medium          | low    | do now   | Implemented during the planned 0.28.0 batch. No runtime behavior, release, version bump, or network dependency added.                                            |

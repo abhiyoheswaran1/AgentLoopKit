@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { loadAgentLoopWorkspace } from '../../core/config.js';
 import { ConfigError } from '../../core/errors.js';
+import { inlineCode } from '../../core/markdown-format.js';
 import { AgentLoopStatusResult, getAgentLoopStatus } from '../../core/status.js';
 import { printAgentLoopJsonError } from '../json-errors.js';
 
@@ -19,19 +20,19 @@ function formatTask(
   task: AgentLoopStatusResult['activeTask'] | AgentLoopStatusResult['latestTask'],
 ) {
   if (!task) return 'none';
-  return `${task.title} (${task.status}) - ${task.path}`;
+  return `${inlineCode(task.title)} (${inlineCode(task.status)}) - ${inlineCode(task.path)}`;
 }
 
 function formatReport(result: NextActionResult) {
   if (!result.latestReport) return 'none';
-  return `${result.latestReport.overallStatus} - ${result.latestReport.path}`;
+  return `${inlineCode(result.latestReport.overallStatus)} - ${inlineCode(result.latestReport.path)}`;
 }
 
 function formatDeferredTasks(tasks: AgentLoopStatusResult['deferredTasks']) {
   if (!tasks.length) return 'none';
   const titles = tasks
     .slice(0, 3)
-    .map((task) => task.title)
+    .map((task) => inlineCode(task.title))
     .join(', ');
   const remaining = tasks.length > 3 ? `, +${tasks.length - 3} more` : '';
   return `${tasks.length} parked - ${titles}${remaining}`;
@@ -60,7 +61,7 @@ function renderNextAction(result: NextActionResult) {
 
   return `# AgentLoopKit Next Action
 
-Run \`${result.command}\`.
+Run ${inlineCode(result.command)}.
 
 ${result.reason}
 
@@ -68,7 +69,7 @@ ${result.reason}
 - Latest open task: ${formatTask(result.latestTask)}
 - Deferred tasks: ${formatDeferredTasks(result.deferredTasks)}
 - Latest verification: ${formatReport(result)}
-- Working tree: ${workingTree}
+- Working tree: ${inlineCode(workingTree)}
 `;
 }
 

@@ -115,6 +115,52 @@ describe('next command', () => {
     expect(result.stdout).toContain('No task contract was found.');
   });
 
+  test('renders next markdown values with safe inline code when task data contains backticks', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'changed.txt'), 'pending change\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-active`task.md'),
+      '# Active `task`\n\n- Status: review`ready\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-10-active`task.md',
+      }),
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-10-10-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass`ok\n',
+    );
+
+    const humanResult = await execa(tsxPath, [cliPath, 'next'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'next', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain('Run `agentloop handoff`.');
+    expect(humanResult.stdout).toContain(
+      '- Active task: `` Active `task` `` (``review`ready``) - ``.agentloop/tasks/2026-06-10-active`task.md``',
+    );
+    expect(humanResult.stdout).toContain(
+      '- Latest verification: `pass` - `.agentloop/reports/2026-06-10-10-00-verification-report.md`',
+    );
+    const next = JSON.parse(jsonResult.stdout);
+    expect(next.activeTask.title).toBe('Active `task`');
+    expect(next.activeTask.path).toBe('.agentloop/tasks/2026-06-10-active`task.md');
+    expect(next.latestReport.overallStatus).toBe('pass');
+  });
+
   test('points back to verification when the latest report failed', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

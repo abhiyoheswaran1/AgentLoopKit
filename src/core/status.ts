@@ -13,6 +13,7 @@ import {
 } from './git.js';
 import { latestMarkdownFile } from './artifacts.js';
 import { verificationReportPattern } from './artifacts.js';
+import { inlineCode } from './markdown-format.js';
 import { getActiveTaskPath, getFallbackTaskPath, listTasks } from './task-state.js';
 
 export type StatusArtifact = {
@@ -187,16 +188,26 @@ function chooseNextAction(input: {
   };
 }
 
-function formatList(values: string[]) {
-  return values.length ? values.join(', ') : 'none';
+function formatMarkdownList(values: string[]) {
+  return values.length ? values.map((value) => inlineCode(value)).join(', ') : 'none';
 }
 
-function formatDeferredTaskSummary(tasks: StatusTask[]) {
+function formatTaskMarkdown(task: StatusTask | null | undefined) {
+  if (!task) return 'No open task found.';
+  return `${inlineCode(task.title)} (${inlineCode(task.status)}) - ${inlineCode(task.path)}`;
+}
+
+function formatReportMarkdown(report: StatusReport | undefined) {
+  if (!report) return 'No verification report found.';
+  return `${inlineCode(report.overallStatus)} - ${inlineCode(report.path)}`;
+}
+
+function formatDeferredTaskSummaryMarkdown(tasks: StatusTask[]) {
   if (!tasks.length) return 'none';
   const count = tasks.length;
   const titles = tasks
     .slice(0, 3)
-    .map((task) => task.title)
+    .map((task) => inlineCode(task.title))
     .join(', ');
   const remaining = count > 3 ? `, +${count - 3} more` : '';
   return `${count} parked - ${titles}${remaining}`;
@@ -231,14 +242,16 @@ Reason: ${result.nextAction.reason}`;
 
 function renderMarkdown(result: StatusRenderInput) {
   const gitLine = result.git.isRepository
-    ? `${result.git.branch || 'unknown branch'}${result.git.commit ? ` @ ${result.git.commit}` : ''}`
-    : 'not inside a git repository';
+    ? `${inlineCode(result.git.branch || 'unknown branch')}${
+        result.git.commit ? ` @ ${inlineCode(result.git.commit)}` : ''
+      }`
+    : inlineCode('not inside a git repository');
   const gitLines = [
     `- Git: ${gitLine}`,
     ...(result.git.isRepository
       ? [
-          `- Git root: ${result.git.root}`,
-          `- Git target: ${result.git.targetIsRoot ? 'root directory' : 'subdirectory'}`,
+          `- Git root: ${inlineCode(result.git.root)}`,
+          `- Git target: ${inlineCode(result.git.targetIsRoot ? 'root directory' : 'subdirectory')}`,
           ...(result.git.targetIsRoot
             ? []
             : [
@@ -251,35 +264,31 @@ function renderMarkdown(result: StatusRenderInput) {
     ? `dirty (${result.workingTree.changedFileCount} changed file(s))`
     : 'clean';
   const activeTask = result.activeTask
-    ? `${result.activeTask.title} (${result.activeTask.status}) - ${result.activeTask.path}`
+    ? formatTaskMarkdown(result.activeTask)
     : result.latestTask
       ? 'none pinned.'
       : result.deferredTasks.length
         ? `none active; ${result.deferredTasks.length} deferred task${result.deferredTasks.length === 1 ? '' : 's'} parked.`
         : 'No task contract found.';
-  const latestTask = result.latestTask
-    ? `${result.latestTask.title} (${result.latestTask.status}) - ${result.latestTask.path}`
-    : 'No open task found.';
-  const latestReport = result.latestReport
-    ? `${result.latestReport.overallStatus} - ${result.latestReport.path}`
-    : 'No verification report found.';
+  const latestTask = formatTaskMarkdown(result.latestTask);
+  const latestReport = formatReportMarkdown(result.latestReport);
 
   return `# AgentLoopKit Status
 
-- Project: ${result.project.name || 'unnamed'} (${result.project.type})
-- Package manager: ${result.project.packageManager}
+- Project: ${inlineCode(result.project.name || 'unnamed')} (${inlineCode(result.project.type)})
+- Package manager: ${inlineCode(result.project.packageManager)}
 ${gitLines.join('\n')}
-- Working tree: ${workingTree}
+- Working tree: ${inlineCode(workingTree)}
 - Active task: ${activeTask}
 - Latest open task: ${latestTask}
-- Deferred tasks: ${formatDeferredTaskSummary(result.deferredTasks)}
+- Deferred tasks: ${formatDeferredTaskSummaryMarkdown(result.deferredTasks)}
 - Latest verification: ${latestReport}
-- Configured commands: ${formatList(result.commands.configured)}
-- Missing commands: ${formatList(result.commands.missing)}
+- Configured commands: ${formatMarkdownList(result.commands.configured)}
+- Missing commands: ${formatMarkdownList(result.commands.missing)}
 
 ## Next Action
 
-Run \`${result.nextAction.command}\`.
+Run ${inlineCode(result.nextAction.command)}.
 
 ${result.nextAction.reason}
 `;

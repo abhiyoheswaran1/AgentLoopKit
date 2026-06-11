@@ -2,6 +2,35 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-11: Harden Status And Next Markdown Output
+
+- Task contract: `.agentloop/tasks/2026-06-11-harden-status-next-markdown-output.md`
+- Trigger:
+  - The Markdown report-surface scan found that `agentloop status` and `agentloop next` rendered local task titles, statuses, paths, git metadata, project names, commands, and working-tree values directly into Markdown.
+  - Agents often paste these outputs into handoffs, so backticks in local values should not corrupt the rendered evidence.
+- Product change:
+  - Added regression tests for `status` and `next` output when task titles, task statuses, task paths, and project names contain backticks.
+  - Changed `status` Markdown to use the shared inline-code formatter for project, git, task, report, command, working-tree, and command-list values.
+  - Changed `next` Markdown to use the shared inline-code formatter for task, report, command, and working-tree values.
+  - Preserved JSON output, brief status output, next-action selection, and normalized verification status parsing.
+- Verification:
+  - Red focused tests failed before the renderer changed:
+    - `npm test -- tests/status.test.ts -t "renders status markdown values"`
+    - `npm test -- tests/next.test.ts -t "renders next markdown values"`
+  - Focused green suite `npm test -- tests/status.test.ts tests/next.test.ts` passed with 30 tests.
+  - Full suite `npm test` passed with 42 test files and 362 tests.
+  - Full self-verify `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-11-harden-status-next-markdown-output.md --task-commands --timeout-ms 240000 --json` passed and wrote `.agentloop/reports/2026-06-11-17-09-verification-report.md`.
+  - Handoff summary generated at `.agentloop/handoffs/2026-06-11-17-18-pr-summary.md`.
+  - CLI smoke `node scripts/smoke-cli.mjs` passed.
+  - Release smoke `npm run smoke:release` passed.
+  - Markdown link check `npm run check:links` passed.
+  - Production dependency audit `npx pnpm@10.12.1 audit --prod` reported no known vulnerabilities.
+  - ProjScan `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The shared Markdown helper kept this to display rendering and avoided changes to JSON contracts or task selection.
+- Improve:
+  - Continue scanning remaining Markdown surfaces such as gate output and artifact inventories before the planned `0.28.0` batch.
+
 ## 2026-06-11: Harden Release-Note Metadata Markdown Output
 
 - Task contract: `.agentloop/tasks/2026-06-11-harden-release-note-metadata-markdown-output.md`

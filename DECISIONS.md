@@ -261,3 +261,7 @@ Verification reports and CI summaries include allowlisted CI fields such as work
 ## 2026-06-11: Release Note Metadata Uses Safe Inline Formatting
 
 Release notes combine package metadata, git range labels, branch names, commit IDs, and local AgentLoop evidence into reviewer-facing Markdown. Those values can contain punctuation from package files, refs, task titles, or artifact paths, so release-note metadata and evidence values now render with the shared inline-code formatter. This keeps Markdown evidence stable without changing git commands, JSON output, changelog parsing, publishing behavior, or external service access.
+
+## 2026-06-11: Status And Next Markdown Use Safe Inline Formatting
+
+`agentloop status` and `agentloop next` give agents and humans the current loop state. They now render local project, git, task, report, command, and working-tree values with the shared inline-code formatter. JSON and brief output stay unchanged, and verification status parsing still accepts the existing normalized status values.
