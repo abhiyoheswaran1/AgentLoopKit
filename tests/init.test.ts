@@ -344,4 +344,42 @@ describe('init', () => {
       'Local-only mode requires a Git repository',
     );
   });
+
+  test('local-only CLI setup errors are JSON when requested', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'init', '--local-only', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'INIT_SETUP_ERROR',
+        message:
+          'Local-only mode requires a Git repository because it writes to .git/info/exclude. Run git init first, or run agentloop init without --local-only.',
+        mode: 'local-only',
+        reason: 'git-repository-required',
+        nextCommand: 'git init',
+      },
+    });
+    await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).rejects.toThrow();
+  });
+
+  test('local-only CLI setup errors stay human-readable by default', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'init', '--local-only'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('agentloop: Local-only mode requires a Git repository');
+  });
 });

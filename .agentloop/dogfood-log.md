@@ -5101,3 +5101,24 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep live npm registry errors as status evidence instead of command-argument errors.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: JSON Error Output for Init Local-Only Setup Failures
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-return-json-errors-for-init-local-only-setup-failures.md`
+- Trigger:
+  - `agentloop init --local-only --json` outside a Git repository used the global human error path.
+- Implementation:
+  - Added a typed init setup error with `mode`, `reason`, and `nextCommand`.
+  - Added JSON output for local-only setup failures when `--json` is requested.
+  - Kept default non-JSON setup failures on the existing human-readable stderr path.
+  - Documented the behavior in README, getting-started docs, and the changelog.
+- Verification run:
+  - Red focused init test failed because JSON mode still wrote the local-only setup error to stderr.
+  - Focused init suite passed: 19 tests.
+  - `.agentloop/reports/2026-06-11-04-09-verification-report.md`, overall status pass.
+  - Built CLI smoke from a non-Git temp directory confirmed `INIT_SETUP_ERROR` with `mode: local-only` and `reason: git-repository-required`.
+- What worked well:
+  - First-run automation now gets the exact setup fix without weakening the local-only safety rule.
+- Improve:
+  - Consider structured JSON for other init setup guards only when the CLI can test them without touching real user directories.
+  - Keep this unreleased until the planned `0.28.0` batch.

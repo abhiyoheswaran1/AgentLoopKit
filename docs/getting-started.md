@@ -19,6 +19,7 @@ npx agentloopkit init --local-only
 ```
 
 This writes the same AgentLoopKit files and adds a marked block to this clone's `.git/info/exclude`. Git ignores `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, and `agentloop.config.json` in that clone. AgentLoopKit does not edit `.gitignore` or global Git config.
+Run local-only mode inside a Git repository. If `--json` is passed and setup cannot continue, AgentLoopKit returns an error object with `mode`, `reason`, and `nextCommand`.
 
 Then check the setup:
 

@@ -41,6 +41,22 @@ export type InitResult = {
   };
 };
 
+export type InitSetupErrorReason = 'home-directory-refused' | 'git-repository-required';
+
+export class InitSetupError extends Error {
+  public readonly code = 'INIT_SETUP_ERROR';
+
+  constructor(
+    message: string,
+    public readonly mode: 'init' | 'local-only',
+    public readonly reason: InitSetupErrorReason,
+    public readonly nextCommand: string,
+  ) {
+    super(message);
+    this.name = 'InitSetupError';
+  }
+}
+
 const LOCAL_ONLY_EXCLUDE_START = '# agentloopkit:local-only:start';
 const LOCAL_ONLY_EXCLUDE_END = '# agentloopkit:local-only:end';
 const LOCAL_ONLY_NOTICE_START = '<!-- agentloopkit:local-only:start -->';
@@ -139,8 +155,11 @@ async function resolveGitInfoExcludePath(cwd: string) {
 async function upsertLocalOnlyGitExclude(cwd: string, result: InitResult) {
   const excludePath = await resolveGitInfoExcludePath(cwd);
   if (!excludePath) {
-    throw new Error(
+    throw new InitSetupError(
       'Local-only mode requires a Git repository because it writes to .git/info/exclude. Run git init first, or run agentloop init without --local-only.',
+      'local-only',
+      'git-repository-required',
+      'git init',
     );
   }
 
@@ -224,8 +243,11 @@ export async function initializeAgentLoop(options: {
     resolveComparablePath(homeDirectory),
   ]);
   if (!options.force && resolvedCwd === resolvedHomeDirectory) {
-    throw new Error(
+    throw new InitSetupError(
       'Refusing to initialize your home directory. Run this inside a project repository, or pass --force if you intentionally want AgentLoopKit files in your home directory.',
+      'init',
+      'home-directory-refused',
+      'cd <project-directory>',
     );
   }
   if (options.localOnly) {

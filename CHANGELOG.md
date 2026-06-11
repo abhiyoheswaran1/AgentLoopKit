@@ -11,6 +11,7 @@
 - Added non-blocking Git detection to `agentloop init` human and JSON output.
 - Added Git root and target-is-root context to `agentloop init` human and JSON output.
 - Added a human warning when `agentloop init` targets a Git repository subdirectory.
+- Added JSON error output for `agentloop init --local-only --json` setup failures when the target is not a Git repository.
 - Added Git root and target-is-root context to `agentloop doctor` human and JSON output.
 - Added Git root and target-is-root context to `agentloop status` human and JSON output.
 - Added Git root and target-is-root context to `agentloop check-gates` human and JSON output.

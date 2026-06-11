@@ -1,9 +1,28 @@
 import { Command } from 'commander';
-import { initializeAgentLoop } from '../../core/init.js';
+import { InitSetupError, initializeAgentLoop } from '../../core/init.js';
 import { consoleLogger as logger } from '../../core/logger.js';
 
 function formatList(values: string[]) {
   return values.length ? values.join(', ') : 'none';
+}
+
+function printInitSetupJsonError(error: InitSetupError) {
+  logger.info(
+    JSON.stringify(
+      {
+        error: {
+          code: error.code,
+          message: error.message,
+          mode: error.mode,
+          reason: error.reason,
+          nextCommand: error.nextCommand,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
 }
 
 export function initCommand() {
@@ -18,12 +37,21 @@ export function initCommand() {
     )
     .action(
       async (options: { dryRun?: boolean; json?: boolean; force?: boolean; localOnly?: boolean }) => {
-        const result = await initializeAgentLoop({
-          cwd: process.cwd(),
-          dryRun: options.dryRun,
-          force: options.force,
-          localOnly: options.localOnly,
-        });
+        let result: Awaited<ReturnType<typeof initializeAgentLoop>>;
+        try {
+          result = await initializeAgentLoop({
+            cwd: process.cwd(),
+            dryRun: options.dryRun,
+            force: options.force,
+            localOnly: options.localOnly,
+          });
+        } catch (error) {
+          if (options.json && error instanceof InitSetupError) {
+            printInitSetupJsonError(error);
+            return;
+          }
+          throw error;
+        }
         if (options.json) {
           logger.info(JSON.stringify(result, null, 2));
           return;
