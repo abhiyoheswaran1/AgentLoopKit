@@ -35,7 +35,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - read-only local policy inspection with `agentloop policy`
 - read-only local policy template status with `agentloop policy status`
 - verification reports with allowlisted CI context
-- local status command for active task, latest verification, dirty files, configured commands, and next action
+- local status command for active task, latest verification, newest run evidence, dirty files, configured commands, and next action
 - local gate-check command for task, verification, handoff, harness, policy, and git evidence
 - local acceptance-layer command with `agentloop ship`
 - deterministic review-readiness scoring that does not claim to measure code quality
@@ -83,6 +83,7 @@ Included so far:
 - read-only `agentloop artifacts` command for local evidence inventory
 - cross-platform CLI smoke workflow for Ubuntu, macOS, and Windows
 - local acceptance-layer commands: `ship`, `prepare-pr`, `runs`, `show-run`, `intent`, and `maintainer-check`
+- `agentloop status` now surfaces the newest local run ledger entry in Markdown, JSON, and brief output
 
 Before release, move `CHANGELOG.md` `## Unreleased` entries into a versioned `0.28.0` section and then run the normal release checklist.
 

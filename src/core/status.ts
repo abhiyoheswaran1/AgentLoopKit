@@ -14,6 +14,7 @@ import {
 import { latestMarkdownFile } from './artifacts.js';
 import { verificationReportPattern } from './artifacts.js';
 import { inlineCode } from './markdown-format.js';
+import { listRuns, RunSummary } from './runs.js';
 import { getActiveTaskPath, getFallbackTaskPath, listTasks } from './task-state.js';
 
 export type StatusArtifact = {
@@ -47,6 +48,7 @@ export type AgentLoopStatusResult = {
   latestTask: StatusTask | null;
   deferredTasks: StatusTask[];
   latestReport?: StatusReport;
+  latestRun?: RunSummary;
   commands: {
     configured: string[];
     missing: string[];
@@ -202,6 +204,20 @@ function formatReportMarkdown(report: StatusReport | undefined) {
   return `${inlineCode(report.overallStatus)} - ${inlineCode(report.path)}`;
 }
 
+function formatRunSummaryMarkdown(run: RunSummary | undefined) {
+  if (!run) return 'No run ledger entries found.';
+  const result =
+    run.score === undefined
+      ? run.overallStatus
+        ? inlineCode(run.overallStatus)
+        : `${inlineCode(String(run.changedFileCount))} changed file(s)`
+      : `${inlineCode(String(run.score))}/100`;
+  const artifactPath = run.shipReportPath ?? run.handoffPath ?? run.verificationReportPath;
+  return `${inlineCode(run.command)} ${result} - ${inlineCode(run.id)}${
+    artifactPath ? ` - ${inlineCode(artifactPath)}` : ''
+  }`;
+}
+
 function formatDeferredTaskSummaryMarkdown(tasks: StatusTask[]) {
   if (!tasks.length) return 'none';
   const count = tasks.length;
@@ -232,11 +248,16 @@ function renderBrief(result: StatusRenderInput) {
   const taskTitle = task?.title ?? 'none';
   const taskStatus = task?.status ?? 'none';
   const verification = result.latestReport?.overallStatus ?? 'missing';
+  const run = result.latestRun
+    ? result.latestRun.score === undefined
+      ? `${result.latestRun.command} ${result.latestRun.overallStatus ?? `${result.latestRun.changedFileCount} files`}`
+      : `${result.latestRun.command} ${result.latestRun.score}/100`
+    : 'none';
   const tree = result.workingTree.dirty
     ? `dirty (${result.workingTree.changedFileCount})`
     : 'clean';
 
-  return `AgentLoopKit: task=${formatBriefValue(taskTitle)} status=${formatBriefValue(taskStatus)}; verification=${verification}; tree=${tree}; next=${formatBriefValue(result.nextAction.command)}
+  return `AgentLoopKit: task=${formatBriefValue(taskTitle)} status=${formatBriefValue(taskStatus)}; verification=${verification}; run=${formatBriefValue(run)}; tree=${tree}; next=${formatBriefValue(result.nextAction.command)}
 Reason: ${result.nextAction.reason}`;
 }
 
@@ -272,6 +293,7 @@ function renderMarkdown(result: StatusRenderInput) {
         : 'No task contract found.';
   const latestTask = formatTaskMarkdown(result.latestTask);
   const latestReport = formatReportMarkdown(result.latestReport);
+  const latestRun = formatRunSummaryMarkdown(result.latestRun);
 
   return `# AgentLoopKit Status
 
@@ -283,6 +305,7 @@ ${gitLines.join('\n')}
 - Latest open task: ${latestTask}
 - Deferred tasks: ${formatDeferredTaskSummaryMarkdown(result.deferredTasks)}
 - Latest verification: ${latestReport}
+- Latest run: ${latestRun}
 - Configured commands: ${formatMarkdownList(result.commands.configured)}
 - Missing commands: ${formatMarkdownList(result.commands.missing)}
 
@@ -337,6 +360,7 @@ export async function getAgentLoopStatus(options: {
       status: task.status,
     }));
   const latestReport = stripReportTimestamp(currentReport);
+  const latestRun = (await listRuns(options.cwd))[0];
   const configured = DEFAULT_COMMAND_KEYS.filter((key) => options.config.commands[key]);
   const missing = DEFAULT_COMMAND_KEYS.filter((key) => !options.config.commands[key]);
   const nextAction = chooseNextAction({
@@ -364,6 +388,7 @@ export async function getAgentLoopStatus(options: {
     latestTask,
     deferredTasks,
     latestReport,
+    latestRun,
     commands: {
       configured,
       missing,

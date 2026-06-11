@@ -1,0 +1,14 @@
+ .agentloop/backlog.md     |  1 +
+ .agentloop/dogfood-log.md | 30 ++++++++++++++++++++++
+ CHANGELOG.md              |  1 +
+ FINAL_HANDOFF.md          |  3 ++-
+ README.md                 |  4 ++-
+ docs/cli-reference.md     |  4 +--
+ docs/mcp.md               |  2 +-
+ docs/status.md            |  4 ++-
+ scripts/smoke-cli.mjs     | 13 ++++++++++
+ src/core/runs.ts          | 30 +++++++++++++++++++---
+ src/core/status.ts        | 27 +++++++++++++++++++-
+ tests/runs.test.ts        | 64 ++++++++++++++++++++++++++++++++++++++++++++++-
+ tests/status.test.ts      | 57 +++++++++++++++++++++++++++++++++++++++++
+ 13 files changed, 228 insertions(+), 12 deletions(-)

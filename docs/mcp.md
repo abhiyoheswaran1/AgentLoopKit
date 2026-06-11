@@ -25,7 +25,7 @@ Example MCP client configuration:
 
 | Tool                                   | Reads                                                                                                                               |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `agentloop_status`                     | Pinned active task, latest open task, parked deferred tasks, latest verification, dirty state, configured commands, and next action |
+| `agentloop_status`                     | Pinned active task, latest open task, parked deferred tasks, latest verification, newest run evidence, dirty state, configured commands, and next action |
 | `agentloop_next`                       | Next recommended AgentLoopKit command and reason                                                                                    |
 | `agentloop_list_tasks`                 | Task contracts under the configured task directory                                                                                  |
 | `agentloop_show_active_task`           | Active task contract content                                                                                                        |

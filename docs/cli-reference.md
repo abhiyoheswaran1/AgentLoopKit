@@ -91,9 +91,9 @@ agentloop next
 agentloop next --json
 ```
 
-`status` shows the pinned active task, newest open task when no task is pinned, deferred tasks, current verification report, working tree state, Git root, configured commands, missing commands, and next suggested command.
+`status` shows the pinned active task, newest open task when no task is pinned, deferred tasks, current verification report, newest local run ledger entry, working tree state, Git root, configured commands, missing commands, and next suggested command.
 
-Use `--brief` when an agent or script needs one compact human-readable line plus the reason. `next` uses the same decision rules but prints only the next action. These commands do not run verification commands, call an LLM, read `.env` contents, or write task state.
+Use `--brief` when an agent or script needs one compact human-readable line plus the reason. Brief output includes the latest run evidence when `.agentloop/runs/` exists. `next` uses the same decision rules but prints only the next action. These commands do not run verification commands, call an LLM, read `.env` contents, or write task state.
 
 See [status.md](status.md).
 

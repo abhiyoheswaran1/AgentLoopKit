@@ -121,7 +121,7 @@ agentloopkit init
 | `agentloop doctor`               | Check setup health, commands, git state, and risk files      |
 | `agentloop create-task`          | Create a scoped task contract                                |
 | `agentloop task ...`             | List, show, pin, update, archive, and inspect task state     |
-| `agentloop status`               | Show active task, current report, dirty files, and next step |
+| `agentloop status`               | Show active task, latest report, latest run, dirty files, and next step |
 | `agentloop next`                 | Print only the next recommended loop action                  |
 | `agentloop verify`               | Run configured checks and write a verification report        |
 | `agentloop ship`                 | Score review readiness and write a ship report               |
@@ -183,6 +183,8 @@ Env files are reported by path only. Verification commands run only when you exp
 `agentloop ship` reuses current verification evidence by default. Pass `--run-verify` when you want it to run verification as part of the readiness flow.
 
 For narrower evidence history, `agentloop verify --write-run` and `agentloop handoff --write-run` can add their own local run records without changing the default command behavior.
+
+`agentloop status` includes the newest local run ledger entry when `.agentloop/runs/` exists, so agents can see the latest review-readiness or verification evidence without opening every report.
 
 ## More Docs
 

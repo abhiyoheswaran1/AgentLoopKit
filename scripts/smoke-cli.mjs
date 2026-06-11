@@ -313,6 +313,19 @@ async function smokeCli({ keep = false } = {}) {
     assert(ship.run?.id, 'ship JSON did not include run.id.');
     console.log('Ship smoke passed.');
 
+    const statusWithRun = parseJson(
+      (await runAgentLoop(['status', '--json'], { cwd: smokeRepo })).stdout,
+      'status with latest run',
+    );
+    assert(
+      statusWithRun.latestRun?.id === ship.run.id,
+      'status JSON did not include the latest ship run.',
+    );
+    assert(
+      statusWithRun.brief?.includes(`run="ship ${ship.readiness.totalScore}/100"`),
+      'status brief did not include the latest ship score.',
+    );
+
     const runs = parseJson((await runAgentLoop(['runs', '--json'], { cwd: smokeRepo })).stdout, 'runs');
     assert(
       Array.isArray(runs.runs) &&

@@ -332,6 +332,63 @@ describe('status command', () => {
     expect(output.brief).toContain('next="agentloop handoff"');
   });
 
+  test('shows latest run ledger evidence in JSON, markdown, and brief status', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await mkdir(path.join(dir, '.agentloop/runs/2026-06-12-10-00-ship'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/runs/2026-06-12-10-00-ship/metadata.json'),
+      JSON.stringify(
+        {
+          id: '2026-06-12-10-00-ship',
+          command: 'ship',
+          createdAt: '2026-06-12-10-00',
+          task: {
+            path: '.agentloop/tasks/2026-06-12-review-login.md',
+            title: 'Review login redirect',
+            status: 'review',
+          },
+          verificationReportPath: '/tmp/demo/.agentloop/reports/verify.md',
+          shipReportPath: '/tmp/demo/.agentloop/reports/ship.md',
+          score: 91,
+          changedFileCount: 4,
+        },
+        null,
+        2,
+      ),
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'status'], {
+      cwd: dir,
+      reject: false,
+    });
+    const briefResult = await execa(tsxPath, [cliPath, 'status', '--brief'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    const status = JSON.parse(jsonResult.stdout);
+    expect(status.latestRun).toMatchObject({
+      id: '2026-06-12-10-00-ship',
+      command: 'ship',
+      score: 91,
+      changedFileCount: 4,
+      shipReportPath: '/tmp/demo/.agentloop/reports/ship.md',
+    });
+    expect(markdownResult.stdout).toContain(
+      '- Latest run: `ship` `91`/100 - `2026-06-12-10-00-ship`',
+    );
+    expect(markdownResult.stdout).toContain('`/tmp/demo/.agentloop/reports/ship.md`');
+    expect(briefResult.stdout).toContain('run="ship 91/100"');
+  });
+
   test('points back to verification when the latest report failed', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

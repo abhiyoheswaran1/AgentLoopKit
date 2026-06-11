@@ -2,6 +2,45 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Latest Run Evidence In Status
+
+- Task contract: `.agentloop/tasks/2026-06-12-show-latest-run-evidence-in-status.md`
+- Trigger:
+  - `ship`, `verify --write-run`, and `handoff --write-run` can now write local ledger evidence.
+  - Agents checking `agentloop status` still needed a separate `runs` call to see the newest evidence run.
+- Product change:
+  - Added `latestRun` to `agentloop status --json`.
+  - Added a `Latest run` line to Markdown status output.
+  - Added a compact `run="..."` segment to `status --brief`.
+  - Kept next-action selection unchanged so run history informs the user without masking stale verification rules.
+- Verification:
+  - Red focused run: `npm test -- tests/status.test.ts -t "shows latest run ledger"` failed before `status` exposed run metadata.
+  - Green focused run: `npm test -- tests/status.test.ts -t "shows latest run ledger"` passed after implementation.
+  - Affected-suite run `npm test -- tests/status.test.ts tests/next.test.ts tests/runs.test.ts tests/cli-docs-drift.test.ts` passed with 4 files and 37 tests.
+  - Built CLI smoke initially failed because same-minute `verify`, `handoff`, and `ship` runs were sorted only by minute-level timestamps.
+  - Red run-order regression `npm test -- tests/runs.test.ts -t "orders same-minute"` failed before precise run ordering existed.
+  - Green run-order regression `npm test -- tests/runs.test.ts -t "orders same-minute"` passed after run metadata gained precise timestamps and `listRuns` sorted by them.
+  - Affected-suite rerun passed with 4 files and 38 tests after the ordering fix.
+  - Full suite `npm test` passed with 47 files and 396 tests.
+  - `npm run typecheck`, `npm run lint`, and `npm run check:links` passed.
+  - `npm run build` passed.
+  - `node scripts/smoke-cli.mjs` passed after the run-ordering fix.
+  - Final full suite `npm test` passed with 47 files and 397 tests.
+  - Final `npm run lint` and `npm run check:links` passed.
+  - `npm run smoke:release` passed.
+  - Production dependency audit `npx pnpm@10.12.1 audit --prod` reported no known vulnerabilities.
+  - ProjScan `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - Final self-verify `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-12-show-latest-run-evidence-in-status.md --task-commands --timeout-ms 300000 --write-run --json` passed and wrote `.agentloop/reports/2026-06-12-01-20-verification-report.md` plus run `.agentloop/runs/2026-06-12-01-27-verify/`.
+  - Final ship report scored 92/100 and wrote `.agentloop/reports/2026-06-12-01-28-ship-report.md`.
+  - Final PR description wrote `.agentloop/handoffs/2026-06-12-01-28-pr-description.md`; handoff summary is `.agentloop/handoffs/2026-06-12-01-28-pr-summary.md`.
+  - `prepare-pr --write` refreshed readiness and wrote the final latest run `.agentloop/runs/2026-06-12-01-28-ship-2/`.
+- Worked well:
+  - The feature reused the existing run-ledger reader, including the symlink guard.
+  - The built smoke test caught a cross-command same-minute ordering case that the first unit test did not cover.
+- Improve:
+  - Consider surfacing a one-line stale-run hint later if teams start depending on run age in status.
+  - Consider making `prepare-pr` reuse an existing fresh ship run instead of writing a second same-minute ship run when nothing changed.
+
 ## 2026-06-12: Opt-In Run Ledger Records For Verify And Handoff
 
 - Task contract: `.agentloop/tasks/2026-06-12-add-opt-in-run-ledger-entries-for-verify-and-handoff.md`

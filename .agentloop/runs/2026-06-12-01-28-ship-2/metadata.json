@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-01-28-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-12-01-28",
+  "createdAtEpochMs": 1781220512495,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-show-latest-run-evidence-in-status.md",
+    "title": "Show latest run evidence in status",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-01-20-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-01-28-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-01-28-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 19
+}

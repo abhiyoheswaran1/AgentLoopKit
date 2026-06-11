@@ -3,7 +3,7 @@ import { access, mkdir, readFile, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
-import { writeVerificationRun } from '../src/core/runs.js';
+import { listRuns, writeVerificationRun } from '../src/core/runs.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -265,5 +265,67 @@ describe('run ledger commands', () => {
     await expect(readFile(path.join(second.path, 'verification-report.md'), 'utf8')).resolves.toContain(
       'Second Verification Report',
     );
+  });
+
+  test('orders same-minute runs by precise metadata timestamp', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const runsDir = path.join(dir, '.agentloop/runs');
+    await mkdir(path.join(runsDir, '2026-06-12-00-00-a-verify'), { recursive: true });
+    await mkdir(path.join(runsDir, '2026-06-12-00-00-b-ship'), { recursive: true });
+    await mkdir(path.join(runsDir, '2026-06-12-00-00-c-handoff'), { recursive: true });
+
+    const base = {
+      createdAt: '2026-06-12-00-00',
+      task: null,
+      changedFileCount: 1,
+    };
+    await writeFile(
+      path.join(runsDir, '2026-06-12-00-00-a-verify/metadata.json'),
+      JSON.stringify(
+        {
+          ...base,
+          id: '2026-06-12-00-00-a-verify',
+          command: 'verify',
+          createdAtEpochMs: 1_000,
+          overallStatus: 'pass',
+        },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(runsDir, '2026-06-12-00-00-b-ship/metadata.json'),
+      JSON.stringify(
+        {
+          ...base,
+          id: '2026-06-12-00-00-b-ship',
+          command: 'ship',
+          createdAtEpochMs: 3_000,
+          score: 91,
+        },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(runsDir, '2026-06-12-00-00-c-handoff/metadata.json'),
+      JSON.stringify(
+        {
+          ...base,
+          id: '2026-06-12-00-00-c-handoff',
+          command: 'handoff',
+          createdAtEpochMs: 2_000,
+        },
+        null,
+        2,
+      ),
+    );
+
+    await expect(listRuns(dir)).resolves.toEqual([
+      expect.objectContaining({ id: '2026-06-12-00-00-b-ship', command: 'ship' }),
+      expect.objectContaining({ id: '2026-06-12-00-00-c-handoff', command: 'handoff' }),
+      expect.objectContaining({ id: '2026-06-12-00-00-a-verify', command: 'verify' }),
+    ]);
   });
 });

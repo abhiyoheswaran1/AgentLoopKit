@@ -11,6 +11,7 @@ It reads:
 - newest open task contract in `.agentloop/tasks/` as `latestTask` when no task is pinned
 - deferred task contracts in `.agentloop/tasks/` as parked `deferredTasks`
 - current `*-verification-report.md` in `.agentloop/reports/`
+- newest local run ledger entry in `.agentloop/runs/`
 - git branch, commit, root, target, and working tree status
 - configured verification commands
 
@@ -32,7 +33,7 @@ Use brief output when an agent prompt, shell script, or status line does not nee
 agentloop status --brief
 ```
 
-Brief output includes the task, task status, verification state, working tree state, next command, and reason.
+Brief output includes the task, task status, verification state, newest run evidence, working tree state, next command, and reason.
 
 Use the smaller next-action command when you do not need the full status block:
 
@@ -74,6 +75,7 @@ The command suggests one next action:
 - `agentloop handoff` when task evidence exists and the working tree has changes
 
 `status` and `next` do not execute project commands, read `.env` contents, call an LLM, or make network requests.
+When `.agentloop/runs/` exists, `status` includes the newest run entry in Markdown, JSON, and brief output. This is local ledger metadata only. It can point to the latest `ship`, `verify --write-run`, `summarize --write-run`, or `handoff --write-run` evidence, but it does not change the next-action decision rules.
 Older verification reports remain on disk, but `status` and `next` ignore them as current evidence for a newer in-progress task. Moving a task to `review` or `done` after verification does not erase the latest report from the loop state.
 If a task stays pinned after it reaches `done`, `status` and `next` point you at `agentloop task archive <path>` so the next session starts clean.
 When no active task is pinned, `status` and `next` report the newest open contract as `latestTask`, leave `activeTask` null, and recommend `agentloop task set <path>` before continuing. They keep tasks marked `deferred`, `done`, `completed`, or `verified` out of `latestTask`. Deferred tasks stay visible as parked work in `deferredTasks`. If every task contract is terminal or deferred, they recommend `agentloop create-task` instead of resurfacing old work.

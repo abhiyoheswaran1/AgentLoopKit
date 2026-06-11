@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, readdir, readFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, stat } from 'node:fs/promises';
 import { AgentLoopError } from './errors.js';
 import { GitFileStatus } from './git.js';
 import { isInsidePath, normalizeExistingAncestor, pathExists, writeTextFile } from './file-system.js';
@@ -11,6 +11,7 @@ export type RunMetadata = {
   id: string;
   command: RunCommand;
   createdAt: string;
+  createdAtEpochMs?: number;
   task: {
     path: string;
     title: string;
@@ -48,6 +49,11 @@ export type RunRecord = {
 export type IntentMatch = RunSummary & {
   file: string;
   why: string;
+};
+
+type SortableRunSummary = {
+  summary: RunSummary;
+  preciseTimestampMs: number;
 };
 
 function runsRoot(cwd: string) {
@@ -129,6 +135,7 @@ export async function writeShipRun(options: {
     id,
     command: 'ship',
     createdAt: options.timestamp,
+    createdAtEpochMs: Date.now(),
     task: options.task,
     ...(options.verificationReportPath
       ? { verificationReportPath: options.verificationReportPath }
@@ -175,6 +182,7 @@ export async function writeVerificationRun(options: {
     id,
     command: 'verify',
     createdAt: options.timestamp,
+    createdAtEpochMs: Date.now(),
     task: options.task,
     verificationReportPath: options.verificationReportPath,
     overallStatus: options.overallStatus,
@@ -212,6 +220,7 @@ export async function writeHandoffRun(options: {
     id,
     command: 'handoff',
     createdAt: options.timestamp,
+    createdAtEpochMs: Date.now(),
     task: options.task,
     ...(options.verificationReportPath
       ? { verificationReportPath: options.verificationReportPath }
@@ -239,16 +248,29 @@ export async function listRuns(cwd: string): Promise<RunSummary[]> {
   const root = runsRoot(cwd);
   if (!(await pathExists(root))) return [];
   const entries = await readdir(root, { withFileTypes: true });
-  const runs: RunSummary[] = [];
+  const runs: SortableRunSummary[] = [];
 
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
     const metadataPath = path.join(root, entry.name, 'metadata.json');
     if (!(await pathExists(metadataPath))) continue;
-    runs.push(toSummary(await readJsonFile<RunMetadata>(metadataPath)));
+    const metadata = await readJsonFile<RunMetadata>(metadataPath);
+    const metadataStat = await stat(metadataPath);
+    runs.push({
+      summary: toSummary(metadata),
+      preciseTimestampMs: metadata.createdAtEpochMs ?? metadataStat.mtimeMs,
+    });
   }
 
-  return runs.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return runs
+    .sort((a, b) => {
+      const minuteCompare = b.summary.createdAt.localeCompare(a.summary.createdAt);
+      if (minuteCompare !== 0) return minuteCompare;
+      const preciseCompare = b.preciseTimestampMs - a.preciseTimestampMs;
+      if (preciseCompare !== 0) return preciseCompare;
+      return b.summary.id.localeCompare(a.summary.id);
+    })
+    .map((run) => run.summary);
 }
 
 export async function readRun(cwd: string, id: string): Promise<RunRecord> {

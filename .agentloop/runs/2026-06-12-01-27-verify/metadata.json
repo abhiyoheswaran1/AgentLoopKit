@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-01-27-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-01-27",
+  "createdAtEpochMs": 1781220470819,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-show-latest-run-evidence-in-status.md",
+    "title": "Show latest run evidence in status",
+    "status": "in-progress"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-01-20-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 15
+}
