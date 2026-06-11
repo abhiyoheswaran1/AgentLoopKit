@@ -12,6 +12,7 @@ import {
   PACKAGE_NAME,
   TEMPLATE_GROUPS,
 } from './constants.js';
+import { resolveOutputArtifactPath } from './artifacts.js';
 import { AgentLoopConfig, createDefaultConfig } from './config.js';
 import { pathExists, readTextIfExists, writeTextFile } from './file-system.js';
 import { getGitRoot, isInsideGitRepo } from './git.js';
@@ -74,7 +75,83 @@ const LOCAL_ONLY_NOTICE = `${LOCAL_ONLY_NOTICE_START}
 This AgentLoopKit setup is excluded by this clone's \`.git/info/exclude\`. Use these files for local agent work. Do not commit these AgentLoopKit files unless a maintainer intentionally converts the repo to a shared harness.
 ${LOCAL_ONLY_NOTICE_END}`;
 
-async function writeGeneratedFile(filePath: string, content: string, result: InitResult) {
+function repoPath(...segments: string[]) {
+  return segments.join('/');
+}
+
+function resolveInitFilePath(options: {
+  cwd: string;
+  requestedPath: string;
+  expectedDir: string;
+  expectedExtension: string;
+}) {
+  return resolveOutputArtifactPath({
+    cwd: options.cwd,
+    artifactType: options.requestedPath === AGENTS_FILE ? 'agents-md' : 'init-file',
+    requestedPath: options.requestedPath,
+    expectedDir: options.expectedDir,
+    expectedExtension: options.expectedExtension,
+  });
+}
+
+async function listTemplateEntries(group: string) {
+  const templateDir = path.join(getTemplateRoot(), group);
+  return (await readdir(templateDir, { withFileTypes: true })).filter((entry) => entry.isFile());
+}
+
+async function validateInitOutputTargets(cwd: string) {
+  for (const group of TEMPLATE_GROUPS) {
+    if (group === 'tasks') continue;
+    for (const entry of await listTemplateEntries(group)) {
+      resolveInitFilePath({
+        cwd,
+        requestedPath: repoPath(AGENTLOOP_DIR, group, entry.name),
+        expectedDir: repoPath(AGENTLOOP_DIR, group),
+        expectedExtension: path.extname(entry.name),
+      });
+    }
+  }
+
+  const rootTargets = [
+    {
+      requestedPath: repoPath(AGENTLOOP_DIR, 'README.md'),
+      expectedDir: AGENTLOOP_DIR,
+      expectedExtension: '.md',
+    },
+    {
+      requestedPath: AGENTLOOP_MANIFEST_FILE,
+      expectedDir: AGENTLOOP_DIR,
+      expectedExtension: '.json',
+    },
+    {
+      requestedPath: repoPath(AGENTLOOP_DIR, 'tasks', 'README.md'),
+      expectedDir: repoPath(AGENTLOOP_DIR, 'tasks'),
+      expectedExtension: '.md',
+    },
+    {
+      requestedPath: repoPath(AGENTLOOP_DIR, 'reports', 'README.md'),
+      expectedDir: repoPath(AGENTLOOP_DIR, 'reports'),
+      expectedExtension: '.md',
+    },
+    { requestedPath: AGENTS_FILE, expectedDir: '.', expectedExtension: '.md' },
+    { requestedPath: AGENTLOOP_FILE, expectedDir: '.', expectedExtension: '.md' },
+    { requestedPath: CONFIG_FILE, expectedDir: '.', expectedExtension: '.json' },
+  ];
+
+  for (const target of rootTargets) {
+    resolveInitFilePath({ cwd, ...target });
+  }
+}
+
+async function writeGeneratedFile(
+  cwd: string,
+  requestedPath: string,
+  expectedDir: string,
+  expectedExtension: string,
+  content: string,
+  result: InitResult,
+) {
+  const filePath = resolveInitFilePath({ cwd, requestedPath, expectedDir, expectedExtension });
   if (await pathExists(filePath)) {
     result.skipped.push(filePath);
     return;
@@ -93,13 +170,13 @@ async function writeRenderedTemplateGroup(
   values: TemplateValues,
   result: InitResult,
 ) {
-  const templateDir = path.join(getTemplateRoot(), group);
-  const entries = await readdir(templateDir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (!entry.isFile()) continue;
+  for (const entry of await listTemplateEntries(group)) {
     const relative = `${group}/${entry.name}`;
     await writeGeneratedFile(
-      path.join(cwd, AGENTLOOP_DIR, group, entry.name),
+      cwd,
+      repoPath(AGENTLOOP_DIR, group, entry.name),
+      repoPath(AGENTLOOP_DIR, group),
+      path.extname(entry.name),
       await readTemplate(relative, values),
       result,
     );
@@ -107,7 +184,12 @@ async function writeRenderedTemplateGroup(
 }
 
 async function upsertAgentsFile(cwd: string, content: string, result: InitResult) {
-  const filePath = path.join(cwd, AGENTS_FILE);
+  const filePath = resolveInitFilePath({
+    cwd,
+    requestedPath: AGENTS_FILE,
+    expectedDir: '.',
+    expectedExtension: '.md',
+  });
   const existing = await readTextIfExists(filePath);
   const marker = '<!-- agentloopkit:start -->';
   if (!existing) {
@@ -189,7 +271,13 @@ async function upsertLocalOnlyGitExclude(cwd: string, result: InitResult) {
   (excludeExists ? result.updated : result.created).push(excludePath);
 }
 
-async function upsertLocalOnlyNotice(filePath: string, result: InitResult) {
+async function upsertLocalOnlyNotice(cwd: string, requestedPath: string, result: InitResult) {
+  const filePath = resolveInitFilePath({
+    cwd,
+    requestedPath,
+    expectedDir: '.',
+    expectedExtension: '.md',
+  });
   const existing = await readTextIfExists(filePath);
   if (existing.includes(LOCAL_ONLY_NOTICE_START)) return;
   if (result.dryRun) {
@@ -250,6 +338,7 @@ export async function initializeAgentLoop(options: {
       'cd <project-directory>',
     );
   }
+  await validateInitOutputTargets(cwd);
   if (options.localOnly) {
     await upsertLocalOnlyGitExclude(cwd, result);
   }
@@ -299,12 +388,18 @@ export async function initializeAgentLoop(options: {
   }
 
   await writeGeneratedFile(
-    path.join(cwd, AGENTLOOP_DIR, 'README.md'),
+    cwd,
+    repoPath(AGENTLOOP_DIR, 'README.md'),
+    AGENTLOOP_DIR,
+    '.md',
     await readTemplate('root/agentloop-directory-readme.md', values),
     result,
   );
   await writeGeneratedFile(
-    path.join(cwd, AGENTLOOP_MANIFEST_FILE),
+    cwd,
+    AGENTLOOP_MANIFEST_FILE,
+    AGENTLOOP_DIR,
+    '.json',
     `${JSON.stringify(
       {
         version: 1,
@@ -317,12 +412,18 @@ export async function initializeAgentLoop(options: {
     result,
   );
   await writeGeneratedFile(
-    path.join(cwd, AGENTLOOP_DIR, 'tasks', 'README.md'),
+    cwd,
+    repoPath(AGENTLOOP_DIR, 'tasks', 'README.md'),
+    repoPath(AGENTLOOP_DIR, 'tasks'),
+    '.md',
     await readTemplate('tasks/README.md', values),
     result,
   );
   await writeGeneratedFile(
-    path.join(cwd, AGENTLOOP_DIR, 'reports', 'README.md'),
+    cwd,
+    repoPath(AGENTLOOP_DIR, 'reports', 'README.md'),
+    repoPath(AGENTLOOP_DIR, 'reports'),
+    '.md',
     '# Verification Reports\n\nAgentLoopKit writes verification reports here when you run `agentloop verify`.\n',
     result,
   );
@@ -330,16 +431,24 @@ export async function initializeAgentLoop(options: {
   const agentsContent = await readTemplate('root/AGENTS.md', values);
   await upsertAgentsFile(cwd, agentsContent, result);
   await writeGeneratedFile(
-    path.join(cwd, AGENTLOOP_FILE),
+    cwd,
+    AGENTLOOP_FILE,
+    '.',
+    '.md',
     await readTemplate('root/AGENTLOOP.md', values),
     result,
   );
   if (options.localOnly) {
-    await upsertLocalOnlyNotice(path.join(cwd, AGENTS_FILE), result);
-    await upsertLocalOnlyNotice(path.join(cwd, AGENTLOOP_FILE), result);
+    await upsertLocalOnlyNotice(cwd, AGENTS_FILE, result);
+    await upsertLocalOnlyNotice(cwd, AGENTLOOP_FILE, result);
   }
 
-  const configPath = path.join(cwd, CONFIG_FILE);
+  const configPath = resolveInitFilePath({
+    cwd,
+    requestedPath: CONFIG_FILE,
+    expectedDir: '.',
+    expectedExtension: '.json',
+  });
   if (await pathExists(configPath)) {
     result.skipped.push(configPath);
   } else if (result.dryRun) {

@@ -1,6 +1,8 @@
 import { Command } from 'commander';
+import { OutputPathError } from '../../core/artifacts.js';
 import { InitSetupError, initializeAgentLoop } from '../../core/init.js';
 import { consoleLogger as logger } from '../../core/logger.js';
+import { printOutputPathJsonError } from '../json-errors.js';
 
 function formatList(values: string[]) {
   return values.length ? values.join(', ') : 'none';
@@ -48,6 +50,10 @@ export function initCommand() {
         } catch (error) {
           if (options.json && error instanceof InitSetupError) {
             printInitSetupJsonError(error);
+            return;
+          }
+          if (options.json && error instanceof OutputPathError) {
+            printOutputPathJsonError(error);
             return;
           }
           throw error;

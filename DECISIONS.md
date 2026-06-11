@@ -161,3 +161,7 @@ Repo-relative config paths are not enough when a directory already exists as a s
 ## 2026-06-11: Agent Instruction Writes Stay Repo-Local
 
 `agentloop install-agent` writes Markdown guidance for coding agents, so it follows the same repo-local rule as generated evidence. The command resolves `.agentloop/agents/*.md` and `AGENTS.md` before reading or writing. If either path points outside the repo through a symlink, AgentLoopKit rejects the command and leaves the outside target unchanged.
+
+## 2026-06-11: Init Preflights Repo-Local Targets
+
+`agentloop init` creates the repo harness, so it now preflights every generated target before writing `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, or `agentloop.config.json`. If an existing symlink would redirect one of those targets outside the current repo, init rejects the run before partial harness files are created.

@@ -18,7 +18,8 @@ export type OutputArtifactType =
   | 'ci-summary'
   | 'release-notes'
   | 'agent-instructions'
-  | 'agents-md';
+  | 'agents-md'
+  | 'init-file';
 export type OutputPathErrorReason = 'outside-directory' | 'wrong-extension';
 
 export class ArtifactPathError extends AgentLoopError {
@@ -48,6 +49,7 @@ const outputArtifactLabels: Record<OutputArtifactType, string> = {
   'release-notes': 'Release notes',
   'agent-instructions': 'Agent instructions',
   'agents-md': 'AGENTS.md',
+  'init-file': 'Init file',
 };
 
 export class OutputPathError extends AgentLoopError {

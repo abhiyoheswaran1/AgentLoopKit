@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { execFile } from 'node:child_process';
-import { mkdir, readFile, realpath, symlink, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, realpath, symlink, writeFile } from 'node:fs/promises';
 import { promisify } from 'node:util';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
@@ -233,6 +233,61 @@ describe('init', () => {
       root: await realpath(dir),
       targetIsRoot: false,
     });
+  });
+
+  test('rejects init when AGENTS.md resolves outside the repo', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    const outsideAgents = path.join(outsideDir, 'AGENTS.md');
+    await writeFile(outsideAgents, '# Outside instructions\n');
+    await symlink(outsideAgents, path.join(dir, 'AGENTS.md'), 'file');
+
+    const result = await execa(tsxPath, [cliPath, 'init', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'OUTPUT_PATH_INVALID',
+      artifactType: 'agents-md',
+      requestedPath: 'AGENTS.md',
+      expectedDir: '.',
+      expectedExtension: '.md',
+      reason: 'outside-directory',
+    });
+    expect(await readFile(outsideAgents, 'utf8')).toBe('# Outside instructions\n');
+    await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
+    await expect(readFile(path.join(dir, '.agentloop/manifest.json'), 'utf8')).rejects.toThrow();
+  });
+
+  test('rejects init when the AgentLoop directory resolves outside the repo', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir();
+    tempDirs.push(dir, outsideDir);
+    await symlink(outsideDir, path.join(dir, '.agentloop'), 'dir');
+
+    const result = await execa(tsxPath, [cliPath, 'init', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'OUTPUT_PATH_INVALID',
+      artifactType: 'init-file',
+      expectedExtension: '.md',
+      reason: 'outside-directory',
+    });
+    expect(output.error.requestedPath).toMatch(/^\.agentloop\//);
+    expect(await readdir(outsideDir)).toEqual([]);
+    await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).rejects.toThrow();
+    await expect(readFile(path.join(dir, 'agentloop.config.json'), 'utf8')).rejects.toThrow();
   });
 
   test('refuses to initialize a home directory without force', async () => {

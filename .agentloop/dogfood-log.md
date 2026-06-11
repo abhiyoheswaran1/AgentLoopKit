@@ -5591,3 +5591,25 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Review `init` writes next, especially pre-existing `.agentloop` or root Markdown symlinks.
   - Keep this unreleased until the planned `0.28.0` batch.
+
+## 2026-06-11: Init Symlink Guard
+
+- Task contract: `.agentloop/tasks/archive/2026-06-11-reject-init-symlink-escapes.md`
+- Trigger:
+  - `agentloop init` could follow pre-existing symlinks for `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, or `agentloop.config.json`, which could redirect first-run harness files outside the target repo.
+- Implementation:
+  - Added a preflight pass for every generated init target before any harness file is written.
+  - Reused the existing output-path guard so `init --json` returns `OUTPUT_PATH_INVALID` for unsafe targets.
+  - Resolved init write paths again at each write/read point, including `AGENTS.md` append behavior and local-only notices.
+  - Updated README, changelog, decisions, and backlog with the repo-local init rule.
+- Verification run:
+  - Red focused init tests failed first because unsafe symlink targets exited `0`.
+  - Focused init suite passed after the guard: 1 file and 21 tests.
+  - Dogfood verification report passed: `.agentloop/reports/2026-06-11-08-00-verification-report.md`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-11-08-02-pr-summary.md`.
+  - Full `npx pnpm@10.12.1 test` passed: 36 files and 279 tests.
+  - `npx pnpm@10.12.1 lint`, `typecheck`, `check:links`, `build`, `git diff --check`, and `npx --yes projscan doctor --format markdown` passed.
+- What worked well:
+  - The existing `OutputPathError` shape covered init without adding a new error contract.
+- Improve:
+  - Consider adding packed-release smoke coverage for symlinked init targets before the `0.28.0` release batch.
