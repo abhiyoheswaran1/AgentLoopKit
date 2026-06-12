@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-12
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 Archived-task ship and prepare-pr fixes are implemented and need a small patch release after the dogfood and logo work.

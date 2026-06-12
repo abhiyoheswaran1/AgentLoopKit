@@ -13,6 +13,10 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Verification:
   - `npm publish --access public --dry-run` passed after the timeout-budget patch.
   - `npm pack --pack-destination /tmp --silent` produced `agentloopkit-0.28.3.tgz`.
+  - GitHub release `v0.28.3` published with tarball SHA-256 `e40d2f6434dd3d509f01588194469d9203bded2c583789484884699e128b718e`.
+  - CI `27423798870`, CLI Smoke `27423798891`, Publish `27423870384`, Docker `27423870325`, and MCP Registry `27424136328` passed.
+  - npm latest is `0.28.3`.
+  - `npm run smoke:published -- --version 0.28.3` passed.
 - Improve:
   - Keep npm dry-run publishing in every release gate. It catches release-hook behavior that a standalone command sequence can miss.
 
