@@ -2,6 +2,27 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Roadmap Release-State Guard
+
+- Task contract: `.agentloop/tasks/2026-06-12-guard-roadmap-release-state.md`
+- Trigger:
+  - After `0.28.3`, release-status docs were current but `ROADMAP.md` still named an older current release.
+  - The product-panel decision treated stale public release state as a trust issue.
+- Product change:
+  - Release smoke now checks `ROADMAP.md` `Current State` lines against `package.json.version`.
+  - The guard is local and deterministic. It does not call npm, GitHub, GHCR, or MCP Registry.
+- Verification:
+  - Red TDD run: `npm test -- tests/release-smoke.test.ts` failed because `assertRoadmapCurrentReleaseState` did not exist.
+  - Green focused run: `npm test -- tests/release-smoke.test.ts` passed with 1 file and 18 tests.
+  - AgentLoop task verification passed with `--progress` and wrote `.agentloop/reports/2026-06-12-17-31-verification-report.md`.
+  - `npm run smoke:release` passed and printed `ROADMAP current release state matches package metadata.`
+  - `npm run dogfood:strict` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The test caught an extractor bug before implementation was accepted.
+- Improve:
+  - Keep release guards narrow. Historical release docs should still be allowed to mention older versions.
+
 ## 2026-06-12: Verification Progress Output
 
 - Task contract: `.agentloop/tasks/2026-06-12-add-verification-progress-output.md`

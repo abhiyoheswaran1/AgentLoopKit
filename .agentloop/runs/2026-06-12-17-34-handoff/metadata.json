@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-17-34-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-12-17-34",
+  "createdAtEpochMs": 1781278457244,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-guard-roadmap-release-state.md",
+    "title": "Guard roadmap release state",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-17-31-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-17-34-pr-summary.md",
+  "changedFileCount": 9
+}

@@ -373,3 +373,9 @@ The `0.28.2` release gate failed late because `server.json` still carried the pr
 Long verification runs can look stuck even when commands are still executing. AgentLoopKit now supports `agentloop verify --progress`, which prints one start line and one finish line per command with elapsed time.
 
 The default human output stays unchanged for scripts and existing users. JSON output remains parseable when `--json` and `--progress` are combined. Raw child-process output stays in the Markdown verification report instead of being streamed to the terminal.
+
+## 2026-06-12: Roadmap Current-State Drift Is A Release-Smoke Failure
+
+The roadmap is a public trust document. If it says an older version is the current public release after a newer version ships, users get conflicting release guidance.
+
+Release smoke now checks only the `ROADMAP.md` `Current State` block against `package.json.version`. The guard is local and deterministic. It does not call npm, GitHub, GHCR, or MCP Registry, and it does not rewrite documentation automatically.

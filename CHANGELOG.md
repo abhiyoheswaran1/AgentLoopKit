@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Added `agentloop verify --progress` for opt-in, bounded per-command progress output during long verification runs while keeping JSON output parseable.
+- Added release-smoke coverage that catches stale `ROADMAP.md` current-release state before packing a release.
 
 ## 0.28.3
 

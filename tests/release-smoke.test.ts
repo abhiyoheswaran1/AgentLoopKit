@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import { readFile } from 'node:fs/promises';
 // @ts-expect-error TS7016: static import keeps helper usage visible to projscan.
 import * as smoke from '../scripts/smoke-packed-release.mjs';
 
@@ -176,6 +177,52 @@ describe('release smoke script helpers', () => {
     ).toThrow('AGENTS.md contains stale repo harness release guidance');
   });
 
+  test('accepts roadmap current-state release lines for the expected version', () => {
+    const content = [
+      '# Roadmap',
+      '',
+      '## Current State',
+      '',
+      '- GitHub release `v0.28.3` is public.',
+      '- npm latest is `agentloopkit@0.28.3`.',
+      '- GHCR and MCP Registry are live for `0.28.3`.',
+      '- Release tag `v0.28.3` points at the published release commit. Current `main` may include post-release bookkeeping.',
+      '',
+      '## Later',
+    ].join('\n');
+
+    expect(() =>
+      smoke.assertRoadmapCurrentReleaseState({
+        filePath: 'ROADMAP.md',
+        content,
+        version: '0.28.3',
+      }),
+    ).not.toThrow();
+  });
+
+  test('rejects stale roadmap current-state release lines', () => {
+    const content = [
+      '# Roadmap',
+      '',
+      '## Current State',
+      '',
+      '- GitHub release `v0.28.1` is public.',
+      '- npm latest is `agentloopkit@0.28.1`.',
+      '- GHCR and MCP Registry are live for `0.28.1`.',
+      '- Release tag `v0.28.1` points at the published release commit. Current `main` may include post-release bookkeeping.',
+      '',
+      '## Later',
+    ].join('\n');
+
+    expect(() =>
+      smoke.assertRoadmapCurrentReleaseState({
+        filePath: 'ROADMAP.md',
+        content,
+        version: '0.28.3',
+      }),
+    ).toThrow('ROADMAP.md current state is stale: expected current public release v0.28.3');
+  });
+
   test('current public docs avoid hardcoded AgentLoopKit version pins', async () => {
     const files = await smoke.collectPublicDocPinFiles(process.cwd());
 
@@ -192,5 +239,21 @@ describe('release smoke script helpers', () => {
     const files = await smoke.collectRepoHarnessFiles(process.cwd());
 
     expect(() => smoke.assertRepoHarnessAvoidsStaleReleaseBatch(files)).not.toThrow();
+  });
+
+  test('current roadmap release state matches package metadata', async () => {
+    const [roadmap, packageJson] = await Promise.all([
+      readFile('ROADMAP.md', 'utf8'),
+      readFile('package.json', 'utf8'),
+    ]);
+    const version = JSON.parse(packageJson).version;
+
+    expect(() =>
+      smoke.assertRoadmapCurrentReleaseState({
+        filePath: 'ROADMAP.md',
+        content: roadmap,
+        version,
+      }),
+    ).not.toThrow();
   });
 });

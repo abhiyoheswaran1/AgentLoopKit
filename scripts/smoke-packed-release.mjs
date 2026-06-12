@@ -183,6 +183,61 @@ export function assertRepoHarnessAvoidsStaleReleaseBatch(files) {
   }
 }
 
+function roadmapCurrentState(content) {
+  const lines = content.split(/\r?\n/);
+  const start = lines.findIndex((line) => /^##\s+Current State\s*$/.test(line));
+  if (start === -1) return '';
+
+  const sectionLines = [];
+  for (const line of lines.slice(start + 1)) {
+    if (/^##\s+/.test(line)) break;
+    sectionLines.push(line);
+  }
+  return sectionLines.join('\n');
+}
+
+function assertRoadmapLine(section, expectedLine, filePath, message) {
+  if (!section.includes(expectedLine)) {
+    throw new Error(`${toPosixPath(filePath)} current state is stale: expected ${message}.`);
+  }
+}
+
+export function assertRoadmapCurrentReleaseState({ filePath, content, version }) {
+  const section = roadmapCurrentState(content);
+  if (!section.trim()) {
+    throw new Error(`${toPosixPath(filePath)} is missing a Current State section.`);
+  }
+
+  assertRoadmapLine(
+    section,
+    `- GitHub release \`v${version}\` is public.`,
+    filePath,
+    `current public release v${version}`,
+  );
+  assertRoadmapLine(
+    section,
+    `- npm latest is \`agentloopkit@${version}\`.`,
+    filePath,
+    `npm latest agentloopkit@${version}`,
+  );
+  assertRoadmapLine(
+    section,
+    `- GHCR and MCP Registry are live for \`${version}\`.`,
+    filePath,
+    `GHCR and MCP Registry version ${version}`,
+  );
+
+  if (
+    !new RegExp(`- Release tag \`v${version}\` points at the published release commit\\.`).test(
+      section,
+    )
+  ) {
+    throw new Error(
+      `${toPosixPath(filePath)} current state is stale: expected release tag v${version}.`,
+    );
+  }
+}
+
 export async function collectPublicDocPinFiles(rootDir) {
   const relativeFiles = unique(
     (await Promise.all(PUBLIC_DOC_ROOTS.map((root) => collectMarkdownFiles(rootDir, root)))).flat(),
@@ -569,6 +624,12 @@ export async function runReleaseSmoke(options = {}) {
     assertPublicDocsDoNotPinVersions(publicDocFiles);
     assertPublicDocsAvoidUnsupportedClaims(publicDocFiles);
     console.log('Public docs have no stale version pins or unsupported public claims.');
+    assertRoadmapCurrentReleaseState({
+      filePath: 'ROADMAP.md',
+      content: await readFile(path.join(cwd, 'ROADMAP.md'), 'utf8'),
+      version: metadata.version,
+    });
+    console.log('ROADMAP current release state matches package metadata.');
 
     await assertPackedVersion({ tarballPath, version: metadata.version, tempRoot });
     console.log('Packed binary version smoke passed.');

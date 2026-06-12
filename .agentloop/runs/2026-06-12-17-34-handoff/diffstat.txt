@@ -1,0 +1,7 @@
+ .agentloop/backlog.md            |  1 +
+ .agentloop/dogfood-log.md        | 21 ++++++++++++++
+ CHANGELOG.md                     |  1 +
+ DECISIONS.md                     |  6 ++++
+ scripts/smoke-packed-release.mjs | 61 ++++++++++++++++++++++++++++++++++++++
+ tests/release-smoke.test.ts      | 63 ++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 153 insertions(+)
