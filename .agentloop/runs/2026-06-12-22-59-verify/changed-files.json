@@ -1,0 +1,26 @@
+[
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "ROADMAP.md"
+  },
+  {
+    "status": "M",
+    "path": "package.json"
+  },
+  {
+    "status": "M",
+    "path": "server.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-22-56-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-release-agentloopkit-0-28-6-patch.md"
+  }
+]
