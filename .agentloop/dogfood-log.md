@@ -7667,3 +7667,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release notes stayed concise enough for GitHub while release evidence stayed local.
 - Improve:
   - Add a future package-metadata test that fails if npm default fields such as `main: eslint.config.js` appear in the packed package.
+
+## 2026-06-12: Post-Release Task Folder Cleanup
+
+- Task contract: `.agentloop/tasks/archive/2026-06-12-archive-shipped-0-28-0-review-tasks.md`
+- Trigger:
+  - After `0.28.0`, the active task folder still contained shipped review-state tasks from the release batch.
+  - `agentloop status --brief` recommended archiving the completed release task before new work.
+- Implementation:
+  - Archived the completed `0.28.0` release task.
+  - Created a cleanup task to keep the action auditable.
+  - Archived shipped `review` tasks from the `0.28.0` batch.
+  - Kept `.agentloop/tasks/2026-06-10-add-scoop-winget-manifests.md` in place with status `deferred`.
+- Verification run:
+  - Dogfood verification passed: `.agentloop/reports/2026-06-12-11-34-verification-report.md`.
+  - Full Vitest passed:
+    - `48` test files
+    - `415` tests
+  - `npm run lint`, `npm run typecheck`, and `npm run build` passed through `agentloop verify`.
+  - Task-specific commands passed:
+    - `node dist/cli/index.js task doctor --json`
+    - `node dist/cli/index.js status --brief`
+  - Dogfood run ledger:
+    - `.agentloop/runs/2026-06-12-11-38-verify/`
+    - `.agentloop/runs/2026-06-12-11-38-ship/`
+  - Dogfood handoff: `.agentloop/handoffs/2026-06-12-11-38-pr-summary.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-11-38-ship-report.md` with score `89`/100.
+  - Final task hygiene:
+    - `node dist/cli/index.js task doctor --json` reported `pass`.
+    - `node dist/cli/index.js task list --json` shows only the deferred Scoop/WinGet task in the active task folder.
+- What worked well:
+  - The release evidence made it clear which review tasks had shipped and could move to the archive.
+- Improve:
+  - Consider a future `task archive --status review --before <release>` helper only if this cleanup repeats.

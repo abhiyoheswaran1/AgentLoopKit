@@ -1,0 +1,23 @@
+ ...-coverage-for-setup-and-nested-command-flows.md | 75 --------------------
+ ...06-11-extract-markdown-inline-code-formatter.md | 73 --------------------
+ ...026-06-11-harden-ci-metadata-markdown-output.md | 79 ----------------------
+ ...11-harden-npm-status-markdown-version-labels.md | 68 -------------------
+ ...6-06-11-harden-pr-summary-changed-file-paths.md | 68 -------------------
+ ...6-06-11-harden-release-note-file-path-labels.md | 69 -------------------
+ ...harden-release-note-metadata-markdown-output.md | 75 --------------------
+ ...arden-verification-report-command-code-spans.md | 68 -------------------
+ ...1-harden-verification-report-markdown-fences.md | 68 -------------------
+ ...lear-errors-when-agentloop-config-is-missing.md | 76 ---------------------
+ ...entloopkit-commands-from-repo-subdirectories.md | 62 -----------------
+ ...run-two-hour-product-security-hardening-pass.md | 75 --------------------
+ ...-06-12-activate-newly-created-task-contracts.md | 60 ----------------
+ .../2026-06-12-add-active-task-done-shortcut.md    | 54 ---------------
+ .../2026-06-12-add-ship-github-comment-output.md   | 58 ----------------
+ ...roup-prepare-pr-changed-files-by-review-area.md | 60 ----------------
+ ...2-improve-next-action-for-review-ready-tasks.md | 52 --------------
+ .../2026-06-12-release-agentloopkit-0-28-0.md      | 66 ------------------
+ ...06-12-report-prepare-pr-ship-evidence-source.md | 54 ---------------
+ ...026-06-12-reuse-fresh-ship-run-in-prepare-pr.md | 53 ---------------
+ ...026-06-12-show-latest-run-evidence-in-status.md | 56 ---------------
+ ...se-repo-relative-paths-in-pr-facing-markdown.md | 59 ----------------
+ 22 files changed, 1428 deletions(-)

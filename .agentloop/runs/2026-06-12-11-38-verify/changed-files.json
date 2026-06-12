@@ -1,0 +1,186 @@
+[
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-11-expand-smoke-coverage-for-setup-and-nested-command-flows.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-11-extract-markdown-inline-code-formatter.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-11-harden-ci-metadata-markdown-output.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-11-harden-npm-status-markdown-version-labels.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-11-harden-pr-summary-changed-file-paths.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-11-harden-release-note-file-path-labels.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-11-harden-release-note-metadata-markdown-output.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-11-harden-verification-report-command-code-spans.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-11-harden-verification-report-markdown-fences.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-11-return-clear-errors-when-agentloop-config-is-missing.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-11-run-agentloopkit-commands-from-repo-subdirectories.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-11-run-two-hour-product-security-hardening-pass.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-activate-newly-created-task-contracts.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-add-active-task-done-shortcut.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-add-ship-github-comment-output.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-group-prepare-pr-changed-files-by-review-area.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-improve-next-action-for-review-ready-tasks.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-release-agentloopkit-0-28-0.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-report-prepare-pr-ship-evidence-source.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-reuse-fresh-ship-run-in-prepare-pr.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-show-latest-run-evidence-in-status.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-use-repo-relative-paths-in-pr-facing-markdown.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-11-34-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-archive-shipped-0-28-0-review-tasks.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-11-expand-smoke-coverage-for-setup-and-nested-command-flows.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-11-extract-markdown-inline-code-formatter.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-11-harden-ci-metadata-markdown-output.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-11-harden-npm-status-markdown-version-labels.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-11-harden-pr-summary-changed-file-paths.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-11-harden-release-note-file-path-labels.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-11-harden-release-note-metadata-markdown-output.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-11-harden-verification-report-command-code-spans.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-11-harden-verification-report-markdown-fences.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-11-return-clear-errors-when-agentloop-config-is-missing.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-11-run-agentloopkit-commands-from-repo-subdirectories.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-11-run-two-hour-product-security-hardening-pass.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-activate-newly-created-task-contracts.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-add-active-task-done-shortcut.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-add-ship-github-comment-output.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-group-prepare-pr-changed-files-by-review-area.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-improve-next-action-for-review-ready-tasks.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-release-agentloopkit-0-28-0.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-report-prepare-pr-ship-evidence-source.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-reuse-fresh-ship-run-in-prepare-pr.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-show-latest-run-evidence-in-status.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-use-repo-relative-paths-in-pr-facing-markdown.md"
+  }
+]

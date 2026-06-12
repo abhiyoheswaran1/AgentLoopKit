@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-11-38-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-11-38",
+  "createdAtEpochMs": 1781257085995,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-archive-shipped-0-28-0-review-tasks.md",
+    "title": "Archive shipped 0.28.0 review tasks",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-11-34-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 46
+}

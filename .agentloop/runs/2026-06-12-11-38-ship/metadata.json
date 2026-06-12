@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-11-38-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-11-38",
+  "createdAtEpochMs": 1781257117723,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-archive-shipped-0-28-0-review-tasks.md",
+    "title": "Archive shipped 0.28.0 review tasks",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-11-34-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-11-38-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-11-38-pr-summary.md",
+  "score": 89,
+  "changedFileCount": 47
+}
