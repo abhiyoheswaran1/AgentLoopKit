@@ -8559,3 +8559,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The previous strict dogfood run exposed a real loop after archived handoff evidence.
 - Improve:
   - Consider showing a short status note when dirty files are only local AgentLoop evidence artifacts.
+
+## 2026-06-13: Align Check-Gates Next Action After Handoff
+
+- Task contract: `.agentloop/tasks/2026-06-13-align-check-gates-next-action-after-fresh-handoff-evidence.md`
+- Trigger:
+  - After the status fix, `agentloop status` stopped recommending another handoff after fresh handoff evidence.
+  - `agentloop check-gates` still printed the older generic `agentloop handoff` next action, so strict dogfood output was internally inconsistent.
+- Product-panel decision:
+  - Lina wanted the two review-readiness commands to agree after handoff evidence is current.
+  - Maya limited the change to next-action guidance and reused the handoff coverage helper.
+  - Samir required gate statuses, strict-mode exit behavior, and changed-file reporting to remain unchanged.
+  - Nora wanted the final next action to tell the agent to start the next task instead of looping on handoff.
+- Implementation:
+  - Moved handoff dirty-file coverage into `src/core/handoff-coverage.ts`.
+  - Updated `status` and `check-gates` to use the shared helper.
+  - Added check-gates regression coverage for covered dirty evidence and an uncovered dirty file.
+- Verification:
+  - Red run failed with `agentloop handoff` as the covered-evidence next action.
+  - Focused green run passed:
+    - `npm test -- tests/check-gates.test.ts -t "latest handoff run covers"`
+  - Affected test files passed with `40` tests:
+    - `npm test -- tests/check-gates.test.ts tests/status.test.ts`
+- What worked well:
+  - Dogfooding caught the inconsistent next action immediately after the status fix.
+- Improve:
+  - Consider adding a shared next-action test fixture across status, gates, and review-context if this pattern repeats.

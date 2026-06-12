@@ -124,6 +124,77 @@ describe('check-gates command', () => {
     );
   });
 
+  test('does not request another handoff when latest handoff run covers dirty evidence', async () => {
+    const dir = await createInitializedRepo();
+    const runId = '2026-06-13-01-11-handoff';
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
+    await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/archive/2026-06-13-docs-hygiene.md'),
+      '# Docs hygiene\n\n- Status: done\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-13-01-06-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/handoffs/.gitkeep'), '');
+    await mkdir(path.join(dir, '.agentloop/runs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/runs/.gitkeep'), '');
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa(
+      'git',
+      ['-c', 'user.email=test@example.com', '-c', 'user.name=Test User', 'commit', '-m', 'init'],
+      { cwd: dir },
+    );
+
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 2;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-13-01-11-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+    await writeJson(path.join(dir, '.agentloop/runs', runId, 'metadata.json'), {
+      id: runId,
+      command: 'handoff',
+      createdAt: '2026-06-13-01-11',
+      createdAtEpochMs: 1_000,
+      task: {
+        path: '.agentloop/tasks/2026-06-13-docs-hygiene.md',
+        title: 'Docs hygiene',
+        status: 'done',
+      },
+      verificationReportPath: '.agentloop/reports/2026-06-13-01-06-verification-report.md',
+      handoffPath: '.agentloop/handoffs/2026-06-13-01-11-pr-summary.md',
+      changedFileCount: 1,
+    });
+    await writeJson(path.join(dir, '.agentloop/runs', runId, 'changed-files.json'), [
+      { status: 'M', path: 'src.ts' },
+    ]);
+
+    const coveredResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(coveredResult.exitCode).toBe(0);
+    const coveredOutput = JSON.parse(coveredResult.stdout);
+    expect(coveredOutput.overallStatus).toBe('pass');
+    expect(coveredOutput.nextAction.command).toBe('agentloop create-task');
+
+    await writeFile(path.join(dir, 'uncovered.ts'), 'export const uncovered = true;\n');
+
+    const uncoveredResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(uncoveredResult.exitCode).toBe(0);
+    const uncoveredOutput = JSON.parse(uncoveredResult.stdout);
+    expect(uncoveredOutput.overallStatus).toBe('pass');
+    expect(uncoveredOutput.nextAction.command).toBe('agentloop handoff');
+  });
+
   test('redacts local git root paths when requested', async () => {
     const dir = await createInitializedRepo();
     await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');

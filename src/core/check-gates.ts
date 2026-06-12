@@ -12,7 +12,9 @@ import {
   isInsideGitRepo,
   parseGitStatus,
 } from './git.js';
+import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
 import { inlineCode } from './markdown-format.js';
+import { listRuns } from './runs.js';
 import { inspectTaskDirectory } from './task-state.js';
 
 export type GateStatus = 'pass' | 'warn' | 'fail';
@@ -97,7 +99,10 @@ function overallStatus(gates: GateCheck[], strict: boolean): GateStatus {
   return 'pass';
 }
 
-function chooseNextAction(gates: GateCheck[]) {
+function chooseNextAction(
+  gates: GateCheck[],
+  input: { dirty: boolean; dirtyCoveredByLatestHandoffRun: boolean },
+) {
   const task = gates.find((item) => item.id === 'task-contract');
   const report = gates.find((item) => item.id === 'verification-report');
   const handoff = gates.find((item) => item.id === 'handoff-summary');
@@ -124,6 +129,13 @@ function chooseNextAction(gates: GateCheck[]) {
     return {
       command: 'agentloop task doctor',
       reason: 'Review task-folder hygiene diagnostics before refreshing handoff evidence.',
+    };
+  }
+  if (input.dirty && input.dirtyCoveredByLatestHandoffRun) {
+    return {
+      command: 'agentloop create-task',
+      reason:
+        'Gate evidence covers the current dirty files. Start the next task, or review the existing handoff before committing.',
     };
   }
   return {
@@ -299,6 +311,12 @@ export async function checkGates(options: {
 
   const inGit = await isInsideGitRepo(options.cwd);
   const changedFiles = inGit ? await parseGitStatus(await getGitStatus(options.cwd)) : [];
+  const latestRun = (await listRuns(options.cwd))[0];
+  const latestHandoffRunCoversDirtyFiles = await dirtyCoveredByLatestHandoffRun(
+    options.cwd,
+    changedFiles,
+    latestRun,
+  );
   const gitRoot = inGit ? await getGitRoot(options.cwd) : '';
   const resolvedGitRoot = gitRoot ? await resolveComparablePath(gitRoot) : '';
   const gitTargetIsRoot = resolvedGitRoot
@@ -341,7 +359,10 @@ export async function checkGates(options: {
       targetIsRoot: gitTargetIsRoot,
       changedFileCount: changedFiles.length,
     },
-    nextAction: chooseNextAction(gates),
+    nextAction: chooseNextAction(gates, {
+      dirty: changedFiles.length > 0,
+      dirtyCoveredByLatestHandoffRun: latestHandoffRunCoversDirtyFiles,
+    }),
   };
   return { ...withoutMarkdown, markdown: renderMarkdown(withoutMarkdown) };
 }

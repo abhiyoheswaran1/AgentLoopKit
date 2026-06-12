@@ -1,0 +1,7 @@
+ .agentloop/backlog.md     |  1 +
+ .agentloop/dogfood-log.md | 26 +++++++++++++++++
+ CHANGELOG.md              |  1 +
+ src/core/check-gates.ts   | 25 +++++++++++++++--
+ src/core/status.ts        | 41 ++-------------------------
+ tests/check-gates.test.ts | 71 +++++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 124 insertions(+), 41 deletions(-)

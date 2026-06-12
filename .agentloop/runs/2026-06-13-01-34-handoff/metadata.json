@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-01-34-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-01-34",
+  "createdAtEpochMs": 1781307271462,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-align-check-gates-next-action-after-fresh-handoff-evidence.md",
+    "title": "Align check-gates next action after fresh handoff evidence",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-01-23-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-01-34-pr-summary.md",
+  "changedFileCount": 12
+}
