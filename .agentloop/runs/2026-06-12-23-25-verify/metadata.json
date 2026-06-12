@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-23-25-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-23-25",
+  "createdAtEpochMs": 1781299541748,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-public-release-notes-mode.md",
+    "title": "Add public release notes mode",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-23-23-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 8
+}

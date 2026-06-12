@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-23-27-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-12-23-27",
+  "createdAtEpochMs": 1781299653644,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-public-release-notes-mode.md",
+    "title": "Add public release notes mode",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-23-23-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-23-27-pr-summary.md",
+  "changedFileCount": 11
+}

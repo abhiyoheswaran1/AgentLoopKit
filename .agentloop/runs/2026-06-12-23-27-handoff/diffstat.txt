@@ -1,0 +1,9 @@
+ .agentloop/backlog.md             |  1 +
+ .agentloop/dogfood-log.md         | 22 ++++++++++++++++++++++
+ CHANGELOG.md                      |  2 +-
+ docs/cli-reference.md             |  3 ++-
+ docs/release-notes.md             |  3 +++
+ src/cli/commands/release-notes.ts |  3 +++
+ src/core/release-notes.ts         | 31 ++++++++++++++++++++++++++++++-
+ tests/release-notes.test.ts       | 26 ++++++++++++++++++++++++++
+ 8 files changed, 88 insertions(+), 3 deletions(-)

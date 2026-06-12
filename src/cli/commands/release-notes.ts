@@ -14,6 +14,7 @@ export function releaseNotesCommand() {
     .option('--from <ref>', 'git ref to compare from')
     .option('--to <ref>', 'git ref to compare to', 'HEAD')
     .option('--release-version <version>', 'release version; defaults to package.json version')
+    .option('--public', 'print concise public-facing release notes')
     .option('--write', 'write notes to .agentloop/handoffs')
     .option('--out <path>', 'output Markdown path when using --write')
     .option('--json', 'print machine-readable output')
@@ -22,6 +23,7 @@ export function releaseNotesCommand() {
         from?: string;
         to?: string;
         releaseVersion?: string;
+        public?: boolean;
         write?: boolean;
         out?: string;
         json?: boolean;
@@ -37,6 +39,7 @@ export function releaseNotesCommand() {
             from: options.from,
             to: options.to,
             version: options.releaseVersion,
+            format: options.public ? 'public' : 'detailed',
             write: options.write,
             outPath: options.out,
           });

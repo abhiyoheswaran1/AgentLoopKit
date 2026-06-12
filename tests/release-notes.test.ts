@@ -101,6 +101,32 @@ describe('release-notes command', () => {
     expect(written).toBe(output.markdown);
   });
 
+  test('prints concise public release notes without local evidence inventory', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'release-notes', '--from', 'v1.2.2', '--to', 'HEAD', '--public', '--json'],
+      { cwd: dir },
+    );
+
+    const output = JSON.parse(result.stdout);
+    expect(output.format).toBe('public');
+    expect(output.markdown).toContain('# demo v1.2.3');
+    expect(output.markdown).toContain('## What changed');
+    expect(output.markdown).toContain('- Added release-note generation.');
+    expect(output.markdown).toContain('- Improved release evidence.');
+    expect(output.markdown).toContain('## Verification');
+    expect(output.markdown).toContain('- Verification: `pass`');
+    expect(output.markdown).toContain('## Install');
+    expect(output.markdown).toContain('npm install demo@1.2.3');
+    expect(output.markdown).not.toContain('## Changed Files');
+    expect(output.markdown).not.toContain('## Working Tree');
+    expect(output.markdown).not.toContain('## AgentLoop Evidence');
+    expect(output.markdown).not.toContain('src/index.ts');
+    expect(output.markdown).not.toContain('.agentloop/tasks/2026-06-10-release-notes.md');
+  });
+
   test('escapes release-note file path labels when paths contain backticks', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: true });
     const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });

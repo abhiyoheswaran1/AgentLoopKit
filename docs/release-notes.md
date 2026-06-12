@@ -6,6 +6,7 @@
 agentloop release-notes
 agentloop release-notes --from v0.19.0 --to HEAD
 agentloop release-notes --release-version <version>
+agentloop release-notes --public
 agentloop release-notes --json
 agentloop release-notes --write
 agentloop release-notes --write --out .agentloop/handoffs/release.md
@@ -32,6 +33,8 @@ If you do not pass `--from`, AgentLoopKit looks for the newest local version tag
 ## Output
 
 Human output is Markdown. JSON output includes the same evidence paths and release metadata for scripts.
+
+Use `--public` when you need concise Markdown for a GitHub release page or announcement. Public mode keeps the version, changelog items, verification status, selected git range, and install command, but leaves out the changed-file inventory, working-tree path list, and local AgentLoop evidence paths. The default output remains the detailed local evidence format.
 
 `--write` creates:
 

@@ -316,6 +316,7 @@ See [ci-summary.md](ci-summary.md).
 agentloop release-notes
 agentloop release-notes --from <tag> --to HEAD
 agentloop release-notes --release-version <version>
+agentloop release-notes --public
 agentloop release-notes --json
 agentloop release-notes --write
 
@@ -330,7 +331,7 @@ agentloop npm-status --expect-current
 agentloop npm-status --registry-json npm-view.json
 ```
 
-`release-notes` drafts local release notes from package metadata, changelog entries, Git history, changed files, working tree status, the active task, the current verification report, and the latest CI summary when those artifacts exist. User-provided Git refs must be ordinary refs such as `v1.2.3` or `HEAD`; option-shaped refs are rejected.
+`release-notes` drafts local release notes from package metadata, changelog entries, Git history, changed files, working tree status, the active task, the current verification report, and the latest CI summary when those artifacts exist. Use `--public` for concise release-page copy that keeps changed-file inventory and local AgentLoop evidence out of the rendered Markdown. User-provided Git refs must be ordinary refs such as `v1.2.3` or `HEAD`; option-shaped refs are rejected.
 
 `release-check` checks local release readiness from package metadata, changelog entries, release scripts, git state, current verification evidence, reviewer handoff, and generated release notes. It warns when `CHANGELOG.md` still has `Unreleased` entries, verification predates the current task, or the latest generated release notes do not mention the local package version. Use `--strict` when warnings should fail CI or a maintainer release gate.
 

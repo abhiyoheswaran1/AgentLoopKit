@@ -15,7 +15,10 @@ import { getGitBranch, getGitCommit } from './git.js';
 import { inlineCode } from './markdown-format.js';
 import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 
+export type ReleaseNotesFormat = 'detailed' | 'public';
+
 export type ReleaseNotesResult = {
+  format: ReleaseNotesFormat;
   timestamp: string;
   packageName: string;
   version: string;
@@ -249,6 +252,28 @@ This command is local and deterministic. Does not create tags, publish packages,
 `;
 }
 
+function renderPublicMarkdown(result: Omit<ReleaseNotesResult, 'markdown' | 'writtenPath'>) {
+  const changelog = result.changelogSection || '- No matching CHANGELOG.md section found.';
+  const verification = result.evidence.verification
+    ? `- Verification: ${inlineCode(result.evidence.verification.overallStatus)}`
+    : '- Verification: not found';
+
+  return `# ${result.packageName} v${result.version}
+
+## What changed
+${changelog}
+
+## Verification
+${verification}
+- Release notes generated from ${inlineCode(result.gitRange.label)}.
+
+## Install
+\`\`\`bash
+npm install ${result.packageName}@${result.version}
+\`\`\`
+`;
+}
+
 export async function generateReleaseNotes(options: {
   cwd: string;
   config: AgentLoopConfig;
@@ -258,8 +283,10 @@ export async function generateReleaseNotes(options: {
   timestamp?: string;
   write?: boolean;
   outPath?: string;
+  format?: ReleaseNotesFormat;
 }): Promise<ReleaseNotesResult> {
   const timestamp = options.timestamp ?? formatTimestamp();
+  const format = options.format ?? 'detailed';
   const packageMetadata = await readPackageMetadata(options.cwd);
   const version = options.version ?? packageMetadata.version;
   const to = validateGitRef('--to', options.to ?? 'HEAD');
@@ -318,6 +345,7 @@ export async function generateReleaseNotes(options: {
     readCiSummary(options.cwd, ciSummaryPath),
   ]);
   const withoutMarkdown = {
+    format,
     timestamp,
     packageName: packageMetadata.name,
     version,
@@ -337,7 +365,8 @@ export async function generateReleaseNotes(options: {
       ciSummary,
     },
   };
-  const markdown = renderMarkdown(withoutMarkdown);
+  const markdown =
+    format === 'public' ? renderPublicMarkdown(withoutMarkdown) : renderMarkdown(withoutMarkdown);
   const writtenPath = options.write
     ? ((options.outPath
         ? resolveOutputArtifactPath({

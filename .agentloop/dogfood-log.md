@@ -2,6 +2,28 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Public Release Notes Mode
+
+- Task contract: `.agentloop/tasks/archive/2026-06-12-add-public-release-notes-mode.md`
+- Trigger:
+  - The `0.28.6` release needed concise public GitHub release notes even though the local release-notes artifact was useful as detailed evidence.
+  - Product panel signal: Elias and Nora wanted release-page copy that is easy to scan; Samir wanted detailed evidence to remain local and deterministic.
+- Product change:
+  - Added `agentloop release-notes --public`.
+  - Public mode keeps package/version, changelog items, verification status, selected git range, and install command.
+  - Public mode omits changed-file inventory, working-tree path lists, and local AgentLoop evidence paths.
+  - The default release-notes output remains the detailed evidence format.
+- Verification:
+  - Red TDD run: `npm test -- tests/release-notes.test.ts -t "prints concise public release notes without local evidence inventory"` failed because `--public` was not a known option.
+  - Green focused run: the same test passed after adding the public renderer and CLI flag.
+  - Full focused suite: `npm test -- tests/release-notes.test.ts` passed with 18 tests.
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-12-23-23-verification-report.md`.
+  - The verification run wrote `.agentloop/runs/2026-06-12-23-25-verify/`.
+- Worked well:
+  - The product now separates public release copy from maintainer evidence without changing the default artifact.
+- Improve:
+  - A future release workflow can use `release-notes --public` directly when creating GitHub release notes.
+
 ## 2026-06-12: 0.28.6 Release Gate
 
 - Task contract: `.agentloop/tasks/archive/2026-06-12-release-agentloopkit-0-28-6-patch.md`
