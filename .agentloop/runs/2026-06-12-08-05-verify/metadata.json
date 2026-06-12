@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-08-05-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-08-05",
+  "createdAtEpochMs": 1781244351722,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-harden-mcp-run-artifact-path-normalization.md",
+    "title": "Harden MCP run artifact path normalization",
+    "status": "in-progress"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-08-02-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 11
+}

@@ -1,4 +1,3 @@
-import path from 'node:path';
 import type { AgentLoopConfig } from './config.js';
 import {
   getArtifactInventory,
@@ -6,31 +5,21 @@ import {
   type ArtifactInventory,
 } from './artifacts.js';
 import { checkGates } from './check-gates.js';
+import { toSafeDisplayPath } from './display-path.js';
 import { inlineCode } from './markdown-format.js';
 import { getPolicyStatus } from './policy.js';
 import { listRuns, type RunSummary } from './runs.js';
 import { getAgentLoopStatus } from './status.js';
 
-function toStoredPath(cwd: string, filePath: string) {
-  const normalized = filePath.split(path.sep).join('/');
-  const marker = '/.agentloop/';
-  const markerIndex = normalized.indexOf(marker);
-  if (markerIndex >= 0) return `.agentloop/${normalized.slice(markerIndex + marker.length)}`;
-
-  const repoPath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
-  if (repoPath.startsWith('..') || path.isAbsolute(repoPath)) return path.basename(filePath);
-  return repoPath.split(path.sep).join('/');
-}
-
 function toReviewContextRunSummary(cwd: string, run: RunSummary) {
   return {
     ...run,
-    task: run.task ? { ...run.task, path: toStoredPath(cwd, run.task.path) } : run.task,
+    task: run.task ? { ...run.task, path: toSafeDisplayPath(cwd, run.task.path) } : run.task,
     ...(run.verificationReportPath
-      ? { verificationReportPath: toStoredPath(cwd, run.verificationReportPath) }
+      ? { verificationReportPath: toSafeDisplayPath(cwd, run.verificationReportPath) }
       : {}),
-    ...(run.shipReportPath ? { shipReportPath: toStoredPath(cwd, run.shipReportPath) } : {}),
-    ...(run.handoffPath ? { handoffPath: toStoredPath(cwd, run.handoffPath) } : {}),
+    ...(run.shipReportPath ? { shipReportPath: toSafeDisplayPath(cwd, run.shipReportPath) } : {}),
+    ...(run.handoffPath ? { handoffPath: toSafeDisplayPath(cwd, run.handoffPath) } : {}),
   };
 }
 

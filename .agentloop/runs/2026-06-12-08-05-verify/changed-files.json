@@ -1,0 +1,46 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-expose-review-context-through-the-cli.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "FINAL_HANDOFF.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/mcp-tools.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/review-context.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/mcp-tools.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-08-02-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-harden-mcp-run-artifact-path-normalization.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-expose-review-context-through-the-cli.md"
+  },
+  {
+    "status": "??",
+    "path": "src/core/display-path.ts"
+  }
+]

@@ -51,6 +51,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - `prepare-pr` grouped changed-file sections for reviewer scanning
 - GitHub-comment Markdown output without token handling inside the CLI
 - local run ledger under `.agentloop/runs/`
+- safe run artifact path rendering for MCP and review-context outputs
 - opt-in run ledger records for `verify`, `summarize`, and `handoff` with `--write-run`
 - `agentloop runs`, `agentloop show-run`, and `agentloop intent <file>`
 - read-only maintainer reviewability check with `agentloop maintainer-check`

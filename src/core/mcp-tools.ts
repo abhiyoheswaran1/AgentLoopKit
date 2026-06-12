@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { loadAgentLoopConfig } from './config.js';
+import { toSafeDisplayPath } from './display-path.js';
 import {
   latestMarkdownFile,
   prSummaryPattern,
@@ -259,8 +260,7 @@ function extractHeading(markdown: string, fallback: string) {
 }
 
 function toStoredPath(cwd: string, absolutePath: string) {
-  const repoPath = path.isAbsolute(absolutePath) ? path.relative(cwd, absolutePath) : absolutePath;
-  return repoPath.split(path.sep).join('/');
+  return toSafeDisplayPath(cwd, absolutePath);
 }
 
 function toMcpRunSummary(cwd: string, run: RunSummary) {

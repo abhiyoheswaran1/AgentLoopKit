@@ -7410,3 +7410,42 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider sharing the same path-normalization helper with all MCP run-summary tools, not only the review-context path.
   - Consider a `review-context --brief` mode only if the default Markdown proves too verbose in real agent sessions.
+
+## 2026-06-12: Safe MCP Run Artifact Display Paths
+
+- Task contract: `.agentloop/tasks/2026-06-12-harden-mcp-run-artifact-path-normalization.md`
+- Trigger:
+  - The CLI review-context tests found that absolute run metadata paths can render as `../..` paths when macOS temp path prefixes differ.
+  - MCP run summary/detail/intent tools used their own local formatter and could expose the same kind of path.
+- Implementation:
+  - Added shared `toSafeDisplayPath` in `src/core/display-path.ts`.
+  - Reused it in `src/core/review-context.ts` and `src/core/mcp-tools.ts`.
+  - Added MCP regression coverage for an outside absolute verification report path in run metadata.
+  - Kept run ledger files unchanged; only read/API display values changed.
+- Verification run:
+  - Red focused test failed first because MCP returned a `../agentloopkit-.../private-verification-report.md` path.
+  - Focused tests passed after the shared formatter:
+    - `npm test -- tests/mcp-tools.test.ts tests/review-context.test.ts`
+  - Broader local checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:links`
+    - `git diff --check`
+    - `npm run build`
+    - `npm test`
+    - `node scripts/smoke-cli.mjs`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npx --yes projscan doctor --format markdown`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-12-08-02-verification-report.md`.
+  - Dogfood runs:
+    - `.agentloop/runs/2026-06-12-08-05-verify/`
+    - `.agentloop/runs/2026-06-12-08-06-handoff/`
+    - `.agentloop/runs/2026-06-12-08-06-ship/`
+  - Dogfood handoff: `.agentloop/handoffs/2026-06-12-08-06-pr-summary.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-08-06-ship-report.md` with score `96`/100.
+- What worked well:
+  - The previous dogfood learning directly produced a small safety hardening task.
+  - The regression checks both the unsafe path shape and the existing `.agentloop/...` display behavior.
+- Improve:
+  - Consider direct unit coverage for `toSafeDisplayPath` if more commands start using it.

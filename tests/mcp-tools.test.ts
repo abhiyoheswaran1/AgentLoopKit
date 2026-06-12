@@ -80,6 +80,7 @@ type RunsPayload = {
     id: string;
     command: string;
     score?: number;
+    verificationReportPath?: string;
     shipReportPath?: string;
   }>;
 };
@@ -89,6 +90,7 @@ type RunPayload = {
     metadata: {
       id: string;
       command: string;
+      verificationReportPath?: string;
       shipReportPath?: string;
     };
     score: {
@@ -228,6 +230,8 @@ type HandoffPayload = {
 async function createInitializedRepo() {
   const dir = await makeTempDir();
   tempDirs.push(dir);
+  const outsideDir = await makeTempDir();
+  tempDirs.push(outsideDir);
   await execa('git', ['init', '-q'], { cwd: dir });
   await writeFile(
     path.join(dir, 'package.json'),
@@ -274,6 +278,7 @@ async function createInitializedRepo() {
           title: 'Add API route',
           status: 'review',
         },
+        verificationReportPath: path.join(outsideDir, 'private-verification-report.md'),
         shipReportPath: path.join(dir, '.agentloop/reports/2026-06-10-12-32-ship-report.md'),
         score: 96,
         changedFileCount: 2,
@@ -430,6 +435,7 @@ describe('mcp tools', () => {
         id: '2026-06-10-12-32-ship',
         command: 'ship',
         score: 96,
+        verificationReportPath: 'private-verification-report.md',
         shipReportPath: '.agentloop/reports/2026-06-10-12-32-ship-report.md',
       }),
     ]);
@@ -437,9 +443,11 @@ describe('mcp tools', () => {
     expect(runPayload.run.metadata).toMatchObject({
       id: '2026-06-10-12-32-ship',
       command: 'ship',
+      verificationReportPath: 'private-verification-report.md',
       shipReportPath: '.agentloop/reports/2026-06-10-12-32-ship-report.md',
     });
     expect(runPayload.run.metadata.shipReportPath).not.toContain(dir);
+    expect(runPayload.run.metadata.verificationReportPath).not.toContain('..');
     expect(runPayload.run.score?.totalScore).toBe(96);
     expect(runPayload.run.changedFiles).toEqual([{ path: 'src/routes/api.ts', status: 'M' }]);
     expect(runPayload.run.diffStat).toContain('src/routes/api.ts');
