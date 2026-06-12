@@ -10,6 +10,7 @@
 - Added `agentloop maintainer-check`, a read-only maintainer reviewability check for AI-assisted PRs.
 - Added read-only MCP tools for the latest ship report and recent run ledger entries.
 - Added read-only MCP `agentloop_show_run` for fetching one local run ledger entry by id.
+- Added read-only MCP `agentloop_file_intent` for local run-ledger intent lookup by file path.
 - Changed `agentloop status` Markdown, JSON, and brief output to include the newest local run ledger entry when `.agentloop/runs/` exists.
 - Changed `agentloop prepare-pr` to reuse a matching fresh ship run instead of writing a duplicate run ledger entry.
 - Added `shipEvidence.source` and `shipEvidence.runId` to `agentloop prepare-pr --json` output.

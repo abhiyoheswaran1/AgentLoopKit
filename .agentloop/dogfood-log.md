@@ -2,6 +2,41 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: MCP File Intent Lookup
+
+- Task contract: `.agentloop/tasks/2026-06-12-expose-file-intent-through-mcp.md`
+- Trigger:
+  - MCP clients could inspect run summaries and details but could not ask which previous AgentLoopKit runs touched a file and why.
+  - The CLI already had deterministic `agentloop intent <file>` behavior backed by the local run ledger.
+- Product change:
+  - Added read-only MCP tool `agentloop_file_intent`.
+  - The tool accepts a repo-relative file path and returns the normalized file plus matching local run summaries.
+  - The tool reads run ledger metadata only; it does not read the target file contents.
+  - Matching run summaries reuse the MCP repo-relative AgentLoop artifact path rendering.
+- Verification:
+  - Red focused run: `npm test -- tests/mcp-tools.test.ts` failed because `agentloop_file_intent` was missing and unknown.
+  - Green focused run of the same command passed after adding the tool.
+  - Focused MCP suite `npm test -- tests/mcp-tools.test.ts tests/mcp-server.test.ts` passed with 2 files and 5 tests.
+  - `npm run typecheck`, `npm run lint`, `npm run check:links`, and `git diff --check` passed.
+  - `npm run build` passed.
+  - Full `npm test` passed with 47 files and 407 tests.
+  - CLI smoke passed.
+  - Packed release smoke passed.
+  - Production dependency audit passed with no known vulnerabilities.
+  - ProjScan reported A 100/100.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-05-54-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-05-58-verify/`.
+  - Archived completed prior task: `.agentloop/tasks/archive/2026-06-12-expose-run-details-through-mcp.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-05-58-ship-report.md`.
+  - Dogfood ship run: `.agentloop/runs/2026-06-12-05-58-ship/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-05-58-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-05-58-pr-description.md`.
+  - Ship score: 92/100 with gates passing.
+- Worked well:
+  - Existing `findFileIntent()` kept the MCP tool deterministic and small.
+- Improve:
+  - Consider exposing maintainer-check through MCP next, but keep the server read-only.
+
 ## 2026-06-12: MCP Run Detail Lookup
 
 - Task contract: `.agentloop/tasks/2026-06-12-expose-run-details-through-mcp.md`

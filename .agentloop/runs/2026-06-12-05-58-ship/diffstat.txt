@@ -1,0 +1,11 @@
+ .agentloop/backlog.md                              |  1 +
+ .../2026-06-12-expose-run-details-through-mcp.md   | 56 ----------------------
+ CHANGELOG.md                                       |  1 +
+ FINAL_HANDOFF.md                                   |  2 +-
+ ROADMAP.md                                         |  2 +-
+ docs/cli-reference.md                              |  2 +-
+ docs/mcp.md                                        |  2 +
+ src/core/mcp-tools.ts                              | 41 +++++++++++++++-
+ src/mcp/server.ts                                  |  2 +-
+ tests/mcp-tools.test.ts                            | 34 +++++++++++++
+ 10 files changed, 82 insertions(+), 61 deletions(-)

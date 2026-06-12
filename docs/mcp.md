@@ -35,6 +35,7 @@ Example MCP client configuration:
 | `agentloop_latest_ship_report`         | Latest ship/readiness report metadata and Markdown content                                                                          |
 | `agentloop_list_runs`                  | Recent local run ledger entries with bounded `limit` input                                                                          |
 | `agentloop_show_run`                   | One local run ledger entry by run id, including metadata, score JSON, changed files, and diffstat                                   |
+| `agentloop_file_intent`                | Local run ledger matches for one repo-relative file path                                                                            |
 | `agentloop_list_handoffs`              | Recent reviewer handoff summaries                                                                                                   |
 | `agentloop_latest_handoff`             | Latest reviewer handoff Markdown content                                                                                            |
 
@@ -55,6 +56,7 @@ It does not:
 - publish packages or create releases
 
 It reads the same local AgentLoopKit files that CLI commands such as `status`, `policy`, `ship`, `runs`, and `handoff` already use.
+`agentloop_file_intent` reads run ledger metadata and does not read the target file contents.
 
 ## Registry
 

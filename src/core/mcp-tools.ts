@@ -12,7 +12,14 @@ import { pathExists, resolvesInsidePath } from './file-system.js';
 import { getAgentLoopStatus } from './status.js';
 import { getActiveTask, listTasks, readTaskContract } from './task-state.js';
 import { listPolicies, readPolicy } from './policy.js';
-import { listRuns, readRun, type RunRecord, type RunSummary } from './runs.js';
+import {
+  findFileIntent,
+  listRuns,
+  readRun,
+  type IntentMatch,
+  type RunRecord,
+  type RunSummary,
+} from './runs.js';
 
 export type McpToolDefinition = {
   name: string;
@@ -134,6 +141,21 @@ const tools: McpToolDefinition[] = [
     },
   },
   {
+    name: 'agentloop_file_intent',
+    description: 'Read local run ledger matches for one repo-relative file path.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          description: 'Repo-relative file path, for example "src/auth/callback.ts".',
+        },
+      },
+      required: ['file'],
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'agentloop_list_handoffs',
     description: 'List recent local reviewer handoff summaries.',
     inputSchema: {
@@ -211,6 +233,14 @@ function toMcpRunRecord(cwd: string, run: RunRecord) {
         ? { handoffPath: toStoredPath(cwd, run.metadata.handoffPath) }
         : {}),
     },
+  };
+}
+
+function toMcpIntentMatch(cwd: string, match: IntentMatch) {
+  return {
+    ...toMcpRunSummary(cwd, match),
+    file: match.file,
+    why: match.why,
   };
 }
 
@@ -342,6 +372,15 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
     case 'agentloop_show_run': {
       const id = readStringArgument(options.arguments, 'id');
       return textResult({ run: toMcpRunRecord(options.cwd, await readRun(options.cwd, id)) });
+    }
+    case 'agentloop_file_intent': {
+      const file = readStringArgument(options.arguments, 'file').replace(/\\/g, '/');
+      return textResult({
+        file,
+        runs: (await findFileIntent(options.cwd, file)).map((match) =>
+          toMcpIntentMatch(options.cwd, match),
+        ),
+      });
     }
     case 'agentloop_list_handoffs': {
       const limit = readLimitArgument(options.arguments);

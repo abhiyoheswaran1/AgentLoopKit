@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-05-58-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-05-58",
+  "createdAtEpochMs": 1781236702498,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-expose-file-intent-through-mcp.md",
+    "title": "Expose file intent through MCP",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-05-54-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-05-58-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-05-58-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 14
+}

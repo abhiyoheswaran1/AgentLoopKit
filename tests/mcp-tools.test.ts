@@ -87,6 +87,15 @@ type RunPayload = {
   };
 };
 
+type IntentPayload = {
+  file: string;
+  runs: Array<{
+    id: string;
+    why: string;
+    shipReportPath?: string;
+  }>;
+};
+
 type HandoffsPayload = {
   handoffs: Array<{
     title: string;
@@ -189,6 +198,7 @@ describe('mcp tools', () => {
       'agentloop_latest_ship_report',
       'agentloop_list_runs',
       'agentloop_show_run',
+      'agentloop_file_intent',
       'agentloop_list_handoffs',
       'agentloop_latest_handoff',
     ]);
@@ -219,6 +229,11 @@ describe('mcp tools', () => {
       name: 'agentloop_show_run',
       arguments: { id: '2026-06-10-12-32-ship' },
     });
+    const intent = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_file_intent',
+      arguments: { file: 'src/routes/api.ts' },
+    });
     const handoffs = await callMcpTool({ cwd: dir, name: 'agentloop_list_handoffs' });
     const handoff = await callMcpTool({ cwd: dir, name: 'agentloop_latest_handoff' });
 
@@ -232,6 +247,7 @@ describe('mcp tools', () => {
     const shipReportPayload = shipReport.payload as ShipReportPayload;
     const runsPayload = runs.payload as RunsPayload;
     const runPayload = run.payload as RunPayload;
+    const intentPayload = intent.payload as IntentPayload;
     const handoffsPayload = handoffs.payload as HandoffsPayload;
     const handoffPayload = handoff.payload as HandoffPayload;
 
@@ -268,6 +284,17 @@ describe('mcp tools', () => {
     expect(runPayload.run.score?.totalScore).toBe(96);
     expect(runPayload.run.changedFiles).toEqual([{ path: 'src/routes/api.ts', status: 'M' }]);
     expect(runPayload.run.diffStat).toContain('src/routes/api.ts');
+    expect(intentPayload).toEqual({
+      file: 'src/routes/api.ts',
+      runs: [
+        expect.objectContaining({
+          id: '2026-06-10-12-32-ship',
+          why: 'Changed in ship run for task "Add API route".',
+          shipReportPath: '.agentloop/reports/2026-06-10-12-32-ship-report.md',
+        }),
+      ],
+    });
+    expect(intentPayload.runs[0].shipReportPath).not.toContain(dir);
     expect(handoffsPayload.handoffs[0]).toMatchObject({ title: 'PR Summary' });
     expect(handoffPayload.handoff.content).toContain('Route implementation handoff.');
   });
@@ -292,6 +319,13 @@ describe('mcp tools', () => {
         arguments: { id: '2026-06-10-99-99-ship' },
       }),
     ).rejects.toThrow('Run not found');
+    await expect(
+      callMcpTool({
+        cwd: dir,
+        name: 'agentloop_file_intent',
+        arguments: { file: '' },
+      }),
+    ).rejects.toThrow('MCP tool argument "file" must be a non-empty string');
     await expect(
       callMcpTool({
         cwd: dir,
