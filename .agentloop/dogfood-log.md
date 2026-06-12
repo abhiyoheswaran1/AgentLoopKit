@@ -2,6 +2,38 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Grouped Prepare PR Change Areas
+
+- Task contract: `.agentloop/tasks/2026-06-12-group-prepare-pr-changed-files-by-review-area.md`
+- Trigger:
+  - Dogfooding showed `prepare-pr` still rendered changed files as one flat list.
+  - The product direction is review readiness, so PR bodies should help reviewers scan risk-sensitive files, source, tests, docs, AgentLoop evidence, config, CI, and other files quickly.
+- Product change:
+  - Extracted the PR summary change-area classifier into a shared `change-areas` helper.
+  - Changed `prepare-pr` PR bodies to group changed files by review area.
+  - Kept `changedFiles` JSON flat and unchanged for scripts.
+- Verification:
+  - Red focused run: `npm test -- tests/prepare-pr.test.ts -t "groups changed files"` failed while `prepare-pr` still rendered a flat changed-file list.
+  - Green focused run: `npm test -- tests/prepare-pr.test.ts -t "groups changed files"` passed after `prepare-pr` used grouped change areas.
+  - Affected suite `npm test -- tests/prepare-pr.test.ts tests/pr-summary.test.ts` passed with 2 files and 13 tests.
+  - `npm run typecheck` passed.
+  - `npm run lint`, `npm run check:links`, and `git diff --check` passed.
+  - Full suite `npm test` passed with 47 files and 399 tests.
+  - `npm run build` passed.
+  - Final self-verify `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-12-group-prepare-pr-changed-files-by-review-area.md --task-commands --timeout-ms 300000 --write-run --json` passed and wrote `.agentloop/reports/2026-06-12-02-33-verification-report.md` plus run `.agentloop/runs/2026-06-12-02-39-verify/`.
+  - First `ship` attempt used the previous review task because the active task pointer still referenced it; corrected with `agentloop task set .agentloop/tasks/2026-06-12-group-prepare-pr-changed-files-by-review-area.md` and removed the stale ship artifacts.
+  - Final ship report scored 96/100 with passing gates and wrote `.agentloop/reports/2026-06-12-02-40-ship-report.md` plus run `.agentloop/runs/2026-06-12-02-40-ship/`.
+  - Final `prepare-pr --write --json` wrote `.agentloop/handoffs/2026-06-12-02-40-pr-description.md`, reused `.agentloop/runs/2026-06-12-02-40-ship/`, and generated Source, Tests, AgentLoop, and Documentation changed-file sections.
+  - Final `npm run check:links`, `git diff --check`, and `agentloop task doctor --json` passed.
+  - Final `npm run smoke:release` passed.
+  - Production dependency audit `npx pnpm@10.12.1 audit --prod` reported no known vulnerabilities.
+  - ProjScan `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The existing PR summary taxonomy was good enough; sharing it avoids a second reviewer-facing classification model.
+- Improve:
+  - Consider exposing `changeAreas` in `prepare-pr --json` only if scripts need grouped structured data.
+  - Consider warning when `create-task` writes a new task but another active task remains pinned.
+
 ## 2026-06-12: Latest Run Evidence In Status
 
 - Task contract: `.agentloop/tasks/2026-06-12-show-latest-run-evidence-in-status.md`

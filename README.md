@@ -125,7 +125,7 @@ agentloopkit init
 | `agentloop next`                 | Print only the next recommended loop action                  |
 | `agentloop verify`               | Run configured checks and write a verification report        |
 | `agentloop ship`                 | Score review readiness and write a ship report               |
-| `agentloop prepare-pr`           | Generate a PR title, body, and optional GitHub comment       |
+| `agentloop prepare-pr`           | Generate a PR title, grouped body, and optional GitHub comment |
 | `agentloop summarize`            | Preview a deterministic reviewer summary                     |
 | `agentloop handoff`              | Write a reviewer handoff summary                             |
 | `agentloop check-gates`          | Check review evidence without running tests                  |
@@ -181,6 +181,8 @@ AgentLoopKit is intentionally boring:
 Env files are reported by path only. Verification commands run only when you explicitly run `agentloop verify`.
 
 `agentloop ship` reuses current verification evidence by default. Pass `--run-verify` when you want it to run verification as part of the readiness flow.
+
+`agentloop prepare-pr` groups changed files by review area, including risk-sensitive paths, source, tests, AgentLoop evidence, docs, CI, config, and other files.
 
 For narrower evidence history, `agentloop verify --write-run` and `agentloop handoff --write-run` can add their own local run records without changing the default command behavior.
 

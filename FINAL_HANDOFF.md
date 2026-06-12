@@ -42,6 +42,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - PR description generation with `agentloop prepare-pr`
 - `prepare-pr` reuse of matching fresh ship evidence to avoid duplicate run ledger entries
 - `prepare-pr --json` evidence-source reporting for reused versus refreshed ship evidence
+- `prepare-pr` grouped changed-file sections for reviewer scanning
 - GitHub-comment Markdown output without token handling inside the CLI
 - local run ledger under `.agentloop/runs/`
 - opt-in run ledger records for `verify`, `summarize`, and `handoff` with `--write-run`

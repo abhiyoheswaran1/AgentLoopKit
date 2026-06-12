@@ -1,0 +1,50 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "FINAL_HANDOFF.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/pr-summary.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/prepare-pr.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/prepare-pr.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-02-33-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-group-prepare-pr-changed-files-by-review-area.md"
+  },
+  {
+    "status": "??",
+    "path": "src/core/change-areas.ts"
+  }
+]

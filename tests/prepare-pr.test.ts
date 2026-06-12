@@ -145,4 +145,49 @@ describe('prepare-pr command', () => {
     expect(shipRuns).toHaveLength(1);
     expect(shipRuns[0].id).toBe(ship.run.id);
   });
+
+  test('groups changed files by review area in the PR body', async () => {
+    const dir = await createPreparePrFixture();
+
+    await mkdir(path.join(dir, 'tests/ui'), { recursive: true });
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    await mkdir(path.join(dir, 'src/ui'), { recursive: true });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(path.join(dir, 'src/ui/button.ts'), 'export const label = "Save";\n');
+    await writeFile(path.join(dir, 'tests/ui/button.test.ts'), 'test("button", () => {});\n');
+    await writeFile(path.join(dir, 'docs/login`flow.md'), '# Login flow\n');
+    await writeFile(path.join(dir, '.agentloop/reports/2026-06-12-extra.md'), '# Extra evidence\n');
+    await git(dir, [
+      'add',
+      '-N',
+      'src/ui/button.ts',
+      'tests/ui/button.test.ts',
+      'docs/login`flow.md',
+    ]);
+
+    const output = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'prepare-pr', '--json'], { cwd: dir })).stdout,
+    );
+
+    expect(output.body).toContain('## Changed Files');
+    expect(output.body).toContain('### Risk-Sensitive');
+    expect(output.body).toContain('- M `src/auth/callback.ts`');
+    expect(output.body).toContain('### Source');
+    expect(output.body).toContain('- A `src/ui/button.ts`');
+    expect(output.body).toContain('### Tests');
+    expect(output.body).toContain('- A `tests/ui/button.test.ts`');
+    expect(output.body).toContain('### AgentLoop');
+    expect(output.body).toContain('- ?? `.agentloop/reports/2026-06-12-extra.md`');
+    expect(output.body).toContain('### Documentation');
+    expect(output.body).toContain('- A ``docs/login`flow.md``');
+    expect(output.changedFiles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: 'src/auth/callback.ts' }),
+        expect.objectContaining({ path: 'src/ui/button.ts' }),
+        expect.objectContaining({ path: 'tests/ui/button.test.ts' }),
+        expect.objectContaining({ path: 'docs/login`flow.md' }),
+        expect.objectContaining({ path: '.agentloop/reports/2026-06-12-extra.md' }),
+      ]),
+    );
+  });
 });

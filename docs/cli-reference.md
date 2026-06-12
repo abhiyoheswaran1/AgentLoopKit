@@ -139,7 +139,7 @@ The readiness score is evidence-based. It scores task clarity, scope control, ve
 
 By default, `ship` reuses current verification evidence. Use `--run-verify` when you want it to run configured verification commands first. Use `--task-commands` with `--run-verify` to also run verification commands recorded in the task contract.
 
-`prepare-pr` generates a PR title and body from the active task, changed files, verification evidence, ship report, gates, risk notes, and rollback notes. `--github-comment` includes Markdown suitable for a PR comment. The CLI does not read GitHub tokens or post comments by itself.
+`prepare-pr` generates a PR title and body from the active task, changed files, verification evidence, ship report, gates, risk notes, and rollback notes. It groups changed files by review area so reviewers can scan risk-sensitive paths, source, tests, AgentLoop evidence, docs, CI, config, and other files. `--github-comment` includes Markdown suitable for a PR comment. The CLI does not read GitHub tokens or post comments by itself.
 
 When a fresh ship run already matches the active task, current verification report, existing ship report, and non-generated changed files, `prepare-pr` reuses that run instead of writing a duplicate run ledger entry. If the evidence is missing or no longer matches, it refreshes ship evidence first.
 

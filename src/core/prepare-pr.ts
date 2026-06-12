@@ -9,6 +9,7 @@ import { resolveOutputArtifactPath } from './artifacts.js';
 import { createShipReport, ShipResult } from './ship.js';
 import { listRuns, readRun } from './runs.js';
 import { readTaskContract, TaskContract } from './task-state.js';
+import { renderChangeAreas } from './change-areas.js';
 
 export type PreparePrResult = {
   titleSuggestion: string;
@@ -64,12 +65,6 @@ function listItems(section: string) {
 
 function renderMarkdownList(values: string[], fallback: string) {
   return values.length ? values.map((value) => `- ${value}`).join('\n') : `- ${fallback}`;
-}
-
-function renderChangedFiles(changedFiles: ShipResult['changedFiles']) {
-  return changedFiles.length
-    ? changedFiles.map((file) => `- ${file.status} ${inlineCode(file.path)}`).join('\n')
-    : '- No changed files detected.';
 }
 
 function relativePath(cwd: string, filePath: string) {
@@ -132,7 +127,7 @@ ${desiredOutcome || problem || 'Review the changed files and AgentLoopKit eviden
 
 ## Changed Files
 
-${renderChangedFiles(input.ship.changedFiles)}
+${renderChangeAreas(input.ship.changedFiles)}
 
 ## Review Readiness
 
