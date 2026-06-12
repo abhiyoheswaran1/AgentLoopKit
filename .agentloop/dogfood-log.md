@@ -2,6 +2,42 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: MCP Artifact Inventory Lookup
+
+- Task contract: `.agentloop/tasks/2026-06-12-expose-artifact-inventory-through-mcp.md`
+- Trigger:
+  - MCP clients could read specific reports and run evidence but still had to scrape directories to discover available local AgentLoopKit artifacts.
+  - The CLI already had read-only `agentloop artifacts --json`, so MCP should expose the same metadata shape.
+- Product change:
+  - Added read-only MCP tool `agentloop_artifacts`.
+  - The tool returns the existing artifact inventory JSON shape.
+  - Added optional `type` and `latest` inputs matching the CLI inventory filters.
+  - The MCP server instructions and docs now mention artifact inventory metadata.
+  - No artifact content dump beyond existing metadata, writes, command execution, env reads, external APIs, uploads, version bump, or release were added.
+- Verification:
+  - Red focused run: `npm test -- tests/mcp-tools.test.ts` failed because `agentloop_artifacts` was missing and unknown.
+  - Green focused run of the same command passed after adding the tool.
+  - Focused MCP suite `npm test -- tests/mcp-tools.test.ts tests/mcp-server.test.ts` passed with 2 files and 5 tests.
+  - `npm run typecheck`, `npm run lint`, `npm run check:links`, and `git diff --check` passed.
+  - `npm run build` passed.
+  - Full `npm test` passed with 47 files and 407 tests.
+  - CLI smoke passed.
+  - Packed release smoke passed.
+  - Production dependency audit passed with no known vulnerabilities.
+  - ProjScan reported A 100/100.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-07-03-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-07-07-verify/`.
+  - Archived completed prior task: `.agentloop/tasks/archive/2026-06-12-expose-gate-status-through-mcp.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-07-07-ship-report.md`.
+  - Dogfood ship run: `.agentloop/runs/2026-06-12-07-07-ship/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-07-07-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-07-07-pr-description.md`.
+  - Ship score: 95/100 with gates passing.
+- Worked well:
+  - Reusing `getArtifactInventory()` and `renderArtifactInventoryJson()` kept the MCP output aligned with CLI automation output.
+- Improve:
+  - Consider a compact MCP status preset later if clients want one call that combines status, gates, latest artifacts, and next action.
+
 ## 2026-06-12: MCP Gate Status Lookup
 
 - Task contract: `.agentloop/tasks/2026-06-12-expose-gate-status-through-mcp.md`

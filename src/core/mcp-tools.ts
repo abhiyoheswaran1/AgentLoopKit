@@ -6,6 +6,11 @@ import {
   prSummaryPattern,
   shipReportPattern,
   verificationReportPattern,
+  artifactInventoryTypes,
+  getArtifactInventory,
+  isArtifactInventoryType,
+  renderArtifactInventoryJson,
+  type ArtifactInventoryFilterType,
 } from './artifacts.js';
 import { AgentLoopError } from './errors.js';
 import { pathExists, resolvesInsidePath } from './file-system.js';
@@ -183,6 +188,25 @@ const tools: McpToolDefinition[] = [
     },
   },
   {
+    name: 'agentloop_artifacts',
+    description: 'Read local AgentLoopKit artifact inventory metadata without artifact contents.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        type: {
+          type: 'string',
+          enum: [...artifactInventoryTypes],
+          description: 'Optional artifact type filter.',
+        },
+        latest: {
+          type: 'boolean',
+          description: 'Return only latest matching artifacts. Defaults to false.',
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'agentloop_list_handoffs',
     description: 'List recent local reviewer handoff summaries.',
     inputSchema: {
@@ -351,6 +375,19 @@ function readBooleanArgument(
   return value;
 }
 
+function readArtifactTypeArgument(
+  args: Record<string, unknown> | undefined,
+): ArtifactInventoryFilterType | undefined {
+  const value = args?.type;
+  if (value === undefined) return undefined;
+  if (typeof value !== 'string' || !isArtifactInventoryType(value)) {
+    throw new AgentLoopError(
+      `MCP tool argument "type" must be one of: ${artifactInventoryTypes.join(', ')}.`,
+    );
+  }
+  return value;
+}
+
 export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolResult> {
   const config = await loadAgentLoopConfig(options.cwd);
 
@@ -431,6 +468,12 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
     case 'agentloop_check_gates': {
       const strict = readBooleanArgument(options.arguments, 'strict', false);
       return textResult(await checkGates({ cwd: options.cwd, config, strict }));
+    }
+    case 'agentloop_artifacts': {
+      const type = readArtifactTypeArgument(options.arguments);
+      const latest = readBooleanArgument(options.arguments, 'latest', false);
+      const inventory = await getArtifactInventory({ cwd: options.cwd, config });
+      return textResult(renderArtifactInventoryJson(inventory, { type, latest }));
     }
     case 'agentloop_list_handoffs': {
       const limit = readLimitArgument(options.arguments);

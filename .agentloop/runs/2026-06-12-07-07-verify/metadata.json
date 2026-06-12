@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-07-07-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-07-07",
+  "createdAtEpochMs": 1781240841601,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-expose-artifact-inventory-through-mcp.md",
+    "title": "Expose artifact inventory through MCP",
+    "status": "in-progress"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-07-03-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 13
+}

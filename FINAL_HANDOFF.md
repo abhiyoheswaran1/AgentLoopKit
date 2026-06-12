@@ -53,7 +53,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - opt-in run ledger records for `verify`, `summarize`, and `handoff` with `--write-run`
 - `agentloop runs`, `agentloop show-run`, and `agentloop intent <file>`
 - read-only maintainer reviewability check with `agentloop maintainer-check`
-- read-only MCP access to policy template status, latest ship reports, recent run ledger summaries and details, file intent matches, maintainer checks, and gate status
+- read-only MCP access to policy template status, latest ship reports, artifact inventory metadata, recent run ledger summaries and details, file intent matches, maintainer checks, and gate status
 - agent instruction installation, including `install-agent all`
 - template system for loops, gates, handoffs, agents, policies, tasks, and harness files
 - generated `.agentloop/README.md`
@@ -95,6 +95,7 @@ Included so far:
 - `agentloop status` now surfaces the newest local run ledger entry in Markdown, JSON, and brief output
 - read-only MCP access to local policy template status
 - read-only MCP access to local review gate status
+- read-only MCP access to local artifact inventory metadata
 
 Before release, move `CHANGELOG.md` `## Unreleased` entries into a versioned `0.28.0` section and then run the normal release checklist.
 

@@ -1,23 +1,23 @@
-# Expose gate status through MCP
+# Expose artifact inventory through MCP
 
 - Created date: 2026-06-12
 - Task type: feature
 - Status: review
 
 ## Problem Statement
-MCP clients can read tasks, policies, verification evidence, ship reports, runs, and maintainer checks, but cannot inspect the deterministic review gate report without shelling out to agentloop check-gates.
+MCP clients can read specific reports and run evidence, but cannot inventory all local AgentLoopKit artifacts the way agentloop artifacts --json can.
 
 ## Desired Outcome
-Expose the existing local review gate report through a read-only MCP tool so agents can see task, verification, handoff, harness, policy, and git gates before review.
+Expose the existing read-only artifact inventory through MCP so agents can discover local task, verification, handoff, report, badge, CI summary, and release-note evidence without directory scraping.
 
 ## Constraints
 - Keep MCP v1 read-only.
-- Do not run verification commands from MCP.
-- Do not post comments, call GitHub APIs, read tokens, or mutate repository files.
+- Do not read artifact file contents beyond the existing inventory metadata behavior.
+- Do not mutate files, run commands, call APIs, or read env contents.
 
 ## Non-Goals
-- New gate definitions or scoring changes.
-- A policy engine or compliance claim.
+- Adding new artifact types.
+- Returning full report contents from the inventory tool.
 
 ## Assumptions
 - None recorded yet.
@@ -31,10 +31,10 @@ Expose the existing local review gate report through a read-only MCP tool so age
 - None recorded yet.
 
 ## Acceptance Criteria
-- agentloop_check_gates appears in the MCP tool list with optional strict input.
-- Calling agentloop_check_gates returns the same deterministic gate status shape used by agentloop check-gates --json.
-- The MCP tool supports strict mode without changing default behavior.
-- MCP docs describe the gate tool and keep the server safety boundary explicit.
+- agentloop_artifacts appears in the MCP tool list with optional type and latest inputs.
+- Calling agentloop_artifacts returns the same deterministic JSON shape as agentloop artifacts --json.
+- The tool supports type and latest filtering and validates unsupported types.
+- MCP docs describe the artifacts tool and preserve the read-only safety boundary.
 
 ## Verification Commands
 - npm test -- tests/mcp-tools.test.ts tests/mcp-server.test.ts

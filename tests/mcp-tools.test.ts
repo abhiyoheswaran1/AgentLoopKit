@@ -133,6 +133,37 @@ type GatesPayload = {
   };
 };
 
+type ArtifactsPayload = {
+  tasks: {
+    count: number;
+    latest: {
+      title: string;
+      path: string;
+    } | null;
+  };
+  verificationReports: {
+    count: number;
+    latest: {
+      path: string;
+      overallStatus: string;
+    } | null;
+  };
+  handoffs: {
+    count: number;
+    latest: {
+      path: string;
+    } | null;
+  };
+};
+
+type LatestArtifactsPayload = {
+  latest: Array<{
+    type: string;
+    path: string;
+    overallStatus?: string;
+  }>;
+};
+
 type HandoffsPayload = {
   handoffs: Array<{
     title: string;
@@ -239,6 +270,7 @@ describe('mcp tools', () => {
       'agentloop_file_intent',
       'agentloop_maintainer_check',
       'agentloop_check_gates',
+      'agentloop_artifacts',
       'agentloop_list_handoffs',
       'agentloop_latest_handoff',
     ]);
@@ -284,6 +316,12 @@ describe('mcp tools', () => {
       name: 'agentloop_check_gates',
       arguments: { strict: true },
     });
+    const artifacts = await callMcpTool({ cwd: dir, name: 'agentloop_artifacts' });
+    const latestVerificationArtifacts = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_artifacts',
+      arguments: { type: 'verification', latest: true },
+    });
     const handoffs = await callMcpTool({ cwd: dir, name: 'agentloop_list_handoffs' });
     const handoff = await callMcpTool({ cwd: dir, name: 'agentloop_latest_handoff' });
 
@@ -301,6 +339,9 @@ describe('mcp tools', () => {
     const intentPayload = intent.payload as IntentPayload;
     const maintainerCheckPayload = maintainerCheck.payload as MaintainerCheckPayload;
     const gatesPayload = gates.payload as GatesPayload;
+    const artifactsPayload = artifacts.payload as ArtifactsPayload;
+    const latestVerificationArtifactsPayload =
+      latestVerificationArtifacts.payload as LatestArtifactsPayload;
     const handoffsPayload = handoffs.payload as HandoffsPayload;
     const handoffPayload = handoff.payload as HandoffPayload;
 
@@ -381,6 +422,26 @@ describe('mcp tools', () => {
       ]),
     );
     expect(gatesPayload.nextAction.command).toBe('agentloop handoff');
+    expect(artifactsPayload.tasks.count).toBe(1);
+    expect(artifactsPayload.tasks.latest).toMatchObject({
+      title: 'Add API route',
+      path: expect.stringContaining('.agentloop/tasks/'),
+    });
+    expect(artifactsPayload.verificationReports.latest).toMatchObject({
+      path: '.agentloop/reports/2026-06-10-12-30-verification-report.md',
+      overallStatus: 'pass',
+    });
+    expect(artifactsPayload.handoffs.latest?.path).toBe(
+      '.agentloop/handoffs/2026-06-10-12-31-pr-summary.md',
+    );
+    expect(latestVerificationArtifactsPayload.latest).toEqual([
+      {
+        type: 'verification',
+        title: 'Verification Report',
+        path: '.agentloop/reports/2026-06-10-12-30-verification-report.md',
+        overallStatus: 'pass',
+      },
+    ]);
     expect(handoffsPayload.handoffs[0]).toMatchObject({ title: 'PR Summary' });
     expect(handoffPayload.handoff.content).toContain('Route implementation handoff.');
   });
@@ -419,6 +480,13 @@ describe('mcp tools', () => {
         arguments: { strict: 'true' },
       }),
     ).rejects.toThrow('MCP tool argument "strict" must be a boolean');
+    await expect(
+      callMcpTool({
+        cwd: dir,
+        name: 'agentloop_artifacts',
+        arguments: { type: 'unknown' },
+      }),
+    ).rejects.toThrow('MCP tool argument "type" must be one of:');
     await expect(
       callMcpTool({
         cwd: dir,
