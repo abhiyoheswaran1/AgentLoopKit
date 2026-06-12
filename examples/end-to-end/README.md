@@ -61,9 +61,10 @@ Use `--write-run` when you want this verification pass to appear in `agentloop r
 
 ```bash
 agentloop ship
+agentloop ship --github-comment
 ```
 
-`ship` checks the active task, changed files, verification freshness, gates, handoff readiness, and risk flags. It writes a ship report under `.agentloop/reports/` and records a local run under `.agentloop/runs/`.
+`ship` checks the active task, changed files, verification freshness, gates, handoff readiness, and risk flags. It writes a ship report under `.agentloop/reports/`, records a local run under `.agentloop/runs/`, and can print compact PR-comment Markdown with `--github-comment`.
 
 The review-readiness score is not a code-quality score. It tells reviewers which local evidence exists and what still needs attention.
 
@@ -74,7 +75,7 @@ agentloop prepare-pr
 agentloop prepare-pr --github-comment
 ```
 
-`prepare-pr` generates a PR title and body from the task contract, changed files, verification evidence, ship report, risk notes, and rollback notes. `--github-comment` prints Markdown that CI can post as a PR comment with normal GitHub Actions steps.
+`prepare-pr` generates a PR title and body from the task contract, changed files, verification evidence, ship report, risk notes, and rollback notes. `--github-comment` prints Markdown when you want the PR-copy flow to produce the comment body too.
 
 ## 8. Write The Handoff
 
@@ -134,8 +135,8 @@ jobs:
           node-version: 24
       - run: npm ci
       - run: npx --yes agentloopkit@latest verify
-      - run: npx --yes agentloopkit@latest ship
-      - run: npx --yes agentloopkit@latest prepare-pr --github-comment > agentloop-pr-comment.md
+      - run: npx --yes agentloopkit@latest ship --github-comment > agentloop-pr-comment.md
+      - run: npx --yes agentloopkit@latest prepare-pr --write
       - run: npx --yes agentloopkit@latest check-gates --strict
       - run: npx --yes agentloopkit@latest artifacts --json
 ```

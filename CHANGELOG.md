@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Added `agentloop ship`, a local review-readiness flow that writes a ship report, records a run ledger entry, and scores task clarity, scope control, verification evidence, evidence freshness, gates, handoff readiness, and risk flags without claiming to measure code quality.
+- Added `agentloop ship --github-comment` to print compact review-readiness Markdown for CI-managed pull request comments without GitHub token handling inside the CLI.
 - Added `agentloop prepare-pr` to generate PR title/body text and GitHub-comment Markdown from local AgentLoopKit evidence without reading GitHub tokens or posting comments.
 - Added `.agentloop/runs/`, `agentloop runs`, `agentloop show-run`, and `agentloop intent <file>` for local run evidence and file-intent lookup.
 - Added `agentloop verify --write-run`, `agentloop summarize --write-run`, and `agentloop handoff --write-run` so narrower evidence flows can opt into local run ledger records.

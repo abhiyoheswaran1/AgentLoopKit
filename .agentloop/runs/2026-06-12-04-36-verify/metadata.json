@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-04-36-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-04-36",
+  "createdAtEpochMs": 1781231811763,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-ship-github-comment-output.md",
+    "title": "Add ship GitHub comment output",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-04-30-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 13
+}

@@ -319,11 +319,18 @@ async function smokeCli({ keep = false } = {}) {
     assert(Array.isArray(gates.gates), 'check-gates JSON did not include gates.');
     console.log(`Check-gates smoke passed with status ${gates.overallStatus}.`);
 
-    const ship = parseJson((await runAgentLoop(['ship', '--json'], { cwd: smokeRepo })).stdout, 'ship');
+    const ship = parseJson(
+      (await runAgentLoop(['ship', '--json', '--github-comment'], { cwd: smokeRepo })).stdout,
+      'ship',
+    );
     assert(ship.readiness?.totalScore >= 0, 'ship JSON did not include a readiness score.');
     assert(ship.shipReportPath, 'ship JSON did not include shipReportPath.');
     assert(await pathExists(ship.shipReportPath), 'ship report was not written.');
     assert(ship.run?.id, 'ship JSON did not include run.id.');
+    assert(
+      ship.githubComment?.includes('AgentLoopKit Review Readiness'),
+      'ship JSON did not include GitHub comment markdown.',
+    );
     console.log('Ship smoke passed.');
 
     const statusWithRun = parseJson(

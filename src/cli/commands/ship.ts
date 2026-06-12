@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
 import { inlineCode } from '../../core/markdown-format.js';
-import { createShipReport } from '../../core/ship.js';
+import { createShipReport, renderShipGithubComment } from '../../core/ship.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function parseTimeoutMs(value: unknown) {
@@ -21,8 +21,10 @@ export function shipCommand() {
     .option('--task-commands', 'when using --run-verify, also run verification commands from the task contract')
     .option('--timeout-ms <ms>', 'per-command verification timeout in milliseconds')
     .option('--strict-gates', 'treat warning gates as readiness gate failures')
+    .option('--github-comment', 'include or print GitHub PR comment markdown')
     .action(async (options: Record<string, unknown>) => {
       const json = options.json === true;
+      const githubComment = options.githubComment === true;
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), json);
       if (!workspace) return;
       let result: Awaited<ReturnType<typeof createShipReport>>;
@@ -44,7 +46,15 @@ export function shipCommand() {
       }
 
       if (json) {
-        console.log(JSON.stringify(result, null, 2));
+        console.log(
+          JSON.stringify(
+            githubComment ? { ...result, githubComment: renderShipGithubComment(result) } : result,
+            null,
+            2,
+          ),
+        );
+      } else if (githubComment) {
+        console.log(renderShipGithubComment(result));
       } else {
         console.log(result.markdown);
         console.log(`\nShip report written: ${inlineCode(result.shipReportPath)}`);

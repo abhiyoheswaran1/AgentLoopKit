@@ -1,0 +1,12 @@
+ .agentloop/backlog.md         |  1 +
+ CHANGELOG.md                  |  1 +
+ FINAL_HANDOFF.md              |  2 ++
+ README.md                     |  6 +++---
+ docs/cli-reference.md         |  3 +++
+ docs/github-actions.md        |  8 ++++----
+ examples/end-to-end/README.md |  9 +++++----
+ scripts/smoke-cli.mjs         |  9 ++++++++-
+ src/cli/commands/ship.ts      | 14 ++++++++++++--
+ src/core/ship.ts              | 30 ++++++++++++++++++++++++++++++
+ tests/ship.test.ts            | 30 ++++++++++++++++++++++++++++++
+ 11 files changed, 99 insertions(+), 14 deletions(-)

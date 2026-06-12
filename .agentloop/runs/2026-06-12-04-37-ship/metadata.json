@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-04-37-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-04-37",
+  "createdAtEpochMs": 1781231823305,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-ship-github-comment-output.md",
+    "title": "Add ship GitHub comment output",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-04-30-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-04-37-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-04-37-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 14
+}

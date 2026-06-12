@@ -88,7 +88,7 @@ agentloop create-task --title "Fix login redirect bug" --type bugfix \
 # Run Codex, Claude Code, Cursor, OpenCode, Gemini CLI, or another coding agent.
 
 agentloop verify --task-commands
-agentloop ship
+agentloop ship --github-comment
 agentloop prepare-pr
 ```
 
@@ -127,7 +127,7 @@ agentloopkit init
 | `agentloop status`               | Show active task, latest report, latest run, dirty files, and next step |
 | `agentloop next`                 | Print only the next recommended loop action                  |
 | `agentloop verify`               | Run configured checks and write a verification report        |
-| `agentloop ship`                 | Score review readiness and write a ship report               |
+| `agentloop ship`                 | Score review readiness, write a ship report, and optionally print a PR comment |
 | `agentloop prepare-pr`           | Generate a PR title, grouped body, and optional GitHub comment |
 | `agentloop summarize`            | Preview a deterministic reviewer summary                     |
 | `agentloop handoff`              | Write a reviewer handoff summary                             |
@@ -183,7 +183,7 @@ AgentLoopKit is intentionally boring:
 
 Env files are reported by path only. Verification commands run only when you explicitly run `agentloop verify`.
 
-`agentloop ship` reuses current verification evidence by default. Pass `--run-verify` when you want it to run verification as part of the readiness flow.
+`agentloop ship` reuses current verification evidence by default. Pass `--run-verify` when you want it to run verification as part of the readiness flow. Pass `--github-comment` when CI needs compact Markdown for a pull request comment. AgentLoopKit does not post the comment itself.
 
 `agentloop prepare-pr` groups changed files by review area, including risk-sensitive paths, source, tests, AgentLoop evidence, docs, CI, config, and other files.
 

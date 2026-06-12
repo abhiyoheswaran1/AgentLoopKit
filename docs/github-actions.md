@@ -144,8 +144,8 @@ jobs:
       - name: Run AgentLoop verification
         run: npx --no-install agentloop verify
 
-      - name: Generate AgentLoop PR comment
-        run: npx --no-install agentloop prepare-pr --github-comment > agentloop-pr-comment.md
+      - name: Generate AgentLoop readiness comment
+        run: npx --no-install agentloop ship --github-comment > agentloop-pr-comment.md
 
       - name: Post AgentLoop PR comment
         uses: actions/github-script@v7
@@ -178,7 +178,7 @@ jobs:
             }
 ```
 
-This recipe uses `pull-requests: write` only for the comment step. AgentLoopKit does not read GitHub tokens, call GitHub APIs, or post comments itself.
+This recipe uses `pull-requests: write` only for the comment step. AgentLoopKit writes local evidence and prints Markdown. It does not read GitHub tokens, call GitHub APIs, or post comments itself.
 
 ## Recipe 4: Composite Action Wrapper
 
@@ -244,7 +244,7 @@ Run `agentloop init` and `agentloop create-task` before relying on CI gates.
 - `agentloop verify` exits non-zero when a configured command fails.
 - `agentloop badge` writes a local SVG badge from existing evidence.
 - `agentloop handoff` writes a deterministic reviewer summary.
-- `agentloop ship` writes a review-readiness ship report and a local run ledger entry.
+- `agentloop ship` writes a review-readiness ship report, local run ledger entry, and optional GitHub-comment Markdown.
 - `agentloop prepare-pr` generates PR copy and optional GitHub-comment Markdown.
 - `agentloop maintainer-check` exits non-zero only when required review evidence fails.
 - `agentloop report` writes a static HTML evidence artifact from local files.

@@ -41,6 +41,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - local status command for active task, latest verification, newest run evidence, dirty files, configured commands, and next action
 - local gate-check command for task, verification, handoff, harness, policy, and git evidence
 - local acceptance-layer command with `agentloop ship`
+- compact readiness-comment output with `agentloop ship --github-comment`
 - deterministic review-readiness scoring that does not claim to measure code quality
 - PR description generation with `agentloop prepare-pr`
 - `prepare-pr` reuse of matching fresh ship evidence to avoid duplicate run ledger entries
@@ -120,6 +121,7 @@ agentloop check-gates --json
 agentloop check-gates --strict
 agentloop ship
 agentloop ship --json
+agentloop ship --github-comment
 agentloop prepare-pr
 agentloop prepare-pr --github-comment
 agentloop runs

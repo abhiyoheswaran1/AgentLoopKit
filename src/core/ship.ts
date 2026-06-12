@@ -68,6 +68,36 @@ function renderChangedFiles(changedFiles: ShipRenderInput['changedFiles']) {
     : '- No changed files detected.';
 }
 
+export function renderShipGithubComment(input: ShipResult) {
+  const task = input.task
+    ? `${inlineCode(input.task.title)} (${inlineCode(input.task.status)})`
+    : 'No task contract found.';
+
+  return `## AgentLoopKit Review Readiness
+
+- Score: ${input.readiness.totalScore}/100
+- Task: ${task}
+- Verification: ${inlineCode(input.verification.status)}${
+    input.verificationReportPath ? ` - ${inlineCode(input.verificationReportPath)}` : ''
+  }
+- Gates: ${inlineCode(input.gates.overallStatus)}
+- Ship report: ${inlineCode(input.shipReportPath)}
+- ${input.readiness.claims[0]}
+
+### Blockers
+
+${renderList(input.readiness.blockers, 'No blockers recorded.')}
+
+### Warnings
+
+${renderList(input.readiness.warnings, 'No warnings recorded.')}
+
+### Next Actions
+
+${renderList(input.readiness.recommendedNextActions, 'Review the diff and open the PR when ready.')}
+`;
+}
+
 function renderShipMarkdown(input: ShipRenderInput) {
   return `# AgentLoopKit Ship Report
 

@@ -2,6 +2,39 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Ship GitHub Comment Output
+
+- Task contract: `.agentloop/tasks/2026-06-12-add-ship-github-comment-output.md`
+- Trigger:
+  - `prepare-pr --github-comment` could emit PR-comment Markdown, but CI users who only want the readiness score still had to route through PR-description generation.
+  - The acceptance-layer flow should let `ship` produce the compact reviewer comment directly.
+- Product change:
+  - Added `agentloop ship --github-comment`.
+  - Added `githubComment` to `ship --json --github-comment`.
+  - Plain `ship --github-comment` prints only the comment Markdown, which keeps CI redirection clean.
+  - Updated GitHub Actions and end-to-end examples to use `ship --github-comment` for readiness comments.
+- Verification:
+  - Red focused run: `npm test -- tests/ship.test.ts -t "GitHub comment|writes a review-readiness"` failed because `ship` did not recognize `--github-comment`.
+  - Green focused run of the same command passed after adding the flag and renderer.
+  - Focused suite `npm test -- tests/ship.test.ts tests/cli-docs-drift.test.ts` passed with 2 files and 4 tests.
+  - `npm run typecheck`, `npm run lint`, `npm run check:links`, `git diff --check`, and `npm run build` passed.
+  - Full `npm test` passed with 47 files and 407 tests.
+  - CLI smoke passed and now asserts `ship --json --github-comment`.
+  - Packed release smoke passed.
+  - Production dependency audit passed with no known vulnerabilities.
+  - ProjScan reported A 100/100.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-04-30-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-04-36-verify/`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-04-37-ship-report.md`.
+  - Dogfood ship run: `.agentloop/runs/2026-06-12-04-37-ship/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-04-37-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-04-37-pr-description.md`.
+  - Ship score: 96/100 with gates passing.
+- Worked well:
+  - The feature reuses existing ship evidence and does not introduce GitHub API, token, or posting behavior.
+- Improve:
+  - Consider sharing one GitHub-comment renderer between `ship` and `prepare-pr` if the two comment shapes start drifting.
+
 ## 2026-06-12: Active Task Done Shortcut
 
 - Task contract: `.agentloop/tasks/2026-06-12-add-active-task-done-shortcut.md`
