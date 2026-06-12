@@ -22,6 +22,7 @@ export function shipCommand() {
     .option('--timeout-ms <ms>', 'per-command verification timeout in milliseconds')
     .option('--strict-gates', 'treat warning gates as readiness gate failures')
     .option('--github-comment', 'include or print GitHub PR comment markdown')
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .action(async (options: Record<string, unknown>) => {
       const json = options.json === true;
       const githubComment = options.githubComment === true;
@@ -36,6 +37,7 @@ export function shipCommand() {
           taskCommands: options.taskCommands === true,
           timeoutMs: parseTimeoutMs(options.timeoutMs),
           strictGates: options.strictGates === true,
+          redactPaths: options.redactPaths === true,
         });
       } catch (error) {
         if (json && error instanceof OutputPathError) {

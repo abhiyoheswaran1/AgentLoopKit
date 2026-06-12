@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, realpath, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -159,6 +159,28 @@ describe('ship command', () => {
     expect(output.githubComment).toContain('### Next Actions');
   });
 
+  test('redacts nested gate git root paths when requested', async () => {
+    const dir = await createShipFixture();
+    const realRoot = await realpath(dir);
+
+    const defaultResult = await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir });
+    const defaultOutput = JSON.parse(defaultResult.stdout);
+    expect(defaultOutput.gates.git.root).toBe(realRoot);
+
+    const redactedResult = await execa(tsxPath, [cliPath, 'ship', '--json', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(redactedResult.exitCode).toBe(0);
+    expect(redactedResult.stdout).not.toContain(realRoot);
+    const redactedOutput = JSON.parse(redactedResult.stdout);
+    expect(redactedOutput.gates.git.root).toBe('[git-root]');
+    expect(redactedOutput.gates.git.targetIsRoot).toBe(true);
+    expect(redactedOutput.gates.markdown).toContain('- Git root: `[git-root]`');
+    expect(redactedOutput.gates.markdown).not.toContain(realRoot);
+  });
+
   test('prints only GitHub comment markdown when requested without JSON', async () => {
     const dir = await createShipFixture();
 
@@ -171,5 +193,19 @@ describe('ship command', () => {
     expect(result.stdout).not.toContain('# AgentLoopKit Ship Report');
     expect(result.stdout).not.toContain('Ship report written:');
     expect(result.stdout).not.toContain(dir);
+  });
+
+  test('accepts redacted GitHub comment output', async () => {
+    const dir = await createShipFixture();
+    const realRoot = await realpath(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'ship', '--github-comment', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('## AgentLoopKit Review Readiness');
+    expect(result.stdout).not.toContain(realRoot);
   });
 });

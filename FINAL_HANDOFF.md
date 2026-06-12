@@ -41,7 +41,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - verification reports with allowlisted CI context
 - local status command for active task, latest verification, newest run evidence, dirty files, configured commands, and next action
 - local gate-check command for task, verification, handoff, harness, policy, and git evidence
-- opt-in `--redact-paths` output for status and gate checks before sharing logs publicly
+- opt-in `--redact-paths` output for status, gate checks, ship reports, and PR preparation before sharing logs publicly
 - local acceptance-layer command with `agentloop ship`
 - compact readiness-comment output with `agentloop ship --github-comment`
 - repo-relative AgentLoop artifact paths in PR-facing Markdown, public JSON, and human write-confirmation output
@@ -98,7 +98,7 @@ Included so far:
 - cross-platform CLI smoke workflow for Ubuntu, macOS, and Windows
 - local acceptance-layer commands: `ship`, `prepare-pr`, `runs`, `show-run`, `intent`, and `maintainer-check`
 - `agentloop status` now surfaces the newest local run ledger entry in Markdown, JSON, and brief output
-- `agentloop status --redact-paths` and `agentloop check-gates --redact-paths` hide the absolute Git root for public logs while keeping default JSON stable for scripts
+- `agentloop status --redact-paths`, `agentloop check-gates --redact-paths`, `agentloop ship --redact-paths`, and `agentloop prepare-pr --redact-paths` hide the absolute Git root for public logs while keeping default JSON stable for scripts
 - read-only MCP access to local policy template status
 - read-only MCP access to local review gate status
 - read-only MCP access to local artifact inventory metadata
@@ -135,8 +135,10 @@ agentloop check-gates --strict
 agentloop ship
 agentloop ship --json
 agentloop ship --github-comment
+agentloop ship --github-comment --redact-paths
 agentloop prepare-pr
 agentloop prepare-pr --github-comment
+agentloop prepare-pr --json --github-comment --redact-paths
 agentloop runs
 agentloop show-run <id>
 agentloop intent src/auth/callback.ts

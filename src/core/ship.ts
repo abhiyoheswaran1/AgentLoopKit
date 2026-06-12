@@ -173,6 +173,7 @@ export async function createShipReport(options: {
   taskCommands?: boolean;
   timeoutMs?: number;
   strictGates?: boolean;
+  redactPaths?: boolean;
 }): Promise<ShipResult> {
   const timestamp = options.timestamp ?? formatTimestamp();
   const gitStatus = await getGitStatus(options.cwd);
@@ -223,6 +224,7 @@ export async function createShipReport(options: {
     cwd: options.cwd,
     config: options.config,
     strict: options.strictGates,
+    redactPaths: options.redactPaths,
   });
   const handoffPath = handoff.outPath;
   const readiness = evaluateReviewReadiness({

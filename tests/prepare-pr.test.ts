@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, realpath, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -131,6 +131,24 @@ describe('prepare-pr command', () => {
       source: 'refreshed',
       runId: shipRuns[0].id,
     });
+  });
+
+  test('accepts redacted output when refreshing ship evidence', async () => {
+    const dir = await createPreparePrFixture();
+    const realRoot = await realpath(dir);
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'prepare-pr', '--json', '--github-comment', '--redact-paths'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).not.toContain(realRoot);
+    const output = JSON.parse(result.stdout);
+    expect(output.githubComment).toContain('## AgentLoopKit Review Readiness');
+    expect(output.shipEvidence.source).toBe('refreshed');
+    expect(output.shipReportPath).toMatch(/\.agentloop\/reports\/.+-ship-report\.md$/);
   });
 
   test('reuses a fresh ship run instead of writing duplicate run ledger entries', async () => {

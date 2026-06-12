@@ -244,11 +244,13 @@ async function refreshShipEvidence(options: {
   cwd: string;
   config: AgentLoopConfig;
   timestamp?: string;
+  redactPaths?: boolean;
 }): Promise<PreparePrShipEvidence> {
   const result = await createShipReport({
     cwd: options.cwd,
     config: options.config,
     timestamp: options.timestamp,
+    redactPaths: options.redactPaths,
   });
   return {
     ...result,
@@ -265,6 +267,7 @@ export async function preparePullRequest(options: {
   timestamp?: string;
   githubComment?: boolean;
   write?: boolean;
+  redactPaths?: boolean;
 }) {
   const preparedShip =
     (await findReusableShipEvidence(options)) ?? (await refreshShipEvidence(options));

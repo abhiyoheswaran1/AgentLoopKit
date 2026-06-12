@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-10-33-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-10-33",
+  "createdAtEpochMs": 1781253238694,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-redact-acceptance-layer-git-roots.md",
+    "title": "Redact acceptance-layer git roots",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-10-29-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 15
+}

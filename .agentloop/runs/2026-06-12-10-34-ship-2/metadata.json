@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-10-34-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-12-10-34",
+  "createdAtEpochMs": 1781253258001,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-redact-acceptance-layer-git-roots.md",
+    "title": "Redact acceptance-layer git roots",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-10-29-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-10-34-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-10-34-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 19
+}

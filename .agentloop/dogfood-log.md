@@ -7529,7 +7529,7 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 
 ## 2026-06-12: Redacted Git-Root Output Mode
 
-- Task contract: `.agentloop/tasks/2026-06-12-add-redacted-path-output-mode.md`
+- Task contract: `.agentloop/tasks/archive/2026-06-12-add-redacted-path-output-mode.md`
 - Trigger:
   - The previous public-path hardening made generated AgentLoop artifact paths repo-relative, but `status` and `check-gates` still showed the absolute local Git root.
   - Public PRs, issues, and CI logs need an easy way to hide the local machine path without changing default JSON for scripts.
@@ -7569,3 +7569,49 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The same regression shape now covers Markdown and JSON for both commands.
 - Improve:
   - Consider a future global `--public` output mode only if more command families need the same redaction controls.
+
+## 2026-06-12: Acceptance-Layer Redacted Git Roots
+
+- Task contract: `.agentloop/tasks/archive/2026-06-12-redact-acceptance-layer-git-roots.md`
+- Trigger:
+  - `status` and `check-gates` gained `--redact-paths`, but dogfooding showed `ship --json` still returned the nested gate result with the absolute local Git root.
+  - `prepare-pr` can refresh ship evidence, so it needed to accept the same redaction option for public PR-prep output.
+- Implementation:
+  - Added `--redact-paths` to `agentloop ship`.
+  - Added `--redact-paths` to `agentloop prepare-pr`.
+  - Propagated the option through `createShipReport` into `checkGates`.
+  - Preserved default JSON behavior unless the user passes `--redact-paths`.
+  - Updated README, CLI reference, changelog, release status, roadmap, final handoff, and backlog.
+- Verification run:
+  - Red focused tests failed first because both commands rejected `--redact-paths`.
+  - Focused regression tests passed after implementation:
+    - `npm test -- tests/ship.test.ts tests/prepare-pr.test.ts`
+    - `npm test -- tests/ship.test.ts tests/prepare-pr.test.ts tests/cli-docs-drift.test.ts`
+  - Broader local checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:links`
+    - `git diff --check`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npx --yes projscan doctor --format markdown`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-12-10-29-verification-report.md`.
+  - Full Vitest inside dogfood verification passed with 48 files and 415 tests.
+  - Built CLI redaction smoke passed:
+    - `node dist/cli/index.js ship --json --redact-paths`
+    - `node dist/cli/index.js ship --github-comment --redact-paths`
+    - `node dist/cli/index.js prepare-pr --json --github-comment --redact-paths`
+  - Dogfood runs:
+    - `.agentloop/runs/2026-06-12-10-33-verify/`
+    - `.agentloop/runs/2026-06-12-10-34-ship/`
+    - `.agentloop/runs/2026-06-12-10-34-ship-2/`
+  - Dogfood handoff: `.agentloop/handoffs/2026-06-12-10-34-pr-summary.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-10-34-ship-report.md`.
+  - Archived completed task contract: `.agentloop/tasks/archive/2026-06-12-redact-acceptance-layer-git-roots.md`.
+- What worked well:
+  - The nested gate-output regression caught the exact place public JSON still leaked local machine paths.
+  - The option keeps automation-compatible defaults intact.
+- Improve:
+  - If more commands need the same behavior, consolidate public-output redaction into a shared CLI option helper.

@@ -11,6 +11,7 @@ export function preparePrCommand() {
     .option('--json', 'print machine-readable output')
     .option('--stdout', 'print the PR body to stdout')
     .option('--github-comment', 'include or print GitHub PR comment markdown')
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .action(async (options: Record<string, unknown>) => {
       const json = options.json === true;
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), json);
@@ -22,6 +23,7 @@ export function preparePrCommand() {
           config: workspace.config,
           write: options.write === true,
           githubComment: options.githubComment === true,
+          redactPaths: options.redactPaths === true,
         });
       } catch (error) {
         if (json && error instanceof OutputPathError) {

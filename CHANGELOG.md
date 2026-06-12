@@ -20,6 +20,7 @@
 - Changed README launch visuals and terminal demo to show the current review-readiness loop with task-aware verification, `ship`, `prepare-pr`, `review-context`, run history, and file intent lookup.
 - Changed public JSON and human output for verification, handoff, ship, prepare-pr, and run paths to report repo-relative `.agentloop/...` paths instead of absolute local filesystem paths.
 - Added `--redact-paths` to `agentloop status` and `agentloop check-gates` so public logs can hide the absolute Git root while default JSON remains script-compatible.
+- Added `--redact-paths` to `agentloop ship` and `agentloop prepare-pr` so acceptance-layer output can hide the absolute Git root inside embedded gate evidence.
 - Changed `agentloop status` Markdown, JSON, and brief output to include the newest local run ledger entry when `.agentloop/runs/` exists.
 - Changed `agentloop prepare-pr` to reuse a matching fresh ship run instead of writing a duplicate run ledger entry.
 - Added `shipEvidence.source` and `shipEvidence.runId` to `agentloop prepare-pr --json` output.
