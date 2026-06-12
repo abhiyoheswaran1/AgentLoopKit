@@ -5,6 +5,7 @@
 - Added `agentloop verify --progress` for opt-in, bounded per-command progress output during long verification runs while keeping JSON output parseable.
 - Added release-smoke coverage that catches stale `ROADMAP.md` current-release state before packing a release.
 - Added built-CLI smoke coverage for `agentloop verify --progress`.
+- Added `agentloop runs --latest` and `agentloop runs --limit <count>` for bounded local run-ledger navigation.
 - Fixed run ledger summaries so archived task contracts hydrate latest-run task title, status, and path while stored run metadata remains unchanged on disk.
 - Fixed `agentloop status` next-action guidance after archived task evidence so dirty shipped work points back to handoff/review instead of starting a new task.
 

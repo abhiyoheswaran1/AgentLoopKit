@@ -337,6 +337,90 @@ describe('run ledger commands', () => {
     ]);
   });
 
+  test('limits run ledger CLI output for recent and latest runs', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'typescript-package', packageManager: 'npm' });
+    await writeJson(path.join(dir, 'agentloop.config.json'), config);
+    const runsDir = path.join(dir, '.agentloop/runs');
+    await mkdir(path.join(runsDir, '2026-06-12-00-00-a-verify'), { recursive: true });
+    await mkdir(path.join(runsDir, '2026-06-12-00-00-b-handoff'), { recursive: true });
+    await mkdir(path.join(runsDir, '2026-06-12-00-00-c-ship'), { recursive: true });
+
+    const base = {
+      createdAt: '2026-06-12-00-00',
+      task: null,
+      changedFileCount: 1,
+    };
+    await writeFile(
+      path.join(runsDir, '2026-06-12-00-00-a-verify/metadata.json'),
+      JSON.stringify(
+        { ...base, id: '2026-06-12-00-00-a-verify', command: 'verify', createdAtEpochMs: 1_000 },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(runsDir, '2026-06-12-00-00-b-handoff/metadata.json'),
+      JSON.stringify(
+        { ...base, id: '2026-06-12-00-00-b-handoff', command: 'handoff', createdAtEpochMs: 2_000 },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(runsDir, '2026-06-12-00-00-c-ship/metadata.json'),
+      JSON.stringify(
+        {
+          ...base,
+          id: '2026-06-12-00-00-c-ship',
+          command: 'ship',
+          createdAtEpochMs: 3_000,
+          score: 99,
+        },
+        null,
+        2,
+      ),
+    );
+
+    const limited = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'runs', '--limit', '2', '--json'], { cwd: dir })).stdout,
+    );
+    const latest = await execa(tsxPath, [cliPath, 'runs', '--latest'], { cwd: dir });
+
+    expect(limited.runs.map((run: { id: string }) => run.id)).toEqual([
+      '2026-06-12-00-00-c-ship',
+      '2026-06-12-00-00-b-handoff',
+    ]);
+    expect(latest.stdout).toContain('2026-06-12-00-00-c-ship');
+    expect(latest.stdout).not.toContain('2026-06-12-00-00-b-handoff');
+    expect(latest.stdout).not.toContain('2026-06-12-00-00-a-verify');
+  });
+
+  test('rejects invalid run ledger limits before loading the workspace', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    const human = await execa(tsxPath, [cliPath, 'runs', '--limit', '0'], {
+      cwd: dir,
+      reject: false,
+    });
+    const json = await execa(tsxPath, [cliPath, 'runs', '--limit', 'nope', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(human.exitCode).toBe(1);
+    expect(human.stderr).toContain('--limit must be a positive integer.');
+    expect(human.stderr).not.toContain('AgentLoopKit config not found');
+    expect(json.exitCode).toBe(1);
+    expect(JSON.parse(json.stdout).error).toMatchObject({
+      code: 'RUN_LIMIT_INVALID',
+      message: '--limit must be a positive integer.',
+    });
+    expect(json.stderr).toBe('');
+  });
+
   test('hydrates run task metadata from archived task files when available', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

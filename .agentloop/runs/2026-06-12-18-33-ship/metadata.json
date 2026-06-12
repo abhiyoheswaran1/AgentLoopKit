@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-18-33-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-18-33",
+  "createdAtEpochMs": 1781282022520,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-run-ledger-limit-controls.md",
+    "title": "Add run ledger limit controls",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-18-26-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-18-33-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-18-33-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 12
+}

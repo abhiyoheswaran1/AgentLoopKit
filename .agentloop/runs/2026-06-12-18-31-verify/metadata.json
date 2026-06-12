@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-18-31-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-18-31",
+  "createdAtEpochMs": 1781281909902,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-run-ledger-limit-controls.md",
+    "title": "Add run ledger limit controls",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-18-26-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 8
+}

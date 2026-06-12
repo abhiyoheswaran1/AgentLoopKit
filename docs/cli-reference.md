@@ -190,6 +190,8 @@ JSON output includes `shipEvidence.source` as `reused` or `refreshed`, plus `shi
 
 ```bash
 agentloop runs
+agentloop runs --latest
+agentloop runs --limit 5
 agentloop runs --json
 agentloop show-run <id>
 agentloop show-run <id> --json
@@ -198,6 +200,8 @@ agentloop intent src/auth/callback.ts --json
 ```
 
 `ship` records a local run folder under `.agentloop/runs/` automatically. `verify --write-run`, `summarize --write-run`, and `handoff --write-run` can also write run records when you want narrower evidence history. Runs store metadata, changed files JSON, and command-specific artifacts such as score JSON, verification reports, diff stats, ship reports, or PR summaries.
+
+Use `runs --latest` for the newest entry, or `runs --limit <count>` for a bounded recent list. Invalid limits fail before AgentLoopKit loads the workspace or reads run metadata.
 
 Run ledger JSON and Markdown use display-safe paths. AgentLoopKit artifacts render as `.agentloop/...`; repo files render as repo-relative paths; older absolute paths outside the repo collapse to the filename.
 

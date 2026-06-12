@@ -2,7 +2,11 @@ import { Command } from 'commander';
 import { AgentLoopError } from '../../core/errors.js';
 import { findFileIntent, listRuns, readRun } from '../../core/runs.js';
 import { inlineCode } from '../../core/markdown-format.js';
-import { loadWorkspaceForJsonCommand, printAgentLoopJsonError } from '../json-errors.js';
+import {
+  CliOptionError,
+  loadWorkspaceForJsonCommand,
+  printAgentLoopJsonError,
+} from '../json-errors.js';
 
 function printRuns(runs: Awaited<ReturnType<typeof listRuns>>) {
   if (!runs.length) {
@@ -21,14 +25,48 @@ function printRuns(runs: Awaited<ReturnType<typeof listRuns>>) {
   }
 }
 
+function parseRunsLimit(options: { latest?: boolean; limit?: string }) {
+  const parsed =
+    options.limit === undefined
+      ? undefined
+      : Number.parseInt(options.limit, 10);
+  if (
+    options.limit !== undefined &&
+    (!/^\d+$/.test(options.limit) || !Number.isSafeInteger(parsed) || parsed < 1)
+  ) {
+    throw new CliOptionError('--limit must be a positive integer.', 'RUN_LIMIT_INVALID', {
+      option: 'limit',
+      value: options.limit,
+    });
+  }
+  if (options.latest) return 1;
+  return parsed;
+}
+
+function limitRuns(runs: Awaited<ReturnType<typeof listRuns>>, limit: number | undefined) {
+  return limit === undefined ? runs : runs.slice(0, limit);
+}
+
 export function runsCommand() {
   return new Command('runs')
     .description('List local AgentLoopKit run ledger entries')
+    .option('--limit <count>', 'show only the newest count run entries')
+    .option('--latest', 'show only the newest run entry')
     .option('--json', 'print machine-readable output')
-    .action(async (options: { json?: boolean }) => {
+    .action(async (options: { json?: boolean; latest?: boolean; limit?: string }) => {
+      let limit: number | undefined;
+      try {
+        limit = parseRunsLimit(options);
+      } catch (error) {
+        if (options.json && error instanceof AgentLoopError) {
+          printAgentLoopJsonError(error);
+          return;
+        }
+        throw error;
+      }
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
-      const runs = await listRuns(workspace.cwd);
+      const runs = limitRuns(await listRuns(workspace.cwd), limit);
       if (options.json) console.log(JSON.stringify({ runs }, null, 2));
       else printRuns(runs);
     });

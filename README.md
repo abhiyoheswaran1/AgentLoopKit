@@ -153,7 +153,7 @@ agentloopkit init
 | `agentloop summarize`            | Preview a deterministic reviewer summary                                       |
 | `agentloop handoff`              | Write a reviewer handoff summary                                               |
 | `agentloop check-gates`          | Check review evidence without running tests                                    |
-| `agentloop runs`                 | List local ship, verify, and handoff run entries                               |
+| `agentloop runs --latest`        | Show the newest local ship, verify, or handoff run entry                       |
 | `agentloop show-run <id>`        | Show one local run ledger entry                                                |
 | `agentloop intent <file>`        | Show which runs touched a file and why                                         |
 | `agentloop maintainer-check`     | Check whether an AI-assisted PR is reviewable                                  |

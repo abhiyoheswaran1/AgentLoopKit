@@ -2,6 +2,31 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Bounded Run Ledger Navigation
+
+- Task contract: `.agentloop/tasks/2026-06-12-add-run-ledger-limit-controls.md`
+- Trigger:
+  - `agentloop runs` had become noisy in this repo because dogfooding writes many verify, handoff, and ship entries.
+- Product change:
+  - Added `agentloop runs --latest`.
+  - Added `agentloop runs --limit <count>`.
+  - Invalid limits fail before workspace loading or run metadata reads.
+- Verification:
+  - Red TDD run: `npm test -- tests/runs.test.ts` failed on unknown `--limit` and invalid-limit behavior.
+  - Green focused run: `npm test -- tests/runs.test.ts` passed with 11 tests.
+  - AgentLoop task verification passed and wrote `.agentloop/reports/2026-06-12-18-26-verification-report.md`.
+  - Full `npm test` and `npm run build` passed inside the AgentLoop verification run.
+  - Built CLI smoke checks: `node dist/cli/index.js runs --latest` and `node dist/cli/index.js runs --limit 2 --json` passed.
+  - Handoff summary: `.agentloop/handoffs/2026-06-12-18-33-pr-summary.md`.
+  - Ship report: `.agentloop/reports/2026-06-12-18-33-ship-report.md` with review readiness `96`/100.
+  - `npm run dogfood:strict` passed.
+  - `npm run check:links` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - Dogfooding a long run ledger made the smallest useful UX improvement obvious.
+- Improve:
+  - Consider adding similar bounded output to `intent <file>` if file histories become noisy.
+
 ## 2026-06-12: Clarified Status After Archived Evidence
 
 - Task contract: `.agentloop/tasks/2026-06-12-clarify-status-after-archived-evidence.md`
