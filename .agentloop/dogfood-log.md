@@ -8488,3 +8488,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Running dogfood after archiving caught the second consumer that needed the same evidence behavior.
 - Improve:
   - Consider making `maintainer-check` warnings easier to summarize in dogfood output when the gate still exits successfully.
+
+## 2026-06-13: Public Docs Hygiene In Dogfood
+
+- Task contract: `.agentloop/tasks/2026-06-13-add-public-docs-hygiene-to-dogfood-gate.md`
+- Trigger:
+  - Release smoke already catches stale public-doc version pins, unsupported release-channel claims, and maintainer-only chatter.
+  - Everyday `npm run dogfood` did not run that lighter public-doc guard, so README/docs regressions could wait until release prep.
+- Product-panel decision:
+  - Elias wanted README and npm-facing docs to stay clean before release day.
+  - Samir required the check to stay read-only and avoid registry, token, publish, tag, and pack operations.
+  - Maya preferred reusing the existing release-smoke assertions instead of adding a second docs scanner.
+  - Nora wanted a direct command for docs-only edits.
+- Implementation:
+  - Added `runPublicDocsHygiene` to the release-smoke helper layer.
+  - Added `scripts/public-docs-hygiene.mjs`.
+  - Added `npm run check:public-docs`.
+  - Added the public docs hygiene step to `npm run dogfood` and `npm run dogfood:strict`.
+  - Updated README and changelog.
+- Verification:
+  - Focused TDD red run failed until the helper and dogfood step existed:
+    - `npm test -- tests/dogfood-script.test.ts tests/release-smoke.test.ts`
+  - Focused green run passed with `2` files and `23` tests.
+  - AgentLoop task verification passed: `.agentloop/reports/2026-06-13-00-31-verification-report.md`.
+  - Run ledger entry: `.agentloop/runs/2026-06-13-00-31-verify`.
+  - Handoff summary: `.agentloop/handoffs/2026-06-13-00-33-pr-summary.md`.
+  - Final strict dogfood passed after the task was marked done and archived.
+  - ProjScan reported project health `A (100/100)`.
+  - Full Vitest passed with `51` files and `460` tests.
+  - ESLint passed.
+  - Public docs hygiene passed with `66` public docs and `2` harness files checked.
+- What worked well:
+  - The dogfood step forced us to keep the docs safety guard in the normal product loop, not only in release smoke.
+- Improve:
+  - Consider making the public docs hygiene output list checked roots when a contributor runs it directly.

@@ -9,6 +9,7 @@ describe('dogfood script helpers', () => {
     expect(steps.map((step: { name: string }) => step.name)).toEqual([
       'task folder hygiene',
       'current loop status',
+      'public docs hygiene',
       'review evidence gates',
       'artifact inventory',
       'maintainer reviewability check',
@@ -24,23 +25,26 @@ describe('dogfood script helpers', () => {
       'doctor',
       '--json',
     ]);
-    expect(steps[2].args).toEqual([
+    expect(steps[2].command).toBe('node');
+    expect(steps[2].args).toEqual(['scripts/public-docs-hygiene.mjs']);
+    expect(steps[2].allowFailure).toBe(false);
+    expect(steps[3].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
       'check-gates',
       '--redact-paths',
     ]);
-    expect(steps[2].allowFailure).toBe(true);
-    expect(steps[4].allowFailure).toBe(true);
-    expect(steps[6].command).toBe('npx');
-    expect(steps[6].args).toEqual(['--yes', 'projscan', 'doctor', '--format', 'markdown']);
+    expect(steps[3].allowFailure).toBe(true);
+    expect(steps[5].allowFailure).toBe(true);
+    expect(steps[7].command).toBe('npx');
+    expect(steps[7].args).toEqual(['--yes', 'projscan', 'doctor', '--format', 'markdown']);
   });
 
   test('adds strict gate mode only when requested', () => {
     const steps = dogfood.createDogfoodSteps({ strict: true });
 
-    expect(steps[2].args).toEqual([
+    expect(steps[3].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
@@ -48,8 +52,8 @@ describe('dogfood script helpers', () => {
       '--redact-paths',
       '--strict',
     ]);
-    expect(steps[2].allowFailure).toBe(false);
-    expect(steps[4].allowFailure).toBe(false);
+    expect(steps[3].allowFailure).toBe(false);
+    expect(steps[5].allowFailure).toBe(false);
   });
 
   test('does not include release, publish, token, or write-heavy commands', () => {
@@ -64,6 +68,7 @@ describe('dogfood script helpers', () => {
     expect(commandText).not.toMatch(/\bship\b/);
     expect(commandText).not.toMatch(/\bprepare-pr\b/);
     expect(commandText).not.toMatch(/\bverify\b/);
+    expect(commandText).not.toMatch(/\bpack\b/);
     expect(commandText).not.toMatch(/\btoken\b/i);
   });
 

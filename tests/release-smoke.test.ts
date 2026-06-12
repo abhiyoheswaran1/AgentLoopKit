@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { readFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 // @ts-expect-error TS7016: static import keeps helper usage visible to projscan.
 import * as smoke from '../scripts/smoke-packed-release.mjs';
 
@@ -255,5 +257,45 @@ describe('release smoke script helpers', () => {
         version,
       }),
     ).not.toThrow();
+  });
+
+  test('public docs hygiene helper checks docs, repo harness, and roadmap without packing', async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), 'agentloopkit-public-docs-hygiene-'));
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    await mkdir(path.join(dir, 'examples'), { recursive: true });
+    await mkdir(path.join(dir, '.github'), { recursive: true });
+
+    await writeFile(path.join(dir, 'package.json'), JSON.stringify({ version: '9.8.7' }));
+    await writeFile(path.join(dir, 'README.md'), 'Run `npx agentloopkit init`.\n');
+    await writeFile(path.join(dir, 'docs', 'guide.md'), 'No cloud backend.\n');
+    await writeFile(path.join(dir, 'examples', 'README.md'), 'Example.\n');
+    await writeFile(path.join(dir, '.github', 'PULL_REQUEST_TEMPLATE.md'), 'Checklist.\n');
+    await writeFile(path.join(dir, 'AGENTS.md'), 'Keep release guidance generic.\n');
+    await writeFile(path.join(dir, 'AGENTLOOP.md'), 'Use the local loop.\n');
+    await writeFile(
+      path.join(dir, 'ROADMAP.md'),
+      [
+        '# Roadmap',
+        '',
+        '## Current State',
+        '',
+        '- GitHub release `v9.8.7` is public.',
+        '- npm latest is `agentloopkit@9.8.7`.',
+        '- GHCR and MCP Registry are live for `9.8.7`.',
+        '- Release tag `v9.8.7` points at the published release commit.',
+      ].join('\n'),
+    );
+
+    await expect(smoke.runPublicDocsHygiene({ cwd: dir })).resolves.toMatchObject({
+      version: '9.8.7',
+      publicDocCount: 4,
+      repoHarnessCount: 2,
+    });
+
+    await writeFile(path.join(dir, 'README.md'), 'Latest GitHub release: v9.8.7.\n');
+
+    await expect(smoke.runPublicDocsHygiene({ cwd: dir })).rejects.toThrow(
+      'README.md contains maintainer-only release chatter',
+    );
   });
 });

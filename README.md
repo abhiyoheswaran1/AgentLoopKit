@@ -123,7 +123,13 @@ AgentLoopKit uses its own loop in this repo. Contributors can run the same local
 npm run dogfood
 ```
 
-That command checks task-folder hygiene, current loop status, review gates, artifact inventory, maintainer reviewability, agent review context, and ProjScan health. It does not publish packages, create tags, post comments, read tokens, read `.env` contents, or run verification commands.
+That command checks task-folder hygiene, current loop status, public docs hygiene, review gates, artifact inventory, maintainer reviewability, agent review context, and ProjScan health. It does not publish packages, create tags, post comments, read tokens, read `.env` contents, or run verification commands.
+
+Run the public-doc check by itself when you edit README, examples, or release-channel docs:
+
+```bash
+npm run check:public-docs
+```
 
 Use the stricter gate before a release or final handoff:
 

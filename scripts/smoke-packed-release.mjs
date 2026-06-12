@@ -263,6 +263,30 @@ export async function collectRepoHarnessFiles(rootDir) {
   );
 }
 
+export async function runPublicDocsHygiene({ cwd = process.cwd(), version } = {}) {
+  const packageJson = JSON.parse(await readFile(path.join(cwd, 'package.json'), 'utf8'));
+  const expectedVersion = version ?? packageJson.version;
+
+  const publicDocFiles = await collectPublicDocPinFiles(cwd);
+  assertPublicDocsDoNotPinVersions(publicDocFiles);
+  assertPublicDocsAvoidUnsupportedClaims(publicDocFiles);
+
+  const repoHarnessFiles = await collectRepoHarnessFiles(cwd);
+  assertRepoHarnessAvoidsStaleReleaseBatch(repoHarnessFiles);
+
+  assertRoadmapCurrentReleaseState({
+    filePath: 'ROADMAP.md',
+    content: await readFile(path.join(cwd, 'ROADMAP.md'), 'utf8'),
+    version: expectedVersion,
+  });
+
+  return {
+    version: expectedVersion,
+    publicDocCount: publicDocFiles.length,
+    repoHarnessCount: repoHarnessFiles.length,
+  };
+}
+
 export function createSmokeSteps({ version, tarballPath }) {
   const npxArgs = ['--yes', '--package', tarballPath, 'agentloop'];
   return [
@@ -620,16 +644,10 @@ export async function runReleaseSmoke(options = {}) {
     const readme = await readPackedReadme({ tarballPath, extractDir });
     assertReadmePins(readme, metadata.version);
     console.log('README has no stale exact version pins.');
-    const publicDocFiles = await collectPublicDocPinFiles(cwd);
-    assertPublicDocsDoNotPinVersions(publicDocFiles);
-    assertPublicDocsAvoidUnsupportedClaims(publicDocFiles);
-    console.log('Public docs have no stale version pins or unsupported public claims.');
-    assertRoadmapCurrentReleaseState({
-      filePath: 'ROADMAP.md',
-      content: await readFile(path.join(cwd, 'ROADMAP.md'), 'utf8'),
-      version: metadata.version,
-    });
-    console.log('ROADMAP current release state matches package metadata.');
+    const hygiene = await runPublicDocsHygiene({ cwd, version: metadata.version });
+    console.log(
+      `Public docs hygiene passed for ${hygiene.publicDocCount} public docs and ${hygiene.repoHarnessCount} harness files.`,
+    );
 
     await assertPackedVersion({ tarballPath, version: metadata.version, tempRoot });
     console.log('Packed binary version smoke passed.');

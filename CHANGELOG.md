@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added a read-only public docs hygiene check to `npm run dogfood` and `npm run dogfood:strict`, with a direct `npm run check:public-docs` script.
 - Added `create-task` warnings when verification commands look like post-verification gates such as `dogfood:strict`, `check-gates --strict`, or `release-check --strict`.
 
 ## 0.28.7

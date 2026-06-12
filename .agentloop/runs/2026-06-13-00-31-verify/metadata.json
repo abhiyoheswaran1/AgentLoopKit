@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-00-31-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-00-31",
+  "createdAtEpochMs": 1781303510350,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-add-public-docs-hygiene-to-dogfood-gate.md",
+    "title": "Add public docs hygiene to dogfood gate",
+    "status": "proposed"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-00-31-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 12
+}

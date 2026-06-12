@@ -35,6 +35,12 @@ export function createDogfoodSteps({ strict = false } = {}) {
   const steps = [
     agentloopStep('task folder hygiene', ['task', 'doctor', '--json']),
     agentloopStep('current loop status', ['status', '--brief', '--redact-paths']),
+    {
+      name: 'public docs hygiene',
+      command: 'node',
+      args: ['scripts/public-docs-hygiene.mjs'],
+      allowFailure: false,
+    },
     agentloopStep('review evidence gates', gateArgs),
     agentloopStep('artifact inventory', ['artifacts', '--json']),
     agentloopStep('maintainer reviewability check', ['maintainer-check', '--json']),
@@ -46,8 +52,8 @@ export function createDogfoodSteps({ strict = false } = {}) {
       allowFailure: false,
     },
   ];
-  steps[2].allowFailure = !strict;
-  steps[4].allowFailure = !strict;
+  steps[3].allowFailure = !strict;
+  steps[5].allowFailure = !strict;
   return steps;
 }
 

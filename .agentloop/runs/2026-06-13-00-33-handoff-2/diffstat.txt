@@ -1,0 +1,10 @@
+ .agentloop/backlog.md            |  1 +
+ .agentloop/dogfood-log.md        | 26 ++++++++++++++++++++++++
+ CHANGELOG.md                     |  1 +
+ README.md                        |  8 +++++++-
+ package.json                     |  1 +
+ scripts/dogfood.mjs              | 10 +++++++--
+ scripts/smoke-packed-release.mjs | 38 +++++++++++++++++++++++++---------
+ tests/dogfood-script.test.ts     | 21 +++++++++++--------
+ tests/release-smoke.test.ts      | 44 +++++++++++++++++++++++++++++++++++++++-
+ 9 files changed, 128 insertions(+), 22 deletions(-)

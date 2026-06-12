@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-00-33-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-13-00-33",
+  "createdAtEpochMs": 1781303638270,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-add-public-docs-hygiene-to-dogfood-gate.md",
+    "title": "Add public docs hygiene to dogfood gate",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-00-31-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-00-33-pr-summary.md",
+  "changedFileCount": 15
+}
