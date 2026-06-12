@@ -1,0 +1,6 @@
+ .agentloop/dogfood-log.md | 13 +++++++
+ FINAL_HANDOFF.md          | 34 +++++++++++++----
+ docs/launch-checklist.md  |  4 +-
+ docs/npm-publishing.md    |  9 ++---
+ docs/release-status.md    | 95 +++++++++++++++++++++--------------------------
+ 5 files changed, 89 insertions(+), 66 deletions(-)

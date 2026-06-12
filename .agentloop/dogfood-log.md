@@ -23,8 +23,21 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - ProjScan reported A 100/100.
   - Local tarball: `/tmp/agentloopkit-0.28.2.tgz`.
   - Local tarball SHA-256: `ea34d7a9d3edefea9ba7edd447cf3e1ec85dd8b94a8d638c7906182f61705b09`.
+- Post-publish proof:
+  - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.2>
+  - Release commit: `fda3195d9ef816ca53084170eb84ce82c342c950`.
+  - CI run `27417101095` passed.
+  - CLI Smoke run `27417101070` passed on Ubuntu, macOS, and Windows.
+  - Publish workflow run `27417122044` passed and published `agentloopkit@0.28.2`.
+  - Docker workflow run `27417122089` passed.
+  - MCP Registry workflow run `27417334613` passed.
+  - `npm view agentloopkit version versions --json` reported latest `0.28.2`.
+  - `node dist/cli/index.js npm-status --agentloopkit --expect-current --json` reported status `current`.
+  - `npm run smoke:published -- --version 0.28.2` passed.
+  - GitHub release asset SHA-256 matched the local tarball SHA-256.
 - Worked well:
   - Distribution artifact tests caught MCP metadata drift before publish.
+  - The published-package smoke helper gave a cleaner user-path check than ad hoc `npx --package` commands from the repo.
 - Improve:
   - Add a release metadata sync helper or release-check rule for `server.json` so maintainers get a faster failure than the full test suite.
   - Add streaming/progress output for long `agentloop verify` runs.

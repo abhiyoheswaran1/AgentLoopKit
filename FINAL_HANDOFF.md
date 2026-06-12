@@ -74,13 +74,33 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Active release candidate: `agentloopkit@0.28.2`
-- Candidate purpose: focused task-contract verification through `agentloop verify --task <path> --task-commands --only-task-commands`
-- Public package before this release: `agentloopkit@0.28.1`
+- Current npm release: `agentloopkit@0.28.2`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.2>
+- Release asset: `agentloopkit-0.28.2.tgz`
+- Release asset SHA-256: `ea34d7a9d3edefea9ba7edd447cf3e1ec85dd8b94a8d638c7906182f61705b09`
+- Release tag: `v0.28.2` at commit `fda3195d9ef816ca53084170eb84ce82c342c950`
+- CI run: `27417101095`
+- CLI Smoke run: `27417101070`
+- Publish workflow run: `27417122044`
+- Docker workflow run: `27417122089`
+- MCP Registry workflow run: `27417334613`
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.28.2`
+
+## 0.28.2 release summary
+
+Included:
+
+- focused task-contract verification with `agentloop verify --task <path> --task-commands --only-task-commands`
+- JSON option errors when the focused shortcut is missing `--task` or `--task-commands`
+- configured repo commands recorded as not run when the focused shortcut is used
+- README and verification docs that show explicit task paths for task-contract commands
+- `server.json` MCP Registry metadata updated to match `package.json`
+
+Release verification covered local release gates, npm trusted publishing, GitHub release assets, GHCR publishing through the Docker workflow, MCP Registry publishing, and clean-directory published-package smoke.
 
 ## Previous release
 
-- Current npm release: `agentloopkit@0.28.1`
+- Previous npm release: `agentloopkit@0.28.1`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.1>
 - Release asset: `agentloopkit-0.28.1.tgz`
 - Release asset SHA-256: `88add27b0cabb4f833866748398e078496d5770151f558dde8a093d464965ac6`
@@ -1104,9 +1124,9 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.28.1` is public.
-- npm latest is `0.28.1`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, `0.26.5`, `0.27.0`, `0.28.0`, and `0.28.1`.
-- GHCR and MCP Registry are live for `0.28.1`.
+- GitHub release `v0.28.2` is public.
+- npm latest is `0.28.2`; registry versions include `0.28.2`.
+- GHCR and MCP Registry workflows passed for `0.28.2`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

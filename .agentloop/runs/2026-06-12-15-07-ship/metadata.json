@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-15-07-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-15-07",
+  "createdAtEpochMs": 1781269666609,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-prepare-0-28-2-patch-release.md",
+    "title": "Prepare 0.28.2 patch release",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-15-06-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-15-07-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-15-07-pr-summary.md",
+  "score": 100,
+  "changedFileCount": 7
+}

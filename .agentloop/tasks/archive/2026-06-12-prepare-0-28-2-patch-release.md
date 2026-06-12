@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-12
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The task-only verification shortcut is implemented and verified, but package metadata and release docs still point at 0.28.1.
