@@ -1,0 +1,26 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/tasks/2026-06-12-prepare-0-28-4-patch-release.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "tests/check-gates.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/prepare-pr.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "vitest.config.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-20-35-verification-report.md"
+  }
+]

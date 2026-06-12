@@ -40,10 +40,9 @@ Publish a small 0.28.4 patch release with accurate changelog, package metadata, 
 - npm test
 - npm run build
 - npm run smoke:release
-- node dist/cli/index.js release-check --strict
 
 ## Post-Verification Gates
-- No post-verification gate recorded. Use this for commands that need a fresh AgentLoop verification report.
+- Commit the fresh verification evidence, then run `node dist/cli/index.js release-check --strict` from a clean tree.
 
 ## Implementation Plan
 - Inspect relevant files before editing.

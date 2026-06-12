@@ -2,6 +2,32 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: 0.28.4 Release Gate
+
+- Task contract: `.agentloop/tasks/2026-06-12-prepare-0-28-4-patch-release.md`
+- Trigger:
+  - The latest dogfood improvements were verified on `main`, but npm and GitHub still pointed at `0.28.3`.
+  - The patch release needed package metadata, MCP metadata, changelog, release smoke, and registry proof to line up.
+- Product change:
+  - Prepared `agentloopkit@0.28.4`.
+  - Updated `server.json` so MCP Registry metadata names the same package version.
+  - Raised Vitest's bounded per-test timeout to 90 seconds after full release gates exposed multiple subprocess-heavy CLI tests exceeding the previous 30 second budget.
+- Verification:
+  - `node scripts/prepublish-check.mjs` passed.
+  - `npm test -- tests/prepare-pr.test.ts tests/check-gates.test.ts tests/status.test.ts` passed with 43 tests.
+  - AgentLoop release verification passed and wrote `.agentloop/reports/2026-06-12-20-35-verification-report.md`.
+  - The passing verification run wrote `.agentloop/runs/2026-06-12-20-39-verify/`.
+  - `npm run lint` passed.
+  - `npm run check:links` passed and checked 1397 Markdown files.
+  - `git diff --check` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The release gate caught stale process assumptions before tagging.
+  - Packed release smoke kept README, public docs, and ROADMAP version state aligned with package metadata.
+- Improve:
+  - `release-check --strict` should stay a post-verification clean-tree gate, not a command inside `agentloop verify`.
+  - Release tasks should include `lint` and `check:links` when docs or tests changed.
+
 ## 2026-06-12: Duplicate Verification Skip Reporting
 
 - Task contract: `.agentloop/tasks/archive/2026-06-12-report-skipped-duplicate-verification-commands.md`

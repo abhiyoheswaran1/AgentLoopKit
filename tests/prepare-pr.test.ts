@@ -152,25 +152,31 @@ describe('prepare-pr command', () => {
     expect(output.shipReportPath).toMatch(/\.agentloop\/reports\/.+-ship-report\.md$/);
   });
 
-  test('reuses a fresh ship run instead of writing duplicate run ledger entries', async () => {
-    const dir = await createPreparePrFixture();
+  test(
+    'reuses a fresh ship run instead of writing duplicate run ledger entries',
+    async () => {
+      const dir = await createPreparePrFixture();
 
-    const ship = JSON.parse((await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir })).stdout);
-    const prepared = JSON.parse(
-      (await execa(tsxPath, [cliPath, 'prepare-pr', '--write', '--json'], { cwd: dir })).stdout,
-    );
-    const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
-    const shipRuns = runs.runs.filter((run: { command: string }) => run.command === 'ship');
+      const ship = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir })).stdout,
+      );
+      const prepared = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'prepare-pr', '--write', '--json'], { cwd: dir })).stdout,
+      );
+      const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
+      const shipRuns = runs.runs.filter((run: { command: string }) => run.command === 'ship');
 
-    expect(prepared.shipReportPath).toBe(ship.shipReportPath);
-    expect(prepared.shipReportPath).not.toContain(dir);
-    expect(prepared.shipEvidence).toEqual({
-      source: 'reused',
-      runId: ship.run.id,
-    });
-    expect(shipRuns).toHaveLength(1);
-    expect(shipRuns[0].id).toBe(ship.run.id);
-  });
+      expect(prepared.shipReportPath).toBe(ship.shipReportPath);
+      expect(prepared.shipReportPath).not.toContain(dir);
+      expect(prepared.shipEvidence).toEqual({
+        source: 'reused',
+        runId: ship.run.id,
+      });
+      expect(shipRuns).toHaveLength(1);
+      expect(shipRuns[0].id).toBe(ship.run.id);
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
 
   test(
     'reuses archived latest-run task evidence for PR copy without writing duplicate ship runs',

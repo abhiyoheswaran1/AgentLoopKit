@@ -7,6 +7,7 @@ import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
+const CLI_CHECK_GATES_TEST_TIMEOUT_MS = 90_000;
 
 let tempDirs: string[] = [];
 
@@ -545,8 +546,10 @@ describe('check-gates command', () => {
     expect(humanResult.stdout).toContain('Run `agentloop task doctor`.');
   });
 
-  test('strict mode treats warning-only gates as failures without changing default behavior', async () => {
-    const dir = await createInitializedRepo();
+  test(
+    'strict mode treats warning-only gates as failures without changing default behavior',
+    async () => {
+      const dir = await createInitializedRepo();
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
       '# Demo task\n\n- Status: in-progress\n',
@@ -588,8 +591,10 @@ describe('check-gates command', () => {
     const strictOutput = JSON.parse(strictResult.stdout);
     expect(strictOutput.overallStatus).toBe('fail');
     expect(strictOutput.strict).toBe(true);
-    expect(strictOutput.gates).toEqual(
-      expect.arrayContaining([expect.objectContaining({ id: 'git-context', status: 'warn' })]),
-    );
-  });
+      expect(strictOutput.gates).toEqual(
+        expect.arrayContaining([expect.objectContaining({ id: 'git-context', status: 'warn' })]),
+      );
+    },
+    CLI_CHECK_GATES_TEST_TIMEOUT_MS,
+  );
 });

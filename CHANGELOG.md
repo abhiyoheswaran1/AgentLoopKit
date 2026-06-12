@@ -14,6 +14,7 @@
 - Added `agentloop create-task --include-config-commands` to copy configured `test`, `lint`, `typecheck`, and `build` commands into new task contracts without running them during creation.
 - Added duplicate-command reporting to verification Markdown and JSON output when exact command strings are selected more than once.
 - Changed verification command selection to run exact duplicate command strings once when configured commands and task contract commands overlap.
+- Changed Vitest's bounded per-test timeout to 90 seconds so full release gates can run subprocess-heavy CLI integration tests reliably.
 - Fixed run ledger summaries so archived task contracts hydrate latest-run task title, status, and path while stored run metadata remains unchanged on disk.
 - Fixed `agentloop status` next-action guidance after archived task evidence so dirty shipped work points back to handoff/review instead of starting a new task.
 
