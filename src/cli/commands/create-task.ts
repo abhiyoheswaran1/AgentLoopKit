@@ -59,6 +59,43 @@ function verificationCommandsFromOptions(
   return uniqueCommands([...configuredVerificationCommands(config), ...explicitCommands]);
 }
 
+type CreateTaskWarning = {
+  code: 'POST_VERIFICATION_GATE_IN_VERIFICATION_COMMANDS';
+  message: string;
+  commands: string[];
+  suggestion: string;
+};
+
+const POST_VERIFICATION_GATE_PATTERNS = [
+  /\bdogfood:strict\b/,
+  /\bcheck-gates\b[\s\S]*\s--strict\b/,
+  /\brelease-check\b[\s\S]*\s--strict\b/,
+];
+
+function looksLikePostVerificationGate(command: string) {
+  return POST_VERIFICATION_GATE_PATTERNS.some((pattern) => pattern.test(command));
+}
+
+function postVerificationGateWarnings(commands: string[] | undefined): CreateTaskWarning[] {
+  const flaggedCommands = uniqueCommands((commands ?? []).filter(looksLikePostVerificationGate));
+  if (flaggedCommands.length === 0) return [];
+
+  const suggestion =
+    flaggedCommands.length === 1
+      ? `Use --post-verification "${flaggedCommands[0]}".`
+      : 'Use --post-verification for each listed command that needs a fresh AgentLoop report.';
+
+  return [
+    {
+      code: 'POST_VERIFICATION_GATE_IN_VERIFICATION_COMMANDS',
+      message:
+        'Some verification commands look like post-verification gates. Move them to --post-verification if they need a fresh AgentLoop report.',
+      commands: flaggedCommands,
+      suggestion,
+    },
+  ];
+}
+
 function resolveTaskType(value: unknown) {
   if (typeof value !== 'string') return undefined;
   const type = value.trim();
@@ -263,16 +300,27 @@ export function createTaskCommand() {
         }
         throw error;
       }
+      const warnings = postVerificationGateWarnings(input.verificationCommands);
       const activeTask = await setActiveTask({
         cwd: workspace.cwd,
         config: workspace.config,
         taskPath: result.path,
       });
       if (options.json) {
-        console.log(JSON.stringify({ task: result, activeTask }, null, 2));
+        console.log(
+          JSON.stringify(
+            warnings.length ? { task: result, activeTask, warnings } : { task: result, activeTask },
+            null,
+            2,
+          ),
+        );
         return;
       }
       console.log(`Task contract created: ${inlineCode(result.path)}`);
       console.log(`Active task set: ${inlineCode(activeTask.path)}`);
+      for (const warning of warnings) {
+        console.log(`Warning: ${warning.message}`);
+        console.log(`Move to --post-verification: ${warning.commands.map(inlineCode).join(', ')}`);
+      }
     });
 }

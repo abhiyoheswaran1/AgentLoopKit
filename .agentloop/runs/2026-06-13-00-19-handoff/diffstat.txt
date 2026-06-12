@@ -1,0 +1,6 @@
+ .agentloop/dogfood-log.md       | 23 +++++++++++
+ CHANGELOG.md                    |  2 +-
+ docs/cli-reference.md           |  2 +
+ src/cli/commands/create-task.ts | 50 ++++++++++++++++++++++-
+ tests/create-task.test.ts       | 87 +++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 162 insertions(+), 2 deletions(-)

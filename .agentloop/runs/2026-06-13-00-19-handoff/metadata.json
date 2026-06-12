@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-00-19-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-00-19",
+  "createdAtEpochMs": 1781302743060,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-warn-about-post-verification-gates-during-task-creation.md",
+    "title": "Warn about post-verification gates during task creation",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-00-16-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-00-19-pr-summary.md",
+  "changedFileCount": 8
+}

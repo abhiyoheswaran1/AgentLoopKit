@@ -2,6 +2,29 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Post-Verification Gate Warnings
+
+- Task contract: `.agentloop/tasks/2026-06-13-warn-about-post-verification-gates-during-task-creation.md`
+- Trigger:
+  - The `0.28.7` release task initially placed `npm run dogfood:strict` and `release-check --strict` under `Verification Commands`, which runs before `agentloop verify` writes the report those gates need.
+  - Product panel signal: Samir and Maya preferred warnings over automatic command movement; Lina wanted the next agent to catch this before a long release gate fails.
+- Product change:
+  - `create-task` now warns when verification commands look like post-verification gates.
+  - JSON output includes a `warnings` array only when warnings exist, preserving existing no-warning JSON output.
+  - Human output prints a concise warning and suggested `--post-verification` form.
+  - Task Markdown keeps commands exactly where the caller supplied them.
+- Verification:
+  - Red TDD run: `npm test -- tests/create-task.test.ts -t "post-verification gates"` failed because no warnings existed.
+  - Green focused run: the same test target passed after adding the detector.
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-13-00-16-verification-report.md`.
+  - The verification run wrote `.agentloop/runs/2026-06-13-00-17-verify/`.
+  - `npm run dogfood:strict` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The feature came directly from release dogfooding and stays conservative: warn, do not rewrite.
+- Improve:
+  - `task doctor` could later flag already-written contracts with the same phase mismatch.
+
 ## 2026-06-12: 0.28.7 Release Prep
 
 - Task contract: `.agentloop/tasks/archive/2026-06-12-release-0-28-7-public-release-notes-patch.md`

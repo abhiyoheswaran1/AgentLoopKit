@@ -437,6 +437,93 @@ describe('create-task command', () => {
     expect(result.stdout).not.toContain('Task contract created:');
   });
 
+  test('warns in JSON when verification commands look like post-verification gates', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Misplaced gate',
+        '--type',
+        'release',
+        '--out',
+        '.agentloop/tasks/misplaced-gate.md',
+        '--verification',
+        'npm run dogfood:strict',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+
+    const output = JSON.parse(result.stdout);
+    expect(output.warnings).toEqual([
+      {
+        code: 'POST_VERIFICATION_GATE_IN_VERIFICATION_COMMANDS',
+        message:
+          'Some verification commands look like post-verification gates. Move them to --post-verification if they need a fresh AgentLoop report.',
+        commands: ['npm run dogfood:strict'],
+        suggestion: 'Use --post-verification "npm run dogfood:strict".',
+      },
+    ]);
+
+    const markdown = await readFile(path.join(dir, '.agentloop/tasks/misplaced-gate.md'), 'utf8');
+    expect(markdown).toContain('## Verification Commands\n- npm run dogfood:strict');
+    expect(markdown).toContain(
+      '## Post-Verification Gates\n- No post-verification gate recorded.',
+    );
+  });
+
+  test('warns in human output when verification commands look like post-verification gates', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Human misplaced gate',
+        '--type',
+        'release',
+        '--out',
+        '.agentloop/tasks/human-misplaced-gate.md',
+        '--verification',
+        'node dist/cli/index.js release-check --strict',
+      ],
+      { cwd: dir },
+    );
+
+    expect(result.stdout).toContain(
+      'Warning: Some verification commands look like post-verification gates.',
+    );
+    expect(result.stdout).toContain(
+      `Move to --post-verification: ${inlineCode('node dist/cli/index.js release-check --strict')}`,
+    );
+    const markdown = await readFile(
+      path.join(dir, '.agentloop/tasks/human-misplaced-gate.md'),
+      'utf8',
+    );
+    expect(markdown).toContain(
+      '## Verification Commands\n- node dist/cli/index.js release-check --strict',
+    );
+    expect(markdown).toContain(
+      '## Post-Verification Gates\n- No post-verification gate recorded.',
+    );
+  });
+
   test('sets the newly created task as active even when another task was pinned', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

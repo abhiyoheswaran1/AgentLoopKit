@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-00-17-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-00-17",
+  "createdAtEpochMs": 1781302648655,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-warn-about-post-verification-gates-during-task-creation.md",
+    "title": "Warn about post-verification gates during task creation",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-00-16-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 8
+}

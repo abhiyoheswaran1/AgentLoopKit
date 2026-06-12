@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Added `create-task` warnings when verification commands look like post-verification gates such as `dogfood:strict`, `check-gates --strict`, or `release-check --strict`.
 
 ## 0.28.7
 
