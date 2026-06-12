@@ -7652,6 +7652,16 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Packed tarball: `/tmp/agentloopkit-0.28.0.tgz`
   - Tarball SHA-256: `82049976512173bcef3edadadef3b5aead76ea29531d2d2f02deafa945dd900c`
   - `npm publish --access public --dry-run` passed and would publish `agentloopkit@0.28.0`.
+  - GitHub release `v0.28.0`: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.0>
+  - GitHub release asset digest matched the local tarball SHA-256.
+  - CI run `27406452797`: pass.
+  - CLI Smoke run `27406452854`: pass on Ubuntu, macOS, and Windows.
+  - npm Publish workflow `27406646825`: pass, published `agentloopkit@0.28.0`.
+  - Docker workflow `27406646793`: pass, published GHCR image `ghcr.io/abhiyoheswaran1/agentloopkit:0.28.0`.
+  - GHCR manifest digest: `sha256:d3d4b708363f452c69a8fa701bc1909922bcc7b8ed7a066ba8e5f55664c3c410`.
+  - MCP Registry workflow `27406850637`: pass.
+  - `npm view agentloopkit version versions --json` reports latest `0.28.0`.
+  - Clean temp-directory install smoke confirmed `agentloop`, `agentloopkit`, `init --dry-run --json`, and `mcp-server --help` from `agentloopkit@0.28.0`.
 - What worked well:
   - The release task caught package metadata before the tag was cut.
   - The release notes stayed concise enough for GitHub while release evidence stayed local.

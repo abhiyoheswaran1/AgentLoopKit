@@ -74,21 +74,23 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.27.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.27.0>
-- Release asset: `agentloopkit-0.27.0.tgz`
-- Release asset SHA-256: `7ff6cb0b2079da83b6cc1cad2b59485337338167388ce1deae01f0752f98f3e0`
-- CI run: `27300845808`
-- Publish workflow run: `27300950330`
-- Docker workflow run: `27300951486`
-- MCP Registry workflow run: `27301046893`
-- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.27.0`
+- Current npm release: `agentloopkit@0.28.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.0>
+- Release asset: `agentloopkit-0.28.0.tgz`
+- Release asset SHA-256: `82049976512173bcef3edadadef3b5aead76ea29531d2d2f02deafa945dd900c`
+- CI run: `27406452797`
+- CLI Smoke run: `27406452854`
+- Publish workflow run: `27406646825`
+- Docker workflow run: `27406646793`
+- GHCR image manifest: `ghcr.io/abhiyoheswaran1/agentloopkit:0.28.0` digest `sha256:d3d4b708363f452c69a8fa701bc1909922bcc7b8ed7a066ba8e5f55664c3c410`
+- MCP Registry workflow run: `27406850637`
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.28.0`
 
-## Current 0.28.0 release candidate
+## 0.28.0 release summary
 
-Current `main` is preparing `0.28.0`. The package and MCP metadata now report `0.28.0`, but GitHub release, npm publish, GHCR publish, and MCP Registry publish still require the normal release gate.
+Current `main` matches the published `0.28.0` release.
 
-Included so far:
+Included:
 
 - simplified npm-facing README with detailed command behavior moved to `docs/cli-reference.md`
 - refreshed README terminal demo and showcase screenshot around `ship`, `prepare-pr`, `review-context`, run history, and file intent lookup
@@ -105,7 +107,7 @@ Included so far:
 - read-only MCP review context snapshots that combine status, gates, policy status, artifacts, recent runs, and latest ship evidence
 - safe run ledger path storage and display for CLI, MCP, status, review-context, and public command outputs
 
-Before publishing, run the normal release checklist and verify the GitHub, npm, GHCR, and MCP Registry outputs.
+Release verification covered local checks, npm trusted publishing, GitHub release assets, GHCR publishing, MCP Registry publishing, and clean-directory install smoke.
 
 ## CLI commands
 
@@ -1090,9 +1092,9 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.27.0` is public.
-- npm latest is `0.27.0`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, `0.26.5`, and `0.27.0`.
-- GHCR and MCP Registry are live for `0.27.0`.
+- GitHub release `v0.28.0` is public.
+- npm latest is `0.28.0`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, `0.26.5`, `0.27.0`, and `0.28.0`.
+- GHCR and MCP Registry are live for `0.28.0`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

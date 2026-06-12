@@ -4,21 +4,23 @@ Last checked: June 12, 2026.
 
 ## Current State
 
-- Current GitHub release: `v0.27.0`
-- Current GitHub release asset: `agentloopkit-0.27.0.tgz`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.27.0>
-- Tarball SHA-256: `7ff6cb0b2079da83b6cc1cad2b59485337338167388ce1deae01f0752f98f3e0`
-- CI run: `27300845808` passed for the `0.27.0` release commit
-- Publish workflow run: `27300950330` passed and published `agentloopkit@0.27.0` through npm trusted publishing
-- Docker workflow run: `27300951486` passed and published the GHCR image for `0.27.0`
-- MCP Registry workflow run: `27301046893` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
+- Current GitHub release: `v0.28.0`
+- Current GitHub release asset: `agentloopkit-0.28.0.tgz`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.0>
+- Tarball SHA-256: `82049976512173bcef3edadadef3b5aead76ea29531d2d2f02deafa945dd900c`
+- CI run: `27406452797` passed for the `0.28.0` release commit
+- CLI Smoke run: `27406452854` passed on Ubuntu, macOS, and Windows
+- Publish workflow run: `27406646825` passed and published `agentloopkit@0.28.0` through npm trusted publishing
+- Docker workflow run: `27406646793` passed and published the GHCR image for `0.28.0`
+- GHCR image manifest: `ghcr.io/abhiyoheswaran1/agentloopkit:0.28.0` digest `sha256:d3d4b708363f452c69a8fa701bc1909922bcc7b8ed7a066ba8e5f55664c3c410`
+- MCP Registry workflow run: `27406850637` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
-- npm latest: `0.27.0`
-- Current `main` is preparing the `0.28.0` release candidate
+- npm latest: `0.28.0`
+- Current `main` matches the published `0.28.0` release
 
-## Current Release Candidate
+## Latest Release Highlights
 
-Prepared for `0.28.0`, but not yet published:
+Released in `0.28.0`:
 
 - npm-facing README simplified and detailed command behavior moved to `docs/cli-reference.md`
 - README terminal demo and showcase screenshot refreshed around the review-readiness loop
@@ -34,7 +36,7 @@ Prepared for `0.28.0`, but not yet published:
 
 These changes are recorded in `CHANGELOG.md` under `## 0.28.0`.
 
-Publish only after the local release gate passes.
+There is no active release candidate after `0.28.0`.
 
 ## Use The Current CLI
 
@@ -42,7 +44,7 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.27.0 version
+npx --yes agentloopkit@0.28.0 version
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -51,7 +53,7 @@ GitHub release tarballs remain useful for provenance checks and rollback, but no
 
 Use the GitHub Actions publish workflow for the next release after release metadata is prepared:
 
-- The next planned release is `0.28.0`; batch current unreleased work instead of cutting a version for every small improvement.
+- No next release is planned yet; batch current unreleased work instead of cutting a version for every small improvement.
 - `package.json` and `CHANGELOG.md` must agree on the next version.
 - `CHANGELOG.md` must have no real entries left under `## Unreleased`.
 - `agentloop npm-status --agentloopkit --expect-current` should pass before the version bump, or the version gap must be explained in release notes.
@@ -66,7 +68,7 @@ After each publish:
 
 ## Verification Evidence
 
-Local release-candidate checks for `0.27.0`:
+Local release checks for `0.28.0`:
 
 - `npm run lint`
 - `npm run typecheck`
@@ -86,7 +88,7 @@ Local release-candidate checks for `0.27.0`:
 Latest release-status documentation checks also passed:
 
 - `npm view agentloopkit version versions --json`
-- direct temp install smoke for `agentloopkit@0.27.0`
+- direct temp install smoke for `agentloopkit@0.28.0`
 - `npx --no-install agentloop version`
 - `npx --no-install agentloopkit version`
 - `npx --no-install agentloop init --dry-run`

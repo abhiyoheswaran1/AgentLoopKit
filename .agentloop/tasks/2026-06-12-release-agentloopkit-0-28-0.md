@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-12
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The 0.28.0 batch is complete and needs the normal release gate: metadata, changelog, verification, GitHub release, npm trusted publishing, GHCR, and MCP Registry proof.
