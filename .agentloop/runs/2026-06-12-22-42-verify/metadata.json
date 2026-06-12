@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-22-42-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-22-42",
+  "createdAtEpochMs": 1781296967320,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-require-current-release-notes-in-release-check.md",
+    "title": "Require current release notes in release-check",
+    "status": "proposed"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-22-41-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

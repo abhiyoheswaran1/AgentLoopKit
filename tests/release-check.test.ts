@@ -20,6 +20,7 @@ async function createReleaseRepo(
     verification?: 'pass' | 'fail' | 'missing';
     handoff?: boolean;
     releaseNotes?: boolean;
+    releaseNotesContent?: string;
     dirty?: boolean;
   } = {},
 ) {
@@ -66,7 +67,7 @@ async function createReleaseRepo(
   if (options.releaseNotes ?? true) {
     await writeFile(
       path.join(dir, '.agentloop/handoffs/2026-06-11-10-10-release-notes.md'),
-      '# Release Notes\n\nRelease evidence.\n',
+      options.releaseNotesContent ?? '# Release Notes\n\n## 1.2.3\n\nRelease evidence.\n',
     );
   }
   await writeFile(path.join(dir, '.env.local'), 'SECRET_VALUE=do-not-print\n');
@@ -138,6 +139,46 @@ describe('release-check command', () => {
       ]),
     );
     expect(output.nextAction.command).toBe('agentloop handoff');
+  });
+
+  test('warns when generated release notes do not mention the package version', async () => {
+    const dir = await createReleaseRepo({
+      releaseNotesContent: '# Release Notes\n\n## 1.2.2\n\nOld release evidence.\n',
+    });
+
+    const defaultResult = await execa(tsxPath, [cliPath, 'release-check', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const strictResult = await execa(tsxPath, [cliPath, 'release-check', '--strict', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const defaultOutput = JSON.parse(defaultResult.stdout);
+    expect(defaultResult.exitCode).toBe(0);
+    expect(defaultOutput.overallStatus).toBe('warn');
+    expect(defaultOutput.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'release-notes',
+          status: 'warn',
+          message:
+            'Latest generated release notes do not mention package version 1.2.3. Regenerate release notes for this release.',
+          path: '.agentloop/handoffs/2026-06-11-10-10-release-notes.md',
+        }),
+      ]),
+    );
+    expect(defaultOutput.nextAction.command).toBe('agentloop release-notes --write');
+
+    expect(strictResult.exitCode).toBe(1);
+    const strictOutput = JSON.parse(strictResult.stdout);
+    expect(strictOutput.overallStatus).toBe('fail');
+    expect(strictOutput.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'release-notes', status: 'warn' }),
+      ]),
+    );
   });
 
   test('blocks publish recommendation when changelog has unreleased entries', async () => {
@@ -266,7 +307,16 @@ describe('release-check command', () => {
         path.join(dir, 'CHANGELOG.md'),
         '# Changelog\n\n## 1.2.3`rc\n\n- Prepared release evidence.\n',
       );
-      await git(dir, ['add', 'package.json', 'CHANGELOG.md']);
+      await writeFile(
+        path.join(dir, '.agentloop/handoffs/2026-06-11-10-10-release-notes.md'),
+        '# Release Notes\n\n## 1.2.3`rc\n\nRelease evidence.\n',
+      );
+      await git(dir, [
+        'add',
+        'package.json',
+        'CHANGELOG.md',
+        '.agentloop/handoffs/2026-06-11-10-10-release-notes.md',
+      ]);
       await git(dir, ['commit', '-m', 'Prepare backtick release fixture']);
       await git(dir, ['checkout', '-b', 'release`branch']);
 

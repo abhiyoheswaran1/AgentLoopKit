@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Changed `agentloop release-check` to warn when the latest generated release notes do not mention the local package version.
 
 ## 0.28.5
 

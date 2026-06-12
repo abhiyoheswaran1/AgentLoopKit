@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-22-52-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-12-22-52",
+  "createdAtEpochMs": 1781297575339,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-12-require-current-release-notes-in-release-check.md",
+    "title": "Require current release notes in release-check",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-22-44-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-22-52-pr-summary.md",
+  "changedFileCount": 15
+}

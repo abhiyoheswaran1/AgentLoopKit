@@ -146,6 +146,16 @@ async function latestEvidencePath(options: { cwd: string; dir: string; pattern: 
   return filePath ? relativePath(options.cwd, filePath) : undefined;
 }
 
+async function releaseNotesMentionVersion(cwd: string, filePath: string | undefined, version: string) {
+  if (!filePath) return false;
+  try {
+    const markdown = await readFile(path.join(cwd, filePath), 'utf8');
+    return markdown.includes(version);
+  } catch {
+    return false;
+  }
+}
+
 async function readChangelogSection(cwd: string, version: string) {
   const changelogPath = path.join(cwd, 'CHANGELOG.md');
   if (!(await pathExists(changelogPath))) return undefined;
@@ -391,12 +401,21 @@ export async function checkReleaseReadiness(options: {
     dir: options.config.paths.handoffsDir,
     pattern: releaseNotesPattern,
   });
+  const releaseNotesCurrent = await releaseNotesMentionVersion(
+    options.cwd,
+    releaseNotesPath,
+    packageMetadata.version,
+  );
   checks.push(
     releaseCheck(
       'release-notes',
       'Release notes',
-      releaseNotesPath ? 'pass' : 'warn',
-      releaseNotesPath ? 'Deterministic release notes found.' : 'No generated release notes found.',
+      releaseNotesPath && releaseNotesCurrent ? 'pass' : 'warn',
+      releaseNotesPath
+        ? releaseNotesCurrent
+          ? `Deterministic release notes found for package version ${packageMetadata.version}.`
+          : `Latest generated release notes do not mention package version ${packageMetadata.version}. Regenerate release notes for this release.`
+        : 'No generated release notes found.',
       releaseNotesPath,
     ),
   );

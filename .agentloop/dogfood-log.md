@@ -2,6 +2,29 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Current Release Notes Evidence Gate
+
+- Task contract: `.agentloop/tasks/2026-06-12-require-current-release-notes-in-release-check.md`
+- Trigger:
+  - Dogfooding after `0.28.5` showed `release-check` accepted the latest generated release-notes artifact even when it described an older package version.
+  - The release gate needed stronger local evidence before pointing maintainers at the npm-status step.
+- Product change:
+  - `release-check` now reads the latest generated release-notes artifact and warns unless it mentions the local `package.json` version.
+  - Strict mode fails that warning, so stale release notes cannot pass a maintainer release gate.
+  - The command stays local-only and does not call npm, GitHub, MCP Registry, or any external API.
+- Verification:
+  - Red TDD run: `npm test -- tests/release-check.test.ts -t "warns when generated release notes do not mention the package version"` failed because stale release notes still passed.
+  - Green focused run: the same regression test passed after the release-notes version check.
+  - Full focused suite: `npm test -- tests/release-check.test.ts` passed with 8 tests.
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-12-22-41-verification-report.md`.
+  - The verification run wrote `.agentloop/runs/2026-06-12-22-42-verify/`.
+  - `npm run dogfood:strict` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The release-check gate now proves the generated release notes belong to the package version being prepared.
+- Improve:
+  - A future release workflow could generate release notes and then run `release-check --strict` in one documented maintainer sequence.
+
 ## 2026-06-12: 0.28.5 Release Gate
 
 - Task contract: `.agentloop/tasks/archive/2026-06-12-release-agentloopkit-0-28-5-patch.md`
