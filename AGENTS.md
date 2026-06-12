@@ -30,6 +30,7 @@ Before changing code:
 - Do not run destructive git or filesystem commands unless the user asks for them.
 - Do not read or print secrets. If env files exist, mention only their paths.
 - Run the configured verification commands before claiming completion.
+- Run `npm run dogfood` during meaningful AgentLoopKit changes to exercise the local self-check path. Use `npm run dogfood:strict` before final handoff or release prep when warnings should block progress.
 - Generate a handoff summary with changed files, tests run, risks, and rollback notes.
 - During implementation in this repository, dogfood `projscan` with `npx projscan doctor --format markdown` or a more specific `projscan` command.
 

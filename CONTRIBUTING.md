@@ -10,6 +10,7 @@ pnpm test
 pnpm typecheck
 pnpm check:links
 pnpm build
+npm run dogfood
 npx projscan doctor --format markdown
 ```
 
@@ -76,4 +77,7 @@ pnpm typecheck
 pnpm test
 pnpm check:links
 pnpm build
+npm run dogfood
 ```
+
+Use `npm run dogfood:strict` before a release or final handoff when warnings should block the change.

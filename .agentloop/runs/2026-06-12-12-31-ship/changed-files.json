@@ -1,0 +1,66 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "AGENTS.md"
+  },
+  {
+    "status": "M",
+    "path": "CONTRIBUTING.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/assets/readme/README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/assets/readme/agentloopkit-showcase.png"
+  },
+  {
+    "status": "M",
+    "path": "docs/assets/readme/agentloopkit-verification.png"
+  },
+  {
+    "status": "M",
+    "path": "docs/assets/readme/showcase.html"
+  },
+  {
+    "status": "M",
+    "path": "docs/assets/readme/verification.html"
+  },
+  {
+    "status": "M",
+    "path": "package.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-12-21-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-12-29-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-add-repeatable-dogfood-gate-and-official-icon-assets.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/logo/"
+  },
+  {
+    "status": "??",
+    "path": "scripts/dogfood.mjs"
+  },
+  {
+    "status": "??",
+    "path": "tests/dogfood-script.test.ts"
+  }
+]

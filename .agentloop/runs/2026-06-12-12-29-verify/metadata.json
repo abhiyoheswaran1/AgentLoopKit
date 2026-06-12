@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-12-29-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-12-29",
+  "createdAtEpochMs": 1781260171649,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-repeatable-dogfood-gate-and-official-icon-assets.md",
+    "title": "Add repeatable dogfood gate and official icon assets",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-12-21-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 14
+}

@@ -2,6 +2,8 @@
 
 These files generate the screenshots and terminal animation used in the root README.
 
+The screenshot HTML uses the official logo from `docs/logo/icon.svg`. Use the SVG source for docs visuals so the rounded app icon edge stays clean on light backgrounds.
+
 Regenerate the terminal GIF:
 
 ```bash

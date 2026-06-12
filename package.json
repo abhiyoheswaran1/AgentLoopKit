@@ -52,6 +52,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check:links": "tsx scripts/check-markdown-links.ts",
+    "dogfood": "node scripts/dogfood.mjs",
+    "dogfood:strict": "node scripts/dogfood.mjs --strict",
     "smoke:release": "node scripts/smoke-packed-release.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

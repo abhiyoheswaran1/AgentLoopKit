@@ -7700,3 +7700,39 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release evidence made it clear which review tasks had shipped and could move to the archive.
 - Improve:
   - Consider a future `task archive --status review --before <release>` helper only if this cleanup repeats.
+
+## 2026-06-12: Repeatable Dogfood Gate And Official Icon Assets
+
+- Task contract: `.agentloop/tasks/2026-06-12-add-repeatable-dogfood-gate-and-official-icon-assets.md`
+- Trigger:
+  - AgentLoopKit dogfooding still depended on remembering a set of CLI checks.
+  - README and generated launch visuals did not use the official icon assets from `docs/logo/`.
+- Implementation:
+  - Added `npm run dogfood` for a read-only local self-check.
+  - Added `npm run dogfood:strict` for final handoff and release-prep gates.
+  - Added `scripts/dogfood.mjs` with an allowlisted child-process environment.
+  - Added Vitest coverage for the dogfood step plan, strict mode, and token-like env filtering.
+  - Added the official icon assets under `docs/logo/`.
+  - Updated README, contributor docs, and README screenshot sources to use the official icon.
+  - Regenerated README screenshots with Playwright.
+- Verification run:
+  - Dogfood verification passed: `.agentloop/reports/2026-06-12-12-21-verification-report.md`.
+  - Full Vitest passed:
+    - `49` test files
+    - `421` tests
+  - Task-specific commands passed:
+    - `npm test -- tests/dogfood-script.test.ts`
+    - `npm run dogfood`
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm test`
+    - `npm run check:links`
+    - `npm run build`
+    - `npx --yes projscan doctor --format markdown`
+  - `npm run dogfood:strict` passed after fresh verification evidence existed.
+- What worked well:
+  - Dogfooding immediately exposed that default dogfood should report stale evidence during active work without failing.
+  - Strict mode still blocks when gate evidence is not ready.
+  - The official SVG avoided the white-edge artifact risk in README visuals.
+- Improve:
+  - Consider teaching `maintainer-check` to distinguish package metadata script changes from dependency version changes.

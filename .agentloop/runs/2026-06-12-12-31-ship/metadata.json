@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-12-31-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-12-31",
+  "createdAtEpochMs": 1781260267783,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-repeatable-dogfood-gate-and-official-icon-assets.md",
+    "title": "Add repeatable dogfood gate and official icon assets",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-12-21-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-12-31-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-12-31-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 16
+}

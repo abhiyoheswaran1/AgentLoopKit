@@ -1,0 +1,11 @@
+ .agentloop/dogfood-log.md                        |  36 +++++++++++++++++++++++
+ AGENTS.md                                        |   1 +
+ CONTRIBUTING.md                                  |   4 +++
+ README.md                                        |  20 +++++++++++++
+ docs/assets/readme/README.md                     |   2 ++
+ docs/assets/readme/agentloopkit-showcase.png     | Bin 527918 -> 528474 bytes
+ docs/assets/readme/agentloopkit-verification.png | Bin 339754 -> 348960 bytes
+ docs/assets/readme/showcase.html                 |  18 ++++--------
+ docs/assets/readme/verification.html             |  25 +++++++++++++++-
+ package.json                                     |   2 ++
+ 10 files changed, 94 insertions(+), 14 deletions(-)

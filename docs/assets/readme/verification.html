@@ -59,6 +59,23 @@
         margin-bottom: 24px;
       }
 
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: var(--muted);
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 18px;
+      }
+
+      .mark {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        box-shadow: 0 16px 40px oklch(24% 0.03 145 / 14%);
+      }
+
       h1 {
         margin: 0;
         font-size: 54px;
@@ -286,7 +303,13 @@
   <body>
     <main class="canvas" aria-label="AgentLoopKit verification report">
       <section class="header">
-        <h1>Verification reports tie tasks to command evidence.</h1>
+        <div>
+          <div class="brand">
+            <img class="mark" src="../../logo/icon.svg" alt="" />
+            AgentLoopKit
+          </div>
+          <h1>Verification reports tie tasks to command evidence.</h1>
+        </div>
         <div class="meta">
           <strong>agentloop verify --task</strong>
           Repo: agentloopkit<br />

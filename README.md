@@ -1,5 +1,9 @@
 # AgentLoopKit
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/logo/icon.svg" alt="AgentLoopKit logo" width="96" height="96">
+</p>
+
 A drop-in engineering loop for coding agents.
 
 An open-source Baseframe Labs developer tool.
@@ -108,6 +112,22 @@ npx agentloopkit next
 </p>
 
 The terminal demo is generated from committed VHS sources in this repository.
+
+## Dogfood Gate
+
+AgentLoopKit uses its own loop in this repo. Contributors can run the same local self-check:
+
+```bash
+npm run dogfood
+```
+
+That command checks task-folder hygiene, current loop status, review gates, artifact inventory, maintainer reviewability, agent review context, and ProjScan health. It does not publish packages, create tags, post comments, read tokens, read `.env` contents, or run verification commands.
+
+Use the stricter gate before a release or final handoff:
+
+```bash
+npm run dogfood:strict
+```
 
 ## Commands
 
