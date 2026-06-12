@@ -2,6 +2,30 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Safer Release-Check Publish Guidance
+
+- Task contract: `.agentloop/tasks/archive/2026-06-12-make-release-check-publish-guidance-safer.md`
+- Trigger:
+  - After `0.28.4` was live, `release-check --strict` still recommended `npm publish --access public`.
+  - The command is local-only, so it cannot know whether npm already has the current version.
+- Product change:
+  - `release-check` now points maintainers to `agentloop npm-status` before publishing.
+  - The command stays read-only and does not call npm, GitHub, or any external API.
+- Verification:
+  - Red TDD run: `npm test -- tests/release-check.test.ts` failed because the command still returned `npm publish --access public`.
+  - Green focused run: `npm test -- tests/release-check.test.ts` passed with 7 tests.
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-12-21-13-verification-report.md`.
+  - The verification run wrote `.agentloop/runs/2026-06-12-21-14-verify/`.
+  - `npm run dogfood:strict` passed.
+  - `npm run check:links` passed and checked 1406 Markdown files.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - `npm run lint` passed.
+  - Full `npm test` passed with 51 files and 455 tests.
+- Worked well:
+  - The release process exposed a real safety copy bug after the package was already current on npm.
+- Improve:
+  - Consider a future `release-check --registry` mode that composes local release evidence with `npm-status` output while keeping default `release-check` local-only.
+
 ## 2026-06-12: 0.28.4 Release Gate
 
 - Task contract: `.agentloop/tasks/2026-06-12-prepare-0-28-4-patch-release.md`

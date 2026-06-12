@@ -255,9 +255,9 @@ function chooseNextAction(checks: ReleaseReadinessCheck[]) {
     };
   }
   return {
-    command: 'npm publish --access public',
+    command: 'agentloop npm-status',
     reason:
-      'Local release evidence is ready. Publish only after owner review and npm authentication.',
+      'Check npm registry state before publishing. If the local version is not published, use the approved release workflow.',
   };
 }
 

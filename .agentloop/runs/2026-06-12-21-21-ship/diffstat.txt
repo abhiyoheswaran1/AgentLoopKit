@@ -1,0 +1,6 @@
+ .agentloop/backlog.md       |  1 +
+ .agentloop/dogfood-log.md   | 24 ++++++++++++++++++++++++
+ CHANGELOG.md                |  2 +-
+ src/core/release-check.ts   |  4 ++--
+ tests/release-check.test.ts |  6 ++++--
+ 5 files changed, 32 insertions(+), 5 deletions(-)

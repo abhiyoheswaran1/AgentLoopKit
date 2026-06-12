@@ -114,7 +114,8 @@ describe('release-check command', () => {
         expect.objectContaining({ id: 'package-safety', status: 'pass' }),
       ]),
     );
-    expect(output.nextAction.command).toBe('npm publish --access public');
+    expect(output.nextAction.command).toBe('agentloop npm-status');
+    expect(output.nextAction.reason).toContain('Check npm registry state before publishing.');
     expect(output.safety.doesNot).toContain('publish packages');
     expect(output.safety.doesNot).toContain('read npm tokens');
   });
@@ -290,7 +291,8 @@ describe('release-check command', () => {
       expect(humanResult.stdout).toContain(
         '- [`pass`] `Changelog section`: ``CHANGELOG.md includes 1.2.3`rc.`` - `CHANGELOG.md`',
       );
-      expect(humanResult.stdout).toContain('Run `npm publish --access public`.');
+      expect(humanResult.stdout).toContain('Run `agentloop npm-status`.');
+      expect(humanResult.stdout).not.toContain('Run `npm publish --access public`.');
       const output = JSON.parse(jsonResult.stdout);
       expect(output.package).toEqual({ name: 'demo`pkg', version: '1.2.3`rc' });
       expect(output.git.branch).toBe('release`branch');

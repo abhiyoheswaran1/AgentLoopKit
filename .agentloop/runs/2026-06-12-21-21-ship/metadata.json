@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-21-21-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-21-21",
+  "createdAtEpochMs": 1781292110683,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-12-make-release-check-publish-guidance-safer.md",
+    "title": "Make release-check publish guidance safer",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-21-13-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-21-21-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-21-21-pr-summary.md",
+  "score": 100,
+  "changedFileCount": 8
+}

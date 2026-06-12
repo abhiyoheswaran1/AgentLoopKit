@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Changed `agentloop release-check` next-action guidance to route maintainers through `agentloop npm-status` before publishing instead of recommending a direct npm publish command.
 
 ## 0.28.4
 

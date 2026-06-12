@@ -1,0 +1,22 @@
+[
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/release-check.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/release-check.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-21-13-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-make-release-check-publish-guidance-safer.md"
+  }
+]
