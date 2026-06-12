@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-19-23-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-19-23",
+  "createdAtEpochMs": 1781285010374,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-12-add-config-verification-command-suggestions.md",
+    "title": "Add config verification command suggestions",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-19-17-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-19-23-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-19-23-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 13
+}

@@ -27,6 +27,7 @@ describe('create-task command', () => {
     expect(result.stdout).toContain('--risk <text>');
     expect(result.stdout).toContain('--risk-note <text>');
     expect(result.stdout).toContain('--post-verification <command>');
+    expect(result.stdout).toContain('--include-config-commands');
     for (const type of TASK_TYPES) {
       expect(result.stdout).toContain(type);
     }
@@ -99,6 +100,63 @@ describe('create-task command', () => {
     expect(markdown).toContain('## Post-Verification Gates');
     expect(markdown).toContain('- npm run dogfood:strict');
     expect(markdown).toContain('- agentloop ship');
+  });
+
+  test('can include configured verification commands without executing them', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({
+        name: 'demo',
+        type: 'typescript-package',
+        packageManager: 'pnpm',
+        commands: {
+          test: 'node ./missing-test-command.js',
+          lint: 'pnpm lint',
+          typecheck: 'pnpm typecheck',
+          build: 'pnpm build',
+        },
+      }),
+    );
+
+    await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Use configured checks',
+        '--type',
+        'feature',
+        '--out',
+        '.agentloop/tasks/use-configured-checks.md',
+        '--include-config-commands',
+        '--verification',
+        'pnpm typecheck',
+        '--verification',
+        'node ./custom-smoke.js',
+      ],
+      { cwd: dir },
+    );
+
+    const markdown = await readFile(
+      path.join(dir, '.agentloop/tasks/use-configured-checks.md'),
+      'utf8',
+    );
+    const verificationSection = markdown.match(
+      /## Verification Commands\n(?<body>[\s\S]*?)\n\n## Post-Verification Gates/,
+    )?.groups?.body;
+
+    expect(verificationSection).toBe(
+      [
+        '- node ./missing-test-command.js',
+        '- pnpm lint',
+        '- pnpm typecheck',
+        '- pnpm build',
+        '- node ./custom-smoke.js',
+      ].join('\n'),
+    );
   });
 
   test('writes task contracts to the parent AgentLoop root when run from a nested directory', async () => {

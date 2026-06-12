@@ -2,6 +2,35 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Config Verification Commands for Task Contracts
+
+- Task contract: `.agentloop/tasks/archive/2026-06-12-add-config-verification-command-suggestions.md`
+- Trigger:
+  - Dogfooding showed TypeScript source changes could omit `typecheck` from task-level verification commands even when `agentloop.config.json` already had the command.
+  - The first implementation exposed a second bug: copying configured commands into a task contract could make `verify --task-commands` run the same exact command twice.
+- Product change:
+  - Added `agentloop create-task --include-config-commands`.
+  - The flag copies non-empty configured `test`, `lint`, `typecheck`, and `build` commands into the task contract without running them during creation.
+  - Task creation de-duplicates exact command strings when configured and explicit verification commands overlap.
+  - Verification now runs exact duplicate command strings once when configured commands and task contract commands overlap.
+- Verification:
+  - Red TDD run: `npm test -- tests/create-task.test.ts` failed because `--include-config-commands` was unknown.
+  - Green focused run: `npm test -- tests/create-task.test.ts` passed with 19 tests.
+  - Red TDD run: `npm test -- tests/verification.test.ts` failed because duplicate configured and task commands both ran.
+  - Green focused run: `npm test -- tests/verification.test.ts` passed with 41 tests.
+  - AgentLoop task verification passed with `--only-task-commands --progress` and wrote `.agentloop/reports/2026-06-12-19-17-verification-report.md`.
+  - The verification run wrote `.agentloop/runs/2026-06-12-19-20-verify/`.
+  - `npm run dogfood:strict` passed.
+  - `npm run check:links` passed and checked 1386 Markdown files.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - Ship report: `.agentloop/reports/2026-06-12-19-23-ship-report.md` with review readiness `96`/100.
+  - PR summary: `.agentloop/handoffs/2026-06-12-19-23-pr-summary.md`.
+  - PR description: `.agentloop/handoffs/2026-06-12-19-23-pr-description.md`.
+- Worked well:
+  - Running the product on itself caught the duplicate-command behavior before the change was committed.
+- Improve:
+  - Consider a future `verify` report note that states when duplicate commands were skipped, so agents can explain why a found task command does not appear as a separate `task` entry.
+
 ## 2026-06-12: Built CLI Smoke Covers Bounded Runs
 
 - Task contract: `.agentloop/tasks/2026-06-12-smoke-test-bounded-run-output.md`

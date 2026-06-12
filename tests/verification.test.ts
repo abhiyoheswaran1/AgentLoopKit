@@ -774,6 +774,69 @@ describe('verification', () => {
     expect(await readFile(path.join(dir, 'task-command-ran.txt'), 'utf8')).toBe('yes');
   });
 
+  test('runs exact duplicate configured and task commands only once', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const duplicateCommand = 'node duplicate-command.mjs';
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'duplicate-command.mjs'),
+      [
+        "import { readFileSync, writeFileSync } from 'node:fs';",
+        "const path = 'duplicate-count.txt';",
+        "const current = Number(readFileSync(path, 'utf8') || '0');",
+        'writeFileSync(path, String(current + 1));',
+        '',
+      ].join('\n'),
+    );
+    await writeFile(path.join(dir, 'duplicate-count.txt'), '0');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/task-commands.md'),
+      [
+        '# Duplicate command opt-in',
+        '',
+        '- Task type: tests',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        `- ${duplicateCommand}`,
+        '',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: duplicateCommand,
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: '.agentloop/tasks/task-commands.md',
+      taskCommands: true,
+      reportTimestamp: '2026-06-12-19-15',
+      nowIso: '2026-06-12T19:15:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('pass');
+    expect(result.taskCommands).toEqual({
+      requested: true,
+      foundCount: 1,
+      commands: [duplicateCommand],
+    });
+    expect(result.commands).toEqual([
+      expect.objectContaining({ key: 'test', command: duplicateCommand, passed: true }),
+    ]);
+    expect(await readFile(path.join(dir, 'duplicate-count.txt'), 'utf8')).toBe('1');
+  });
+
   test('does not run post-verification gates with task verification commands', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

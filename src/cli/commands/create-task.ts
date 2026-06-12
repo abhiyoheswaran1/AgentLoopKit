@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import prompts from 'prompts';
+import { AgentLoopConfig } from '../../core/config.js';
 import { TASK_TYPES } from '../../core/constants.js';
 import { AgentLoopError } from '../../core/errors.js';
 import { inlineCode } from '../../core/markdown-format.js';
@@ -26,6 +27,36 @@ function stringOption(options: Record<string, unknown>, ...keys: string[]) {
 
 function listOption(options: Record<string, unknown>, ...keys: string[]) {
   return keys.flatMap((key) => (Array.isArray(options[key]) ? (options[key] as string[]) : []));
+}
+
+function uniqueCommands(commands: string[]) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const command of commands) {
+    const clean = command.trim();
+    if (!clean || seen.has(clean)) continue;
+    seen.add(clean);
+    result.push(clean);
+  }
+  return result;
+}
+
+function configuredVerificationCommands(config: AgentLoopConfig) {
+  return uniqueCommands([
+    config.commands.test,
+    config.commands.lint,
+    config.commands.typecheck,
+    config.commands.build,
+  ]);
+}
+
+function verificationCommandsFromOptions(
+  options: Record<string, unknown>,
+  config: AgentLoopConfig,
+) {
+  const explicitCommands = listOption(options, 'verifyCommand', 'verification');
+  if (options.includeConfigCommands !== true) return uniqueCommands(explicitCommands);
+  return uniqueCommands([...configuredVerificationCommands(config), ...explicitCommands]);
 }
 
 function resolveTaskType(value: unknown) {
@@ -158,6 +189,10 @@ export function createTaskCommand() {
     .option('--verify-command <command>', 'verification command; repeat or use newlines', lines, [])
     .option('--verification <command>', 'verification command; repeat or use newlines', lines, [])
     .option(
+      '--include-config-commands',
+      'copy configured test, lint, typecheck, and build commands into the task contract',
+    )
+    .option(
       '--post-verification <command>',
       'post-verification gate; repeat or use newlines',
       lines,
@@ -203,7 +238,7 @@ export function createTaskCommand() {
               likelyFiles: listOption(options, 'likelyFile'),
               forbiddenFiles: listOption(options, 'forbiddenFile'),
               acceptanceCriteria: listOption(options, 'acceptance'),
-              verificationCommands: listOption(options, 'verifyCommand', 'verification'),
+              verificationCommands: verificationCommandsFromOptions(options, workspace.config),
               postVerificationCommands: listOption(options, 'postVerification'),
               riskNotes: listOption(options, 'risk', 'riskNote'),
               rollbackNotes: stringOption(options, 'rollback'),

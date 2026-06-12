@@ -237,6 +237,18 @@ type VerificationCommandSelection = {
   taskCommands: string[];
 };
 
+function uniqueCommandEntries(entries: Array<[VerificationCommandKey, string]>) {
+  const seen = new Set<string>();
+  const result: Array<[VerificationCommandKey, string]> = [];
+  for (const [key, command] of entries) {
+    const clean = command.trim();
+    if (!clean || seen.has(clean)) continue;
+    seen.add(clean);
+    result.push([key, clean]);
+  }
+  return result;
+}
+
 async function commandEntries(
   config: AgentLoopConfig,
   options: VerificationOptions,
@@ -268,7 +280,7 @@ async function commandEntries(
   }
 
   return {
-    commands: active,
+    commands: uniqueCommandEntries(active),
     taskCommandsRequested: options.taskCommands === true,
     taskCommandsFound,
     taskCommands,

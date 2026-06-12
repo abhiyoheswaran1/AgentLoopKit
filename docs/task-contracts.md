@@ -15,6 +15,7 @@ agentloop create-task --type bugfix --title "Fix checkout redirect" \
   --likely-file src/auth \
   --forbidden-file migrations/ \
   --acceptance "Redirect returns users to checkout" \
+  --include-config-commands \
   --verification "pnpm test" \
   --rollback "Revert the auth callback change"
 ```
@@ -50,6 +51,8 @@ agentloop task doctor
 
 Use `agentloop task list --json` when an agent needs a machine-readable list of contracts before choosing the active task. The list command is read-only and does not create `.agentloop/state.json`.
 Use `agentloop create-task --json` when an agent needs the created task path, Markdown content, and active-task metadata without parsing human output. If you pass `--out`, the path must be a Markdown file inside the configured task directory. AgentLoopKit resolves existing path ancestors before writing or reading task artifacts, so a symlink inside or at the configured task directory cannot redirect task files outside the repo. Invalid `--out` paths return parseable JSON errors with `requestedOut`, `tasksDir`, and `reason`.
+Use `--include-config-commands` when a task should start with the repo's configured verification commands. AgentLoopKit copies non-empty `test`, `lint`, `typecheck`, and `build` commands into the contract and removes exact duplicates. It does not execute those commands while creating the task.
+Use `agentloop verify --task <path> --task-commands --only-task-commands` when the contract already lists the full verification set. If a command appears in both the config and the task contract during a normal verification run, AgentLoopKit runs that exact command string once.
 For unsupported `--type` values, `agentloop create-task --json` returns a parseable error with `supportedTaskTypes` and writes no task file.
 Use `agentloop task show --json` when an agent needs the selected contract content in a stable schema. Invalid task paths on `show`, `set`, `status`, and `archive` return parseable JSON errors with `requestedTask`, `tasksDir`, and `reason`. Existing symlinked ancestors must still resolve inside the configured task directory and the current repo.
 Use `agentloop task status --json` when an agent needs to update the contract state without hand-editing Markdown. Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Unsupported status values return a parseable JSON error with `supportedStatuses` and leave the task file unchanged. Use `deferred` for parked work that should remain visible but not become `latestTask` in `status` or `next`.

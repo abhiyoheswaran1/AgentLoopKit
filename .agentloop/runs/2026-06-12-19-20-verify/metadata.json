@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-19-20-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-19-20",
+  "createdAtEpochMs": 1781284812690,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-12-add-config-verification-command-suggestions.md",
+    "title": "Add config verification command suggestions",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-19-17-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 17
+}

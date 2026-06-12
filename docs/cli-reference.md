@@ -53,6 +53,7 @@ agentloop create-task --type feature --title "Add settings page" \
   --likely-file src/settings \
   --forbidden-file migrations/ \
   --acceptance "Settings can be saved" \
+  --include-config-commands \
   --verification "pnpm test" \
   --risk "Touches account preferences" \
   --rollback "Remove the settings route"
@@ -68,6 +69,8 @@ Task contracts record the problem statement, desired outcome, constraints, non-g
 `create-task` sets the new contract as the active task. With `--json`, output includes both `task` and `activeTask`. Use `task set <path>` when you need to switch back to an older or alternate contract.
 
 Use `--verification` for commands that `agentloop verify --task-commands` may run before the verification report exists. Use `--post-verification` for gates that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, or reviewer-handoff checks. Post-verification gates are recorded in the task contract but are not executed by `agentloop verify --task-commands`.
+
+Use `--include-config-commands` to copy non-empty `test`, `lint`, `typecheck`, and `build` commands from `agentloop.config.json` into the contract's `Verification Commands` section. AgentLoopKit de-duplicates exact command strings and does not run those commands during task creation.
 
 ## Task State
 
@@ -140,6 +143,8 @@ agentloop verify --write-run
 `verify` reads `agentloop.config.json`, runs configured commands, captures output excerpts, and writes a Markdown report under `.agentloop/reports/`.
 
 Use `--task` to include task context in the report. Use `--task-commands` when you also want to run commands listed under the task contract's `Verification Commands` section. Add `--only-task-commands` when a reviewed task contract should run by itself without the configured repo commands.
+
+Verification runs each exact command string once. If a command appears in both `agentloop.config.json` and the task contract, AgentLoopKit keeps the first configured slot and skips the duplicate task entry.
 
 `verify --task-commands` does not run `Post-Verification Gates`. Run those after the verification report exists.
 
