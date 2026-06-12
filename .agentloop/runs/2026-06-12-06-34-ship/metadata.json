@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-06-34-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-06-34",
+  "createdAtEpochMs": 1781238892482,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-expose-policy-status-through-mcp.md",
+    "title": "Expose policy status through MCP",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-06-28-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-06-34-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-06-34-pr-summary.md",
+  "score": 95,
+  "changedFileCount": 15
+}

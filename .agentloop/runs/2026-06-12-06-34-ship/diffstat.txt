@@ -1,0 +1,12 @@
+ .agentloop/backlog.md                              |  1 +
+ .agentloop/dogfood-log.md                          | 35 ++++++++++++++
+ ...26-06-12-expose-maintainer-check-through-mcp.md | 56 ----------------------
+ CHANGELOG.md                                       |  1 +
+ FINAL_HANDOFF.md                                   |  3 +-
+ ROADMAP.md                                         |  2 +-
+ docs/cli-reference.md                              |  2 +-
+ docs/mcp.md                                        |  1 +
+ src/core/mcp-tools.ts                              | 11 ++++-
+ src/mcp/server.ts                                  |  2 +-
+ tests/mcp-tools.test.ts                            | 30 ++++++++++++
+ 11 files changed, 83 insertions(+), 61 deletions(-)

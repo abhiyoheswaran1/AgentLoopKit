@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-06-31-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-06-31",
+  "createdAtEpochMs": 1781238697108,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-expose-policy-status-through-mcp.md",
+    "title": "Expose policy status through MCP",
+    "status": "in-progress"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-06-28-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 13
+}

@@ -11,7 +11,7 @@ import { AgentLoopError } from './errors.js';
 import { pathExists, resolvesInsidePath } from './file-system.js';
 import { getAgentLoopStatus } from './status.js';
 import { getActiveTask, listTasks, readTaskContract } from './task-state.js';
-import { listPolicies, readPolicy } from './policy.js';
+import { getPolicyStatus, listPolicies, readPolicy } from './policy.js';
 import { runMaintainerCheck } from './maintainer-check.js';
 import {
   findFileIntent,
@@ -99,6 +99,12 @@ const tools: McpToolDefinition[] = [
       required: ['policyName'],
       additionalProperties: false,
     },
+  },
+  {
+    name: 'agentloop_policy_status',
+    description:
+      'Read local AgentLoopKit policy template status, including current, modified, missing, and extra policies.',
+    inputSchema: emptyInputSchema,
   },
   {
     name: 'agentloop_latest_verification_report',
@@ -346,6 +352,9 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
       return textResult({
         policy: await readPolicy({ cwd: options.cwd, config, policyName }),
       });
+    }
+    case 'agentloop_policy_status': {
+      return textResult(await getPolicyStatus({ cwd: options.cwd, config }));
     }
     case 'agentloop_latest_verification_report': {
       const reportPath = await latestMarkdownFile(

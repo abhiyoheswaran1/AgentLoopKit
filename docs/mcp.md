@@ -31,6 +31,7 @@ Example MCP client configuration:
 | `agentloop_show_active_task`           | Active task contract content                                                                                                        |
 | `agentloop_list_policies`              | Repo-local safety policy files                                                                                                      |
 | `agentloop_read_policy`                | One repo-local safety policy by name                                                                                                |
+| `agentloop_policy_status`              | Repo-local policy template status: `current`, `modified`, `missing`, and `extra` files                                              |
 | `agentloop_latest_verification_report` | Latest verification report metadata and Markdown content                                                                            |
 | `agentloop_latest_ship_report`         | Latest ship/readiness report metadata and Markdown content                                                                          |
 | `agentloop_list_runs`                  | Recent local run ledger entries with bounded `limit` input                                                                          |

@@ -12,6 +12,7 @@
 - Added read-only MCP `agentloop_show_run` for fetching one local run ledger entry by id.
 - Added read-only MCP `agentloop_file_intent` for local run-ledger intent lookup by file path.
 - Added read-only MCP `agentloop_maintainer_check` for local maintainer reviewability checks.
+- Added read-only MCP `agentloop_policy_status` for local policy template status.
 - Changed `agentloop status` Markdown, JSON, and brief output to include the newest local run ledger entry when `.agentloop/runs/` exists.
 - Changed `agentloop prepare-pr` to reuse a matching fresh ship run instead of writing a duplicate run ledger entry.
 - Added `shipEvidence.source` and `shipEvidence.runId` to `agentloop prepare-pr --json` output.

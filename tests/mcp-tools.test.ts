@@ -47,6 +47,20 @@ type PolicyPayload = {
   };
 };
 
+type PolicyStatusPayload = {
+  policies: Array<{
+    name: string;
+    status: string;
+    templatePath: string | null;
+  }>;
+  summary: {
+    current: number;
+    modified: number;
+    missing: number;
+    extra: number;
+  };
+};
+
 type ReportPayload = {
   report: {
     path: string;
@@ -205,6 +219,7 @@ describe('mcp tools', () => {
       'agentloop_show_active_task',
       'agentloop_list_policies',
       'agentloop_read_policy',
+      'agentloop_policy_status',
       'agentloop_latest_verification_report',
       'agentloop_latest_ship_report',
       'agentloop_list_runs',
@@ -229,6 +244,7 @@ describe('mcp tools', () => {
       name: 'agentloop_read_policy',
       arguments: { policyName: 'security' },
     });
+    const policyStatus = await callMcpTool({ cwd: dir, name: 'agentloop_policy_status' });
     const report = await callMcpTool({ cwd: dir, name: 'agentloop_latest_verification_report' });
     const shipReport = await callMcpTool({ cwd: dir, name: 'agentloop_latest_ship_report' });
     const runs = await callMcpTool({
@@ -259,6 +275,7 @@ describe('mcp tools', () => {
     const activeTaskPayload = activeTask.payload as ActiveTaskPayload;
     const policiesPayload = policies.payload as PoliciesPayload;
     const policyPayload = policy.payload as PolicyPayload;
+    const policyStatusPayload = policyStatus.payload as PolicyStatusPayload;
     const reportPayload = report.payload as ReportPayload;
     const shipReportPayload = shipReport.payload as ShipReportPayload;
     const runsPayload = runs.payload as RunsPayload;
@@ -275,6 +292,19 @@ describe('mcp tools', () => {
     expect(activeTaskPayload.task.content).toContain('Route returns JSON');
     expect(policiesPayload.policies.map((entry) => entry.name)).toContain('security-policy');
     expect(policyPayload.policy.title).toBe('Security Policy');
+    expect(policyStatusPayload.summary).toEqual({
+      current: 8,
+      modified: 0,
+      missing: 0,
+      extra: 0,
+    });
+    expect(policyStatusPayload.policies).toContainEqual({
+      name: 'security-policy',
+      title: 'Security Policy',
+      path: '.agentloop/policies/security-policy.md',
+      status: 'current',
+      templatePath: 'templates/policies/security-policy.md',
+    });
     expect(reportPayload.report.path).toBe(
       '.agentloop/reports/2026-06-10-12-30-verification-report.md',
     );

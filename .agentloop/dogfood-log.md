@@ -2,6 +2,41 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: MCP Policy Status Lookup
+
+- Task contract: `.agentloop/tasks/2026-06-12-expose-policy-status-through-mcp.md`
+- Trigger:
+  - MCP clients could read policy files but could not inspect whether local policies were current, modified, missing, or extra without shelling out to the CLI.
+  - `agentloop policy status --json` already had the deterministic local comparison behavior, so MCP only needed a read-only wrapper.
+- Product change:
+  - Added read-only MCP tool `agentloop_policy_status`.
+  - The tool returns the same local policy status shape as `agentloop policy status --json`.
+  - The MCP server instructions and docs now mention policy template status alongside policy reads.
+  - No policy writes, migrations, command execution, env reads, external APIs, uploads, version bump, or release were added.
+- Verification:
+  - Red focused run: `npm test -- tests/mcp-tools.test.ts` failed because `agentloop_policy_status` was missing and unknown.
+  - Green focused run of the same command passed after adding the tool.
+  - Focused MCP suite `npm test -- tests/mcp-tools.test.ts tests/mcp-server.test.ts` passed with 2 files and 5 tests.
+  - `npm run typecheck`, `npm run lint`, `npm run check:links`, and `git diff --check` passed.
+  - `npm run build` passed.
+  - Full `npm test` passed with 47 files and 407 tests.
+  - CLI smoke passed.
+  - Packed release smoke passed.
+  - Production dependency audit passed with no known vulnerabilities.
+  - ProjScan reported A 100/100.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-06-28-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-06-31-verify/`.
+  - Archived completed prior task: `.agentloop/tasks/archive/2026-06-12-expose-maintainer-check-through-mcp.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-06-34-ship-report.md`.
+  - Dogfood ship run: `.agentloop/runs/2026-06-12-06-34-ship/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-06-34-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-06-34-pr-description.md`.
+  - Ship score: 95/100 with gates passing.
+- Worked well:
+  - Reusing `getPolicyStatus()` kept MCP behavior consistent with the existing CLI JSON output.
+- Improve:
+  - Keep MCP v1 read-only; if policy migration ever exists, it should remain a separate explicit CLI command, not an MCP side effect.
+
 ## 2026-06-12: MCP Maintainer Check
 
 - Task contract: `.agentloop/tasks/2026-06-12-expose-maintainer-check-through-mcp.md`
