@@ -26,7 +26,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Policy customization guidance for repo-local safety rules
 - Repo-type policy examples for common project shapes
 - Local review-evidence gates with `agentloop check-gates` and `--strict`
-- Read-only MCP server with `agentloop mcp-server` for status, tasks, policies, verification reports, ship reports, run summaries, and handoffs
+- Read-only MCP server with `agentloop mcp-server` for status, tasks, policies, verification reports, ship reports, run summaries and details, and handoffs
 - Agent instruction installers, including `agentloop install-agent all`
 - Static bash, zsh, fish, and PowerShell completions
 - GitHub Actions, GitLab CI, and Buildkite recipes for evidence checks and CI-generated artifacts

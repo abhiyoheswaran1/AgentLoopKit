@@ -12,7 +12,7 @@ import { pathExists, resolvesInsidePath } from './file-system.js';
 import { getAgentLoopStatus } from './status.js';
 import { getActiveTask, listTasks, readTaskContract } from './task-state.js';
 import { listPolicies, readPolicy } from './policy.js';
-import { listRuns, type RunSummary } from './runs.js';
+import { listRuns, readRun, type RunRecord, type RunSummary } from './runs.js';
 
 export type McpToolDefinition = {
   name: string;
@@ -119,6 +119,21 @@ const tools: McpToolDefinition[] = [
     },
   },
   {
+    name: 'agentloop_show_run',
+    description: 'Read one local AgentLoopKit run ledger entry by run id.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+          description: 'Run id, for example "2026-06-10-12-32-ship".',
+        },
+      },
+      required: ['id'],
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'agentloop_list_handoffs',
     description: 'List recent local reviewer handoff summaries.',
     inputSchema: {
@@ -169,11 +184,33 @@ function toStoredPath(cwd: string, absolutePath: string) {
 function toMcpRunSummary(cwd: string, run: RunSummary) {
   return {
     ...run,
+    task: run.task ? { ...run.task, path: toStoredPath(cwd, run.task.path) } : run.task,
     ...(run.verificationReportPath
       ? { verificationReportPath: toStoredPath(cwd, run.verificationReportPath) }
       : {}),
     ...(run.shipReportPath ? { shipReportPath: toStoredPath(cwd, run.shipReportPath) } : {}),
     ...(run.handoffPath ? { handoffPath: toStoredPath(cwd, run.handoffPath) } : {}),
+  };
+}
+
+function toMcpRunRecord(cwd: string, run: RunRecord) {
+  return {
+    ...run,
+    metadata: {
+      ...run.metadata,
+      task: run.metadata.task
+        ? { ...run.metadata.task, path: toStoredPath(cwd, run.metadata.task.path) }
+        : run.metadata.task,
+      ...(run.metadata.verificationReportPath
+        ? { verificationReportPath: toStoredPath(cwd, run.metadata.verificationReportPath) }
+        : {}),
+      ...(run.metadata.shipReportPath
+        ? { shipReportPath: toStoredPath(cwd, run.metadata.shipReportPath) }
+        : {}),
+      ...(run.metadata.handoffPath
+        ? { handoffPath: toStoredPath(cwd, run.metadata.handoffPath) }
+        : {}),
+    },
   };
 }
 
@@ -301,6 +338,10 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
           .slice(0, limit)
           .map((run) => toMcpRunSummary(options.cwd, run)),
       });
+    }
+    case 'agentloop_show_run': {
+      const id = readStringArgument(options.arguments, 'id');
+      return textResult({ run: toMcpRunRecord(options.cwd, await readRun(options.cwd, id)) });
     }
     case 'agentloop_list_handoffs': {
       const limit = readLimitArgument(options.arguments);

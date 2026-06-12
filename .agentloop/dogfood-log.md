@@ -2,6 +2,45 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: MCP Run Detail Lookup
+
+- Task contract: `.agentloop/tasks/2026-06-12-expose-run-details-through-mcp.md`
+- Trigger:
+  - MCP clients could list recent run ledger summaries but could not inspect one run's score JSON, changed files, or diffstat without shelling out to `agentloop show-run`.
+  - The MCP server should expose the same local review evidence as the CLI while staying read-only.
+- Product change:
+  - Added read-only MCP tool `agentloop_show_run`.
+  - The tool accepts a run id and returns one run record with metadata, score, changed files, and diffstat.
+  - MCP run detail metadata now renders AgentLoop artifact paths repo-relative.
+  - The tool reuses the existing run-ledger id validation and path guards.
+- Verification:
+  - Red focused run: `npm test -- tests/mcp-tools.test.ts` failed because `agentloop_show_run` was missing and unknown.
+  - Green focused run of the same command passed after adding the tool.
+  - Focused MCP suite `npm test -- tests/mcp-tools.test.ts tests/mcp-server.test.ts` passed with 2 files and 5 tests.
+  - `npm run typecheck`, `npm run lint`, `npm run check:links`, and `git diff --check` passed.
+  - `npm run build` passed.
+  - Full `npm test` first timed out in five subprocess-heavy tests because it ran in parallel with `npm run build`.
+  - Rerunning the five timed-out files alone passed with 5 files and 54 tests.
+  - Rerunning full `npm test` alone passed with 47 files and 407 tests.
+  - CLI smoke passed.
+  - Packed release smoke passed.
+  - Production dependency audit passed with no known vulnerabilities.
+  - ProjScan reported A 100/100.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-05-38-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-05-42-verify/`.
+  - First dogfood ship run: `.agentloop/runs/2026-06-12-05-42-ship/` found task hygiene warning.
+  - Archived completed prior task: `.agentloop/tasks/archive/2026-06-12-expose-ship-evidence-through-mcp.md`.
+  - Final dogfood ship report: `.agentloop/reports/2026-06-12-05-42-ship-report.md`.
+  - Final dogfood ship run: `.agentloop/runs/2026-06-12-05-42-ship-2/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-05-42-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-05-42-pr-description.md`.
+  - Final ship score: 92/100 with gates passing.
+- Worked well:
+  - `task doctor` correctly caught the stale done task before the commit.
+  - Existing `readRun()` safety checks kept the MCP implementation small.
+- Improve:
+  - Avoid running full test and build concurrently; subprocess-heavy tests can hit timeout budgets under local load.
+
 ## 2026-06-12: MCP Ship And Run Evidence
 
 - Task contract: `.agentloop/tasks/2026-06-12-expose-ship-evidence-through-mcp.md`

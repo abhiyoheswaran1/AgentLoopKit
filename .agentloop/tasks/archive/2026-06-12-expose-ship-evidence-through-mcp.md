@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-12
 - Task type: feature
-- Status: review
+- Status: done
 
 ## Problem Statement
 The read-only MCP server exposes tasks, policies, verification reports, handoffs, status, and next action, but MCP clients cannot directly read the latest ship/readiness report or run ledger evidence.

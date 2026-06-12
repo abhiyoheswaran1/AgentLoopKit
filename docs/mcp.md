@@ -34,6 +34,7 @@ Example MCP client configuration:
 | `agentloop_latest_verification_report` | Latest verification report metadata and Markdown content                                                                            |
 | `agentloop_latest_ship_report`         | Latest ship/readiness report metadata and Markdown content                                                                          |
 | `agentloop_list_runs`                  | Recent local run ledger entries with bounded `limit` input                                                                          |
+| `agentloop_show_run`                   | One local run ledger entry by run id, including metadata, score JSON, changed files, and diffstat                                   |
 | `agentloop_list_handoffs`              | Recent reviewer handoff summaries                                                                                                   |
 | `agentloop_latest_handoff`             | Latest reviewer handoff Markdown content                                                                                            |
 

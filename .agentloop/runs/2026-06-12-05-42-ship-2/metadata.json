@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-05-42-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-12-05-42",
+  "createdAtEpochMs": 1781235764361,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-expose-run-details-through-mcp.md",
+    "title": "Expose run details through MCP",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-05-38-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-05-42-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-05-42-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 18
+}

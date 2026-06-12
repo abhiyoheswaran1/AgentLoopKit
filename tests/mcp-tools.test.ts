@@ -70,6 +70,23 @@ type RunsPayload = {
   }>;
 };
 
+type RunPayload = {
+  run: {
+    metadata: {
+      id: string;
+      command: string;
+      shipReportPath?: string;
+    };
+    score: {
+      totalScore: number;
+    } | null;
+    changedFiles: Array<{
+      path: string;
+    }>;
+    diffStat: string;
+  };
+};
+
 type HandoffsPayload = {
   handoffs: Array<{
     title: string;
@@ -139,6 +156,18 @@ async function createInitializedRepo() {
       2,
     )}\n`,
   );
+  await writeFile(
+    path.join(dir, '.agentloop/runs/2026-06-10-12-32-ship/score.json'),
+    `${JSON.stringify({ totalScore: 96 }, null, 2)}\n`,
+  );
+  await writeFile(
+    path.join(dir, '.agentloop/runs/2026-06-10-12-32-ship/changed-files.json'),
+    `${JSON.stringify([{ path: 'src/routes/api.ts', status: 'M' }], null, 2)}\n`,
+  );
+  await writeFile(
+    path.join(dir, '.agentloop/runs/2026-06-10-12-32-ship/diffstat.txt'),
+    ' src/routes/api.ts | 4 ++++\n',
+  );
   return { dir };
 }
 
@@ -159,6 +188,7 @@ describe('mcp tools', () => {
       'agentloop_latest_verification_report',
       'agentloop_latest_ship_report',
       'agentloop_list_runs',
+      'agentloop_show_run',
       'agentloop_list_handoffs',
       'agentloop_latest_handoff',
     ]);
@@ -184,6 +214,11 @@ describe('mcp tools', () => {
       name: 'agentloop_list_runs',
       arguments: { limit: 1 },
     });
+    const run = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_show_run',
+      arguments: { id: '2026-06-10-12-32-ship' },
+    });
     const handoffs = await callMcpTool({ cwd: dir, name: 'agentloop_list_handoffs' });
     const handoff = await callMcpTool({ cwd: dir, name: 'agentloop_latest_handoff' });
 
@@ -196,6 +231,7 @@ describe('mcp tools', () => {
     const reportPayload = report.payload as ReportPayload;
     const shipReportPayload = shipReport.payload as ShipReportPayload;
     const runsPayload = runs.payload as RunsPayload;
+    const runPayload = run.payload as RunPayload;
     const handoffsPayload = handoffs.payload as HandoffsPayload;
     const handoffPayload = handoff.payload as HandoffPayload;
 
@@ -223,6 +259,15 @@ describe('mcp tools', () => {
       }),
     ]);
     expect(runsPayload.runs[0].shipReportPath).not.toContain(dir);
+    expect(runPayload.run.metadata).toMatchObject({
+      id: '2026-06-10-12-32-ship',
+      command: 'ship',
+      shipReportPath: '.agentloop/reports/2026-06-10-12-32-ship-report.md',
+    });
+    expect(runPayload.run.metadata.shipReportPath).not.toContain(dir);
+    expect(runPayload.run.score?.totalScore).toBe(96);
+    expect(runPayload.run.changedFiles).toEqual([{ path: 'src/routes/api.ts', status: 'M' }]);
+    expect(runPayload.run.diffStat).toContain('src/routes/api.ts');
     expect(handoffsPayload.handoffs[0]).toMatchObject({ title: 'PR Summary' });
     expect(handoffPayload.handoff.content).toContain('Route implementation handoff.');
   });
@@ -233,6 +278,20 @@ describe('mcp tools', () => {
     await expect(callMcpTool({ cwd: dir, name: 'agentloop_verify' })).rejects.toThrow(
       'Unknown MCP tool',
     );
+    await expect(
+      callMcpTool({
+        cwd: dir,
+        name: 'agentloop_show_run',
+        arguments: { id: '../2026-06-10-12-32-ship' },
+      }),
+    ).rejects.toThrow('Invalid run id');
+    await expect(
+      callMcpTool({
+        cwd: dir,
+        name: 'agentloop_show_run',
+        arguments: { id: '2026-06-10-99-99-ship' },
+      }),
+    ).rejects.toThrow('Run not found');
     await expect(
       callMcpTool({
         cwd: dir,
