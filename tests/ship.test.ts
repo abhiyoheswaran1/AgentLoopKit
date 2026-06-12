@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { mkdir, readFile, realpath, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, realpath, rename, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -9,6 +9,7 @@ import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
+const CLI_SHIP_TEST_TIMEOUT_MS = 90_000;
 
 let tempDirs: string[] = [];
 
@@ -137,6 +138,56 @@ describe('ship command', () => {
     expect(markdown).not.toContain(dir);
   });
 
+  test('uses latest run task evidence when the task contract was archived', async () => {
+    const dir = await createShipFixture();
+    await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+    await rename(
+      path.join(dir, '.agentloop/tasks/2026-06-11-fix-login.md'),
+      path.join(dir, '.agentloop/tasks/archive/2026-06-11-fix-login.md'),
+    );
+    await writeJson(path.join(dir, '.agentloop/runs/2026-06-11-12-05-ship/metadata.json'), {
+      id: '2026-06-11-12-05-ship',
+      command: 'ship',
+      createdAt: '2026-06-11-12-05',
+      createdAtEpochMs: 1781179500000,
+      task: {
+        path: '.agentloop/tasks/2026-06-11-fix-login.md',
+        title: 'Fix login redirect bug',
+        status: 'done',
+      },
+      verificationReportPath: '.agentloop/reports/2026-06-11-12-00-verification-report.md',
+      shipReportPath: '.agentloop/reports/2026-06-11-12-05-ship-report.md',
+      changedFileCount: 1,
+      score: 96,
+    });
+
+    const result = await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+
+    expect(output.task).toEqual({
+      path: '.agentloop/tasks/archive/2026-06-11-fix-login.md',
+      title: 'Fix login redirect bug',
+      status: 'in-progress',
+    });
+    const taskClarity = output.readiness.dimensions.find(
+      (dimension: { id: string }) => dimension.id === 'task-clarity',
+    );
+    expect(taskClarity).toEqual(
+      expect.objectContaining({
+        id: 'task-clarity',
+        score: expect.any(Number),
+      }),
+    );
+    expect(taskClarity?.score).toBeGreaterThan(0);
+    expect(taskClarity?.reason).not.toBe('No task contract is active or discoverable.');
+    expect(output.readiness.blockers).not.toContain('No task contract found.');
+    expect(output.readiness.totalScore).toBeGreaterThanOrEqual(85);
+
+    const markdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
+    expect(markdown).toContain('Fix login redirect bug');
+    expect(markdown).toContain('.agentloop/tasks/archive/2026-06-11-fix-login.md');
+  });
+
   test('includes GitHub comment markdown in JSON output when requested', async () => {
     const dir = await createShipFixture();
 
@@ -159,27 +210,31 @@ describe('ship command', () => {
     expect(output.githubComment).toContain('### Next Actions');
   });
 
-  test('redacts nested gate git root paths when requested', async () => {
-    const dir = await createShipFixture();
-    const realRoot = await realpath(dir);
+  test(
+    'redacts nested gate git root paths when requested',
+    async () => {
+      const dir = await createShipFixture();
+      const realRoot = await realpath(dir);
 
-    const defaultResult = await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir });
-    const defaultOutput = JSON.parse(defaultResult.stdout);
-    expect(defaultOutput.gates.git.root).toBe(realRoot);
+      const defaultResult = await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir });
+      const defaultOutput = JSON.parse(defaultResult.stdout);
+      expect(defaultOutput.gates.git.root).toBe(realRoot);
 
-    const redactedResult = await execa(tsxPath, [cliPath, 'ship', '--json', '--redact-paths'], {
-      cwd: dir,
-      reject: false,
-    });
+      const redactedResult = await execa(tsxPath, [cliPath, 'ship', '--json', '--redact-paths'], {
+        cwd: dir,
+        reject: false,
+      });
 
-    expect(redactedResult.exitCode).toBe(0);
-    expect(redactedResult.stdout).not.toContain(realRoot);
-    const redactedOutput = JSON.parse(redactedResult.stdout);
-    expect(redactedOutput.gates.git.root).toBe('[git-root]');
-    expect(redactedOutput.gates.git.targetIsRoot).toBe(true);
-    expect(redactedOutput.gates.markdown).toContain('- Git root: `[git-root]`');
-    expect(redactedOutput.gates.markdown).not.toContain(realRoot);
-  });
+      expect(redactedResult.exitCode).toBe(0);
+      expect(redactedResult.stdout).not.toContain(realRoot);
+      const redactedOutput = JSON.parse(redactedResult.stdout);
+      expect(redactedOutput.gates.git.root).toBe('[git-root]');
+      expect(redactedOutput.gates.git.targetIsRoot).toBe(true);
+      expect(redactedOutput.gates.markdown).toContain('- Git root: `[git-root]`');
+      expect(redactedOutput.gates.markdown).not.toContain(realRoot);
+    },
+    CLI_SHIP_TEST_TIMEOUT_MS,
+  );
 
   test('prints only GitHub comment markdown when requested without JSON', async () => {
     const dir = await createShipFixture();

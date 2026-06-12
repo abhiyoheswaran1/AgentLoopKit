@@ -1,0 +1,8 @@
+ .agentloop/backlog.md     |  3 ++-
+ .agentloop/dogfood-log.md | 36 ++++++++++++++++++++++++++++++++
+ DECISIONS.md              | 12 +++++++++++
+ src/core/prepare-pr.ts    |  6 +++---
+ src/core/ship.ts          |  4 ++--
+ tests/prepare-pr.test.ts  | 38 +++++++++++++++++++++++++++++++++-
+ tests/ship.test.ts        | 52 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 7 files changed, 143 insertions(+), 8 deletions(-)

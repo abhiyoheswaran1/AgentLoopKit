@@ -2,6 +2,57 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: 0.28.3 Release Gate
+
+- Task contract: `.agentloop/tasks/2026-06-12-release-agentloopkit-0-28-3.md`
+- Trigger:
+  - The archived-task `ship` and `prepare-pr` fixes were ready for a small patch release.
+- What happened:
+  - The first local release gate passed, but `npm publish --access public --dry-run` exposed two full-suite timeout failures in subprocess-heavy tests.
+  - Added explicit 90s Vitest timeout budgets to those integration tests, matching the existing pattern for other ledger and artifact tests.
+- Verification:
+  - `npm publish --access public --dry-run` passed after the timeout-budget patch.
+  - `npm pack --pack-destination /tmp --silent` produced `agentloopkit-0.28.3.tgz`.
+- Improve:
+  - Keep npm dry-run publishing in every release gate. It catches release-hook behavior that a standalone command sequence can miss.
+
+## 2026-06-12: Prepare-pr Reuses Archived Task Evidence
+
+- Task contract: `.agentloop/tasks/2026-06-12-fix-prepare-pr-archived-task-evidence.md`
+- Trigger:
+  - After `ship` was fixed to use archived latest-run task evidence, dogfooding showed `prepare-pr` could still lose the task title and task-body sections after cleanup.
+  - The generated PR description fell back to generic copy even though a fresh ship report had the archived task context.
+- Product change:
+  - `prepare-pr` now uses the same current-or-latest-run task evidence resolver as `ship`.
+  - Fresh ship-run reuse now works after task archival without writing a duplicate ship run.
+  - PR title, acceptance criteria, risks, and rollback notes stay available from the archived task contract.
+- Verification:
+  - Red TDD run: `npm test -- tests/prepare-pr.test.ts` failed because `titleSuggestion` was `AgentLoopKit review-ready changes`.
+  - Green focused run: `npm test -- tests/prepare-pr.test.ts` passed with 1 file and 5 tests.
+  - Post-archive dogfood run: `agentloop ship` resolved `.agentloop/tasks/archive/2026-06-12-fix-prepare-pr-archived-task-evidence.md` as `done`, and `agentloop prepare-pr --write --json` reused run `2026-06-12-16-28-ship`.
+- Worked well:
+  - The dogfood flow caught a user-facing handoff regression immediately after the lower-level `ship` scoring fix.
+- Improve:
+  - Keep release gates checking the full lifecycle after archiving, not only while a task is active.
+
+## 2026-06-12: Ship Reuses Archived Task Evidence
+
+- Task contract: `.agentloop/tasks/2026-06-12-fix-ship-archived-task-scoring.md`
+- Trigger:
+  - After the post-verification gates task was archived, `npm run dogfood:strict`, `check-gates`, and `maintainer-check` still found the archived task through latest-run evidence.
+  - `agentloop ship` did not use that same fallback, so it scored task clarity as missing after cleanup.
+- Product change:
+  - `agentloop ship` now uses the same current-or-latest-run task evidence resolver as gates and maintainer-check.
+  - Archived task evidence remains read-only context. It does not reactivate the task, alter archive behavior, or execute commands.
+- Verification:
+  - Red TDD run: `npm test -- tests/ship.test.ts` failed because `ship --json` returned `task: null`, task clarity `0`, and blocker `No task contract found.`
+  - Green focused run: `npm test -- tests/ship.test.ts` passed with 1 file and 6 tests.
+- Worked well:
+  - Dogfooding caught a consistency gap between related review-readiness commands.
+  - The fix reused an existing safety-checked resolver instead of adding a parallel path lookup.
+- Improve:
+  - Keep watching for places where archived task evidence is valid for review but should not become active task state.
+
 ## 2026-06-12: Post-Verification Gates For Dogfood Flow
 
 - Task contract: `.agentloop/tasks/2026-06-12-add-post-verification-task-gates.md`

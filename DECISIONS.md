@@ -1,5 +1,17 @@
 # Decisions
 
+## 2026-06-12: Prepare-pr Uses Archived Latest-Run Task Evidence
+
+`agentloop prepare-pr` should reuse the same task-evidence model as `agentloop ship`. When a fresh ship run references a task that has since moved into `.agentloop/tasks/archive/`, `prepare-pr` may use that archived task as read-only PR context and may reuse the fresh ship run instead of writing duplicate ship evidence.
+
+This keeps PR titles, acceptance criteria, risk notes, and rollback notes available after normal dogfood cleanup. It does not reactivate archived tasks, change task archive behavior, post to GitHub, run verification commands, or accept task paths outside the configured task directory.
+
+## 2026-06-12: Ship Uses Archived Latest-Run Task Evidence
+
+`agentloop ship`, `check-gates`, and `maintainer-check` should agree about task evidence after cleanup. When no active or open task exists, they may reuse the latest run's task reference if the corresponding Markdown file exists in `.agentloop/tasks/archive/`.
+
+This keeps review-readiness scoring tied to the completed task after the task has been archived. It does not make archived tasks active again, change task archive behavior, run verification commands, or accept arbitrary paths outside the configured task directory.
+
 ## 2026-06-12: Post-Verification Gates Are Explicit Evidence
 
 Task contracts can record `Post-Verification Gates` for commands that need a fresh AgentLoop verification report, such as `npm run dogfood:strict`, `agentloop ship`, or reviewer handoff checks. `agentloop create-task` accepts repeatable `--post-verification` flags for this section.

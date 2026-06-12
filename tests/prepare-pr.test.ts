@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, realpath, writeFile } from 'node:fs/promises';
+import { mkdir, realpath, rename, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -8,6 +8,7 @@ import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
+const CLI_PREPARE_PR_TEST_TIMEOUT_MS = 90_000;
 
 let tempDirs: string[] = [];
 
@@ -170,6 +171,46 @@ describe('prepare-pr command', () => {
     expect(shipRuns).toHaveLength(1);
     expect(shipRuns[0].id).toBe(ship.run.id);
   });
+
+  test(
+    'reuses archived latest-run task evidence for PR copy without writing duplicate ship runs',
+    async () => {
+      const dir = await createPreparePrFixture();
+
+      await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir });
+      await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+      await rename(
+        path.join(dir, '.agentloop/tasks/2026-06-11-fix-login.md'),
+        path.join(dir, '.agentloop/tasks/archive/2026-06-11-fix-login.md'),
+      );
+
+      const archivedShip = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir })).stdout,
+      );
+      const prepared = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'prepare-pr', '--write', '--json'], { cwd: dir })).stdout,
+      );
+      const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
+      const shipRuns = runs.runs.filter((run: { command: string }) => run.command === 'ship');
+
+      expect(archivedShip.task).toMatchObject({
+        path: '.agentloop/tasks/archive/2026-06-11-fix-login.md',
+        title: 'Fix login redirect bug',
+      });
+      expect(prepared.titleSuggestion).toBe('Fix login redirect bug');
+      expect(prepared.body).toContain('# Fix login redirect bug');
+      expect(prepared.body).toContain('Password-reset login redirects to the requested page.');
+      expect(prepared.body).toContain('Auth flow touched; review redirect edge cases.');
+      expect(prepared.body).toContain('Revert the auth callback change.');
+      expect(prepared.shipReportPath).toBe(archivedShip.shipReportPath);
+      expect(prepared.shipEvidence).toEqual({
+        source: 'reused',
+        runId: archivedShip.run.id,
+      });
+      expect(shipRuns).toHaveLength(2);
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
 
   test('groups changed files by review area in the PR body', async () => {
     const dir = await createPreparePrFixture();

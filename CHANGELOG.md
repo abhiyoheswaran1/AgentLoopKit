@@ -4,6 +4,11 @@
 
 - No unreleased changes yet.
 
+## 0.28.3
+
+- Fixed `agentloop ship` so archived latest-run task contracts still count as task evidence after normal task cleanup.
+- Fixed `agentloop prepare-pr` so it keeps the archived task title, acceptance criteria, risk notes, and rollback notes after cleanup, and reuses fresh ship evidence instead of writing duplicate ship runs.
+
 ## 0.28.2
 
 - Added `agentloop verify --task <path> --task-commands --only-task-commands` for focused task-contract verification without configured repo commands.

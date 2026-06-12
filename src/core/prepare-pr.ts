@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
-import { resolveCurrentTaskVerificationEvidence } from './evidence.js';
+import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import { getGitStatus, GitFileStatus, parseGitStatus } from './git.js';
 import { inlineCode } from './markdown-format.js';
@@ -193,7 +193,7 @@ async function findReusableShipEvidence(options: {
   cwd: string;
   config: AgentLoopConfig;
 }): Promise<PreparePrShipEvidence | undefined> {
-  const evidence = await resolveCurrentTaskVerificationEvidence(options);
+  const evidence = await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
   if (!evidence.taskPath || !evidence.currentReportPath || evidence.staleReport) return undefined;
 
   const taskPath = relativePath(options.cwd, evidence.taskPath);
@@ -271,7 +271,7 @@ export async function preparePullRequest(options: {
 }) {
   const preparedShip =
     (await findReusableShipEvidence(options)) ?? (await refreshShipEvidence(options));
-  const evidence = await resolveCurrentTaskVerificationEvidence(options);
+  const evidence = await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
   const task = evidence.taskPath
     ? await readTaskContract({
         cwd: options.cwd,

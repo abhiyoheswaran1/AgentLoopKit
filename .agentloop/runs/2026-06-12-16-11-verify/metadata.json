@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-16-11-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-16-11",
+  "createdAtEpochMs": 1781273461534,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-fix-ship-archived-task-scoring.md",
+    "title": "Fix ship archived task scoring",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-16-08-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

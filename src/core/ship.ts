@@ -4,7 +4,7 @@ import { AgentLoopConfig } from './config.js';
 import { resolveOutputArtifactPath } from './artifacts.js';
 import { checkGates } from './check-gates.js';
 import { formatTimestamp } from './dates.js';
-import { resolveCurrentTaskVerificationEvidence } from './evidence.js';
+import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
 import { getGitDiffStat, getGitStatus, parseGitStatus } from './git.js';
 import { writeTextFile } from './file-system.js';
 import { fencedCodeBlock, inlineCode } from './markdown-format.js';
@@ -179,7 +179,7 @@ export async function createShipReport(options: {
   const gitStatus = await getGitStatus(options.cwd);
   const changedFiles = await parseGitStatus(gitStatus);
   const diffStat = await getGitDiffStat(options.cwd);
-  const evidence = await resolveCurrentTaskVerificationEvidence(options);
+  const evidence = await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
   const task = evidence.taskPath
     ? await readTaskContract({
         cwd: options.cwd,
