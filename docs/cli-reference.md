@@ -240,6 +240,8 @@ If the latest verification report is older than the active or newest open task, 
 
 Warnings keep exit code `0` by default. Use `--strict` in CI when warning gates should fail.
 
+Clean committed work does not fail strict gates only because there are no changed files. The Git context gate reports that state as pass when the repo is inside Git.
+
 Use `--redact-paths` when gate output will be copied into a public issue, PR, or CI log. It hides the absolute Git root without changing gate decisions.
 
 See [check-gates.md](check-gates.md).

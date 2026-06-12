@@ -2,6 +2,32 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: 0.28.5 Release Gate
+
+- Task contract: `.agentloop/tasks/2026-06-12-release-agentloopkit-0-28-5-patch.md`
+- Trigger:
+  - The safer `release-check` publish guidance landed after `0.28.4`.
+  - The maintainer asked for a small patch release after logo and dogfood work.
+- Product change:
+  - Prepared `agentloopkit@0.28.5`.
+  - Updated `server.json` so MCP Registry metadata names the same package version.
+  - Moved the release-check guidance changelog note from `Unreleased` into `0.28.5`.
+  - Updated `ROADMAP.md` current release state so release smoke matches package metadata.
+  - Fixed `check-gates --strict` so clean committed release evidence does not fail only because there are no changed files.
+- Verification:
+  - First AgentLoop release verification failed because `ROADMAP.md` still named `0.28.4`.
+  - Focused guard: `npm test -- tests/release-smoke.test.ts` passed with 18 tests after the roadmap update.
+  - Focused packed smoke: `npm run smoke:release` passed after the roadmap update.
+  - Red TDD run: `npm test -- tests/check-gates.test.ts -t "passes strict gates for clean verified evidence with no changed files"` failed because clean Git context still warned.
+  - Green focused run: the same check-gates test passed after the gate status change.
+  - Full check-gates run: `npm test -- tests/check-gates.test.ts` passed with 13 tests.
+  - AgentLoop release verification passed and wrote `.agentloop/reports/2026-06-12-21-42-verification-report.md`.
+  - The passing verification run wrote `.agentloop/runs/2026-06-12-21-51-verify/`.
+- Worked well:
+  - The release-smoke roadmap guard caught stale public release state before tagging.
+- Improve:
+  - Release tasks should keep registry checks in the post-publish section because `npm-status --expect-current` cannot pass for a new version before the trusted publishing workflow runs.
+
 ## 2026-06-12: Safer Release-Check Publish Guidance
 
 - Task contract: `.agentloop/tasks/archive/2026-06-12-make-release-check-publish-guidance-safer.md`

@@ -2,7 +2,12 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.28.5
+
 - Changed `agentloop release-check` next-action guidance to route maintainers through `agentloop npm-status` before publishing instead of recommending a direct npm publish command.
+- Changed `agentloop check-gates --strict` so a clean Git tree with current task, verification, and handoff evidence passes instead of failing on the informational `No changed files detected` message.
 
 ## 0.28.4
 

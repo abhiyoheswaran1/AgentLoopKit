@@ -35,6 +35,7 @@ Statuses:
 The command exits with code `1` when any gate fails. Warnings keep exit code `0`.
 Task-folder hygiene issues are warnings by default. Run `agentloop task doctor` for the detailed cleanup list.
 When task, verification, and handoff evidence are present but task hygiene still warns, the next action points to `agentloop task doctor`.
+When a clean Git tree has current task, verification, and handoff evidence, the Git context gate passes and reports that no changed files were detected.
 
 Use `--strict` when CI should fail on warnings:
 

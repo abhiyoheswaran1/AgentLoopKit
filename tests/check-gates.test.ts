@@ -439,7 +439,7 @@ describe('check-gates command', () => {
         expect.objectContaining({ id: 'task-contract', status: 'fail' }),
         expect.objectContaining({ id: 'verification-report', status: 'fail' }),
         expect.objectContaining({ id: 'handoff-summary', status: 'warn' }),
-        expect.objectContaining({ id: 'git-context', status: 'warn' }),
+        expect.objectContaining({ id: 'git-context', status: 'pass' }),
       ]),
     );
     expect(output.nextAction.command).toBe('agentloop create-task');
@@ -547,7 +547,7 @@ describe('check-gates command', () => {
   });
 
   test(
-    'strict mode treats warning-only gates as failures without changing default behavior',
+    'passes strict gates for clean verified evidence with no changed files',
     async () => {
       const dir = await createInitializedRepo();
     await writeFile(
@@ -581,18 +581,30 @@ describe('check-gates command', () => {
 
     expect(defaultResult.exitCode).toBe(0);
     const defaultOutput = JSON.parse(defaultResult.stdout);
-    expect(defaultOutput.overallStatus).toBe('warn');
+    expect(defaultOutput.overallStatus).toBe('pass');
     expect(defaultOutput.strict).toBe(false);
     expect(defaultOutput.gates).toEqual(
-      expect.arrayContaining([expect.objectContaining({ id: 'git-context', status: 'warn' })]),
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'git-context',
+          status: 'pass',
+          message: 'No changed files detected.',
+        }),
+      ]),
     );
 
-    expect(strictResult.exitCode).toBe(1);
+    expect(strictResult.exitCode).toBe(0);
     const strictOutput = JSON.parse(strictResult.stdout);
-    expect(strictOutput.overallStatus).toBe('fail');
+    expect(strictOutput.overallStatus).toBe('pass');
     expect(strictOutput.strict).toBe(true);
       expect(strictOutput.gates).toEqual(
-        expect.arrayContaining([expect.objectContaining({ id: 'git-context', status: 'warn' })]),
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'git-context',
+            status: 'pass',
+            message: 'No changed files detected.',
+          }),
+        ]),
       );
     },
     CLI_CHECK_GATES_TEST_TIMEOUT_MS,

@@ -308,7 +308,7 @@ export async function checkGates(options: {
     gate(
       'git-context',
       'Git context',
-      !inGit || changedFiles.length === 0 ? 'warn' : 'pass',
+      !inGit ? 'warn' : 'pass',
       !inGit
         ? 'Not inside a git repository.'
         : changedFiles.length === 0
