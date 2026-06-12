@@ -33,6 +33,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - local release-note handoffs with `agentloop release-notes`
 - read-only npm registry status checks with `agentloop npm-status`
 - read-only local evidence inventory with `agentloop artifacts`
+- read-only local reviewability snapshot with `agentloop review-context`
 - next-action shortcut with `agentloop next`
 - prepublish metadata guard that blocks npm publish while `CHANGELOG.md` has unreleased entries
 - read-only local policy inspection with `agentloop policy`
@@ -90,6 +91,7 @@ Included so far:
 - simplified npm-facing README with detailed command behavior moved to `docs/cli-reference.md`
 - generated first-run harness guidance with a risk-aware task example and task-linked verification command
 - read-only `agentloop artifacts` command for local evidence inventory
+- read-only `agentloop review-context` command for non-MCP agents
 - cross-platform CLI smoke workflow for Ubuntu, macOS, and Windows
 - local acceptance-layer commands: `ship`, `prepare-pr`, `runs`, `show-run`, `intent`, and `maintainer-check`
 - `agentloop status` now surfaces the newest local run ledger entry in Markdown, JSON, and brief output

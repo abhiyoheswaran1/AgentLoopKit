@@ -7366,3 +7366,47 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Avoid broad Prettier runs on long Markdown tables such as `.agentloop/backlog.md`; touched-file formatting can still create review noise.
   - Consider a future MCP `agentloop_review_context` option for smaller or larger snapshots only if real client usage shows the default is too broad.
+
+## 2026-06-12: CLI Review Context Snapshot
+
+- Task contract: `.agentloop/tasks/2026-06-12-expose-review-context-through-the-cli.md`
+- Trigger:
+  - Non-MCP agent sessions should not have to stitch together `status`, `check-gates`, `policy status`, `artifacts`, and `runs` just to understand review readiness.
+  - The MCP review context was useful enough to expose as a normal local CLI command.
+- Implementation:
+  - Added shared `src/core/review-context.ts`.
+  - Added `agentloop review-context` and `agentloop review-context --json`.
+  - Rewired MCP `agentloop_review_context` to use the shared core builder.
+  - Added shell completion, README, CLI reference, changelog, roadmap, final handoff, and smoke coverage.
+  - Added a regression that ensures review-context output does not leak absolute temp repo paths from run metadata.
+- Verification run:
+  - Red focused tests failed first because `review-context` was missing from CLI help/dispatch and docs/completions.
+  - A focused green run initially found a real path-normalization bug where absolute run metadata could appear as `../../...` on macOS temp paths.
+  - Focused tests passed after the path guard:
+    - `npm test -- tests/review-context.test.ts tests/cli-docs-drift.test.ts tests/mcp-tools.test.ts`
+  - Broader local checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:links`
+    - `git diff --check`
+    - `npm run build`
+    - `node scripts/smoke-cli.mjs`
+    - `npm test`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npx --yes projscan doctor --format markdown`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-12-07-43-verification-report.md`.
+  - Dogfood runs:
+    - `.agentloop/runs/2026-06-12-07-47-verify/`
+    - `.agentloop/runs/2026-06-12-07-47-handoff/`
+    - `.agentloop/runs/2026-06-12-07-48-ship/`
+  - Dogfood handoffs:
+    - `.agentloop/handoffs/2026-06-12-07-47-pr-summary.md`
+    - `.agentloop/handoffs/2026-06-12-07-48-pr-summary.md`
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-07-48-ship-report.md` with score `96`/100.
+- What worked well:
+  - The docs-drift test made the public command-surface work explicit.
+  - The CLI test caught the path-normalization issue before commit.
+- Improve:
+  - Consider sharing the same path-normalization helper with all MCP run-summary tools, not only the review-context path.
+  - Consider a `review-context --brief` mode only if the default Markdown proves too verbose in real agent sessions.

@@ -103,6 +103,17 @@ Use `--brief` when an agent or script needs one compact human-readable line plus
 
 See [status.md](status.md).
 
+## Review Context
+
+```bash
+agentloop review-context
+agentloop review-context --json
+```
+
+`review-context` prints one read-only local snapshot for agents and scripts that do not use MCP. It combines active task state, latest verification, review gates, policy status, artifact inventory, recent run ledger entries, latest ship score, working-tree state, safety notes, and the next recommended action.
+
+The command does not run verification, write files, include full Markdown artifact bodies, read `.env` contents, call external APIs, or post to GitHub.
+
 ## Verification
 
 ```bash

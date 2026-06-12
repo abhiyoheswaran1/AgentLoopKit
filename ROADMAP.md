@@ -20,6 +20,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Local CI provenance summaries with `agentloop ci-summary` for GitHub Actions, GitLab CI, and Buildkite
 - Local release-note handoffs with `agentloop release-notes`
 - Local evidence inventory with `agentloop artifacts`
+- Local reviewability snapshot with `agentloop review-context`
 - Local template manifest checks and manual migration guidance
 - Local safety policy inspection with `agentloop policy`
 - Local safety policy template status with `agentloop policy status`
@@ -45,7 +46,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
-- Current `main` is accumulating unreleased work for the planned `0.28.0` batch, including README cleanup, first-run guidance polish, cross-platform smoke CI, read-only artifact inventory, and MCP review context snapshots. Do not cut releases for every small improvement.
+- Current `main` is accumulating unreleased work for the planned `0.28.0` batch, including README cleanup, first-run guidance polish, cross-platform smoke CI, read-only artifact inventory, CLI review context snapshots, and MCP review context snapshots. Do not cut releases for every small improvement.
 
 ## Near Term
 

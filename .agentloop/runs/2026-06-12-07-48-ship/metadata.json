@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-07-48-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-07-48",
+  "createdAtEpochMs": 1781243302854,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-expose-review-context-through-the-cli.md",
+    "title": "Expose review context through the CLI",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-07-43-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-07-48-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-07-48-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 21
+}

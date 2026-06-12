@@ -15,6 +15,7 @@ const topLevelCommands = [
   ['handoff', 'Write a reviewer handoff'],
   ['status', 'Show current loop state'],
   ['next', 'Show the next recommended loop action'],
+  ['review-context', 'Show one reviewability context snapshot'],
   ['check-gates', 'Check review gate evidence'],
   ['ship', 'Score review readiness and write a ship report'],
   ['prepare-pr', 'Generate a PR description from local evidence'],

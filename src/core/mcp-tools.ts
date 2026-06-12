@@ -19,6 +19,7 @@ import { getActiveTask, listTasks, readTaskContract } from './task-state.js';
 import { getPolicyStatus, listPolicies, readPolicy } from './policy.js';
 import { runMaintainerCheck } from './maintainer-check.js';
 import { checkGates } from './check-gates.js';
+import { getReviewContext } from './review-context.js';
 import {
   findFileIntent,
   listRuns,
@@ -394,61 +395,6 @@ function readArtifactTypeArgument(
     );
   }
   return value;
-}
-
-async function getReviewContext(options: {
-  cwd: string;
-  config: Awaited<ReturnType<typeof loadAgentLoopConfig>>;
-}) {
-  const [status, gates, policies, inventory, runs] = await Promise.all([
-    getAgentLoopStatus({ cwd: options.cwd, config: options.config }),
-    checkGates({ cwd: options.cwd, config: options.config }),
-    getPolicyStatus({ cwd: options.cwd, config: options.config }),
-    getArtifactInventory({ cwd: options.cwd, config: options.config }),
-    listRuns(options.cwd),
-  ]);
-  const recentRuns = runs.slice(0, 5).map((run) => toMcpRunSummary(options.cwd, run));
-  const latestShip =
-    recentRuns.find((run) => run.command === 'ship' && run.score !== undefined) ?? null;
-
-  return {
-    status: {
-      project: status.project,
-      workingTree: status.workingTree,
-      activeTask: status.activeTask,
-      latestTask: status.latestTask,
-      latestVerification: status.latestReport
-        ? {
-            path: status.latestReport.path,
-            title: status.latestReport.title,
-            overallStatus: status.latestReport.overallStatus,
-          }
-        : null,
-      latestRun: status.latestRun ? toMcpRunSummary(options.cwd, status.latestRun) : null,
-      nextAction: status.nextAction,
-    },
-    gates: {
-      strict: gates.strict,
-      overallStatus: gates.overallStatus,
-      gates: gates.gates,
-      nextAction: gates.nextAction,
-    },
-    policies,
-    artifacts: renderArtifactInventoryJson(inventory),
-    recentRuns,
-    latestShip: latestShip
-      ? {
-          id: latestShip.id,
-          score: latestShip.score,
-          shipReportPath: latestShip.shipReportPath,
-        }
-      : null,
-    safety: {
-      readOnly: true,
-      includesMarkdownContent: false,
-      commandsRun: [],
-    },
-  };
 }
 
 export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolResult> {

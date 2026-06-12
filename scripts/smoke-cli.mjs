@@ -300,7 +300,15 @@ async function smokeCli({ keep = false } = {}) {
     const handoff = parseJson(
       (
         await runAgentLoop(
-          ['handoff', '--task', taskPath, '--report', verification.reportPath, '--write-run', '--json'],
+          [
+            'handoff',
+            '--task',
+            taskPath,
+            '--report',
+            verification.reportPath,
+            '--write-run',
+            '--json',
+          ],
           { cwd: smokeRepo },
         )
       ).stdout,
@@ -346,7 +354,28 @@ async function smokeCli({ keep = false } = {}) {
       'status brief did not include the latest ship score.',
     );
 
-    const runs = parseJson((await runAgentLoop(['runs', '--json'], { cwd: smokeRepo })).stdout, 'runs');
+    const reviewContext = parseJson(
+      (await runAgentLoop(['review-context', '--json'], { cwd: smokeRepo })).stdout,
+      'review-context',
+    );
+    assert(
+      reviewContext.latestShip?.score === ship.readiness.totalScore,
+      'review-context JSON did not include the latest ship score.',
+    );
+    assert(
+      reviewContext.gates?.overallStatus === 'pass',
+      'review-context JSON did not include passing gates.',
+    );
+    assert(
+      !JSON.stringify(reviewContext).includes(smokeRepo),
+      'review-context JSON leaked the absolute smoke repo path.',
+    );
+    console.log('Review-context smoke passed.');
+
+    const runs = parseJson(
+      (await runAgentLoop(['runs', '--json'], { cwd: smokeRepo })).stdout,
+      'runs',
+    );
     assert(
       Array.isArray(runs.runs) &&
         runs.runs.some((run) => run.id === verification.run.id && run.command === 'verify') &&
@@ -373,7 +402,10 @@ async function smokeCli({ keep = false } = {}) {
       'prepare-pr',
     );
     assert(preparedPr.titleSuggestion, 'prepare-pr JSON did not include titleSuggestion.');
-    assert(preparedPr.body?.includes('## Verification Evidence'), 'prepare-pr body missing verification section.');
+    assert(
+      preparedPr.body?.includes('## Verification Evidence'),
+      'prepare-pr body missing verification section.',
+    );
     assert(
       preparedPr.githubComment?.includes('AgentLoopKit Review Readiness'),
       'prepare-pr JSON did not include GitHub comment markdown.',

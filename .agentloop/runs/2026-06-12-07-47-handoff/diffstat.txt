@@ -1,0 +1,13 @@
+ .agentloop/backlog.md                              |  1 +
+ ...2026-06-12-expose-review-context-through-mcp.md | 72 ----------------------
+ CHANGELOG.md                                       |  1 +
+ FINAL_HANDOFF.md                                   |  2 +
+ README.md                                          | 62 ++++++++++---------
+ ROADMAP.md                                         |  3 +-
+ docs/cli-reference.md                              | 11 ++++
+ scripts/smoke-cli.mjs                              | 38 +++++++++++-
+ src/cli/index.ts                                   |  2 +
+ src/core/completions.ts                            |  1 +
+ src/core/mcp-tools.ts                              | 56 +----------------
+ tests/cli-docs-drift.test.ts                       |  1 +
+ 12 files changed, 89 insertions(+), 161 deletions(-)

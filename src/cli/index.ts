@@ -25,6 +25,7 @@ import { shipCommand } from './commands/ship.js';
 import { preparePrCommand } from './commands/prepare-pr.js';
 import { intentCommand, runsCommand, showRunCommand } from './commands/runs.js';
 import { maintainerCheckCommand } from './commands/maintainer-check.js';
+import { reviewContextCommand } from './commands/review-context.js';
 import { getPackageVersion } from '../core/version.js';
 
 const program = new Command();
@@ -42,6 +43,7 @@ program.addCommand(summarizeCommand());
 program.addCommand(handoffCommand());
 program.addCommand(statusCommand());
 program.addCommand(nextCommand());
+program.addCommand(reviewContextCommand());
 program.addCommand(checkGatesCommand());
 program.addCommand(shipCommand());
 program.addCommand(preparePrCommand());

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-07-47-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-07-47",
+  "createdAtEpochMs": 1781243266754,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-expose-review-context-through-the-cli.md",
+    "title": "Expose review context through the CLI",
+    "status": "in-progress"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-07-43-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 18
+}

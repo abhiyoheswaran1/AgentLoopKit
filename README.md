@@ -118,37 +118,38 @@ agentloop init
 agentloopkit init
 ```
 
-| Command                          | Purpose                                                      |
-| -------------------------------- | ------------------------------------------------------------ |
-| `agentloop init`                 | Generate the repo harness and config                         |
-| `agentloop doctor`               | Check setup health, commands, git state, and risk files      |
-| `agentloop create-task`          | Create a scoped task contract                                |
-| `agentloop task ...`             | List, show, pin, update, archive, and inspect task state     |
-| `agentloop status`               | Show active task, latest report, latest run, dirty files, and next step |
-| `agentloop next`                 | Print only the next recommended loop action                  |
-| `agentloop verify`               | Run configured checks and write a verification report        |
+| Command                          | Purpose                                                                        |
+| -------------------------------- | ------------------------------------------------------------------------------ |
+| `agentloop init`                 | Generate the repo harness and config                                           |
+| `agentloop doctor`               | Check setup health, commands, git state, and risk files                        |
+| `agentloop create-task`          | Create a scoped task contract                                                  |
+| `agentloop task ...`             | List, show, pin, update, archive, and inspect task state                       |
+| `agentloop status`               | Show active task, latest report, latest run, dirty files, and next step        |
+| `agentloop next`                 | Print only the next recommended loop action                                    |
+| `agentloop review-context`       | Show one read-only reviewability context snapshot                              |
+| `agentloop verify`               | Run configured checks and write a verification report                          |
 | `agentloop ship`                 | Score review readiness, write a ship report, and optionally print a PR comment |
-| `agentloop prepare-pr`           | Generate a PR title, grouped body, and optional GitHub comment |
-| `agentloop summarize`            | Preview a deterministic reviewer summary                     |
-| `agentloop handoff`              | Write a reviewer handoff summary                             |
-| `agentloop check-gates`          | Check review evidence without running tests                  |
-| `agentloop runs`                 | List local ship, verify, and handoff run entries             |
-| `agentloop show-run <id>`        | Show one local run ledger entry                              |
-| `agentloop intent <file>`        | Show which runs touched a file and why                       |
-| `agentloop maintainer-check`     | Check whether an AI-assisted PR is reviewable                |
-| `agentloop artifacts`            | Inventory local task, report, handoff, and badge evidence    |
-| `agentloop report`               | Write a local static HTML evidence report                    |
-| `agentloop badge`                | Write a local SVG evidence badge                             |
-| `agentloop ci-summary`           | Summarize CI context and existing AgentLoop evidence         |
-| `agentloop release-notes`        | Draft local release notes from repo evidence                 |
-| `agentloop release-check`        | Check local release readiness without publishing             |
-| `agentloop npm-status`           | Check npm registry status without publishing                 |
-| `agentloop mcp-server`           | Start the read-only MCP stdio server                         |
-| `agentloop policy ...`           | Read and compare local safety policies                       |
-| `agentloop install-agent <name>` | Add agent-specific instructions                              |
-| `agentloop list-templates`       | List bundled templates                                       |
-| `agentloop completion <shell>`   | Print shell completion scripts                               |
-| `agentloop version`              | Print the CLI version                                        |
+| `agentloop prepare-pr`           | Generate a PR title, grouped body, and optional GitHub comment                 |
+| `agentloop summarize`            | Preview a deterministic reviewer summary                                       |
+| `agentloop handoff`              | Write a reviewer handoff summary                                               |
+| `agentloop check-gates`          | Check review evidence without running tests                                    |
+| `agentloop runs`                 | List local ship, verify, and handoff run entries                               |
+| `agentloop show-run <id>`        | Show one local run ledger entry                                                |
+| `agentloop intent <file>`        | Show which runs touched a file and why                                         |
+| `agentloop maintainer-check`     | Check whether an AI-assisted PR is reviewable                                  |
+| `agentloop artifacts`            | Inventory local task, report, handoff, and badge evidence                      |
+| `agentloop report`               | Write a local static HTML evidence report                                      |
+| `agentloop badge`                | Write a local SVG evidence badge                                               |
+| `agentloop ci-summary`           | Summarize CI context and existing AgentLoop evidence                           |
+| `agentloop release-notes`        | Draft local release notes from repo evidence                                   |
+| `agentloop release-check`        | Check local release readiness without publishing                               |
+| `agentloop npm-status`           | Check npm registry status without publishing                                   |
+| `agentloop mcp-server`           | Start the read-only MCP stdio server                                           |
+| `agentloop policy ...`           | Read and compare local safety policies                                         |
+| `agentloop install-agent <name>` | Add agent-specific instructions                                                |
+| `agentloop list-templates`       | List bundled templates                                                         |
+| `agentloop completion <shell>`   | Print shell completion scripts                                                 |
+| `agentloop version`              | Print the CLI version                                                          |
 
 See [docs/cli-reference.md](docs/cli-reference.md) for command examples, JSON modes, and safety notes.
 
@@ -190,6 +191,7 @@ Env files are reported by path only. Verification commands run only when you exp
 For narrower evidence history, `agentloop verify --write-run` and `agentloop handoff --write-run` can add their own local run records without changing the default command behavior.
 
 `agentloop status` includes the newest local run ledger entry when `.agentloop/runs/` exists, so agents can see the latest review-readiness or verification evidence without opening every report.
+`agentloop review-context --json` gives non-MCP agents one read-only local snapshot with status, gates, policies, artifacts, recent runs, latest ship evidence, and the next action.
 
 ## More Docs
 
