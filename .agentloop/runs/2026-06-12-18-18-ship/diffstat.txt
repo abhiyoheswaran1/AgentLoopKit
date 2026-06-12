@@ -1,0 +1,6 @@
+ .agentloop/backlog.md     |  1 +
+ .agentloop/dogfood-log.md | 20 ++++++++++++++++++++
+ CHANGELOG.md              |  1 +
+ src/core/status.ts        | 14 ++++++++++++++
+ tests/status.test.ts      | 34 ++++++++++++++++++++++++++++++++++
+ 5 files changed, 70 insertions(+)

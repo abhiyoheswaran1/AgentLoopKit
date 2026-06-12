@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-18-18-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-12-18-18",
+  "createdAtEpochMs": 1781281125545,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-clarify-status-after-archived-evidence.md",
+    "title": "Clarify status after archived evidence",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-18-11-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-18-18-pr-summary.md",
+  "changedFileCount": 8
+}

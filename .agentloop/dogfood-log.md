@@ -2,6 +2,28 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Clarified Status After Archived Evidence
+
+- Task contract: `.agentloop/tasks/2026-06-12-clarify-status-after-archived-evidence.md`
+- Trigger:
+  - After task cleanup, `agentloop status` could say `agentloop create-task` even while the just-shipped dirty evidence still needed final handoff or review attention.
+- Product change:
+  - `agentloop status` now points to `agentloop handoff` when no open task exists, the tree is dirty, and the latest run references completed task evidence.
+  - Dirty work with no task/run evidence still points to `agentloop create-task`.
+  - JSON, brief, and Markdown status outputs share the same next-action decision.
+- Verification:
+  - Focused run: `npm test -- tests/status.test.ts` passed with 25 tests.
+  - AgentLoop task verification passed and wrote `.agentloop/reports/2026-06-12-18-11-verification-report.md`.
+  - Full `npm test` and `npm run build` passed inside the AgentLoop verification run.
+  - Handoff summary: `.agentloop/handoffs/2026-06-12-18-18-pr-summary.md`.
+  - Ship report: `.agentloop/reports/2026-06-12-18-18-ship-report.md` with review readiness `100`/100.
+  - `npm run dogfood:strict` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The previous archived-run fix made this mismatch visible in real dogfood output.
+- Improve:
+  - Keep next-action rules aligned between `status`, `check-gates`, and the dogfood gate.
+
 ## 2026-06-12: Hydrated Archived Run Task Status
 
 - Task contract: `.agentloop/tasks/2026-06-12-hydrate-archived-run-task-status.md`

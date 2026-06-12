@@ -137,6 +137,7 @@ function chooseNextAction(input: {
   latestTask: StatusTask | null;
   deferredTasks: StatusTask[];
   latestReport?: StatusReport;
+  latestRun?: RunSummary;
   dirty: boolean;
 }) {
   if (!input.activeTask) {
@@ -145,6 +146,18 @@ function chooseNextAction(input: {
         command: `agentloop task set ${input.latestTask.path}`,
         reason:
           'No active task is pinned, but an open task contract exists. Pin it before continuing the loop, or create a new task if this is not the right work.',
+      };
+    }
+    const latestRunTaskStatus = input.latestRun?.task?.status.trim().toLowerCase();
+    if (
+      input.dirty &&
+      (latestRunTaskStatus === 'done' || latestRunTaskStatus === 'review') &&
+      input.latestRun?.task
+    ) {
+      return {
+        command: 'agentloop handoff',
+        reason:
+          'The latest run references completed task evidence, but the working tree still has changes. Refresh the handoff or review the dirty evidence before starting a new task.',
       };
     }
     if (input.deferredTasks.length > 0) {
@@ -381,6 +394,7 @@ export async function getAgentLoopStatus(options: {
     latestTask,
     deferredTasks,
     latestReport,
+    latestRun,
     dirty: changedFiles.length > 0,
   });
   const withoutMarkdown = {

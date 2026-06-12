@@ -267,6 +267,25 @@ describe('status command', () => {
     expect(result.stdout).toContain('agentloop create-task');
   });
 
+  test('still recommends creating a task when dirty work has no task evidence', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'changed.txt'), 'unscoped change\n');
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const status = JSON.parse(result.stdout);
+    expect(status.workingTree.dirty).toBe(true);
+    expect(status.latestRun).toBeUndefined();
+    expect(status.nextAction.command).toBe('agentloop create-task');
+  });
+
   test('renders status markdown values with safe inline code when task data contains backticks', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -742,18 +761,33 @@ describe('status command', () => {
         2,
       ),
     );
+    await writeFile(path.join(dir, 'changed.txt'), 'post-archive evidence change\n');
 
     const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
       cwd: dir,
       reject: false,
     });
+    const briefResult = await execa(tsxPath, [cliPath, 'status', '--brief'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'status'], {
+      cwd: dir,
+      reject: false,
+    });
 
     expect(result.exitCode).toBe(0);
+    expect(briefResult.exitCode).toBe(0);
+    expect(markdownResult.exitCode).toBe(0);
     const status = JSON.parse(result.stdout);
     expect(status.latestRun.task).toEqual({
       path: '.agentloop/tasks/archive/2026-06-12-fix-login.md',
       title: 'Fix login redirect bug',
       status: 'done',
     });
+    expect(status.nextAction.command).toBe('agentloop handoff');
+    expect(status.nextAction.reason).toContain('latest run references completed task evidence');
+    expect(briefResult.stdout).toContain('next="agentloop handoff"');
+    expect(markdownResult.stdout).toContain('Run `agentloop handoff`.');
   });
 });
