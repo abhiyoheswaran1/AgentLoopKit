@@ -1,0 +1,30 @@
+[
+  {
+    "status": "M",
+    "path": "AGENTLOOP.md"
+  },
+  {
+    "status": "M",
+    "path": "AGENTS.md"
+  },
+  {
+    "status": "M",
+    "path": "scripts/smoke-packed-release.mjs"
+  },
+  {
+    "status": "M",
+    "path": "tests/release-smoke.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-11-54-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-clean-stale-0-28-0-harness-release-guidance.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/logo/"
+  }
+]

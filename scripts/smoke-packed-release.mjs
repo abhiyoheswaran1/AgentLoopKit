@@ -43,6 +43,17 @@ const INTERNAL_CHATTER_CLAIMS = [
   { label: 'npm latest remains wording', pattern: /\bnpm latest remains\b/i },
 ];
 
+const STALE_REPO_HARNESS_RELEASE_CLAIMS = [
+  {
+    label: 'planned version batch',
+    pattern: /\bplanned\s+`?\d+\.\d+\.\d+`?\s+batch\b/i,
+  },
+  {
+    label: 'post-release current development window',
+    pattern: /\bcurrent development after\s+`?\d+\.\d+\.\d+`?.*\bplanned\s+`?\d+\.\d+\.\d+`?/i,
+  },
+];
+
 const SAFE_ENV_KEYS = [
   'APPDATA',
   'CI',
@@ -158,6 +169,20 @@ export function assertPublicDocsAvoidUnsupportedClaims(files) {
   }
 }
 
+export function assertRepoHarnessAvoidsStaleReleaseBatch(files) {
+  for (const file of files) {
+    const staleClaim = STALE_REPO_HARNESS_RELEASE_CLAIMS.find((claim) =>
+      claim.pattern.test(file.content),
+    );
+
+    if (staleClaim) {
+      throw new Error(
+        `${toPosixPath(file.filePath)} contains stale repo harness release guidance: ${staleClaim.label}. Keep release gating generic after a batch ships.`,
+      );
+    }
+  }
+}
+
 export async function collectPublicDocPinFiles(rootDir) {
   const relativeFiles = unique(
     (await Promise.all(PUBLIC_DOC_ROOTS.map((root) => collectMarkdownFiles(rootDir, root)))).flat(),
@@ -165,6 +190,16 @@ export async function collectPublicDocPinFiles(rootDir) {
     .map(toPosixPath)
     .sort();
 
+  return Promise.all(
+    relativeFiles.map(async (filePath) => ({
+      filePath,
+      content: await readFile(path.join(rootDir, filePath), 'utf8'),
+    })),
+  );
+}
+
+export async function collectRepoHarnessFiles(rootDir) {
+  const relativeFiles = ['AGENTS.md', 'AGENTLOOP.md'];
   return Promise.all(
     relativeFiles.map(async (filePath) => ({
       filePath,

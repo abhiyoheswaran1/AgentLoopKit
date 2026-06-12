@@ -164,6 +164,18 @@ describe('release smoke script helpers', () => {
     ).not.toThrow();
   });
 
+  test('rejects stale planned-release batch guidance in repo harness files', () => {
+    expect(() =>
+      smoke.assertRepoHarnessAvoidsStaleReleaseBatch([
+        {
+          filePath: 'AGENTS.md',
+          content:
+            'Accumulate current unreleased work for the planned `0.28.0` batch until the maintainer explicitly asks for release prep.',
+        },
+      ]),
+    ).toThrow('AGENTS.md contains stale repo harness release guidance');
+  });
+
   test('current public docs avoid hardcoded AgentLoopKit version pins', async () => {
     const files = await smoke.collectPublicDocPinFiles(process.cwd());
 
@@ -174,5 +186,11 @@ describe('release smoke script helpers', () => {
     const files = await smoke.collectPublicDocPinFiles(process.cwd());
 
     expect(() => smoke.assertPublicDocsAvoidUnsupportedClaims(files)).not.toThrow();
+  });
+
+  test('current repo harness avoids stale planned-release batch guidance', async () => {
+    const files = await smoke.collectRepoHarnessFiles(process.cwd());
+
+    expect(() => smoke.assertRepoHarnessAvoidsStaleReleaseBatch(files)).not.toThrow();
   });
 });

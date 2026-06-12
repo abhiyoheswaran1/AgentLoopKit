@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-12-01-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-12-01",
+  "createdAtEpochMs": 1781258486059,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-clean-stale-0-28-0-harness-release-guidance.md",
+    "title": "Clean stale 0.28.0 harness release guidance",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-11-54-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-12-01-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-12-01-pr-summary.md",
+  "score": 100,
+  "changedFileCount": 8
+}

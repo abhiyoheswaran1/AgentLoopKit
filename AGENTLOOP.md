@@ -45,4 +45,4 @@ No agent should claim completion without verification evidence or a clear statem
 
 ## Release Cadence
 
-Current development after `0.27.0` should accumulate as unreleased work for the planned `0.28.0` batch. Do not bump package versions, create tags, publish npm, publish GitHub Releases, publish GHCR, or publish MCP Registry entries unless the maintainer explicitly asks for release prep.
+Do not bump package versions, create tags, publish npm, publish GitHub Releases, publish GHCR, or publish MCP Registry entries during active implementation. Prepare releases only when the maintainer explicitly asks for release prep. Before claiming a release is available, verify the relevant registry, GitHub release, GHCR image, or MCP Registry entry from current output.

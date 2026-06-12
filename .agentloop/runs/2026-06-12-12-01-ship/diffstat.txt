@@ -1,0 +1,5 @@
+ AGENTLOOP.md                     |  2 +-
+ AGENTS.md                        |  2 +-
+ scripts/smoke-packed-release.mjs | 35 +++++++++++++++++++++++++++++++++++
+ tests/release-smoke.test.ts      | 18 ++++++++++++++++++
+ 4 files changed, 55 insertions(+), 2 deletions(-)
