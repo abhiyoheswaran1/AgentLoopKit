@@ -28,7 +28,7 @@
 - Changed `agentloop policy list/status` human output to render policy titles, statuses, and paths with Markdown-safe inline-code delimiters while keeping JSON output and raw `policy show` content unchanged.
 - Changed run ledger reads and writes to reject run-id directories that resolve outside `.agentloop/runs/` through symlinks.
 - Changed run ledger writes to keep same-minute same-command records by appending collision-safe numeric suffixes instead of overwriting the existing run.
-- Changed MCP and review-context run artifact path rendering to collapse AgentLoop artifact paths to `.agentloop/...` and avoid exposing outside absolute paths from run metadata.
+- Changed run ledger reads and writes to return safe display paths for task, artifact, and changed-file metadata, collapsing AgentLoop artifacts to `.agentloop/...` and outside absolute paths to basenames. MCP run tools and `review-context` now inherit that behavior from the ledger reader.
 - Fixed `agentloop prepare-pr` so PR bodies include every acceptance-criteria bullet from the task contract instead of only the first line.
 - Changed release-note missing-ref fallback copy to render requested Git refs with Markdown-safe inline-code delimiters while preserving raw fallback reason data.
 - Changed release notes to render commit subjects with Markdown-safe inline-code delimiters while preserving raw commit subjects in JSON output.

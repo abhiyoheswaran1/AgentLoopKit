@@ -3,7 +3,8 @@ import { access, mkdir, readFile, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
-import { listRuns, writeVerificationRun } from '../src/core/runs.js';
+import { toSafeDisplayPath } from '../src/core/display-path.js';
+import { findFileIntent, listRuns, readRun, writeVerificationRun } from '../src/core/runs.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -14,6 +15,10 @@ let tempDirs: string[] = [];
 
 async function git(cwd: string, args: string[]) {
   return execa('git', args, { cwd });
+}
+
+function repoPath(cwd: string, filePath: string) {
+  return toSafeDisplayPath(cwd, filePath);
 }
 
 async function createRunFixture() {
@@ -152,17 +157,18 @@ describe('run ledger commands', () => {
 
     expect(verify.overallStatus).toBe('not-run');
     expect(verify.run.id).toMatch(/verify$/);
+    expect(verify.run.metadata.verificationReportPath).toBe(repoPath(dir, verify.reportPath));
     expect(runs.runs).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           id: verify.run.id,
           command: 'verify',
-          verificationReportPath: verify.reportPath,
+          verificationReportPath: repoPath(dir, verify.reportPath),
         }),
       ]),
     );
     expect(shown.run.metadata.command).toBe('verify');
-    expect(shown.run.metadata.verificationReportPath).toBe(verify.reportPath);
+    expect(shown.run.metadata.verificationReportPath).toBe(repoPath(dir, verify.reportPath));
     expect(shown.run.score).toBeNull();
     expect(intent.runs).toEqual(
       expect.arrayContaining([
@@ -190,17 +196,18 @@ describe('run ledger commands', () => {
     );
 
     expect(handoff.run.id).toMatch(/handoff$/);
+    expect(handoff.run.metadata.handoffPath).toBe(repoPath(dir, handoff.outPath));
     expect(runs.runs).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           id: handoff.run.id,
           command: 'handoff',
-          handoffPath: handoff.outPath,
+          handoffPath: repoPath(dir, handoff.outPath),
         }),
       ]),
     );
     expect(shown.run.metadata.command).toBe('handoff');
-    expect(shown.run.metadata.handoffPath).toBe(handoff.outPath);
+    expect(shown.run.metadata.handoffPath).toBe(repoPath(dir, handoff.outPath));
     expect(shown.run.diffStat).toContain('src/auth/callback.ts');
     expect(intent.runs).toEqual(
       expect.arrayContaining([
@@ -326,6 +333,82 @@ describe('run ledger commands', () => {
       expect.objectContaining({ id: '2026-06-12-00-00-b-ship', command: 'ship' }),
       expect.objectContaining({ id: '2026-06-12-00-00-c-handoff', command: 'handoff' }),
       expect.objectContaining({ id: '2026-06-12-00-00-a-verify', command: 'verify' }),
+    ]);
+  });
+
+  test('sanitizes stored absolute run paths at the ledger read boundary', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir('agentloopkit-outside-run-path-');
+    tempDirs.push(dir, outsideDir);
+    const runsDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-ship');
+    await mkdir(runsDir, { recursive: true });
+
+    await writeFile(
+      path.join(runsDir, 'metadata.json'),
+      JSON.stringify(
+        {
+          id: '2026-06-12-00-00-ship',
+          command: 'ship',
+          createdAt: '2026-06-12-00-00',
+          createdAtEpochMs: 1_000,
+          task: {
+            path: path.join(dir, '.agentloop/tasks/2026-06-12-fix-login.md'),
+            title: 'Fix login redirect bug',
+            status: 'review',
+          },
+          verificationReportPath: path.join(outsideDir, 'private-verification-report.md'),
+          shipReportPath: path.join(dir, '.agentloop/reports/2026-06-12-00-00-ship-report.md'),
+          handoffPath: path.join(dir, '.agentloop/handoffs/2026-06-12-00-00-pr-summary.md'),
+          score: 94,
+          changedFileCount: 2,
+        },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(runsDir, 'changed-files.json'),
+      JSON.stringify(
+        [
+          { path: path.join(dir, 'src/auth/callback.ts'), status: 'M' },
+          { path: path.join(outsideDir, 'private.ts'), status: 'M' },
+        ],
+        null,
+        2,
+      ),
+    );
+
+    await expect(listRuns(dir)).resolves.toEqual([
+      expect.objectContaining({
+        id: '2026-06-12-00-00-ship',
+        task: expect.objectContaining({
+          path: '.agentloop/tasks/2026-06-12-fix-login.md',
+        }),
+        verificationReportPath: 'private-verification-report.md',
+        shipReportPath: '.agentloop/reports/2026-06-12-00-00-ship-report.md',
+        handoffPath: '.agentloop/handoffs/2026-06-12-00-00-pr-summary.md',
+      }),
+    ]);
+
+    const record = await readRun(dir, '2026-06-12-00-00-ship');
+    expect(record.metadata.task?.path).toBe('.agentloop/tasks/2026-06-12-fix-login.md');
+    expect(record.metadata.verificationReportPath).toBe('private-verification-report.md');
+    expect(record.metadata.shipReportPath).toBe(
+      '.agentloop/reports/2026-06-12-00-00-ship-report.md',
+    );
+    expect(record.metadata.handoffPath).toBe('.agentloop/handoffs/2026-06-12-00-00-pr-summary.md');
+    expect(record.changedFiles).toEqual([
+      { path: 'src/auth/callback.ts', status: 'M' },
+      { path: 'private.ts', status: 'M' },
+    ]);
+    expect(JSON.stringify(record)).not.toContain(dir);
+    expect(JSON.stringify(record)).not.toContain('..');
+
+    await expect(findFileIntent(dir, 'src/auth/callback.ts')).resolves.toEqual([
+      expect.objectContaining({
+        id: '2026-06-12-00-00-ship',
+        file: 'src/auth/callback.ts',
+      }),
     ]);
   });
 });

@@ -5,23 +5,10 @@ import {
   type ArtifactInventory,
 } from './artifacts.js';
 import { checkGates } from './check-gates.js';
-import { toSafeDisplayPath } from './display-path.js';
 import { inlineCode } from './markdown-format.js';
 import { getPolicyStatus } from './policy.js';
-import { listRuns, type RunSummary } from './runs.js';
+import { listRuns } from './runs.js';
 import { getAgentLoopStatus } from './status.js';
-
-function toReviewContextRunSummary(cwd: string, run: RunSummary) {
-  return {
-    ...run,
-    task: run.task ? { ...run.task, path: toSafeDisplayPath(cwd, run.task.path) } : run.task,
-    ...(run.verificationReportPath
-      ? { verificationReportPath: toSafeDisplayPath(cwd, run.verificationReportPath) }
-      : {}),
-    ...(run.shipReportPath ? { shipReportPath: toSafeDisplayPath(cwd, run.shipReportPath) } : {}),
-    ...(run.handoffPath ? { handoffPath: toSafeDisplayPath(cwd, run.handoffPath) } : {}),
-  };
-}
 
 export async function getReviewContext(options: { cwd: string; config: AgentLoopConfig }) {
   const [status, gates, policies, inventory, runs] = await Promise.all([
@@ -31,7 +18,7 @@ export async function getReviewContext(options: { cwd: string; config: AgentLoop
     getArtifactInventory({ cwd: options.cwd, config: options.config }),
     listRuns(options.cwd),
   ]);
-  const recentRuns = runs.slice(0, 5).map((run) => toReviewContextRunSummary(options.cwd, run));
+  const recentRuns = runs.slice(0, 5);
   const latestShip =
     recentRuns.find((run) => run.command === 'ship' && run.score !== undefined) ?? null;
 
@@ -48,7 +35,7 @@ export async function getReviewContext(options: { cwd: string; config: AgentLoop
             overallStatus: status.latestReport.overallStatus,
           }
         : null,
-      latestRun: status.latestRun ? toReviewContextRunSummary(options.cwd, status.latestRun) : null,
+      latestRun: status.latestRun,
       nextAction: status.nextAction,
     },
     gates: {

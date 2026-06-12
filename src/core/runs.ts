@@ -4,6 +4,7 @@ import { AgentLoopError } from './errors.js';
 import { GitFileStatus } from './git.js';
 import { isInsidePath, normalizeExistingAncestor, pathExists, writeTextFile } from './file-system.js';
 import { ReviewReadinessResult } from './readiness-score.js';
+import { toSafeDisplayPath } from './display-path.js';
 
 export type RunCommand = 'ship' | 'verify' | 'handoff';
 
@@ -97,18 +98,45 @@ async function allocateRunDirectory(cwd: string, timestamp: string, command: Run
   throw new AgentLoopError(`Unable to allocate a run id for ${baseId}.`, 'RUN_ID_COLLISION');
 }
 
-function toSummary(metadata: RunMetadata): RunSummary {
+function sanitizeRunMetadata(cwd: string, metadata: RunMetadata): RunMetadata {
   return {
-    id: metadata.id,
-    command: metadata.command,
-    createdAt: metadata.createdAt,
-    task: metadata.task,
-    score: metadata.score,
-    overallStatus: metadata.overallStatus,
-    changedFileCount: metadata.changedFileCount,
-    verificationReportPath: metadata.verificationReportPath,
-    shipReportPath: metadata.shipReportPath,
-    handoffPath: metadata.handoffPath,
+    ...metadata,
+    task: metadata.task
+      ? {
+          ...metadata.task,
+          path: toSafeDisplayPath(cwd, metadata.task.path),
+        }
+      : metadata.task,
+    ...(metadata.verificationReportPath
+      ? { verificationReportPath: toSafeDisplayPath(cwd, metadata.verificationReportPath) }
+      : {}),
+    ...(metadata.shipReportPath
+      ? { shipReportPath: toSafeDisplayPath(cwd, metadata.shipReportPath) }
+      : {}),
+    ...(metadata.handoffPath ? { handoffPath: toSafeDisplayPath(cwd, metadata.handoffPath) } : {}),
+  };
+}
+
+function sanitizeChangedFiles(cwd: string, changedFiles: GitFileStatus[]): GitFileStatus[] {
+  return changedFiles.map((changedFile) => ({
+    ...changedFile,
+    path: toSafeDisplayPath(cwd, changedFile.path),
+  }));
+}
+
+function toSummary(cwd: string, metadata: RunMetadata): RunSummary {
+  const safeMetadata = sanitizeRunMetadata(cwd, metadata);
+  return {
+    id: safeMetadata.id,
+    command: safeMetadata.command,
+    createdAt: safeMetadata.createdAt,
+    task: safeMetadata.task,
+    score: safeMetadata.score,
+    overallStatus: safeMetadata.overallStatus,
+    changedFileCount: safeMetadata.changedFileCount,
+    verificationReportPath: safeMetadata.verificationReportPath,
+    shipReportPath: safeMetadata.shipReportPath,
+    handoffPath: safeMetadata.handoffPath,
   };
 }
 
@@ -145,12 +173,17 @@ export async function writeShipRun(options: {
     score: options.score.totalScore,
     changedFileCount: options.changedFiles.length,
   };
+  const safeMetadata = sanitizeRunMetadata(options.cwd, metadata);
+  const safeChangedFiles = sanitizeChangedFiles(options.cwd, options.changedFiles);
 
-  await writeTextFile(path.join(directory, 'metadata.json'), `${JSON.stringify(metadata, null, 2)}\n`);
+  await writeTextFile(
+    path.join(directory, 'metadata.json'),
+    `${JSON.stringify(safeMetadata, null, 2)}\n`,
+  );
   await writeTextFile(path.join(directory, 'score.json'), `${JSON.stringify(options.score, null, 2)}\n`);
   await writeTextFile(
     path.join(directory, 'changed-files.json'),
-    `${JSON.stringify(options.changedFiles, null, 2)}\n`,
+    `${JSON.stringify(safeChangedFiles, null, 2)}\n`,
   );
   await writeTextFile(path.join(directory, 'diffstat.txt'), options.diffStat);
   await writeTextFile(path.join(directory, 'ship-report.md'), options.shipMarkdown);
@@ -162,7 +195,7 @@ export async function writeShipRun(options: {
   return {
     id,
     path: directory,
-    metadata,
+    metadata: safeMetadata,
   };
 }
 
@@ -188,18 +221,23 @@ export async function writeVerificationRun(options: {
     overallStatus: options.overallStatus,
     changedFileCount: options.changedFiles.length,
   };
+  const safeMetadata = sanitizeRunMetadata(options.cwd, metadata);
+  const safeChangedFiles = sanitizeChangedFiles(options.cwd, options.changedFiles);
 
-  await writeTextFile(path.join(directory, 'metadata.json'), `${JSON.stringify(metadata, null, 2)}\n`);
+  await writeTextFile(
+    path.join(directory, 'metadata.json'),
+    `${JSON.stringify(safeMetadata, null, 2)}\n`,
+  );
   await writeTextFile(
     path.join(directory, 'changed-files.json'),
-    `${JSON.stringify(options.changedFiles, null, 2)}\n`,
+    `${JSON.stringify(safeChangedFiles, null, 2)}\n`,
   );
   await writeTextFile(path.join(directory, 'verification-report.md'), options.markdown);
 
   return {
     id,
     path: directory,
-    metadata,
+    metadata: safeMetadata,
   };
 }
 
@@ -228,11 +266,16 @@ export async function writeHandoffRun(options: {
     ...(options.handoffPath ? { handoffPath: options.handoffPath } : {}),
     changedFileCount: options.changedFiles.length,
   };
+  const safeMetadata = sanitizeRunMetadata(options.cwd, metadata);
+  const safeChangedFiles = sanitizeChangedFiles(options.cwd, options.changedFiles);
 
-  await writeTextFile(path.join(directory, 'metadata.json'), `${JSON.stringify(metadata, null, 2)}\n`);
+  await writeTextFile(
+    path.join(directory, 'metadata.json'),
+    `${JSON.stringify(safeMetadata, null, 2)}\n`,
+  );
   await writeTextFile(
     path.join(directory, 'changed-files.json'),
-    `${JSON.stringify(options.changedFiles, null, 2)}\n`,
+    `${JSON.stringify(safeChangedFiles, null, 2)}\n`,
   );
   await writeTextFile(path.join(directory, 'diffstat.txt'), options.diffStat);
   await writeTextFile(path.join(directory, 'pr-summary.md'), options.markdown);
@@ -240,7 +283,7 @@ export async function writeHandoffRun(options: {
   return {
     id,
     path: directory,
-    metadata,
+    metadata: safeMetadata,
   };
 }
 
@@ -257,7 +300,7 @@ export async function listRuns(cwd: string): Promise<RunSummary[]> {
     const metadata = await readJsonFile<RunMetadata>(metadataPath);
     const metadataStat = await stat(metadataPath);
     runs.push({
-      summary: toSummary(metadata),
+      summary: toSummary(cwd, metadata),
       preciseTimestampMs: metadata.createdAtEpochMs ?? metadataStat.mtimeMs,
     });
   }
@@ -278,12 +321,14 @@ export async function readRun(cwd: string, id: string): Promise<RunRecord> {
   if (!(await pathExists(directory))) throw new AgentLoopError(`Run not found: ${id}`, 'RUN_NOT_FOUND');
   const scorePath = path.join(directory, 'score.json');
   const changedFilesPath = path.join(directory, 'changed-files.json');
+  const metadata = await readJsonFile<RunMetadata>(path.join(directory, 'metadata.json'));
+  const changedFiles = (await pathExists(changedFilesPath))
+    ? await readJsonFile<GitFileStatus[]>(changedFilesPath)
+    : [];
   return {
-    metadata: await readJsonFile<RunMetadata>(path.join(directory, 'metadata.json')),
+    metadata: sanitizeRunMetadata(cwd, metadata),
     score: (await pathExists(scorePath)) ? await readJsonFile<ReviewReadinessResult>(scorePath) : null,
-    changedFiles: (await pathExists(changedFilesPath))
-      ? await readJsonFile<GitFileStatus[]>(changedFilesPath)
-      : [],
+    changedFiles: sanitizeChangedFiles(cwd, changedFiles),
     diffStat: (await pathExists(path.join(directory, 'diffstat.txt')))
       ? await readFile(path.join(directory, 'diffstat.txt'), 'utf8')
       : '',

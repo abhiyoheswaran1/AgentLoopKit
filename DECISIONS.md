@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-06-12: Run Ledger Paths Are Display Evidence
+
+Run metadata should help humans, agents, and MCP clients review evidence without leaking local machine paths. New run records store display-safe paths: AgentLoopKit artifacts as `.agentloop/...`, repo files as repo-relative paths, and outside absolute paths as filenames. The reader also sanitizes older run records so existing ledgers keep working.
+
+The run ledger is not an absolute-path database. Commands that need to read files should resolve current artifact locations through the existing artifact and config helpers instead of trusting stored run paths.
+
 ## 2026-06-09: Ship As A Boring npm CLI
 
 AgentLoopKit ships as a TypeScript Node CLI distributed through npm and npx. The package has no postinstall script, telemetry, cloud backend, database, or API key requirement.

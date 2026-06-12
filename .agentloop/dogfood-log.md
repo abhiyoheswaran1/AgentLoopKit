@@ -7449,3 +7449,42 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The regression checks both the unsafe path shape and the existing `.agentloop/...` display behavior.
 - Improve:
   - Consider direct unit coverage for `toSafeDisplayPath` if more commands start using it.
+
+## 2026-06-12: Safe Run Ledger Display Paths
+
+- Task contract: `.agentloop/tasks/2026-06-12-sanitize-run-ledger-display-paths.md`
+- Trigger:
+  - The previous MCP hardening fixed consumer formatting, but the run ledger reader still returned raw stored paths.
+  - Public `runs`, `show-run`, `intent`, MCP run tools, and `review-context` should not need separate path-safety logic.
+- Implementation:
+  - Moved run metadata path normalization into `src/core/runs.ts`.
+  - New run records store display-safe task, artifact, and changed-file paths.
+  - Older run records with absolute paths remain readable and are sanitized on read.
+  - Simplified MCP and review-context run consumers so they use the ledger output directly.
+- Verification run:
+  - Red focused run `npm test -- tests/runs.test.ts` failed because `listRuns` returned raw absolute run metadata paths.
+  - Green focused runs passed:
+    - `npm test -- tests/runs.test.ts`
+    - `npm test -- tests/runs.test.ts tests/mcp-tools.test.ts tests/review-context.test.ts`
+  - Broader local checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:links`
+    - `git diff --check`
+    - `npm run build`
+    - `npm test`
+    - `node scripts/smoke-cli.mjs`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npx --yes projscan doctor --format markdown`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-12-08-35-verification-report.md`.
+  - Dogfood runs:
+    - `.agentloop/runs/2026-06-12-08-40-verify/`
+    - `.agentloop/runs/2026-06-12-08-40-ship/`
+  - Dogfood handoff: `.agentloop/handoffs/2026-06-12-08-40-pr-summary.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-08-40-ship-report.md` with score `96`/100.
+- What worked well:
+  - The dogfood trail from the MCP path bug identified the next boundary to harden.
+  - Moving the behavior into the run reader reduced duplicate formatting in MCP and review-context code.
+- Improve:
+  - Keep treating run ledger paths as review evidence, not filesystem authority.

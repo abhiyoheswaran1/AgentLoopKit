@@ -25,9 +25,6 @@ import {
   findFileIntent,
   listRuns,
   readRun,
-  type IntentMatch,
-  type RunRecord,
-  type RunSummary,
 } from './runs.js';
 
 export type McpToolDefinition = {
@@ -263,47 +260,6 @@ function toStoredPath(cwd: string, absolutePath: string) {
   return toSafeDisplayPath(cwd, absolutePath);
 }
 
-function toMcpRunSummary(cwd: string, run: RunSummary) {
-  return {
-    ...run,
-    task: run.task ? { ...run.task, path: toStoredPath(cwd, run.task.path) } : run.task,
-    ...(run.verificationReportPath
-      ? { verificationReportPath: toStoredPath(cwd, run.verificationReportPath) }
-      : {}),
-    ...(run.shipReportPath ? { shipReportPath: toStoredPath(cwd, run.shipReportPath) } : {}),
-    ...(run.handoffPath ? { handoffPath: toStoredPath(cwd, run.handoffPath) } : {}),
-  };
-}
-
-function toMcpRunRecord(cwd: string, run: RunRecord) {
-  return {
-    ...run,
-    metadata: {
-      ...run.metadata,
-      task: run.metadata.task
-        ? { ...run.metadata.task, path: toStoredPath(cwd, run.metadata.task.path) }
-        : run.metadata.task,
-      ...(run.metadata.verificationReportPath
-        ? { verificationReportPath: toStoredPath(cwd, run.metadata.verificationReportPath) }
-        : {}),
-      ...(run.metadata.shipReportPath
-        ? { shipReportPath: toStoredPath(cwd, run.metadata.shipReportPath) }
-        : {}),
-      ...(run.metadata.handoffPath
-        ? { handoffPath: toStoredPath(cwd, run.metadata.handoffPath) }
-        : {}),
-    },
-  };
-}
-
-function toMcpIntentMatch(cwd: string, match: IntentMatch) {
-  return {
-    ...toMcpRunSummary(cwd, match),
-    file: match.file,
-    why: match.why,
-  };
-}
-
 async function readMarkdownArtifact(cwd: string, filePath: string | undefined, key: string) {
   if (!filePath) return { [key]: null };
   const content = await readFile(filePath, 'utf8');
@@ -450,22 +406,18 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
     case 'agentloop_list_runs': {
       const limit = readLimitArgument(options.arguments);
       return textResult({
-        runs: (await listRuns(options.cwd))
-          .slice(0, limit)
-          .map((run) => toMcpRunSummary(options.cwd, run)),
+        runs: (await listRuns(options.cwd)).slice(0, limit),
       });
     }
     case 'agentloop_show_run': {
       const id = readStringArgument(options.arguments, 'id');
-      return textResult({ run: toMcpRunRecord(options.cwd, await readRun(options.cwd, id)) });
+      return textResult({ run: await readRun(options.cwd, id) });
     }
     case 'agentloop_file_intent': {
       const file = readStringArgument(options.arguments, 'file').replace(/\\/g, '/');
       return textResult({
         file,
-        runs: (await findFileIntent(options.cwd, file)).map((match) =>
-          toMcpIntentMatch(options.cwd, match),
-        ),
+        runs: await findFileIntent(options.cwd, file),
       });
     }
     case 'agentloop_maintainer_check': {

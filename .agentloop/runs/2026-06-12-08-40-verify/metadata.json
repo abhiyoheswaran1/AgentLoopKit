@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-08-40-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-08-40",
+  "createdAtEpochMs": 1781246428191,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-sanitize-run-ledger-display-paths.md",
+    "title": "Sanitize run ledger display paths",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-08-35-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 17
+}

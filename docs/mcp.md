@@ -61,6 +61,7 @@ It does not:
 - publish packages or create releases
 
 It reads the same local AgentLoopKit files that CLI commands such as `status`, `policy`, `ship`, `runs`, and `handoff` already use.
+Run ledger paths exposed through MCP use the same display-safe paths as the CLI: `.agentloop/...` for AgentLoopKit artifacts, repo-relative paths for repo files, and basenames for older outside absolute paths.
 `agentloop_file_intent` reads run ledger metadata and does not read the target file contents.
 `agentloop_review_context` returns metadata and scores only; it does not include full report, handoff, task, or policy Markdown bodies.
 

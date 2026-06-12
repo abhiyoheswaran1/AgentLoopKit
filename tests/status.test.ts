@@ -380,12 +380,12 @@ describe('status command', () => {
       command: 'ship',
       score: 91,
       changedFileCount: 4,
-      shipReportPath: '/tmp/demo/.agentloop/reports/ship.md',
+      shipReportPath: '.agentloop/reports/ship.md',
     });
     expect(markdownResult.stdout).toContain(
       '- Latest run: `ship` `91`/100 - `2026-06-12-10-00-ship`',
     );
-    expect(markdownResult.stdout).toContain('`/tmp/demo/.agentloop/reports/ship.md`');
+    expect(markdownResult.stdout).toContain('`.agentloop/reports/ship.md`');
     expect(briefResult.stdout).toContain('run="ship 91/100"');
   });
 

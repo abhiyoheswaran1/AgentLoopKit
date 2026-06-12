@@ -1,0 +1,15 @@
+ .agentloop/backlog.md                              |  2 +-
+ .agentloop/dogfood-log.md                          | 22 +++++
+ ...2-harden-mcp-run-artifact-path-normalization.md | 71 ----------------
+ CHANGELOG.md                                       |  2 +-
+ DECISIONS.md                                       |  6 ++
+ FINAL_HANDOFF.md                                   |  2 +-
+ README.md                                          |  1 +
+ docs/cli-reference.md                              |  2 +
+ docs/mcp.md                                        |  1 +
+ src/core/mcp-tools.ts                              | 54 +-----------
+ src/core/review-context.ts                         | 19 +----
+ src/core/runs.ts                                   | 95 ++++++++++++++++------
+ tests/runs.test.ts                                 | 93 +++++++++++++++++++--
+ tests/status.test.ts                               |  4 +-
+ 14 files changed, 201 insertions(+), 173 deletions(-)

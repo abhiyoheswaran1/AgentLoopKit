@@ -1,0 +1,104 @@
+# PR Summary
+
+- Generated: 2026-06-12-08-40
+- Task context: `Sanitize run ledger display paths`
+- Verification status: Overall status: pass
+
+## Summary
+This summary was generated deterministically from git status, the latest task contract, and the latest verification report.
+
+## Changed Files
+- M `.agentloop/backlog.md`
+- M `.agentloop/dogfood-log.md`
+- D `.agentloop/tasks/2026-06-12-harden-mcp-run-artifact-path-normalization.md`
+- M `CHANGELOG.md`
+- M `DECISIONS.md`
+- M `FINAL_HANDOFF.md`
+- M `README.md`
+- M `docs/cli-reference.md`
+- M `docs/mcp.md`
+- M `src/core/mcp-tools.ts`
+- M `src/core/review-context.ts`
+- M `src/core/runs.ts`
+- M `tests/runs.test.ts`
+- M `tests/status.test.ts`
+- ?? `.agentloop/reports/2026-06-12-08-35-verification-report.md`
+- ?? `.agentloop/runs/2026-06-12-08-40-verify/`
+- ?? `.agentloop/tasks/2026-06-12-sanitize-run-ledger-display-paths.md`
+- ?? `.agentloop/tasks/archive/2026-06-12-harden-mcp-run-artifact-path-normalization.md`
+
+## Change Areas
+### Source
+- M `src/core/mcp-tools.ts`
+- M `src/core/review-context.ts`
+- M `src/core/runs.ts`
+
+### Tests
+- M `tests/runs.test.ts`
+- M `tests/status.test.ts`
+
+### AgentLoop
+- M `.agentloop/backlog.md`
+- M `.agentloop/dogfood-log.md`
+- D `.agentloop/tasks/2026-06-12-harden-mcp-run-artifact-path-normalization.md`
+- ?? `.agentloop/reports/2026-06-12-08-35-verification-report.md`
+- ?? `.agentloop/runs/2026-06-12-08-40-verify/`
+- ?? `.agentloop/tasks/2026-06-12-sanitize-run-ledger-display-paths.md`
+- ?? `.agentloop/tasks/archive/2026-06-12-harden-mcp-run-artifact-path-normalization.md`
+
+### Documentation
+- M `CHANGELOG.md`
+- M `DECISIONS.md`
+- M `FINAL_HANDOFF.md`
+- M `README.md`
+- M `docs/cli-reference.md`
+- M `docs/mcp.md`
+
+## Diff Stats
+```text
+.agentloop/backlog.md                              |  2 +-
+ .agentloop/dogfood-log.md                          | 22 +++++
+ ...2-harden-mcp-run-artifact-path-normalization.md | 71 ----------------
+ CHANGELOG.md                                       |  2 +-
+ DECISIONS.md                                       |  6 ++
+ FINAL_HANDOFF.md                                   |  2 +-
+ README.md                                          |  1 +
+ docs/cli-reference.md                              |  2 +
+ docs/mcp.md                                        |  1 +
+ src/core/mcp-tools.ts                              | 54 +-----------
+ src/core/review-context.ts                         | 19 +----
+ src/core/runs.ts                                   | 95 ++++++++++++++++------
+ tests/runs.test.ts                                 | 93 +++++++++++++++++++--
+ tests/status.test.ts                               |  4 +-
+ 14 files changed, 201 insertions(+), 173 deletions(-)
+```
+
+## Behaviour Changed
+- Review changed files and task contract to confirm intended behavior.
+
+## Review Focus
+- Review source changes for behavior and public API impact.
+- Check tests cover the changed behavior.
+- Check docs match the implemented command behavior.
+- Review AgentLoop artifacts for accurate task, verification, and handoff evidence.
+
+## Verification Performed
+- Overall status: pass
+
+## Verification Not Performed
+- Check the verification report for skipped commands.
+
+## Risks
+- Re-check protected files such as migrations, secrets, auth, billing, deployment, and public APIs before merge.
+
+## Rollback Notes
+- Revert the changed files or revert the merge commit if this lands as a PR.
+
+## Reviewer Checklist
+- [ ] Acceptance criteria match the task contract.
+- [ ] Verification evidence is adequate for the change.
+- [ ] Risk areas have been reviewed.
+- [ ] Rollback plan is clear.
+
+## Follow-Ups
+- Capture any deferred work in ROADMAP.md or a new task contract.
