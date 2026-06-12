@@ -2,7 +2,7 @@ import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { latestMarkdownFile, prSummaryPattern } from './artifacts.js';
-import { resolveCurrentTaskVerificationEvidence } from './evidence.js';
+import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
 import { getGitStatus, parseGitStatus } from './git.js';
 import { readTaskContract } from './task-state.js';
 
@@ -65,7 +65,7 @@ export async function runMaintainerCheck(options: {
   cwd: string;
   config: AgentLoopConfig;
 }): Promise<MaintainerCheckResult> {
-  const evidence = await resolveCurrentTaskVerificationEvidence(options);
+  const evidence = await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
   const checks: MaintainerCheck[] = [];
 
   if (evidence.taskPath) {

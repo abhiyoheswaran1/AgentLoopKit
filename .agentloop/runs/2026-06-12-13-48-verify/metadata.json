@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-13-48-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-13-48",
+  "createdAtEpochMs": 1781264921655,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-accept-archived-task-evidence-in-gates.md",
+    "title": "Accept archived task evidence in gates",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-13-46-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 24
+}

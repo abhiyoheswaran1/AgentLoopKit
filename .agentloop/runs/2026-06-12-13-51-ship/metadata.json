@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-13-51-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-13-51",
+  "createdAtEpochMs": 1781265099200,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-accept-archived-task-evidence-in-gates.md",
+    "title": "Accept archived task evidence in gates",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-13-48-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-13-51-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-13-51-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 27
+}

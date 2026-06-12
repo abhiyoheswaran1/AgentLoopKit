@@ -76,6 +76,8 @@ agentloop task done .agentloop/tasks/<task-file>.md
 agentloop task current
 agentloop task clear
 agentloop task archive .agentloop/tasks/<task-file>.md
+agentloop task archive --status done --dry-run
+agentloop task archive --status done
 agentloop task doctor
 ```
 
@@ -85,7 +87,7 @@ Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review
 
 `task done` marks the active task `done`. Pass a path to mark a non-active task done.
 
-Archive task contracts after verification and handoff, not as a substitute for either.
+Archive task contracts after verification and handoff, not as a substitute for either. Use `task archive --status done --dry-run` to preview a bulk cleanup, then run `task archive --status done` to move finished contracts into `.agentloop/tasks/archive/`. Bulk archive only accepts `done`; parked or active work still requires an explicit path.
 
 ## Status And Next
 
@@ -198,6 +200,8 @@ agentloop maintainer-check --json
 ```
 
 `maintainer-check` helps maintainers evaluate AI-assisted pull requests. It checks for a task contract, fresh verification evidence, handoff evidence, changed file count, dependency and lockfile changes, migrations, auth/security-sensitive files, and generated output files.
+
+If a verified task was archived after handoff, `maintainer-check` can use the latest run ledger entry when it still points to an existing archived task contract.
 
 It is read-only. It does not write reports, run verification commands, call GitHub APIs, read tokens, or upload files.
 

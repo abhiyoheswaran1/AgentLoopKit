@@ -3,6 +3,8 @@ import { readFile, stat } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { latestMarkdownFile, verificationReportPattern } from './artifacts.js';
 import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
+import { pathExists, resolvesInsidePath } from './file-system.js';
+import { listRuns } from './runs.js';
 
 export type CurrentVerificationEvidence = {
   currentReportPath?: string;
@@ -36,6 +38,38 @@ function isPostVerificationTaskStatus(status: string) {
 
 export async function getCurrentTaskPath(options: { cwd: string; config: AgentLoopConfig }) {
   return (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
+}
+
+async function resolveLatestRunTaskPath(options: { cwd: string; config: AgentLoopConfig }) {
+  const latestRunWithTask = (await listRuns(options.cwd)).find((run) => run.task?.path);
+  const runTaskPath = latestRunWithTask?.task?.path;
+  if (!runTaskPath || !runTaskPath.endsWith('.md')) return undefined;
+
+  const tasksRoot = path.resolve(options.cwd, options.config.paths.tasksDir);
+  const archiveRoot = path.join(tasksRoot, 'archive');
+  const candidates = [
+    path.resolve(options.cwd, runTaskPath),
+    path.join(archiveRoot, path.basename(runTaskPath)),
+  ];
+
+  for (const candidate of candidates) {
+    if (
+      candidate.endsWith('.md') &&
+      resolvesInsidePath(tasksRoot, candidate) &&
+      resolvesInsidePath(options.cwd, candidate) &&
+      (await pathExists(candidate))
+    ) {
+      return candidate;
+    }
+  }
+  return undefined;
+}
+
+export async function getCurrentOrLatestRunTaskPath(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+}) {
+  return (await getCurrentTaskPath(options)) ?? (await resolveLatestRunTaskPath(options));
 }
 
 export async function getLatestVerificationReportPath(options: {
@@ -92,6 +126,22 @@ export async function resolveCurrentTaskVerificationEvidence(options: {
   config: AgentLoopConfig;
 }): Promise<CurrentTaskVerificationEvidence> {
   const taskPath = await getCurrentTaskPath(options);
+  const reportPath = await getLatestVerificationReportPath(options);
+  return {
+    taskPath,
+    ...(await resolveCurrentVerificationEvidence({
+      cwd: options.cwd,
+      taskPath,
+      reportPath,
+    })),
+  };
+}
+
+export async function resolveCurrentOrLatestRunTaskVerificationEvidence(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+}): Promise<CurrentTaskVerificationEvidence> {
+  const taskPath = await getCurrentOrLatestRunTaskPath(options);
   const reportPath = await getLatestVerificationReportPath(options);
   return {
     taskPath,

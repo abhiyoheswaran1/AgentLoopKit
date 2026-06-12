@@ -7797,3 +7797,82 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The helper now keeps post-release proof repeatable and concise.
 - Improve:
   - Consider adding a future `agentloop release-status` report that gathers npm, GitHub release, GHCR, MCP, and published smoke proof in one command.
+
+## 2026-06-12: Bulk Task Archive Mode
+
+- Task contract: `.agentloop/tasks/archive/2026-06-12-add-bulk-task-archive-mode.md`
+- Trigger:
+  - Dogfooding release batches left finished task contracts in the active task folder because archiving them one at a time was easy to skip.
+- Product-panel decision:
+  - Lina wanted less cleanup friction after long agent sessions.
+  - Maya and Samir limited the bulk path to `done` tasks and required a dry-run path so parked or active work is not swept accidentally.
+  - Nora pushed for parseable JSON output so future scripts can preview the move list.
+- Implementation:
+  - Added `agentloop task archive --status done --dry-run`.
+  - Added `agentloop task archive --status done`.
+  - Preserved `agentloop task archive <path>` output and behavior.
+  - Added focused CLI tests in `tests/task-archive.test.ts`.
+  - Updated README, CLI reference, task docs, status docs, and repo harness guidance.
+  - Used the new bulk archive command on this task after verification and handoff.
+- Verification run:
+  - AgentLoop verification passed: `.agentloop/reports/2026-06-12-13-30-verification-report.md`.
+  - Run ledger entry: `.agentloop/runs/2026-06-12-13-31-verify`.
+  - Ship report: `.agentloop/reports/2026-06-12-13-33-ship-report.md` with review readiness `96`/100.
+  - Handoff summary: `.agentloop/handoffs/2026-06-12-13-34-pr-summary.md`.
+  - PR description: `.agentloop/handoffs/2026-06-12-13-33-pr-description.md`.
+  - Bulk archive dry-run reported `1` task and the actual archive moved `1` task.
+  - Task-specific commands passed:
+    - `npm test -- tests/task-archive.test.ts`
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run build`
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - TDD caught the missing CLI surface before implementation.
+  - JSON output made the dry-run contract easy to assert.
+  - The existing single-task archive helper kept path safety and active-task clearing in one place.
+- Improve:
+  - `agentloop verify --task --task-commands` also runs configured repo commands unless each `--no-*` flag is passed. A future `--only-task-commands` shortcut would make focused dogfood verification clearer.
+
+## 2026-06-12: Archived Task Gate Evidence
+
+- Task contract: `.agentloop/tasks/2026-06-12-accept-archived-task-evidence-in-gates.md`
+- Trigger:
+  - After the bulk archive task was verified, shipped, handed off, and archived, `npm run dogfood:strict` failed because `check-gates --strict` no longer saw task evidence.
+- Root cause:
+  - `check-gates` looked only at the active/latest open task under `.agentloop/tasks/`.
+  - The latest ship run still referenced the task, but the task file had moved into `.agentloop/tasks/archive/`.
+- Implementation:
+  - Added a narrow gate fallback that resolves the latest run task to an existing active or archived Markdown contract when no active/open task remains.
+  - Kept the failure path when no task evidence exists anywhere.
+  - Added regression coverage in `tests/check-gates.test.ts`.
+- Verification:
+  - `npm test -- tests/check-gates.test.ts` passed with `13` tests.
+  - AgentLoop verification passed: `.agentloop/reports/2026-06-12-13-48-verification-report.md`.
+  - Run ledger entry: `.agentloop/runs/2026-06-12-13-51-verify`.
+  - Ship report: `.agentloop/reports/2026-06-12-13-51-ship-report.md` with review readiness `92`/100.
+  - Handoff summary: `.agentloop/handoffs/2026-06-12-13-51-pr-summary.md`.
+  - PR description: `.agentloop/handoffs/2026-06-12-13-51-pr-description.md`.
+- What worked well:
+  - The new bulk archive flow immediately exposed the next gate edge case.
+- Improve:
+  - The final dogfood gate should stay part of every post-handoff cleanup check.
+
+## 2026-06-12: Archived Task Maintainer Evidence
+
+- Trigger:
+  - After `check-gates` accepted archived task evidence, `npm run dogfood:strict` still failed because `maintainer-check` reported the task contract as missing.
+- Root cause:
+  - `maintainer-check` still used the current-task-only evidence lookup.
+- Implementation:
+  - Moved the archived latest-run task resolver into the shared evidence layer.
+  - Updated `check-gates` and `maintainer-check` to use the same resolver.
+  - Added regression coverage in `tests/maintainer-check.test.ts`.
+- Verification:
+  - `npm test -- tests/maintainer-check.test.ts` passed with `2` tests.
+  - `npm test -- tests/check-gates.test.ts` passed with `13` tests.
+  - `npm run dogfood:strict` passed after both completed tasks were archived.
+- What worked well:
+  - Running dogfood after archiving caught the second consumer that needed the same evidence behavior.
+- Improve:
+  - Consider making `maintainer-check` warnings easier to summarize in dogfood output when the gate still exits successfully.

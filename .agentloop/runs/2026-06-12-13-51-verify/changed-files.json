@@ -1,0 +1,106 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/harness/commands.md"
+  },
+  {
+    "status": "M",
+    "path": "AGENTLOOP.md"
+  },
+  {
+    "status": "M",
+    "path": "AGENTS.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/check-gates.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/status.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/task-contracts.md"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/commands/task.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/check-gates.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/task-state.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/check-gates.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-12-13-33-pr-description.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-12-13-34-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-13-30-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-13-33-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-13-46-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-13-48-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-13-31-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-13-33-ship/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-13-48-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-accept-archived-task-evidence-in-gates.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-add-bulk-task-archive-mode.md"
+  },
+  {
+    "status": "??",
+    "path": "tests/task-archive.test.ts"
+  }
+]

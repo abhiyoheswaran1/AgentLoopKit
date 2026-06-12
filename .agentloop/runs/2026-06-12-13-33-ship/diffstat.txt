@@ -1,0 +1,12 @@
+ .agentloop/backlog.md          |   4 ++
+ .agentloop/dogfood-log.md      |  31 +++++++++++
+ .agentloop/harness/commands.md |   1 +
+ AGENTLOOP.md                   |   2 +-
+ AGENTS.md                      |   1 +
+ README.md                      |   7 +++
+ docs/cli-reference.md          |   4 +-
+ docs/status.md                 |   4 +-
+ docs/task-contracts.md         |   4 +-
+ src/cli/commands/task.ts       | 113 +++++++++++++++++++++++++++++++++++++++--
+ src/core/task-state.ts         |  76 +++++++++++++++++++++++++++
+ 11 files changed, 239 insertions(+), 8 deletions(-)

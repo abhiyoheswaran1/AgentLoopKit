@@ -17,6 +17,7 @@ Rules:
 - Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
 - Use `agentloop task done` after verification and handoff when the active task is ready to close.
 - Use `agentloop task archive <path>` only after verification and handoff are complete.
+- Use `agentloop task archive --status done --dry-run` before any bulk cleanup, then `agentloop task archive --status done`.
 - Use `agentloop task doctor` to find missing, legacy, unsupported, or terminal task statuses without mutating task files.
 - Use `agentloop status` to inspect pinned active task, latest open task, parked deferred tasks, latest report, dirty files, and next action.
 - Use `agentloop next` when you only need the next recommended loop command.

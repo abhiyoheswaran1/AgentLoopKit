@@ -171,6 +171,13 @@ agentloopkit init
 | `agentloop completion <shell>`   | Print shell completion scripts                                                 |
 | `agentloop version`              | Print the CLI version                                                          |
 
+Clean up finished task contracts after verification and handoff:
+
+```bash
+agentloop task archive --status done --dry-run
+agentloop task archive --status done
+```
+
 See [docs/cli-reference.md](docs/cli-reference.md) for command examples, JSON modes, and safety notes.
 
 ## Agent Setup

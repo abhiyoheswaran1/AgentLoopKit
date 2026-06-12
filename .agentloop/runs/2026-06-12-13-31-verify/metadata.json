@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-13-31-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-13-31",
+  "createdAtEpochMs": 1781263881771,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-bulk-task-archive-mode.md",
+    "title": "Add bulk task archive mode",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-13-30-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 12
+}

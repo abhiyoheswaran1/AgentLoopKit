@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-13-33-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-13-33",
+  "createdAtEpochMs": 1781264042972,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-bulk-task-archive-mode.md",
+    "title": "Add bulk task archive mode",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-13-30-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-13-33-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-13-34-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 15
+}

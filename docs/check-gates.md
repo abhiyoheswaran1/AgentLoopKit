@@ -14,6 +14,8 @@ It inspects local files only:
 
 It does not run tests, call an LLM, score code quality, or block human review.
 
+If a verified task was archived after handoff, `check-gates` can use the latest run ledger entry when it still points to an existing task contract under `.agentloop/tasks/archive/`.
+
 ```bash
 agentloop check-gates
 agentloop check-gates --json

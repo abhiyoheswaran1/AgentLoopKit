@@ -4,6 +4,7 @@ import type { AgentLoopConfig } from '../../core/config.js';
 import { AgentLoopError } from '../../core/errors.js';
 import {
   archiveTask,
+  archiveTasksByStatus,
   clearActiveTask,
   getActiveTask,
   inspectTaskDirectory,
@@ -17,6 +18,7 @@ import {
 import type {
   ActiveTask,
   ArchivedTask,
+  BulkTaskArchiveResult,
   ListedTask,
   TaskContract,
   TaskDoctorResult,
@@ -84,6 +86,24 @@ function printArchivedTask(task: ArchivedTask, options: { json?: boolean }) {
   }
   console.log(`Archived task: ${inlineCode(task.title)} (${inlineCode(task.status)})`);
   console.log(`${inlineCode(task.previousPath)} -> ${inlineCode(task.path)}`);
+}
+
+function printBulkTaskArchive(result: BulkTaskArchiveResult, options: { json?: boolean }) {
+  if (options.json) {
+    console.log(JSON.stringify({ taskArchive: result }, null, 2));
+    return;
+  }
+
+  const action = result.dryRun ? 'would archive' : 'archived';
+  console.log(
+    `Bulk task archive ${result.dryRun ? 'dry run' : 'complete'}: ${action} ${inlineCode(
+      String(result.count),
+    )} task contract(s) with status ${inlineCode(result.status)}.`,
+  );
+  for (const task of result.tasks) {
+    console.log(`- ${inlineCode(task.title)}`);
+    console.log(`  ${inlineCode(task.previousPath)} -> ${inlineCode(task.path)}`);
+  }
 }
 
 function printTaskDoctor(result: TaskDoctorResult, options: { json?: boolean }) {
@@ -303,22 +323,107 @@ export function taskCommand() {
 
   command
     .command('archive')
-    .argument('<path>', 'task contract path under .agentloop/tasks')
+    .argument('[path]', 'task contract path under .agentloop/tasks')
+    .option('--status <status>', 'bulk archive task contracts with this status')
+    .option('--dry-run', 'preview bulk archive output without moving task contracts')
     .option('--json', 'print machine-readable output')
     .description('Archive a task contract')
-    .action(async (taskPath: string, options: { json?: boolean }) => {
+    .action(
+      async (
+        taskPath: string | undefined,
+        options: { status?: string; dryRun?: boolean; json?: boolean },
+      ) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
+
+      if (!taskPath && !options.status) {
+        const error = new AgentLoopError(
+          'Pass a task path or --status <status> to archive task contracts.',
+          'TASK_ARCHIVE_TARGET_REQUIRED',
+        );
+        if (options.json) {
+          printJsonError(error);
+          return;
+        }
+        throw error;
+      }
+
+      if (taskPath && options.status) {
+        const error = new AgentLoopError(
+          'Pass either a task path or --status <status>, not both.',
+          'TASK_ARCHIVE_AMBIGUOUS_TARGET',
+        );
+        if (options.json) {
+          printJsonError(error);
+          return;
+        }
+        throw error;
+      }
+
+      if (taskPath && options.dryRun) {
+        const error = new AgentLoopError(
+          '--dry-run is only supported with --status bulk archive mode.',
+          'TASK_ARCHIVE_DRY_RUN_REQUIRES_STATUS',
+        );
+        if (options.json) {
+          printJsonError(error);
+          return;
+        }
+        throw error;
+      }
+
+      if (options.status) {
+        let result: BulkTaskArchiveResult;
+        try {
+          result = await archiveTasksByStatus({
+            cwd: workspace.cwd,
+            config: workspace.config,
+            status: options.status,
+            dryRun: options.dryRun,
+          });
+        } catch (error) {
+          if (
+            options.json &&
+            error instanceof AgentLoopError &&
+            (error.code === 'UNSUPPORTED_TASK_STATUS' ||
+              error.code === 'TASK_ARCHIVE_STATUS_NOT_TERMINAL')
+          ) {
+            printJsonError(error, {
+              requestedStatus: options.status,
+              supportedStatuses: TASK_STATUSES,
+            });
+            return;
+          }
+          if (printTaskOutputPathJsonError(error, options)) return;
+          throw error;
+        }
+        printBulkTaskArchive(result, options);
+        return;
+      }
+
+      const singleTaskPath = taskPath;
+      if (!singleTaskPath) {
+        throw new AgentLoopError(
+          'Pass a task path or --status <status> to archive task contracts.',
+          'TASK_ARCHIVE_TARGET_REQUIRED',
+        );
+      }
+
       let task: ArchivedTask;
       try {
-        task = await archiveTask({ cwd: workspace.cwd, config: workspace.config, taskPath });
+        task = await archiveTask({
+          cwd: workspace.cwd,
+          config: workspace.config,
+          taskPath: singleTaskPath,
+        });
       } catch (error) {
         if (printTaskPathJsonError(error, options)) return;
         if (printTaskOutputPathJsonError(error, options)) return;
         throw error;
       }
       printArchivedTask(task, options);
-    });
+    },
+    );
 
   command
     .command('doctor')

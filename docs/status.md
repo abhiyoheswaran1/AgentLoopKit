@@ -64,6 +64,8 @@ agentloop task set .agentloop/tasks/2026-06-09-add-settings-page.md
 agentloop task status .agentloop/tasks/2026-06-09-add-settings-page.md in-progress
 agentloop task done
 agentloop task archive .agentloop/tasks/2026-06-09-add-settings-page.md
+agentloop task archive --status done --dry-run
+agentloop task archive --status done
 agentloop task doctor
 agentloop task current --json
 agentloop task clear
@@ -73,7 +75,7 @@ agentloop task clear
 `agentloop task show --json` returns one task contract's metadata and Markdown content without changing repo state.
 `agentloop task status --json` updates only the task contract's `- Status:` line. Status is not verification evidence.
 `agentloop task done --json` marks the active task `done`. Pass a path when you need to finish a task that is not active.
-`agentloop task archive --json` moves one named contract into `.agentloop/tasks/archive/`, preserves Markdown content, refuses collisions, and clears the active pointer if needed.
+`agentloop task archive --json` moves one named contract into `.agentloop/tasks/archive/`, preserves Markdown content, refuses collisions, and clears the active pointer if needed. `agentloop task archive --status done --dry-run` previews a batch cleanup; `agentloop task archive --status done` archives finished contracts and leaves parked or active tasks alone.
 `agentloop task doctor --json` checks for missing, legacy, unsupported, and terminal statuses in the active task directory without writing state.
 
 The command suggests one next action:

@@ -35,6 +35,14 @@ export type ArchivedTask = ActiveTask & {
   previousPath: string;
 };
 
+export type BulkTaskArchiveResult = {
+  mode: 'bulk';
+  status: TaskStatus;
+  dryRun: boolean;
+  count: number;
+  tasks: ArchivedTask[];
+};
+
 export type TaskDoctorDiagnostic = {
   id:
     | 'legacy-task-status'
@@ -223,6 +231,14 @@ function parseTaskStatus(status: string): TaskStatus {
   );
 }
 
+function assertBulkArchiveStatus(status: TaskStatus) {
+  if (status === 'done') return;
+  throw new AgentLoopError(
+    `Bulk archive only supports terminal task status "done". Archive "${status}" tasks one at a time.`,
+    'TASK_ARCHIVE_STATUS_NOT_TERMINAL',
+  );
+}
+
 function isFallbackTaskCandidate(status: string) {
   const clean = status.trim().toLowerCase();
   return clean !== 'unknown' && !NON_FALLBACK_TASK_STATUSES.has(clean);
@@ -318,6 +334,66 @@ export async function archiveTask(options: {
   return {
     ...(await readTaskMetadata(options.cwd, destinationPath)),
     previousPath,
+  };
+}
+
+export async function archiveTasksByStatus(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  status: string;
+  dryRun?: boolean;
+}): Promise<BulkTaskArchiveResult> {
+  const status = parseTaskStatus(options.status);
+  assertBulkArchiveStatus(status);
+
+  const tasks = (await listTasks(options))
+    .filter((task) => task.status.trim().toLowerCase() === status)
+    .sort((left, right) => left.path.localeCompare(right.path));
+
+  const plannedTasks = await Promise.all(
+    tasks.map(async (task) => {
+      const destinationPath = resolveArchiveDestinationPath({
+        cwd: options.cwd,
+        config: options.config,
+        taskFileName: path.basename(task.path),
+      });
+      if (await pathExists(destinationPath)) {
+        throw new AgentLoopError(
+          `Archived task already exists: ${toStoredPath(options.cwd, destinationPath)}`,
+        );
+      }
+      return {
+        previousPath: task.path,
+        path: toStoredPath(options.cwd, destinationPath),
+        title: task.title,
+        status: task.status,
+      };
+    }),
+  );
+
+  if (options.dryRun) {
+    return {
+      mode: 'bulk',
+      status,
+      dryRun: true,
+      count: plannedTasks.length,
+      tasks: plannedTasks,
+    };
+  }
+
+  const archivedTasks: ArchivedTask[] = [];
+  for (const task of plannedTasks) {
+    archivedTasks.push(
+      await archiveTask({ cwd: options.cwd, config: options.config, taskPath: task.previousPath }),
+    );
+  }
+
+  return {
+    mode: 'bulk',
+    status,
+    dryRun: false,
+    count: archivedTasks.length,
+    tasks: archivedTasks,
   };
 }
 

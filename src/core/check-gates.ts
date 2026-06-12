@@ -2,7 +2,7 @@ import path from 'node:path';
 import { readFile, realpath } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { latestMarkdownFile, prSummaryPattern } from './artifacts.js';
-import { resolveCurrentTaskVerificationEvidence } from './evidence.js';
+import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
 import { pathExists, resolvesInsidePath } from './file-system.js';
 import {
   getGitBranch,
@@ -187,9 +187,9 @@ export async function checkGates(options: {
   redactPaths?: boolean;
 }): Promise<CheckGatesResult> {
   const strict = options.strict ?? false;
-  const evidence = await resolveCurrentTaskVerificationEvidence(options);
+  const evidence = await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
   const taskPath = evidence.taskPath;
-  const reportPath = evidence.currentReportPath;
+  const currentReportPath = evidence.currentReportPath;
   const handoffPath = await latestMarkdownFile(
     path.join(options.cwd, options.config.paths.handoffsDir),
     {
@@ -214,8 +214,8 @@ export async function checkGates(options: {
     gates.push(gate('task-contract', 'Task contract', 'fail', 'No task contract found.'));
   }
 
-  if (reportPath) {
-    const reportMarkdown = await readFile(reportPath, 'utf8');
+  if (currentReportPath) {
+    const reportMarkdown = await readFile(currentReportPath, 'utf8');
     const status = extractOverallStatus(reportMarkdown);
     gates.push(
       gate(
@@ -223,7 +223,7 @@ export async function checkGates(options: {
         'Verification report',
         status === 'pass' ? 'pass' : 'fail',
         `Overall status: ${status}`,
-        relativePath(options.cwd, reportPath),
+        relativePath(options.cwd, currentReportPath),
       ),
     );
   } else if (evidence.staleReport) {

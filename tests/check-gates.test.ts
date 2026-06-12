@@ -3,7 +3,7 @@ import { mkdir, realpath, rm, symlink, utimes, writeFile } from 'node:fs/promise
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
-import { makeTempDir, removeTempDir } from './helpers.js';
+import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
@@ -67,6 +67,60 @@ describe('check-gates command', () => {
       ]),
     );
     expect(output.nextAction.command).toBe('agentloop handoff');
+  });
+
+  test('passes strict gates when latest run references an archived task contract', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
+    await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/archive/2026-06-12-demo.md'),
+      '# Demo task\n\n- Status: done\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-12-13-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-12-13-34-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+    await writeJson(path.join(dir, '.agentloop/runs/2026-06-12-13-33-ship/metadata.json'), {
+      id: '2026-06-12-13-33-ship',
+      command: 'ship',
+      createdAt: '2026-06-12-13-33',
+      createdAtEpochMs: 1781264042972,
+      task: {
+        path: '.agentloop/tasks/2026-06-12-demo.md',
+        title: 'Demo task',
+        status: 'done',
+      },
+      verificationReportPath: '.agentloop/reports/2026-06-12-13-30-verification-report.md',
+      handoffPath: '.agentloop/handoffs/2026-06-12-13-34-pr-summary.md',
+      shipReportPath: '.agentloop/reports/2026-06-12-13-33-ship-report.md',
+      score: 96,
+      changedFileCount: 1,
+    });
+
+    const result = await execa(tsxPath, [cliPath, 'check-gates', '--strict', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.overallStatus).toBe('pass');
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'task-contract',
+          status: 'pass',
+          message: 'Demo task',
+          path: '.agentloop/tasks/archive/2026-06-12-demo.md',
+        }),
+      ]),
+    );
   });
 
   test('redacts local git root paths when requested', async () => {

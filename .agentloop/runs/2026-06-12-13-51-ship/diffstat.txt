@@ -1,0 +1,15 @@
+ .agentloop/backlog.md          |   6 +++
+ .agentloop/dogfood-log.md      |  55 ++++++++++++++++++++
+ .agentloop/harness/commands.md |   1 +
+ AGENTLOOP.md                   |   2 +-
+ AGENTS.md                      |   1 +
+ README.md                      |   7 +++
+ docs/check-gates.md            |   2 +
+ docs/cli-reference.md          |   4 +-
+ docs/status.md                 |   4 +-
+ docs/task-contracts.md         |   4 +-
+ src/cli/commands/task.ts       | 113 +++++++++++++++++++++++++++++++++++++++--
+ src/core/check-gates.ts        |  53 ++++++++++++++++---
+ src/core/task-state.ts         |  76 +++++++++++++++++++++++++++
+ tests/check-gates.test.ts      |  56 +++++++++++++++++++-
+ 14 files changed, 368 insertions(+), 16 deletions(-)
