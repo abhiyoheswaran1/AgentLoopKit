@@ -8585,3 +8585,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Dogfooding caught the inconsistent next action immediately after the status fix.
 - Improve:
   - Consider adding a shared next-action test fixture across status, gates, and review-context if this pattern repeats.
+
+## 2026-06-13: Preserve Archived Task Context In Handoff
+
+- Task contract: `.agentloop/tasks/2026-06-13-preserve-archived-task-context-in-handoff.md`
+- Trigger:
+  - During the check-gates handoff flow, a plain `agentloop handoff --write-run` after archiving the task generated a summary with `No task contract found.`
+  - Passing `--task` manually fixed the output, which showed the CLI had enough local evidence but the default path did not reuse it.
+- Product-panel decision:
+  - Lina wanted the default handoff command to stay useful after the normal done/archive workflow.
+  - Maya limited the fix to the existing evidence helper that already knows how to resolve latest run task context.
+  - Samir required no invented task context when there is no recent local task evidence.
+  - Nora wanted explicit `--task` to remain the clear override.
+- Implementation:
+  - Updated handoff summary generation to use current-or-latest-run task evidence.
+  - Added regression coverage for archived task fallback, no-evidence fallback, and explicit `--task` precedence.
+- Verification:
+  - Red run failed because handoff rendered `No task contract found.`
+  - Focused green run passed:
+    - `npm test -- tests/handoff.test.ts -t "latest run task context"`
+  - Handoff suite passed with `16` tests:
+    - `npm test -- tests/handoff.test.ts`
+- What worked well:
+  - Dogfooding caught a real workflow paper cut immediately after the previous handoff fix.
+- Improve:
+  - Consider making `task archive` print a short reminder that a final handoff can be generated after archival.

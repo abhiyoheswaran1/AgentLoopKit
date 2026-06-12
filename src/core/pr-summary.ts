@@ -6,7 +6,7 @@ import { getGitDiffStat, getGitStatus, parseGitStatus, GitFileStatus } from './g
 import { pathExists, writeTextFile } from './file-system.js';
 import { resolveExplicitArtifactPath, resolveOutputArtifactPath } from './artifacts.js';
 import {
-  getCurrentTaskPath,
+  getCurrentOrLatestRunTaskPath,
   getLatestVerificationReportPath,
   resolveCurrentVerificationEvidence,
 } from './evidence.js';
@@ -144,7 +144,8 @@ export async function summarizeRepository(options: {
           requestedPath: options.taskPath,
           expectedDir: options.config.paths.tasksDir,
         })
-      : undefined) ?? (await getCurrentTaskPath({ cwd: options.cwd, config: options.config }));
+      : undefined) ??
+    (await getCurrentOrLatestRunTaskPath({ cwd: options.cwd, config: options.config }));
   const reportPath =
     (options.reportPath
       ? await resolveExplicitArtifactPath({

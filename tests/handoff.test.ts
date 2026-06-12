@@ -46,6 +46,38 @@ async function createExplicitTaskFixture() {
   return dir;
 }
 
+async function createArchivedRunTaskFixture() {
+  const dir = await makeTempDir();
+  tempDirs.push(dir);
+  const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+  await writeJson(path.join(dir, 'agentloop.config.json'), config);
+  await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+  await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+  await writeFile(
+    path.join(dir, '.agentloop/tasks/archive/2026-06-09-demo.md'),
+    '# Archived demo task\n\n- Status: done\n',
+  );
+  await writeFile(
+    path.join(dir, '.agentloop/reports/2026-06-09-12-00-verification-report.md'),
+    '# Verification Report\n\nOverall status: pass\n',
+  );
+  await writeJson(path.join(dir, '.agentloop/runs/2026-06-09-12-05-verify/metadata.json'), {
+    id: '2026-06-09-12-05-verify',
+    command: 'verify',
+    createdAt: '2026-06-09-12-05',
+    createdAtEpochMs: 1_000,
+    task: {
+      path: '.agentloop/tasks/2026-06-09-demo.md',
+      title: 'Archived demo task',
+      status: 'done',
+    },
+    verificationReportPath: '.agentloop/reports/2026-06-09-12-00-verification-report.md',
+    overallStatus: 'pass',
+    changedFileCount: 1,
+  });
+  return dir;
+}
+
 describe('handoff command', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
@@ -216,6 +248,51 @@ describe('handoff command', () => {
     const output = JSON.parse(result.stdout);
     expect(output.markdown).toContain(`Task context: ${inlineCode('Demo task')}`);
     expect(output.markdown).not.toContain('Task context: Newer task');
+  });
+
+  test('uses latest run task context after the task has been archived', async () => {
+    const dir = await createArchivedRunTaskFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'handoff', '--json'], { cwd: dir });
+
+    const output = JSON.parse(result.stdout);
+    expect(output.markdown).toContain(`Task context: ${inlineCode('Archived demo task')}`);
+    expect(output.markdown).not.toContain('No task contract found.');
+  });
+
+  test('does not invent task context when no task evidence exists', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    await writeJson(path.join(dir, 'agentloop.config.json'), config);
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'handoff', '--json'], { cwd: dir });
+
+    const output = JSON.parse(result.stdout);
+    expect(output.markdown).toContain(`Task context: ${inlineCode('No task contract found.')}`);
+  });
+
+  test('lets explicit handoff task paths override latest run task context', async () => {
+    const dir = await createArchivedRunTaskFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-explicit.md'),
+      '# Explicit handoff task\n\n- Status: in-progress\n',
+    );
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'handoff', '--task', '.agentloop/tasks/2026-06-09-explicit.md', '--json'],
+      { cwd: dir },
+    );
+
+    const output = JSON.parse(result.stdout);
+    expect(output.markdown).toContain(`Task context: ${inlineCode('Explicit handoff task')}`);
+    expect(output.markdown).not.toContain('Archived demo task');
   });
 
   test('prints explicit missing summarize task paths as JSON errors', async () => {

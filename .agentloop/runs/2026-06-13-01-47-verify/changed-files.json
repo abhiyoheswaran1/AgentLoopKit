@@ -1,0 +1,30 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/pr-summary.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/handoff.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-01-46-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-13-preserve-archived-task-context-in-handoff.md"
+  }
+]

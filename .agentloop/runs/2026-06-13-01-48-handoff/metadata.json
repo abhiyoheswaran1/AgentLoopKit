@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-01-48-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-01-48",
+  "createdAtEpochMs": 1781308105593,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-preserve-archived-task-context-in-handoff.md",
+    "title": "Preserve archived task context in handoff",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-01-46-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-01-48-pr-summary.md",
+  "changedFileCount": 8
+}

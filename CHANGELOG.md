@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fixed `agentloop handoff` so it can preserve archived completed task context from recent run evidence when no active task exists.
 - Fixed `agentloop check-gates` next-action guidance so fresh handoff evidence no longer conflicts with `agentloop status`.
 - Fixed `agentloop status` so a fresh handoff run does not keep recommending another handoff only because its own run folder is dirty.
 - Added a read-only public docs hygiene check to `npm run dogfood` and `npm run dogfood:strict`, with a direct `npm run check:public-docs` script.
