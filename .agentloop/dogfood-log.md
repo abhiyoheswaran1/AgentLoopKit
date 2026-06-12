@@ -2,6 +2,58 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: 0.28.2 Patch Release Gate
+
+- Task contract: `.agentloop/tasks/2026-06-12-prepare-0-28-2-patch-release.md`
+- Trigger:
+  - The task-only verification shortcut needed a small patch release after logo and dogfood work landed.
+  - Package metadata, changelog, MCP server metadata, and release docs needed to agree before GitHub/npm publishing.
+- Product change:
+  - Bumped package metadata to `0.28.2`.
+  - Moved shortcut changes into `CHANGELOG.md` under `0.28.2`.
+  - Updated release docs to identify `0.28.2` as the active patch candidate.
+  - Updated `server.json` from `0.28.1` to `0.28.2`.
+- Verification:
+  - First release gate failed because `server.json` still listed npm package version `0.28.1`.
+  - Focused fix verification: `npm test -- tests/distribution-artifacts.test.ts` passed with 1 file and 10 tests.
+  - Final release gate report: `.agentloop/reports/2026-06-12-14-42-verification-report.md`.
+  - Final release gate run: `.agentloop/runs/2026-06-12-14-50-verify/`.
+  - Final release gate passed `npm run lint`, `npm run typecheck`, `npm test`, `npm run check:links`, `node scripts/prepublish-check.mjs`, `git diff --check`, `npm run build`, `npm run smoke:release`, `node scripts/smoke-cli.mjs`, `node dist/cli/index.js artifacts --json`, `npx --yes projscan doctor --format markdown`, `npm run dogfood:strict`, `npm publish --access public --dry-run`, and `npm pack --pack-destination /tmp --silent`.
+  - Full suite passed with 51 files and 436 tests.
+  - ProjScan reported A 100/100.
+  - Local tarball: `/tmp/agentloopkit-0.28.2.tgz`.
+  - Local tarball SHA-256: `ea34d7a9d3edefea9ba7edd447cf3e1ec85dd8b94a8d638c7906182f61705b09`.
+- Worked well:
+  - Distribution artifact tests caught MCP metadata drift before publish.
+- Improve:
+  - Add a release metadata sync helper or release-check rule for `server.json` so maintainers get a faster failure than the full test suite.
+  - Add streaming/progress output for long `agentloop verify` runs.
+
+## 2026-06-12: Task-Only Verification Shortcut
+
+- Task contract: `.agentloop/tasks/2026-06-12-add-task-only-verification-shortcut.md`
+- Trigger:
+  - Focused dogfood verification required `--no-test --no-lint --no-typecheck --no-build` before task contract commands could run by themselves.
+  - The safe part of the workflow already required `--task-commands`; the missing piece was a shorter way to skip configured repo commands.
+- Product change:
+  - Added `agentloop verify --task <path> --task-commands --only-task-commands`.
+  - The shortcut skips configured `test`, `lint`, `typecheck`, and `build` commands and records them under `notRun`.
+  - The shortcut returns JSON option errors and runs nothing when `--task` or `--task-commands` is missing.
+  - Public docs now show the explicit task path for task-command verification.
+- Verification:
+  - Red focused run: `npm test -- tests/verification.test.ts` failed because `--only-task-commands` was unknown.
+  - Green focused run: `npm test -- tests/verification.test.ts` passed with 1 file and 36 tests.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-14-16-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-14-19-verify/`.
+  - Task-only shortcut verification report: `.agentloop/reports/2026-06-12-14-20-verification-report.md`.
+  - Task-only shortcut run: `.agentloop/runs/2026-06-12-14-22-verify/`.
+  - Full verification included `npx pnpm@10.12.1 test`, lint, typecheck, build, and `npx --yes projscan doctor --format markdown`.
+  - Shortcut verification ran six task commands and recorded configured `test`, `lint`, `typecheck`, and `build` as not run.
+- Worked well:
+  - The new flag made the dogfood loop shorter without making task Markdown executable by default.
+- Improve:
+  - Consider a future active-task default for `verify --task-commands`, so users do not need to paste the task path after `create-task`.
+
 ## 2026-06-12: MCP Artifact Inventory Lookup
 
 - Task contract: `.agentloop/tasks/2026-06-12-expose-artifact-inventory-through-mcp.md`

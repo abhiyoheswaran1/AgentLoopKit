@@ -1,0 +1,16 @@
+ .agentloop/backlog.md        |   2 +-
+ .agentloop/dogfood-log.md    |  25 +++++++
+ CHANGELOG.md                 |   5 ++
+ DECISIONS.md                 |   6 ++
+ FINAL_HANDOFF.md             |   6 ++
+ README.md                    |   2 +-
+ docs/cli-reference.md        |   3 +-
+ docs/launch-checklist.md     |   4 +-
+ docs/npm-publishing.md       |   5 +-
+ docs/release-status.md       |  22 +++---
+ docs/verification-reports.md |   5 +-
+ package.json                 |   2 +-
+ server.json                  |   4 +-
+ src/cli/commands/verify.ts   |  66 ++++++++++++++++--
+ tests/verification.test.ts   | 162 +++++++++++++++++++++++++++++++++++++++++++
+ 15 files changed, 295 insertions(+), 24 deletions(-)

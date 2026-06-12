@@ -4,6 +4,11 @@
 
 - No unreleased changes yet.
 
+## 0.28.2
+
+- Added `agentloop verify --task <path> --task-commands --only-task-commands` for focused task-contract verification without configured repo commands.
+- Changed the README quickstart and verification docs to show explicit task paths when running task contract commands.
+
 ## 0.28.1
 
 - Added `npm run dogfood` and `npm run dogfood:strict` as repeatable local self-check gates for AgentLoopKit development.

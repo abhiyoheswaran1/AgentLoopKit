@@ -74,6 +74,12 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
+- Active release candidate: `agentloopkit@0.28.2`
+- Candidate purpose: focused task-contract verification through `agentloop verify --task <path> --task-commands --only-task-commands`
+- Public package before this release: `agentloopkit@0.28.1`
+
+## Previous release
+
 - Current npm release: `agentloopkit@0.28.1`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.1>
 - Release asset: `agentloopkit-0.28.1.tgz`

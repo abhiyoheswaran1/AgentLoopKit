@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-14-19-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-14-19",
+  "createdAtEpochMs": 1781266789466,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-task-only-verification-shortcut.md",
+    "title": "Add task-only verification shortcut",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-14-16-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

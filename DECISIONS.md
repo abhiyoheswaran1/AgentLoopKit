@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-06-12: Task-Only Verification Still Requires Explicit Task Commands
+
+`agentloop verify --only-task-commands` is a convenience flag, not a new execution permission. It only works with both `--task <path>` and `--task-commands`, so task Markdown never becomes executable because a user asked for a report with task context.
+
+The shortcut skips configured repo commands through the existing verification skip path and records `test`, `lint`, `typecheck`, and `build` as not run. This keeps focused dogfood runs clear while preserving default broad verification behavior.
+
 ## 2026-06-12: Run Ledger Paths Are Display Evidence
 
 Run metadata should help humans, agents, and MCP clients review evidence without leaking local machine paths. New run records store display-safe paths: AgentLoopKit artifacts as `.agentloop/...`, repo files as repo-relative paths, and outside absolute paths as filenames. The reader also sanitizes older run records so existing ledgers keep working.

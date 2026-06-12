@@ -4,8 +4,9 @@ Last checked: June 12, 2026.
 
 ## Current State
 
-- Current GitHub release: `v0.28.1`
-- Current GitHub release asset: `agentloopkit-0.28.1.tgz`
+- Active release candidate: `v0.28.2`
+- Current public GitHub release before this release: `v0.28.1`
+- Current public GitHub release asset before this release: `agentloopkit-0.28.1.tgz`
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.1>
 - Tarball SHA-256: `88add27b0cabb4f833866748398e078496d5770151f558dde8a093d464965ac6`
 - CI run: `27410702770` passed for the `0.28.1` release commit
@@ -15,10 +16,15 @@ Last checked: June 12, 2026.
 - GHCR image manifest: `ghcr.io/abhiyoheswaran1/agentloopkit:0.28.1` digest `sha256:d1a4c66e70d98cf6a18a261f513fce273b9c92727017c7ba910da391cfc11ea8`
 - MCP Registry workflow run: `27410894807` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
-- npm latest: `0.28.1`
+- npm latest before this release: `0.28.1`
 - Release tag `v0.28.1` points at commit `fd2c733`
 
 ## Latest Release Highlights
+
+Planned in `0.28.2`:
+
+- `agentloop verify --task <path> --task-commands --only-task-commands` for focused task-contract verification
+- README and verification docs that show explicit task paths when running task contract commands
 
 Released in `0.28.1`:
 
@@ -29,9 +35,9 @@ Released in `0.28.1`:
 - stale release-guidance smoke coverage in public harness docs
 - archived shipped internal task contracts and refreshed release evidence
 
-These changes are recorded in `CHANGELOG.md` under `## 0.28.1`.
+The `0.28.2` changes are recorded in `CHANGELOG.md` under `## 0.28.2`.
 
-There is no active release candidate after `0.28.1`.
+The `0.28.2` candidate should become current only after GitHub release workflows publish npm, GHCR, and MCP Registry metadata and post-publish smoke checks pass.
 
 ## Use The Current CLI
 
@@ -39,7 +45,7 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.28.1 version
+npx --yes agentloopkit@0.28.2 version
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -48,7 +54,7 @@ GitHub release tarballs remain useful for provenance checks and rollback, but no
 
 Use the GitHub Actions publish workflow for the next release after release metadata is prepared:
 
-- No next release is planned yet; batch current unreleased work instead of cutting a version for every small improvement.
+- `0.28.2` is the active patch candidate.
 - `package.json` and `CHANGELOG.md` must agree on the next version.
 - `CHANGELOG.md` must have no real entries left under `## Unreleased`.
 - `agentloop npm-status --agentloopkit --expect-current` should pass before the version bump, or the version gap must be explained in release notes.
@@ -63,7 +69,7 @@ After each publish:
 
 ## Verification Evidence
 
-Local release checks for `0.28.1`:
+Local release checks planned for `0.28.2`:
 
 - `npm run lint`
 - `npm run typecheck`

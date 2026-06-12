@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-14-40-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-14-40",
+  "createdAtEpochMs": 1781268042068,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-prepare-0-28-2-patch-release.md",
+    "title": "Prepare 0.28.2 patch release",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-14-31-verification-report.md",
+  "overallStatus": "fail",
+  "changedFileCount": 26
+}

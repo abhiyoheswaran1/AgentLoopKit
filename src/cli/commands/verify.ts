@@ -13,7 +13,12 @@ import { writeVerificationRun } from '../../core/runs.js';
 import { readTaskMetadata } from '../../core/task-state.js';
 import { runVerification } from '../../core/verification.js';
 import { toSafeDisplayPath } from '../../core/display-path.js';
-import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
+import {
+  CliOptionError,
+  loadWorkspaceForJsonCommand,
+  printAgentLoopJsonError,
+  printOutputPathJsonError,
+} from '../json-errors.js';
 
 function collect(value: string, previous: string[]) {
   previous.push(value);
@@ -49,6 +54,43 @@ function printArtifactPathJsonError(error: ArtifactPathError) {
   process.exitCode = 1;
 }
 
+function validateOnlyTaskCommands(options: {
+  onlyTaskCommands?: boolean;
+  taskCommands?: boolean;
+  taskPath?: string;
+  json?: boolean;
+}) {
+  if (!options.onlyTaskCommands) return true;
+
+  const error = !options.taskPath
+    ? new CliOptionError(
+        '--only-task-commands requires --task.',
+        'ONLY_TASK_COMMANDS_REQUIRES_TASK',
+        {
+          option: 'only-task-commands',
+          requiredOption: 'task',
+        },
+      )
+    : options.taskCommands !== true
+      ? new CliOptionError(
+          '--only-task-commands requires --task-commands.',
+          'ONLY_TASK_COMMANDS_REQUIRES_TASK_COMMANDS',
+          {
+            option: 'only-task-commands',
+            requiredOption: 'task-commands',
+          },
+        )
+      : undefined;
+
+  if (!error) return true;
+  if (options.json) {
+    printAgentLoopJsonError(error);
+    return false;
+  }
+
+  throw error;
+}
+
 async function resolveTaskForRun(options: {
   cwd: string;
   config: AgentLoopConfig;
@@ -76,6 +118,10 @@ export function verifyCommand() {
     .description('Run configured verification commands and write a report')
     .option('--task <path>', 'task contract path for humans to cross-reference')
     .option('--task-commands', 'also run verification commands listed in the task contract')
+    .option(
+      '--only-task-commands',
+      'run only task contract verification commands; requires --task and --task-commands',
+    )
     .option('--json', 'print machine-readable output')
     .option('--no-build', 'skip build command')
     .option('--no-test', 'skip test command')
@@ -88,6 +134,16 @@ export function verifyCommand() {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json === true);
       if (!workspace) return;
       const taskPath = typeof options.task === 'string' ? options.task : undefined;
+      if (
+        !validateOnlyTaskCommands({
+          onlyTaskCommands: options.onlyTaskCommands === true,
+          taskCommands: options.taskCommands === true,
+          taskPath,
+          json: options.json === true,
+        })
+      ) {
+        return;
+      }
       if (options.json && taskPath) {
         try {
           await resolveExplicitArtifactPath({
@@ -112,10 +168,10 @@ export function verifyCommand() {
           taskPath,
           taskCommands: options.taskCommands === true,
           skip: {
-            build: options.build === false,
-            test: options.test === false,
-            lint: options.lint === false,
-            typecheck: options.typecheck === false,
+            build: options.onlyTaskCommands === true || options.build === false,
+            test: options.onlyTaskCommands === true || options.test === false,
+            lint: options.onlyTaskCommands === true || options.lint === false,
+            typecheck: options.onlyTaskCommands === true || options.typecheck === false,
           },
           customCommands: options.command as string[],
           timeoutMs: parseTimeoutMs(options.timeoutMs),

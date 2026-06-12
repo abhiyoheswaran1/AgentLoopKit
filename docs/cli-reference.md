@@ -126,13 +126,14 @@ agentloop verify
 agentloop verify --json
 agentloop verify --task .agentloop/tasks/<task-file>.md
 agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands
+agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands --only-task-commands
 agentloop verify --timeout-ms 120000
 agentloop verify --write-run
 ```
 
 `verify` reads `agentloop.config.json`, runs configured commands, captures output excerpts, and writes a Markdown report under `.agentloop/reports/`.
 
-Use `--task` to include task context in the report. Use `--task-commands` when you also want to run verification commands listed inside the task contract.
+Use `--task` to include task context in the report. Use `--task-commands` when you also want to run verification commands listed inside the task contract. Add `--only-task-commands` when a reviewed task contract should run by itself without the configured repo commands.
 
 Use `--write-run` when you want verification to also create a local run ledger entry under `.agentloop/runs/`. The run records the verification report path, task reference when available, current changed files, and overall verification status.
 
