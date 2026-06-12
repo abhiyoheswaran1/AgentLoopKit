@@ -74,24 +74,24 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.28.5`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.5>
-- Release asset: `agentloopkit-0.28.5.tgz`
-- Release asset SHA-256: `89244fd07cb85c2615adf7461cbb9a71d24b83858752acc22f83752fe1e47ba7`
-- Release tag: `v0.28.5` at commit `65ab0d7eb19b6d5817d86d1ba4e7224476788e5c`
-- CI run: `27440864521`
-- CLI Smoke run: `27440864531`
-- Publish workflow run: `27440882421`
-- Docker workflow run: `27440882387`
-- MCP Registry workflow run: `27441104421`
-- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.28.5`
+- Current npm release: `agentloopkit@0.28.6`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.6>
+- Release asset: `agentloopkit-0.28.6.tgz`
+- Release asset SHA-256: `2f91b2c0adc5d44f5f32f09eb40f4e0ce028c07400c6fb76fe075070ec65b573`
+- Release tag: `v0.28.6` at commit `445806d9af40c614d3d79d9e6efcf096fb2823a6`
+- CI run: `27442870785`
+- CLI Smoke run: `27442870779`
+- Publish workflow run: `27442925865`
+- Docker workflow run: `27442925900`
+- MCP Registry workflow run: `27443148213`
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.28.6`
 
-## 0.28.5 release summary
+## 0.28.6 release summary
 
 Included:
 
-- safer `agentloop release-check` next-action guidance through `agentloop npm-status`
-- clean-tree `agentloop check-gates --strict` behavior for committed work with current evidence
+- stale release-note evidence detection in `agentloop release-check`
+- strict release-check failure when generated release notes do not mention the package version
 - synchronized package metadata, changelog, roadmap state, and MCP `server.json`
 
 Release verification covered local release gates, npm trusted publishing, GitHub release assets, GHCR publishing through the Docker workflow, MCP Registry publishing, and clean-directory published-package smoke.

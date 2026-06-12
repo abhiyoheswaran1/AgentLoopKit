@@ -1,0 +1,58 @@
+[
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "FINAL_HANDOFF.md"
+  },
+  {
+    "status": "M",
+    "path": "ROADMAP.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/launch-checklist.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/npm-publishing.md"
+  },
+  {
+    "status": "M",
+    "path": "package.json"
+  },
+  {
+    "status": "M",
+    "path": "server.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-12-23-36-release-notes.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-12-23-54-release-notes.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-23-37-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-23-46-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-23-45-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-23-53-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-release-0-28-7-public-release-notes-patch.md"
+  }
+]

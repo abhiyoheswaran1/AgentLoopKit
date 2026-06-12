@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.28.7
+
 - Added `agentloop release-notes --public` for concise release-page Markdown that omits local changed-file and AgentLoop evidence inventories.
 
 ## 0.28.6

@@ -2,6 +2,29 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: 0.28.7 Release Prep
+
+- Task contract: `.agentloop/tasks/2026-06-12-release-0-28-7-public-release-notes-patch.md`
+- Trigger:
+  - The maintainer asked for a small patch release after the logo and dogfood work.
+  - The previous release exposed a product gap: detailed local release notes were useful for evidence, but too noisy for public GitHub release pages.
+- Product change:
+  - Prepared `agentloopkit@0.28.7`.
+  - Added public release-page output with `agentloop release-notes --public`.
+  - Updated release metadata across `package.json`, `server.json`, `CHANGELOG.md`, and `ROADMAP.md`.
+  - Corrected stale maintainer docs that still referenced `0.28.5`.
+- Verification:
+  - Pre-bump npm status passed: local `0.28.6` matched npm latest `0.28.6`.
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-12-23-46-verification-report.md`.
+  - The verification run wrote `.agentloop/runs/2026-06-12-23-53-verify/`.
+  - `npm run dogfood:strict` passed after the fresh verification report existed.
+  - `node dist/cli/index.js release-check` passed release metadata checks and warned only because the release prep tree was still dirty.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - Dogfooding caught that `dogfood:strict` and strict release checks belong after verification writes evidence, not inside the same pre-report command list.
+- Improve:
+  - Consider teaching `create-task` to nudge post-report gates into the `Post-Verification Gates` section when command names include `dogfood:strict`, `check-gates --strict`, or `release-check --strict`.
+
 ## 2026-06-12: Public Release Notes Mode
 
 - Task contract: `.agentloop/tasks/archive/2026-06-12-add-public-release-notes-mode.md`
