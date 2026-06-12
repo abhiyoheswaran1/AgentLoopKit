@@ -19,6 +19,12 @@ export type VerificationCommandResult = {
   timedOut?: boolean;
 };
 
+export type SkippedDuplicateCommand = {
+  command: string;
+  originalKey: VerificationCommandKey;
+  duplicateKey: VerificationCommandKey;
+};
+
 export type VerificationCiContext = {
   provider: 'github-actions' | 'gitlab-ci' | 'buildkite' | 'generic-ci';
   providerName: string;
@@ -73,6 +79,7 @@ export type VerificationResult = {
     foundCount: number;
     commands: string[];
   };
+  skippedDuplicateCommands: SkippedDuplicateCommand[];
   ciContext?: VerificationCiContext;
   markdown: string;
   reportPath: string;
@@ -235,18 +242,29 @@ type VerificationCommandSelection = {
   taskCommandsRequested: boolean;
   taskCommandsFound: number;
   taskCommands: string[];
+  skippedDuplicateCommands: SkippedDuplicateCommand[];
 };
 
 function uniqueCommandEntries(entries: Array<[VerificationCommandKey, string]>) {
-  const seen = new Set<string>();
+  const seen = new Map<string, VerificationCommandKey>();
   const result: Array<[VerificationCommandKey, string]> = [];
+  const skippedDuplicateCommands: SkippedDuplicateCommand[] = [];
   for (const [key, command] of entries) {
     const clean = command.trim();
-    if (!clean || seen.has(clean)) continue;
-    seen.add(clean);
+    if (!clean) continue;
+    const originalKey = seen.get(clean);
+    if (originalKey) {
+      skippedDuplicateCommands.push({
+        command: clean,
+        originalKey,
+        duplicateKey: key,
+      });
+      continue;
+    }
+    seen.set(clean, key);
     result.push([key, clean]);
   }
-  return result;
+  return { commands: result, skippedDuplicateCommands };
 }
 
 async function commandEntries(
@@ -279,11 +297,14 @@ async function commandEntries(
     }
   }
 
+  const selectedCommands = uniqueCommandEntries(active);
+
   return {
-    commands: uniqueCommandEntries(active),
+    commands: selectedCommands.commands,
     taskCommandsRequested: options.taskCommands === true,
     taskCommandsFound,
     taskCommands,
+    skippedDuplicateCommands: selectedCommands.skippedDuplicateCommands,
   };
 }
 
@@ -380,6 +401,22 @@ function renderTaskCommandContext(selection: VerificationCommandSelection) {
 
   return `## Task Commands
 - Task verification commands were requested, but none were found in the task contract.
+
+`;
+}
+
+function renderDuplicateCommandContext(selection: VerificationCommandSelection) {
+  if (selection.skippedDuplicateCommands.length === 0) return '';
+
+  return `## Duplicate Commands
+${selection.skippedDuplicateCommands
+  .map(
+    (duplicate) =>
+      `- Skipped duplicate ${inlineCode(duplicate.duplicateKey)} command ${inlineCode(
+        duplicate.command,
+      )}; already selected as ${inlineCode(duplicate.originalKey)}.`,
+  )
+  .join('\n')}
 
 `;
 }
@@ -522,6 +559,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
 ${renderCiContext(ciContext)}
 ${taskContext}
 ${renderTaskCommandContext(commandSelection)}
+${renderDuplicateCommandContext(commandSelection)}
 ${renderFailureSummary(results)}
 ## Commands Run
 ${
@@ -563,6 +601,7 @@ ${
       foundCount: commandSelection.taskCommandsFound,
       commands: commandSelection.taskCommands,
     },
+    skippedDuplicateCommands: commandSelection.skippedDuplicateCommands,
     ciContext,
     markdown,
     reportPath,

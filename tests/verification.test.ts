@@ -831,9 +831,20 @@ describe('verification', () => {
       foundCount: 1,
       commands: [duplicateCommand],
     });
+    expect(result.skippedDuplicateCommands).toEqual([
+      {
+        command: duplicateCommand,
+        originalKey: 'test',
+        duplicateKey: 'task',
+      },
+    ]);
     expect(result.commands).toEqual([
       expect.objectContaining({ key: 'test', command: duplicateCommand, passed: true }),
     ]);
+    expect(result.markdown).toContain('## Duplicate Commands');
+    expect(result.markdown).toContain(
+      '- Skipped duplicate `task` command `node duplicate-command.mjs`; already selected as `test`.',
+    );
     expect(await readFile(path.join(dir, 'duplicate-count.txt'), 'utf8')).toBe('1');
   });
 

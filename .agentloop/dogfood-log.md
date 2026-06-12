@@ -2,6 +2,33 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Duplicate Verification Skip Reporting
+
+- Task contract: `.agentloop/tasks/archive/2026-06-12-report-skipped-duplicate-verification-commands.md`
+- Trigger:
+  - The previous config-command task made verification skip exact duplicate command strings, but reports did not explain which duplicate was skipped.
+  - Agents need that evidence when a task command was found but does not appear as a separate command result.
+- Product change:
+  - Verification JSON now includes `skippedDuplicateCommands` with `command`, `originalKey`, and `duplicateKey`.
+  - Markdown verification reports include a `Duplicate Commands` section when exact duplicates are skipped.
+  - Duplicate commands still execute once.
+  - Two subprocess-heavy integration tests now use the repo's existing 90s timeout-budget pattern after the full suite exposed 30s timeouts.
+- Verification:
+  - Red TDD run: `npm test -- tests/verification.test.ts -t "runs exact duplicate configured and task commands only once"` failed because `skippedDuplicateCommands` was missing.
+  - Green targeted run: the same focused test passed.
+  - Focused affected run: `npm test -- tests/verification.test.ts tests/prepare-pr.test.ts tests/release-check.test.ts` passed with 53 tests.
+  - First AgentLoop task verification failed because `tests/prepare-pr.test.ts` and `tests/release-check.test.ts` had two timeout-prone tests without the local 90s budget.
+  - Retried AgentLoop task verification passed and wrote `.agentloop/reports/2026-06-12-19-43-verification-report.md`.
+  - The passing verification run wrote `.agentloop/runs/2026-06-12-19-49-verify/`.
+  - `npm run dogfood:strict` passed.
+  - `npm run check:links` passed and checked 1394 Markdown files.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - Final ship and PR evidence were generated after the log entry was written and are stored in the committed run ledger for this task.
+- Worked well:
+  - The previous task's dogfood note became the next task and produced a concrete UX improvement.
+- Improve:
+  - If duplicate skips become common, consider adding the count to the terminal success line without printing full command strings by default.
+
 ## 2026-06-12: Config Verification Commands for Task Contracts
 
 - Task contract: `.agentloop/tasks/archive/2026-06-12-add-config-verification-command-suggestions.md`

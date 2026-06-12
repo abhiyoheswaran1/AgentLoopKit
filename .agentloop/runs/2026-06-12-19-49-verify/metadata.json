@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-19-49-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-19-49",
+  "createdAtEpochMs": 1781286564693,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-report-skipped-duplicate-verification-commands.md",
+    "title": "Report skipped duplicate verification commands",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-19-43-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 11
+}

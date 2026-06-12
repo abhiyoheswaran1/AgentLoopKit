@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-19-53-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-19-53",
+  "createdAtEpochMs": 1781286803783,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-12-report-skipped-duplicate-verification-commands.md",
+    "title": "Report skipped duplicate verification commands",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-19-43-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-19-53-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-19-53-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 11
+}

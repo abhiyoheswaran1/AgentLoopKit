@@ -1,0 +1,9 @@
+ .agentloop/backlog.md        |   1 +
+ .agentloop/dogfood-log.md    |  27 ++++++++++
+ CHANGELOG.md                 |   1 +
+ docs/verification-reports.md |   2 +
+ src/core/verification.ts     |  49 +++++++++++++++--
+ tests/prepare-pr.test.ts     |  91 ++++++++++++++++---------------
+ tests/release-check.test.ts  | 125 ++++++++++++++++++++++---------------------
+ tests/verification.test.ts   |  11 ++++
+ 8 files changed, 200 insertions(+), 107 deletions(-)

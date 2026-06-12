@@ -8,6 +8,7 @@
 - Added `agentloop runs --latest` and `agentloop runs --limit <count>` for bounded local run-ledger navigation.
 - Added built-CLI smoke coverage for bounded `agentloop runs` output.
 - Added `agentloop create-task --include-config-commands` to copy configured `test`, `lint`, `typecheck`, and `build` commands into new task contracts without running them during creation.
+- Added duplicate-command reporting to verification Markdown and JSON output when exact command strings are selected more than once.
 - Changed verification command selection to run exact duplicate command strings once when configured commands and task contract commands overlap.
 - Fixed run ledger summaries so archived task contracts hydrate latest-run task title, status, and path while stored run metadata remains unchanged on disk.
 - Fixed `agentloop status` next-action guidance after archived task evidence so dirty shipped work points back to handoff/review instead of starting a new task.
