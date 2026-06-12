@@ -46,7 +46,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
-- Current `main` is accumulating unreleased work for the planned `0.28.0` batch, including README cleanup, first-run guidance polish, cross-platform smoke CI, read-only artifact inventory, CLI review context snapshots, and MCP review context snapshots. Do not cut releases for every small improvement.
+- Current `main` is accumulating unreleased work for the planned `0.28.0` batch, including README/demo refreshes, first-run guidance polish, cross-platform smoke CI, the local acceptance-layer commands, safer run ledger and public artifact paths, read-only artifact inventory, CLI review context snapshots, and MCP evidence tools. Do not cut releases for every small improvement.
 
 ## Near Term
 

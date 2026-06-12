@@ -116,6 +116,10 @@ async function assertFileExists(root, relativePath) {
   assert(await pathExists(filePath), `Expected ${relativePath} to exist.`);
 }
 
+function resolvePublicPath(root, filePath) {
+  return path.isAbsolute(filePath) ? filePath : path.join(root, filePath);
+}
+
 function assertPathInside(parent, child, label) {
   const realParent = realPathIfExists(parent);
   const realChild = realPathIfExists(child);
@@ -293,7 +297,8 @@ async function smokeCli({ keep = false } = {}) {
     );
     assert(verification.overallStatus === 'pass', 'verify did not report pass.');
     assert(verification.reportPath, 'verify JSON did not include reportPath.');
-    assert(await pathExists(verification.reportPath), 'verify report was not written.');
+    const verificationReportPath = resolvePublicPath(smokeRepo, verification.reportPath);
+    assert(await pathExists(verificationReportPath), 'verify report was not written.');
     assert(verification.run?.id, 'verify JSON did not include run.id when --write-run was used.');
     console.log('Verify smoke passed.');
 
@@ -315,7 +320,8 @@ async function smokeCli({ keep = false } = {}) {
       'handoff',
     );
     assert(handoff.outPath, 'handoff JSON did not include outPath.');
-    assert(await pathExists(handoff.outPath), 'handoff summary was not written.');
+    const handoffPath = resolvePublicPath(smokeRepo, handoff.outPath);
+    assert(await pathExists(handoffPath), 'handoff summary was not written.');
     assert(handoff.run?.id, 'handoff JSON did not include run.id when --write-run was used.');
     console.log('Handoff smoke passed.');
 
@@ -333,7 +339,8 @@ async function smokeCli({ keep = false } = {}) {
     );
     assert(ship.readiness?.totalScore >= 0, 'ship JSON did not include a readiness score.');
     assert(ship.shipReportPath, 'ship JSON did not include shipReportPath.');
-    assert(await pathExists(ship.shipReportPath), 'ship report was not written.');
+    const shipReportPath = resolvePublicPath(smokeRepo, ship.shipReportPath);
+    assert(await pathExists(shipReportPath), 'ship report was not written.');
     assert(ship.run?.id, 'ship JSON did not include run.id.');
     assert(
       ship.githubComment?.includes('AgentLoopKit Review Readiness'),
@@ -493,9 +500,13 @@ async function smokeCli({ keep = false } = {}) {
     );
     assert(nestedVerification.overallStatus === 'pass', 'nested verify did not report pass.');
     assert(nestedVerification.reportPath, 'nested verify JSON did not include reportPath.');
-    assertPathInside(smokeRepo, nestedVerification.reportPath, 'nested verify report');
+    const nestedVerificationReportPath = resolvePublicPath(
+      smokeRepo,
+      nestedVerification.reportPath,
+    );
+    assertPathInside(smokeRepo, nestedVerificationReportPath, 'nested verify report');
     assert(
-      await pathExists(nestedVerification.reportPath),
+      await pathExists(nestedVerificationReportPath),
       'nested verify report was not written.',
     );
 
@@ -516,8 +527,9 @@ async function smokeCli({ keep = false } = {}) {
       'nested handoff',
     );
     assert(nestedHandoff.outPath, 'nested handoff JSON did not include outPath.');
-    assertPathInside(smokeRepo, nestedHandoff.outPath, 'nested handoff summary');
-    assert(await pathExists(nestedHandoff.outPath), 'nested handoff summary was not written.');
+    const nestedHandoffPath = resolvePublicPath(smokeRepo, nestedHandoff.outPath);
+    assertPathInside(smokeRepo, nestedHandoffPath, 'nested handoff summary');
+    assert(await pathExists(nestedHandoffPath), 'nested handoff summary was not written.');
 
     const nestedGates = parseJson(
       (await runAgentLoop(['check-gates', '--json'], { cwd: nestedDir })).stdout,

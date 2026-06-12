@@ -12,6 +12,7 @@ import { inlineCode } from '../../core/markdown-format.js';
 import { writeVerificationRun } from '../../core/runs.js';
 import { readTaskMetadata } from '../../core/task-state.js';
 import { runVerification } from '../../core/verification.js';
+import { toSafeDisplayPath } from '../../core/display-path.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function collect(value: string, previous: string[]) {
@@ -144,15 +145,25 @@ export function verifyCommand() {
         });
       }
 
-      const output = run ? { ...result, run } : result;
+      const publicResult = {
+        ...result,
+        reportPath: toSafeDisplayPath(workspace.cwd, result.reportPath),
+      };
+      const publicRun = run
+        ? {
+            ...run,
+            path: toSafeDisplayPath(workspace.cwd, run.path),
+          }
+        : undefined;
+      const output = publicRun ? { ...publicResult, run: publicRun } : publicResult;
       if (options.json) console.log(JSON.stringify(output, null, 2));
       else {
         console.log(
-          `Verification report written: ${inlineCode(result.reportPath)}\nOverall status: ${inlineCode(
-            result.overallStatus,
-          )}`,
+          `Verification report written: ${inlineCode(
+            publicResult.reportPath,
+          )}\nOverall status: ${inlineCode(result.overallStatus)}`,
         );
-        if (run) console.log(`Run written: ${inlineCode(run.path)}`);
+        if (publicRun) console.log(`Run written: ${inlineCode(publicRun.path)}`);
       }
       if (result.overallStatus === 'fail') process.exitCode = 1;
     });

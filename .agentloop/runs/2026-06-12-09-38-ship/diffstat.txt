@@ -1,0 +1,25 @@
+ .agentloop/backlog.md                              |   2 +
+ ...2026-06-12-sanitize-run-ledger-display-paths.md |  54 ---------------------
+ CHANGELOG.md                                       |   4 +-
+ FINAL_HANDOFF.md                                   |   6 ++-
+ README.md                                          |   4 +-
+ ROADMAP.md                                         |   2 +-
+ docs/assets/readme/README.md                       |   2 +-
+ docs/assets/readme/agentloopkit-cli.gif            | Bin 2696884 -> 1471375 bytes
+ docs/assets/readme/agentloopkit-cli.tape           |  42 +++++++---------
+ docs/assets/readme/agentloopkit-showcase.png       | Bin 532219 -> 527918 bytes
+ docs/assets/readme/showcase.html                   |  41 +++++++++-------
+ docs/release-status.md                             |   7 ++-
+ scripts/smoke-cli.mjs                              |  26 +++++++---
+ src/cli/commands/summarize.ts                      |  26 ++++++++--
+ src/cli/commands/verify.ts                         |  21 ++++++--
+ src/core/prepare-pr.ts                             |  18 ++++---
+ src/core/ship.ts                                   |  15 +++++-
+ tests/ci-summary.test.ts                           |   3 +-
+ tests/handoff.test.ts                              |  24 +++++----
+ tests/prepare-pr.test.ts                           |   4 +-
+ tests/runs.test.ts                                 |   3 +-
+ tests/ship.test.ts                                 |  15 ++++--
+ tests/status.test.ts                               |   3 +-
+ tests/verification.test.ts                         |  25 ++++++----
+ 24 files changed, 192 insertions(+), 155 deletions(-)

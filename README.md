@@ -20,7 +20,7 @@ The screenshots and terminal demo in this README are generated from committed so
 
 AgentLoopKit is a repo-level toolkit for developers using Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and other coding agents.
 
-It does not replace your agent, IDE, or CLI. It gives those tools a repeatable local workflow:
+Keep your agent, IDE, and CLI. AgentLoopKit gives those tools a repeatable local workflow:
 
 1. Specify the task.
 2. Constrain the risk.
@@ -104,7 +104,7 @@ npx agentloopkit next
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, doctor, task contract creation, task status, verification, handoff, gates, HTML report, and badge commands" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, task creation, task-aware verification, review-readiness scoring, PR preparation, review context, run history, and file intent lookup" width="100%">
 </p>
 
 The terminal demo is generated from committed VHS sources in this repository.

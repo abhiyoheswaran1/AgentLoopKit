@@ -6,6 +6,7 @@ import { inlineCode } from '../../core/markdown-format.js';
 import { summarizeRepository } from '../../core/pr-summary.js';
 import { writeHandoffRun } from '../../core/runs.js';
 import { readTaskMetadata } from '../../core/task-state.js';
+import { toSafeDisplayPath } from '../../core/display-path.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 const SUPPORTED_OUTPUT_FORMATS = ['markdown', 'json'] as const;
@@ -67,6 +68,18 @@ function resolveOutputFormat(options: Record<string, unknown>): OutputFormat | u
   );
 }
 
+function publicSummaryResult<T extends Awaited<ReturnType<typeof summarizeRepository>>>(
+  cwd: string,
+  result: T,
+): T {
+  return {
+    ...result,
+    outPath: toSafeDisplayPath(cwd, result.outPath),
+    ...(result.reportPath ? { reportPath: toSafeDisplayPath(cwd, result.reportPath) } : {}),
+    ...(result.taskPath ? { taskPath: toSafeDisplayPath(cwd, result.taskPath) } : {}),
+  };
+}
+
 async function runSummaryCommand(options: Record<string, unknown>, defaultWrite: boolean) {
   const format = resolveOutputFormat(options);
   if (!format) return;
@@ -113,13 +126,20 @@ async function runSummaryCommand(options: Record<string, unknown>, defaultWrite:
       markdown: result.markdown,
     });
   }
-  const output = run ? { ...result, run } : result;
+  const publicResult = publicSummaryResult(workspace.cwd, result);
+  const publicRun = run
+    ? {
+        ...run,
+        path: toSafeDisplayPath(workspace.cwd, run.path),
+      }
+    : undefined;
+  const output = publicRun ? { ...publicResult, run: publicRun } : publicResult;
   if (json) {
     console.log(JSON.stringify(output, null, 2));
   } else {
     console.log(result.markdown);
-    if (writeOption) console.log(`\nSummary written: ${inlineCode(result.outPath)}`);
-    if (run) console.log(`Run written: ${inlineCode(run.path)}`);
+    if (writeOption) console.log(`\nSummary written: ${inlineCode(publicResult.outPath)}`);
+    if (publicRun) console.log(`Run written: ${inlineCode(publicRun.path)}`);
   }
 }
 

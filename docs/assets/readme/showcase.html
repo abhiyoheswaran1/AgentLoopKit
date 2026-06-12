@@ -291,8 +291,14 @@
         bottom: 44px;
         display: flex;
         justify-content: space-between;
+        gap: 28px;
         color: var(--muted);
         font-size: 15px;
+      }
+
+      .footer span:first-child {
+        max-width: 840px;
+        line-height: 1.35;
       }
     </style>
   </head>
@@ -308,10 +314,10 @@
 
       <section class="grid">
         <div>
-          <h1>A repo-local loop for coding agents.</h1>
+          <h1>Make agent code ready to merge.</h1>
           <p class="lede">
-            AgentLoopKit gives Codex, Claude Code, Cursor, OpenCode, Gemini CLI, and GitHub Copilot
-            CLI the same task contract, verification, and handoff ritual.
+            AgentLoopKit gives Codex, Claude Code, Cursor, OpenCode, Gemini CLI, and Copilot CLI
+            the same task contract, verification evidence, ship score, and PR handoff.
           </p>
           <div class="command"><span class="prompt">$</span> npx agentloopkit init</div>
           <div class="proof">
@@ -322,13 +328,13 @@
               <strong>0</strong
               ><span>cloud services, API keys, telemetry, or postinstall scripts</span>
             </div>
-            <div><strong>7</strong><span>steps from task contract to reviewer handoff</span></div>
+            <div><strong>7</strong><span>steps from task contract to merge-ready handoff</span></div>
           </div>
         </div>
 
         <div class="loop">
           <div class="loop-title">
-            <h2>Specify → Handoff</h2>
+            <h2>Specify → Ship</h2>
             <span>deterministic, local, reviewable</span>
           </div>
           <div class="steps">
@@ -338,7 +344,7 @@
             <div class="step"><b>04</b><span>Implement</span></div>
             <div class="step"><b>05</b><span>Verify</span></div>
             <div class="step"><b>06</b><span>Review</span></div>
-            <div class="step"><b>07</b><span>Handoff</span></div>
+            <div class="step"><b>07</b><span>Ship</span></div>
           </div>
 
           <div class="artifact-grid">
@@ -358,16 +364,16 @@
               </ul>
             </div>
             <div class="artifact">
-              <h3>.agentloop/reports/verification-report.md</h3>
+              <h3>.agentloop/reports/ship-report.md</h3>
               <ul>
                 <li>
-                  <span class="dot"></span><span>Commands run with exit codes and excerpts</span>
+                  <span class="dot"></span><span>Review-readiness score with dimensions</span>
                 </li>
                 <li>
-                  <span class="dot"></span><span>Git branch, commit, and working tree state</span>
+                  <span class="dot"></span><span>Verification, gates, changed files, and risks</span>
                 </li>
                 <li>
-                  <span class="dot"></span><span>Honest list of checks that did not run</span>
+                  <span class="dot"></span><span>Reviewer checklist and rollback notes</span>
                 </li>
               </ul>
             </div>
@@ -376,12 +382,11 @@
               <span class="green">PASS</span> pnpm test <span class="blue">(110 tests)</span><br />
               <span class="green">PASS</span> pnpm typecheck<br />
               <span class="green">PASS</span> agentloop check-gates --strict<br />
-              <span class="blue">LINK</span> verification report to task context<br />
-              <span class="blue">WRITE</span> .agentloop/handoffs/2026-06-10-05-10-pr-summary.md<br />
-              <span class="blue">WRITE</span>
-              .agentloop/reports/2026-06-10-05-09-verification-report.md<br />
-              <span class="blue">WRITE</span> .agentloop/reports/2026-06-10-05-09-agentloop-report.html<br />
-              <span class="blue">WRITE</span> .agentloop/reports/agentloop-verification.svg<br />
+              <span class="blue">SCORE</span> review readiness: 96/100<br />
+              <span class="blue">WRITE</span> .agentloop/reports/2026-06-10-05-11-ship-report.md<br />
+              <span class="blue">WRITE</span> .agentloop/runs/2026-06-10-05-11-ship/<br />
+              <span class="blue">WRITE</span> .agentloop/handoffs/2026-06-10-05-11-pr-summary.md<br />
+              <span class="blue">PREP</span> PR body grouped by review area<br />
               <span class="blue">ARCHIVE</span> .agentloop/tasks/archive/add-settings-page.md
             </div>
           </div>
@@ -390,8 +395,8 @@
 
       <div class="footer">
         <span
-          >Works with Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and
-          generic agents.</span
+          >Works with Codex, Claude Code, Cursor, OpenCode, Gemini CLI, Copilot CLI, and generic
+          agents.</span
         >
         <span>No LLM required.</span>
       </div>

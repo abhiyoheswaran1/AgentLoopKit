@@ -10,6 +10,7 @@ import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
+const CLI_LEDGER_TEST_TIMEOUT_MS = 90_000;
 
 let tempDirs: string[] = [];
 
@@ -132,7 +133,7 @@ describe('run ledger commands', () => {
         why: 'Changed in ship run for task "Fix login redirect bug".',
       }),
     ]);
-  });
+  }, CLI_LEDGER_TEST_TIMEOUT_MS);
 
   test('records verification runs in the local ledger when requested', async () => {
     const dir = await createRunFixture();

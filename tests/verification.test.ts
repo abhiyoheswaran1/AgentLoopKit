@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { access, mkdir, readdir, readFile, realpath, symlink, writeFile } from 'node:fs/promises';
+import { access, mkdir, readdir, readFile, symlink, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir } from './helpers.js';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -23,6 +23,10 @@ function unwrapInlineCode(value: string) {
 function extractWrittenVerificationReportPath(stdout: string) {
   const rawPath = stdout.match(/Verification report written: (.+)/)?.[1];
   return rawPath ? unwrapInlineCode(rawPath) : undefined;
+}
+
+function resolveOutputPath(cwd: string, filePath: string) {
+  return path.isAbsolute(filePath) ? filePath : path.join(cwd, filePath);
 }
 
 describe('verification', () => {
@@ -123,9 +127,10 @@ describe('verification', () => {
 
     expect(result.exitCode).toBe(0);
     const output = JSON.parse(result.stdout);
-    expect(output.reportPath).toContain(path.join(dir, '.agentloop', 'reports'));
-    expect(output.reportPath).not.toContain(path.join(nested, '.agentloop'));
-    await expect(readFile(output.reportPath, 'utf8')).resolves.toContain('nested-ok');
+    expect(output.reportPath).toMatch(/\.agentloop\/reports\/.+-verification-report\.md$/);
+    expect(output.reportPath).not.toContain(dir);
+    expect(output.reportPath).not.toContain(nested);
+    await expect(readFile(path.join(dir, output.reportPath), 'utf8')).resolves.toContain('nested-ok');
   });
 
   test('reports no verification when no commands are configured', async () => {
@@ -955,7 +960,8 @@ describe('verification', () => {
     );
     const reportPath = extractWrittenVerificationReportPath(result.stdout);
     expect(reportPath).toBeTruthy();
-    const markdown = await readFile(reportPath as string, 'utf8');
+    expect(reportPath).not.toContain(dir);
+    const markdown = await readFile(resolveOutputPath(dir, reportPath as string), 'utf8');
     expect(markdown).toContain('## Task Context');
     expect(markdown).toContain(`- Title: ${inlineCode('CLI task context')}`);
     expect(markdown).toContain(`- Task type: ${inlineCode('docs')}`);
@@ -979,12 +985,12 @@ describe('verification', () => {
     });
     config.paths.reportsDir = '.agentloop/reports`safe';
     await writeFile(path.join(dir, 'agentloop.config.json'), JSON.stringify(config, null, 2));
-    const resolvedDir = await realpath(dir);
 
     const result = await execa(tsxPath, [cliPath, 'verify'], { cwd: dir });
-    const expectedDirPrefix = path.join(resolvedDir, config.paths.reportsDir);
 
-    expect(result.stdout).toContain(`Verification report written: \`\`${expectedDirPrefix}`);
+    expect(result.stdout).toContain('Verification report written:');
+    expect(result.stdout).toContain(config.paths.reportsDir);
+    expect(result.stdout).not.toContain(dir);
     expect(result.stdout).toContain(`Overall status: ${inlineCode('pass')}`);
   });
 
@@ -1197,7 +1203,8 @@ describe('verification', () => {
 
     const reportPath = extractWrittenVerificationReportPath(result.stdout);
     expect(reportPath).toBeTruthy();
-    const markdown = await readFile(reportPath as string, 'utf8');
+    expect(reportPath).not.toContain(dir);
+    const markdown = await readFile(resolveOutputPath(dir, reportPath as string), 'utf8');
     expect(markdown).toContain(`- Status: ${inlineCode('unavailable')}`);
     expect(markdown).toContain('Task path must point to a Markdown task contract.');
   });

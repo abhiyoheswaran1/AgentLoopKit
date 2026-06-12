@@ -43,7 +43,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - local gate-check command for task, verification, handoff, harness, policy, and git evidence
 - local acceptance-layer command with `agentloop ship`
 - compact readiness-comment output with `agentloop ship --github-comment`
-- repo-relative AgentLoop artifact paths in PR-facing Markdown while JSON path fields stay script-friendly
+- repo-relative AgentLoop artifact paths in PR-facing Markdown, public JSON, and human write-confirmation output
 - deterministic review-readiness scoring that does not claim to measure code quality
 - PR description generation with `agentloop prepare-pr`
 - `prepare-pr` reuse of matching fresh ship evidence to avoid duplicate run ledger entries
@@ -51,7 +51,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - `prepare-pr` grouped changed-file sections for reviewer scanning
 - GitHub-comment Markdown output without token handling inside the CLI
 - local run ledger under `.agentloop/runs/`
-- safe run ledger path storage and display for CLI, MCP, and review-context outputs
+- safe run ledger path storage and display for CLI, MCP, review-context, and public command outputs
 - opt-in run ledger records for `verify`, `summarize`, and `handoff` with `--write-run`
 - `agentloop runs`, `agentloop show-run`, and `agentloop intent <file>`
 - read-only maintainer reviewability check with `agentloop maintainer-check`
@@ -90,6 +90,7 @@ Current `main` is accumulating work for a future `0.28.0` release. No version bu
 Included so far:
 
 - simplified npm-facing README with detailed command behavior moved to `docs/cli-reference.md`
+- refreshed README terminal demo and showcase screenshot around `ship`, `prepare-pr`, `review-context`, run history, and file intent lookup
 - generated first-run harness guidance with a risk-aware task example and task-linked verification command
 - read-only `agentloop artifacts` command for local evidence inventory
 - read-only `agentloop review-context` command for non-MCP agents
@@ -100,6 +101,7 @@ Included so far:
 - read-only MCP access to local review gate status
 - read-only MCP access to local artifact inventory metadata
 - read-only MCP review context snapshots that combine status, gates, policy status, artifacts, recent runs, and latest ship evidence
+- safe run ledger path storage and display for CLI, MCP, status, review-context, and public command outputs
 
 Before release, move `CHANGELOG.md` `## Unreleased` entries into a versioned `0.28.0` section and then run the normal release checklist.
 

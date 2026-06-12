@@ -17,12 +17,14 @@
 - Added read-only MCP `agentloop_artifacts` for local artifact inventory metadata.
 - Added read-only MCP `agentloop_review_context` for one local reviewability snapshot that combines status, gates, policies, artifacts, recent runs, and latest ship evidence without artifact bodies.
 - Added `agentloop review-context` and `agentloop review-context --json` for non-MCP agents that need the same read-only local reviewability snapshot.
+- Changed README launch visuals and terminal demo to show the current review-readiness loop with task-aware verification, `ship`, `prepare-pr`, `review-context`, run history, and file intent lookup.
+- Changed public JSON and human output for verification, handoff, ship, prepare-pr, and run paths to report repo-relative `.agentloop/...` paths instead of absolute local filesystem paths.
 - Changed `agentloop status` Markdown, JSON, and brief output to include the newest local run ledger entry when `.agentloop/runs/` exists.
 - Changed `agentloop prepare-pr` to reuse a matching fresh ship run instead of writing a duplicate run ledger entry.
 - Added `shipEvidence.source` and `shipEvidence.runId` to `agentloop prepare-pr --json` output.
 - Added `agentloop task done` as a shortcut for marking the active task, or an explicit task path, as `done`.
 - Changed `agentloop prepare-pr` PR bodies to group changed files by review area.
-- Changed `agentloop ship` reports/comments and `agentloop prepare-pr` PR-facing Markdown to render AgentLoop artifact paths repo-relative while preserving JSON path fields for scripts.
+- Changed `agentloop ship` reports/comments and `agentloop prepare-pr` PR-facing Markdown to render AgentLoop artifact paths repo-relative while keeping JSON path fields script-friendly and repo-relative.
 - Changed `agentloop create-task` to set the newly created contract as the active task and include `activeTask` in JSON output.
 - Changed `agentloop status` and `agentloop next` to recommend marking clean, verified `review` tasks as `done` before starting unrelated work.
 - Changed `agentloop policy list/status` human output to render policy titles, statuses, and paths with Markdown-safe inline-code delimiters while keeping JSON output and raw `policy show` content unchanged.

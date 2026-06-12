@@ -11,7 +11,7 @@ vhs docs/assets/readme/agentloopkit-cli.tape
 
 Run VHS from the repository root. The tape packs the local build to `/tmp`, installs it into a clean temp repository, hides the setup work with `Hide`/`Wait`/`Show`, then records the visible AgentLoopKit loop.
 
-The current GIF uses a 1200x720 Catppuccin Mocha terminal and shows `init`, `doctor`, task creation, task status, verification, handoff, gate checks, HTML report generation, and badge generation.
+The current GIF uses a 1200x720 Catppuccin Mocha terminal and shows `init`, task creation, task-aware verification, `ship --github-comment`, `prepare-pr --github-comment`, `review-context`, run history, and file intent lookup.
 
 Regenerate the Playwright screenshots:
 

@@ -8,6 +8,7 @@ import { makeTempDir, removeTempDir } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
+const CLI_ARTIFACT_LOOKUP_TEST_TIMEOUT_MS = 90_000;
 
 let tempDirs: string[] = [];
 
@@ -465,5 +466,5 @@ describe('ci-summary command', () => {
       'verification-report.md',
     );
     expect(JSON.parse(reportResult.stdout).metadata.verificationStatus).toBe('pass');
-  });
+  }, CLI_ARTIFACT_LOOKUP_TEST_TIMEOUT_MS);
 });

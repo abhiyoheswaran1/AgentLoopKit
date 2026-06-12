@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-09-38-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-09-38",
+  "createdAtEpochMs": 1781249921567,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-refresh-readme-launch-copy-and-demo-assets.md",
+    "title": "Refresh README launch copy and demo assets",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-09-34-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-09-38-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-09-38-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 33
+}

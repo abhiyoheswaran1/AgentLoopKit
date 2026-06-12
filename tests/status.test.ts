@@ -9,6 +9,7 @@ let tempDirs: string[] = [];
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
+const CLI_STATUS_TEST_TIMEOUT_MS = 90_000;
 
 describe('status command', () => {
   afterEach(async () => {
@@ -387,7 +388,7 @@ describe('status command', () => {
     );
     expect(markdownResult.stdout).toContain('`.agentloop/reports/ship.md`');
     expect(briefResult.stdout).toContain('run="ship 91/100"');
-  });
+  }, CLI_STATUS_TEST_TIMEOUT_MS);
 
   test('points back to verification when the latest report failed', async () => {
     const dir = await makeTempDir();

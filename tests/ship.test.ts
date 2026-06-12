@@ -119,11 +119,15 @@ describe('ship command', () => {
     expect(output.changedFiles).toEqual([{ status: 'M', path: 'src/auth/callback.ts' }]);
     expect(output.shipReportPath).toMatch(/\.agentloop\/reports\/.+-ship-report\.md$/);
     expect(output.handoffPath).toMatch(/\.agentloop\/handoffs\/.+-pr-summary\.md$/);
+    expect(output.shipReportPath).not.toContain(dir);
+    expect(output.handoffPath).not.toContain(dir);
+    expect(output.verificationReportPath).not.toContain(dir);
+    expect(output.run.path).not.toContain(dir);
     expect(output.githubComment).toBeUndefined();
-    expect(existsSync(output.shipReportPath)).toBe(true);
-    expect(existsSync(output.handoffPath)).toBe(true);
+    expect(existsSync(path.join(dir, output.shipReportPath))).toBe(true);
+    expect(existsSync(path.join(dir, output.handoffPath))).toBe(true);
 
-    const markdown = await readFile(output.shipReportPath, 'utf8');
+    const markdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
     expect(markdown).toContain('# AgentLoopKit Ship Report');
     expect(markdown).toContain('Make agent-generated code reviewable, verifiable, and merge-ready.');
     expect(markdown).toContain('This is a review-readiness score, not a code-quality score.');
@@ -146,7 +150,10 @@ describe('ship command', () => {
     expect(output.githubComment).toContain('This is a review-readiness score, not a code-quality score.');
     expect(output.githubComment).toContain('.agentloop/reports/');
     expect(output.githubComment).not.toContain(dir);
-    expect(output.shipReportPath).toContain(dir);
+    expect(output.shipReportPath).not.toContain(dir);
+    expect(output.handoffPath).not.toContain(dir);
+    expect(output.verificationReportPath).not.toContain(dir);
+    expect(output.run.path).not.toContain(dir);
     expect(output.githubComment).toContain('### Blockers');
     expect(output.githubComment).toContain('### Warnings');
     expect(output.githubComment).toContain('### Next Actions');

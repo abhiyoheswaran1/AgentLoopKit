@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { mkdir, readdir, realpath, symlink, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -60,7 +60,8 @@ describe('handoff command', () => {
     const output = JSON.parse(result.stdout);
     expect(output.markdown).toContain('# PR Summary');
     expect(output.outPath).toContain('.agentloop/handoffs');
-    expect(existsSync(output.outPath)).toBe(true);
+    expect(output.outPath).not.toContain(dir);
+    expect(existsSync(path.join(dir, output.outPath))).toBe(true);
   });
 
   test('keeps summarize read-only unless write is requested', async () => {
@@ -70,7 +71,8 @@ describe('handoff command', () => {
 
     const output = JSON.parse(result.stdout);
     expect(output.outPath).toContain('.agentloop/handoffs');
-    expect(existsSync(output.outPath)).toBe(false);
+    expect(output.outPath).not.toContain(dir);
+    expect(existsSync(path.join(dir, output.outPath))).toBe(false);
   });
 
   test('prints written summary paths with Markdown-safe inline values', async () => {
@@ -86,13 +88,12 @@ describe('handoff command', () => {
       path.join(dir, '.agentloop/reports/2026-06-09-12-00-verification-report.md'),
       '# Verification Report\n\nOverall status: pass\n',
     );
-    const resolvedDir = await realpath(dir);
 
     const result = await execa(tsxPath, [cliPath, 'summarize', '--write'], { cwd: dir });
-    const expectedDirPrefix = path.join(resolvedDir, config.paths.handoffsDir);
 
-    expect(result.stdout).toContain(`Summary written: \`\`${expectedDirPrefix}`);
-    expect(result.stdout).not.toContain(`Summary written: ${expectedDirPrefix}`);
+    expect(result.stdout).toContain('Summary written:');
+    expect(result.stdout).toContain(config.paths.handoffsDir);
+    expect(result.stdout).not.toContain(dir);
   });
 
   test('accepts --format json for summarize output', async () => {
@@ -105,7 +106,8 @@ describe('handoff command', () => {
     const output = JSON.parse(result.stdout);
     expect(output.markdown).toContain('# PR Summary');
     expect(output.outPath).toContain('.agentloop/handoffs');
-    expect(existsSync(output.outPath)).toBe(false);
+    expect(output.outPath).not.toContain(dir);
+    expect(existsSync(path.join(dir, output.outPath))).toBe(false);
   });
 
   test('rejects unsupported summarize formats without writing', async () => {
@@ -187,7 +189,8 @@ describe('handoff command', () => {
 
     const output = JSON.parse(result.stdout);
     expect(output.markdown).toContain('Overall status: custom-pass');
-    expect(existsSync(output.outPath)).toBe(false);
+    expect(output.outPath).not.toContain(dir);
+    expect(existsSync(path.join(dir, output.outPath))).toBe(false);
   });
 
   test('accepts --verification as a handoff alias for --report', async () => {
@@ -201,7 +204,8 @@ describe('handoff command', () => {
 
     const output = JSON.parse(result.stdout);
     expect(output.markdown).toContain('Overall status: custom-pass');
-    expect(existsSync(output.outPath)).toBe(true);
+    expect(output.outPath).not.toContain(dir);
+    expect(existsSync(path.join(dir, output.outPath))).toBe(true);
   });
 
   test('uses explicit active task state when writing handoff', async () => {

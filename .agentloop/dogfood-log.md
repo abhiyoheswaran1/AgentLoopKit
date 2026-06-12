@@ -7488,3 +7488,41 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Moving the behavior into the run reader reduced duplicate formatting in MCP and review-context code.
 - Improve:
   - Keep treating run ledger paths as review evidence, not filesystem authority.
+
+## 2026-06-12: README Demo Refresh And Public Artifact Path Output
+
+- Task contract: `.agentloop/tasks/2026-06-12-refresh-readme-launch-copy-and-demo-assets.md`
+- Trigger:
+  - The README demo still showed an older CLI loop and did not explain the current acceptance-layer flow.
+  - Dogfooding `ship --json` showed that public command results could still expose absolute local artifact paths after run ledger metadata was sanitized.
+- Implementation:
+  - Refreshed README launch copy, VHS terminal demo, and Playwright showcase screenshot around `create-task`, task-aware `verify`, `ship`, `prepare-pr`, `review-context`, `runs`, and `intent`.
+  - Changed public CLI JSON and human write-confirmation output for generated artifacts to use repo-relative `.agentloop/...` paths.
+  - Kept internal core write paths usable for implementation code and tests that need to read generated files.
+  - Updated smoke tests and long-running subprocess tests so full-suite load does not create false timeout failures.
+- Verification run:
+  - Red focused tests failed first because `ship`, `prepare-pr`, and `verify` returned absolute local paths in public JSON.
+  - Green focused path tests passed:
+    - `npm test -- tests/ship.test.ts tests/prepare-pr.test.ts tests/verification.test.ts tests/handoff.test.ts tests/runs.test.ts`
+  - Broader local checks passed:
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run check:links`
+    - `git diff --check`
+    - `npm run build`
+    - `npm test`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npx --yes projscan doctor --format markdown`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-12-09-34-verification-report.md`.
+  - Dogfood runs:
+    - `.agentloop/runs/2026-06-12-09-38-verify/`
+    - `.agentloop/runs/2026-06-12-09-38-ship/`
+  - Dogfood handoff: `.agentloop/handoffs/2026-06-12-09-38-pr-summary.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-09-38-ship-report.md` with score `92`/100.
+- What worked well:
+  - The README demo now matches the product's current review-readiness loop.
+  - The built CLI smoke script caught the public path contract change before release prep.
+- Improve:
+  - Consider whether gate JSON should also offer a repo-redacted mode for `git.root`; this pass focused on generated artifact paths.

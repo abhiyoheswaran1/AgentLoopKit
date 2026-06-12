@@ -9,6 +9,7 @@ import { getGitDiffStat, getGitStatus, parseGitStatus } from './git.js';
 import { writeTextFile } from './file-system.js';
 import { fencedCodeBlock, inlineCode } from './markdown-format.js';
 import { summarizeRepository } from './pr-summary.js';
+import { toSafeDisplayPath } from './display-path.js';
 import {
   evaluateReviewReadiness,
   ReadinessVerificationInput,
@@ -277,5 +278,17 @@ export async function createShipReport(options: {
     diffStat,
     shipMarkdown: markdown,
   });
-  return { ...withoutMarkdown, markdown, run };
+  return {
+    ...withoutMarkdown,
+    ...(verificationReportPath
+      ? { verificationReportPath: toSafeDisplayPath(options.cwd, verificationReportPath) }
+      : {}),
+    ...(handoffPath ? { handoffPath: toSafeDisplayPath(options.cwd, handoffPath) } : {}),
+    shipReportPath: toSafeDisplayPath(options.cwd, shipReportPath),
+    markdown,
+    run: {
+      ...run,
+      path: toSafeDisplayPath(options.cwd, run.path),
+    },
+  };
 }

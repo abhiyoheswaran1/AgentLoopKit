@@ -122,7 +122,8 @@ describe('prepare-pr command', () => {
     expect(output.githubComment).toContain('.agentloop/reports/');
     expect(output.githubComment).not.toContain(dir);
     expect(output.shipReportPath).toMatch(/\.agentloop\/reports\/.+-ship-report\.md$/);
-    expect(output.shipReportPath).toContain(dir);
+    expect(output.shipReportPath).not.toContain(dir);
+    expect(output.handoffPath).not.toContain(dir);
     const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
     const shipRuns = runs.runs.filter((run: { command: string }) => run.command === 'ship');
     expect(shipRuns).toHaveLength(1);
@@ -143,6 +144,7 @@ describe('prepare-pr command', () => {
     const shipRuns = runs.runs.filter((run: { command: string }) => run.command === 'ship');
 
     expect(prepared.shipReportPath).toBe(ship.shipReportPath);
+    expect(prepared.shipReportPath).not.toContain(dir);
     expect(prepared.shipEvidence).toEqual({
       source: 'reused',
       runId: ship.run.id,

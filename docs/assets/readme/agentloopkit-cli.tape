@@ -29,46 +29,40 @@ Type "npx agentloopkit init"
 Enter
 Sleep 1.6s
 
-Type "npx agentloop doctor"
+Type "npx agentloop create-task --title login-redirect --type bugfix --acceptance redirect-returns-to-requested-page --verification true"
 Enter
 Sleep 2.2s
 
-Type "npx agentloop create-task --title settings --type feature --out .agentloop/tasks/settings.md"
+Hide
+Type@1ms "mkdir -p src && echo fixed > src/login.js && git add package.json package-lock.json 2>/dev/null || true"
 Enter
-Sleep 2.2s
+Wait
+Show
 
-Type "npx agentloop task set .agentloop/tasks/settings.md"
+Type "npx agentloop status --brief"
 Enter
-Sleep 1.6s
+Sleep 1.4s
 
-Type "npx agentloop task status .agentloop/tasks/settings.md in-progress"
+Type "npx agentloop verify --task-commands"
 Enter
-Sleep 1.6s
+Sleep 3.6s
 
-Type "npx agentloop status"
+Type "npx agentloop ship --github-comment"
 Enter
-Sleep 1.8s
+Sleep 2.6s
 
-Type "npx agentloop verify --task .agentloop/tasks/settings.md --no-lint"
+Type "npx agentloop prepare-pr --github-comment"
 Enter
-Sleep 4s
+Sleep 2.4s
 
-Type "npx agentloop next"
-Enter
-Sleep 1.2s
-
-Type "npx agentloop handoff"
-Enter
-Sleep 1.5s
-
-Type "npx agentloop check-gates --strict"
-Enter
-Sleep 1.5s
-
-Type "npx agentloop report"
-Enter
-Sleep 1.2s
-
-Type "npx agentloop badge"
+Type "npx agentloop review-context"
 Enter
 Sleep 2s
+
+Type "npx agentloop runs"
+Enter
+Sleep 1.6s
+
+Type "npx agentloop intent src/login.js"
+Enter
+Sleep 1.5s

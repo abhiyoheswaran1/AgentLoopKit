@@ -1,6 +1,6 @@
 # Release Status
 
-Last checked: June 11, 2026.
+Last checked: June 12, 2026.
 
 ## Current State
 
@@ -21,9 +21,14 @@ Last checked: June 11, 2026.
 Prepared for the future `0.28.0` release, but not yet released:
 
 - npm-facing README simplified and detailed command behavior moved to `docs/cli-reference.md`
+- README terminal demo and showcase screenshot refreshed around the review-readiness loop
 - generated first-run guidance improved with a risk-aware task example and task-linked verification
 - `agentloop artifacts` added as a read-only local evidence inventory
 - cross-platform CLI smoke workflow added for Ubuntu, macOS, and Windows
+- local acceptance-layer commands added: `ship`, `prepare-pr`, `runs`, `show-run`, `intent`, and `maintainer-check`
+- `agentloop review-context` added for non-MCP agents
+- read-only MCP tools added for ship reports, run ledger details, file intent, maintainer checks, gates, artifacts, policy status, and review context
+- run ledger, public JSON, and human artifact path output hardened so public evidence does not leak absolute local paths
 
 These changes must move from `CHANGELOG.md` `## Unreleased` into a versioned `0.28.0` section before publishing.
 

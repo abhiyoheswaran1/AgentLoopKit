@@ -10,6 +10,7 @@ import { createShipReport, ShipResult } from './ship.js';
 import { listRuns, readRun } from './runs.js';
 import { readTaskContract, TaskContract } from './task-state.js';
 import { renderChangeAreas } from './change-areas.js';
+import { toSafeDisplayPath } from './display-path.js';
 
 export type PreparePrResult = {
   titleSuggestion: string;
@@ -68,8 +69,7 @@ function renderMarkdownList(values: string[], fallback: string) {
 }
 
 function relativePath(cwd: string, filePath: string) {
-  const repoPath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
-  return repoPath.split(path.sep).join('/') || '.';
+  return toSafeDisplayPath(cwd, filePath);
 }
 
 function resolveMaybeRepoPath(cwd: string, filePath: string) {
@@ -226,9 +226,9 @@ async function findReusableShipEvidence(options: {
         fresh: true,
         path: relativePath(options.cwd, verificationReportPath),
       },
-      verificationReportPath,
-      shipReportPath: resolveMaybeRepoPath(options.cwd, run.shipReportPath),
-      handoffPath: run.handoffPath,
+      verificationReportPath: relativePath(options.cwd, verificationReportPath),
+      shipReportPath: relativePath(options.cwd, run.shipReportPath),
+      handoffPath: run.handoffPath ? relativePath(options.cwd, run.handoffPath) : undefined,
       changedFiles: record.changedFiles,
       shipEvidence: {
         source: 'reused',
@@ -298,9 +298,11 @@ export async function preparePullRequest(options: {
     titleSuggestion: task?.title ?? 'AgentLoopKit review-ready changes',
     body,
     ...(githubComment ? { githubComment } : {}),
-    shipReportPath: preparedShip.shipReportPath,
-    handoffPath: preparedShip.handoffPath,
-    ...(writtenPath ? { writtenPath } : {}),
+    shipReportPath: relativePath(options.cwd, preparedShip.shipReportPath),
+    ...(preparedShip.handoffPath
+      ? { handoffPath: relativePath(options.cwd, preparedShip.handoffPath) }
+      : {}),
+    ...(writtenPath ? { writtenPath: relativePath(options.cwd, writtenPath) } : {}),
     shipEvidence: preparedShip.shipEvidence,
     readiness: preparedShip.readiness,
     changedFiles: preparedShip.changedFiles,
