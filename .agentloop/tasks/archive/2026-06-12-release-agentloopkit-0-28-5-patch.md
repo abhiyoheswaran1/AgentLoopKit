@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-12
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The safer release-check publish guidance is committed after 0.28.4 and needs a small trusted-publishing patch release.

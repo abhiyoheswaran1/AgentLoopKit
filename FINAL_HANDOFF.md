@@ -74,28 +74,25 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.28.4`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.4>
-- Release asset: `agentloopkit-0.28.4.tgz`
-- Release asset SHA-256: `9550589fcb6400d5d3972c2f308d60d7d25df0d85d70033f293d0ad709435a6f`
-- Release tag: `v0.28.4` at commit `5bb4b21d6d736874deade7ac5933860a7b4e231e`
-- CI run: `27435878819`
-- CLI Smoke run: `27435878785`
-- Publish workflow run: `27436246020`
-- Docker workflow run: `27436246026`
-- MCP Registry workflow run: `27436462226`
-- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.28.4`
+- Current npm release: `agentloopkit@0.28.5`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.5>
+- Release asset: `agentloopkit-0.28.5.tgz`
+- Release asset SHA-256: `89244fd07cb85c2615adf7461cbb9a71d24b83858752acc22f83752fe1e47ba7`
+- Release tag: `v0.28.5` at commit `65ab0d7eb19b6d5817d86d1ba4e7224476788e5c`
+- CI run: `27440864521`
+- CLI Smoke run: `27440864531`
+- Publish workflow run: `27440882421`
+- Docker workflow run: `27440882387`
+- MCP Registry workflow run: `27441104421`
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.28.5`
 
-## 0.28.4 release summary
+## 0.28.5 release summary
 
 Included:
 
-- bounded `agentloop verify --progress` output for long verification runs
-- bounded run-ledger navigation with `agentloop runs --latest` and `agentloop runs --limit <count>`
-- task-contract creation with `agentloop create-task --include-config-commands`
-- duplicate-command skip reporting in verification Markdown and JSON
-- archived-task evidence fixes for run summaries and status guidance
-- a 90 second Vitest timeout budget for subprocess-heavy CLI integration tests
+- safer `agentloop release-check` next-action guidance through `agentloop npm-status`
+- clean-tree `agentloop check-gates --strict` behavior for committed work with current evidence
+- synchronized package metadata, changelog, roadmap state, and MCP `server.json`
 
 Release verification covered local release gates, npm trusted publishing, GitHub release assets, GHCR publishing through the Docker workflow, MCP Registry publishing, and clean-directory published-package smoke.
 

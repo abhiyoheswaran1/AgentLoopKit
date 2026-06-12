@@ -4,7 +4,7 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 
 ## 2026-06-12: 0.28.5 Release Gate
 
-- Task contract: `.agentloop/tasks/2026-06-12-release-agentloopkit-0-28-5-patch.md`
+- Task contract: `.agentloop/tasks/archive/2026-06-12-release-agentloopkit-0-28-5-patch.md`
 - Trigger:
   - The safer `release-check` publish guidance landed after `0.28.4`.
   - The maintainer asked for a small patch release after logo and dogfood work.
@@ -21,8 +21,18 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Red TDD run: `npm test -- tests/check-gates.test.ts -t "passes strict gates for clean verified evidence with no changed files"` failed because clean Git context still warned.
   - Green focused run: the same check-gates test passed after the gate status change.
   - Full check-gates run: `npm test -- tests/check-gates.test.ts` passed with 13 tests.
-  - AgentLoop release verification passed and wrote `.agentloop/reports/2026-06-12-21-42-verification-report.md`.
-  - The passing verification run wrote `.agentloop/runs/2026-06-12-21-51-verify/`.
+  - Final AgentLoop release verification passed and wrote `.agentloop/reports/2026-06-12-22-10-verification-report.md`.
+  - The final verification run wrote `.agentloop/runs/2026-06-12-22-20-verify/`.
+  - `npm run dogfood:strict` passed after the clean-tree strict-gate fix.
+  - `node dist/cli/index.js release-check --strict` passed.
+  - GitHub release `v0.28.5` was created with release asset SHA-256 `89244fd07cb85c2615adf7461cbb9a71d24b83858752acc22f83752fe1e47ba7`.
+  - CI workflow `27440864521` passed.
+  - CLI Smoke workflow `27440864531` passed on Ubuntu, macOS, and Windows.
+  - Publish workflow `27440882421` passed and published `agentloopkit@0.28.5`.
+  - Docker workflow `27440882387` passed.
+  - MCP Registry workflow `27441104421` passed.
+  - `npm view agentloopkit version versions --json` reported latest `0.28.5`.
+  - `npm run smoke:published -- --version 0.28.5` passed.
 - Worked well:
   - The release-smoke roadmap guard caught stale public release state before tagging.
 - Improve:
