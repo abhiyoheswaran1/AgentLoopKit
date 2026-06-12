@@ -27,6 +27,16 @@ Use JSON for scripts and agents:
 agentloop status --json
 ```
 
+Use redacted path output when you plan to paste status into a public issue, PR, or CI log:
+
+```bash
+agentloop status --redact-paths
+agentloop status --json --redact-paths
+```
+
+`--redact-paths` replaces the absolute Git root with `[git-root]`. It keeps repo-relative AgentLoop artifact paths such as `.agentloop/reports/...`.
+The default JSON output still returns the absolute Git root for scripts that need it.
+
 Use brief output when an agent prompt, shell script, or status line does not need the full Markdown block:
 
 ```bash

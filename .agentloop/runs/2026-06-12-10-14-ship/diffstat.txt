@@ -1,0 +1,17 @@
+ .agentloop/backlog.md                              |  1 +
+ ...2-refresh-readme-launch-copy-and-demo-assets.md | 56 ----------------------
+ CHANGELOG.md                                       |  1 +
+ FINAL_HANDOFF.md                                   |  2 +
+ README.md                                          |  1 +
+ ROADMAP.md                                         |  2 +-
+ docs/check-gates.md                                |  4 ++
+ docs/cli-reference.md                              |  6 +++
+ docs/release-status.md                             |  1 +
+ docs/status.md                                     | 10 ++++
+ src/cli/commands/check-gates.ts                    |  4 +-
+ src/cli/commands/status.ts                         |  9 +++-
+ src/core/check-gates.ts                            |  8 +++-
+ src/core/status.ts                                 |  8 +++-
+ tests/check-gates.test.ts                          | 27 +++++++++++
+ tests/status.test.ts                               | 27 +++++++++++
+ 16 files changed, 105 insertions(+), 62 deletions(-)

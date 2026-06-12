@@ -29,6 +29,7 @@ Prepared for the future `0.28.0` release, but not yet released:
 - `agentloop review-context` added for non-MCP agents
 - read-only MCP tools added for ship reports, run ledger details, file intent, maintainer checks, gates, artifacts, policy status, and review context
 - run ledger, public JSON, and human artifact path output hardened so public evidence does not leak absolute local paths
+- `agentloop status --redact-paths` and `agentloop check-gates --redact-paths` added for public logs that should hide the absolute Git root
 
 These changes must move from `CHANGELOG.md` `## Unreleased` into a versioned `0.28.0` section before publishing.
 

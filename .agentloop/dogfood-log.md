@@ -7526,3 +7526,46 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The built CLI smoke script caught the public path contract change before release prep.
 - Improve:
   - Consider whether gate JSON should also offer a repo-redacted mode for `git.root`; this pass focused on generated artifact paths.
+
+## 2026-06-12: Redacted Git-Root Output Mode
+
+- Task contract: `.agentloop/tasks/2026-06-12-add-redacted-path-output-mode.md`
+- Trigger:
+  - The previous public-path hardening made generated AgentLoop artifact paths repo-relative, but `status` and `check-gates` still showed the absolute local Git root.
+  - Public PRs, issues, and CI logs need an easy way to hide the local machine path without changing default JSON for scripts.
+- Implementation:
+  - Added `--redact-paths` to `agentloop status` and `agentloop check-gates`.
+  - Redacted only the public `git.root` value to `[git-root]`.
+  - Kept `targetIsRoot`, branch, commit, changed-file counts, gate decisions, and repo-relative `.agentloop/...` paths intact.
+  - Documented the flag in the README safety model, CLI reference, status docs, check-gates docs, release status, changelog, roadmap, final handoff, and internal backlog.
+- Verification run:
+  - Red focused tests failed first because the CLI did not recognize `--redact-paths`.
+  - Focused regression tests passed after implementation:
+    - `npm test -- tests/status.test.ts tests/check-gates.test.ts tests/cli-docs-drift.test.ts`
+  - Broader local checks passed:
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run check:links`
+    - `git diff --check`
+    - `npm run build`
+    - `npm test`
+    - `node scripts/smoke-cli.mjs`
+    - `npm run smoke:release`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npx --yes projscan doctor --format markdown`
+  - Built CLI smoke confirmed:
+    - `node dist/cli/index.js status --redact-paths`
+    - `node dist/cli/index.js status --json --redact-paths`
+    - `node dist/cli/index.js check-gates --redact-paths`
+    - `node dist/cli/index.js check-gates --json --redact-paths`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-12-10-08-verification-report.md`.
+  - Dogfood runs:
+    - `.agentloop/runs/2026-06-12-10-14-verify/`
+    - `.agentloop/runs/2026-06-12-10-14-ship/`
+  - Dogfood handoff: `.agentloop/handoffs/2026-06-12-10-14-pr-summary.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-10-14-ship-report.md` with score `96`/100.
+- What worked well:
+  - The flag keeps existing script behavior stable while giving users a public-log-safe path.
+  - The same regression shape now covers Markdown and JSON for both commands.
+- Improve:
+  - Consider a future global `--public` output mode only if more command families need the same redaction controls.

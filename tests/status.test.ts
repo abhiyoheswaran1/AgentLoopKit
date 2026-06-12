@@ -58,6 +58,33 @@ describe('status command', () => {
     );
   });
 
+  test('redacts local git root paths when requested', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    const realRoot = await realpath(dir);
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+    const humanResult = await execa(tsxPath, [cliPath, 'status', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(humanResult.exitCode).toBe(0);
+    expect(jsonResult.stdout).not.toContain(realRoot);
+    expect(humanResult.stdout).not.toContain(realRoot);
+    const status = JSON.parse(jsonResult.stdout);
+    expect(status.git.root).toBe('[git-root]');
+    expect(status.git.targetIsRoot).toBe(true);
+    expect(humanResult.stdout).toContain('- Git root: `[git-root]`');
+    expect(humanResult.stdout).toContain('- Git target: `root directory`');
+  });
+
   test('discovers parent AgentLoop config when run from a nested directory', async () => {
     const dir = await makeTempDir();
     const nested = path.join(dir, 'src', 'features');

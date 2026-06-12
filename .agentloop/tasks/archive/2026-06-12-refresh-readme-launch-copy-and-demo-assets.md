@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-12
 - Task type: docs
-- Status: review
+- Status: done
 
 ## Problem Statement
 The README positioning is current, but the committed terminal demo still shows the older init/doctor/verify/handoff/report/badge flow and does not show the new review-readiness layer.

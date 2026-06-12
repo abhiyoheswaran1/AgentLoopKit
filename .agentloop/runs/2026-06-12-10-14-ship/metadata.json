@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-10-14-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-10-14",
+  "createdAtEpochMs": 1781252079280,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-redacted-path-output-mode.md",
+    "title": "Add redacted path output mode",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-10-08-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-10-14-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-10-14-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 20
+}

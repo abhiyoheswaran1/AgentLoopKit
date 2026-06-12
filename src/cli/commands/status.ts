@@ -9,7 +9,8 @@ export function statusCommand() {
     .description('Show active task, latest verification, dirty files, and next action')
     .option('--json', 'print machine-readable output')
     .option('--brief', 'print compact human-readable output')
-    .action(async (options: { json?: boolean; brief?: boolean }) => {
+    .option('--redact-paths', 'redact local absolute paths in public output')
+    .action(async (options: { json?: boolean; brief?: boolean; redactPaths?: boolean }) => {
       let workspace: Awaited<ReturnType<typeof loadAgentLoopWorkspace>>;
       try {
         workspace = await loadAgentLoopWorkspace(process.cwd());
@@ -20,7 +21,11 @@ export function statusCommand() {
         }
         throw error;
       }
-      const result = await getAgentLoopStatus({ cwd: workspace.cwd, config: workspace.config });
+      const result = await getAgentLoopStatus({
+        cwd: workspace.cwd,
+        config: workspace.config,
+        redactPaths: options.redactPaths === true,
+      });
       if (options.json) {
         console.log(JSON.stringify(result, null, 2));
       } else if (options.brief) {

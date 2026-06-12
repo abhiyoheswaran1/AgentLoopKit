@@ -93,6 +93,7 @@ Archive task contracts after verification and handoff, not as a substitute for e
 agentloop status
 agentloop status --brief
 agentloop status --json
+agentloop status --redact-paths
 agentloop next
 agentloop next --json
 ```
@@ -100,6 +101,8 @@ agentloop next --json
 `status` shows the pinned active task, newest open task when no task is pinned, deferred tasks, current verification report, newest local run ledger entry, working tree state, Git root, configured commands, missing commands, and next suggested command. Clean `review` tasks with passing verification point to `agentloop task done` before the next task starts.
 
 Use `--brief` when an agent or script needs one compact human-readable line plus the reason. Brief output includes the latest run evidence when `.agentloop/runs/` exists. `next` uses the same decision rules but prints only the next action. These commands do not run verification commands, call an LLM, read `.env` contents, or write task state.
+
+Use `status --redact-paths` before pasting output into public logs. It replaces the absolute Git root with `[git-root]` and keeps repo-relative AgentLoop artifact paths. Default JSON keeps the absolute Git root for scripts that need it.
 
 See [status.md](status.md).
 
@@ -201,6 +204,7 @@ It is read-only. It does not write reports, run verification commands, call GitH
 agentloop check-gates
 agentloop check-gates --json
 agentloop check-gates --strict
+agentloop check-gates --redact-paths
 ```
 
 `check-gates` checks review evidence without running tests. It looks for task evidence, current verification evidence, handoff evidence, task-folder hygiene, harness files, policy files, and Git context.
@@ -208,6 +212,8 @@ agentloop check-gates --strict
 If the latest verification report is older than the active or newest open task, `check-gates` treats it as stale and asks you to rerun verification for that task.
 
 Warnings keep exit code `0` by default. Use `--strict` in CI when warning gates should fail.
+
+Use `--redact-paths` when gate output will be copied into a public issue, PR, or CI log. It hides the absolute Git root without changing gate decisions.
 
 See [check-gates.md](check-gates.md).
 

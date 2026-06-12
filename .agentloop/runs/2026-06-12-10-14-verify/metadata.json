@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-10-14-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-10-14",
+  "createdAtEpochMs": 1781252059714,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-redacted-path-output-mode.md",
+    "title": "Add redacted path output mode",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-10-08-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 19
+}

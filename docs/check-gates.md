@@ -18,7 +18,11 @@ It does not run tests, call an LLM, score code quality, or block human review.
 agentloop check-gates
 agentloop check-gates --json
 agentloop check-gates --strict
+agentloop check-gates --redact-paths
 ```
+
+Use `--redact-paths` before pasting gate output into a public issue, PR, or CI log. It replaces the absolute Git root with `[git-root]` while preserving repo-relative AgentLoop artifact paths.
+Default JSON keeps the absolute Git root for scripts that need it.
 
 Statuses:
 

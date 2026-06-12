@@ -246,6 +246,11 @@ async function resolveComparablePath(filePath: string) {
 
 type StatusRenderInput = Omit<AgentLoopStatusResult, 'brief' | 'markdown'>;
 
+function redactGitRoot(root: string, redactPaths: boolean | undefined) {
+  if (!redactPaths || !root) return root;
+  return '[git-root]';
+}
+
 function formatBriefValue(value: string) {
   return `"${value.replace(/["\r\n]/g, ' ').trim()}"`;
 }
@@ -327,6 +332,7 @@ ${result.nextAction.reason}
 export async function getAgentLoopStatus(options: {
   cwd: string;
   config: AgentLoopConfig;
+  redactPaths?: boolean;
 }): Promise<AgentLoopStatusResult> {
   const inGit = await isInsideGitRepo(options.cwd);
   const gitRoot = inGit ? await getGitRoot(options.cwd) : '';
@@ -383,7 +389,7 @@ export async function getAgentLoopStatus(options: {
       isRepository: inGit,
       branch: inGit ? await getGitBranch(options.cwd) : '',
       commit: inGit ? await getGitCommit(options.cwd) : '',
-      root: resolvedGitRoot,
+      root: redactGitRoot(resolvedGitRoot, options.redactPaths),
       targetIsRoot: gitTargetIsRoot,
     },
     workingTree: {

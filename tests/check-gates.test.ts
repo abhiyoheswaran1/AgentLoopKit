@@ -69,6 +69,33 @@ describe('check-gates command', () => {
     expect(output.nextAction.command).toBe('agentloop handoff');
   });
 
+  test('redacts local git root paths when requested', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
+    const realRoot = await realpath(dir);
+
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'check-gates', '--json', '--redact-paths'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+    const humanResult = await execa(tsxPath, [cliPath, 'check-gates', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.stdout).not.toContain(realRoot);
+    expect(humanResult.stdout).not.toContain(realRoot);
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.git.root).toBe('[git-root]');
+    expect(output.git.targetIsRoot).toBe(true);
+    expect(humanResult.stdout).toContain('- Git root: `[git-root]`');
+    expect(humanResult.stdout).toContain('- Git target: `root directory`');
+  });
+
   test('ignores symlinked report and handoff roots that resolve outside the repo', async () => {
     const dir = await createInitializedRepo();
     const outsideReports = await makeTempDir();

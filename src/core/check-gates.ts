@@ -175,10 +175,16 @@ ${result.nextAction.reason}
 `;
 }
 
+function redactGitRoot(root: string, redactPaths: boolean | undefined) {
+  if (!redactPaths || !root) return root;
+  return '[git-root]';
+}
+
 export async function checkGates(options: {
   cwd: string;
   config: AgentLoopConfig;
   strict?: boolean;
+  redactPaths?: boolean;
 }): Promise<CheckGatesResult> {
   const strict = options.strict ?? false;
   const evidence = await resolveCurrentTaskVerificationEvidence(options);
@@ -331,7 +337,7 @@ export async function checkGates(options: {
       isRepository: inGit,
       branch: inGit ? await getGitBranch(options.cwd) : '',
       commit: inGit ? await getGitCommit(options.cwd) : '',
-      root: resolvedGitRoot,
+      root: redactGitRoot(resolvedGitRoot, options.redactPaths),
       targetIsRoot: gitTargetIsRoot,
       changedFileCount: changedFiles.length,
     },

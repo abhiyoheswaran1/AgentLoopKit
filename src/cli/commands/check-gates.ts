@@ -9,7 +9,8 @@ export function checkGatesCommand() {
     .description('Check whether task, verification, handoff, harness, policy, and git gates pass')
     .option('--json', 'print machine-readable output')
     .option('--strict', 'treat warning gates as failures')
-    .action(async (options: { json?: boolean; strict?: boolean }) => {
+    .option('--redact-paths', 'redact local absolute paths in public output')
+    .action(async (options: { json?: boolean; strict?: boolean; redactPaths?: boolean }) => {
       let workspace: Awaited<ReturnType<typeof loadAgentLoopWorkspace>>;
       try {
         workspace = await loadAgentLoopWorkspace(process.cwd());
@@ -24,6 +25,7 @@ export function checkGatesCommand() {
         cwd: workspace.cwd,
         config: workspace.config,
         strict: options.strict,
+        redactPaths: options.redactPaths === true,
       });
       if (options.json) {
         console.log(JSON.stringify(result, null, 2));
