@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-13-13-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-13-13",
+  "createdAtEpochMs": 1781262784394,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-published-package-smoke-helper.md",
+    "title": "Add published package smoke helper",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-13-08-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-13-13-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-13-13-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 15
+}

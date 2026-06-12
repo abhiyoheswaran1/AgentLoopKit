@@ -45,6 +45,11 @@ Before a new public release:
 7. Let `.github/workflows/publish.yml` publish to npm through OIDC.
 8. Let Docker, MCP Registry, and related release workflows run from the GitHub release.
 9. Verify npm again.
+10. Run the published-package smoke from clean temporary directories:
+
+   ```bash
+   npm run smoke:published -- --version <version>
+   ```
 
 ## Prepublish Checks
 
@@ -62,6 +67,14 @@ npm run smoke:release
 `prepublishOnly` runs the local changelog metadata guard, typecheck, tests, and build.
 
 The packed-package smoke check builds the CLI, packs the package into a temporary directory, runs the packed binary in isolated temp repositories, checks path guards and home-directory refusal, and verifies packaged public docs for stale package pins. It does not publish, create tags, call GitHub APIs, read npm tokens, or read `.env` files.
+
+After a GitHub release has published to npm, run:
+
+```bash
+npm run smoke:published -- --version <version>
+```
+
+That check verifies the public npm package with `npm view`, `npx agentloopkit@<version> version`, `npx agentloopkit@<version> init --dry-run --json`, and both installed bin aliases from clean temporary directories. It does not publish, create tags, call GitHub APIs, read npm tokens, or read `.env` files.
 
 Current `main` also includes a prepublish guard:
 

@@ -1,0 +1,62 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/launch-checklist.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/npm-publishing.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/release-status.md"
+  },
+  {
+    "status": "M",
+    "path": "package.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-12-58-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-13-03-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-13-08-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-13-02-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-13-07-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-13-12-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-add-published-package-smoke-helper.md"
+  },
+  {
+    "status": "??",
+    "path": "scripts/smoke-published-package.mjs"
+  },
+  {
+    "status": "??",
+    "path": "tests/published-smoke-script.test.ts"
+  }
+]

@@ -7770,3 +7770,30 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The new dogfood gate gave a repeatable local self-check before the release.
 - Improve:
   - Add a future release-status command that records npm, GitHub release, GHCR, and MCP proof into docs from one deterministic local report.
+
+## 2026-06-12: Published Package Smoke Helper
+
+- Task contract: `.agentloop/tasks/2026-06-12-add-published-package-smoke-helper.md`
+- Trigger:
+  - During `0.28.1` verification, running `npx agentloopkit@0.28.1` from inside the package repo showed that maintainer smoke commands can behave differently from real user temp-directory usage.
+- Implementation:
+  - Added `npm run smoke:published`.
+  - Added `scripts/smoke-published-package.mjs`.
+  - Added Vitest coverage for the smoke plan, cross-platform bin paths, token-like env filtering, dry-run output summaries, and installed-bin display labels.
+  - Updated release docs and launch checklist to use the helper after npm publish.
+- Verification run:
+  - AgentLoop verification passed: `.agentloop/reports/2026-06-12-13-08-verification-report.md`.
+  - Full Vitest passed:
+    - `50` test files
+    - `427` tests
+  - `npm run smoke:published -- --version 0.28.1` passed and verified:
+    - `npm view agentloopkit@0.28.1 version`
+    - `npx --yes agentloopkit@0.28.1 version`
+    - `npx --yes agentloopkit@0.28.1 init --dry-run --json`
+    - installed `agentloop` and `agentloopkit` bin aliases
+  - `npm run lint`, `npm run typecheck`, `npm run check:links`, `npm run build`, and ProjScan passed.
+- What worked well:
+  - Dogfooding exposed the difference between testing from the package repo and testing the real user path.
+  - The helper now keeps post-release proof repeatable and concise.
+- Improve:
+  - Consider adding a future `agentloop release-status` report that gathers npm, GitHub release, GHCR, MCP, and published smoke proof in one command.

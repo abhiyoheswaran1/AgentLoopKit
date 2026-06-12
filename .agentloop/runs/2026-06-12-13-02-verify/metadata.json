@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-13-02-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-13-02",
+  "createdAtEpochMs": 1781262157820,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-published-package-smoke-helper.md",
+    "title": "Add published package smoke helper",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-12-58-verification-report.md",
+  "overallStatus": "fail",
+  "changedFileCount": 9
+}

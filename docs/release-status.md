@@ -84,6 +84,7 @@ Latest release-status documentation checks also passed:
 
 - `npm view agentloopkit version versions --json`
 - direct temp install smoke for `agentloopkit@0.28.1`
+- `npm run smoke:published -- --version 0.28.1`
 - `npx --no-install agentloop version`
 - `npx --no-install agentloopkit version`
 - `npx --no-install agentloop init --dry-run`

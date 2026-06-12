@@ -1,0 +1,7 @@
+ .agentloop/backlog.md     |  2 ++
+ .agentloop/dogfood-log.md | 27 +++++++++++++++++++++++++++
+ docs/launch-checklist.md  |  1 +
+ docs/npm-publishing.md    | 13 +++++++++++++
+ docs/release-status.md    |  1 +
+ package.json              |  1 +
+ 6 files changed, 45 insertions(+)
