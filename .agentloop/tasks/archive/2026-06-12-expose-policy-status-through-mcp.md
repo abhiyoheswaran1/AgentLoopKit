@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-12
 - Task type: feature
-- Status: review
+- Status: done
 
 ## Problem Statement
 MCP clients can read individual policy files, but cannot inspect whether local AgentLoopKit policies are current, customized, missing, or extra without shelling out to the CLI.

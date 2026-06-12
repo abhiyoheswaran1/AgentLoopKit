@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-06-51-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-06-51",
+  "createdAtEpochMs": 1781239896149,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-expose-gate-status-through-mcp.md",
+    "title": "Expose gate status through MCP",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-06-47-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-06-51-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-06-51-pr-summary.md",
+  "score": 95,
+  "changedFileCount": 14
+}

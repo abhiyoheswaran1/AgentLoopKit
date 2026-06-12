@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-06-51-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-06-51",
+  "createdAtEpochMs": 1781239869258,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-expose-gate-status-through-mcp.md",
+    "title": "Expose gate status through MCP",
+    "status": "in-progress"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-06-47-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 13
+}

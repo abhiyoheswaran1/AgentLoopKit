@@ -13,6 +13,7 @@ import { getAgentLoopStatus } from './status.js';
 import { getActiveTask, listTasks, readTaskContract } from './task-state.js';
 import { getPolicyStatus, listPolicies, readPolicy } from './policy.js';
 import { runMaintainerCheck } from './maintainer-check.js';
+import { checkGates } from './check-gates.js';
 import {
   findFileIntent,
   listRuns,
@@ -166,6 +167,20 @@ const tools: McpToolDefinition[] = [
     name: 'agentloop_maintainer_check',
     description: 'Read local maintainer reviewability checks for AI-assisted changes.',
     inputSchema: emptyInputSchema,
+  },
+  {
+    name: 'agentloop_check_gates',
+    description: 'Read local review gate status for task, verification, handoff, harness, policy, and git evidence.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        strict: {
+          type: 'boolean',
+          description: 'Treat warning gates as failures. Defaults to false.',
+        },
+      },
+      additionalProperties: false,
+    },
   },
   {
     name: 'agentloop_list_handoffs',
@@ -323,6 +338,19 @@ function readLimitArgument(args: Record<string, unknown> | undefined) {
   return value;
 }
 
+function readBooleanArgument(
+  args: Record<string, unknown> | undefined,
+  key: string,
+  defaultValue: boolean,
+) {
+  const value = args?.[key];
+  if (value === undefined) return defaultValue;
+  if (typeof value !== 'boolean') {
+    throw new AgentLoopError(`MCP tool argument "${key}" must be a boolean.`);
+  }
+  return value;
+}
+
 export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolResult> {
   const config = await loadAgentLoopConfig(options.cwd);
 
@@ -399,6 +427,10 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
     }
     case 'agentloop_maintainer_check': {
       return textResult(await runMaintainerCheck({ cwd: options.cwd, config }));
+    }
+    case 'agentloop_check_gates': {
+      const strict = readBooleanArgument(options.arguments, 'strict', false);
+      return textResult(await checkGates({ cwd: options.cwd, config, strict }));
     }
     case 'agentloop_list_handoffs': {
       const limit = readLimitArgument(options.arguments);

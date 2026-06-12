@@ -2,6 +2,42 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: MCP Gate Status Lookup
+
+- Task contract: `.agentloop/tasks/2026-06-12-expose-gate-status-through-mcp.md`
+- Trigger:
+  - MCP clients could read local evidence and maintainer checks but could not inspect the deterministic review gate report without shelling out to `agentloop check-gates`.
+  - `check-gates` is already local-only and read-only, so the MCP surface should reuse it rather than introduce new gate logic.
+- Product change:
+  - Added read-only MCP tool `agentloop_check_gates`.
+  - The tool returns the same gate status shape as `agentloop check-gates --json`.
+  - Added optional `strict` input for clients that want warning gates to fail, matching the CLI behavior.
+  - The MCP server instructions and docs now mention gate status.
+  - No verification execution, write tools, GitHub posting, token handling, env reads, external APIs, uploads, version bump, or release were added.
+- Verification:
+  - Red focused run: `npm test -- tests/mcp-tools.test.ts` failed because `agentloop_check_gates` was missing and unknown.
+  - Green focused run of the same command passed after adding the tool.
+  - Focused MCP suite `npm test -- tests/mcp-tools.test.ts tests/mcp-server.test.ts` passed with 2 files and 5 tests.
+  - `npm run typecheck`, `npm run lint`, `npm run check:links`, and `git diff --check` passed.
+  - `npm run build` passed.
+  - Full `npm test` passed with 47 files and 407 tests.
+  - CLI smoke passed.
+  - Packed release smoke passed.
+  - Production dependency audit passed with no known vulnerabilities.
+  - ProjScan reported A 100/100.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-06-47-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-06-51-verify/`.
+  - Archived completed prior task: `.agentloop/tasks/archive/2026-06-12-expose-policy-status-through-mcp.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-06-51-ship-report.md`.
+  - Dogfood ship run: `.agentloop/runs/2026-06-12-06-51-ship/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-06-51-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-06-51-pr-description.md`.
+  - Ship score: 95/100 with gates passing.
+- Worked well:
+  - Reusing `checkGates()` made the MCP tool consistent with CLI, ship, badge, and CI-summary gate behavior.
+- Improve:
+  - Consider MCP access to `agentloop artifacts` next so agents can inventory local evidence without reading directories directly.
+
 ## 2026-06-12: MCP Policy Status Lookup
 
 - Task contract: `.agentloop/tasks/2026-06-12-expose-policy-status-through-mcp.md`

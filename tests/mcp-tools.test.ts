@@ -121,6 +121,18 @@ type MaintainerCheckPayload = {
   suggestedContributorRequest: string;
 };
 
+type GatesPayload = {
+  strict: boolean;
+  overallStatus: string;
+  gates: Array<{
+    id: string;
+    status: string;
+  }>;
+  nextAction: {
+    command: string;
+  };
+};
+
 type HandoffsPayload = {
   handoffs: Array<{
     title: string;
@@ -226,6 +238,7 @@ describe('mcp tools', () => {
       'agentloop_show_run',
       'agentloop_file_intent',
       'agentloop_maintainer_check',
+      'agentloop_check_gates',
       'agentloop_list_handoffs',
       'agentloop_latest_handoff',
     ]);
@@ -266,6 +279,11 @@ describe('mcp tools', () => {
       cwd: dir,
       name: 'agentloop_maintainer_check',
     });
+    const gates = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_check_gates',
+      arguments: { strict: true },
+    });
     const handoffs = await callMcpTool({ cwd: dir, name: 'agentloop_list_handoffs' });
     const handoff = await callMcpTool({ cwd: dir, name: 'agentloop_latest_handoff' });
 
@@ -282,6 +300,7 @@ describe('mcp tools', () => {
     const runPayload = run.payload as RunPayload;
     const intentPayload = intent.payload as IntentPayload;
     const maintainerCheckPayload = maintainerCheck.payload as MaintainerCheckPayload;
+    const gatesPayload = gates.payload as GatesPayload;
     const handoffsPayload = handoffs.payload as HandoffsPayload;
     const handoffPayload = handoff.payload as HandoffPayload;
 
@@ -352,6 +371,16 @@ describe('mcp tools', () => {
       'Confirm the task contract matches the pull request scope.',
     );
     expect(maintainerCheckPayload.suggestedContributorRequest).toEqual(expect.any(String));
+    expect(gatesPayload.strict).toBe(true);
+    expect(gatesPayload.overallStatus).toBe('pass');
+    expect(gatesPayload.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'task-contract', status: 'pass' }),
+        expect.objectContaining({ id: 'verification-report', status: 'pass' }),
+        expect.objectContaining({ id: 'handoff-summary', status: 'pass' }),
+      ]),
+    );
+    expect(gatesPayload.nextAction.command).toBe('agentloop handoff');
     expect(handoffsPayload.handoffs[0]).toMatchObject({ title: 'PR Summary' });
     expect(handoffPayload.handoff.content).toContain('Route implementation handoff.');
   });
@@ -383,6 +412,13 @@ describe('mcp tools', () => {
         arguments: { file: '' },
       }),
     ).rejects.toThrow('MCP tool argument "file" must be a non-empty string');
+    await expect(
+      callMcpTool({
+        cwd: dir,
+        name: 'agentloop_check_gates',
+        arguments: { strict: 'true' },
+      }),
+    ).rejects.toThrow('MCP tool argument "strict" must be a boolean');
     await expect(
       callMcpTool({
         cwd: dir,

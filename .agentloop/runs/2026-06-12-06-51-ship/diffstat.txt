@@ -1,0 +1,11 @@
+ .agentloop/backlog.md                              |  1 +
+ .../2026-06-12-expose-policy-status-through-mcp.md | 59 ----------------------
+ CHANGELOG.md                                       |  1 +
+ FINAL_HANDOFF.md                                   |  3 +-
+ ROADMAP.md                                         |  2 +-
+ docs/cli-reference.md                              |  2 +-
+ docs/mcp.md                                        |  1 +
+ src/core/mcp-tools.ts                              | 32 ++++++++++++
+ src/mcp/server.ts                                  |  2 +-
+ tests/mcp-tools.test.ts                            | 36 +++++++++++++
+ 10 files changed, 76 insertions(+), 63 deletions(-)
