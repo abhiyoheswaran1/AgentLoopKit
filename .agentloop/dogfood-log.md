@@ -21,6 +21,12 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - `npm run check:links` passed and checked 1397 Markdown files.
   - `git diff --check` passed.
   - `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - GitHub release `v0.28.4` was created with release asset SHA-256 `9550589fcb6400d5d3972c2f308d60d7d25df0d85d70033f293d0ad709435a6f`.
+  - Publish workflow `27436246020` passed and published `agentloopkit@0.28.4`.
+  - Docker workflow `27436246026` passed.
+  - MCP Registry workflow `27436462226` passed.
+  - `npm view agentloopkit version versions --json` reported latest `0.28.4`.
+  - `npm run smoke:published -- --version 0.28.4` passed.
 - Worked well:
   - The release gate caught stale process assumptions before tagging.
   - Packed release smoke kept README, public docs, and ROADMAP version state aligned with package metadata.

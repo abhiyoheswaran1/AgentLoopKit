@@ -74,11 +74,37 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.28.3`
+- Current npm release: `agentloopkit@0.28.4`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.4>
+- Release asset: `agentloopkit-0.28.4.tgz`
+- Release asset SHA-256: `9550589fcb6400d5d3972c2f308d60d7d25df0d85d70033f293d0ad709435a6f`
+- Release tag: `v0.28.4` at commit `5bb4b21d6d736874deade7ac5933860a7b4e231e`
+- CI run: `27435878819`
+- CLI Smoke run: `27435878785`
+- Publish workflow run: `27436246020`
+- Docker workflow run: `27436246026`
+- MCP Registry workflow run: `27436462226`
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.28.4`
+
+## 0.28.4 release summary
+
+Included:
+
+- bounded `agentloop verify --progress` output for long verification runs
+- bounded run-ledger navigation with `agentloop runs --latest` and `agentloop runs --limit <count>`
+- task-contract creation with `agentloop create-task --include-config-commands`
+- duplicate-command skip reporting in verification Markdown and JSON
+- archived-task evidence fixes for run summaries and status guidance
+- a 90 second Vitest timeout budget for subprocess-heavy CLI integration tests
+
+Release verification covered local release gates, npm trusted publishing, GitHub release assets, GHCR publishing through the Docker workflow, MCP Registry publishing, and clean-directory published-package smoke.
+
+## Previous release
+
+- Previous npm release: `agentloopkit@0.28.3`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.3>
 - Release asset: `agentloopkit-0.28.3.tgz`
 - Release asset SHA-256: `e40d2f6434dd3d509f01588194469d9203bded2c583789484884699e128b718e`
-- Release tag: `v0.28.3` at commit `f4cd47050ef190487350431cf1adff8b0788c809`
 - CI run: `27423798870`
 - CLI Smoke run: `27423798891`
 - Publish workflow run: `27423870384`
@@ -93,31 +119,6 @@ Included:
 - archived-task evidence reuse in `agentloop ship`
 - archived-task PR copy and ship-run reuse in `agentloop prepare-pr`
 - explicit timeout budgets for subprocess-heavy `ship` and `prepare-pr` integration tests under full release-hook load
-
-Release verification covered local release gates, npm trusted publishing, GitHub release assets, GHCR publishing through the Docker workflow, MCP Registry publishing, and clean-directory published-package smoke.
-
-## Previous release
-
-- Previous npm release: `agentloopkit@0.28.2`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.2>
-- Release asset: `agentloopkit-0.28.2.tgz`
-- Release asset SHA-256: `ea34d7a9d3edefea9ba7edd447cf3e1ec85dd8b94a8d638c7906182f61705b09`
-- CI run: `27417101095`
-- CLI Smoke run: `27417101070`
-- Publish workflow run: `27417122044`
-- Docker workflow run: `27417122089`
-- MCP Registry workflow run: `27417334613`
-- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.28.2`
-
-## 0.28.2 release summary
-
-Included:
-
-- focused task-contract verification with `agentloop verify --task <path> --task-commands --only-task-commands`
-- JSON option errors when the focused shortcut is missing `--task` or `--task-commands`
-- configured repo commands recorded as not run when the focused shortcut is used
-- README and verification docs that show explicit task paths for task-contract commands
-- `server.json` MCP Registry metadata updated to match `package.json`
 
 Release verification covered local release gates, npm trusted publishing, GitHub release assets, GHCR publishing through the Docker workflow, MCP Registry publishing, and clean-directory published-package smoke.
 

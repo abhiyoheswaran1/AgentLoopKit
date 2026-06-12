@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-12
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The repo has verified dogfood improvements after 0.28.3, but npm and GitHub still point at 0.28.3.
