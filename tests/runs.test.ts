@@ -337,6 +337,96 @@ describe('run ledger commands', () => {
     ]);
   });
 
+  test('hydrates run task metadata from archived task files when available', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const runsDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-ship');
+    const archivedTaskPath = path.join(
+      dir,
+      '.agentloop/tasks/archive/2026-06-12-fix-login.md',
+    );
+    await mkdir(runsDir, { recursive: true });
+    await mkdir(path.dirname(archivedTaskPath), { recursive: true });
+    await writeFile(archivedTaskPath, '# Fix login redirect bug\n\n- Status: done\n');
+    await writeFile(
+      path.join(runsDir, 'metadata.json'),
+      JSON.stringify(
+        {
+          id: '2026-06-12-00-00-ship',
+          command: 'ship',
+          createdAt: '2026-06-12-00-00',
+          createdAtEpochMs: 1_000,
+          task: {
+            path: '.agentloop/tasks/2026-06-12-fix-login.md',
+            title: 'Old run snapshot title',
+            status: 'in-progress',
+          },
+          score: 100,
+          changedFileCount: 1,
+        },
+        null,
+        2,
+      ),
+    );
+
+    await expect(listRuns(dir)).resolves.toEqual([
+      expect.objectContaining({
+        task: {
+          path: '.agentloop/tasks/archive/2026-06-12-fix-login.md',
+          title: 'Fix login redirect bug',
+          status: 'done',
+        },
+      }),
+    ]);
+
+    const record = await readRun(dir, '2026-06-12-00-00-ship');
+    expect(record.metadata.task).toEqual({
+      path: '.agentloop/tasks/archive/2026-06-12-fix-login.md',
+      title: 'Fix login redirect bug',
+      status: 'done',
+    });
+    await expect(readFile(path.join(runsDir, 'metadata.json'), 'utf8')).resolves.toContain(
+      '"status": "in-progress"',
+    );
+  });
+
+  test('falls back to stored run task metadata when the task file is missing', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const runsDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-ship');
+    await mkdir(runsDir, { recursive: true });
+    await writeFile(
+      path.join(runsDir, 'metadata.json'),
+      JSON.stringify(
+        {
+          id: '2026-06-12-00-00-ship',
+          command: 'ship',
+          createdAt: '2026-06-12-00-00',
+          createdAtEpochMs: 1_000,
+          task: {
+            path: '.agentloop/tasks/2026-06-12-missing.md',
+            title: 'Stored task title',
+            status: 'in-progress',
+          },
+          score: 92,
+          changedFileCount: 1,
+        },
+        null,
+        2,
+      ),
+    );
+
+    await expect(listRuns(dir)).resolves.toEqual([
+      expect.objectContaining({
+        task: {
+          path: '.agentloop/tasks/2026-06-12-missing.md',
+          title: 'Stored task title',
+          status: 'in-progress',
+        },
+      }),
+    ]);
+  });
+
   test('sanitizes stored absolute run paths at the ledger read boundary', async () => {
     const dir = await makeTempDir();
     const outsideDir = await makeTempDir('agentloopkit-outside-run-path-');

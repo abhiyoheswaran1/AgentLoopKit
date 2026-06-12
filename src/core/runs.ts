@@ -5,6 +5,7 @@ import { GitFileStatus } from './git.js';
 import { isInsidePath, normalizeExistingAncestor, pathExists, writeTextFile } from './file-system.js';
 import { ReviewReadinessResult } from './readiness-score.js';
 import { toSafeDisplayPath } from './display-path.js';
+import { readTaskMetadata } from './task-state.js';
 
 export type RunCommand = 'ship' | 'verify' | 'handoff';
 
@@ -124,24 +125,55 @@ function sanitizeChangedFiles(cwd: string, changedFiles: GitFileStatus[]): GitFi
   }));
 }
 
-function toSummary(cwd: string, metadata: RunMetadata): RunSummary {
-  const safeMetadata = sanitizeRunMetadata(cwd, metadata);
+function toSummary(metadata: RunMetadata): RunSummary {
   return {
-    id: safeMetadata.id,
-    command: safeMetadata.command,
-    createdAt: safeMetadata.createdAt,
-    task: safeMetadata.task,
-    score: safeMetadata.score,
-    overallStatus: safeMetadata.overallStatus,
-    changedFileCount: safeMetadata.changedFileCount,
-    verificationReportPath: safeMetadata.verificationReportPath,
-    shipReportPath: safeMetadata.shipReportPath,
-    handoffPath: safeMetadata.handoffPath,
+    id: metadata.id,
+    command: metadata.command,
+    createdAt: metadata.createdAt,
+    task: metadata.task,
+    score: metadata.score,
+    overallStatus: metadata.overallStatus,
+    changedFileCount: metadata.changedFileCount,
+    verificationReportPath: metadata.verificationReportPath,
+    shipReportPath: metadata.shipReportPath,
+    handoffPath: metadata.handoffPath,
   };
 }
 
 async function readJsonFile<T>(filePath: string): Promise<T> {
   return JSON.parse(await readFile(filePath, 'utf8')) as T;
+}
+
+async function readTaskIfPresent(cwd: string, taskPath: string) {
+  const repoRoot = normalizeExistingAncestor(path.resolve(cwd));
+  const absolutePath = path.isAbsolute(taskPath)
+    ? path.resolve(taskPath)
+    : path.resolve(cwd, taskPath);
+  if (!absolutePath.endsWith('.md')) return undefined;
+  if (!isInsidePath(repoRoot, normalizeExistingAncestor(absolutePath))) return undefined;
+
+  const candidates = [
+    absolutePath,
+    path.join(path.dirname(absolutePath), 'archive', path.basename(absolutePath)),
+  ];
+
+  for (const candidate of candidates) {
+    if (!candidate.endsWith('.md')) continue;
+    if (!isInsidePath(repoRoot, normalizeExistingAncestor(candidate))) continue;
+    const candidateStat = await stat(candidate).catch(() => undefined);
+    if (!candidateStat?.isFile()) continue;
+    return readTaskMetadata(cwd, candidate);
+  }
+
+  return undefined;
+}
+
+async function hydrateRunMetadata(cwd: string, metadata: RunMetadata): Promise<RunMetadata> {
+  const safeMetadata = sanitizeRunMetadata(cwd, metadata);
+  const currentTask = safeMetadata.task
+    ? await readTaskIfPresent(cwd, safeMetadata.task.path)
+    : undefined;
+  return currentTask ? { ...safeMetadata, task: currentTask } : safeMetadata;
 }
 
 export async function writeShipRun(options: {
@@ -298,9 +330,10 @@ export async function listRuns(cwd: string): Promise<RunSummary[]> {
     const metadataPath = path.join(root, entry.name, 'metadata.json');
     if (!(await pathExists(metadataPath))) continue;
     const metadata = await readJsonFile<RunMetadata>(metadataPath);
+    const hydratedMetadata = await hydrateRunMetadata(cwd, metadata);
     const metadataStat = await stat(metadataPath);
     runs.push({
-      summary: toSummary(cwd, metadata),
+      summary: toSummary(hydratedMetadata),
       preciseTimestampMs: metadata.createdAtEpochMs ?? metadataStat.mtimeMs,
     });
   }
@@ -321,12 +354,15 @@ export async function readRun(cwd: string, id: string): Promise<RunRecord> {
   if (!(await pathExists(directory))) throw new AgentLoopError(`Run not found: ${id}`, 'RUN_NOT_FOUND');
   const scorePath = path.join(directory, 'score.json');
   const changedFilesPath = path.join(directory, 'changed-files.json');
-  const metadata = await readJsonFile<RunMetadata>(path.join(directory, 'metadata.json'));
+  const metadata = await hydrateRunMetadata(
+    cwd,
+    await readJsonFile<RunMetadata>(path.join(directory, 'metadata.json')),
+  );
   const changedFiles = (await pathExists(changedFilesPath))
     ? await readJsonFile<GitFileStatus[]>(changedFilesPath)
     : [];
   return {
-    metadata: sanitizeRunMetadata(cwd, metadata),
+    metadata,
     score: (await pathExists(scorePath)) ? await readJsonFile<ReviewReadinessResult>(scorePath) : null,
     changedFiles: sanitizeChangedFiles(cwd, changedFiles),
     diffStat: (await pathExists(path.join(directory, 'diffstat.txt')))

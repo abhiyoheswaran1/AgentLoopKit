@@ -2,6 +2,29 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Hydrated Archived Run Task Status
+
+- Task contract: `.agentloop/tasks/2026-06-12-hydrate-archived-run-task-status.md`
+- Trigger:
+  - `agentloop runs --json` and `agentloop status --json` showed archived completed work as `in-progress` because run metadata kept the original task snapshot.
+- Product change:
+  - Run summaries now hydrate task title, status, and path from the current task file or archived task file when present.
+  - Stored run metadata remains unchanged on disk.
+  - Missing task files still fall back to the stored run snapshot.
+- Verification:
+  - Red TDD run: `npm test -- tests/runs.test.ts tests/status.test.ts` failed on stale latest-run task metadata.
+  - Green focused run: `npm test -- tests/runs.test.ts tests/status.test.ts` passed with 33 tests.
+  - AgentLoop task verification passed and wrote `.agentloop/reports/2026-06-12-17-53-verification-report.md`.
+  - Full `npm test` and `npm run build` passed inside the AgentLoop verification run.
+  - Handoff summary: `.agentloop/handoffs/2026-06-12-18-00-pr-summary.md`.
+  - Ship report: `.agentloop/reports/2026-06-12-18-00-ship-report.md` with review readiness `96`/100.
+  - `npm run dogfood:strict` passed and showed recent archived runs with `status: done`.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - Dogfooding exposed a real ledger trust issue after archiving completed task contracts.
+- Improve:
+  - Evidence displays should prefer reachable local artifacts when they exist, without rewriting historical evidence files.
+
 ## 2026-06-12: Built CLI Smoke Covers Verify Progress
 
 - Task contract: `.agentloop/tasks/2026-06-12-smoke-test-verify-progress-flag.md`

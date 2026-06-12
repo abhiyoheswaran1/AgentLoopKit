@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-17-58-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-17-58",
+  "createdAtEpochMs": 1781279936530,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-hydrate-archived-run-task-status.md",
+    "title": "Hydrate archived run task status",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-17-53-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

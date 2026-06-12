@@ -708,4 +708,52 @@ describe('status command', () => {
       'Run `agentloop task archive .agentloop/tasks/2026-06-09-done-task.md`.',
     );
   });
+
+  test('hydrates latest run task metadata from archived task files', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    const runsDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-ship');
+    const archivedTaskPath = path.join(
+      dir,
+      '.agentloop/tasks/archive/2026-06-12-fix-login.md',
+    );
+    await mkdir(runsDir, { recursive: true });
+    await mkdir(path.dirname(archivedTaskPath), { recursive: true });
+    await writeFile(archivedTaskPath, '# Fix login redirect bug\n\n- Status: done\n');
+    await writeFile(
+      path.join(runsDir, 'metadata.json'),
+      JSON.stringify(
+        {
+          id: '2026-06-12-00-00-ship',
+          command: 'ship',
+          createdAt: '2026-06-12-00-00',
+          createdAtEpochMs: 1_000,
+          task: {
+            path: '.agentloop/tasks/2026-06-12-fix-login.md',
+            title: 'Old run snapshot title',
+            status: 'in-progress',
+          },
+          score: 100,
+          changedFileCount: 1,
+        },
+        null,
+        2,
+      ),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const status = JSON.parse(result.stdout);
+    expect(status.latestRun.task).toEqual({
+      path: '.agentloop/tasks/archive/2026-06-12-fix-login.md',
+      title: 'Fix login redirect bug',
+      status: 'done',
+    });
+  });
 });

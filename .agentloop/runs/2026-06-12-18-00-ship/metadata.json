@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-18-00-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-18-00",
+  "createdAtEpochMs": 1781280015366,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-hydrate-archived-run-task-status.md",
+    "title": "Hydrate archived run task status",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-17-53-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-18-00-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-18-00-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 11
+}
