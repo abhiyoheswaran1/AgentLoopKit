@@ -26,6 +26,7 @@ describe('create-task command', () => {
     expect(result.stdout).toContain('Supported task types:');
     expect(result.stdout).toContain('--risk <text>');
     expect(result.stdout).toContain('--risk-note <text>');
+    expect(result.stdout).toContain('--post-verification <command>');
     for (const type of TASK_TYPES) {
       expect(result.stdout).toContain(type);
     }
@@ -74,6 +75,10 @@ describe('create-task command', () => {
         'pnpm test',
         '--verify-command',
         'pnpm build',
+        '--post-verification',
+        'npm run dogfood:strict',
+        '--post-verification',
+        'agentloop ship',
       ],
       { cwd: dir },
     );
@@ -91,6 +96,9 @@ describe('create-task command', () => {
     expect(markdown).toContain('- Second criterion is preserved');
     expect(markdown).toContain('- pnpm test');
     expect(markdown).toContain('- pnpm build');
+    expect(markdown).toContain('## Post-Verification Gates');
+    expect(markdown).toContain('- npm run dogfood:strict');
+    expect(markdown).toContain('- agentloop ship');
   });
 
   test('writes task contracts to the parent AgentLoop root when run from a nested directory', async () => {

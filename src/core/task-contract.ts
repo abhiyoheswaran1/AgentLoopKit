@@ -30,6 +30,7 @@ export type TaskContractInput = {
   forbiddenFiles?: string[];
   acceptanceCriteria?: string[];
   verificationCommands?: string[];
+  postVerificationCommands?: string[];
   riskNotes?: string[];
   rollbackNotes?: string;
 };
@@ -89,6 +90,12 @@ ${list(input.acceptanceCriteria, 'Add acceptance criteria before implementation 
 
 ## Verification Commands
 ${list(input.verificationCommands, 'No verification command recorded.')}
+
+## Post-Verification Gates
+${list(
+  input.postVerificationCommands,
+  'No post-verification gate recorded. Use this for commands that need a fresh AgentLoop verification report.',
+)}
 
 ## Implementation Plan
 - Inspect relevant files before editing.

@@ -16,12 +16,15 @@ describe('task contract generation', () => {
       forbiddenFiles: ['migrations/'],
       acceptanceCriteria: ['Settings page renders'],
       verificationCommands: ['pnpm test'],
+      postVerificationCommands: ['npm run dogfood:strict'],
       rollbackNotes: 'Revert the feature files.',
     });
 
     expect(markdown).toContain('# Add settings page');
     expect(markdown).toContain('Task type: feature');
     expect(markdown).toContain('No database changes');
+    expect(markdown).toContain('## Post-Verification Gates');
+    expect(markdown).toContain('- npm run dogfood:strict');
     expect(markdown).toContain('## Handoff Requirements');
   });
 });

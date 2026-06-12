@@ -56,13 +56,18 @@ agentloop create-task --type feature --title "Add settings page" \
   --verification "pnpm test" \
   --risk "Touches account preferences" \
   --rollback "Remove the settings route"
+agentloop create-task --type bugfix --title "Fix release guard" \
+  --verification "npm test -- tests/prepublish-check.test.ts" \
+  --post-verification "npm run dogfood:strict"
 ```
 
 Supported task types are `feature`, `bugfix`, `refactor`, `tests`, `test-generation`, `docs`, `release`, `security-review`, `dependency-upgrade`, and `migration`.
 
-Task contracts record the problem statement, desired outcome, constraints, non-goals, assumptions, likely files, files not to touch, acceptance criteria, verification commands, risk notes, and rollback notes.
+Task contracts record the problem statement, desired outcome, constraints, non-goals, assumptions, likely files, files not to touch, acceptance criteria, verification commands, post-verification gates, risk notes, and rollback notes.
 
 `create-task` sets the new contract as the active task. With `--json`, output includes both `task` and `activeTask`. Use `task set <path>` when you need to switch back to an older or alternate contract.
+
+Use `--verification` for commands that `agentloop verify --task-commands` may run before the verification report exists. Use `--post-verification` for gates that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, or reviewer-handoff checks. Post-verification gates are recorded in the task contract but are not executed by `agentloop verify --task-commands`.
 
 ## Task State
 
@@ -133,7 +138,9 @@ agentloop verify --write-run
 
 `verify` reads `agentloop.config.json`, runs configured commands, captures output excerpts, and writes a Markdown report under `.agentloop/reports/`.
 
-Use `--task` to include task context in the report. Use `--task-commands` when you also want to run verification commands listed inside the task contract. Add `--only-task-commands` when a reviewed task contract should run by itself without the configured repo commands.
+Use `--task` to include task context in the report. Use `--task-commands` when you also want to run commands listed under the task contract's `Verification Commands` section. Add `--only-task-commands` when a reviewed task contract should run by itself without the configured repo commands.
+
+`verify --task-commands` does not run `Post-Verification Gates`. Run those after the verification report exists.
 
 Use `--write-run` when you want verification to also create a local run ledger entry under `.agentloop/runs/`. The run records the verification report path, task reference when available, current changed files, and overall verification status.
 

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-15-52-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-15-52",
+  "createdAtEpochMs": 1781272324875,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-post-verification-task-gates.md",
+    "title": "Add post-verification task gates",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-15-42-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-15-52-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-15-52-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 16
+}

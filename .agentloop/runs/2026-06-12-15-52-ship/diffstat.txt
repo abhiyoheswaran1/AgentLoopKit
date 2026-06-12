@@ -1,0 +1,14 @@
+ .agentloop/backlog.md             |  2 +-
+ .agentloop/dogfood-log.md         | 25 ++++++++++++++++++++++++
+ .agentloop/harness/commands.md    |  2 ++
+ DECISIONS.md                      |  6 ++++++
+ docs/cli-reference.md             | 11 +++++++++--
+ docs/verification-reports.md      |  2 ++
+ src/cli/commands/create-task.ts   | 15 ++++++++++++++
+ src/core/task-contract.ts         |  7 +++++++
+ src/templates/harness/commands.md |  2 +-
+ src/templates/tasks/README.md     |  5 ++++-
+ tests/create-task.test.ts         |  8 ++++++++
+ tests/task-contract.test.ts       |  3 +++
+ tests/verification.test.ts        | 41 +++++++++++++++++++++++++++++++++++++++
+ 13 files changed, 124 insertions(+), 5 deletions(-)

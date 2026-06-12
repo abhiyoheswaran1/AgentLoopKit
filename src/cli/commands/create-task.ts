@@ -96,6 +96,11 @@ async function collectInteractive(initial: { title?: string; type?: TaskType }) 
       name: 'verificationCommands',
       message: 'Verification commands (separate with semicolons)',
     },
+    {
+      type: 'text',
+      name: 'postVerificationCommands',
+      message: 'Post-verification gates (separate with semicolons)',
+    },
     { type: 'text', name: 'rollbackNotes', message: 'Rollback notes' },
   ]);
 
@@ -120,6 +125,9 @@ async function collectInteractive(initial: { title?: string; type?: TaskType }) 
       .split(';')
       .filter(Boolean),
     verificationCommands: String(answers.verificationCommands ?? '')
+      .split(';')
+      .filter(Boolean),
+    postVerificationCommands: String(answers.postVerificationCommands ?? '')
       .split(';')
       .filter(Boolean),
     rollbackNotes: answers.rollbackNotes,
@@ -149,6 +157,12 @@ export function createTaskCommand() {
     .option('--acceptance <text>', 'acceptance criterion; repeat or use newlines', lines, [])
     .option('--verify-command <command>', 'verification command; repeat or use newlines', lines, [])
     .option('--verification <command>', 'verification command; repeat or use newlines', lines, [])
+    .option(
+      '--post-verification <command>',
+      'post-verification gate; repeat or use newlines',
+      lines,
+      [],
+    )
     .option('--risk <text>', 'risk note; repeat or use newlines', lines, [])
     .option('--risk-note <text>', 'risk note; repeat or use newlines', lines, [])
     .option('--rollback <text>', 'rollback notes')
@@ -190,6 +204,7 @@ export function createTaskCommand() {
               forbiddenFiles: listOption(options, 'forbiddenFile'),
               acceptanceCriteria: listOption(options, 'acceptance'),
               verificationCommands: listOption(options, 'verifyCommand', 'verification'),
+              postVerificationCommands: listOption(options, 'postVerification'),
               riskNotes: listOption(options, 'risk', 'riskNote'),
               rollbackNotes: stringOption(options, 'rollback'),
             }

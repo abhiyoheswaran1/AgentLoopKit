@@ -42,3 +42,5 @@ Use `agentloop ci-summary --write` after verification and handoff when CI should
 Use `agentloop release-notes --write` after verification when a release workflow needs a local release-note draft from changelog, git, task, verification, and CI-summary evidence. It does not create tags, publish packages, call provider APIs, or read tokens.
 
 Use `agentloop npm-status` when release docs mention npm availability. Use `--agentloopkit` when checking AgentLoopKit itself from a temp release-smoke folder or CI workspace. The command runs `npm view` only when invoked, or reads captured registry JSON with `--registry-json`. It does not publish packages, read tokens, read `.env` files, or change package metadata.
+
+Use `agentloop verify --task <path> --task-commands` only for reviewed commands listed under `Verification Commands`. Commands under `Post-Verification Gates` are not run by `verify`; run them after the verification report exists.

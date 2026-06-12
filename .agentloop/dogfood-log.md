@@ -2,6 +2,32 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Post-Verification Gates For Dogfood Flow
+
+- Task contract: `.agentloop/tasks/2026-06-12-add-post-verification-task-gates.md`
+- Trigger:
+  - The release metadata guard task showed that `npm run dogfood:strict` fails when a task puts it under `Verification Commands`, because strict dogfood needs a fresh verification report first.
+  - The product-panel decision favored explicit task evidence over automatic second-phase command execution.
+- Product change:
+  - `agentloop create-task` now accepts repeatable `--post-verification` flags.
+  - Generated task contracts include a `Post-Verification Gates` section.
+  - `agentloop verify --task-commands` still executes only reviewed commands under `Verification Commands`.
+  - CLI docs, verification docs, task templates, and harness command guidance now explain the split.
+- Verification:
+  - Red TDD run: `npm test -- tests/task-contract.test.ts tests/create-task.test.ts tests/verification.test.ts` failed before the CLI flag and generated section existed.
+  - Green focused run: `npm test -- tests/task-contract.test.ts tests/create-task.test.ts tests/verification.test.ts` passed with 3 files and 56 tests.
+  - Supporting checks passed: `npm run lint`, `npm run typecheck`, `npm run check:links`, `git diff --check`, and `npx --yes projscan doctor --format markdown`.
+  - AgentLoop verification report: `.agentloop/reports/2026-06-12-15-42-verification-report.md`.
+  - Run ledger entry: `.agentloop/runs/2026-06-12-15-44-verify/`.
+  - Post-verification gate: `npm run dogfood:strict` passed after the report existed.
+  - Final ship and handoff evidence were generated after the task was archived, with review readiness `96`/100.
+- Worked well:
+  - The product now matches the way we use it: verify first, then run evidence-dependent gates.
+  - The verification parser test protects the safety boundary, so post-verification commands do not become hidden execution.
+- Improve:
+  - Long verification runs still look quiet while subprocesses execute. Keep the streaming progress backlog item separate.
+  - `agentloop ship` should reuse archived latest-run task evidence after cleanup, the same way strict gates and maintainer-check already do.
+
 ## 2026-06-12: Release Metadata Sync Prepublish Guard
 
 - Task contract: `.agentloop/tasks/2026-06-12-add-release-metadata-sync-prepublish-guard.md`

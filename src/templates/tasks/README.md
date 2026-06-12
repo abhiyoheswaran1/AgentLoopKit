@@ -11,11 +11,14 @@ agentloop create-task --type feature --title "Add settings page" \
   --forbidden-file migrations/ \
   --acceptance "Settings can be saved" \
   --verification "pnpm test" \
+  --post-verification "npm run dogfood:strict" \
   --risk "Touches account preferences" \
   --rollback "Remove the settings route"
 ```
 
-Task contracts turn fuzzy requests into scoped engineering work. A good contract names the desired outcome, constraints, non-goals, likely files, files not to touch, acceptance criteria, verification commands, and rollback notes.
+Task contracts turn fuzzy requests into scoped engineering work. A good contract names the desired outcome, constraints, non-goals, likely files, files not to touch, acceptance criteria, verification commands, post-verification gates, and rollback notes.
+
+Use verification commands for checks that `agentloop verify --task-commands` can run before a report exists. Use post-verification gates for checks that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, or reviewer handoff checks.
 
 Supported task types are `feature`, `bugfix`, `refactor`, `tests`, `test-generation`, `docs`, `release`, `security-review`, `dependency-upgrade`, and `migration`.
 

@@ -713,6 +713,47 @@ describe('verification', () => {
     expect(await readFile(path.join(dir, 'task-command-ran.txt'), 'utf8')).toBe('yes');
   });
 
+  test('does not run post-verification gates with task verification commands', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/task-commands.md'),
+      [
+        '# Task command opt-in',
+        '',
+        '- Task type: docs',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        "- node -e \"require('fs').writeFileSync('task-command-ran.txt', 'yes')\"",
+        '',
+        '## Post-Verification Gates',
+        "- node -e \"require('fs').writeFileSync('post-verification-ran.txt', 'yes')\"",
+        '',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: '.agentloop/tasks/task-commands.md',
+      taskCommands: true,
+      reportTimestamp: '2026-06-10-12-07',
+      nowIso: '2026-06-10T12:07:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('pass');
+    expect(result.taskCommands).toEqual({
+      requested: true,
+      foundCount: 1,
+      commands: ["node -e \"require('fs').writeFileSync('task-command-ran.txt', 'yes')\""],
+    });
+    await expect(readFile(path.join(dir, 'task-command-ran.txt'), 'utf8')).resolves.toBe('yes');
+    await expect(access(path.join(dir, 'post-verification-ran.txt'))).rejects.toThrow();
+  });
+
   test('reports when task verification commands are requested but absent', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

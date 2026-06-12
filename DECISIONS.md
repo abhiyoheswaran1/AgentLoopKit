@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-06-12: Post-Verification Gates Are Explicit Evidence
+
+Task contracts can record `Post-Verification Gates` for commands that need a fresh AgentLoop verification report, such as `npm run dogfood:strict`, `agentloop ship`, or reviewer handoff checks. `agentloop create-task` accepts repeatable `--post-verification` flags for this section.
+
+`agentloop verify --task-commands` still runs only reviewed commands under `Verification Commands`. It does not execute post-verification gates, because those commands depend on evidence that `verify` writes after subprocesses finish. This keeps command execution explicit and avoids report-dependent checks failing for the wrong reason.
+
 ## 2026-06-12: Task-Only Verification Still Requires Explicit Task Commands
 
 `agentloop verify --only-task-commands` is a convenience flag, not a new execution permission. It only works with both `--task <path>` and `--task-commands`, so task Markdown never becomes executable because a user asked for a report with task context.
