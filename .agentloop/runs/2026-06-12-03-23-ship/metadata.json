@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-03-23-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-03-23",
+  "createdAtEpochMs": 1781227421840,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-activate-newly-created-task-contracts.md",
+    "title": "Activate newly created task contracts",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-03-16-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-03-23-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-03-23-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 17
+}

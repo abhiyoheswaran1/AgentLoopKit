@@ -1,11 +1,12 @@
 import path from 'node:path';
-import { mkdir, readFile, realpath, stat, symlink } from 'node:fs/promises';
+import { mkdir, readFile, realpath, stat, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import { TASK_TYPES } from '../src/core/constants.js';
 import { initializeAgentLoop } from '../src/core/init.js';
 import { inlineCode } from '../src/core/markdown-format.js';
+import { setActiveTask } from '../src/core/task-state.js';
 import { CLI_PROCESS_TIMEOUT_MS, makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -187,6 +188,7 @@ describe('create-task command', () => {
     expect(result.stdout).toContain(
       `Task contract created: ${inlineCode(path.join(resolvedDir, taskPath))}`,
     );
+    expect(result.stdout).toContain(`Active task set: ${inlineCode(taskPath)}`);
   });
 
   test('accepts repeated risk note flags in non-interactive mode', async () => {
@@ -356,12 +358,60 @@ describe('create-task command', () => {
     );
 
     expect(JSON.parse(result.stdout)).toEqual({
+      activeTask: {
+        path: '.agentloop/tasks/json-output.md',
+        title: 'JSON output',
+        status: 'proposed',
+      },
       task: {
         path: path.join(resolvedDir, '.agentloop/tasks/json-output.md'),
         markdown: expect.stringContaining('# JSON output'),
       },
     });
     expect(result.stdout).not.toContain('Task contract created:');
+  });
+
+  test('sets the newly created task as active even when another task was pinned', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    await writeJson(path.join(dir, 'agentloop.config.json'), config);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    const oldTaskPath = path.join(dir, '.agentloop/tasks/old-task.md');
+    await writeFile(oldTaskPath, '# Old task\n\n- Status: in-progress\n');
+    await setActiveTask({ cwd: dir, config, taskPath: oldTaskPath });
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'New active task',
+        '--type',
+        'bugfix',
+        '--out',
+        '.agentloop/tasks/new-active-task.md',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    const current = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'task', 'current', '--json'], { cwd: dir })).stdout,
+    );
+
+    expect(JSON.parse(result.stdout)).toMatchObject({
+      activeTask: {
+        path: '.agentloop/tasks/new-active-task.md',
+        title: 'New active task',
+        status: 'proposed',
+      },
+    });
+    expect(current.activeTask).toMatchObject({
+      path: '.agentloop/tasks/new-active-task.md',
+      title: 'New active task',
+      status: 'proposed',
+    });
   });
 
   test('prints invalid config errors as JSON without creating a task', async () => {

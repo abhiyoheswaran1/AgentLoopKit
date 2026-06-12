@@ -2,6 +2,42 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Create Task Activates New Contract
+
+- Task contract: `.agentloop/tasks/2026-06-12-activate-newly-created-task-contracts.md`
+- Trigger:
+  - Dogfooding the grouped `prepare-pr` work showed that `create-task` wrote a new contract while the active task pointer still referenced an older review task.
+  - `ship` and `prepare-pr` then used stale task context until `agentloop task set` corrected the pointer.
+- Product change:
+  - `create-task` now calls the same active-task path guard as `agentloop task set` after writing the new contract.
+  - Human output includes both the created task path and active-task path.
+  - JSON output includes `task` plus `activeTask` metadata.
+- Verification:
+  - Red focused run: `npm test -- tests/create-task.test.ts -t "sets the newly created task as active"` failed while `create-task --json` returned only `task` and left the older active pointer in place.
+  - Green focused run: `npm test -- tests/create-task.test.ts -t "sets the newly created task as active"` passed after `create-task` activated the new task.
+  - Affected suite `npm test -- tests/create-task.test.ts tests/task-state.test.ts` passed with 2 files and 55 tests.
+  - `npm run typecheck` passed.
+  - `npm run lint` passed.
+  - `npm run check:links` passed.
+  - `git diff --check` passed.
+  - Full `npm test` passed with 47 files and 400 tests.
+  - `npm run build` passed.
+  - CLI smoke passed with explicit assertions for `create-task --json` `activeTask` and `task current --json`.
+  - Release smoke passed against the packed tarball.
+  - Production dependency audit passed with no known vulnerabilities.
+  - ProjScan reported A 100/100.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-03-16-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-03-23-verify/`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-03-23-ship-report.md`.
+  - Dogfood ship run: `.agentloop/runs/2026-06-12-03-23-ship/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-03-23-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-03-23-pr-description.md`.
+  - Ship score: 96/100 with gates passing.
+- Worked well:
+  - Reusing `setActiveTask` kept the existing path and symlink guards in the write path.
+- Improve:
+  - Consider adding `--no-activate` later only if scripts need task creation without changing loop state.
+
 ## 2026-06-12: Grouped Prepare PR Change Areas
 
 - Task contract: `.agentloop/tasks/2026-06-12-group-prepare-pr-changed-files-by-review-area.md`

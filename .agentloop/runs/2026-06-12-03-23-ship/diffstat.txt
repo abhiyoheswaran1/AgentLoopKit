@@ -1,0 +1,15 @@
+ .agentloop/backlog.md           |  1 +
+ .agentloop/dogfood-log.md       | 36 ++++++++++++++++++++++++++++
+ CHANGELOG.md                    |  1 +
+ FINAL_HANDOFF.md                |  1 +
+ README.md                       |  2 ++
+ docs/cli-reference.md           |  2 ++
+ docs/getting-started.md         |  4 ++--
+ docs/status.md                  |  2 +-
+ docs/task-contracts.md          |  4 ++--
+ scripts/smoke-cli.mjs           | 13 +++++++++++
+ src/cli/commands/create-task.ts |  9 ++++++-
+ src/templates/root/AGENTLOOP.md |  4 ++--
+ src/templates/tasks/README.md   |  2 +-
+ tests/create-task.test.ts       | 52 ++++++++++++++++++++++++++++++++++++++++-
+ 14 files changed, 123 insertions(+), 10 deletions(-)

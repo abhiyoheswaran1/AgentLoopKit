@@ -16,6 +16,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - doctor risk-file category warnings with capped path examples
 - task contract generation
 - task contract creation with JSON output for agents and scripts
+- task contract creation that activates the new task by default
 - active task pinning with `.agentloop/state.json`
 - read-only task contract listing with active-task markers
 - explicit task status transitions in Markdown task contracts

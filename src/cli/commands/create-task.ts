@@ -4,6 +4,7 @@ import { TASK_TYPES } from '../../core/constants.js';
 import { AgentLoopError } from '../../core/errors.js';
 import { inlineCode } from '../../core/markdown-format.js';
 import { createTaskContractFile, TaskOutputPathError, TaskType } from '../../core/task-contract.js';
+import { setActiveTask } from '../../core/task-state.js';
 import { loadWorkspaceForJsonCommand } from '../json-errors.js';
 
 function lines(value: string | undefined, previous: string[]) {
@@ -212,10 +213,16 @@ export function createTaskCommand() {
         }
         throw error;
       }
+      const activeTask = await setActiveTask({
+        cwd: workspace.cwd,
+        config: workspace.config,
+        taskPath: result.path,
+      });
       if (options.json) {
-        console.log(JSON.stringify({ task: result }, null, 2));
+        console.log(JSON.stringify({ task: result, activeTask }, null, 2));
         return;
       }
       console.log(`Task contract created: ${inlineCode(result.path)}`);
+      console.log(`Active task set: ${inlineCode(activeTask.path)}`);
     });
 }

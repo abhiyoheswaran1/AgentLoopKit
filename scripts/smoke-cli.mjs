@@ -237,7 +237,20 @@ async function smokeCli({ keep = false } = {}) {
       'create-task',
     );
     assert(createdTask.task?.path, 'create-task JSON did not include task.path.');
+    assert(
+      createdTask.activeTask?.path === taskPath,
+      'create-task JSON did not set the created task as active.',
+    );
     await assertFileExists(smokeRepo, taskPath);
+
+    const currentAfterCreate = parseJson(
+      (await runAgentLoop(['task', 'current', '--json'], { cwd: smokeRepo })).stdout,
+      'task current after create-task',
+    );
+    assert(
+      currentAfterCreate.activeTask?.path === taskPath,
+      'task current did not report the task created by create-task.',
+    );
     console.log('Create-task smoke passed.');
 
     const activeTask = parseJson(

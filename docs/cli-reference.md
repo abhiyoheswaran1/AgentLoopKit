@@ -62,6 +62,8 @@ Supported task types are `feature`, `bugfix`, `refactor`, `tests`, `test-generat
 
 Task contracts record the problem statement, desired outcome, constraints, non-goals, assumptions, likely files, files not to touch, acceptance criteria, verification commands, risk notes, and rollback notes.
 
+`create-task` sets the new contract as the active task. With `--json`, output includes both `task` and `activeTask`. Use `task set <path>` when you need to switch back to an older or alternate contract.
+
 ## Task State
 
 ```bash

@@ -92,6 +92,8 @@ agentloop ship
 agentloop prepare-pr
 ```
 
+`create-task` sets the new contract as the active task. Use `agentloop task set <path>` only when you need to switch to another contract.
+
 Use `agentloop status` or `agentloop next` when an agent needs the next local action without reading every file:
 
 ```bash
