@@ -367,3 +367,9 @@ The run ledger lives under `.agentloop/runs/` instead of a database or cloud ser
 The `0.28.2` release gate failed late because `server.json` still carried the previous package version. Distribution artifact tests caught the issue, but only after a heavier release run.
 
 `scripts/prepublish-check.mjs` now compares `package.json.version` with both `server.json.version` and the npm package entry in `server.json`. This keeps the release guard local, read-only, and fast. The guard does not rewrite metadata, call npm, create releases, or publish registry entries.
+
+## 2026-06-12: Verification Progress Is Opt-In And Bounded
+
+Long verification runs can look stuck even when commands are still executing. AgentLoopKit now supports `agentloop verify --progress`, which prints one start line and one finish line per command with elapsed time.
+
+The default human output stays unchanged for scripts and existing users. JSON output remains parseable when `--json` and `--progress` are combined. Raw child-process output stays in the Markdown verification report instead of being streamed to the terminal.

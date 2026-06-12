@@ -68,6 +68,67 @@ describe('verification', () => {
     expect(result.markdown).toContain('ok');
   });
 
+  test('emits bounded progress events for executed verification commands', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const events: Array<Record<string, unknown>> = [];
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"test-ok\\")"',
+        lint: 'node -e "console.log(\\"lint-ok\\")"',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-12-17-30',
+      nowIso: '2026-06-12T17:30:00.000Z',
+      onProgress: (event) => events.push(event),
+    });
+
+    expect(result.overallStatus).toBe('pass');
+    expect(events).toHaveLength(4);
+    expect(events[0]).toEqual({
+      event: 'start',
+      index: 1,
+      total: 2,
+      key: 'test',
+      command: 'node -e "console.log(\\"test-ok\\")"',
+    });
+    expect(events[1]).toMatchObject({
+      event: 'finish',
+      index: 1,
+      total: 2,
+      key: 'test',
+      command: 'node -e "console.log(\\"test-ok\\")"',
+      status: 'pass',
+      exitCode: 0,
+    });
+    expect(events[1].durationMs).toEqual(expect.any(Number));
+    expect(events[2]).toMatchObject({
+      event: 'start',
+      index: 2,
+      total: 2,
+      key: 'lint',
+    });
+    expect(events[3]).toMatchObject({
+      event: 'finish',
+      index: 2,
+      total: 2,
+      key: 'lint',
+      status: 'pass',
+      exitCode: 0,
+    });
+    expect(events[3].durationMs).toEqual(expect.any(Number));
+  });
+
   test('formats report metadata values as safe inline Markdown', async () => {
     const dir = await makeTempDir();
     const repoDir = path.join(dir, 'demo`repo');
@@ -1033,6 +1094,75 @@ describe('verification', () => {
     expect(result.stdout).toContain(config.paths.reportsDir);
     expect(result.stdout).not.toContain(dir);
     expect(result.stdout).toContain(`Overall status: ${inlineCode('pass')}`);
+  });
+
+  test('CLI verify --progress prints bounded command progress without raw command output', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeFile(
+      path.join(dir, 'emit-hidden-output.mjs'),
+      "console.log('raw-child-output-hidden-from-progress');\n",
+    );
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: 'node emit-hidden-output.mjs',
+            lint: 'node -e "console.log(\\"lint-ok\\")"',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'verify', '--progress'], { cwd: dir });
+
+    expect(result.stdout).toContain('[1/2] test started: `node emit-hidden-output.mjs`');
+    expect(result.stdout).toMatch(/\[1\/2\] test passed in \d+ms/);
+    expect(result.stdout).toContain('[2/2] lint started: `node -e "console.log(\\"lint-ok\\")"`');
+    expect(result.stdout).toMatch(/\[2\/2\] lint passed in \d+ms/);
+    expect(result.stdout).toContain('Verification report written:');
+    expect(result.stdout).toContain(`Overall status: ${inlineCode('pass')}`);
+    expect(result.stdout).not.toContain('raw-child-output-hidden-from-progress');
+  });
+
+  test('CLI verify --json suppresses progress output even when --progress is provided', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: 'node -e "console.log(\\"json-ok\\")"',
+            lint: '',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'verify', '--json', '--progress'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+
+    expect(output.overallStatus).toBe('pass');
+    expect(result.stdout).not.toContain('[1/1]');
+    expect(result.stderr).toBe('');
   });
 
   test('CLI verify prints invalid task paths as JSON errors', async () => {

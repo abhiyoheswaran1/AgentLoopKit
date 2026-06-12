@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Added `agentloop verify --progress` for opt-in, bounded per-command progress output during long verification runs while keeping JSON output parseable.
 
 ## 0.28.3
 

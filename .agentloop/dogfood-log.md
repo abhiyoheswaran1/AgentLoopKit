@@ -2,6 +2,31 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Verification Progress Output
+
+- Task contract: `.agentloop/tasks/2026-06-12-add-verification-progress-output.md`
+- Trigger:
+  - Dogfood release gates and test runs can look idle while subprocesses run.
+  - The product-panel decision favored a small opt-in progress mode over a spinner, TUI, live log stream, or new dependency.
+- Product change:
+  - `agentloop verify --progress` prints bounded command start/finish lines.
+  - Raw child-process output stays in the verification report.
+  - `agentloop verify --json --progress` keeps stdout parseable as JSON.
+- Verification:
+  - Red TDD run: `npm test -- tests/verification.test.ts` failed because progress events were absent and `--progress` was unknown.
+  - Green focused run: `npm test -- tests/verification.test.ts` passed with 1 file and 40 tests.
+  - AgentLoop task verification passed with `--progress` and wrote `.agentloop/reports/2026-06-12-17-19-verification-report.md`.
+  - Full `npm test` passed with 51 files and 444 tests.
+  - `npm run build` passed.
+  - `npm run dogfood:strict` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - `agentloop ship` reported review readiness 96/100.
+- Worked well:
+  - The fix directly improved the same long-running gate pain that dogfooding exposed.
+- Improve:
+  - Consider using `--progress` in release and dogfood docs where humans run long local checks.
+  - Do not parallelize dependent `ship` and `prepare-pr` dogfood commands; run `ship` first, then let `prepare-pr` reuse that evidence.
+
 ## 2026-06-12: 0.28.3 Release Gate
 
 - Task contract: `.agentloop/tasks/2026-06-12-release-agentloopkit-0-28-3.md`

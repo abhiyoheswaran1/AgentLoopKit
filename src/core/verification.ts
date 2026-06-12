@@ -30,6 +30,26 @@ export type VerificationCiContext = {
   runAttempt?: string;
 };
 
+export type VerificationProgressEvent =
+  | {
+      event: 'start';
+      index: number;
+      total: number;
+      key: VerificationCommandKey;
+      command: string;
+    }
+  | {
+      event: 'finish';
+      index: number;
+      total: number;
+      key: VerificationCommandKey;
+      command: string;
+      status: 'pass' | 'fail' | 'timeout';
+      exitCode: number;
+      durationMs: number;
+      timedOut?: boolean;
+    };
+
 export type VerificationOptions = {
   cwd: string;
   config: AgentLoopConfig;
@@ -41,6 +61,7 @@ export type VerificationOptions = {
   skip?: Partial<Record<'test' | 'lint' | 'typecheck' | 'build', boolean>>;
   customCommands?: string[];
   timeoutMs?: number;
+  onProgress?: (event: VerificationProgressEvent) => void;
 };
 
 export type VerificationResult = {
@@ -442,16 +463,31 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
   ];
 
   const results: VerificationCommandResult[] = [];
-  for (const [key, command] of commands) {
-    results.push(
-      await runVerificationCommand({
-        key,
-        command,
-        cwd: options.cwd,
-        env,
-        timeoutMs: options.timeoutMs,
-      }),
-    );
+  const totalCommands = commands.length;
+  for (const [commandIndex, [key, command]] of commands.entries()) {
+    const index = commandIndex + 1;
+    options.onProgress?.({ event: 'start', index, total: totalCommands, key, command });
+    const startedAt = Date.now();
+    const result = await runVerificationCommand({
+      key,
+      command,
+      cwd: options.cwd,
+      env,
+      timeoutMs: options.timeoutMs,
+    });
+    const durationMs = Math.max(0, Date.now() - startedAt);
+    options.onProgress?.({
+      event: 'finish',
+      index,
+      total: totalCommands,
+      key,
+      command,
+      status: result.timedOut ? 'timeout' : result.passed ? 'pass' : 'fail',
+      exitCode: result.exitCode,
+      durationMs,
+      ...(result.timedOut ? { timedOut: true } : {}),
+    });
+    results.push(result);
   }
 
   const overallStatus =

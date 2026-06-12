@@ -11,7 +11,7 @@ import { getGitStatus, parseGitStatus } from '../../core/git.js';
 import { inlineCode } from '../../core/markdown-format.js';
 import { writeVerificationRun } from '../../core/runs.js';
 import { readTaskMetadata } from '../../core/task-state.js';
-import { runVerification } from '../../core/verification.js';
+import { runVerification, VerificationProgressEvent } from '../../core/verification.js';
 import { toSafeDisplayPath } from '../../core/display-path.js';
 import {
   CliOptionError,
@@ -32,6 +32,28 @@ function parseTimeoutMs(value: unknown) {
     throw new Error('Timeout must be a positive integer in milliseconds.');
   }
   return parsed;
+}
+
+function formatProgressStatus(event: Extract<VerificationProgressEvent, { event: 'finish' }>) {
+  if (event.status === 'pass') return 'passed';
+  if (event.status === 'timeout') return 'timed out';
+  return 'failed';
+}
+
+function printVerificationProgress(event: VerificationProgressEvent) {
+  if (event.event === 'start') {
+    console.log(
+      `[${event.index}/${event.total}] ${event.key} started: ${inlineCode(event.command)}`,
+    );
+    return;
+  }
+
+  const exitSuffix = event.status === 'pass' ? '' : ` (exit ${event.exitCode})`;
+  console.log(
+    `[${event.index}/${event.total}] ${event.key} ${formatProgressStatus(event)} in ${
+      event.durationMs
+    }ms${exitSuffix}`,
+  );
 }
 
 function printArtifactPathJsonError(error: ArtifactPathError) {
@@ -129,6 +151,7 @@ export function verifyCommand() {
     .option('--no-typecheck', 'skip typecheck command')
     .option('--command <command>', 'custom command to run', collect, [])
     .option('--timeout-ms <ms>', 'per-command timeout in milliseconds')
+    .option('--progress', 'print bounded per-command progress in human output')
     .option('--write-run', 'write a local run ledger entry under .agentloop/runs')
     .action(async (options: Record<string, unknown>) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json === true);
@@ -175,6 +198,8 @@ export function verifyCommand() {
           },
           customCommands: options.command as string[],
           timeoutMs: parseTimeoutMs(options.timeoutMs),
+          onProgress:
+            options.progress === true && options.json !== true ? printVerificationProgress : undefined,
         });
       } catch (error) {
         if (options.json && error instanceof OutputPathError) {

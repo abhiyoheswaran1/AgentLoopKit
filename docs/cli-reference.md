@@ -133,6 +133,7 @@ agentloop verify --task .agentloop/tasks/<task-file>.md
 agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands
 agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands --only-task-commands
 agentloop verify --timeout-ms 120000
+agentloop verify --progress
 agentloop verify --write-run
 ```
 
@@ -143,6 +144,8 @@ Use `--task` to include task context in the report. Use `--task-commands` when y
 `verify --task-commands` does not run `Post-Verification Gates`. Run those after the verification report exists.
 
 Use `--write-run` when you want verification to also create a local run ledger entry under `.agentloop/runs/`. The run records the verification report path, task reference when available, current changed files, and overall verification status.
+
+Use `--progress` for long local checks. It prints bounded start/finish lines for each command and keeps raw command output in the verification report. JSON output remains parseable when `--json` and `--progress` are combined.
 
 Failed reports include a short failure summary with each failed command, exit code, timeout state, and useful final output lines. If no commands are configured, AgentLoopKit writes a report saying nothing was verified.
 

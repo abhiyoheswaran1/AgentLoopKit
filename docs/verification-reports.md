@@ -32,6 +32,7 @@ agentloop verify --task .agentloop/tasks/add-settings-page.md --task-commands
 agentloop verify --task .agentloop/tasks/add-settings-page.md --task-commands --only-task-commands
 agentloop verify --command "node smoke-test.js"
 agentloop verify --timeout-ms 120000
+agentloop verify --progress
 agentloop verify --json
 ```
 
@@ -56,6 +57,8 @@ Command output is kept as evidence, but report code blocks use Markdown fences l
 Command labels use Markdown inline-code delimiters long enough to contain the exact command string. This keeps command names readable even when a configured command contains backticks.
 
 Use `--timeout-ms` to set a per-command timeout for long or risky checks. Timed-out commands fail verification and the report marks `Timed out: yes`.
+
+Use `--progress` when a long verification run should show bounded terminal progress. It prints one start line and one finish line per command with elapsed time. It does not stream child-process output to the terminal, and `--json` keeps stdout as JSON even when `--progress` is present.
 
 Long command output is shortened in the command section. AgentLoopKit keeps the beginning and ending output with a truncation marker, so setup context and final error lines remain visible without committing huge logs.
 

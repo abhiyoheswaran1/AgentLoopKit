@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-17-25-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-17-25",
+  "createdAtEpochMs": 1781277937919,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-verification-progress-output.md",
+    "title": "Add verification progress output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-17-19-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-17-25-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-17-25-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 15
+}

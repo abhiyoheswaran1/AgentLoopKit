@@ -91,7 +91,7 @@ agentloop create-task --title "Fix login redirect bug" --type bugfix \
 
 # Run Codex, Claude Code, Cursor, OpenCode, Gemini CLI, or another coding agent.
 
-agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands
+agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands --progress
 agentloop ship --github-comment
 agentloop prepare-pr
 ```
