@@ -2,6 +2,39 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: MCP Ship And Run Evidence
+
+- Task contract: `.agentloop/tasks/2026-06-12-expose-ship-evidence-through-mcp.md`
+- Trigger:
+  - The read-only MCP server exposed status, tasks, policies, verification reports, and handoffs, but not ship readiness reports or run ledger summaries.
+  - MCP clients need the same local evidence that reviewers see in `ship`, without write access or command execution.
+- Product change:
+  - Added read-only MCP tool `agentloop_latest_ship_report`.
+  - Added read-only MCP tool `agentloop_list_runs` with a bounded `limit` argument.
+  - MCP run paths now render repo-relative paths for verification reports, ship reports, and handoffs.
+  - The MCP server still performs no writes, no command execution, no API calls, and no env-file reads.
+- Verification:
+  - Red focused run: `npm test -- tests/mcp-tools.test.ts` failed because the new tools were missing and `agentloop_latest_ship_report` was unknown.
+  - Green focused run of the same command passed after adding the tools.
+  - Focused MCP suite `npm test -- tests/mcp-tools.test.ts tests/mcp-server.test.ts` passed with 2 files and 5 tests.
+  - `npm run typecheck`, `npm run lint`, `npm run check:links`, `git diff --check`, and `npm run build` passed.
+  - Full `npm test` passed with 47 files and 407 tests.
+  - CLI smoke passed.
+  - Packed release smoke passed.
+  - Production dependency audit passed with no known vulnerabilities.
+  - ProjScan reported A 100/100.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-05-11-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-05-17-verify/`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-05-17-ship-report.md`.
+  - Dogfood ship run: `.agentloop/runs/2026-06-12-05-17-ship/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-05-17-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-05-17-pr-description.md`.
+  - Ship score: 96/100 with gates passing.
+- Worked well:
+  - The implementation reused the existing artifact root guards and run ledger reader instead of creating new filesystem paths.
+- Improve:
+  - Consider a future read-only `agentloop_show_run` MCP tool if clients need full run details instead of summaries.
+
 ## 2026-06-12: Repo-Relative PR-Facing Paths
 
 - Task contract: `.agentloop/tasks/2026-06-12-use-repo-relative-paths-in-pr-facing-markdown.md`

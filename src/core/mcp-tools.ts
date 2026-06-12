@@ -1,12 +1,18 @@
 import path from 'node:path';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { loadAgentLoopConfig } from './config.js';
-import { latestMarkdownFile, prSummaryPattern, verificationReportPattern } from './artifacts.js';
+import {
+  latestMarkdownFile,
+  prSummaryPattern,
+  shipReportPattern,
+  verificationReportPattern,
+} from './artifacts.js';
 import { AgentLoopError } from './errors.js';
 import { pathExists, resolvesInsidePath } from './file-system.js';
 import { getAgentLoopStatus } from './status.js';
 import { getActiveTask, listTasks, readTaskContract } from './task-state.js';
 import { listPolicies, readPolicy } from './policy.js';
+import { listRuns, type RunSummary } from './runs.js';
 
 export type McpToolDefinition = {
   name: string;
@@ -92,6 +98,27 @@ const tools: McpToolDefinition[] = [
     inputSchema: emptyInputSchema,
   },
   {
+    name: 'agentloop_latest_ship_report',
+    description: 'Read the latest local ship report metadata and Markdown content.',
+    inputSchema: emptyInputSchema,
+  },
+  {
+    name: 'agentloop_list_runs',
+    description: 'List recent local AgentLoopKit run ledger entries.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        limit: {
+          type: 'number',
+          minimum: 1,
+          maximum: 50,
+          description: 'Maximum run entries to return. Defaults to 20.',
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'agentloop_list_handoffs',
     description: 'List recent local reviewer handoff summaries.',
     inputSchema: {
@@ -135,7 +162,19 @@ function extractHeading(markdown: string, fallback: string) {
 }
 
 function toStoredPath(cwd: string, absolutePath: string) {
-  return path.relative(cwd, absolutePath).split(path.sep).join('/');
+  const repoPath = path.isAbsolute(absolutePath) ? path.relative(cwd, absolutePath) : absolutePath;
+  return repoPath.split(path.sep).join('/');
+}
+
+function toMcpRunSummary(cwd: string, run: RunSummary) {
+  return {
+    ...run,
+    ...(run.verificationReportPath
+      ? { verificationReportPath: toStoredPath(cwd, run.verificationReportPath) }
+      : {}),
+    ...(run.shipReportPath ? { shipReportPath: toStoredPath(cwd, run.shipReportPath) } : {}),
+    ...(run.handoffPath ? { handoffPath: toStoredPath(cwd, run.handoffPath) } : {}),
+  };
 }
 
 async function readMarkdownArtifact(cwd: string, filePath: string | undefined, key: string) {
@@ -244,6 +283,24 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
         },
       );
       return textResult(await readMarkdownArtifact(options.cwd, reportPath, 'report'));
+    }
+    case 'agentloop_latest_ship_report': {
+      const shipReportPath = await latestMarkdownFile(
+        path.join(options.cwd, config.paths.reportsDir),
+        {
+          pattern: shipReportPattern,
+          rootDir: options.cwd,
+        },
+      );
+      return textResult(await readMarkdownArtifact(options.cwd, shipReportPath, 'shipReport'));
+    }
+    case 'agentloop_list_runs': {
+      const limit = readLimitArgument(options.arguments);
+      return textResult({
+        runs: (await listRuns(options.cwd))
+          .slice(0, limit)
+          .map((run) => toMcpRunSummary(options.cwd, run)),
+      });
     }
     case 'agentloop_list_handoffs': {
       const limit = readLimitArgument(options.arguments);

@@ -54,6 +54,22 @@ type ReportPayload = {
   };
 };
 
+type ShipReportPayload = {
+  shipReport: {
+    path: string;
+    content: string;
+  };
+};
+
+type RunsPayload = {
+  runs: Array<{
+    id: string;
+    command: string;
+    score?: number;
+    shipReportPath?: string;
+  }>;
+};
+
 type HandoffsPayload = {
   handoffs: Array<{
     title: string;
@@ -92,10 +108,36 @@ async function createInitializedRepo() {
     path.join(dir, '.agentloop/reports/2026-06-10-12-30-verification-report.md'),
     '# Verification Report\n\n- Overall status: pass\n\nTests passed.\n',
   );
+  await writeFile(
+    path.join(dir, '.agentloop/reports/2026-06-10-12-32-ship-report.md'),
+    '# AgentLoopKit Ship Report\n\n- Review readiness score: `96`/100\n',
+  );
   await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
   await writeFile(
     path.join(dir, '.agentloop/handoffs/2026-06-10-12-31-pr-summary.md'),
     '# PR Summary\n\nRoute implementation handoff.\n',
+  );
+  await mkdir(path.join(dir, '.agentloop/runs/2026-06-10-12-32-ship'), { recursive: true });
+  await writeFile(
+    path.join(dir, '.agentloop/runs/2026-06-10-12-32-ship/metadata.json'),
+    `${JSON.stringify(
+      {
+        id: '2026-06-10-12-32-ship',
+        command: 'ship',
+        createdAt: '2026-06-10-12-32',
+        createdAtEpochMs: Date.parse('2026-06-10T12:32:00Z'),
+        task: {
+          path: '.agentloop/tasks/2026-06-10-add-api-route.md',
+          title: 'Add API route',
+          status: 'review',
+        },
+        shipReportPath: path.join(dir, '.agentloop/reports/2026-06-10-12-32-ship-report.md'),
+        score: 96,
+        changedFileCount: 2,
+      },
+      null,
+      2,
+    )}\n`,
   );
   return { dir };
 }
@@ -115,6 +157,8 @@ describe('mcp tools', () => {
       'agentloop_list_policies',
       'agentloop_read_policy',
       'agentloop_latest_verification_report',
+      'agentloop_latest_ship_report',
+      'agentloop_list_runs',
       'agentloop_list_handoffs',
       'agentloop_latest_handoff',
     ]);
@@ -134,6 +178,12 @@ describe('mcp tools', () => {
       arguments: { policyName: 'security' },
     });
     const report = await callMcpTool({ cwd: dir, name: 'agentloop_latest_verification_report' });
+    const shipReport = await callMcpTool({ cwd: dir, name: 'agentloop_latest_ship_report' });
+    const runs = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_list_runs',
+      arguments: { limit: 1 },
+    });
     const handoffs = await callMcpTool({ cwd: dir, name: 'agentloop_list_handoffs' });
     const handoff = await callMcpTool({ cwd: dir, name: 'agentloop_latest_handoff' });
 
@@ -144,6 +194,8 @@ describe('mcp tools', () => {
     const policiesPayload = policies.payload as PoliciesPayload;
     const policyPayload = policy.payload as PolicyPayload;
     const reportPayload = report.payload as ReportPayload;
+    const shipReportPayload = shipReport.payload as ShipReportPayload;
+    const runsPayload = runs.payload as RunsPayload;
     const handoffsPayload = handoffs.payload as HandoffsPayload;
     const handoffPayload = handoff.payload as HandoffPayload;
 
@@ -158,6 +210,19 @@ describe('mcp tools', () => {
       '.agentloop/reports/2026-06-10-12-30-verification-report.md',
     );
     expect(reportPayload.report.content).toContain('Tests passed.');
+    expect(shipReportPayload.shipReport.path).toBe(
+      '.agentloop/reports/2026-06-10-12-32-ship-report.md',
+    );
+    expect(shipReportPayload.shipReport.content).toContain('Review readiness score');
+    expect(runsPayload.runs).toEqual([
+      expect.objectContaining({
+        id: '2026-06-10-12-32-ship',
+        command: 'ship',
+        score: 96,
+        shipReportPath: '.agentloop/reports/2026-06-10-12-32-ship-report.md',
+      }),
+    ]);
+    expect(runsPayload.runs[0].shipReportPath).not.toContain(dir);
     expect(handoffsPayload.handoffs[0]).toMatchObject({ title: 'PR Summary' });
     expect(handoffPayload.handoff.content).toContain('Route implementation handoff.');
   });

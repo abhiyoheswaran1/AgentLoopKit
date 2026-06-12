@@ -11,6 +11,7 @@ import {
 import { inlineCode } from './markdown-format.js';
 
 export const verificationReportPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report\.md$/;
+export const shipReportPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ship-report\.md$/;
 export const prSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-pr-summary\.md$/;
 export const ciSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ci-summary\.md$/;
 export const releaseNotesPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-release-notes\.md$/;

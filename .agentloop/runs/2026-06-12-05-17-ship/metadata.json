@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-05-17-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-05-17",
+  "createdAtEpochMs": 1781234276881,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-expose-ship-evidence-through-mcp.md",
+    "title": "Expose ship evidence through MCP",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-05-11-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-05-17-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-05-17-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 13
+}

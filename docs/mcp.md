@@ -32,6 +32,8 @@ Example MCP client configuration:
 | `agentloop_list_policies`              | Repo-local safety policy files                                                                                                      |
 | `agentloop_read_policy`                | One repo-local safety policy by name                                                                                                |
 | `agentloop_latest_verification_report` | Latest verification report metadata and Markdown content                                                                            |
+| `agentloop_latest_ship_report`         | Latest ship/readiness report metadata and Markdown content                                                                          |
+| `agentloop_list_runs`                  | Recent local run ledger entries with bounded `limit` input                                                                          |
 | `agentloop_list_handoffs`              | Recent reviewer handoff summaries                                                                                                   |
 | `agentloop_latest_handoff`             | Latest reviewer handoff Markdown content                                                                                            |
 
@@ -51,7 +53,7 @@ It does not:
 - upload data
 - publish packages or create releases
 
-It reads the same local AgentLoopKit files that CLI commands such as `status`, `policy`, and `handoff` already use.
+It reads the same local AgentLoopKit files that CLI commands such as `status`, `policy`, `ship`, `runs`, and `handoff` already use.
 
 ## Registry
 

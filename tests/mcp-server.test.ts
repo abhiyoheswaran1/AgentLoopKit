@@ -58,6 +58,10 @@ describe('mcp-server command', () => {
       '# Outside Verification\n\noutside-secret-report-content\n',
     );
     await writeFile(
+      path.join(outsideReports, '2026-06-10-11-01-ship-report.md'),
+      '# Outside Ship\n\noutside-secret-ship-content\n',
+    );
+    await writeFile(
       path.join(outsideHandoffs, '2026-06-10-11-05-pr-summary.md'),
       '# Outside Handoff\n\noutside-secret-handoff-content\n',
     );
@@ -75,14 +79,19 @@ describe('mcp-server command', () => {
       name: 'agentloop_list_handoffs',
       arguments: { limit: 10 },
     });
+    const shipReport = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_latest_ship_report',
+    });
     const handoff = await callMcpTool({
       cwd: dir,
       name: 'agentloop_latest_handoff',
     });
 
     expect(report.payload).toEqual({ report: null });
+    expect(shipReport.payload).toEqual({ shipReport: null });
     expect(handoffs.payload).toEqual({ handoffs: [] });
     expect(handoff.payload).toEqual({ handoff: null });
-    expect(JSON.stringify([report, handoffs, handoff])).not.toContain('outside-secret');
+    expect(JSON.stringify([report, shipReport, handoffs, handoff])).not.toContain('outside-secret');
   });
 });

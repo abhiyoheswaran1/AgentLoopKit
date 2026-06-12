@@ -1,0 +1,11 @@
+ .agentloop/backlog.md    |  1 +
+ CHANGELOG.md             |  1 +
+ FINAL_HANDOFF.md         |  1 +
+ ROADMAP.md               |  2 +-
+ docs/mcp.md              |  4 ++-
+ src/core/artifacts.ts    |  1 +
+ src/core/mcp-tools.ts    | 61 +++++++++++++++++++++++++++++++++++++++++++--
+ src/mcp/server.ts        |  2 +-
+ tests/mcp-server.test.ts | 11 +++++++-
+ tests/mcp-tools.test.ts  | 65 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 10 files changed, 143 insertions(+), 6 deletions(-)

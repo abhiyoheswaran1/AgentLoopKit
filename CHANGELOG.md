@@ -8,6 +8,7 @@
 - Added `.agentloop/runs/`, `agentloop runs`, `agentloop show-run`, and `agentloop intent <file>` for local run evidence and file-intent lookup.
 - Added `agentloop verify --write-run`, `agentloop summarize --write-run`, and `agentloop handoff --write-run` so narrower evidence flows can opt into local run ledger records.
 - Added `agentloop maintainer-check`, a read-only maintainer reviewability check for AI-assisted PRs.
+- Added read-only MCP tools for the latest ship report and recent run ledger entries.
 - Changed `agentloop status` Markdown, JSON, and brief output to include the newest local run ledger entry when `.agentloop/runs/` exists.
 - Changed `agentloop prepare-pr` to reuse a matching fresh ship run instead of writing a duplicate run ledger entry.
 - Added `shipEvidence.source` and `shipEvidence.runId` to `agentloop prepare-pr --json` output.

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-05-17-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-05-17",
+  "createdAtEpochMs": 1781234263096,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-expose-ship-evidence-through-mcp.md",
+    "title": "Expose ship evidence through MCP",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-05-11-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 12
+}

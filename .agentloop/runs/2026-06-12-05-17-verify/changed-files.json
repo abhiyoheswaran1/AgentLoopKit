@@ -1,0 +1,50 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "FINAL_HANDOFF.md"
+  },
+  {
+    "status": "M",
+    "path": "ROADMAP.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/mcp.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/artifacts.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/mcp-tools.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/mcp/server.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/mcp-server.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/mcp-tools.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-05-11-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-expose-ship-evidence-through-mcp.md"
+  }
+]

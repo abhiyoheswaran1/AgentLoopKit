@@ -53,6 +53,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - opt-in run ledger records for `verify`, `summarize`, and `handoff` with `--write-run`
 - `agentloop runs`, `agentloop show-run`, and `agentloop intent <file>`
 - read-only maintainer reviewability check with `agentloop maintainer-check`
+- read-only MCP access to latest ship reports and recent run ledger summaries
 - agent instruction installation, including `install-agent all`
 - template system for loops, gates, handoffs, agents, policies, tasks, and harness files
 - generated `.agentloop/README.md`
