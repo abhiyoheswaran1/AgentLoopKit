@@ -13,6 +13,7 @@
 - Added `shipEvidence.source` and `shipEvidence.runId` to `agentloop prepare-pr --json` output.
 - Added `agentloop task done` as a shortcut for marking the active task, or an explicit task path, as `done`.
 - Changed `agentloop prepare-pr` PR bodies to group changed files by review area.
+- Changed `agentloop ship` reports/comments and `agentloop prepare-pr` PR-facing Markdown to render AgentLoop artifact paths repo-relative while preserving JSON path fields for scripts.
 - Changed `agentloop create-task` to set the newly created contract as the active task and include `activeTask` in JSON output.
 - Changed `agentloop status` and `agentloop next` to recommend marking clean, verified `review` tasks as `done` before starting unrelated work.
 - Changed `agentloop policy list/status` human output to render policy titles, statuses, and paths with Markdown-safe inline-code delimiters while keeping JSON output and raw `policy show` content unchanged.

@@ -34,10 +34,13 @@ export type ShipResult = {
 };
 
 type ShipRenderInput = Omit<ShipResult, 'markdown' | 'run'>;
+type ShipMarkdownInput = ShipRenderInput & { cwd: string };
 
-function relativePath(cwd: string, filePath: string | undefined) {
+function relativePath(cwd: string | undefined, filePath: string | undefined) {
   if (!filePath) return undefined;
-  return path.relative(cwd, filePath).split(path.sep).join('/') || '.';
+  if (!cwd) return filePath.split(path.sep).join('/');
+  const repoPath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
+  return repoPath.split(path.sep).join('/') || '.';
 }
 
 function extractOverallStatus(markdown: string | undefined): ReadinessVerificationInput['status'] {
@@ -68,20 +71,22 @@ function renderChangedFiles(changedFiles: ShipRenderInput['changedFiles']) {
     : '- No changed files detected.';
 }
 
-export function renderShipGithubComment(input: ShipResult) {
+export function renderShipGithubComment(input: ShipResult, cwd?: string) {
   const task = input.task
     ? `${inlineCode(input.task.title)} (${inlineCode(input.task.status)})`
     : 'No task contract found.';
+  const verificationReportPath = relativePath(cwd, input.verificationReportPath);
+  const shipReportPath = relativePath(cwd, input.shipReportPath) ?? input.shipReportPath;
 
   return `## AgentLoopKit Review Readiness
 
 - Score: ${input.readiness.totalScore}/100
 - Task: ${task}
 - Verification: ${inlineCode(input.verification.status)}${
-    input.verificationReportPath ? ` - ${inlineCode(input.verificationReportPath)}` : ''
+    verificationReportPath ? ` - ${inlineCode(verificationReportPath)}` : ''
   }
 - Gates: ${inlineCode(input.gates.overallStatus)}
-- Ship report: ${inlineCode(input.shipReportPath)}
+- Ship report: ${inlineCode(shipReportPath)}
 - ${input.readiness.claims[0]}
 
 ### Blockers
@@ -98,7 +103,10 @@ ${renderList(input.readiness.recommendedNextActions, 'Review the diff and open t
 `;
 }
 
-function renderShipMarkdown(input: ShipRenderInput) {
+function renderShipMarkdown(input: ShipMarkdownInput) {
+  const verificationReportPath = relativePath(input.cwd, input.verificationReportPath);
+  const handoffPath = relativePath(input.cwd, input.handoffPath);
+
   return `# AgentLoopKit Ship Report
 
 Make agent-generated code reviewable, verifiable, and merge-ready.
@@ -111,9 +119,9 @@ Make agent-generated code reviewable, verifiable, and merge-ready.
       : 'No task contract found.'
   }
 - Verification: ${inlineCode(input.verification.status)}${
-    input.verificationReportPath ? ` - ${inlineCode(input.verificationReportPath)}` : ''
+    verificationReportPath ? ` - ${inlineCode(verificationReportPath)}` : ''
   }
-- Handoff: ${input.handoffPath ? inlineCode(input.handoffPath) : 'No handoff generated.'}
+- Handoff: ${handoffPath ? inlineCode(handoffPath) : 'No handoff generated.'}
 - Gates: ${inlineCode(input.gates.overallStatus)}
 
 ## Score Boundary
@@ -255,7 +263,7 @@ export async function createShipReport(options: {
     diffStat,
     shipReportPath,
   };
-  const markdown = renderShipMarkdown(withoutMarkdown);
+  const markdown = renderShipMarkdown({ ...withoutMarkdown, cwd: options.cwd });
   await writeTextFile(shipReportPath, markdown);
   const run = await writeShipRun({
     cwd: options.cwd,

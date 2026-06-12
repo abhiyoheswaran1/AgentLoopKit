@@ -115,9 +115,14 @@ describe('prepare-pr command', () => {
     expect(output.body).toContain('Auth flow touched; review redirect edge cases.');
     expect(output.body).toContain('## Rollback Notes');
     expect(output.body).toContain('Revert the auth callback change.');
+    expect(output.body).toContain('.agentloop/reports/');
+    expect(output.body).not.toContain(dir);
     expect(output.githubComment).toContain('## AgentLoopKit Review Readiness');
     expect(output.githubComment).toContain('This is a review-readiness score, not a code-quality score.');
+    expect(output.githubComment).toContain('.agentloop/reports/');
+    expect(output.githubComment).not.toContain(dir);
     expect(output.shipReportPath).toMatch(/\.agentloop\/reports\/.+-ship-report\.md$/);
+    expect(output.shipReportPath).toContain(dir);
     const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
     const shipRuns = runs.runs.filter((run: { command: string }) => run.command === 'ship');
     expect(shipRuns).toHaveLength(1);

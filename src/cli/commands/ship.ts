@@ -48,13 +48,15 @@ export function shipCommand() {
       if (json) {
         console.log(
           JSON.stringify(
-            githubComment ? { ...result, githubComment: renderShipGithubComment(result) } : result,
+            githubComment
+              ? { ...result, githubComment: renderShipGithubComment(result, workspace.cwd) }
+              : result,
             null,
             2,
           ),
         );
       } else if (githubComment) {
-        console.log(renderShipGithubComment(result));
+        console.log(renderShipGithubComment(result, workspace.cwd));
       } else {
         console.log(result.markdown);
         console.log(`\nShip report written: ${inlineCode(result.shipReportPath)}`);

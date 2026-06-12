@@ -2,6 +2,38 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Repo-Relative PR-Facing Paths
+
+- Task contract: `.agentloop/tasks/2026-06-12-use-repo-relative-paths-in-pr-facing-markdown.md`
+- Trigger:
+  - Dogfooding `agentloop ship --github-comment --json` showed absolute local artifact paths in PR-facing Markdown.
+  - PR comments and PR descriptions should not leak a maintainer's machine path.
+- Product change:
+  - `ship` reports and `ship --github-comment` now render verification, handoff, and ship report paths relative to the repo.
+  - `prepare-pr` body and GitHub comment Markdown now render AgentLoop artifact paths relative to the repo.
+  - JSON fields such as `shipReportPath`, `handoffPath`, and `verificationReportPath` remain unchanged for scripts.
+- Verification:
+  - Red focused run: `npm test -- tests/ship.test.ts tests/prepare-pr.test.ts -t "review-readiness|GitHub comment|generates a PR description"` failed because Markdown included the temp repo root.
+  - Green focused run of the same command passed after display-only path normalization.
+  - Affected suite `npm test -- tests/ship.test.ts tests/prepare-pr.test.ts` passed with 2 files and 6 tests.
+  - `npm run typecheck`, `npm run lint`, `npm run check:links`, `git diff --check`, and `npm run build` passed.
+  - Full `npm test` passed with 47 files and 407 tests.
+  - CLI smoke passed.
+  - Packed release smoke passed.
+  - Production dependency audit passed with no known vulnerabilities.
+  - ProjScan reported A 100/100.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-04-51-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-04-57-verify/`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-04-58-ship-report.md`.
+  - Dogfood ship run: `.agentloop/runs/2026-06-12-04-58-ship/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-04-58-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-04-58-pr-description.md`.
+  - Ship score: 96/100 with gates passing.
+- Worked well:
+  - Tests now protect both sides of the contract: Markdown is repo-relative, JSON path fields stay script-friendly.
+- Improve:
+  - Review other PR-facing Markdown commands for absolute artifact paths if new report types are added.
+
 ## 2026-06-12: Ship GitHub Comment Output
 
 - Task contract: `.agentloop/tasks/2026-06-12-add-ship-github-comment-output.md`

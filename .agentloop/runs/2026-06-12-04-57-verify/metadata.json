@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-04-57-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-04-57",
+  "createdAtEpochMs": 1781233070116,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-use-repo-relative-paths-in-pr-facing-markdown.md",
+    "title": "Use repo-relative paths in PR-facing Markdown",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-04-51-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 11
+}

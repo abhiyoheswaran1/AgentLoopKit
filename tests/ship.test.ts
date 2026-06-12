@@ -129,6 +129,8 @@ describe('ship command', () => {
     expect(markdown).toContain('This is a review-readiness score, not a code-quality score.');
     expect(markdown).toContain('src/auth/callback.ts');
     expect(markdown).toContain('Review risk-sensitive files before merge.');
+    expect(markdown).toContain('.agentloop/reports/');
+    expect(markdown).not.toContain(dir);
   });
 
   test('includes GitHub comment markdown in JSON output when requested', async () => {
@@ -142,7 +144,9 @@ describe('ship command', () => {
     expect(output.githubComment).toContain('## AgentLoopKit Review Readiness');
     expect(output.githubComment).toContain(`Score: ${output.readiness.totalScore}/100`);
     expect(output.githubComment).toContain('This is a review-readiness score, not a code-quality score.');
-    expect(output.githubComment).toContain(output.shipReportPath);
+    expect(output.githubComment).toContain('.agentloop/reports/');
+    expect(output.githubComment).not.toContain(dir);
+    expect(output.shipReportPath).toContain(dir);
     expect(output.githubComment).toContain('### Blockers');
     expect(output.githubComment).toContain('### Warnings');
     expect(output.githubComment).toContain('### Next Actions');
@@ -155,8 +159,10 @@ describe('ship command', () => {
 
     expect(result.stdout).toContain('## AgentLoopKit Review Readiness');
     expect(result.stdout).toContain('This is a review-readiness score, not a code-quality score.');
+    expect(result.stdout).toContain('.agentloop/reports/');
     expect(result.stdout).toContain('### Next Actions');
     expect(result.stdout).not.toContain('# AgentLoopKit Ship Report');
     expect(result.stdout).not.toContain('Ship report written:');
+    expect(result.stdout).not.toContain(dir);
   });
 });

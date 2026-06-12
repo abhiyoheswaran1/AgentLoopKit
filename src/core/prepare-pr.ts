@@ -68,7 +68,8 @@ function renderMarkdownList(values: string[], fallback: string) {
 }
 
 function relativePath(cwd: string, filePath: string) {
-  return path.relative(cwd, filePath).split(path.sep).join('/') || '.';
+  const repoPath = path.isAbsolute(filePath) ? path.relative(cwd, filePath) : filePath;
+  return repoPath.split(path.sep).join('/') || '.';
 }
 
 function resolveMaybeRepoPath(cwd: string, filePath: string) {
@@ -105,12 +106,14 @@ function sameMeaningfulChanges(left: GitFileStatus[], right: GitFileStatus[]) {
   );
 }
 
-function verificationLine(ship: PreparePrShipEvidence) {
-  const report = ship.verificationReportPath ? ` (${ship.verificationReportPath})` : '';
+function verificationLine(ship: PreparePrShipEvidence, cwd: string) {
+  const report = ship.verificationReportPath
+    ? ` (${relativePath(cwd, ship.verificationReportPath)})`
+    : '';
   return `Overall status: ${ship.verification.status}${report}`;
 }
 
-function buildPrBody(input: { task: TaskContract | null; ship: PreparePrShipEvidence }) {
+function buildPrBody(input: { cwd: string; task: TaskContract | null; ship: PreparePrShipEvidence }) {
   const title = input.task?.title ?? 'AgentLoopKit review-ready changes';
   const taskContent = input.task?.content ?? '';
   const desiredOutcome = sectionContent(taskContent, 'Desired Outcome');
@@ -133,7 +136,7 @@ ${renderChangeAreas(input.ship.changedFiles)}
 
 - Score: ${input.ship.readiness.totalScore}/100
 ${input.ship.readiness.claims.map((claim) => `- ${claim}`).join('\n')}
-- Ship report: ${inlineCode(input.ship.shipReportPath)}
+- Ship report: ${inlineCode(relativePath(input.cwd, input.ship.shipReportPath))}
 
 ## Acceptance Criteria
 
@@ -141,7 +144,7 @@ ${renderMarkdownList(acceptance, 'No acceptance criteria were recorded.')}
 
 ## Verification Evidence
 
-- ${verificationLine(input.ship)}
+- ${verificationLine(input.ship, input.cwd)}
 
 ## Reviewer Checklist
 
@@ -164,12 +167,12 @@ ${rollback || 'No rollback notes were recorded.'}
 `;
 }
 
-function buildGithubComment(ship: PreparePrShipEvidence) {
+function buildGithubComment(ship: PreparePrShipEvidence, cwd: string) {
   return `## AgentLoopKit Review Readiness
 
 - Score: ${ship.readiness.totalScore}/100
-- Ship report: ${inlineCode(ship.shipReportPath)}
-- Handoff: ${ship.handoffPath ? inlineCode(ship.handoffPath) : 'not generated'}
+- Ship report: ${inlineCode(relativePath(cwd, ship.shipReportPath))}
+- Handoff: ${ship.handoffPath ? inlineCode(relativePath(cwd, ship.handoffPath)) : 'not generated'}
 - ${ship.readiness.claims[0]}
 
 ### Blockers
@@ -273,8 +276,10 @@ export async function preparePullRequest(options: {
         taskPath: evidence.taskPath,
       })
     : null;
-  const body = buildPrBody({ task, ship: preparedShip });
-  const githubComment = options.githubComment ? buildGithubComment(preparedShip) : undefined;
+  const body = buildPrBody({ cwd: options.cwd, task, ship: preparedShip });
+  const githubComment = options.githubComment
+    ? buildGithubComment(preparedShip, options.cwd)
+    : undefined;
   let writtenPath: string | undefined;
 
   if (options.write) {

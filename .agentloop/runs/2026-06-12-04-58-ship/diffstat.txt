@@ -1,0 +1,10 @@
+ .agentloop/backlog.md    |  1 +
+ CHANGELOG.md             |  1 +
+ FINAL_HANDOFF.md         |  1 +
+ docs/cli-reference.md    |  2 ++
+ src/cli/commands/ship.ts |  6 ++++--
+ src/core/prepare-pr.ts   | 27 ++++++++++++++++-----------
+ src/core/ship.ts         | 26 +++++++++++++++++---------
+ tests/prepare-pr.test.ts |  5 +++++
+ tests/ship.test.ts       |  8 +++++++-
+ 9 files changed, 54 insertions(+), 23 deletions(-)

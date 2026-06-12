@@ -42,6 +42,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - local gate-check command for task, verification, handoff, harness, policy, and git evidence
 - local acceptance-layer command with `agentloop ship`
 - compact readiness-comment output with `agentloop ship --github-comment`
+- repo-relative AgentLoop artifact paths in PR-facing Markdown while JSON path fields stay script-friendly
 - deterministic review-readiness scoring that does not claim to measure code quality
 - PR description generation with `agentloop prepare-pr`
 - `prepare-pr` reuse of matching fresh ship evidence to avoid duplicate run ledger entries
