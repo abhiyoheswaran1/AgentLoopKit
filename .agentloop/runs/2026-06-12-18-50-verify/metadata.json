@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-18-50-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-18-50",
+  "createdAtEpochMs": 1781283019918,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-smoke-test-bounded-run-output.md",
+    "title": "Smoke test bounded run output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-18-46-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

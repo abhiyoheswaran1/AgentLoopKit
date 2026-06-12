@@ -425,6 +425,23 @@ async function smokeCli({ keep = false } = {}) {
         runs.runs.some((run) => run.id === ship.run.id && run.command === 'ship'),
       'runs JSON did not include verify, handoff, and ship runs.',
     );
+    const latestRuns = await runAgentLoop(['runs', '--latest'], { cwd: smokeRepo });
+    assert(latestRuns.stdout.includes(ship.run.id), 'runs --latest did not include the latest ship run.');
+    assert(
+      !latestRuns.stdout.includes(handoff.run.id) && !latestRuns.stdout.includes(verification.run.id),
+      'runs --latest included older run entries.',
+    );
+    const limitedRuns = parseJson(
+      (await runAgentLoop(['runs', '--limit', '2', '--json'], { cwd: smokeRepo })).stdout,
+      'runs --limit',
+    );
+    assert(Array.isArray(limitedRuns.runs), 'runs --limit JSON did not include runs.');
+    assert(limitedRuns.runs.length === 2, 'runs --limit 2 did not return exactly two runs.');
+    assert(
+      limitedRuns.runs[0]?.id === ship.run.id && limitedRuns.runs[1]?.id === handoff.run.id,
+      'runs --limit 2 did not return the newest two runs in order.',
+    );
+    console.log('Run ledger limit smoke passed.');
 
     const shownRun = parseJson(
       (await runAgentLoop(['show-run', ship.run.id, '--json'], { cwd: smokeRepo })).stdout,

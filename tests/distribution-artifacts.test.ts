@@ -153,6 +153,9 @@ describe('distribution artifacts', () => {
     expect(smokeScript).toContain('raw-child-output-hidden-from-progress');
     expect(smokeScript).toContain("'handoff'");
     expect(smokeScript).toContain("'check-gates', '--json'");
+    expect(smokeScript).toContain("'runs', '--latest'");
+    expect(smokeScript).toContain("'runs', '--limit', '2', '--json'");
+    expect(smokeScript).toContain('Run ledger limit smoke passed.');
     expect(smokeScript).toContain("'policy', 'list', '--json'");
     expect(smokeScript).toContain("'install-agent', 'codex', '--json'");
   });

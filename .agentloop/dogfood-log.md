@@ -2,6 +2,31 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Built CLI Smoke Covers Bounded Runs
+
+- Task contract: `.agentloop/tasks/2026-06-12-smoke-test-bounded-run-output.md`
+- Trigger:
+  - `agentloop runs --latest` and `agentloop runs --limit <count>` had source tests, but release smoke did not prove the built CLI accepted the new flags.
+- Product change:
+  - `scripts/smoke-cli.mjs` now runs the built CLI with `runs --latest`.
+  - It also runs `runs --limit 2 --json` and checks that exactly the newest two runs are returned in order.
+  - `tests/distribution-artifacts.test.ts` guards that this smoke coverage remains present.
+- Verification:
+  - Focused run: `npm test -- tests/distribution-artifacts.test.ts` passed with 10 tests.
+  - Focused run after the CI typecheck fix: `npm test -- tests/runs.test.ts tests/distribution-artifacts.test.ts` passed with 21 tests.
+  - `npm run typecheck` passed after tightening `runs --limit` parsing.
+  - `npm run build && node scripts/smoke-cli.mjs` passed and printed `Run ledger limit smoke passed.`
+  - AgentLoop task verification passed and wrote `.agentloop/reports/2026-06-12-18-46-verification-report.md`.
+  - Full `npm test` passed inside the AgentLoop verification run.
+  - Handoff summary: `.agentloop/handoffs/2026-06-12-18-53-pr-summary.md`.
+  - Ship report: `.agentloop/reports/2026-06-12-18-53-ship-report.md` with review readiness `96`/100.
+  - `npm run dogfood:strict` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The previous GitHub CI failure caught a type-narrowing issue that local focused runtime tests did not cover.
+- Improve:
+  - Include `npm run typecheck` in task verification commands whenever TypeScript source changes, even for smoke-test tasks.
+
 ## 2026-06-12: Bounded Run Ledger Navigation
 
 - Task contract: `.agentloop/tasks/2026-06-12-add-run-ledger-limit-controls.md`

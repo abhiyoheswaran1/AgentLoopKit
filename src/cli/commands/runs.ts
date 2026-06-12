@@ -26,18 +26,15 @@ function printRuns(runs: Awaited<ReturnType<typeof listRuns>>) {
 }
 
 function parseRunsLimit(options: { latest?: boolean; limit?: string }) {
-  const parsed =
-    options.limit === undefined
-      ? undefined
-      : Number.parseInt(options.limit, 10);
-  if (
-    options.limit !== undefined &&
-    (!/^\d+$/.test(options.limit) || !Number.isSafeInteger(parsed) || parsed < 1)
-  ) {
-    throw new CliOptionError('--limit must be a positive integer.', 'RUN_LIMIT_INVALID', {
-      option: 'limit',
-      value: options.limit,
-    });
+  let parsed: number | undefined;
+  if (options.limit !== undefined) {
+    parsed = Number.parseInt(options.limit, 10);
+    if (!/^\d+$/.test(options.limit) || !Number.isSafeInteger(parsed) || parsed < 1) {
+      throw new CliOptionError('--limit must be a positive integer.', 'RUN_LIMIT_INVALID', {
+        option: 'limit',
+        value: options.limit,
+      });
+    }
   }
   if (options.latest) return 1;
   return parsed;

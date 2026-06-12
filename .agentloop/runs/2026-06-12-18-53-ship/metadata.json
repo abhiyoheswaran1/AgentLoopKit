@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-18-53-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-18-53",
+  "createdAtEpochMs": 1781283200028,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-smoke-test-bounded-run-output.md",
+    "title": "Smoke test bounded run output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-18-46-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-18-53-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-18-53-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 11
+}
