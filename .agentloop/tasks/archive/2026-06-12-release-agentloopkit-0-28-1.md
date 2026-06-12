@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-12
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The dogfood gate and official icon assets are complete on main and need a small patch release.

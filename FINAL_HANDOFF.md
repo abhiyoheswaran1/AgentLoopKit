@@ -74,24 +74,30 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.28.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.0>
-- Release asset: `agentloopkit-0.28.0.tgz`
-- Release asset SHA-256: `82049976512173bcef3edadadef3b5aead76ea29531d2d2f02deafa945dd900c`
-- CI run: `27406452797`
-- CLI Smoke run: `27406452854`
-- Publish workflow run: `27406646825`
-- Docker workflow run: `27406646793`
-- GHCR image manifest: `ghcr.io/abhiyoheswaran1/agentloopkit:0.28.0` digest `sha256:d3d4b708363f452c69a8fa701bc1909922bcc7b8ed7a066ba8e5f55664c3c410`
-- MCP Registry workflow run: `27406850637`
-- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.28.0`
+- Current npm release: `agentloopkit@0.28.1`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.1>
+- Release asset: `agentloopkit-0.28.1.tgz`
+- Release asset SHA-256: `88add27b0cabb4f833866748398e078496d5770151f558dde8a093d464965ac6`
+- CI run: `27410702770`
+- CLI Smoke run: `27410702781`
+- Publish workflow run: `27410709613`
+- Docker workflow run: `27410709578`
+- GHCR image manifest: `ghcr.io/abhiyoheswaran1/agentloopkit:0.28.1` digest `sha256:d1a4c66e70d98cf6a18a261f513fce273b9c92727017c7ba910da391cfc11ea8`
+- MCP Registry workflow run: `27410894807`
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.28.1`
 
-## 0.28.0 release summary
+## 0.28.1 release summary
 
-Current `main` matches the published `0.28.0` release.
+Release tag `v0.28.1` points at commit `fd2c733`. Current `main` may include post-release documentation updates.
 
 Included:
 
+- repeatable local dogfood gates: `npm run dogfood` and `npm run dogfood:strict`
+- official AgentLoopKit logo assets under `docs/logo/`
+- refreshed README launch screenshots using the official mark
+- README, contributor, and agent guidance for the dogfood gate
+- stale release-guidance smoke coverage in public harness docs
+- archived shipped internal task contracts and refreshed release evidence
 - simplified npm-facing README with detailed command behavior moved to `docs/cli-reference.md`
 - refreshed README terminal demo and showcase screenshot around `ship`, `prepare-pr`, `review-context`, run history, and file intent lookup
 - generated first-run harness guidance with a risk-aware task example and task-linked verification command
@@ -1092,9 +1098,9 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.28.0` is public.
-- npm latest is `0.28.0`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, `0.26.5`, `0.27.0`, and `0.28.0`.
-- GHCR and MCP Registry are live for `0.28.0`.
+- GitHub release `v0.28.1` is public.
+- npm latest is `0.28.1`; registry versions are `0.1.0`, `0.1.1`, `0.24.0`, `0.24.1`, `0.24.2`, `0.24.3`, `0.24.4`, `0.24.5`, `0.25.0`, `0.26.0`, `0.26.1`, `0.26.2`, `0.26.3`, `0.26.4`, `0.26.5`, `0.27.0`, `0.28.0`, and `0.28.1`.
+- GHCR and MCP Registry are live for `0.28.1`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

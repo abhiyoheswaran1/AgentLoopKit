@@ -7736,3 +7736,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The official SVG avoided the white-edge artifact risk in README visuals.
 - Improve:
   - Consider teaching `maintainer-check` to distinguish package metadata script changes from dependency version changes.
+
+## 2026-06-12: Release 0.28.1
+
+- Task contract: `.agentloop/tasks/archive/2026-06-12-release-agentloopkit-0-28-1.md`
+- Trigger:
+  - The dogfood gate, official icon assets, and release-hygiene cleanup were ready for a small patch release.
+- Implementation:
+  - Bumped package and MCP server metadata to `0.28.1`.
+  - Updated `CHANGELOG.md`.
+  - Created GitHub release `v0.28.1` with `agentloopkit-0.28.1.tgz`.
+  - Let npm trusted publishing release `agentloopkit@0.28.1`.
+  - Verified Docker/GHCR and MCP Registry workflows.
+- Verification run:
+  - AgentLoop verification passed: `.agentloop/reports/2026-06-12-12-35-verification-report.md`.
+  - Full Vitest passed:
+    - `49` test files
+    - `421` tests
+  - Release-specific checks passed:
+    - `npm run check:links`
+    - `node scripts/prepublish-check.mjs`
+    - `npm run smoke:release`
+    - `npm run dogfood:strict`
+    - `npx --yes projscan doctor --format markdown`
+    - `git diff --check`
+  - `agentloop ship` reported review readiness `100`/100.
+  - npm latest is `0.28.1`.
+  - Clean temp-directory npx smoke confirmed `npx --yes agentloopkit@0.28.1 version` and `npx --yes agentloopkit@0.28.1 init --dry-run --json`.
+  - GHCR manifest for `ghcr.io/abhiyoheswaran1/agentloopkit:0.28.1` resolves with digest `sha256:d1a4c66e70d98cf6a18a261f513fce273b9c92727017c7ba910da391cfc11ea8`.
+  - MCP Registry workflow `27410894807` passed.
+- What worked well:
+  - The release moved through the normal GitHub release, trusted npm publishing, GHCR, and MCP Registry path without manual npm publish.
+  - The new dogfood gate gave a repeatable local self-check before the release.
+- Improve:
+  - Add a future release-status command that records npm, GitHub release, GHCR, and MCP proof into docs from one deterministic local report.
