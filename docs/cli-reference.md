@@ -143,6 +143,8 @@ By default, `ship` reuses current verification evidence. Use `--run-verify` when
 
 When a fresh ship run already matches the active task, current verification report, existing ship report, and non-generated changed files, `prepare-pr` reuses that run instead of writing a duplicate run ledger entry. If the evidence is missing or no longer matches, it refreshes ship evidence first.
 
+JSON output includes `shipEvidence.source` as `reused` or `refreshed`, plus `shipEvidence.runId` when the evidence came from a run ledger entry.
+
 ## Run Ledger And Intent
 
 ```bash

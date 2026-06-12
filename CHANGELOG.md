@@ -9,6 +9,7 @@
 - Added `agentloop maintainer-check`, a read-only maintainer reviewability check for AI-assisted PRs.
 - Changed `agentloop status` Markdown, JSON, and brief output to include the newest local run ledger entry when `.agentloop/runs/` exists.
 - Changed `agentloop prepare-pr` to reuse a matching fresh ship run instead of writing a duplicate run ledger entry.
+- Added `shipEvidence.source` and `shipEvidence.runId` to `agentloop prepare-pr --json` output.
 - Changed `agentloop policy list/status` human output to render policy titles, statuses, and paths with Markdown-safe inline-code delimiters while keeping JSON output and raw `policy show` content unchanged.
 - Changed run ledger reads and writes to reject run-id directories that resolve outside `.agentloop/runs/` through symlinks.
 - Changed run ledger writes to keep same-minute same-command records by appending collision-safe numeric suffixes instead of overwriting the existing run.

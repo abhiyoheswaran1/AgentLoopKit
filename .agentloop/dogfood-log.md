@@ -69,6 +69,34 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Add a JSON field later that tells callers whether `prepare-pr` reused or refreshed ship evidence.
 
+## 2026-06-12: Prepare PR Ship Evidence Source
+
+- Task contract: `.agentloop/tasks/2026-06-12-report-prepare-pr-ship-evidence-source.md`
+- Trigger:
+  - After `prepare-pr` learned to reuse fresh ship runs, JSON callers still had no direct way to know whether evidence was reused or refreshed.
+- Product change:
+  - Added `shipEvidence.source` to `prepare-pr --json` with `reused` or `refreshed`.
+  - Added `shipEvidence.runId` when the PR description is backed by a run ledger entry.
+  - Kept human output unchanged.
+- Verification:
+  - Red focused run: `npm test -- tests/prepare-pr.test.ts` failed before `shipEvidence` existed.
+  - Green focused run: `npm test -- tests/prepare-pr.test.ts` passed with 1 file and 2 tests.
+  - `npm run typecheck` passed.
+  - `npm run lint`, `npm run check:links`, `npm run build`, `node scripts/smoke-cli.mjs`, and `npm run smoke:release` passed.
+  - Focused suite `npm test -- tests/prepare-pr.test.ts tests/cli-docs-drift.test.ts` passed with 2 files and 3 tests.
+  - Full suite `npm test` passed with 47 files and 398 tests.
+  - Production dependency audit `npx pnpm@10.12.1 audit --prod` reported no known vulnerabilities.
+  - ProjScan `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - Final self-verify `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-12-report-prepare-pr-ship-evidence-source.md --task-commands --timeout-ms 300000 --write-run --json` passed and wrote `.agentloop/reports/2026-06-12-02-03-verification-report.md` plus run `.agentloop/runs/2026-06-12-02-09-verify/`.
+  - `agentloop task doctor` initially warned that an older completed task was still in the active task folder.
+  - Archived `.agentloop/tasks/2026-06-12-add-opt-in-run-ledger-entries-for-verify-and-handoff.md` to `.agentloop/tasks/archive/2026-06-12-add-opt-in-run-ledger-entries-for-verify-and-handoff.md`; `agentloop task doctor --json` then passed with 16 checked tasks and 0 diagnostics.
+  - Final ship report scored 96/100 with passing gates and wrote `.agentloop/reports/2026-06-12-02-12-ship-report.md` plus run `.agentloop/runs/2026-06-12-02-12-ship/`.
+  - Final `prepare-pr --write --json` wrote `.agentloop/handoffs/2026-06-12-02-12-pr-description.md`, reused `.agentloop/runs/2026-06-12-02-12-ship/`, and reported `shipEvidence.source` as `reused`.
+- Worked well:
+  - The field is additive and deterministic, and it avoids making agents infer behavior from run counts.
+- Improve:
+  - Consider showing the evidence source in `prepare-pr --github-comment` only if reviewers ask for that detail.
+
 ## 2026-06-12: Opt-In Run Ledger Records For Verify And Handoff
 
 - Task contract: `.agentloop/tasks/2026-06-12-add-opt-in-run-ledger-entries-for-verify-and-handoff.md`

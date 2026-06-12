@@ -17,6 +17,10 @@ export type PreparePrResult = {
   shipReportPath: string;
   handoffPath?: string;
   writtenPath?: string;
+  shipEvidence: {
+    source: 'reused' | 'refreshed';
+    runId?: string;
+  };
   readiness: ShipResult['readiness'];
   changedFiles: ShipResult['changedFiles'];
 };
@@ -31,7 +35,8 @@ type PreparePrShipEvidence = Pick<
   | 'shipReportPath'
   | 'handoffPath'
   | 'changedFiles'
->;
+> &
+  Pick<PreparePrResult, 'shipEvidence'>;
 
 function sectionContent(markdown: string, heading: string) {
   const lines = markdown.split(/\r?\n/);
@@ -227,10 +232,33 @@ async function findReusableShipEvidence(options: {
       shipReportPath: resolveMaybeRepoPath(options.cwd, run.shipReportPath),
       handoffPath: run.handoffPath,
       changedFiles: record.changedFiles,
+      shipEvidence: {
+        source: 'reused',
+        runId: run.id,
+      },
     };
   }
 
   return undefined;
+}
+
+async function refreshShipEvidence(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  timestamp?: string;
+}): Promise<PreparePrShipEvidence> {
+  const result = await createShipReport({
+    cwd: options.cwd,
+    config: options.config,
+    timestamp: options.timestamp,
+  });
+  return {
+    ...result,
+    shipEvidence: {
+      source: 'refreshed',
+      runId: result.run.id,
+    },
+  };
 }
 
 export async function preparePullRequest(options: {
@@ -240,13 +268,8 @@ export async function preparePullRequest(options: {
   githubComment?: boolean;
   write?: boolean;
 }) {
-  const ship =
-    (await findReusableShipEvidence(options)) ??
-    (await createShipReport({
-      cwd: options.cwd,
-      config: options.config,
-      timestamp: options.timestamp,
-    }));
+  const preparedShip =
+    (await findReusableShipEvidence(options)) ?? (await refreshShipEvidence(options));
   const evidence = await resolveCurrentTaskVerificationEvidence(options);
   const task = evidence.taskPath
     ? await readTaskContract({
@@ -255,12 +278,12 @@ export async function preparePullRequest(options: {
         taskPath: evidence.taskPath,
       })
     : null;
-  const body = buildPrBody({ task, ship });
-  const githubComment = options.githubComment ? buildGithubComment(ship) : undefined;
+  const body = buildPrBody({ task, ship: preparedShip });
+  const githubComment = options.githubComment ? buildGithubComment(preparedShip) : undefined;
   let writtenPath: string | undefined;
 
   if (options.write) {
-    const timestamp = options.timestamp ?? ship.timestamp;
+    const timestamp = options.timestamp ?? preparedShip.timestamp;
     writtenPath = resolveOutputArtifactPath({
       cwd: options.cwd,
       artifactType: 'handoff',
@@ -275,10 +298,11 @@ export async function preparePullRequest(options: {
     titleSuggestion: task?.title ?? 'AgentLoopKit review-ready changes',
     body,
     ...(githubComment ? { githubComment } : {}),
-    shipReportPath: ship.shipReportPath,
-    handoffPath: ship.handoffPath,
+    shipReportPath: preparedShip.shipReportPath,
+    handoffPath: preparedShip.handoffPath,
     ...(writtenPath ? { writtenPath } : {}),
-    readiness: ship.readiness,
-    changedFiles: ship.changedFiles,
+    shipEvidence: preparedShip.shipEvidence,
+    readiness: preparedShip.readiness,
+    changedFiles: preparedShip.changedFiles,
   } satisfies PreparePrResult;
 }

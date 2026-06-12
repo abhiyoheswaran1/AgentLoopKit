@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-02-09-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-02-09",
+  "createdAtEpochMs": 1781222968764,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-report-prepare-pr-ship-evidence-source.md",
+    "title": "Report prepare-pr ship evidence source",
+    "status": "in-progress"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-02-03-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 9
+}

@@ -119,7 +119,12 @@ describe('prepare-pr command', () => {
     expect(output.githubComment).toContain('This is a review-readiness score, not a code-quality score.');
     expect(output.shipReportPath).toMatch(/\.agentloop\/reports\/.+-ship-report\.md$/);
     const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
-    expect(runs.runs.filter((run: { command: string }) => run.command === 'ship')).toHaveLength(1);
+    const shipRuns = runs.runs.filter((run: { command: string }) => run.command === 'ship');
+    expect(shipRuns).toHaveLength(1);
+    expect(output.shipEvidence).toMatchObject({
+      source: 'refreshed',
+      runId: shipRuns[0].id,
+    });
   });
 
   test('reuses a fresh ship run instead of writing duplicate run ledger entries', async () => {
@@ -133,6 +138,10 @@ describe('prepare-pr command', () => {
     const shipRuns = runs.runs.filter((run: { command: string }) => run.command === 'ship');
 
     expect(prepared.shipReportPath).toBe(ship.shipReportPath);
+    expect(prepared.shipEvidence).toEqual({
+      source: 'reused',
+      runId: ship.run.id,
+    });
     expect(shipRuns).toHaveLength(1);
     expect(shipRuns[0].id).toBe(ship.run.id);
   });
