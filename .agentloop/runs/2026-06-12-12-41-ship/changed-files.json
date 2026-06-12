@@ -1,0 +1,30 @@
+[
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "package.json"
+  },
+  {
+    "status": "M",
+    "path": "server.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-12-12-35-release-notes.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-12-35-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-12-39-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-release-agentloopkit-0-28-1.md"
+  }
+]

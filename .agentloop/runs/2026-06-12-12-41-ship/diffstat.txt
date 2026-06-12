@@ -1,0 +1,4 @@
+ CHANGELOG.md | 8 ++++++++
+ package.json | 2 +-
+ server.json  | 4 ++--
+ 3 files changed, 11 insertions(+), 3 deletions(-)

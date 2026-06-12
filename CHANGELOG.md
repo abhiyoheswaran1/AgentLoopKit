@@ -4,6 +4,14 @@
 
 - No unreleased changes yet.
 
+## 0.28.1
+
+- Added `npm run dogfood` and `npm run dogfood:strict` as repeatable local self-check gates for AgentLoopKit development.
+- Added official AgentLoopKit logo assets under `docs/logo/` and refreshed README launch screenshots to use the official mark.
+- Changed README, contributor guidance, and agent guidance to document the dogfood gate without adding publish, tag, token, or verification side effects.
+- Changed release status and release hygiene docs to keep public package state clear after `0.28.0`.
+- Archived shipped internal task contracts and added release-smoke coverage that blocks stale planned-release guidance in public-facing harness docs.
+
 ## 0.28.0
 
 - Added `agentloop ship`, a local review-readiness flow that writes a ship report, records a run ledger entry, and scores task clarity, scope control, verification evidence, evidence freshness, gates, handoff readiness, and risk flags without claiming to measure code quality.
