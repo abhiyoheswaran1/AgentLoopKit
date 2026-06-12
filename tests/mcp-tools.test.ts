@@ -156,6 +156,55 @@ type ArtifactsPayload = {
   };
 };
 
+type ReviewContextPayload = {
+  status: {
+    activeTask: {
+      title: string;
+      path: string;
+    } | null;
+    latestVerification: {
+      overallStatus: string;
+      path: string;
+      title: string;
+    } | null;
+    nextAction: {
+      command: string;
+    };
+  };
+  gates: {
+    overallStatus: string;
+    gates: Array<{
+      id: string;
+      status: string;
+    }>;
+  };
+  policies: {
+    summary: {
+      current: number;
+      modified: number;
+      missing: number;
+      extra: number;
+    };
+  };
+  artifacts: ArtifactsPayload;
+  recentRuns: Array<{
+    id: string;
+    command: string;
+    score?: number;
+    shipReportPath?: string;
+  }>;
+  latestShip: {
+    id: string;
+    score: number;
+    shipReportPath: string;
+  } | null;
+  safety: {
+    readOnly: boolean;
+    includesMarkdownContent: boolean;
+    commandsRun: string[];
+  };
+};
+
 type LatestArtifactsPayload = {
   latest: Array<{
     type: string;
@@ -271,6 +320,7 @@ describe('mcp tools', () => {
       'agentloop_maintainer_check',
       'agentloop_check_gates',
       'agentloop_artifacts',
+      'agentloop_review_context',
       'agentloop_list_handoffs',
       'agentloop_latest_handoff',
     ]);
@@ -317,6 +367,7 @@ describe('mcp tools', () => {
       arguments: { strict: true },
     });
     const artifacts = await callMcpTool({ cwd: dir, name: 'agentloop_artifacts' });
+    const reviewContext = await callMcpTool({ cwd: dir, name: 'agentloop_review_context' });
     const latestVerificationArtifacts = await callMcpTool({
       cwd: dir,
       name: 'agentloop_artifacts',
@@ -340,6 +391,7 @@ describe('mcp tools', () => {
     const maintainerCheckPayload = maintainerCheck.payload as MaintainerCheckPayload;
     const gatesPayload = gates.payload as GatesPayload;
     const artifactsPayload = artifacts.payload as ArtifactsPayload;
+    const reviewContextPayload = reviewContext.payload as ReviewContextPayload;
     const latestVerificationArtifactsPayload =
       latestVerificationArtifacts.payload as LatestArtifactsPayload;
     const handoffsPayload = handoffs.payload as HandoffsPayload;
@@ -434,6 +486,48 @@ describe('mcp tools', () => {
     expect(artifactsPayload.handoffs.latest?.path).toBe(
       '.agentloop/handoffs/2026-06-10-12-31-pr-summary.md',
     );
+    expect(reviewContextPayload.status.activeTask).toMatchObject({
+      title: 'Add API route',
+      path: expect.stringContaining('.agentloop/tasks/'),
+    });
+    expect(reviewContextPayload.status.latestVerification).toEqual({
+      overallStatus: 'pass',
+      path: '.agentloop/reports/2026-06-10-12-30-verification-report.md',
+      title: 'Verification Report',
+    });
+    expect(reviewContextPayload.status.nextAction.command).toBe('agentloop handoff');
+    expect(reviewContextPayload.gates.overallStatus).toBe('pass');
+    expect(reviewContextPayload.gates.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'task-contract', status: 'pass' }),
+        expect.objectContaining({ id: 'verification-report', status: 'pass' }),
+      ]),
+    );
+    expect(reviewContextPayload.policies.summary.current).toBe(8);
+    expect(reviewContextPayload.artifacts.verificationReports.latest).toMatchObject({
+      path: '.agentloop/reports/2026-06-10-12-30-verification-report.md',
+      overallStatus: 'pass',
+    });
+    expect(reviewContextPayload.recentRuns).toEqual([
+      expect.objectContaining({
+        id: '2026-06-10-12-32-ship',
+        command: 'ship',
+        score: 96,
+        shipReportPath: '.agentloop/reports/2026-06-10-12-32-ship-report.md',
+      }),
+    ]);
+    expect(reviewContextPayload.latestShip).toEqual({
+      id: '2026-06-10-12-32-ship',
+      score: 96,
+      shipReportPath: '.agentloop/reports/2026-06-10-12-32-ship-report.md',
+    });
+    expect(reviewContextPayload.safety).toEqual({
+      readOnly: true,
+      includesMarkdownContent: false,
+      commandsRun: [],
+    });
+    expect(JSON.stringify(reviewContext.payload)).not.toContain(dir);
+    expect(JSON.stringify(reviewContext.payload)).not.toContain('Route implementation handoff.');
     expect(latestVerificationArtifactsPayload.latest).toEqual([
       {
         type: 'verification',

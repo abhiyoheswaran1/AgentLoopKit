@@ -7326,3 +7326,43 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider a future `ship --no-handoff` or `ship --reuse-handoff` mode if users want strictly read-only scoring.
   - Consider ledger support for explicit `verify` and `handoff` runs after the `ship` flow settles.
+
+## 2026-06-12: MCP Review Context Snapshot
+
+- Task contract: `.agentloop/tasks/2026-06-12-expose-review-context-through-mcp.md`
+- Trigger:
+  - The MCP server had strong read-only primitives, but MCP clients still had to orchestrate several tool calls to understand review readiness before continuing agent work.
+  - The product direction is shifting toward AgentLoopKit as the local acceptance layer for agent-generated code.
+- Implementation:
+  - Added read-only MCP `agentloop_review_context`.
+  - The payload combines status, review gates, policy status, artifact inventory, recent run summaries, latest ship score, and an explicit safety block.
+  - The tool does not run commands, write files, read `.env` contents, call external APIs, or include full task/report/handoff/policy Markdown bodies.
+  - Added regression coverage that rejects absolute temp-path leakage in the aggregate payload.
+- Verification run:
+  - Red focused test failed first in `tests/mcp-tools.test.ts` because `agentloop_review_context` was not listed and unknown at dispatch.
+  - Focused suite passed after implementation:
+    - `npm test -- tests/mcp-tools.test.ts`
+  - Broader local checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:links`
+    - `git diff --check`
+    - `npm run build`
+    - `npm test`
+    - `node scripts/smoke-cli.mjs`
+    - `npx pnpm@10.12.1 audit --prod`
+    - `npx --yes projscan doctor --format markdown`
+    - `npm run smoke:release`
+  - Dogfood verification passed: `.agentloop/reports/2026-06-12-07-22-verification-report.md`.
+  - Dogfood runs:
+    - `.agentloop/runs/2026-06-12-07-26-verify/`
+    - `.agentloop/runs/2026-06-12-07-26-handoff/`
+    - `.agentloop/runs/2026-06-12-07-26-ship/`
+  - Dogfood handoff: `.agentloop/handoffs/2026-06-12-07-26-pr-summary.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-07-26-ship-report.md` with score `96`/100.
+- What worked well:
+  - The existing local readers made the MCP slice small and kept it read-only.
+  - `ship` caught the medium-sized change set and made the scope warning explicit.
+- Improve:
+  - Avoid broad Prettier runs on long Markdown tables such as `.agentloop/backlog.md`; touched-file formatting can still create review noise.
+  - Consider a future MCP `agentloop_review_context` option for smaller or larger snapshots only if real client usage shows the default is too broad.

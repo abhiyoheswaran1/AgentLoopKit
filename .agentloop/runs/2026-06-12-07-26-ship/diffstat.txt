@@ -1,0 +1,10 @@
+ .agentloop/backlog.md                              | 391 +++++++++++----------
+ ...-06-12-expose-artifact-inventory-through-mcp.md |  59 ----
+ CHANGELOG.md                                       |   1 +
+ FINAL_HANDOFF.md                                   |   3 +-
+ ROADMAP.md                                         |   4 +-
+ docs/cli-reference.md                              |   2 +-
+ docs/mcp.md                                        |  38 +-
+ src/core/mcp-tools.ts                              |  81 ++++-
+ tests/mcp-tools.test.ts                            |  94 +++++
+ 9 files changed, 388 insertions(+), 285 deletions(-)

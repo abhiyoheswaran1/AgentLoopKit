@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-07-26-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-12-07-26",
+  "createdAtEpochMs": 1781241991807,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-expose-review-context-through-mcp.md",
+    "title": "Expose review context through MCP",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-07-22-verification-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-07-26-pr-summary.md",
+  "changedFileCount": 13
+}

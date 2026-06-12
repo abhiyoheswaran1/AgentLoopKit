@@ -26,7 +26,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Policy customization guidance for repo-local safety rules
 - Repo-type policy examples for common project shapes
 - Local review-evidence gates with `agentloop check-gates` and `--strict`
-- Read-only MCP server with `agentloop mcp-server` for status, tasks, policies, policy template status, verification reports, ship reports, artifact inventory metadata, run summaries and details, file intent matches, maintainer checks, gate status, and handoffs
+- Read-only MCP server with `agentloop mcp-server` for status, tasks, policies, policy template status, verification reports, ship reports, artifact inventory metadata, review context snapshots, run summaries and details, file intent matches, maintainer checks, gate status, and handoffs
 - Agent instruction installers, including `agentloop install-agent all`
 - Static bash, zsh, fish, and PowerShell completions
 - GitHub Actions, GitLab CI, and Buildkite recipes for evidence checks and CI-generated artifacts
@@ -45,7 +45,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
-- Current `main` is accumulating unreleased work for the planned `0.28.0` batch, including README cleanup, first-run guidance polish, cross-platform smoke CI, and the read-only artifacts command. Do not cut releases for every small improvement.
+- Current `main` is accumulating unreleased work for the planned `0.28.0` batch, including README cleanup, first-run guidance polish, cross-platform smoke CI, read-only artifact inventory, and MCP review context snapshots. Do not cut releases for every small improvement.
 
 ## Near Term
 

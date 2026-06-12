@@ -15,6 +15,7 @@
 - Added read-only MCP `agentloop_policy_status` for local policy template status.
 - Added read-only MCP `agentloop_check_gates` for local review gate status.
 - Added read-only MCP `agentloop_artifacts` for local artifact inventory metadata.
+- Added read-only MCP `agentloop_review_context` for one local reviewability snapshot that combines status, gates, policies, artifacts, recent runs, and latest ship evidence without artifact bodies.
 - Changed `agentloop status` Markdown, JSON, and brief output to include the newest local run ledger entry when `.agentloop/runs/` exists.
 - Changed `agentloop prepare-pr` to reuse a matching fresh ship run instead of writing a duplicate run ledger entry.
 - Added `shipEvidence.source` and `shipEvidence.runId` to `agentloop prepare-pr --json` output.
