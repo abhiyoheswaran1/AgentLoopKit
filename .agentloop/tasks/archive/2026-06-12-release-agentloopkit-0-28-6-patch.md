@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-12
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The current source includes a release-check safety fix that should ship as a small patch release after the dogfood pass.

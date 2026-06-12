@@ -1,0 +1,18 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-release-agentloopkit-0-28-6-patch.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/release-status.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-release-agentloopkit-0-28-6-patch.md"
+  }
+]

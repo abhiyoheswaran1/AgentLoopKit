@@ -1,0 +1,4 @@
+ .agentloop/dogfood-log.md                          | 29 +++++++++
+ ...2026-06-12-release-agentloopkit-0-28-6-patch.md | 68 ----------------------
+ docs/release-status.md                             | 55 ++++++++---------
+ 3 files changed, 52 insertions(+), 100 deletions(-)

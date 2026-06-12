@@ -2,9 +2,38 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: 0.28.6 Release Gate
+
+- Task contract: `.agentloop/tasks/archive/2026-06-12-release-agentloopkit-0-28-6-patch.md`
+- Trigger:
+  - The release-check stale-release-notes guard landed on `main`.
+  - The maintainer asked for a small patch release after the dogfood pass.
+- Product change:
+  - Prepared `agentloopkit@0.28.6`.
+  - Updated `package.json`, `server.json`, `CHANGELOG.md`, and `ROADMAP.md`.
+  - Generated clean release notes for `v0.28.5..HEAD`.
+- Verification:
+  - AgentLoop release verification passed and wrote `.agentloop/reports/2026-06-12-22-56-verification-report.md`.
+  - The verification run wrote `.agentloop/runs/2026-06-12-22-59-verify/`.
+  - `npm run dogfood:strict` passed.
+  - `node dist/cli/index.js release-check --strict` passed and verified the `0.28.6` release notes.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - GitHub release `v0.28.6` was created with release asset SHA-256 `2f91b2c0adc5d44f5f32f09eb40f4e0ce028c07400c6fb76fe075070ec65b573`.
+  - CI workflow `27442870785` passed.
+  - CLI Smoke workflow `27442870779` passed on Ubuntu, macOS, and Windows.
+  - Publish workflow `27442925865` passed and published `agentloopkit@0.28.6`.
+  - Docker workflow `27442925900` passed.
+  - MCP Registry workflow `27443148213` passed.
+  - `npm view agentloopkit version versions --json` reported latest `0.28.6`.
+  - `npm run smoke:published -- --version 0.28.6` passed.
+- Worked well:
+  - The new release-check rule caught the exact evidence it was meant to prove: current-version release notes existed before publishing.
+- Improve:
+  - The generated release notes include many AgentLoop evidence files; keep GitHub release notes concise and public-facing.
+
 ## 2026-06-12: Current Release Notes Evidence Gate
 
-- Task contract: `.agentloop/tasks/2026-06-12-require-current-release-notes-in-release-check.md`
+- Task contract: `.agentloop/tasks/archive/2026-06-12-require-current-release-notes-in-release-check.md`
 - Trigger:
   - Dogfooding after `0.28.5` showed `release-check` accepted the latest generated release-notes artifact even when it described an older package version.
   - The release gate needed stronger local evidence before pointing maintainers at the npm-status step.
