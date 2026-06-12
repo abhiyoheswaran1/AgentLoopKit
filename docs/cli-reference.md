@@ -71,6 +71,8 @@ agentloop task list
 agentloop task show .agentloop/tasks/<task-file>.md
 agentloop task set .agentloop/tasks/<task-file>.md
 agentloop task status .agentloop/tasks/<task-file>.md in-progress
+agentloop task done
+agentloop task done .agentloop/tasks/<task-file>.md
 agentloop task current
 agentloop task clear
 agentloop task archive .agentloop/tasks/<task-file>.md
@@ -80,6 +82,8 @@ agentloop task doctor
 `task list --json` returns `path`, `title`, `status`, `active`, and `modifiedAt`. Listing tasks does not create or update `.agentloop/state.json`.
 
 Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Use `deferred` for parked work that should remain visible but should not become the next unpinned task.
+
+`task done` marks the active task `done`. Pass a path to mark a non-active task done.
 
 Archive task contracts after verification and handoff, not as a substitute for either.
 
@@ -93,7 +97,7 @@ agentloop next
 agentloop next --json
 ```
 
-`status` shows the pinned active task, newest open task when no task is pinned, deferred tasks, current verification report, newest local run ledger entry, working tree state, Git root, configured commands, missing commands, and next suggested command. Clean `review` tasks with passing verification point to `agentloop task status <path> done` before the next task starts.
+`status` shows the pinned active task, newest open task when no task is pinned, deferred tasks, current verification report, newest local run ledger entry, working tree state, Git root, configured commands, missing commands, and next suggested command. Clean `review` tasks with passing verification point to `agentloop task done` before the next task starts.
 
 Use `--brief` when an agent or script needs one compact human-readable line plus the reason. Brief output includes the latest run evidence when `.agentloop/runs/` exists. `next` uses the same decision rules but prints only the next action. These commands do not run verification commands, call an LLM, read `.env` contents, or write task state.
 

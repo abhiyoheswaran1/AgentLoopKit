@@ -381,6 +381,15 @@ async function smokeCli({ keep = false } = {}) {
     assert(Array.isArray(maintainer.checks), 'maintainer-check JSON did not include checks.');
     console.log(`Maintainer-check smoke passed with status ${maintainer.status}.`);
 
+    const doneTask = parseJson(
+      (await runAgentLoop(['task', 'done', '--json'], { cwd: smokeRepo })).stdout,
+      'task done',
+    );
+    assert(doneTask.task?.status === 'done', 'task done did not mark the active task done.');
+    const doneTaskMarkdown = await readFile(path.join(smokeRepo, taskPath), 'utf8');
+    assert(doneTaskMarkdown.includes('- Status: done'), 'task done did not update task Markdown.');
+    console.log('Task done smoke passed.');
+
     const nestedStatus = parseJson(
       (await runAgentLoop(['status', '--json'], { cwd: nestedDir })).stdout,
       'nested status',

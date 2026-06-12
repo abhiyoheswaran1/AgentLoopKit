@@ -21,9 +21,10 @@ describe('completion scripts', () => {
     expect(script).toContain('policy:List or inspect local AgentLoopKit policies');
     expect(script).toContain('show:Show a local policy');
     expect(script).toContain('status:Show local policy template status');
-    expect(script).toContain('task:List, inspect, update, or archive task contracts');
+    expect(script).toContain('task:List, inspect, update, complete, or archive task contracts');
     expect(script).toContain('doctor:Check task folder hygiene');
     expect(script).toContain('status:Update a task contract status');
+    expect(script).toContain('done:Mark a task contract done');
     expect(script).toContain('in-progress');
     expect(script).toContain('deferred');
     expect(script).toContain('_values \'task type\'');
@@ -43,7 +44,7 @@ describe('completion scripts', () => {
     expect(script).toContain('release-notes');
     expect(script).toContain('npm-status');
     expect(script).toContain('next');
-    expect(script).toContain('list show set status archive current clear doctor');
+    expect(script).toContain('list show set status done archive current clear doctor');
     expect(script).toContain('compgen -W "list show status"');
     expect(script).toContain(`compgen -W "${TASK_TYPES.join(' ')}"`);
     expect(script).toContain(
@@ -75,6 +76,7 @@ describe('completion scripts', () => {
     expect(script).toContain("'release-notes'");
     expect(script).toContain("'npm-status'");
     expect(script).toContain("'task'");
+    expect(script).toContain("'done'");
     expect(script).toContain("'archive'");
     expect(script).toContain("'doctor'");
     expect(script).toContain("'policy'");

@@ -2,6 +2,38 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Active Task Done Shortcut
+
+- Task contract: `.agentloop/tasks/2026-06-12-add-active-task-done-shortcut.md`
+- Trigger:
+  - The review-ready next action now pointed at task completion, but it required `agentloop task status <path> done`.
+  - That was correct but clumsy for agents and humans closing the active task loop.
+- Product change:
+  - Added `agentloop task done` to mark the active task done.
+  - Added `agentloop task done <path>` for explicit task completion.
+  - Updated `status` and `next` to recommend the short command for clean, verified tasks in `review`.
+  - Kept archive as a separate action so completion does not move files by surprise.
+- Verification:
+  - Red focused run: `npm test -- tests/task-state.test.ts tests/status.test.ts tests/next.test.ts -t "task done|recommends finishing an active review task|marks the active task done|marks an explicit task done|active task errors"` failed because `task done` did not exist and status/next still recommended the path-heavy command.
+  - Green focused run of the same command passed after adding the shortcut and recommendation update.
+  - Focused suite `npm test -- tests/task-state.test.ts tests/status.test.ts tests/next.test.ts tests/completion.test.ts tests/cli-docs-drift.test.ts` passed with 5 files and 83 tests.
+  - `npm run typecheck`, `npm run lint`, `npm run check:links`, `git diff --check`, `npm test`, and `npm run build` passed.
+  - CLI smoke passed and now asserts `agentloop task done --json`.
+  - Packed release smoke passed.
+  - Production dependency audit passed with no known vulnerabilities.
+  - ProjScan reported A 100/100.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-04-04-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-04-11-verify/`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-04-12-ship-report.md`.
+  - Dogfood ship run: `.agentloop/runs/2026-06-12-04-12-ship/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-04-12-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-04-12-pr-description.md`.
+  - Ship score: 92/100 with gates passing.
+- Worked well:
+  - The command reuses the existing status update path, so task validation and file writes stay in one place.
+- Improve:
+  - Consider a separate active-task archive shortcut later, but keep it explicit because archiving moves files.
+
 ## 2026-06-12: Review-Ready Next Action
 
 - Task contract: `.agentloop/tasks/2026-06-12-improve-next-action-for-review-ready-tasks.md`

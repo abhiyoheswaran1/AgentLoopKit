@@ -20,6 +20,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - active task pinning with `.agentloop/state.json`
 - read-only task contract listing with active-task markers
 - explicit task status transitions in Markdown task contracts
+- active task completion shortcut with `agentloop task done`
 - review-ready next-action guidance for clean tasks still pinned in `review`
 - task contract archiving into `.agentloop/tasks/archive/`
 - static bash, zsh, fish, and PowerShell shell completion scripts

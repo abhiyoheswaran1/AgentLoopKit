@@ -467,9 +467,9 @@ describe('status command', () => {
       title: 'Review login',
       status: 'review',
     });
-    expect(status.nextAction.command).toBe(`agentloop task status ${taskPath} done`);
+    expect(status.nextAction.command).toBe('agentloop task done');
     expect(status.nextAction.reason).toContain('active task is in review');
-    expect(markdownResult.stdout).toContain(`Run \`agentloop task status ${taskPath} done\`.`);
+    expect(markdownResult.stdout).toContain('Run `agentloop task done`.');
   });
 
   test('uses modified time instead of filename sort for the active task', async () => {

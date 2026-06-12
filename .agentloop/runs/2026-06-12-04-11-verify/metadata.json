@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-04-11-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-04-11",
+  "createdAtEpochMs": 1781230318589,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-active-task-done-shortcut.md",
+    "title": "Add active task done shortcut",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-04-04-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 33
+}

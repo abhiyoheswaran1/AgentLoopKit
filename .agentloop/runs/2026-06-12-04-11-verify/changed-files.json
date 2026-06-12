@@ -1,0 +1,134 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/harness/commands.md"
+  },
+  {
+    "status": "M",
+    "path": "AGENTLOOP.md"
+  },
+  {
+    "status": "M",
+    "path": "AGENTS.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "FINAL_HANDOFF.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/getting-started.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/status.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/task-contracts.md"
+  },
+  {
+    "status": "M",
+    "path": "scripts/smoke-cli.mjs"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/commands/task.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/completions.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/status.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/claude-code.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/codex.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/cursor.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/gemini-cli.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/generic.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/github-copilot-cli.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/opencode.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/harness/commands.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/root/AGENTLOOP.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/root/AGENTS.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/root/agentloop-directory-readme.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/tasks/README.md"
+  },
+  {
+    "status": "M",
+    "path": "tests/completion.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/next.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/status.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/task-state.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-04-04-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-add-active-task-done-shortcut.md"
+  }
+]

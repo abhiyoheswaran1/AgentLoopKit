@@ -28,6 +28,7 @@ agentloop task list
 agentloop task show .agentloop/tasks/<task-file>.md
 agentloop task set .agentloop/tasks/<task-file>.md
 agentloop task status .agentloop/tasks/<task-file>.md in-progress
+agentloop task done
 agentloop task archive .agentloop/tasks/<task-file>.md
 agentloop task doctor
 ```
@@ -37,5 +38,6 @@ agentloop task doctor
 For unsupported `--type` values, `agentloop create-task --json` returns a parseable error with `supportedTaskTypes` and writes no task file.
 `agentloop task show --json` returns one task contract's metadata and Markdown content without changing active state.
 `agentloop task status --json` updates only the task contract's `- Status:` line. Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Use `deferred` for parked work that should stay visible without becoming the next unpinned task.
+`agentloop task done --json` marks the active task `done`. Pass a path when the task is not active.
 `agentloop task archive --json` moves one named task contract into `.agentloop/tasks/archive/` after verification and handoff. It preserves the Markdown file and refuses to overwrite an existing archive file.
 `agentloop task doctor --json` reports task-folder hygiene issues without editing, archiving, or deleting task files.

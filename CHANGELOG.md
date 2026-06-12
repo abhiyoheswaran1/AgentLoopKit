@@ -10,6 +10,7 @@
 - Changed `agentloop status` Markdown, JSON, and brief output to include the newest local run ledger entry when `.agentloop/runs/` exists.
 - Changed `agentloop prepare-pr` to reuse a matching fresh ship run instead of writing a duplicate run ledger entry.
 - Added `shipEvidence.source` and `shipEvidence.runId` to `agentloop prepare-pr --json` output.
+- Added `agentloop task done` as a shortcut for marking the active task, or an explicit task path, as `done`.
 - Changed `agentloop prepare-pr` PR bodies to group changed files by review area.
 - Changed `agentloop create-task` to set the newly created contract as the active task and include `activeTask` in JSON output.
 - Changed `agentloop status` and `agentloop next` to recommend marking clean, verified `review` tasks as `done` before starting unrelated work.

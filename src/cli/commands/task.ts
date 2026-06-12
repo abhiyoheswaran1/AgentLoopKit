@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
+import type { AgentLoopConfig } from '../../core/config.js';
 import { AgentLoopError } from '../../core/errors.js';
 import {
   archiveTask,
@@ -161,9 +162,29 @@ function printTaskOutputPathJsonError(error: unknown, options: { json?: boolean 
   return false;
 }
 
+async function updateDoneTask(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  taskPath?: string;
+}) {
+  const taskPath = options.taskPath ?? (await getActiveTask(options))?.path;
+  if (!taskPath) {
+    throw new AgentLoopError(
+      'No active task set. Run `agentloop task set <path>` or pass a task path.',
+      'ACTIVE_TASK_NOT_SET',
+    );
+  }
+  return updateTaskStatus({
+    cwd: options.cwd,
+    config: options.config,
+    taskPath,
+    status: 'done',
+  });
+}
+
 export function taskCommand() {
   const command = new Command('task').description(
-    'List, inspect, update, or archive task contracts',
+    'List, inspect, update, complete, or archive task contracts',
   );
 
   command
@@ -247,6 +268,32 @@ export function taskCommand() {
             requestedStatus: status,
             supportedStatuses: TASK_STATUSES,
           });
+          return;
+        }
+        throw error;
+      }
+      printUpdatedTask(task, options);
+    });
+
+  command
+    .command('done')
+    .argument('[path]', 'task contract path under .agentloop/tasks; defaults to active task')
+    .option('--json', 'print machine-readable output')
+    .description('Mark a task contract done')
+    .action(async (taskPath: string | undefined, options: { json?: boolean }) => {
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
+      let task: ActiveTask;
+      try {
+        task = await updateDoneTask({
+          cwd: workspace.cwd,
+          config: workspace.config,
+          taskPath,
+        });
+      } catch (error) {
+        if (printTaskPathJsonError(error, options)) return;
+        if (options.json && error instanceof AgentLoopError) {
+          printJsonError(error);
           return;
         }
         throw error;

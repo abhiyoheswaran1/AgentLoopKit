@@ -224,7 +224,7 @@ describe('next command', () => {
     const next = JSON.parse(result.stdout);
     expect(next.activeTask.status).toBe('review');
     expect(next.latestReport.overallStatus).toBe('pass');
-    expect(next.command).toBe(`agentloop task status ${taskPath} done`);
+    expect(next.command).toBe('agentloop task done');
     expect(next.reason).toContain('active task is in review');
   });
 

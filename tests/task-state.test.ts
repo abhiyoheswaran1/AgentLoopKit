@@ -834,6 +834,62 @@ describe('task command', () => {
     expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: review\n');
   });
 
+  test('marks the active task done from the CLI without a path', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+    await execa(tsxPath, [cliPath, 'task', 'set', '.agentloop/tasks/2026-06-09-demo.md'], {
+      cwd: dir,
+    });
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'done', '--json'], { cwd: dir });
+
+    expect(JSON.parse(result.stdout)).toEqual({
+      task: {
+        path: '.agentloop/tasks/2026-06-09-demo.md',
+        title: 'Demo task',
+        status: 'done',
+      },
+    });
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: done\n');
+  });
+
+  test('marks an explicit task done from the CLI', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'done', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
+      { cwd: dir },
+    );
+
+    expect(JSON.parse(result.stdout)).toEqual({
+      task: {
+        path: '.agentloop/tasks/2026-06-09-demo.md',
+        title: 'Demo task',
+        status: 'done',
+      },
+    });
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: done\n');
+  });
+
+  test('prints active task errors as JSON when task done has no active task', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'done', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'ACTIVE_TASK_NOT_SET',
+        message: 'No active task set. Run `agentloop task set <path>` or pass a task path.',
+      },
+    });
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: proposed\n');
+  });
+
   test('updates task status to deferred from the CLI', async () => {
     const { dir, taskPath } = await createTaskStateFixture();
 

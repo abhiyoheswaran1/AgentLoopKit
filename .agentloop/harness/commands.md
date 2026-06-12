@@ -15,6 +15,7 @@ Rules:
 - Use `agentloop task show <path>` to read a task contract without changing active state.
 - Use `agentloop task set <path>` when the active task is ambiguous.
 - Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
+- Use `agentloop task done` after verification and handoff when the active task is ready to close.
 - Use `agentloop task archive <path>` only after verification and handoff are complete.
 - Use `agentloop task doctor` to find missing, legacy, unsupported, or terminal task statuses without mutating task files.
 - Use `agentloop status` to inspect pinned active task, latest open task, parked deferred tasks, latest report, dirty files, and next action.

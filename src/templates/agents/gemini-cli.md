@@ -11,6 +11,7 @@ Before editing:
 - Run `agentloop task list` when active work is unclear.
 - Run `agentloop task show <path>` before implementing a selected task.
 - Run `agentloop task status <path> in-progress` when implementation starts.
+- Run `agentloop task done` after verification and handoff when the active task is ready to close.
 - Run `agentloop task archive <path>` only after verification and handoff are complete.
 - Run `agentloop task doctor` when old task files make current work unclear.
 - Run `agentloop policy list`, `agentloop policy show <policy>`, and `agentloop policy status` before risky edits.
