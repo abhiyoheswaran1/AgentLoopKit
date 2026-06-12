@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-01-09-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-01-09",
+  "createdAtEpochMs": 1781305766064,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-stop-handoff-run-folders-from-causing-repeat-handoff-prompts.md",
+    "title": "Stop handoff run folders from causing repeat handoff prompts",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-01-06-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 11
+}

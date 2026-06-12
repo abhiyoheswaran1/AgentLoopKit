@@ -790,4 +790,83 @@ describe('status command', () => {
     expect(briefResult.stdout).toContain('next="agentloop handoff"');
     expect(markdownResult.stdout).toContain('Run `agentloop handoff`.');
   });
+
+  test('does not request another handoff when dirty files are covered by the latest handoff run', async () => {
+    const dir = await makeTempDir();
+    const runId = '2026-06-13-00-33-handoff';
+    const runsDir = path.join(dir, '.agentloop/runs', runId);
+    const archivedTaskPath = path.join(
+      dir,
+      '.agentloop/tasks/archive/2026-06-13-docs-hygiene.md',
+    );
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
+    await mkdir(path.dirname(archivedTaskPath), { recursive: true });
+    await writeFile(archivedTaskPath, '# Docs hygiene\n\n- Status: done\n');
+    await mkdir(path.join(dir, '.agentloop/runs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/runs/.gitkeep'), '');
+    await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/handoffs/.gitkeep'), '');
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa(
+      'git',
+      ['-c', 'user.name=AgentLoopKit Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'baseline', '-q'],
+      { cwd: dir },
+    );
+    await mkdir(runsDir, { recursive: true });
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 2;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-13-00-33-pr-summary.md'),
+      '# PR Summary\n',
+    );
+    await writeFile(
+      path.join(runsDir, 'metadata.json'),
+      JSON.stringify(
+        {
+          id: runId,
+          command: 'handoff',
+          createdAt: '2026-06-13-00-33',
+          createdAtEpochMs: 1_000,
+          task: {
+            path: '.agentloop/tasks/2026-06-13-docs-hygiene.md',
+            title: 'Old docs hygiene',
+            status: 'in-progress',
+          },
+          handoffPath: '.agentloop/handoffs/2026-06-13-00-33-pr-summary.md',
+          changedFileCount: 12,
+        },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(runsDir, 'changed-files.json'),
+      `${JSON.stringify([{ status: 'M', path: 'src.ts' }], null, 2)}\n`,
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const status = JSON.parse(result.stdout);
+    expect(status.workingTree.dirty).toBe(true);
+    expect(status.workingTree.changedFiles).toContainEqual({ status: 'M', path: 'src.ts' });
+    expect(status.workingTree.changedFiles).toContainEqual({
+      status: '??',
+      path: '.agentloop/handoffs/2026-06-13-00-33-pr-summary.md',
+    });
+    expect(status.workingTree.changedFiles).toContainEqual({
+      status: '??',
+      path: `.agentloop/runs/${runId}/`,
+    });
+    expect(status.latestRun.task).toMatchObject({
+      path: '.agentloop/tasks/archive/2026-06-13-docs-hygiene.md',
+      status: 'done',
+    });
+    expect(status.nextAction.command).toBe('agentloop create-task');
+  });
 });

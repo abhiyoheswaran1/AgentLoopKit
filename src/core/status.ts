@@ -14,7 +14,7 @@ import {
 import { latestMarkdownFile } from './artifacts.js';
 import { verificationReportPattern } from './artifacts.js';
 import { inlineCode } from './markdown-format.js';
-import { listRuns, RunSummary } from './runs.js';
+import { listRuns, readRun, RunSummary } from './runs.js';
 import { getActiveTaskPath, getFallbackTaskPath, listTasks } from './task-state.js';
 
 export type StatusArtifact = {
@@ -139,6 +139,7 @@ function chooseNextAction(input: {
   latestReport?: StatusReport;
   latestRun?: RunSummary;
   dirty: boolean;
+  dirtyCoveredByLatestHandoffRun: boolean;
 }) {
   if (!input.activeTask) {
     if (input.latestTask) {
@@ -151,6 +152,7 @@ function chooseNextAction(input: {
     const latestRunTaskStatus = input.latestRun?.task?.status.trim().toLowerCase();
     if (
       input.dirty &&
+      !input.dirtyCoveredByLatestHandoffRun &&
       (latestRunTaskStatus === 'done' || latestRunTaskStatus === 'review') &&
       input.latestRun?.task
     ) {
@@ -208,6 +210,44 @@ function chooseNextAction(input: {
     command: 'agentloop create-task',
     reason: 'The repo is clean. Start the next task contract when ready.',
   };
+}
+
+function normalizeGitStatusPath(filePath: string) {
+  return filePath.replace(/\\/g, '/').replace(/\/+$/, '');
+}
+
+function isLatestHandoffRunArtifact(filePath: string, latestRun: RunSummary | undefined) {
+  if (!latestRun || latestRun.command !== 'handoff') return false;
+  const normalizedPath = normalizeGitStatusPath(filePath);
+  const runPath = `.agentloop/runs/${latestRun.id}`;
+  return normalizedPath === runPath || normalizedPath.startsWith(`${runPath}/`);
+}
+
+async function dirtyCoveredByLatestHandoffRun(
+  cwd: string,
+  changedFiles: GitFileStatus[],
+  latestRun: RunSummary | undefined,
+) {
+  if (changedFiles.length === 0 || latestRun?.command !== 'handoff') return false;
+
+  const latestRunRecord = await readRun(cwd, latestRun.id).catch(() => undefined);
+  const coveredPaths = new Set(
+    (latestRunRecord?.changedFiles ?? []).map((changedFile) =>
+      normalizeGitStatusPath(changedFile.path),
+    ),
+  );
+  for (const artifactPath of [
+    latestRun.verificationReportPath,
+    latestRun.shipReportPath,
+    latestRun.handoffPath,
+  ]) {
+    if (artifactPath) coveredPaths.add(normalizeGitStatusPath(artifactPath));
+  }
+
+  return changedFiles.every((changedFile) => {
+    if (isLatestHandoffRunArtifact(changedFile.path, latestRun)) return true;
+    return coveredPaths.has(normalizeGitStatusPath(changedFile.path));
+  });
 }
 
 function formatMarkdownList(values: string[]) {
@@ -387,6 +427,11 @@ export async function getAgentLoopStatus(options: {
     }));
   const latestReport = stripReportTimestamp(currentReport);
   const latestRun = (await listRuns(options.cwd))[0];
+  const latestHandoffRunCoversDirtyFiles = await dirtyCoveredByLatestHandoffRun(
+    options.cwd,
+    changedFiles,
+    latestRun,
+  );
   const configured = DEFAULT_COMMAND_KEYS.filter((key) => options.config.commands[key]);
   const missing = DEFAULT_COMMAND_KEYS.filter((key) => !options.config.commands[key]);
   const nextAction = chooseNextAction({
@@ -396,6 +441,7 @@ export async function getAgentLoopStatus(options: {
     latestReport,
     latestRun,
     dirty: changedFiles.length > 0,
+    dirtyCoveredByLatestHandoffRun: latestHandoffRunCoversDirtyFiles,
   });
   const withoutMarkdown = {
     project: options.config.project,

@@ -8522,3 +8522,40 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The dogfood step forced us to keep the docs safety guard in the normal product loop, not only in release smoke.
 - Improve:
   - Consider making the public docs hygiene output list checked roots when a contributor runs it directly.
+
+## 2026-06-13: Stop Handoff Run Folder Repeat Prompts
+
+- Task contract: `.agentloop/tasks/2026-06-13-stop-handoff-run-folders-from-causing-repeat-handoff-prompts.md`
+- Trigger:
+  - After `handoff --write-run`, `agentloop status` still recommended `agentloop handoff`.
+  - The latest handoff run captured the dirty files before writing its own run folder, so the run folder itself remained as new dirty evidence.
+- Root cause:
+  - `chooseNextAction` only received a boolean dirty flag.
+  - It could not distinguish unhanded-off source/docs changes from the latest handoff run folder created by the handoff command itself.
+- Product-panel decision:
+  - Lina wanted to remove the loop because it wastes agent time after a correct handoff.
+  - Samir required working-tree JSON to keep reporting all dirty files.
+  - Maya kept the fix inside status next-action selection, without changing run metadata format.
+  - Nora wanted unrelated dirty files to keep pointing back to `agentloop handoff`.
+- Implementation:
+  - Added a status regression test for a dirty latest handoff run folder.
+  - Added a narrow status helper that compares dirty paths with the latest handoff run's recorded changed files, explicit run artifact paths, and `.agentloop/runs/<latest-handoff-run-id>/`.
+  - Preserved full working-tree reporting.
+- Verification:
+  - Red run failed with `agentloop handoff` as the next action.
+  - Focused green run passed after including a source change covered by `changed-files.json`:
+    - `npm test -- tests/status.test.ts -t "dirty files are covered"`
+  - Existing unrelated-dirty-file coverage still passed:
+    - `npm test -- tests/status.test.ts -t "hydrates latest run task metadata"`
+  - Full status test file passed with `26` tests:
+    - `npm test -- tests/status.test.ts`
+  - Final AgentLoop task verification passed: `.agentloop/reports/2026-06-13-01-06-verification-report.md`.
+  - Run ledger entry: `.agentloop/runs/2026-06-13-01-09-verify`.
+  - Handoff summary generated with `agentloop handoff --write-run`.
+  - Built CLI dogfood proof after final handoff:
+    - `node dist/cli/index.js status --brief --redact-paths`
+    - Result: next action was `agentloop create-task`, not another handoff.
+- What worked well:
+  - The previous strict dogfood run exposed a real loop after archived handoff evidence.
+- Improve:
+  - Consider showing a short status note when dirty files are only local AgentLoop evidence artifacts.
