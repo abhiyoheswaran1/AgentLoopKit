@@ -7615,3 +7615,45 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The option keeps automation-compatible defaults intact.
 - Improve:
   - If more commands need the same behavior, consolidate public-output redaction into a shared CLI option helper.
+
+## 2026-06-12: Release Gate For 0.28.0
+
+- Task contract: `.agentloop/tasks/2026-06-12-release-agentloopkit-0-28-0.md`
+- Trigger:
+  - The 0.28.0 batch was ready for the normal release gate.
+  - The release needed package metadata, changelog, release notes, local verification, package proof, GitHub release, npm trusted publishing, GHCR, and MCP Registry proof.
+- Implementation:
+  - Updated `package.json` and `server.json` to `0.28.0`.
+  - Moved `CHANGELOG.md` entries into a `0.28.0` section and left `Unreleased` empty.
+  - Wrote concise public release notes at `.agentloop/handoffs/2026-06-12-10-59-release-notes.md`.
+  - Corrected package metadata before packaging so the tarball exposes the CLI through `bin` and does not include an accidental `main` field.
+- Verification run:
+  - Dogfood verification passed: `.agentloop/reports/2026-06-12-11-00-verification-report.md`.
+  - Full Vitest passed twice inside the release gate and npm dry-run:
+    - `48` test files
+    - `415` tests
+  - Release task commands passed:
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm test`
+    - `npm run check:links`
+    - `node scripts/prepublish-check.mjs`
+    - `git diff --check`
+    - `npm run build`
+    - `npm run smoke:release`
+    - `node scripts/smoke-cli.mjs`
+    - `node dist/cli/index.js artifacts --json`
+    - `npx --yes projscan doctor --format markdown`
+  - Dogfood run ledger:
+    - `.agentloop/runs/2026-06-12-11-07-verify/`
+    - `.agentloop/runs/2026-06-12-11-08-ship/`
+  - Dogfood handoff: `.agentloop/handoffs/2026-06-12-11-08-pr-summary.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-11-08-ship-report.md` with score `96`/100.
+  - Packed tarball: `/tmp/agentloopkit-0.28.0.tgz`
+  - Tarball SHA-256: `82049976512173bcef3edadadef3b5aead76ea29531d2d2f02deafa945dd900c`
+  - `npm publish --access public --dry-run` passed and would publish `agentloopkit@0.28.0`.
+- What worked well:
+  - The release task caught package metadata before the tag was cut.
+  - The release notes stayed concise enough for GitHub while release evidence stayed local.
+- Improve:
+  - Add a future package-metadata test that fails if npm default fields such as `main: eslint.config.js` appear in the packed package.

@@ -84,9 +84,9 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - MCP Registry workflow run: `27301046893`
 - Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.27.0`
 
-## Current unreleased 0.28.0 batch
+## Current 0.28.0 release candidate
 
-Current `main` is accumulating work for a future `0.28.0` release. No version bump, GitHub release, npm publish, GHCR publish, or MCP Registry publish has been done for this batch.
+Current `main` is preparing `0.28.0`. The package and MCP metadata now report `0.28.0`, but GitHub release, npm publish, GHCR publish, and MCP Registry publish still require the normal release gate.
 
 Included so far:
 
@@ -105,7 +105,7 @@ Included so far:
 - read-only MCP review context snapshots that combine status, gates, policy status, artifacts, recent runs, and latest ship evidence
 - safe run ledger path storage and display for CLI, MCP, status, review-context, and public command outputs
 
-Before release, move `CHANGELOG.md` `## Unreleased` entries into a versioned `0.28.0` section and then run the normal release checklist.
+Before publishing, run the normal release checklist and verify the GitHub, npm, GHCR, and MCP Registry outputs.
 
 ## CLI commands
 

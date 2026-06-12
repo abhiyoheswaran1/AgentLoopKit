@@ -1,0 +1,86 @@
+# PR Summary
+
+- Generated: 2026-06-12-11-08
+- Task context: `Release AgentLoopKit 0.28.0`
+- Verification status: Overall status: pass
+
+## Summary
+This summary was generated deterministically from git status, the latest task contract, and the latest verification report.
+
+## Changed Files
+- M `CHANGELOG.md`
+- M `FINAL_HANDOFF.md`
+- M `ROADMAP.md`
+- M `docs/launch-checklist.md`
+- M `docs/npm-publishing.md`
+- M `docs/release-status.md`
+- M `package.json`
+- M `server.json`
+- ?? `.agentloop/handoffs/2026-06-12-10-59-release-notes.md`
+- ?? `.agentloop/reports/2026-06-12-11-00-verification-report.md`
+- ?? `.agentloop/runs/2026-06-12-11-07-verify/`
+- ?? `.agentloop/tasks/2026-06-12-release-agentloopkit-0-28-0.md`
+
+## Change Areas
+### AgentLoop
+- ?? `.agentloop/handoffs/2026-06-12-10-59-release-notes.md`
+- ?? `.agentloop/reports/2026-06-12-11-00-verification-report.md`
+- ?? `.agentloop/runs/2026-06-12-11-07-verify/`
+- ?? `.agentloop/tasks/2026-06-12-release-agentloopkit-0-28-0.md`
+
+### Documentation
+- M `CHANGELOG.md`
+- M `FINAL_HANDOFF.md`
+- M `ROADMAP.md`
+- M `docs/launch-checklist.md`
+- M `docs/npm-publishing.md`
+- M `docs/release-status.md`
+
+### Config / Package
+- M `package.json`
+
+### Other
+- M `server.json`
+
+## Diff Stats
+```text
+CHANGELOG.md             |  4 ++++
+ FINAL_HANDOFF.md         |  6 +++---
+ ROADMAP.md               |  2 +-
+ docs/launch-checklist.md |  2 +-
+ docs/npm-publishing.md   |  6 +++---
+ docs/release-status.md   | 10 +++++-----
+ package.json             |  2 +-
+ server.json              |  4 ++--
+ 8 files changed, 20 insertions(+), 16 deletions(-)
+```
+
+## Behaviour Changed
+- Review changed files and task contract to confirm intended behavior.
+
+## Review Focus
+- Check docs match the implemented command behavior.
+- Review package and config changes for install, build, and publish impact.
+- Review AgentLoop artifacts for accurate task, verification, and handoff evidence.
+- Review uncategorized files for ownership and scope.
+
+## Verification Performed
+- Overall status: pass
+
+## Verification Not Performed
+- Check the verification report for skipped commands.
+
+## Risks
+- Re-check protected files such as migrations, secrets, auth, billing, deployment, and public APIs before merge.
+
+## Rollback Notes
+- Revert the changed files or revert the merge commit if this lands as a PR.
+
+## Reviewer Checklist
+- [ ] Acceptance criteria match the task contract.
+- [ ] Verification evidence is adequate for the change.
+- [ ] Risk areas have been reviewed.
+- [ ] Rollback plan is clear.
+
+## Follow-Ups
+- Capture any deferred work in ROADMAP.md or a new task contract.

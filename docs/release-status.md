@@ -14,11 +14,11 @@ Last checked: June 12, 2026.
 - MCP Registry workflow run: `27301046893` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 - npm latest: `0.27.0`
-- Current `main` is accumulating unreleased work for the planned `0.28.0` batch
+- Current `main` is preparing the `0.28.0` release candidate
 
-## Current Unreleased Batch
+## Current Release Candidate
 
-Prepared for the future `0.28.0` release, but not yet released:
+Prepared for `0.28.0`, but not yet published:
 
 - npm-facing README simplified and detailed command behavior moved to `docs/cli-reference.md`
 - README terminal demo and showcase screenshot refreshed around the review-readiness loop
@@ -32,9 +32,9 @@ Prepared for the future `0.28.0` release, but not yet released:
 - `agentloop status --redact-paths` and `agentloop check-gates --redact-paths` added for public logs that should hide the absolute Git root
 - `agentloop ship --redact-paths` and `agentloop prepare-pr --redact-paths` added for acceptance-layer output that should hide embedded gate Git roots
 
-These changes must move from `CHANGELOG.md` `## Unreleased` into a versioned `0.28.0` section before publishing.
+These changes are recorded in `CHANGELOG.md` under `## 0.28.0`.
 
-Do not publish or bump versions until the maintainer asks for release prep.
+Publish only after the local release gate passes.
 
 ## Use The Current CLI
 
