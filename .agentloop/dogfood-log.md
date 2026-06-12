@@ -2,6 +2,36 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Review-Ready Next Action
+
+- Task contract: `.agentloop/tasks/2026-06-12-improve-next-action-for-review-ready-tasks.md`
+- Trigger:
+  - After committing the create-task activation fix, `agentloop status --json` showed a clean repo with an active task still in `review`.
+  - The recommended next command was `agentloop create-task`, which could send agents into unrelated work before closing the current loop.
+- Product change:
+  - `status` and `next` now recommend `agentloop task status <path> done` when the active task is `review`, verification passed, and the working tree is clean.
+  - Failed verification still points to `agentloop verify`.
+  - Dirty working trees still point to `agentloop handoff`.
+- Verification:
+  - Red focused run: `npm test -- tests/status.test.ts -t "recommends finishing an active review task"` failed because the next command was `agentloop create-task`.
+  - Green focused run: `npm test -- tests/status.test.ts -t "recommends finishing an active review task"` passed after updating the next-action rules.
+  - Affected suite `npm test -- tests/status.test.ts tests/next.test.ts tests/task-state.test.ts` passed with 3 files and 70 tests.
+  - `npm run typecheck`, `npm run lint`, `npm run check:links`, `git diff --check`, `npm test`, and `npm run build` passed.
+  - CLI smoke and packed release smoke passed.
+  - Production dependency audit passed with no known vulnerabilities.
+  - ProjScan reported A 100/100.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-03-38-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-03-45-verify/`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-03-45-ship-report.md`.
+  - Dogfood ship run: `.agentloop/runs/2026-06-12-03-45-ship/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-03-45-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-03-45-pr-description.md`.
+  - Ship score: 96/100 with gates passing.
+- Worked well:
+  - The bug surfaced directly through AgentLoopKit's own `status` output after a clean commit.
+- Improve:
+  - Consider a future command that closes the task loop explicitly without forcing users to remember `task status ... done` then `task archive ...`.
+
 ## 2026-06-12: Create Task Activates New Contract
 
 - Task contract: `.agentloop/tasks/2026-06-12-activate-newly-created-task-contracts.md`

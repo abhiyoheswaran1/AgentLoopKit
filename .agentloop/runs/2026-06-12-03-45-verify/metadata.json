@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-03-45-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-03-45",
+  "createdAtEpochMs": 1781228746441,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-improve-next-action-for-review-ready-tasks.md",
+    "title": "Improve next action for review-ready tasks",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-03-38-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 11
+}

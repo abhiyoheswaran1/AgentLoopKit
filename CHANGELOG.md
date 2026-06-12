@@ -12,6 +12,7 @@
 - Added `shipEvidence.source` and `shipEvidence.runId` to `agentloop prepare-pr --json` output.
 - Changed `agentloop prepare-pr` PR bodies to group changed files by review area.
 - Changed `agentloop create-task` to set the newly created contract as the active task and include `activeTask` in JSON output.
+- Changed `agentloop status` and `agentloop next` to recommend marking clean, verified `review` tasks as `done` before starting unrelated work.
 - Changed `agentloop policy list/status` human output to render policy titles, statuses, and paths with Markdown-safe inline-code delimiters while keeping JSON output and raw `policy show` content unchanged.
 - Changed run ledger reads and writes to reject run-id directories that resolve outside `.agentloop/runs/` through symlinks.
 - Changed run ledger writes to keep same-minute same-command records by appending collision-safe numeric suffixes instead of overwriting the existing run.

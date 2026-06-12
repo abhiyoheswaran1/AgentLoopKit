@@ -184,6 +184,13 @@ function chooseNextAction(input: {
       reason: 'Task and verification evidence exist, and the working tree has changes.',
     };
   }
+  if (input.activeTask.status.trim().toLowerCase() === 'review') {
+    return {
+      command: `agentloop task status ${input.activeTask.path} done`,
+      reason:
+        'The active task is in review, verification passed, and the repo is clean. Mark it done after the handoff is ready, or leave it in review if human review is still pending.',
+    };
+  }
   return {
     command: 'agentloop create-task',
     reason: 'The repo is clean. Start the next task contract when ready.',

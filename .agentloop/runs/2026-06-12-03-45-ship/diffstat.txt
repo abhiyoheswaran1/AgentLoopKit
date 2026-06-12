@@ -1,0 +1,10 @@
+ .agentloop/backlog.md     |  1 +
+ .agentloop/dogfood-log.md | 18 ++++++++++++++++++
+ CHANGELOG.md              |  1 +
+ FINAL_HANDOFF.md          |  1 +
+ docs/cli-reference.md     |  2 +-
+ docs/status.md            |  3 ++-
+ src/core/status.ts        |  7 +++++++
+ tests/next.test.ts        | 32 ++++++++++++++++++++++++++++++++
+ tests/status.test.ts      | 40 ++++++++++++++++++++++++++++++++++++++++
+ 9 files changed, 103 insertions(+), 2 deletions(-)

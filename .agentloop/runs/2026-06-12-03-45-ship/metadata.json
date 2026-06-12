@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-03-45-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-03-45",
+  "createdAtEpochMs": 1781228761756,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-improve-next-action-for-review-ready-tasks.md",
+    "title": "Improve next action for review-ready tasks",
+    "status": "review"
+  },
+  "verificationReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-03-38-verification-report.md",
+  "shipReportPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/reports/2026-06-12-03-45-ship-report.md",
+  "handoffPath": "/Users/abhyoh/local dev folder/Apps/AgentLoopKit/.agentloop/handoffs/2026-06-12-03-45-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 12
+}

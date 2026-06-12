@@ -73,10 +73,11 @@ The command suggests one next action:
 - `agentloop verify` when an in-progress task exists without verification evidence that is at least as new as the task contract
 - `agentloop verify` when the latest verification report failed
 - `agentloop handoff` when task evidence exists and the working tree has changes
+- `agentloop task status <path> done` when the pinned active task is `review`, verification passed, and the working tree is clean
 
 `status` and `next` do not execute project commands, read `.env` contents, call an LLM, or make network requests.
 When `.agentloop/runs/` exists, `status` includes the newest run entry in Markdown, JSON, and brief output. This is local ledger metadata only. It can point to the latest `ship`, `verify --write-run`, `summarize --write-run`, or `handoff --write-run` evidence, but it does not change the next-action decision rules.
 Older verification reports remain on disk, but `status` and `next` ignore them as current evidence for a newer in-progress task. Moving a task to `review` or `done` after verification does not erase the latest report from the loop state.
-If a task stays pinned after it reaches `done`, `status` and `next` point you at `agentloop task archive <path>` so the next session starts clean.
+If a task stays pinned in `review` after verification passes and the repo becomes clean, `status` and `next` point you at `agentloop task status <path> done`. If a task stays pinned after it reaches `done`, they point you at `agentloop task archive <path>` so the next session starts clean.
 When no active task is pinned, `status` and `next` report the newest open contract as `latestTask`, leave `activeTask` null, and recommend `agentloop task set <path>` before continuing. They keep tasks marked `deferred`, `done`, `completed`, or `verified` out of `latestTask`. Deferred tasks stay visible as parked work in `deferredTasks`. If every task contract is terminal or deferred, they recommend `agentloop create-task` instead of resurfacing old work.
 Run `agentloop task doctor` when a repo has many old task files and you need a cleanup checklist before choosing the next task.

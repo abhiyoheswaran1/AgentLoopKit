@@ -432,6 +432,46 @@ describe('status command', () => {
     );
   });
 
+  test('recommends finishing an active review task when verification passed and the tree is clean', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    const taskPath = '.agentloop/tasks/2026-06-09-review-login.md';
+    await writeFile(path.join(dir, taskPath), '# Review login\n\n- Status: review\n');
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: taskPath,
+      }),
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'status'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    const status = JSON.parse(jsonResult.stdout);
+    expect(status.activeTask).toMatchObject({
+      path: taskPath,
+      title: 'Review login',
+      status: 'review',
+    });
+    expect(status.nextAction.command).toBe(`agentloop task status ${taskPath} done`);
+    expect(status.nextAction.reason).toContain('active task is in review');
+    expect(markdownResult.stdout).toContain(`Run \`agentloop task status ${taskPath} done\`.`);
+  });
+
   test('uses modified time instead of filename sort for the active task', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
