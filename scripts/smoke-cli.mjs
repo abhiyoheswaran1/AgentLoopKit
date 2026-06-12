@@ -302,6 +302,41 @@ async function smokeCli({ keep = false } = {}) {
     assert(verification.run?.id, 'verify JSON did not include run.id when --write-run was used.');
     console.log('Verify smoke passed.');
 
+    await writeFile(
+      path.join(smokeRepo, 'progress-output.mjs'),
+      "console.log('raw-child-output-hidden-from-progress');\n",
+    );
+    const progressVerification = await runAgentLoop(
+      [
+        'verify',
+        '--task',
+        taskPath,
+        '--no-test',
+        '--no-lint',
+        '--no-typecheck',
+        '--no-build',
+        '--command',
+        'node progress-output.mjs',
+        '--progress',
+      ],
+      { cwd: smokeRepo },
+    );
+    assert(
+      progressVerification.stdout.includes(
+        '[1/1] custom started: `node progress-output.mjs`',
+      ),
+      'verify --progress did not print the command start line.',
+    );
+    assert(
+      /\[1\/1\] custom passed in \d+ms/.test(progressVerification.stdout),
+      'verify --progress did not print the command finish line.',
+    );
+    assert(
+      !progressVerification.stdout.includes('raw-child-output-hidden-from-progress'),
+      'verify --progress streamed raw child output to stdout.',
+    );
+    console.log('Verify progress smoke passed.');
+
     const handoff = parseJson(
       (
         await runAgentLoop(

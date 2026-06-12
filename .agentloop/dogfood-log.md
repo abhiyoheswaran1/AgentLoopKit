@@ -2,6 +2,26 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Built CLI Smoke Covers Verify Progress
+
+- Task contract: `.agentloop/tasks/2026-06-12-smoke-test-verify-progress-flag.md`
+- Trigger:
+  - `agentloop verify --progress` had source-level tests, but the built package smoke flow did not prove the packaged binary accepted the new flag.
+- Product change:
+  - `scripts/smoke-cli.mjs` now runs `verify --progress` against the built CLI.
+  - The smoke assertion checks the start line, finish line, and absence of raw child-process output in stdout.
+- Verification:
+  - Red TDD run: `npm test -- tests/distribution-artifacts.test.ts` failed because the smoke script had no `--progress` coverage.
+  - Green focused run: `npm test -- tests/distribution-artifacts.test.ts` passed with 1 file and 10 tests.
+  - `npm run build && node scripts/smoke-cli.mjs` passed, including `Verify progress smoke passed.`
+  - AgentLoop task verification passed with `--progress` and wrote `.agentloop/reports/2026-06-12-17-39-verification-report.md`.
+  - `npm run dogfood:strict` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The smoke flow now covers the exact binary users get from the package.
+- Improve:
+  - Keep new CLI flags covered in both source tests and built smoke when they affect release confidence.
+
 ## 2026-06-12: Roadmap Release-State Guard
 
 - Task contract: `.agentloop/tasks/2026-06-12-guard-roadmap-release-state.md`

@@ -1,0 +1,6 @@
+ .agentloop/backlog.md                |  1 +
+ .agentloop/dogfood-log.md            | 20 ++++++++++++++++++++
+ CHANGELOG.md                         |  1 +
+ scripts/smoke-cli.mjs                | 35 +++++++++++++++++++++++++++++++++++
+ tests/distribution-artifacts.test.ts |  3 +++
+ 5 files changed, 60 insertions(+)

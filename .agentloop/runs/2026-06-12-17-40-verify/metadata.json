@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-17-40-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-17-40",
+  "createdAtEpochMs": 1781278822618,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-smoke-test-verify-progress-flag.md",
+    "title": "Smoke test verify progress flag",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-17-39-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

@@ -148,6 +148,9 @@ describe('distribution artifacts', () => {
     expect(smokeScript).toContain("'status', '--json'");
     expect(smokeScript).toContain("'create-task'");
     expect(smokeScript).toContain("'verify'");
+    expect(smokeScript).toContain("'--progress'");
+    expect(smokeScript).toContain('Verify progress smoke passed.');
+    expect(smokeScript).toContain('raw-child-output-hidden-from-progress');
     expect(smokeScript).toContain("'handoff'");
     expect(smokeScript).toContain("'check-gates', '--json'");
     expect(smokeScript).toContain("'policy', 'list', '--json'");
