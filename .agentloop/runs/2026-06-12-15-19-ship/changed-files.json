@@ -1,0 +1,58 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "DECISIONS.md"
+  },
+  {
+    "status": "M",
+    "path": "scripts/prepublish-check.mjs"
+  },
+  {
+    "status": "M",
+    "path": "tests/prepublish-check.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-15-13-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-15-14-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-15-16-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-12-15-18-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-15-13-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-15-14-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-15-16-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-12-15-19-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-12-add-release-metadata-sync-prepublish-guard.md"
+  }
+]

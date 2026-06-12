@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-12-15-19-ship",
+  "command": "ship",
+  "createdAt": "2026-06-12-15-19",
+  "createdAtEpochMs": 1781270356079,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-release-metadata-sync-prepublish-guard.md",
+    "title": "Add release metadata sync prepublish guard",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-15-18-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-12-15-19-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-12-15-19-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 14
+}

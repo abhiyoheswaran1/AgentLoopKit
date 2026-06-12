@@ -343,3 +343,9 @@ Release notes include a fallback reason when a requested `--from` Git ref is mis
 AgentLoopKit now treats review readiness as a local evidence problem. `agentloop ship` composes existing task, verification, gate, handoff, Git, and risk signals into a deterministic score and Markdown report. The score does not claim to measure code quality. It only states whether the work has enough local evidence for review.
 
 The run ledger lives under `.agentloop/runs/` instead of a database or cloud service. `intent <file>` reads that local ledger to explain which previous ship runs touched a file. GitHub comment output is Markdown only; the CLI does not require tokens or post comments itself.
+
+## 2026-06-12: Prepublish Checks Guard MCP Registry Metadata Drift
+
+The `0.28.2` release gate failed late because `server.json` still carried the previous package version. Distribution artifact tests caught the issue, but only after a heavier release run.
+
+`scripts/prepublish-check.mjs` now compares `package.json.version` with both `server.json.version` and the npm package entry in `server.json`. This keeps the release guard local, read-only, and fast. The guard does not rewrite metadata, call npm, create releases, or publish registry entries.

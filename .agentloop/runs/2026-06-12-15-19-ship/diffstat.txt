@@ -1,0 +1,6 @@
+ .agentloop/backlog.md          |  3 +-
+ .agentloop/dogfood-log.md      | 25 +++++++++++++
+ DECISIONS.md                   |  6 +++
+ scripts/prepublish-check.mjs   | 53 ++++++++++++++++++++++++--
+ tests/prepublish-check.test.ts | 85 ++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 168 insertions(+), 4 deletions(-)

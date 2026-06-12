@@ -2,6 +2,34 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: Release Metadata Sync Prepublish Guard
+
+- Task contract: `.agentloop/tasks/2026-06-12-add-release-metadata-sync-prepublish-guard.md`
+- Trigger:
+  - The `0.28.2` release gate failed late because `server.json` still listed `0.28.1` after `package.json` moved to `0.28.2`.
+  - The product-panel decision favored a fast read-only prepublish guard over metadata auto-rewrites.
+- Product change:
+  - `scripts/prepublish-check.mjs` now checks `package.json.version` against `server.json.version`.
+  - The same guard checks the `agentloopkit` npm package entry inside `server.json`.
+  - The guard prints the expected version from `package.json` and the stale value from `server.json`.
+- Verification:
+  - Red TDD run: `npm test -- tests/prepublish-check.test.ts` failed because stale `server.json` metadata still exited 0.
+  - Green focused run: `npm test -- tests/prepublish-check.test.ts` passed with 4 tests.
+  - First focused AgentLoop verification failed because `npm run dogfood:strict` was listed as a task command before a current verification report existed.
+  - The task contract now treats `npm run dogfood:strict` as a post-report handoff gate.
+  - Focused AgentLoop verification passed: `.agentloop/reports/2026-06-12-15-14-verification-report.md`.
+  - Final AgentLoop verification passed: `.agentloop/reports/2026-06-12-15-18-verification-report.md`.
+  - Run ledger entries: `.agentloop/runs/2026-06-12-15-14-verify/` and `.agentloop/runs/2026-06-12-15-19-verify/`.
+  - `npm run dogfood:strict` passed after the report existed.
+  - Ship report: `.agentloop/reports/2026-06-12-15-19-ship-report.md` with review readiness `96`/100.
+  - Handoff summary: `.agentloop/handoffs/2026-06-12-15-19-pr-summary.md`.
+  - ProjScan reported A 100/100.
+- Worked well:
+  - The release failure became a concrete product guard within one dogfood cycle.
+  - The new `--only-task-commands` flag made the focused verification pass shorter and clearer.
+- Improve:
+  - Add phase-aware guidance so task contracts do not put post-report commands inside the same `verify --task-commands` phase.
+
 ## 2026-06-12: 0.28.2 Patch Release Gate
 
 - Task contract: `.agentloop/tasks/2026-06-12-prepare-0-28-2-patch-release.md`

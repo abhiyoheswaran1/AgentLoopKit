@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-12-15-13-verify",
+  "command": "verify",
+  "createdAt": "2026-06-12-15-13",
+  "createdAtEpochMs": 1781270013035,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-12-add-release-metadata-sync-prepublish-guard.md",
+    "title": "Add release metadata sync prepublish guard",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-15-13-verification-report.md",
+  "overallStatus": "fail",
+  "changedFileCount": 6
+}
