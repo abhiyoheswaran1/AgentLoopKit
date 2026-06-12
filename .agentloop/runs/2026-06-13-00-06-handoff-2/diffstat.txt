@@ -1,0 +1,7 @@
+ .agentloop/dogfood-log.md                          | 11 +++-
+ ...12-release-0-28-7-public-release-notes-patch.md | 75 ----------------------
+ FINAL_HANDOFF.md                                   | 50 +++++++--------
+ docs/launch-checklist.md                           |  2 +-
+ docs/npm-publishing.md                             |  8 +--
+ docs/release-status.md                             | 48 +++++++-------
+ 6 files changed, 66 insertions(+), 128 deletions(-)

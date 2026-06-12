@@ -1,0 +1,38 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-12-release-0-28-7-public-release-notes-patch.md"
+  },
+  {
+    "status": "M",
+    "path": "FINAL_HANDOFF.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/launch-checklist.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/npm-publishing.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/release-status.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-13-00-06-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-00-06-handoff/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-12-release-0-28-7-public-release-notes-patch.md"
+  }
+]

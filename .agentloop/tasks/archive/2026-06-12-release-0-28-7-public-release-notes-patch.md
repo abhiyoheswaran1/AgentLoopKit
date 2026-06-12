@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-12
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The logo and dogfood gate work is released in `0.28.6`, but the next release workflow still needs one small patch: concise public release notes for GitHub release pages. The repo also has stale maintainer docs that still mention `0.28.5` as the current published version. We need to ship the public release-notes mode and clean release metadata through the normal GitHub release gate.

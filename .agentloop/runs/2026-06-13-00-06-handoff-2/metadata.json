@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-00-06-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-13-00-06",
+  "createdAtEpochMs": 1781301984101,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-12-release-0-28-7-public-release-notes-patch.md",
+    "title": "Release 0.28.7 public release notes patch",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-12-23-46-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-00-06-pr-summary.md",
+  "changedFileCount": 9
+}

@@ -4,7 +4,7 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 
 ## 2026-06-12: 0.28.7 Release Prep
 
-- Task contract: `.agentloop/tasks/2026-06-12-release-0-28-7-public-release-notes-patch.md`
+- Task contract: `.agentloop/tasks/archive/2026-06-12-release-0-28-7-public-release-notes-patch.md`
 - Trigger:
   - The maintainer asked for a small patch release after the logo and dogfood work.
   - The previous release exposed a product gap: detailed local release notes were useful for evidence, but too noisy for public GitHub release pages.
@@ -19,7 +19,16 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The verification run wrote `.agentloop/runs/2026-06-12-23-53-verify/`.
   - `npm run dogfood:strict` passed after the fresh verification report existed.
   - `node dist/cli/index.js release-check` passed release metadata checks and warned only because the release prep tree was still dirty.
+  - `node dist/cli/index.js release-check --strict` passed after the release prep commit produced a clean tree.
   - `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - GitHub release `v0.28.7` was created with release asset SHA-256 `cd2c1b019e6f2b9e5a88576548da4f81048ca24cd9a3e5edd34141b82d08d27b`.
+  - CI workflow `27445382568` passed.
+  - CLI Smoke workflow `27445382562` passed on Ubuntu, macOS, and Windows.
+  - Publish workflow `27445394952` passed and published `agentloopkit@0.28.7`.
+  - Docker workflow `27445394954` passed.
+  - MCP Registry workflow `27445602561` passed.
+  - `npm view agentloopkit version versions --json` reported latest `0.28.7`.
+  - `npm run smoke:published -- --version 0.28.7` passed.
 - Worked well:
   - Dogfooding caught that `dogfood:strict` and strict release checks belong after verification writes evidence, not inside the same pre-report command list.
 - Improve:

@@ -4,28 +4,28 @@ Last checked: June 12, 2026.
 
 ## Current State
 
-- Current public release: `v0.28.6`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.6>
-- Release asset: `agentloopkit-0.28.6.tgz`
-- Release asset SHA-256: `2f91b2c0adc5d44f5f32f09eb40f4e0ce028c07400c6fb76fe075070ec65b573`
-- Release tag `v0.28.6` points at commit `445806d9af40c614d3d79d9e6efcf096fb2823a6`
-- npm latest: `0.28.6`
-- CI run: `27442870785` passed for the release commit
-- CLI Smoke run: `27442870779` passed on Ubuntu, macOS, and Windows
-- Publish workflow run: `27442925865` passed and published `agentloopkit@0.28.6` through npm trusted publishing
-- Docker workflow run: `27442925900` passed and published the GHCR image for `0.28.6`
-- MCP Registry workflow run: `27443148213` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
+- Current public release: `v0.28.7`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.7>
+- Release asset: `agentloopkit-0.28.7.tgz`
+- Release asset SHA-256: `cd2c1b019e6f2b9e5a88576548da4f81048ca24cd9a3e5edd34141b82d08d27b`
+- Release tag `v0.28.7` points at commit `d7bc79d02dfa5c8b5602866fbb88436dcd60be47`
+- npm latest: `0.28.7`
+- CI run: `27445382568` passed for the release commit
+- CLI Smoke run: `27445382562` passed on Ubuntu, macOS, and Windows
+- Publish workflow run: `27445394952` passed and published `agentloopkit@0.28.7` through npm trusted publishing
+- Docker workflow run: `27445394954` passed and published the GHCR image for `0.28.7`
+- MCP Registry workflow run: `27445602561` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
 Docker is not installed in the local maintainer shell, and the current GitHub token lacks `read:packages`, so this page records the successful Docker workflow as GHCR proof instead of a locally pulled image digest.
 
 ## Latest Release Highlights
 
-Released in `0.28.6`:
+Released in `0.28.7`:
 
-- `agentloop release-check` warns when the latest generated release notes do not mention the local package version
-- `agentloop release-check --strict` fails stale release-note evidence before a maintainer cuts a release
-- release notes for `0.28.6` were generated from a clean `v0.28.5..HEAD` range
+- `agentloop release-notes --public` prints concise release-page Markdown.
+- Public release notes keep the version, changelog items, verification status, selected git range, and install command.
+- The detailed release-notes output remains the default local evidence format.
 
 ## Use The Current CLI
 
@@ -33,7 +33,7 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.28.6 version
+npx --yes agentloopkit@0.28.7 version
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -57,11 +57,15 @@ After each publish:
 
 ## Verification Evidence
 
-Local release gate for `0.28.6`:
+Local release gate for `0.28.7`:
 
 - `node scripts/prepublish-check.mjs`
-- `npm test -- tests/release-check.test.ts tests/release-smoke.test.ts`
+- `npm test -- tests/release-notes.test.ts tests/release-smoke.test.ts tests/release-check.test.ts`
+- `npm run lint`
 - `npm run typecheck`
+- `npm test`
+- `npm run check:links`
+- `git diff --check`
 - `npm run build`
 - `npm run smoke:release`
 - `npm run dogfood:strict`
@@ -70,17 +74,17 @@ Local release gate for `0.28.6`:
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: latest `0.28.6`
+- `npm view agentloopkit version versions --json`: latest `0.28.7`
 - `node dist/cli/index.js npm-status --agentloopkit --expect-current --json`: status `current`
-- `npm run smoke:published -- --version 0.28.6`: passed
-- `npx --yes agentloopkit@0.28.6 version`: reported `0.28.6` through the published-package smoke
+- `npm run smoke:published -- --version 0.28.7`: passed
+- `npx --yes agentloopkit@0.28.7 version`: reported `0.28.7` through the published-package smoke
 - GitHub release asset digest matched the local tarball SHA-256
 - CI, CLI Smoke, Publish, Docker, and MCP Registry workflows passed
 
 Latest release-status documentation checks:
 
 - `npm run dogfood:strict`
-- `npm run check:links`: 1439 Markdown files checked
+- `npm run check:links`: 1452 Markdown files checked
 - `node scripts/prepublish-check.mjs`
 - `git diff --check`
 - `npx --yes projscan doctor --format markdown`: A 100/100
