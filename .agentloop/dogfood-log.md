@@ -2,6 +2,40 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-12: MCP Maintainer Check
+
+- Task contract: `.agentloop/tasks/2026-06-12-expose-maintainer-check-through-mcp.md`
+- Trigger:
+  - MCP clients could read evidence but could not ask AgentLoopKit for the deterministic maintainer reviewability checklist used by the CLI.
+  - Maintainer-check is local-only and already avoids posting comments, calling GitHub, or reading tokens.
+- Product change:
+  - Added read-only MCP tool `agentloop_maintainer_check`.
+  - The tool returns the existing maintainer-check payload with status, checks, checklist, and suggested contributor request.
+  - The implementation does not change maintainer-check logic.
+- Verification:
+  - Red focused run: `npm test -- tests/mcp-tools.test.ts` failed because `agentloop_maintainer_check` was missing and unknown.
+  - Green focused run of the same command passed after adding the tool.
+  - Focused MCP suite `npm test -- tests/mcp-tools.test.ts tests/mcp-server.test.ts` passed with 2 files and 5 tests.
+  - `npm run typecheck`, `npm run lint`, `npm run check:links`, and `git diff --check` passed.
+  - `npm run build` passed.
+  - Full `npm test` passed with 47 files and 407 tests.
+  - CLI smoke passed.
+  - Packed release smoke passed.
+  - Production dependency audit passed with no known vulnerabilities.
+  - ProjScan reported A 100/100.
+  - Dogfood verification report: `.agentloop/reports/2026-06-12-06-10-verification-report.md`.
+  - Dogfood verify run: `.agentloop/runs/2026-06-12-06-13-verify/`.
+  - Archived completed prior task: `.agentloop/tasks/archive/2026-06-12-expose-file-intent-through-mcp.md`.
+  - Dogfood ship report: `.agentloop/reports/2026-06-12-06-13-ship-report.md`.
+  - Dogfood ship run: `.agentloop/runs/2026-06-12-06-13-ship/`.
+  - Dogfood PR summary: `.agentloop/handoffs/2026-06-12-06-13-pr-summary.md`.
+  - Dogfood PR description: `.agentloop/handoffs/2026-06-12-06-13-pr-description.md`.
+  - Ship score: 92/100 with gates passing.
+- Worked well:
+  - The MCP command stayed as a thin read-only wrapper around the existing maintainer-check core.
+- Improve:
+  - Add MCP coverage for policy status only if clients need policy drift signals beyond `agentloop_list_policies` and `agentloop_read_policy`.
+
 ## 2026-06-12: MCP File Intent Lookup
 
 - Task contract: `.agentloop/tasks/2026-06-12-expose-file-intent-through-mcp.md`

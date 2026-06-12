@@ -12,6 +12,7 @@ import { pathExists, resolvesInsidePath } from './file-system.js';
 import { getAgentLoopStatus } from './status.js';
 import { getActiveTask, listTasks, readTaskContract } from './task-state.js';
 import { listPolicies, readPolicy } from './policy.js';
+import { runMaintainerCheck } from './maintainer-check.js';
 import {
   findFileIntent,
   listRuns,
@@ -154,6 +155,11 @@ const tools: McpToolDefinition[] = [
       required: ['file'],
       additionalProperties: false,
     },
+  },
+  {
+    name: 'agentloop_maintainer_check',
+    description: 'Read local maintainer reviewability checks for AI-assisted changes.',
+    inputSchema: emptyInputSchema,
   },
   {
     name: 'agentloop_list_handoffs',
@@ -381,6 +387,9 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
           toMcpIntentMatch(options.cwd, match),
         ),
       });
+    }
+    case 'agentloop_maintainer_check': {
+      return textResult(await runMaintainerCheck({ cwd: options.cwd, config }));
     }
     case 'agentloop_list_handoffs': {
       const limit = readLimitArgument(options.arguments);

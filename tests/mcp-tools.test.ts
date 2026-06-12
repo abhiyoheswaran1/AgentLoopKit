@@ -96,6 +96,17 @@ type IntentPayload = {
   }>;
 };
 
+type MaintainerCheckPayload = {
+  status: string;
+  checks: Array<{
+    id: string;
+    status: string;
+    message: string;
+  }>;
+  maintainerChecklist: string[];
+  suggestedContributorRequest: string;
+};
+
 type HandoffsPayload = {
   handoffs: Array<{
     title: string;
@@ -199,6 +210,7 @@ describe('mcp tools', () => {
       'agentloop_list_runs',
       'agentloop_show_run',
       'agentloop_file_intent',
+      'agentloop_maintainer_check',
       'agentloop_list_handoffs',
       'agentloop_latest_handoff',
     ]);
@@ -234,6 +246,10 @@ describe('mcp tools', () => {
       name: 'agentloop_file_intent',
       arguments: { file: 'src/routes/api.ts' },
     });
+    const maintainerCheck = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_maintainer_check',
+    });
     const handoffs = await callMcpTool({ cwd: dir, name: 'agentloop_list_handoffs' });
     const handoff = await callMcpTool({ cwd: dir, name: 'agentloop_latest_handoff' });
 
@@ -248,6 +264,7 @@ describe('mcp tools', () => {
     const runsPayload = runs.payload as RunsPayload;
     const runPayload = run.payload as RunPayload;
     const intentPayload = intent.payload as IntentPayload;
+    const maintainerCheckPayload = maintainerCheck.payload as MaintainerCheckPayload;
     const handoffsPayload = handoffs.payload as HandoffsPayload;
     const handoffPayload = handoff.payload as HandoffPayload;
 
@@ -295,6 +312,16 @@ describe('mcp tools', () => {
       ],
     });
     expect(intentPayload.runs[0].shipReportPath).not.toContain(dir);
+    expect(maintainerCheckPayload.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'task-contract', status: 'pass' }),
+        expect.objectContaining({ id: 'verification-evidence', status: 'pass' }),
+      ]),
+    );
+    expect(maintainerCheckPayload.maintainerChecklist).toContain(
+      'Confirm the task contract matches the pull request scope.',
+    );
+    expect(maintainerCheckPayload.suggestedContributorRequest).toEqual(expect.any(String));
     expect(handoffsPayload.handoffs[0]).toMatchObject({ title: 'PR Summary' });
     expect(handoffPayload.handoff.content).toContain('Route implementation handoff.');
   });

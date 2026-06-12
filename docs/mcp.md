@@ -36,6 +36,7 @@ Example MCP client configuration:
 | `agentloop_list_runs`                  | Recent local run ledger entries with bounded `limit` input                                                                          |
 | `agentloop_show_run`                   | One local run ledger entry by run id, including metadata, score JSON, changed files, and diffstat                                   |
 | `agentloop_file_intent`                | Local run ledger matches for one repo-relative file path                                                                            |
+| `agentloop_maintainer_check`           | Local maintainer reviewability checks for AI-assisted changes                                                                       |
 | `agentloop_list_handoffs`              | Recent reviewer handoff summaries                                                                                                   |
 | `agentloop_latest_handoff`             | Latest reviewer handoff Markdown content                                                                                            |
 

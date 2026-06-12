@@ -298,7 +298,7 @@ See [release-notes.md](release-notes.md) and [npm-status.md](npm-status.md).
 agentloop mcp-server
 ```
 
-The MCP server is read-only. It exposes existing repo evidence to MCP clients through stdio: status, next action, task contracts, active task, policies, latest verification report, latest ship report, run ledger summaries and details, file intent matches, and handoff summaries.
+The MCP server is read-only. It exposes existing repo evidence to MCP clients through stdio: status, next action, task contracts, active task, policies, latest verification report, latest ship report, run ledger summaries and details, file intent matches, maintainer reviewability checks, and handoff summaries.
 
 It does not run verification commands, edit files, call external APIs, read `.env` contents, or upload data.
 

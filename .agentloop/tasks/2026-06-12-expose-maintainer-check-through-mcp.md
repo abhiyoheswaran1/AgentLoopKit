@@ -1,4 +1,4 @@
-# Expose file intent through MCP
+# Expose maintainer check through MCP
 
 - Created date: 2026-06-12
 - Task type: feature
@@ -8,14 +8,14 @@
 Describe the problem this task should solve.
 
 ## Desired Outcome
-MCP clients can ask which local AgentLoopKit runs touched or referenced a file and why, using the existing run ledger without command execution.
+MCP clients can inspect local maintainer reviewability signals for AI-assisted work without command execution, writes, API calls, or token handling.
 
 ## Constraints
 - None recorded yet.
 
 ## Non-Goals
-- Do not add MCP write tools, command execution, or GitHub token handling.
-- Do not infer intent with an LLM or inspect file contents.
+- Do not add write tools, GitHub posting, token handling, or PR API integration.
+- Do not change maintainer-check scoring or gate logic.
 
 ## Assumptions
 - None recorded yet.
@@ -29,9 +29,9 @@ MCP clients can ask which local AgentLoopKit runs touched or referenced a file a
 - None recorded yet.
 
 ## Acceptance Criteria
-- Read-only MCP tool agentloop_file_intent accepts a repo-relative file path and returns the same deterministic intent matches as agentloop intent.
-- The MCP intent payload includes the normalized file path and matching run summaries with repo-relative AgentLoop artifact paths.
-- The tool does not read the target file contents, execute commands, call APIs, or write files.
+- Read-only MCP tool agentloop_maintainer_check returns the same deterministic maintainer-check payload used by the CLI.
+- The MCP maintainer-check payload remains local-only and does not post comments, call GitHub, or read environment files.
+- The tool is documented in MCP docs and covered by MCP tool tests.
 
 ## Verification Commands
 - npm test -- tests/mcp-tools.test.ts tests/mcp-server.test.ts
@@ -44,7 +44,7 @@ MCP clients can ask which local AgentLoopKit runs touched or referenced a file a
 - Record any architecture decision in DECISIONS.md.
 
 ## Risk Notes
-- MCP intent lookup must not turn arbitrary file paths into file reads or absolute path leaks.
+- Maintainer-check may expose local paths in structured output; avoid adding new path exposure beyond existing CLI JSON semantics unless already normalized.
 
 ## Rollback Notes
 Document how to revert or disable this change.
