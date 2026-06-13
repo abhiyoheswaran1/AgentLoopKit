@@ -864,7 +864,11 @@ describe('status command', () => {
     });
     expect(status.workingTree.changedFiles).toContainEqual({
       status: '??',
-      path: `.agentloop/runs/${runId}/`,
+      path: `.agentloop/runs/${runId}/metadata.json`,
+    });
+    expect(status.workingTree.changedFiles).toContainEqual({
+      status: '??',
+      path: `.agentloop/runs/${runId}/changed-files.json`,
     });
     expect(status.latestRun.task).toMatchObject({
       path: '.agentloop/tasks/archive/2026-06-13-docs-hygiene.md',
@@ -956,7 +960,7 @@ describe('status command', () => {
     });
     expect(status.workingTree.dirty).toBe(true);
     expect(status.nextAction.command).toBe('agentloop task done');
-    expect(status.nextAction.reason).toContain('handoff evidence covers the current dirty files');
+    expect(status.nextAction.reason).toContain('handoff evidence cover the current dirty files');
     expect(briefResult.stdout).toContain('next="agentloop task done"');
     expect(markdownResult.stdout).toContain('Run `agentloop task done`.');
   });

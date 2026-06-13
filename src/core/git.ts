@@ -39,7 +39,10 @@ export async function getGitAbsoluteDir(cwd: string) {
 }
 
 export async function getGitStatus(cwd: string) {
-  const result = await execa('git', ['status', '--short'], { cwd, reject: false });
+  const result = await execa('git', ['status', '--short', '--untracked-files=all'], {
+    cwd,
+    reject: false,
+  });
   return result.exitCode === 0 ? result.stdout : '';
 }
 

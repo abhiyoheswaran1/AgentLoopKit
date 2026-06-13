@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-08-54-ship",
+  "command": "ship",
+  "createdAt": "2026-06-13-08-54",
+  "createdAtEpochMs": 1781333702285,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-report-nested-untracked-files-precisely.md",
+    "title": "Report nested untracked files precisely",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-08-45-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-08-54-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-08-54-pr-summary.md",
+  "score": 95,
+  "changedFileCount": 13
+}

@@ -205,7 +205,7 @@ function chooseNextAction(input: {
       return {
         command: 'agentloop task done',
         reason:
-          'Task, verification, and handoff evidence covers the current dirty files. Mark the task done when the handoff is ready, or keep it open if work is still in progress.',
+          'Task, verification, and handoff evidence cover the current dirty files. Mark the task done when the handoff is ready, or keep it open if work is still in progress.',
       };
     }
     return {

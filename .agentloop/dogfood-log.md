@@ -2,6 +2,44 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Precise Nested Untracked File Evidence
+
+- Task contract: `.agentloop/tasks/2026-06-13-report-nested-untracked-files-precisely.md`
+- Trigger:
+  - Earlier ship dogfooding noted that Git can report a newly added folder as `?? src/`.
+  - That shorthand makes AgentLoop evidence less useful because ship reports, handoffs, run ledgers, maintainer checks, and intent lookup work best with file-level paths.
+- Product-panel decision:
+  - Lina wanted agents and reviewers to see exactly which new files changed.
+  - Samir accepted the change because it uses Git's built-in porcelain option and reads no extra files.
+  - Maya kept the fix inside the shared git helper so existing consumers inherit the same `GitFileStatus` shape.
+- Implementation:
+  - `getGitStatus` now runs `git status --short --untracked-files=all`.
+  - No command output schema changed.
+  - A post-ship status check also caught and fixed the user-facing phrase `evidence covers`; the next-action reason now says `evidence cover`.
+- Verification:
+  - Red run failed on current behavior because Git returned `?? src/`:
+    - `npm test -- tests/git.test.ts`
+  - Focused green run passed with `3` tests:
+    - `npm test -- tests/git.test.ts`
+  - Red copy run failed on the old next-action grammar:
+    - `npm test -- tests/status.test.ts tests/next.test.ts -t "dirty files are covered"`
+  - Focused green copy run passed with `3` covered tests:
+    - `npm test -- tests/status.test.ts tests/next.test.ts -t "dirty files are covered"`
+  - Affected Git/status/next suite passed with `43` tests:
+    - `npm test -- tests/git.test.ts tests/status.test.ts tests/next.test.ts`
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-13-08-45-verification-report.md`.
+  - Final ship evidence wrote `.agentloop/reports/2026-06-13-08-54-ship-report.md` with a `95`/100 review-readiness score and passing gates.
+  - Strict gates passed:
+    - `node dist/cli/index.js check-gates --redact-paths --strict`
+  - Dogfood strict passed:
+    - `npm run dogfood:strict`
+  - ProjScan passed with A `100`/100:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - A dogfood note turned into one small shared fix with a direct regression test.
+- Improve:
+  - Watch performance in repos with huge untracked folders that are not ignored. Users should still add generated bulk directories to `.gitignore`.
+
 ## 2026-06-13: Post-Ship Gate Reporting
 
 - Task contract: `.agentloop/tasks/archive/2026-06-13-report-post-ship-gate-state.md`

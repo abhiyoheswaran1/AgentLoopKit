@@ -468,7 +468,7 @@ describe('next command', () => {
     });
     expect(next.workingTree.dirty).toBe(true);
     expect(next.command).toBe('agentloop task done');
-    expect(next.reason).toContain('handoff evidence covers the current dirty files');
+    expect(next.reason).toContain('handoff evidence cover the current dirty files');
   });
 
   test('recommends archiving a pinned done task', async () => {

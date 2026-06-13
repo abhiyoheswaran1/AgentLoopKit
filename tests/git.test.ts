@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { realpath } from 'node:fs/promises';
+import { mkdir, realpath, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import {
   commandExists,
@@ -58,5 +58,28 @@ describe('git helpers', () => {
 
     await expect(isInsideGitRepo(path.resolve(dir))).resolves.toBe(true);
     await expect(getGitRoot(path.resolve(dir))).resolves.toBe(await realpath(dir));
+  });
+
+  test('reports nested untracked files instead of directory shorthand', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const { execa } = await import('execa');
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await writeFile(path.join(dir, 'README.md'), '# Fixture\n');
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa(
+      'git',
+      ['-c', 'user.email=test@example.com', '-c', 'user.name=Test User', 'commit', '-m', 'init'],
+      { cwd: dir },
+    );
+
+    await mkdir(path.join(dir, 'src/features'), { recursive: true });
+    await writeFile(path.join(dir, 'src/features/alpha.ts'), 'export const alpha = true;\n');
+    await writeFile(path.join(dir, 'src/features/beta.ts'), 'export const beta = true;\n');
+
+    const status = await getGitStatus(dir);
+
+    expect(status).toContain('?? src/features/alpha.ts');
+    expect(status).toContain('?? src/features/beta.ts');
   });
 });
