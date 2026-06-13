@@ -134,6 +134,7 @@ The command does not run verification, write files, include full Markdown artifa
 ```bash
 agentloop verify
 agentloop verify --json
+agentloop verify --task-commands
 agentloop verify --task .agentloop/tasks/<task-file>.md
 agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands
 agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands --only-task-commands
@@ -144,7 +145,7 @@ agentloop verify --write-run
 
 `verify` reads `agentloop.config.json`, runs configured commands, captures output excerpts, and writes a Markdown report under `.agentloop/reports/`.
 
-Use `--task` to include task context in the report. Use `--task-commands` when you also want to run commands listed under the task contract's `Verification Commands` section. Add `--only-task-commands` when a reviewed task contract should run by itself without the configured repo commands.
+Use `--task` to include task context in the report. Use `--task-commands` when you also want to run commands listed under the task contract's `Verification Commands` section. `--task-commands` uses the explicit `--task` path first, then the active task set by `create-task` or `task set`; without either, it exits before running commands. Add `--only-task-commands` when a reviewed task contract should run by itself without the configured repo commands.
 
 Verification runs each exact command string once. If a command appears in both `agentloop.config.json` and the task contract, AgentLoopKit keeps the first configured slot and skips the duplicate task entry.
 

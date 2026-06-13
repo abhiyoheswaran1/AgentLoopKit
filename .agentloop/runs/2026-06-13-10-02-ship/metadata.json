@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-10-02-ship",
+  "command": "ship",
+  "createdAt": "2026-06-13-10-02",
+  "createdAtEpochMs": 1781337741693,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-require-task-context-for-task-command-verification.md",
+    "title": "Require task context for task command verification",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-09-56-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-10-02-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-10-02-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 21
+}

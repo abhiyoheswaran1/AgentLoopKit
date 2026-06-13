@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-09-59-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-09-59",
+  "createdAtEpochMs": 1781337556003,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-require-task-context-for-task-command-verification.md",
+    "title": "Require task context for task command verification",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-09-56-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 10
+}

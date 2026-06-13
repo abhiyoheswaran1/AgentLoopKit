@@ -1512,6 +1512,67 @@ describe('verification', () => {
     ]);
   });
 
+  test('CLI verify uses the active task when --task-commands is passed without --task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: '',
+            lint: '',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify(
+        { version: 1, activeTaskPath: '.agentloop/tasks/active-task.md' },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/active-task.md'),
+      [
+        '# Active task commands',
+        '',
+        '- Task type: bugfix',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        '- node -e "console.log(\'active-task-check\')"',
+        '',
+      ].join('\n'),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'verify', '--task-commands', '--json'], {
+      cwd: dir,
+    });
+    const output = JSON.parse(result.stdout);
+
+    expect(output.overallStatus).toBe('pass');
+    expect(output.taskCommands).toEqual({
+      requested: true,
+      foundCount: 1,
+      commands: ['node -e "console.log(\'active-task-check\')"'],
+    });
+    const markdown = await readFile(resolveOutputPath(dir, output.reportPath), 'utf8');
+    expect(markdown).toContain(`- Path: ${inlineCode('.agentloop/tasks/active-task.md')}`);
+    expect(markdown).not.toContain(dir);
+  });
+
   test('CLI verify can run only task verification commands', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -1581,6 +1642,74 @@ describe('verification', () => {
     await expect(access(path.join(dir, 'configured-build-ran.txt'))).rejects.toThrow();
   });
 
+  test('CLI verify can run only active task verification commands with --task-commands', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: "node -e \"require('fs').writeFileSync('configured-test-ran.txt', 'yes')\"",
+            lint: '',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify(
+        { version: 1, activeTaskPath: '.agentloop/tasks/active-task.md' },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/active-task.md'),
+      [
+        '# Active task-only commands',
+        '',
+        '- Task type: bugfix',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        '- node -e "require(\'fs\').writeFileSync(\'active-task-command-ran.txt\', \'yes\')"',
+        '',
+      ].join('\n'),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'verify', '--task-commands', '--only-task-commands', '--json'],
+      { cwd: dir },
+    );
+    const output = JSON.parse(result.stdout);
+
+    expect(output.overallStatus).toBe('pass');
+    expect(output.notRun).toEqual(expect.arrayContaining(['test', 'lint', 'typecheck', 'build']));
+    expect(output.commands).toEqual([
+      expect.objectContaining({
+        key: 'task',
+        command:
+          'node -e "require(\'fs\').writeFileSync(\'active-task-command-ran.txt\', \'yes\')"',
+        passed: true,
+      }),
+    ]);
+    await expect(readFile(path.join(dir, 'active-task-command-ran.txt'), 'utf8')).resolves.toBe(
+      'yes',
+    );
+    await expect(access(path.join(dir, 'configured-test-ran.txt'))).rejects.toThrow();
+  });
+
   test('CLI verify rejects --only-task-commands without --task-commands before running commands', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -1635,7 +1764,7 @@ describe('verification', () => {
     await expect(access(path.join(dir, 'configured-test-ran.txt'))).rejects.toThrow();
   });
 
-  test('CLI verify rejects --only-task-commands without --task before running commands', async () => {
+  test('CLI verify rejects --only-task-commands without an explicit or active task before running commands', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await writeFile(
@@ -1667,10 +1796,50 @@ describe('verification', () => {
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toBe('');
     expect(output.error).toMatchObject({
-      code: 'ONLY_TASK_COMMANDS_REQUIRES_TASK',
-      option: 'only-task-commands',
+      code: 'TASK_COMMANDS_REQUIRES_TASK',
+      option: 'task-commands',
       requiredOption: 'task',
     });
     await expect(access(path.join(dir, 'configured-test-ran.txt'))).rejects.toThrow();
+  });
+
+  test('CLI verify rejects --task-commands without an explicit or active task before running commands', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: "node -e \"require('fs').writeFileSync('configured-test-ran.txt', 'yes')\"",
+            lint: '',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'verify', '--task-commands', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const output = JSON.parse(result.stdout);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(output.error).toMatchObject({
+      code: 'TASK_COMMANDS_REQUIRES_TASK',
+      option: 'task-commands',
+      requiredOption: 'task',
+    });
+    await expect(access(path.join(dir, 'configured-test-ran.txt'))).rejects.toThrow();
+    await expect(access(path.join(dir, '.agentloop/reports'))).rejects.toThrow();
   });
 });

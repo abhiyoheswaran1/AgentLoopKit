@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { Command } from 'commander';
 import {
   ArtifactPathError,
@@ -10,7 +11,7 @@ import { getCurrentTaskPath } from '../../core/evidence.js';
 import { getGitStatus, parseGitStatus } from '../../core/git.js';
 import { inlineCode } from '../../core/markdown-format.js';
 import { writeVerificationRun } from '../../core/runs.js';
-import { readTaskMetadata } from '../../core/task-state.js';
+import { getActiveTaskPath, readTaskMetadata } from '../../core/task-state.js';
 import { runVerification, VerificationProgressEvent } from '../../core/verification.js';
 import { toSafeDisplayPath } from '../../core/display-path.js';
 import {
@@ -79,21 +80,12 @@ function printArtifactPathJsonError(error: ArtifactPathError) {
 function validateOnlyTaskCommands(options: {
   onlyTaskCommands?: boolean;
   taskCommands?: boolean;
-  taskPath?: string;
   json?: boolean;
 }) {
   if (!options.onlyTaskCommands) return true;
 
-  const error = !options.taskPath
-    ? new CliOptionError(
-        '--only-task-commands requires --task.',
-        'ONLY_TASK_COMMANDS_REQUIRES_TASK',
-        {
-          option: 'only-task-commands',
-          requiredOption: 'task',
-        },
-      )
-    : options.taskCommands !== true
+  const error =
+    options.taskCommands !== true
       ? new CliOptionError(
           '--only-task-commands requires --task-commands.',
           'ONLY_TASK_COMMANDS_REQUIRES_TASK_COMMANDS',
@@ -108,6 +100,42 @@ function validateOnlyTaskCommands(options: {
   if (options.json) {
     printAgentLoopJsonError(error);
     return false;
+  }
+
+  throw error;
+}
+
+function repoRelativePath(cwd: string, filePath: string) {
+  return path.relative(cwd, filePath).split(path.sep).join('/') || '.';
+}
+
+async function resolveEffectiveTaskPathForVerify(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  taskPath?: string;
+  taskCommands?: boolean;
+  json?: boolean;
+}): Promise<{ ok: true; taskPath?: string } | { ok: false }> {
+  if (options.taskPath || !options.taskCommands) return { ok: true, taskPath: options.taskPath };
+
+  const activeTaskPath = await getActiveTaskPath({ cwd: options.cwd, config: options.config });
+  if (activeTaskPath) {
+    return { ok: true, taskPath: repoRelativePath(options.cwd, activeTaskPath) };
+  }
+
+  const error = new CliOptionError(
+    '--task-commands requires --task or an active task. Run `agentloop task set <path>` or pass --task.',
+    'TASK_COMMANDS_REQUIRES_TASK',
+    {
+      option: 'task-commands',
+      requiredOption: 'task',
+      alternative: 'active-task',
+    },
+  );
+
+  if (options.json) {
+    printAgentLoopJsonError(error);
+    return { ok: false };
   }
 
   throw error;
@@ -161,7 +189,6 @@ export function verifyCommand() {
         !validateOnlyTaskCommands({
           onlyTaskCommands: options.onlyTaskCommands === true,
           taskCommands: options.taskCommands === true,
-          taskPath,
           json: options.json === true,
         })
       ) {
@@ -183,12 +210,20 @@ export function verifyCommand() {
           throw error;
         }
       }
+      const effectiveTask = await resolveEffectiveTaskPathForVerify({
+        cwd: workspace.cwd,
+        config: workspace.config,
+        taskPath,
+        taskCommands: options.taskCommands === true,
+        json: options.json === true,
+      });
+      if (!effectiveTask.ok) return;
       let result: Awaited<ReturnType<typeof runVerification>>;
       try {
         result = await runVerification({
           cwd: workspace.cwd,
           config: workspace.config,
-          taskPath,
+          taskPath: effectiveTask.taskPath,
           taskCommands: options.taskCommands === true,
           skip: {
             build: options.onlyTaskCommands === true || options.build === false,
@@ -217,7 +252,7 @@ export function verifyCommand() {
           task: await resolveTaskForRun({
             cwd: workspace.cwd,
             config: workspace.config,
-            taskPath,
+            taskPath: effectiveTask.taskPath,
           }),
           verificationReportPath: result.reportPath,
           overallStatus: result.overallStatus,

@@ -9069,3 +9069,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The previous dogfood note turned directly into a small product fix.
 - Improve:
   - Consider extracting shared active-task next-action wording if more commands need to explain the done/archive path.
+
+## 2026-06-13: Require Task Context For Task-Command Verification
+
+- Task contract: `.agentloop/tasks/2026-06-13-require-task-context-for-task-command-verification.md`
+- Trigger:
+  - After archiving a task, a dogfood `verify --task-commands --write-run` run could proceed without an explicit task path.
+  - The run metadata then had no task reference, and later review evidence could lean on older task context.
+- Product-panel decision:
+  - Samir wanted command execution to stop when task intent is ambiguous.
+  - Lina wanted active-task flows to stay ergonomic for long agent sessions.
+  - Nora wanted a clear JSON error for scripts instead of a quiet `not-run` report.
+  - Maya kept the change in the CLI layer so core verification remains usable without task context.
+- Implementation:
+  - `verify --task-commands` now uses an explicit `--task` first, then the pinned active task.
+  - Without either task source, the CLI exits before running configured or task-defined commands.
+  - `--only-task-commands` now works with the active task as well as an explicit task path.
+- Verification:
+  - Red run failed on ignored active-task context and taskless command execution:
+    - `npm test -- tests/verification.test.ts -t "task-commands"`
+  - Focused green run passed with `6` task-command tests:
+    - `npm test -- tests/verification.test.ts -t "task-commands"`
+- What worked well:
+  - AgentLoopKit’s own run ledger exposed a real evidence-quality issue before release.
+- Improve:
+  - Consider applying the same “explicit or active task” rule to other task-sensitive commands if dogfooding finds fallback ambiguity.
