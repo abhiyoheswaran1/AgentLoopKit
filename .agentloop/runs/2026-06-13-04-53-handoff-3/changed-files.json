@@ -1,0 +1,54 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/post-verification-gates.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-13-04-53-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-04-47-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-04-53-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-04-47-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-04-53-handoff-2/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-04-53-handoff/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-04-53-ship/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-13-keep-post-verification-gate-detection-conservative.md"
+  },
+  {
+    "status": "??",
+    "path": "tests/post-verification-gates.test.ts"
+  }
+]

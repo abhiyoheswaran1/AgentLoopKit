@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-04-53-ship",
+  "command": "ship",
+  "createdAt": "2026-06-13-04-53",
+  "createdAtEpochMs": 1781319188032,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-keep-post-verification-gate-detection-conservative.md",
+    "title": "Keep post-verification gate detection conservative",
+    "status": "proposed"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-04-47-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-04-53-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-04-53-pr-summary.md",
+  "score": 99,
+  "changedFileCount": 10
+}

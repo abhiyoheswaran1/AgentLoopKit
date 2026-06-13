@@ -2,6 +2,34 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Conservative Post-Verification Gate Matching
+
+- Task contract: `.agentloop/tasks/2026-06-13-keep-post-verification-gate-detection-conservative.md`
+- Trigger:
+  - The broadened gate detector could match `agentloop ship` in the middle of another command, such as `echo agentloop ship` or `npm run agentloop ship`.
+  - Product panel signal: Samir wanted fewer false-positive warnings; Maya preferred a small token-based matcher over a broad regex or full shell parser.
+- Product change:
+  - The shared detector now tokenizes simple shell words and only warns when the command itself clearly invokes AgentLoopKit.
+  - Supported true positives include `agentloop ship`, `agentloopkit prepare-pr`, `npx --yes agentloopkit ...`, package exec forms, `node dist/cli/index.js ...`, and `tsx src/cli/index.ts ...`.
+  - False positives such as `echo agentloop ship`, `npm run agentloop ship`, `node scripts/print-command.mjs agentloop ship`, and project scripts named `ship` no longer warn.
+- Verification:
+  - Red TDD run: `npm test -- tests/post-verification-gates.test.ts` failed on the false-positive cases.
+  - Green focused run: the same test passed with 20 tests after the token-based matcher.
+  - Affected integration checks passed:
+    - `npm test -- tests/create-task.test.ts -t "post-verification gates"`
+    - `npm test -- tests/task-state.test.ts -t "post-verification gates"`
+  - `npm run typecheck` passed.
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-13-04-47-verification-report.md`.
+  - The verification run wrote `.agentloop/runs/2026-06-13-04-47-verify/`.
+  - Full `npm test` passed with 52 files and 490 tests.
+  - `npm run lint`, `npm run build`, `npm run check:links`, and `git diff --check` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - `agentloop ship --redact-paths` wrote `.agentloop/reports/2026-06-13-04-53-ship-report.md` with a 99/100 review-readiness score.
+- Worked well:
+  - Direct unit coverage keeps the detector cheap to harden without running the slow CLI suites for every edge case.
+- Improve:
+  - If command parsing grows again, move the detector toward a tiny documented parser instead of expanding regexes.
+
 ## 2026-06-13: Broaden Post-Verification Gate Detection
 
 - Task contract: `.agentloop/tasks/2026-06-13-broaden-post-verification-gate-detection.md`

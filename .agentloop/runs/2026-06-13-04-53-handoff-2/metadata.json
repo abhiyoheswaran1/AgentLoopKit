@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-04-53-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-13-04-53",
+  "createdAtEpochMs": 1781319189722,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-keep-post-verification-gate-detection-conservative.md",
+    "title": "Keep post-verification gate detection conservative",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-04-47-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-04-53-pr-summary.md",
+  "changedFileCount": 12
+}

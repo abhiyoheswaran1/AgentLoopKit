@@ -1,0 +1,5 @@
+ .agentloop/backlog.md               |  1 +
+ .agentloop/dogfood-log.md           | 28 +++++++++++++++++
+ CHANGELOG.md                        |  1 +
+ src/core/post-verification-gates.ts | 63 ++++++++++++++++++++++++++++++++-----
+ 4 files changed, 85 insertions(+), 8 deletions(-)

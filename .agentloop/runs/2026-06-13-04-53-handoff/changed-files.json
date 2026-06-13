@@ -1,0 +1,34 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/post-verification-gates.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-04-47-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-04-47-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-13-keep-post-verification-gate-detection-conservative.md"
+  },
+  {
+    "status": "??",
+    "path": "tests/post-verification-gates.test.ts"
+  }
+]
