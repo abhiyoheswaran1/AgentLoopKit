@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-08-08-ship",
+  "command": "ship",
+  "createdAt": "2026-06-13-08-08",
+  "createdAtEpochMs": 1781330885488,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-align-status-next-action-with-fresh-handoff-coverage.md",
+    "title": "Align status next action with fresh handoff coverage",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-07-59-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-08-08-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-08-08-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 13
+}

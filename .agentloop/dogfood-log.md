@@ -8969,3 +8969,27 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The stricter gate caught our own stale handoff state before final handoff was refreshed.
 - Improve:
   - `status --brief` still recommends `agentloop handoff` after strict gates pass with covered dirty files; review whether it should mirror `check-gates` in a future task.
+
+## 2026-06-13: Align Status Next Action With Fresh Handoff Coverage
+
+- Task contract: `.agentloop/tasks/2026-06-13-align-status-next-action-with-fresh-handoff-coverage.md`
+- Trigger:
+  - After fresh handoff evidence passed strict gates, `status --brief` could still recommend another `agentloop handoff`.
+  - That made agents repeat the same command instead of moving the task lifecycle forward.
+- Product-panel decision:
+  - Nora wanted `status`, `next`, and `check-gates` to stop fighting each other.
+  - Lina wanted the command to advance the active task lifecycle after handoff evidence exists.
+  - Maya kept the change inside status next-action selection; `check-gates` behavior stayed unchanged.
+- Implementation:
+  - `status` and `next` now recommend `agentloop task done` when an active task has passing verification and fresh handoff coverage for the current dirty files.
+  - Dirty files without fresh handoff coverage still recommend `agentloop handoff`.
+- Verification:
+  - Red run failed on the old repeated-handoff recommendation:
+    - `npm test -- tests/status.test.ts tests/next.test.ts`
+  - Focused green run passed with `40` tests:
+    - `npm test -- tests/status.test.ts tests/next.test.ts`
+  - Typecheck, build, and lint passed.
+- What worked well:
+  - The previous dogfood note turned directly into a small product fix.
+- Improve:
+  - Consider extracting shared active-task next-action wording if more commands need to explain the done/archive path.

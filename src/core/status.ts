@@ -201,6 +201,13 @@ function chooseNextAction(input: {
     };
   }
   if (input.dirty) {
+    if (input.dirtyCoveredByLatestHandoffRun) {
+      return {
+        command: 'agentloop task done',
+        reason:
+          'Task, verification, and handoff evidence covers the current dirty files. Mark the task done when the handoff is ready, or keep it open if work is still in progress.',
+      };
+    }
     return {
       command: 'agentloop handoff',
       reason: 'Task and verification evidence exist, and the working tree has changes.',

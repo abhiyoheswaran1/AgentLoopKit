@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-08-07-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-08-07",
+  "createdAtEpochMs": 1781330827885,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-align-status-next-action-with-fresh-handoff-coverage.md",
+    "title": "Align status next action with fresh handoff coverage",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-07-59-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 9
+}

@@ -86,7 +86,8 @@ The command suggests one next action:
 - `agentloop task archive <path>` when the pinned active task is already `done`
 - `agentloop verify` when an in-progress task exists without verification evidence that is at least as new as the task contract
 - `agentloop verify` when the latest verification report failed
-- `agentloop handoff` when task evidence exists and the working tree has changes
+- `agentloop handoff` when task evidence exists and the working tree has changes that are not covered by the latest handoff or ship run
+- `agentloop task done` when task evidence, passing verification, and handoff evidence cover the current dirty files
 - `agentloop task done` when the pinned active task is `review`, verification passed, and the working tree is clean
 
 `status` and `next` do not execute project commands, read `.env` contents, call an LLM, or make network requests.

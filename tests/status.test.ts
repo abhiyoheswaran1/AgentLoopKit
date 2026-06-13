@@ -872,4 +872,92 @@ describe('status command', () => {
     });
     expect(status.nextAction.command).toBe('agentloop create-task');
   });
+
+  test('recommends finishing an active task when dirty files are covered by the latest handoff run', async () => {
+    const dir = await makeTempDir();
+    const runId = '2026-06-13-00-44-handoff';
+    const taskPath = '.agentloop/tasks/2026-06-13-active-handoff.md';
+    const handoffPath = '.agentloop/handoffs/2026-06-13-00-44-pr-summary.md';
+    const runsDir = path.join(dir, '.agentloop/runs', runId);
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
+    await writeFile(path.join(dir, taskPath), '# Active handoff\n\n- Status: in-progress\n');
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({ version: 1, activeTaskPath: taskPath }),
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-13-00-40-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/runs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/runs/.gitkeep'), '');
+    await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/handoffs/.gitkeep'), '');
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa(
+      'git',
+      ['-c', 'user.name=AgentLoopKit Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'baseline', '-q'],
+      { cwd: dir },
+    );
+    await mkdir(runsDir, { recursive: true });
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 2;\n');
+    await writeFile(path.join(dir, handoffPath), '# PR Summary\n');
+    await writeFile(
+      path.join(runsDir, 'metadata.json'),
+      JSON.stringify(
+        {
+          id: runId,
+          command: 'handoff',
+          createdAt: '2026-06-13-00-44',
+          createdAtEpochMs: 1_000,
+          task: {
+            path: taskPath,
+            title: 'Active handoff',
+            status: 'in-progress',
+          },
+          verificationReportPath: '.agentloop/reports/2026-06-13-00-40-verification-report.md',
+          handoffPath,
+          changedFileCount: 1,
+        },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(runsDir, 'changed-files.json'),
+      `${JSON.stringify([{ status: 'M', path: 'src.ts' }], null, 2)}\n`,
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const briefResult = await execa(tsxPath, [cliPath, 'status', '--brief'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'status'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(briefResult.exitCode).toBe(0);
+    expect(markdownResult.exitCode).toBe(0);
+    const status = JSON.parse(jsonResult.stdout);
+    expect(status.activeTask).toMatchObject({
+      path: taskPath,
+      title: 'Active handoff',
+      status: 'in-progress',
+    });
+    expect(status.workingTree.dirty).toBe(true);
+    expect(status.nextAction.command).toBe('agentloop task done');
+    expect(status.nextAction.reason).toContain('handoff evidence covers the current dirty files');
+    expect(briefResult.stdout).toContain('next="agentloop task done"');
+    expect(markdownResult.stdout).toContain('Run `agentloop task done`.');
+  });
 });
