@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-10-57-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-10-57",
+  "createdAtEpochMs": 1781341068000,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-accept-redacted-output-flag-on-review-context.md",
+    "title": "Accept redacted output flag on review context",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-10-57-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 8
+}

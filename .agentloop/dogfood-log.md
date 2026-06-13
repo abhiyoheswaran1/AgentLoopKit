@@ -9157,3 +9157,31 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - A normal dogfood command found the inconsistency before release prep.
 - Improve:
   - Continue checking whether other shortcut commands should accept the same safety flags as their underlying full-report commands.
+
+## 2026-06-13: Accept Redacted Output Flag On Review Context
+
+- Task contract: `.agentloop/tasks/2026-06-13-accept-redacted-output-flag-on-review-context.md`
+- Trigger:
+  - After adding `next --redact-paths`, the same audit found `review-context` still rejected the safety flag.
+  - `review-context` is a shareable snapshot built from status and gate evidence, so users should not need to remember a different flag set.
+- Product-panel decision:
+  - Samir wanted public-log redaction to be predictable on every copyable review surface.
+  - Nora wanted the CLI shortcut commands to accept the same safety options as the full reports they summarize.
+  - Maya kept the change narrow: add the option, pass it into existing status and gate helpers, and leave the snapshot schema unchanged.
+- Implementation:
+  - Added `--redact-paths` to `agentloop review-context`.
+  - Passed the flag to nested `getAgentLoopStatus` and `checkGates` calls.
+  - Documented the flag in README and CLI reference.
+- Verification:
+  - Red run failed on the missing option:
+    - `npm test -- tests/review-context.test.ts -t "accepts redacted output"`
+  - Focused green run passed:
+    - `npm test -- tests/review-context.test.ts -t "accepts redacted output"`
+  - Full review-context suite, typecheck, lint, and build passed.
+  - AgentLoop task-command verification passed:
+    - `.agentloop/reports/2026-06-13-10-57-verification-report.md`
+    - `.agentloop/runs/2026-06-13-10-57-verify`
+- What worked well:
+  - The follow-up surfaced directly from the previous dogfood note about shortcut command safety flags.
+- Improve:
+  - Consider adding public-docs hygiene coverage that keeps README redaction guidance aligned with supported CLI flags.

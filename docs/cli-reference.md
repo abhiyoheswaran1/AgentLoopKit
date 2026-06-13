@@ -124,6 +124,7 @@ See [status.md](status.md).
 ```bash
 agentloop review-context
 agentloop review-context --json
+agentloop review-context --redact-paths
 ```
 
 `review-context` prints one read-only local snapshot for agents and scripts that do not use MCP. It combines active task state, latest verification, review gates, policy status, artifact inventory, recent run ledger entries, latest ship score, working-tree state, safety notes, and the next recommended action.

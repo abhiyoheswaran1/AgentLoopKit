@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, realpath, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -154,5 +154,29 @@ describe('review-context command', () => {
     expect(result.stdout).toContain('Run `agentloop handoff`.');
     expect(result.stdout).not.toContain(dir);
     expect(result.stdout).not.toContain('Review handoff.');
+  });
+
+  test('accepts redacted output mode for human and JSON output', async () => {
+    const dir = await createRepoWithReviewContextEvidence();
+    const realRoot = await realpath(dir);
+
+    const humanResult = await execa(tsxPath, [cliPath, 'review-context', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'review-context', '--json', '--redact-paths'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(humanResult.exitCode).toBe(0);
+    expect(jsonResult.exitCode).toBe(0);
+    expect(humanResult.stdout).not.toContain(realRoot);
+    expect(jsonResult.stdout).not.toContain(realRoot);
+    expect(JSON.parse(jsonResult.stdout).safety.readOnly).toBe(true);
   });
 });

@@ -10,10 +10,18 @@ import { getPolicyStatus } from './policy.js';
 import { listRuns } from './runs.js';
 import { getAgentLoopStatus } from './status.js';
 
-export async function getReviewContext(options: { cwd: string; config: AgentLoopConfig }) {
+export async function getReviewContext(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  redactPaths?: boolean;
+}) {
   const [status, gates, policies, inventory, runs] = await Promise.all([
-    getAgentLoopStatus({ cwd: options.cwd, config: options.config }),
-    checkGates({ cwd: options.cwd, config: options.config }),
+    getAgentLoopStatus({
+      cwd: options.cwd,
+      config: options.config,
+      redactPaths: options.redactPaths,
+    }),
+    checkGates({ cwd: options.cwd, config: options.config, redactPaths: options.redactPaths }),
     getPolicyStatus({ cwd: options.cwd, config: options.config }),
     getArtifactInventory({ cwd: options.cwd, config: options.config }),
     listRuns(options.cwd),
