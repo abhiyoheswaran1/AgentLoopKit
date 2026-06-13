@@ -107,6 +107,11 @@ function printBulkTaskArchive(result: BulkTaskArchiveResult, options: { json?: b
     console.log(`- ${inlineCode(task.title)}`);
     console.log(`  ${inlineCode(task.previousPath)} -> ${inlineCode(task.path)}`);
   }
+  if (!result.dryRun) {
+    console.log(
+      'Next step: run `agentloop handoff --write-run` to capture reviewer evidence for the archived tasks.',
+    );
+  }
 }
 
 function printTaskDoctor(result: TaskDoctorResult, options: { json?: boolean }) {

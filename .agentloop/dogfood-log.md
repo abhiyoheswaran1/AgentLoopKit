@@ -8636,3 +8636,30 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Dogfooding produced a small CLI improvement that reinforces the intended loop.
 - Improve:
   - Consider whether bulk archive should print a similar next step after moving done tasks.
+
+## 2026-06-13: Print Bulk Archive Handoff Next Step
+
+- Task contract: `.agentloop/tasks/2026-06-13-print-bulk-archive-handoff-next-step.md`
+- Trigger:
+  - Single-task archive now prints the handoff next step.
+  - Bulk archive still left users without the next command after moving done task contracts.
+- Product-panel decision:
+  - Nora wanted the bulk path to match the single-task path.
+  - Samir required dry-run output to avoid claiming reviewer evidence should be captured.
+  - Maya kept the change to successful human output only.
+  - Lina wanted long-running cleanup sessions to keep the handoff step visible.
+- Implementation:
+  - Added the handoff next-step line to successful non-dry-run bulk archive output.
+  - Added tests for real bulk archive output, dry-run output, and JSON output.
+- Verification:
+  - Red run failed because bulk archive output lacked the next step:
+    - `npm test -- tests/task-state.test.ts -t "bulk archiving tasks"`
+  - Focused green run passed.
+  - Bulk archive guard tests passed:
+    - `npm test -- tests/task-state.test.ts -t "bulk archive"`
+  - Full task-state suite passed with `43` tests:
+    - `npm test -- tests/task-state.test.ts`
+- What worked well:
+  - The previous dogfood improvement immediately suggested the adjacent bulk archive path.
+- Improve:
+  - Consider extracting the archive handoff next-step copy into a shared constant if another command needs it.

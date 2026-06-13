@@ -978,4 +978,80 @@ describe('task command', () => {
     });
     expect(JSON.parse(currentResult.stdout)).toEqual({ activeTask: null });
   });
+
+  test('prints a handoff next step after bulk archiving tasks', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-first.md'),
+      '# First done task\n\n- Status: done\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-second.md'),
+      '# Second done task\n\n- Status: done\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'archive', '--status', 'done'], {
+      cwd: dir,
+    });
+
+    expect(result.stdout).toContain(
+      'Bulk task archive complete: archived `2` task contract(s) with status `done`.',
+    );
+    expect(result.stdout).toContain(
+      'Next step: run `agentloop handoff --write-run` to capture reviewer evidence for the archived tasks.',
+    );
+  });
+
+  test('does not print the handoff evidence step for bulk archive dry runs', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-first.md'),
+      '# First done task\n\n- Status: done\n',
+    );
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'archive', '--status', 'done', '--dry-run'],
+      { cwd: dir },
+    );
+
+    expect(result.stdout).toContain(
+      'Bulk task archive dry run: would archive `1` task contract(s) with status `done`.',
+    );
+    expect(result.stdout).not.toContain('capture reviewer evidence');
+    expect(await readFile(path.join(dir, '.agentloop/tasks/2026-06-09-first.md'), 'utf8')).toBe(
+      '# First done task\n\n- Status: done\n',
+    );
+  });
+
+  test('keeps bulk archive JSON output data-only', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-first.md'),
+      '# First done task\n\n- Status: done\n',
+    );
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'archive', '--status', 'done', '--json'],
+      { cwd: dir },
+    );
+
+    expect(JSON.parse(result.stdout)).toEqual({
+      taskArchive: {
+        mode: 'bulk',
+        status: 'done',
+        dryRun: false,
+        count: 1,
+        tasks: [
+          {
+            previousPath: '.agentloop/tasks/2026-06-09-first.md',
+            path: '.agentloop/tasks/archive/2026-06-09-first.md',
+            title: 'First done task',
+            status: 'done',
+          },
+        ],
+      },
+    });
+  });
 });

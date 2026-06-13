@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-02-18-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-02-18",
+  "createdAtEpochMs": 1781309897383,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-print-bulk-archive-handoff-next-step.md",
+    "title": "Print bulk archive handoff next step",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-02-14-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-02-18-pr-summary.md",
+  "changedFileCount": 8
+}

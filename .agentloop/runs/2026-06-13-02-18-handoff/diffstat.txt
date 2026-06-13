@@ -1,0 +1,6 @@
+ .agentloop/backlog.md     |  1 +
+ .agentloop/dogfood-log.md | 27 +++++++++++++++++
+ CHANGELOG.md              |  1 +
+ src/cli/commands/task.ts  |  5 ++++
+ tests/task-state.test.ts  | 76 +++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 110 insertions(+)
