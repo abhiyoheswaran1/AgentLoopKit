@@ -32,6 +32,8 @@ Use redacted path output when you plan to paste status into a public issue, PR, 
 ```bash
 agentloop status --redact-paths
 agentloop status --json --redact-paths
+agentloop next --redact-paths
+agentloop next --json --redact-paths
 ```
 
 `--redact-paths` replaces the absolute Git root with `[git-root]`. It keeps repo-relative AgentLoop artifact paths such as `.agentloop/reports/...`.
@@ -50,6 +52,7 @@ Use the smaller next-action command when you do not need the full status block:
 ```bash
 agentloop next
 agentloop next --json
+agentloop next --redact-paths
 ```
 
 `agentloop next` reads the same local evidence and returns the same recommended command as `status`. It does not run project checks, write `.agentloop/state.json`, read `.env` contents, call an LLM, or make network requests.

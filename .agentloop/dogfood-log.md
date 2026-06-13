@@ -9123,3 +9123,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The npm-status recommendation led to a real public-doc cleanup instead of another feature.
 - Improve:
   - Consider whether `FINAL_HANDOFF.md` should be split into current handoff plus archived release history after the next release.
+
+## 2026-06-13: Accept Redacted Output Flag On Next Command
+
+- Task contract: `.agentloop/tasks/2026-06-13-accept-redacted-output-flag-on-next-command.md`
+- Trigger:
+  - A release-hygiene check used `agentloop next --redact-paths` and Commander rejected the flag.
+  - `next` reads the same status evidence as `status`, so shareable-output redaction should work on both commands.
+- Product-panel decision:
+  - Nora wanted the status and next-action surfaces to feel consistent.
+  - Samir wanted public-log redaction to be predictable wherever users copy AgentLoop output.
+  - Maya kept the fix in the CLI command surface and reused the existing status redaction option.
+- Implementation:
+  - Added `--redact-paths` to `agentloop next`.
+  - Passed the flag through to `getAgentLoopStatus`.
+  - Documented the flag in README, CLI reference, and status docs.
+- Verification:
+  - Red run failed on the missing option:
+    - `npm test -- tests/next.test.ts -t "accepts redacted output"`
+  - Focused green run passed:
+    - `npm test -- tests/next.test.ts -t "accepts redacted output"`
+  - Full next-command suite, typecheck, lint, and build passed.
+  - AgentLoop task-command verification passed:
+    - `.agentloop/reports/2026-06-13-10-38-verification-report.md`
+    - `.agentloop/runs/2026-06-13-10-40-verify`
+  - Ship report scored `96/100` with no blockers:
+    - `.agentloop/reports/2026-06-13-10-40-ship-report.md`
+  - Task was marked done, archived, and refreshed with final handoff evidence:
+    - `.agentloop/tasks/archive/2026-06-13-accept-redacted-output-flag-on-next-command.md`
+    - `.agentloop/handoffs/2026-06-13-10-46-pr-summary.md`
+    - `.agentloop/runs/2026-06-13-10-46-handoff`
+- What worked well:
+  - A normal dogfood command found the inconsistency before release prep.
+- Improve:
+  - Continue checking whether other shortcut commands should accept the same safety flags as their underlying full-report commands.

@@ -1,0 +1,8 @@
+ .agentloop/dogfood-log.md | 30 ++++++++++++++++++++++++++++++
+ CHANGELOG.md              |  1 +
+ README.md                 |  1 +
+ docs/cli-reference.md     |  3 ++-
+ docs/status.md            |  3 +++
+ src/cli/commands/next.ts  |  9 +++++++--
+ tests/next.test.ts        | 24 +++++++++++++++++++++++-
+ 7 files changed, 67 insertions(+), 4 deletions(-)

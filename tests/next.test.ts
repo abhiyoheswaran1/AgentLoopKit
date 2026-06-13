@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { access, mkdir, utimes, writeFile } from 'node:fs/promises';
+import { access, mkdir, realpath, utimes, writeFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
@@ -97,6 +97,28 @@ describe('next command', () => {
       code: 'CONFIG_ERROR',
       message: expect.stringContaining('Invalid AgentLoopKit config'),
     });
+  });
+
+  test('accepts redacted output mode for human and JSON output', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+
+    const humanResult = await execa(tsxPath, [cliPath, 'next', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'next', '--json', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(humanResult.exitCode).toBe(0);
+    expect(jsonResult.exitCode).toBe(0);
+    expect(humanResult.stdout).not.toContain(await realpath(dir));
+    expect(jsonResult.stdout).not.toContain(await realpath(dir));
+    expect(JSON.parse(jsonResult.stdout).command).toBe('agentloop create-task');
   });
 
   test('prints a concise human next action when no task exists', async () => {

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-10-46-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-10-46",
+  "createdAtEpochMs": 1781340366031,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-accept-redacted-output-flag-on-next-command.md",
+    "title": "Accept redacted output flag on next command",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-10-38-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-10-46-pr-summary.md",
+  "changedFileCount": 25
+}

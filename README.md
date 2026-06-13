@@ -107,6 +107,7 @@ Use `agentloop status` or `agentloop next` when an agent needs the next local ac
 npx agentloopkit status
 npx agentloopkit status --brief
 npx agentloopkit next
+npx agentloopkit next --redact-paths
 ```
 
 <p align="center">

@@ -79,7 +79,8 @@ export function nextCommand() {
   return new Command('next')
     .description('Show the next recommended loop action')
     .option('--json', 'print machine-readable output')
-    .action(async (options: { json?: boolean }) => {
+    .option('--redact-paths', 'redact local absolute paths in public output')
+    .action(async (options: { json?: boolean; redactPaths?: boolean }) => {
       let workspace: Awaited<ReturnType<typeof loadAgentLoopWorkspace>>;
       try {
         workspace = await loadAgentLoopWorkspace(process.cwd());
@@ -90,7 +91,11 @@ export function nextCommand() {
         }
         throw error;
       }
-      const status = await getAgentLoopStatus({ cwd: workspace.cwd, config: workspace.config });
+      const status = await getAgentLoopStatus({
+        cwd: workspace.cwd,
+        config: workspace.config,
+        redactPaths: options.redactPaths === true,
+      });
       const result = toNextActionResult(status);
 
       if (options.json) {

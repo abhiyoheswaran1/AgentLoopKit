@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed `agentloop next` to accept `--redact-paths` in human and JSON output, matching the shareable-output behavior of `status`.
 - Added public-docs hygiene coverage for stale root `FINAL_HANDOFF.md` current-release and install guidance, and refreshed the current handoff copy.
 - Changed `agentloop verify --task-commands` to use the active task when `--task` is omitted, and to exit before running commands when no explicit or active task exists.
 - Fixed generated handoff and ship report writes so repeated same-minute runs allocate suffixed Markdown artifact paths instead of overwriting earlier evidence.
