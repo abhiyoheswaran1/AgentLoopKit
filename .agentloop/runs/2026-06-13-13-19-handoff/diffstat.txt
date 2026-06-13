@@ -1,0 +1,12 @@
+ .agentloop/dogfood-log.md            | 44 ++++++++++++++++++++++++++++++++++++
+ CHANGELOG.md                         |  1 +
+ README.md                            |  2 +-
+ docs/cli-reference.md                |  3 +++
+ scripts/dogfood.mjs                  |  6 ++++-
+ scripts/smoke-packed-release.mjs     |  1 +
+ src/cli/commands/maintainer-check.ts |  9 ++++++--
+ src/core/maintainer-check.ts         | 33 +++++++++++++++++++++++----
+ tests/dogfood-script.test.ts         |  8 +++++++
+ tests/maintainer-check.test.ts       | 25 +++++++++++++++++++-
+ tests/release-smoke.test.ts          |  2 +-
+ 11 files changed, 123 insertions(+), 11 deletions(-)

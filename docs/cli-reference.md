@@ -228,6 +228,7 @@ Run ledger JSON and Markdown use display-safe paths. AgentLoopKit artifacts rend
 ```bash
 agentloop maintainer-check
 agentloop maintainer-check --json
+agentloop maintainer-check --redact-paths
 ```
 
 `maintainer-check` helps maintainers evaluate AI-assisted pull requests. It checks for a task contract, fresh verification evidence, handoff evidence, changed file count, dependency and lockfile changes, migrations, auth/security-sensitive files, and generated output files.
@@ -235,6 +236,8 @@ agentloop maintainer-check --json
 When the repo has dirty files, handoff evidence must come from the latest handoff or ship run and cover those files. An older PR summary still appears in the output, but `maintainer-check` warns that it is stale.
 
 If a verified task was archived after handoff, `maintainer-check` can use the latest run ledger entry when it still points to an existing archived task contract.
+
+Use `--redact-paths` before pasting maintainer-check output into a public issue, PR, or CI log. Default JSON keeps existing repo-relative paths unchanged for scripts.
 
 It is read-only. It does not write reports, run verification commands, call GitHub APIs, read tokens, or upload files.
 

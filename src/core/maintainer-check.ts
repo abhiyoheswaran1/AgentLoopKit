@@ -37,6 +37,23 @@ function check(id: string, status: MaintainerCheckStatus, message: string, fileP
   return { id, status, message, ...(filePath ? { path: filePath } : {}) };
 }
 
+function redactLocalRoot(value: string | undefined, root: string, redactPaths: boolean | undefined) {
+  if (!value || !redactPaths || !root || root === path.parse(root).root) return value;
+  return value
+    .split(root)
+    .join('[git-root]')
+    .split(root.replace(/\\/g, '/'))
+    .join('[git-root]');
+}
+
+function redactCheck(check: MaintainerCheck, root: string, redactPaths: boolean | undefined) {
+  return {
+    ...check,
+    message: redactLocalRoot(check.message, root, redactPaths) ?? check.message,
+    ...(check.path ? { path: redactLocalRoot(check.path, root, redactPaths) ?? check.path } : {}),
+  };
+}
+
 function hasPath(changedFiles: string[], pattern: RegExp) {
   return changedFiles.some((filePath) => pattern.test(filePath));
 }
@@ -66,6 +83,7 @@ function contributorRequest(checks: MaintainerCheck[]) {
 export async function runMaintainerCheck(options: {
   cwd: string;
   config: AgentLoopConfig;
+  redactPaths?: boolean;
 }): Promise<MaintainerCheckResult> {
   const evidence = await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
   const checks: MaintainerCheck[] = [];
@@ -190,15 +208,16 @@ export async function runMaintainerCheck(options: {
     ),
   );
 
-  const status = overallStatus(checks);
+  const outputChecks = checks.map((item) => redactCheck(item, options.cwd, options.redactPaths));
+  const status = overallStatus(outputChecks);
   const maintainerChecklist = [
     'Confirm the task contract matches the pull request scope.',
     'Confirm verification evidence is fresh and relevant.',
     'Review changed files for ownership and blast radius.',
-    ...(checks.some((item) => item.id === 'auth-security-files' && item.status === 'warn')
+    ...(outputChecks.some((item) => item.id === 'auth-security-files' && item.status === 'warn')
       ? ['Review auth/security-sensitive files manually.']
       : []),
-    ...(checks.some((item) => item.id === 'dependency-lockfiles' && item.status === 'warn')
+    ...(outputChecks.some((item) => item.id === 'dependency-lockfiles' && item.status === 'warn')
       ? ['Review dependency and lockfile changes manually.']
       : []),
     'Confirm rollback notes are practical.',
@@ -206,8 +225,12 @@ export async function runMaintainerCheck(options: {
 
   return {
     status,
-    checks,
+    checks: outputChecks,
     maintainerChecklist,
-    suggestedContributorRequest: contributorRequest(checks),
+    suggestedContributorRequest: redactLocalRoot(
+      contributorRequest(outputChecks),
+      options.cwd,
+      options.redactPaths,
+    ) ?? '',
   };
 }

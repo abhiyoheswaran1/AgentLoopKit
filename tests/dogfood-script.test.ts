@@ -36,6 +36,14 @@ describe('dogfood script helpers', () => {
       '--redact-paths',
     ]);
     expect(steps[3].allowFailure).toBe(true);
+    expect(steps[5].args).toEqual([
+      '--no-install',
+      'tsx',
+      'src/cli/index.ts',
+      'maintainer-check',
+      '--json',
+      '--redact-paths',
+    ]);
     expect(steps[5].allowFailure).toBe(true);
     expect(steps[6].args).toEqual([
       '--no-install',

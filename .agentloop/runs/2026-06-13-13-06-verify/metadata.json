@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-13-06-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-13-06",
+  "createdAtEpochMs": 1781348765575,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-add-redacted-maintainer-check-output.md",
+    "title": "Add redacted maintainer-check output",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-13-05-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 30
+}

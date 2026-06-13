@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, realpath, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -173,6 +173,29 @@ describe('maintainer-check command', () => {
         }),
       ]),
     );
+  });
+
+  test('accepts redacted output mode for public maintainer review logs', async () => {
+    const dir = await createReviewableFixture({ freshHandoffRun: true });
+    const nestedDir = path.join(dir, 'packages', 'web');
+    await mkdir(nestedDir, { recursive: true });
+    const root = await realpath(dir);
+
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'maintainer-check', '--json', '--redact-paths'],
+      { cwd: nestedDir },
+    );
+    const humanResult = await execa(tsxPath, [cliPath, 'maintainer-check', '--redact-paths'], {
+      cwd: nestedDir,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(humanResult.exitCode).toBe(0);
+    expect(jsonResult.stdout).not.toContain(root);
+    expect(humanResult.stdout).not.toContain(root);
+    expect(JSON.parse(jsonResult.stdout).status).toBe('pass');
+    expect(humanResult.stdout).toContain('# AgentLoopKit Maintainer Check');
   });
 
   test('accepts latest run task evidence when the task contract was archived', async () => {

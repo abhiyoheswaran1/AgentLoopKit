@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-13-19-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-13-19",
+  "createdAtEpochMs": 1781349580431,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-add-redacted-maintainer-check-output.md",
+    "title": "Add redacted maintainer-check output",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-13-15-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-13-19-pr-summary-2.md",
+  "changedFileCount": 45
+}

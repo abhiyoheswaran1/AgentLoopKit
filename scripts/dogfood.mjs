@@ -44,7 +44,11 @@ export function createDogfoodSteps({ strict = false } = {}) {
     },
     agentloopStep('review evidence gates', gateArgs),
     agentloopStep('artifact inventory', ['artifacts', '--json']),
-    agentloopStep('maintainer reviewability check', ['maintainer-check', '--json']),
+    agentloopStep('maintainer reviewability check', [
+      'maintainer-check',
+      '--json',
+      '--redact-paths',
+    ]),
     agentloopStep('agent review context', ['review-context', '--json', '--redact-paths']),
     {
       name: 'projscan project health',

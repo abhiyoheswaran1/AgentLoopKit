@@ -9384,3 +9384,47 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The public-docs guard now treats `doctor` as part of the same safe-share command family.
 - Improve:
   - Consider deriving the README redaction command list from CLI command metadata instead of maintaining a separate smoke-test list.
+
+## 2026-06-13: Add Redacted Maintainer Check Output
+
+- Task contract: `.agentloop/tasks/archive/2026-06-13-add-redacted-maintainer-check-output.md`
+- Trigger:
+  - `maintainer-check` is intended for review conversations, but it did not accept the public-log redaction flag used by related commands.
+  - The command usually reports repo-relative paths today, but accepting the same flag makes the safety workflow predictable for maintainers.
+- Product-panel decision:
+  - Samir wanted reviewer-facing diagnostics to use the same explicit redaction affordance as `doctor`, `ship`, and `prepare-pr`.
+  - Nora wanted copy-paste commands to behave consistently instead of forcing users to remember exceptions.
+  - Maya kept the change narrow: preserve default output, add an output redaction pass, and update the docs guard.
+- Implementation:
+  - Added `--redact-paths` to `agentloop maintainer-check`.
+  - Added a redaction pass for maintainer-check messages and paths.
+  - Updated README, CLI reference, changelog, and public-docs hygiene coverage.
+- Verification:
+  - Red run failed on the missing CLI flag:
+    - `npm test -- tests/maintainer-check.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/maintainer-check.test.ts tests/release-smoke.test.ts`
+  - Dogfood gate update red run failed until `maintainer-check --json --redact-paths` was added to `scripts/dogfood.mjs`:
+    - `npm test -- tests/dogfood-script.test.ts -t "default read-only dogfood step plan"`
+  - Focused green run after dogfood update passed:
+    - `npm test -- tests/dogfood-script.test.ts tests/maintainer-check.test.ts tests/release-smoke.test.ts`
+  - Task-command verification passed:
+    - `.agentloop/reports/2026-06-13-12-56-verification-report.md`
+    - `.agentloop/runs/2026-06-13-12-56-verify`
+  - Refreshed verification after dogfood-script changes passed:
+    - `.agentloop/reports/2026-06-13-13-05-verification-report.md`
+    - `.agentloop/runs/2026-06-13-13-06-verify`
+  - Final full verification after cleanup passed:
+    - `.agentloop/reports/2026-06-13-13-15-verification-report.md`
+    - `.agentloop/runs/2026-06-13-13-19-verify`
+  - Full local gates passed:
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm test`
+    - `node dist/cli/index.js check-gates --redact-paths --strict`
+    - `npm run dogfood:strict:json`
+  - Dogfood strict mode now runs `maintainer-check --json --redact-paths` and included `npx --yes projscan doctor --format markdown`.
+- What worked well:
+  - The safety flag now covers another reviewer-facing surface without changing normal script output.
+- Improve:
+  - Consider deriving supported `--redact-paths` docs from command metadata once more commands share the option.
