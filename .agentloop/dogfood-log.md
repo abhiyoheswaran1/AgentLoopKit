@@ -2,6 +2,32 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Dogfood JSON Summary
+
+- Task contract: `.agentloop/tasks/2026-06-13-add-dogfood-json-summary.md`
+- Trigger:
+  - `npm run dogfood:strict` is useful for humans, but agents and CI jobs had no structured summary to inspect without scraping terminal text.
+  - Product panel signal: Lina wanted repeatable evidence for long agent sessions; Maya wanted the runner to stay small and testable.
+- Product change:
+  - Added quiet `--json` mode to `scripts/dogfood.mjs`.
+  - Added `npm run dogfood:json` and `npm run dogfood:strict:json`.
+  - JSON summaries include mode, status, step results, command text, exit codes, durations, allow-failure state, and safety notes.
+  - Default human output remains the streaming dogfood log.
+- Verification:
+  - Red TDD run: `npm test -- tests/dogfood-script.test.ts` failed because JSON parsing and injected runner support did not exist.
+  - Green focused run: `npm test -- tests/dogfood-script.test.ts` passed with 8 tests.
+  - `npm run typecheck`, `npm run build`, `npm run lint`, and `npm run check:links` passed.
+  - `npm run dogfood:json` produced a passing default-mode JSON summary with non-blocking allowed failures before fresh task verification.
+  - AgentLoop task verification passed and wrote `.agentloop/reports/2026-06-13-05-10-verification-report.md`.
+  - Full `npm test` passed with 52 files and 494 tests.
+  - `npm run dogfood:strict:json` passed with structured strict-mode step results.
+  - `npm run dogfood:strict` passed with human output.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - The injected runner keeps dogfood behavior testable without running the real dogfood gate inside unit tests.
+- Improve:
+  - Consider `--json --pretty=false` later if CI consumers need compact one-line JSON.
+
 ## 2026-06-13: Conservative Post-Verification Gate Matching
 
 - Task contract: `.agentloop/tasks/2026-06-13-keep-post-verification-gate-detection-conservative.md`

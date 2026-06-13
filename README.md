@@ -125,6 +125,15 @@ npm run dogfood
 
 That command checks task-folder hygiene, current loop status, public docs hygiene, review gates, artifact inventory, maintainer reviewability, agent review context, and ProjScan health. It does not publish packages, create tags, post comments, read tokens, read `.env` contents, or run verification commands.
 
+Use JSON output when an agent or CI job needs a structured dogfood summary:
+
+```bash
+npm run dogfood:json
+npm run dogfood:strict:json
+```
+
+The JSON summary reports the mode, overall status, step results, exit codes, durations, and safety notes.
+
 Run the public-doc check by itself when you edit README, examples, or release-channel docs:
 
 ```bash

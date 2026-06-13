@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-05-15-ship",
+  "command": "ship",
+  "createdAt": "2026-06-13-05-15",
+  "createdAtEpochMs": 1781320526777,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-add-dogfood-json-summary.md",
+    "title": "Add dogfood JSON summary",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-05-10-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-05-15-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-05-15-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 11
+}

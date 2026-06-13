@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-05-16-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-05-16",
+  "createdAtEpochMs": 1781320560032,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-add-dogfood-json-summary.md",
+    "title": "Add dogfood JSON summary",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-05-10-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-05-15-pr-summary.md",
+  "changedFileCount": 15
+}

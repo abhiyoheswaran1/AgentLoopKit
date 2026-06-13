@@ -71,9 +71,10 @@ export function buildDogfoodEnv(sourceEnv = process.env) {
   return env;
 }
 
-function parseArgs(argv) {
+export function parseArgs(argv) {
   return {
     strict: argv.includes('--strict'),
+    json: argv.includes('--json'),
     help: argv.includes('--help') || argv.includes('-h'),
   };
 }
@@ -84,8 +85,10 @@ function printHelp() {
 Usage:
   npm run dogfood
   npm run dogfood:strict
+  node scripts/dogfood.mjs --json
 
 Default mode runs read-only AgentLoopKit self-checks and ProjScan. Strict mode treats review-gate warnings as failures.
+JSON mode prints a deterministic summary for agents and CI logs.
 
 This script does not publish packages, create tags, create GitHub releases, post comments, read token files, read .env contents, or run verification commands.`);
 }
@@ -94,46 +97,163 @@ function formatCommand(step) {
   return [step.command, ...step.args].join(' ');
 }
 
-async function runStep(step, env) {
-  console.log(`\n## ${step.name}`);
-  console.log(`$ ${formatCommand(step)}`);
-
+async function spawnStep(step, env, options = {}) {
   const child = spawn(step.command, step.args, {
     env,
-    stdio: 'inherit',
+    stdio: options.quiet ? 'ignore' : 'inherit',
   });
 
-  const exitCode = await new Promise((resolve) => {
+  return new Promise((resolve) => {
+    let settled = false;
+    const settle = (result) => {
+      if (settled) return;
+      settled = true;
+      resolve(result);
+    };
+
     child.on('error', (error) => {
-      console.error(`Failed to start ${step.name}: ${error.message}`);
-      resolve(1);
+      settle({ exitCode: 1, errorMessage: error.message });
     });
-    child.on('close', (code) => resolve(code ?? 1));
+    child.on('close', (code) => settle({ exitCode: code ?? 1 }));
   });
-
-  if (exitCode !== 0 && step.allowFailure) {
-    console.log(`${step.name} reported exit code ${exitCode}; continuing in default mode.`);
-    return;
-  }
-
-  if (exitCode !== 0) {
-    throw new Error(`${step.name} failed with exit code ${exitCode}`);
-  }
 }
 
-export async function runDogfood({ strict = false, cwd = process.cwd() } = {}) {
-  process.chdir(cwd);
-  const env = buildDogfoodEnv();
-  const steps = createDogfoodSteps({ strict });
+function normalizeProcessResult(result) {
+  if (typeof result === 'number') return { exitCode: result };
+  return {
+    exitCode: Number.isInteger(result?.exitCode) ? result.exitCode : 1,
+    errorMessage: result?.errorMessage,
+  };
+}
 
-  console.log('# AgentLoopKit Dogfood Gate');
-  console.log(strict ? 'Mode: strict' : 'Mode: default');
+function createStepResult(step, processResult, durationMs) {
+  const exitCode = processResult.exitCode;
+  const status = exitCode === 0 ? 'pass' : step.allowFailure ? 'allowed-failure' : 'fail';
+  const result = {
+    name: step.name,
+    command: step.command,
+    args: step.args,
+    commandText: formatCommand(step),
+    allowFailure: step.allowFailure,
+    status,
+    exitCode,
+    durationMs,
+  };
 
-  for (const step of steps) {
-    await runStep(step, env);
+  if (processResult.errorMessage) result.errorMessage = processResult.errorMessage;
+  return result;
+}
+
+async function runStep(step, env, options) {
+  if (!options.json) {
+    options.logger.log(`\n## ${step.name}`);
+    options.logger.log(`$ ${formatCommand(step)}`);
   }
 
-  console.log('\nDogfood gate passed.');
+  const startedAt = options.now();
+  let processResult;
+  try {
+    processResult = normalizeProcessResult(
+      await options.runProcess(step, env, { quiet: options.json }),
+    );
+  } catch (error) {
+    processResult = {
+      exitCode: 1,
+      errorMessage: error instanceof Error ? error.message : String(error),
+    };
+  }
+  const durationMs = Math.max(0, options.now() - startedAt);
+  const stepResult = createStepResult(step, processResult, durationMs);
+
+  if (stepResult.status === 'allowed-failure' && !options.json) {
+    options.logger.log(
+      `${step.name} reported exit code ${stepResult.exitCode}; continuing in default mode.`,
+    );
+  }
+
+  return stepResult;
+}
+
+export function createDogfoodSafetyNotes() {
+  return {
+    publishesPackages: false,
+    createsTags: false,
+    createsGithubReleases: false,
+    postsComments: false,
+    readsEnvFiles: false,
+    readsTokenFiles: false,
+    runsVerificationCommands: false,
+    changesPackageMetadata: false,
+  };
+}
+
+function findFailedStep(steps) {
+  return steps.find((step) => step.status === 'fail');
+}
+
+export async function runDogfood(options = {}) {
+  const {
+    strict = false,
+    cwd = process.cwd(),
+    json = false,
+    logger = console,
+    runProcess = spawnStep,
+    now = () => Date.now(),
+  } = options;
+
+  process.chdir(cwd);
+  const env = buildDogfoodEnv();
+  const steps = options.steps ?? createDogfoodSteps({ strict });
+  const mode = strict ? 'strict' : 'default';
+
+  if (!json) {
+    logger.log('# AgentLoopKit Dogfood Gate');
+    logger.log(`Mode: ${mode}`);
+  }
+
+  const results = [];
+  for (const step of steps) {
+    const result = await runStep(step, env, { json, logger, runProcess, now });
+    results.push(result);
+    if (result.status === 'fail') break;
+  }
+
+  const failedStep = findFailedStep(results);
+  const summary = {
+    status: failedStep ? 'fail' : 'pass',
+    mode,
+    strict,
+    steps: results,
+    safety: createDogfoodSafetyNotes(),
+  };
+
+  if (!json && summary.status === 'pass') {
+    logger.log('\nDogfood gate passed.');
+  }
+
+  return summary;
+}
+
+function failureMessage(summary) {
+  const failedStep = findFailedStep(summary.steps);
+  if (!failedStep) return 'unknown failure';
+  const suffix = failedStep.errorMessage ? `: ${failedStep.errorMessage}` : '';
+  return `${failedStep.name} failed with exit code ${failedStep.exitCode}${suffix}`;
+}
+
+function printJsonSummary(summary) {
+  console.log(JSON.stringify(summary, null, 2));
+}
+
+async function runCli(options) {
+  const summary = await runDogfood(options);
+  if (options.json) printJsonSummary(summary);
+
+  if (summary.status === 'fail') {
+    if (!options.json) console.error(`\nDogfood gate failed: ${failureMessage(summary)}`);
+    process.exitCode = 1;
+    return;
+  }
 }
 
 export function isDirectRun(metaUrl, argvPath) {
@@ -145,8 +265,19 @@ if (isDirectRun(import.meta.url, process.argv[1])) {
   if (options.help) {
     printHelp();
   } else {
-    runDogfood(options).catch((error) => {
-      console.error(`\nDogfood gate failed: ${error.message}`);
+    runCli(options).catch((error) => {
+      if (options.json) {
+        printJsonSummary({
+          status: 'fail',
+          mode: options.strict ? 'strict' : 'default',
+          strict: options.strict,
+          steps: [],
+          safety: createDogfoodSafetyNotes(),
+          errorMessage: error instanceof Error ? error.message : String(error),
+        });
+      } else {
+        console.error(`\nDogfood gate failed: ${error.message}`);
+      }
       process.exitCode = 1;
     });
   }

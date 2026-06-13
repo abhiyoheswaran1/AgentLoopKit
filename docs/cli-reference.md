@@ -312,6 +312,19 @@ It does not call CI provider APIs, read secrets, upload files, run tests, or dum
 
 See [ci-summary.md](ci-summary.md).
 
+## Dogfood Scripts
+
+```bash
+npm run dogfood
+npm run dogfood:json
+npm run dogfood:strict
+npm run dogfood:strict:json
+```
+
+The dogfood scripts run AgentLoopKit's local self-check path for this repository. JSON mode prints one structured summary with mode, overall status, step results, exit codes, durations, and safety notes for agents and CI logs.
+
+The scripts do not publish packages, create tags, post comments, read tokens, read `.env` files, or run verification commands.
+
 ## Release Notes And npm Status
 
 ```bash

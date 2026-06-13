@@ -56,6 +56,132 @@ describe('dogfood script helpers', () => {
     expect(steps[5].allowFailure).toBe(false);
   });
 
+  test('parses JSON mode without changing strict mode parsing', () => {
+    expect(dogfood.parseArgs(['--json'])).toMatchObject({
+      json: true,
+      strict: false,
+      help: false,
+    });
+    expect(dogfood.parseArgs(['--strict', '--json'])).toMatchObject({
+      json: true,
+      strict: true,
+      help: false,
+    });
+  });
+
+  test('returns a deterministic JSON-friendly summary for passing dogfood steps', async () => {
+    const logs: string[] = [];
+    const summary = await dogfood.runDogfood({
+      strict: true,
+      json: true,
+      cwd: process.cwd(),
+      steps: [
+        { name: 'first check', command: 'node', args: ['first.js'], allowFailure: false },
+        { name: 'second check', command: 'node', args: ['second.js'], allowFailure: false },
+      ],
+      logger: {
+        log: (message: string) => logs.push(message),
+        error: (message: string) => logs.push(message),
+      },
+      now: (() => {
+        const values = [1000, 1017, 2000, 2042];
+        return () => values.shift() ?? 2042;
+      })(),
+      runProcess: async () => ({ exitCode: 0 }),
+    });
+
+    expect(logs).toEqual([]);
+    expect(summary).toMatchObject({
+      mode: 'strict',
+      strict: true,
+      status: 'pass',
+      safety: {
+        publishesPackages: false,
+        createsTags: false,
+        readsEnvFiles: false,
+        readsTokenFiles: false,
+        runsVerificationCommands: false,
+      },
+      steps: [
+        {
+          name: 'first check',
+          commandText: 'node first.js',
+          allowFailure: false,
+          exitCode: 0,
+          status: 'pass',
+          durationMs: 17,
+        },
+        {
+          name: 'second check',
+          commandText: 'node second.js',
+          allowFailure: false,
+          exitCode: 0,
+          status: 'pass',
+          durationMs: 42,
+        },
+      ],
+    });
+  });
+
+  test('records a failed JSON summary and skips remaining strict steps', async () => {
+    const seen: string[] = [];
+    const summary = await dogfood.runDogfood({
+      strict: true,
+      json: true,
+      cwd: process.cwd(),
+      steps: [
+        { name: 'fails', command: 'node', args: ['fail.js'], allowFailure: false },
+        { name: 'skipped', command: 'node', args: ['skip.js'], allowFailure: false },
+      ],
+      logger: { log: () => undefined, error: () => undefined },
+      now: (() => {
+        const values = [3000, 3050];
+        return () => values.shift() ?? 3050;
+      })(),
+      runProcess: async (step: { name: string }) => {
+        seen.push(step.name);
+        return { exitCode: 9, errorMessage: 'fixture failure' };
+      },
+    });
+
+    expect(seen).toEqual(['fails']);
+    expect(summary).toMatchObject({
+      status: 'fail',
+      steps: [
+        {
+          name: 'fails',
+          status: 'fail',
+          exitCode: 9,
+          errorMessage: 'fixture failure',
+          durationMs: 50,
+        },
+      ],
+    });
+  });
+
+  test('keeps allowed default-mode dogfood failures non-blocking in JSON summaries', async () => {
+    const summary = await dogfood.runDogfood({
+      strict: false,
+      json: true,
+      cwd: process.cwd(),
+      steps: [{ name: 'warning gate', command: 'node', args: ['warn.js'], allowFailure: true }],
+      logger: { log: () => undefined, error: () => undefined },
+      now: (() => {
+        const values = [4000, 4025];
+        return () => values.shift() ?? 4025;
+      })(),
+      runProcess: async () => ({ exitCode: 2 }),
+    });
+
+    expect(summary.status).toBe('pass');
+    expect(summary.steps[0]).toMatchObject({
+      name: 'warning gate',
+      status: 'allowed-failure',
+      exitCode: 2,
+      durationMs: 25,
+    });
+  });
+
   test('does not include release, publish, token, or write-heavy commands', () => {
     const steps = dogfood.createDogfoodSteps({ strict: true });
     const commandText = steps
