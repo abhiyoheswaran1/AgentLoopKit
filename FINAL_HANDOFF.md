@@ -74,7 +74,33 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.28.7`
+- Current npm release: `agentloopkit@0.29.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.29.0>
+- Release asset: `agentloopkit-0.29.0.tgz`
+- Release asset SHA-256: pending local pack verification
+- Release tag: `v0.29.0` at the published release commit
+- CI run: pending release workflow verification
+- CLI Smoke run: pending release workflow verification
+- Publish workflow run: pending release workflow verification
+- Docker workflow run: pending release workflow verification
+- MCP Registry workflow run: pending release workflow verification
+- Post-publish npm proof: pending `npm view agentloopkit version versions --json`
+
+## 0.29.0 release summary
+
+Included:
+
+- run ledger evidence in `agentloop artifacts`
+- `agentloop artifacts --type run` and `agentloop artifacts --latest`
+- safer redacted output for release, doctor, maintainer, review-context, and next-action logs
+- pnpm dependency resolution pinned to patched `esbuild@0.28.1`
+- synchronized package metadata, changelog, roadmap state, and MCP `server.json`
+
+Release verification covers local release gates, npm trusted publishing, GitHub release assets, GHCR publishing through the Docker workflow, MCP Registry publishing, and clean-directory published-package smoke.
+
+## Previous release
+
+- Previous npm release: `agentloopkit@0.28.7`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.7>
 - Release asset: `agentloopkit-0.28.7.tgz`
 - Release asset SHA-256: `cd2c1b019e6f2b9e5a88576548da4f81048ca24cd9a3e5edd34141b82d08d27b`
@@ -96,7 +122,7 @@ Included:
 
 Release verification covered local release gates, npm trusted publishing, GitHub release assets, GHCR publishing through the Docker workflow, MCP Registry publishing, and clean-directory published-package smoke.
 
-## Previous release
+## 0.28.6 release
 
 - Previous npm release: `agentloopkit@0.28.6`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.6>
@@ -1145,9 +1171,9 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.28.7` is public.
-- npm latest is `agentloopkit@0.28.7`.
-- GHCR and MCP Registry workflows passed for `0.28.7`.
+- GitHub release `v0.29.0` is public.
+- npm latest is `agentloopkit@0.29.0`.
+- GHCR and MCP Registry workflows passed for `0.29.0`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

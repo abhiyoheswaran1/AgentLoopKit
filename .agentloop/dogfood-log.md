@@ -9511,3 +9511,38 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Dogfooding exposed the missing run evidence directly through the existing inventory workflow.
 - Improve:
   - Consider adding a compact `artifacts --type run --limit` later if repos with long run histories need more than latest/count.
+
+## 2026-06-13: Release 0.29.0 Gate
+
+- Task contract: `.agentloop/tasks/2026-06-13-release-0-29-0.md`
+- Trigger:
+  - Post-`0.28.7` changes needed one public release with package metadata, MCP metadata, changelog, docs, release notes, verification evidence, and security checks aligned.
+- Implementation:
+  - Bumped `agentloopkit` and MCP metadata to `0.29.0`.
+  - Moved unreleased changelog entries into `0.29.0`.
+  - Added a pnpm override so release tooling resolves patched `esbuild@0.28.1`.
+  - Refreshed release status, launch checklist, npm publishing notes, final handoff, release notes, and review handoff evidence.
+- Verification:
+  - Full task-command verification passed:
+    - `.agentloop/reports/2026-06-13-14-36-verification-report.md`
+    - `.agentloop/runs/2026-06-13-14-41-verify`
+  - The release gate included:
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm test`
+    - `npm run check:links`
+    - `npm run build`
+    - `npm run check:public-docs`
+    - `npm run smoke:release`
+    - `git diff --check`
+    - `npx --yes pnpm@10.12.1 audit --audit-level high`
+    - `npx --yes projscan doctor --format markdown`
+  - Dogfood strict mode passed through the direct script:
+    - `node scripts/dogfood.mjs --strict --json`
+  - Strict gates passed:
+    - `node dist/cli/index.js check-gates --strict --redact-paths`
+- What worked well:
+  - The release gate caught the stale `esbuild` advisory before publishing.
+  - The dogfood script gave a compact proof that task hygiene, status, gates, artifacts, maintainer checks, review context, and ProjScan were all green.
+- Improve:
+  - Add dependency-audit coverage to the standard dogfood gate so security drift is caught before release prep.

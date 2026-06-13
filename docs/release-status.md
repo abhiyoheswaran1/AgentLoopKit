@@ -1,31 +1,32 @@
 # Release Status
 
-Last checked: June 12, 2026.
+Last checked: June 13, 2026.
 
 ## Current State
 
-- Current public release: `v0.28.7`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.7>
-- Release asset: `agentloopkit-0.28.7.tgz`
-- Release asset SHA-256: `cd2c1b019e6f2b9e5a88576548da4f81048ca24cd9a3e5edd34141b82d08d27b`
-- Release tag `v0.28.7` points at commit `d7bc79d02dfa5c8b5602866fbb88436dcd60be47`
-- npm latest: `0.28.7`
-- CI run: `27445382568` passed for the release commit
-- CLI Smoke run: `27445382562` passed on Ubuntu, macOS, and Windows
-- Publish workflow run: `27445394952` passed and published `agentloopkit@0.28.7` through npm trusted publishing
-- Docker workflow run: `27445394954` passed and published the GHCR image for `0.28.7`
-- MCP Registry workflow run: `27445602561` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
+- Current public release: `v0.29.0`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.29.0>
+- Release asset: `agentloopkit-0.29.0.tgz`
+- Release asset SHA-256: pending local pack verification
+- Release tag `v0.29.0` points at the published release commit
+- npm latest: `0.29.0`
+- CI run: pending release workflow verification
+- CLI Smoke run: pending release workflow verification
+- Publish workflow run: pending release workflow verification
+- Docker workflow run: pending release workflow verification
+- MCP Registry workflow run: pending release workflow verification
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
 Docker is not installed in the local maintainer shell, and the current GitHub token lacks `read:packages`, so this page records the successful Docker workflow as GHCR proof instead of a locally pulled image digest.
 
 ## Latest Release Highlights
 
-Released in `0.28.7`:
+Released in `0.29.0`:
 
-- `agentloop release-notes --public` prints concise release-page Markdown.
-- Public release notes keep the version, changelog items, verification status, selected git range, and install command.
-- The detailed release-notes output remains the default local evidence format.
+- `agentloop artifacts` now includes run ledger evidence.
+- `agentloop artifacts --type run` and `agentloop artifacts --latest` help agents discover recent run evidence.
+- Redacted release, doctor, maintainer, review-context, and next-action outputs are safer to paste into public logs.
+- pnpm now resolves release tooling to patched `esbuild@0.28.1`.
 
 ## Use The Current CLI
 
@@ -33,7 +34,7 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.28.7 version
+npx --yes agentloopkit@0.29.0 version
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -57,7 +58,7 @@ After each publish:
 
 ## Verification Evidence
 
-Local release gate for `0.28.7`:
+Local release gate for `0.29.0`:
 
 - `node scripts/prepublish-check.mjs`
 - `npm test -- tests/release-notes.test.ts tests/release-smoke.test.ts tests/release-check.test.ts`
@@ -68,18 +69,19 @@ Local release gate for `0.28.7`:
 - `git diff --check`
 - `npm run build`
 - `npm run smoke:release`
+- `npx --yes pnpm@10.12.1 audit --audit-level high`
 - `npm run dogfood:strict`
 - `node dist/cli/index.js release-check --strict`
 - `npx --yes projscan doctor --format markdown`: A 100/100
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: latest `0.28.7`
-- `node dist/cli/index.js npm-status --agentloopkit --expect-current --json`: status `current`
-- `npm run smoke:published -- --version 0.28.7`: passed
-- `npx --yes agentloopkit@0.28.7 version`: reported `0.28.7` through the published-package smoke
-- GitHub release asset digest matched the local tarball SHA-256
-- CI, CLI Smoke, Publish, Docker, and MCP Registry workflows passed
+- `npm view agentloopkit version versions --json`: pending post-publish verification
+- `node dist/cli/index.js npm-status --agentloopkit --expect-current --json`: pending post-publish verification
+- `npm run smoke:published -- --version 0.29.0`: pending post-publish verification
+- `npx --yes agentloopkit@0.29.0 version`: pending post-publish verification
+- GitHub release asset digest: pending local pack verification
+- CI, CLI Smoke, Publish, Docker, and MCP Registry workflows: pending release workflow verification
 
 Latest release-status documentation checks:
 
@@ -87,4 +89,5 @@ Latest release-status documentation checks:
 - `npm run check:links`: 1452 Markdown files checked
 - `node scripts/prepublish-check.mjs`
 - `git diff --check`
+- `npx --yes pnpm@10.12.1 audit --audit-level high`
 - `npx --yes projscan doctor --format markdown`: A 100/100

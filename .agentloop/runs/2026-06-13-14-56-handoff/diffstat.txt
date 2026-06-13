@@ -1,0 +1,11 @@
+ .agentloop/dogfood-log.md |  35 ++++
+ CHANGELOG.md              |   5 +
+ FINAL_HANDOFF.md          |  36 +++-
+ ROADMAP.md                |   8 +-
+ docs/launch-checklist.md  |   2 +-
+ docs/npm-publishing.md    |  10 +-
+ docs/release-status.md    |  51 ++---
+ package.json              |   7 +-
+ pnpm-lock.yaml            | 515 +++++++++++-----------------------------------
+ server.json               |   4 +-
+ 10 files changed, 241 insertions(+), 432 deletions(-)

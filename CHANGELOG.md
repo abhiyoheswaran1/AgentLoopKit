@@ -2,10 +2,15 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.29.0
+
 - Added run ledger entries to `agentloop artifacts`, including `--type run` and `--latest` support, so agents can discover local run evidence from the same inventory command.
 - Added `agentloop release-check --redact-paths` so release-readiness output can be pasted into public issues, PRs, or CI logs without exposing the local Git root.
 - Added `agentloop maintainer-check --redact-paths` so reviewer-readiness output uses the same public-log safety flag as doctor, status, gates, ship, and PR preparation.
 - Added `agentloop doctor --redact-paths` for safe public sharing of setup, Git-root, and risk-file output while keeping default doctor JSON unchanged for scripts.
+- Changed pnpm dependency resolution to use patched `esbuild@0.28.1` for release tooling and test/build dependencies.
 - Changed `agentloop ship` report and GitHub-comment readiness lists to escape Markdown control characters in warning, blocker, and next-action prose.
 - Changed `agentloop prepare-pr` to escape Markdown control characters in task-derived PR list prose and readiness comment lists.
 - Changed dogfood JSON summaries to redact the current workspace root from step arguments, command text, and child-process error messages.
