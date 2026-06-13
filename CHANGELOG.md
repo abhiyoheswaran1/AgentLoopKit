@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added a human-readable `task archive` next step that points maintainers to `agentloop handoff --write-run`.
 - Fixed `agentloop handoff` so it can preserve archived completed task context from recent run evidence when no active task exists.
 - Fixed `agentloop check-gates` next-action guidance so fresh handoff evidence no longer conflicts with `agentloop status`.
 - Fixed `agentloop status` so a fresh handoff run does not keep recommending another handoff only because its own run folder is dirty.

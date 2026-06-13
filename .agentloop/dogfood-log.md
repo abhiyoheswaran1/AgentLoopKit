@@ -8610,3 +8610,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Dogfooding caught a real workflow paper cut immediately after the previous handoff fix.
 - Improve:
   - Consider making `task archive` print a short reminder that a final handoff can be generated after archival.
+
+## 2026-06-13: Print Archive Handoff Next Step
+
+- Task contract: `.agentloop/tasks/2026-06-13-print-archive-handoff-next-step.md`
+- Trigger:
+  - The previous dogfood run showed that final handoff after archival now works.
+  - `task archive` still did not tell users the next command to run.
+- Product-panel decision:
+  - Nora wanted one concrete next step in the terminal output.
+  - Lina wanted the archive-to-handoff path to be obvious during long agent sessions.
+  - Samir required JSON output to stay machine-readable and unchanged.
+  - Maya kept the change to CLI copy only.
+- Implementation:
+  - Added a human-readable archive next-step line:
+    - `Next step: run agentloop handoff --write-run to capture reviewer evidence for the archived task.`
+  - Kept JSON archive output unchanged.
+- Verification:
+  - Red run failed because archive output lacked the next step:
+    - `npm test -- tests/task-state.test.ts -t "prints task lifecycle human output"`
+  - Focused green run passed.
+  - Full task-state suite passed with `40` tests:
+    - `npm test -- tests/task-state.test.ts`
+- What worked well:
+  - Dogfooding produced a small CLI improvement that reinforces the intended loop.
+- Improve:
+  - Consider whether bulk archive should print a similar next step after moving done tasks.

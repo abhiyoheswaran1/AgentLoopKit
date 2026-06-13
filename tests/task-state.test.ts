@@ -388,6 +388,9 @@ describe('task command', () => {
     expect(archiveResult.stdout).toContain(
       `${inlineCode(taskPath)} -> ${inlineCode('.agentloop/tasks/archive/2026-06-09-active`task.md')}`,
     );
+    expect(archiveResult.stdout).toContain(
+      'Next step: run `agentloop handoff --write-run` to capture reviewer evidence for the archived task.',
+    );
   });
 
   test('reports task folder hygiene diagnostics from the CLI without writing state', async () => {

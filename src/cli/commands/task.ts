@@ -86,6 +86,9 @@ function printArchivedTask(task: ArchivedTask, options: { json?: boolean }) {
   }
   console.log(`Archived task: ${inlineCode(task.title)} (${inlineCode(task.status)})`);
   console.log(`${inlineCode(task.previousPath)} -> ${inlineCode(task.path)}`);
+  console.log(
+    'Next step: run `agentloop handoff --write-run` to capture reviewer evidence for the archived task.',
+  );
 }
 
 function printBulkTaskArchive(result: BulkTaskArchiveResult, options: { json?: boolean }) {
