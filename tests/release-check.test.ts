@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readdir, utimes, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, realpath, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -260,6 +260,45 @@ describe('release-check command', () => {
     expect(output.checks).toEqual(
       expect.arrayContaining([expect.objectContaining({ id: 'handoff-summary', status: 'warn' })]),
     );
+  });
+
+  test('redacts local git root paths when requested', async () => {
+    const dir = await createReleaseRepo();
+    const nestedDir = path.join(dir, 'packages', 'web');
+    await mkdir(nestedDir, { recursive: true });
+    const root = await realpath(dir);
+
+    const defaultResult = await execa(tsxPath, [cliPath, 'release-check', '--json'], {
+      cwd: nestedDir,
+      reject: false,
+    });
+    const redactedJsonResult = await execa(
+      tsxPath,
+      [cliPath, 'release-check', '--json', '--redact-paths'],
+      {
+        cwd: nestedDir,
+        reject: false,
+      },
+    );
+    const redactedHumanResult = await execa(
+      tsxPath,
+      [cliPath, 'release-check', '--redact-paths'],
+      {
+        cwd: nestedDir,
+        reject: false,
+      },
+    );
+
+    expect(defaultResult.exitCode).toBe(0);
+    expect(JSON.parse(defaultResult.stdout).git.root).toBe(root);
+
+    expect(redactedJsonResult.exitCode).toBe(0);
+    const redacted = JSON.parse(redactedJsonResult.stdout);
+    expect(redacted.git.root).toBe('[git-root]');
+    expect(JSON.stringify(redacted)).not.toContain(root);
+
+    expect(redactedHumanResult.exitCode).toBe(0);
+    expect(redactedHumanResult.stdout).not.toContain(root);
   });
 
   test('stays read-only while reporting dirty working tree risk', async () => {

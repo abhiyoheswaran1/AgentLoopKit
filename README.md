@@ -237,7 +237,7 @@ For narrower evidence history, `agentloop verify --write-run` and `agentloop han
 
 `agentloop status` includes the newest local run ledger entry when `.agentloop/runs/` exists, so agents can see the latest review-readiness or verification evidence without opening every report.
 Run ledger output uses safe display paths: `.agentloop/...` for AgentLoopKit artifacts, repo-relative paths for repo files, and filenames for older outside absolute paths.
-Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-gates`, `ship`, `prepare-pr`, or `maintainer-check` before pasting output into a public issue, PR, or CI log. That mode replaces the absolute Git root with `[git-root]`.
+Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-gates`, `ship`, `prepare-pr`, `maintainer-check`, or `release-check` before pasting output into a public issue, PR, or CI log. That mode replaces the absolute Git root with `[git-root]`.
 `agentloop review-context --json` gives non-MCP agents one read-only local snapshot with status, gates, policies, artifacts, recent runs, latest ship evidence, and the next action.
 
 ## More Docs

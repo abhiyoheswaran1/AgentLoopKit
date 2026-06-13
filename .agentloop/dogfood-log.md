@@ -9428,3 +9428,42 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The safety flag now covers another reviewer-facing surface without changing normal script output.
 - Improve:
   - Consider deriving supported `--redact-paths` docs from command metadata once more commands share the option.
+
+## 2026-06-13: Add Redacted Release Check Output
+
+- Task contract: `.agentloop/tasks/archive/2026-06-13-add-redacted-release-check-output.md`
+- Trigger:
+  - `release-check` is a maintainer and CI-facing command, but it did not accept the same public-log redaction flag as other shareable commands.
+  - Release-readiness output includes the Git root in JSON, so public logs need an explicit safe mode.
+- Product-panel decision:
+  - Samir wanted release gate output to avoid exposing local machine paths.
+  - Elias wanted README safety guidance to match every command a maintainer may paste into release issues.
+  - Maya kept the change local to output rendering and CLI parsing, with no change to release readiness decisions.
+- Implementation:
+  - Added `--redact-paths` to `agentloop release-check`.
+  - Redacted local Git root values in release-check JSON and Markdown when requested.
+  - Updated README, CLI reference, changelog, public-docs hygiene coverage, and release-check tests.
+- Verification:
+  - Red run failed on the missing CLI flag:
+    - `npm test -- tests/release-check.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/release-check.test.ts tests/release-smoke.test.ts`
+  - Local checks passed:
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run build`
+    - `npm run check:public-docs`
+  - Task-command verification passed:
+    - `.agentloop/reports/2026-06-13-13-34-verification-report.md`
+    - `.agentloop/runs/2026-06-13-13-36-verify`
+  - Full local test suite passed:
+    - `npm test` (`52` files, `517` tests)
+  - Full local gates passed:
+    - `node dist/cli/index.js check-gates --redact-paths --strict`
+    - `npm run dogfood:strict:json`
+    - `npm run check:public-docs`
+  - Dogfood strict mode included `npx --yes projscan doctor --format markdown`.
+- What worked well:
+  - The release command now joins the same safe-share option family as doctor, gates, ship, prepare-pr, and maintainer-check.
+- Improve:
+  - Consider deriving supported public-log redaction docs from command metadata instead of maintaining a separate README smoke list.

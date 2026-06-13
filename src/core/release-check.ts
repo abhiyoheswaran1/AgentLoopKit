@@ -76,6 +76,27 @@ function relativePath(cwd: string, filePath: string) {
   return path.relative(cwd, filePath).split(path.sep).join('/') || '.';
 }
 
+function redactLocalRoot(value: string | undefined, root: string, redactPaths: boolean | undefined) {
+  if (!value || !redactPaths || !root || root === path.parse(root).root) return value;
+  return value
+    .split(root)
+    .join('[git-root]')
+    .split(root.replace(/\\/g, '/'))
+    .join('[git-root]');
+}
+
+function redactReleaseCheck(
+  check: ReleaseReadinessCheck,
+  root: string,
+  redactPaths: boolean | undefined,
+) {
+  return {
+    ...check,
+    message: redactLocalRoot(check.message, root, redactPaths) ?? check.message,
+    ...(check.path ? { path: redactLocalRoot(check.path, root, redactPaths) ?? check.path } : {}),
+  };
+}
+
 async function resolveComparablePath(filePath: string) {
   try {
     return await realpath(filePath);
@@ -314,6 +335,7 @@ export async function checkReleaseReadiness(options: {
   cwd: string;
   config: AgentLoopConfig;
   strict?: boolean;
+  redactPaths?: boolean;
 }): Promise<ReleaseCheckResult> {
   const strict = options.strict ?? false;
   const packageMetadata = await readPackageMetadata(options.cwd);
@@ -506,9 +528,13 @@ export async function checkReleaseReadiness(options: {
     ),
   );
 
+  const outputChecks = checks.map((item) =>
+    redactReleaseCheck(item, resolvedGitRoot, options.redactPaths),
+  );
+  const rawNextAction = chooseNextAction(checks);
   const withoutMarkdown = {
     strict,
-    overallStatus: overallStatus(checks, strict),
+    overallStatus: overallStatus(outputChecks, strict),
     package: {
       name: packageMetadata.name,
       version: packageMetadata.version,
@@ -517,12 +543,19 @@ export async function checkReleaseReadiness(options: {
       isRepository: inGit,
       branch: inGit ? await getGitBranch(options.cwd) : '',
       commit: inGit ? await getGitCommit(options.cwd) : '',
-      root: resolvedGitRoot,
+      root: redactLocalRoot(resolvedGitRoot, resolvedGitRoot, options.redactPaths) ?? resolvedGitRoot,
       targetIsRoot,
       changedFileCount: changedFiles.length,
     },
-    checks,
-    nextAction: chooseNextAction(checks),
+    checks: outputChecks,
+    nextAction: {
+      command:
+        redactLocalRoot(rawNextAction.command, resolvedGitRoot, options.redactPaths) ??
+        rawNextAction.command,
+      reason:
+        redactLocalRoot(rawNextAction.reason, resolvedGitRoot, options.redactPaths) ??
+        rawNextAction.reason,
+    },
     safety: {
       does: [
         'read package.json',

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added `agentloop release-check --redact-paths` so release-readiness output can be pasted into public issues, PRs, or CI logs without exposing the local Git root.
 - Added `agentloop maintainer-check --redact-paths` so reviewer-readiness output uses the same public-log safety flag as doctor, status, gates, ship, and PR preparation.
 - Added `agentloop doctor --redact-paths` for safe public sharing of setup, Git-root, and risk-file output while keeping default doctor JSON unchanged for scripts.
 - Changed `agentloop ship` report and GitHub-comment readiness lists to escape Markdown control characters in warning, blocker, and next-action prose.

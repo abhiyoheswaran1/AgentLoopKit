@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-13-44-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-13-13-44",
+  "createdAtEpochMs": 1781351101842,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-add-redacted-release-check-output.md",
+    "title": "Add redacted release-check output",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-13-34-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-13-44-ship-report-2.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-13-44-pr-summary-3.md",
+  "score": 92,
+  "changedFileCount": 40
+}

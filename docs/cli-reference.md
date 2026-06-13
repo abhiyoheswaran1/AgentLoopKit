@@ -354,6 +354,7 @@ agentloop release-notes --write
 agentloop release-check
 agentloop release-check --json
 agentloop release-check --strict
+agentloop release-check --redact-paths
 
 agentloop npm-status
 agentloop npm-status --agentloopkit
@@ -365,6 +366,8 @@ agentloop npm-status --registry-json npm-view.json
 `release-notes` drafts local release notes from package metadata, changelog entries, Git history, changed files, working tree status, the active task, the current verification report, and the latest CI summary when those artifacts exist. Use `--public` for concise release-page copy that keeps changed-file inventory and local AgentLoop evidence out of the rendered Markdown. User-provided Git refs must be ordinary refs such as `v1.2.3` or `HEAD`; option-shaped refs are rejected.
 
 `release-check` checks local release readiness from package metadata, changelog entries, release scripts, git state, current verification evidence, reviewer handoff, and generated release notes. It warns when `CHANGELOG.md` still has `Unreleased` entries, verification predates the current task, or the latest generated release notes do not mention the local package version. Use `--strict` when warnings should fail CI or a maintainer release gate.
+
+Use `--redact-paths` before pasting release-check output into a public issue, PR, or CI log. Default JSON keeps the absolute Git root for scripts that need it.
 
 `npm-status` checks registry state without publishing. It validates package names before running `npm view --json <package> version versions`, unless you pass captured registry JSON. It refuses `.env` and `.env.*` paths for `--registry-json`.
 

@@ -63,6 +63,7 @@ const README_REDACTION_COMMANDS = [
   'ship',
   'prepare-pr',
   'maintainer-check',
+  'release-check',
 ];
 
 const SAFE_ENV_KEYS = [
