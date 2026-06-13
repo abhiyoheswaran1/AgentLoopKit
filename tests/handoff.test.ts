@@ -5,6 +5,7 @@ import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import { inlineCode } from '../src/core/markdown-format.js';
+import { summarizeRepository } from '../src/core/pr-summary.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -94,6 +95,31 @@ describe('handoff command', () => {
     expect(output.outPath).toContain('.agentloop/handoffs');
     expect(output.outPath).not.toContain(dir);
     expect(existsSync(path.join(dir, output.outPath))).toBe(true);
+  });
+
+  test('keeps same-minute written handoffs instead of overwriting them', async () => {
+    const dir = await createSummaryFixture();
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const first = await summarizeRepository({
+      cwd: dir,
+      config,
+      timestamp: '2026-06-09-12-05',
+      write: true,
+    });
+    const second = await summarizeRepository({
+      cwd: dir,
+      config,
+      timestamp: '2026-06-09-12-05',
+      write: true,
+    });
+
+    expect(first.outPath).toBe(path.join(dir, '.agentloop/handoffs/2026-06-09-12-05-pr-summary.md'));
+    expect(second.outPath).toBe(
+      path.join(dir, '.agentloop/handoffs/2026-06-09-12-05-pr-summary-2.md'),
+    );
+    expect(existsSync(first.outPath)).toBe(true);
+    expect(existsSync(second.outPath)).toBe(true);
   });
 
   test('keeps summarize read-only unless write is requested', async () => {

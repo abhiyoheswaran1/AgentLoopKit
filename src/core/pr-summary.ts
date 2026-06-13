@@ -4,7 +4,7 @@ import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
 import { getGitDiffStat, getGitStatus, parseGitStatus, GitFileStatus } from './git.js';
 import { pathExists, writeTextFile } from './file-system.js';
-import { resolveExplicitArtifactPath, resolveOutputArtifactPath } from './artifacts.js';
+import { resolveExplicitArtifactPath, resolveUniqueOutputArtifactPath } from './artifacts.js';
 import {
   getCurrentOrLatestRunTaskPath,
   getLatestVerificationReportPath,
@@ -179,7 +179,7 @@ export async function summarizeRepository(options: {
   });
   const defaultOutPath = path.join(options.config.paths.handoffsDir, `${timestamp}-pr-summary.md`);
   const outPath = options.write
-    ? resolveOutputArtifactPath({
+    ? await resolveUniqueOutputArtifactPath({
         cwd: options.cwd,
         artifactType: 'handoff',
         requestedPath: defaultOutPath,

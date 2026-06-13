@@ -1,0 +1,9 @@
+ .agentloop/backlog.md     |  1 +
+ .agentloop/dogfood-log.md | 38 ++++++++++++++++++++++++++++++++++++++
+ CHANGELOG.md              |  1 +
+ src/core/artifacts.ts     | 41 ++++++++++++++++++++++++++++++++++++-----
+ src/core/pr-summary.ts    |  4 ++--
+ src/core/ship.ts          |  5 +++--
+ tests/handoff.test.ts     | 26 ++++++++++++++++++++++++++
+ tests/ship.test.ts        | 25 +++++++++++++++++++++++++
+ 8 files changed, 132 insertions(+), 9 deletions(-)

@@ -2,6 +2,44 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Same-Minute Evidence Artifact Collision Guard
+
+- Task contract: `.agentloop/tasks/2026-06-13-avoid-same-minute-evidence-artifact-overwrites.md`
+- Trigger:
+  - During repeated dogfood `ship` runs, the run ledger allocated unique run directories such as `...-ship-2`, but the Markdown ship report and PR summary reused the same minute-level filenames.
+  - That could overwrite the human-readable evidence a reviewer or maintainer expects to inspect later.
+- Product-panel decision:
+  - Lina wanted long agent sessions to preserve every review packet.
+  - Samir required the fix to keep existing output path guards.
+  - Maya kept explicit output paths exact and limited suffix allocation to generated default artifact names.
+- Implementation:
+  - Added a unique default output path allocator that reuses existing directory and extension safety checks.
+  - `summarizeRepository` now writes default handoffs to suffixed paths when the minute-level file already exists.
+  - `ship` now passes its timestamp into the handoff writer and writes suffixed ship reports when needed.
+  - Artifact lookup patterns accept suffixed generated handoff, ship, verification, CI summary, and release-note filenames.
+- Verification:
+  - Red run failed because same-minute handoff and ship artifacts reused the first path:
+    - `npm test -- tests/ship.test.ts tests/handoff.test.ts -t "same-minute"`
+  - Focused green run passed with `2` same-minute tests:
+    - `npm test -- tests/ship.test.ts tests/handoff.test.ts -t "same-minute"`
+  - Affected artifact tests passed with `41` tests:
+    - `npm test -- tests/ship.test.ts tests/handoff.test.ts tests/artifacts.test.ts tests/mcp-tools.test.ts`
+  - Full test suite passed with `52` files and `502` tests:
+    - `npm test`
+  - AgentLoop verification passed and wrote a fresh verification report.
+  - Final ship evidence was refreshed after verification and passed with a `95`/100 review-readiness score.
+  - Strict gates and maintainer-check passed:
+    - `node dist/cli/index.js check-gates --redact-paths --strict`
+    - `node dist/cli/index.js maintainer-check --json`
+  - Dogfood strict JSON passed:
+    - `npm run dogfood:strict:json`
+  - ProjScan passed with A `100`/100:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - Dogfooding exposed the mismatch between unique run directories and overwritten Markdown artifacts.
+- Improve:
+  - Consider applying the same unique default path allocator to verification reports, CI summaries, release notes, and HTML reports in a follow-up if users run those commands repeatedly in the same minute.
+
 ## 2026-06-13: Precise Nested Untracked File Evidence
 
 - Task contract: `.agentloop/tasks/2026-06-13-report-nested-untracked-files-precisely.md`

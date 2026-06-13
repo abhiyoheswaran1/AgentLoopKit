@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-09-35-ship",
+  "command": "ship",
+  "createdAt": "2026-06-13-09-35",
+  "createdAtEpochMs": 1781336137508,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-avoid-same-minute-evidence-artifact-overwrites.md",
+    "title": "Avoid same-minute evidence artifact overwrites",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-09-26-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-09-35-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-09-35-pr-summary.md",
+  "score": 95,
+  "changedFileCount": 13
+}

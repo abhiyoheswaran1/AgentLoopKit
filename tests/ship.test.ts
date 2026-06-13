@@ -4,6 +4,7 @@ import { mkdir, readFile, realpath, rename, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { createShipReport } from '../src/core/ship.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -147,6 +148,30 @@ describe('ship command', () => {
     expect(markdown).toContain('.agentloop/reports/');
     expect(markdown).not.toContain('Latest handoff does not cover the current dirty files.');
     expect(markdown).not.toContain(dir);
+  });
+
+  test('keeps same-minute ship report and handoff artifacts instead of overwriting them', async () => {
+    const dir = await createShipFixture();
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'typescript-package',
+      packageManager: 'npm',
+      commands: { test: 'npm test' },
+    });
+
+    const first = await createShipReport({ cwd: dir, config, timestamp: '2026-06-11-12-05' });
+    const second = await createShipReport({ cwd: dir, config, timestamp: '2026-06-11-12-05' });
+
+    expect(first.shipReportPath).toBe('.agentloop/reports/2026-06-11-12-05-ship-report.md');
+    expect(first.handoffPath).toBe('.agentloop/handoffs/2026-06-11-12-05-pr-summary.md');
+    expect(second.shipReportPath).toBe('.agentloop/reports/2026-06-11-12-05-ship-report-2.md');
+    expect(second.handoffPath).toBe('.agentloop/handoffs/2026-06-11-12-05-pr-summary-2.md');
+    expect(existsSync(path.join(dir, first.shipReportPath))).toBe(true);
+    expect(first.handoffPath).toBeDefined();
+    expect(second.handoffPath).toBeDefined();
+    expect(existsSync(path.join(dir, first.handoffPath!))).toBe(true);
+    expect(existsSync(path.join(dir, second.shipReportPath))).toBe(true);
+    expect(existsSync(path.join(dir, second.handoffPath!))).toBe(true);
   });
 
   test('uses latest run task evidence when the task contract was archived', async () => {

@@ -1,0 +1,54 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/artifacts.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/pr-summary.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/ship.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/handoff.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/ship.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-09-26-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-09-35-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-09-35-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-09-35-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-13-avoid-same-minute-evidence-artifact-overwrites.md"
+  }
+]

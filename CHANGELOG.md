@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fixed generated handoff and ship report writes so repeated same-minute runs allocate suffixed Markdown artifact paths instead of overwriting earlier evidence.
 - Changed git status collection to request individual untracked files, so new folders appear as file-level evidence in status, ship, handoff, run-ledger, and maintainer outputs.
 - Fixed `agentloop status` and `agentloop next` next-action copy so covered handoff evidence uses correct grammar.
 - Changed `agentloop status` and `agentloop next` so active tasks with passing verification and fresh handoff coverage recommend `agentloop task done` instead of asking for another handoff.

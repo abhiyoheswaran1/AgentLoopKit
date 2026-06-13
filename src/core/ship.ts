@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
-import { resolveOutputArtifactPath } from './artifacts.js';
+import { resolveUniqueOutputArtifactPath } from './artifacts.js';
 import { checkGates } from './check-gates.js';
 import { formatTimestamp } from './dates.js';
 import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
@@ -218,10 +218,11 @@ export async function createShipReport(options: {
     config: options.config,
     taskPath: evidence.taskPath ? relativePath(options.cwd, evidence.taskPath) : undefined,
     reportPath: verificationReportPath,
+    timestamp,
     write: true,
   });
   const handoffPath = handoff.outPath;
-  const shipReportPath = resolveOutputArtifactPath({
+  const shipReportPath = await resolveUniqueOutputArtifactPath({
     cwd: options.cwd,
     artifactType: 'report',
     requestedPath: path.join(options.config.paths.reportsDir, `${timestamp}-ship-report.md`),

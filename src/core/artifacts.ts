@@ -10,11 +10,16 @@ import {
 } from './file-system.js';
 import { inlineCode } from './markdown-format.js';
 
-export const verificationReportPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report\.md$/;
-export const shipReportPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ship-report\.md$/;
-export const prSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-pr-summary\.md$/;
-export const ciSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ci-summary\.md$/;
-export const releaseNotesPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-release-notes\.md$/;
+export const verificationReportPattern =
+  /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report(?:-\d+)?\.md$/;
+export const shipReportPattern =
+  /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ship-report(?:-\d+)?\.md$/;
+export const prSummaryPattern =
+  /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-pr-summary(?:-\d+)?\.md$/;
+export const ciSummaryPattern =
+  /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ci-summary(?:-\d+)?\.md$/;
+export const releaseNotesPattern =
+  /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-release-notes(?:-\d+)?\.md$/;
 export const generatedMarkdownPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-.+\.md$/;
 
 export const artifactInventoryTypes = [
@@ -288,6 +293,32 @@ export function resolveOutputArtifactPath(options: {
   }
 
   return absolutePath;
+}
+
+export async function resolveUniqueOutputArtifactPath(options: {
+  cwd: string;
+  artifactType: OutputArtifactType;
+  requestedPath: string;
+  expectedDir: string;
+  expectedExtension: string;
+}) {
+  const firstPath = resolveOutputArtifactPath(options);
+  if (!(await pathExists(firstPath))) return firstPath;
+
+  const parsed = path.parse(firstPath);
+  for (let index = 2; index <= 1000; index += 1) {
+    const requestedPath = path.join(parsed.dir, `${parsed.name}-${index}${parsed.ext}`);
+    const candidate = resolveOutputArtifactPath({
+      ...options,
+      requestedPath,
+    });
+    if (!(await pathExists(candidate))) return candidate;
+  }
+
+  throw new AgentLoopError(
+    `Unable to allocate a unique ${options.artifactType} output path for ${options.requestedPath}.`,
+    'OUTPUT_PATH_COLLISION',
+  );
 }
 
 export async function latestMarkdownFile(
