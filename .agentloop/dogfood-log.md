@@ -8737,3 +8737,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Dogfooding exposed a small but important difference between parked future work and current work.
 - Improve:
   - Consider whether `check-gates` should also use `none` for clean evidenced states in a future task.
+
+## 2026-06-13: Calm Check-Gates Next Action For Clean Passing Evidence
+
+- Task contract: `.agentloop/tasks/2026-06-13-calm-check-gates-next-action-for-clean-passing-evidence.md`
+- Trigger:
+  - After the repo was clean and evidenced, `agentloop check-gates` still recommended `agentloop handoff`.
+  - `status` and `next` had already learned to avoid noisy commands in clean states.
+- Product-panel decision:
+  - Nora wanted gate output to match the calmer clean-state UX.
+  - Lina wanted dirty evidence to keep pointing agents back to handoff.
+  - Samir wanted gate pass/fail semantics unchanged.
+  - Maya kept this to next-action rendering only.
+- Implementation:
+  - `check-gates` now returns `command: "none"` when gates pass and the changed-file count is zero.
+  - Human output prints `No command required.` for that clean state.
+  - Dirty covered and uncovered evidence guidance remains unchanged.
+- Verification:
+  - Red run failed on the old `agentloop handoff` recommendation:
+    - `npm test -- tests/check-gates.test.ts`
+  - Focused green run passed with `14` tests:
+    - `npm test -- tests/check-gates.test.ts`
+- What worked well:
+  - The previous dogfood task exposed this adjacent CLI inconsistency.
+- Improve:
+  - Consider centralizing `none` next-action rendering if another command adopts it.

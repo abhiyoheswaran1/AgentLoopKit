@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-03-45-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-03-45",
+  "createdAtEpochMs": 1781315143825,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-calm-check-gates-next-action-for-clean-passing-evidence.md",
+    "title": "Calm check-gates next action for clean passing evidence",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-03-41-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-03-45-pr-summary.md",
+  "changedFileCount": 8
+}

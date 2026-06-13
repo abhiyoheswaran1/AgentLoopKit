@@ -641,33 +641,45 @@ describe('check-gates command', () => {
       { cwd: dir },
     );
 
-    const defaultResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
-      cwd: dir,
-      reject: false,
-    });
-    const strictResult = await execa(tsxPath, [cliPath, 'check-gates', '--strict', '--json'], {
-      cwd: dir,
-      reject: false,
-    });
+      const defaultResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+        cwd: dir,
+        reject: false,
+      });
+      const strictResult = await execa(tsxPath, [cliPath, 'check-gates', '--strict', '--json'], {
+        cwd: dir,
+        reject: false,
+      });
+      const humanResult = await execa(tsxPath, [cliPath, 'check-gates'], {
+        cwd: dir,
+        reject: false,
+      });
 
-    expect(defaultResult.exitCode).toBe(0);
-    const defaultOutput = JSON.parse(defaultResult.stdout);
-    expect(defaultOutput.overallStatus).toBe('pass');
-    expect(defaultOutput.strict).toBe(false);
-    expect(defaultOutput.gates).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: 'git-context',
-          status: 'pass',
-          message: 'No changed files detected.',
-        }),
-      ]),
-    );
+      expect(defaultResult.exitCode).toBe(0);
+      const defaultOutput = JSON.parse(defaultResult.stdout);
+      expect(defaultOutput.overallStatus).toBe('pass');
+      expect(defaultOutput.strict).toBe(false);
+      expect(defaultOutput.nextAction).toEqual({
+        command: 'none',
+        reason: 'Gate evidence is complete and the repo is clean.',
+      });
+      expect(defaultOutput.gates).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'git-context',
+            status: 'pass',
+            message: 'No changed files detected.',
+          }),
+        ]),
+      );
 
-    expect(strictResult.exitCode).toBe(0);
-    const strictOutput = JSON.parse(strictResult.stdout);
-    expect(strictOutput.overallStatus).toBe('pass');
-    expect(strictOutput.strict).toBe(true);
+      expect(strictResult.exitCode).toBe(0);
+      const strictOutput = JSON.parse(strictResult.stdout);
+      expect(strictOutput.overallStatus).toBe('pass');
+      expect(strictOutput.strict).toBe(true);
+      expect(strictOutput.nextAction).toEqual({
+        command: 'none',
+        reason: 'Gate evidence is complete and the repo is clean.',
+      });
       expect(strictOutput.gates).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -677,6 +689,9 @@ describe('check-gates command', () => {
           }),
         ]),
       );
+      expect(humanResult.exitCode).toBe(0);
+      expect(humanResult.stdout).toContain('No command required.');
+      expect(humanResult.stdout).toContain('Gate evidence is complete and the repo is clean.');
     },
     CLI_CHECK_GATES_TEST_TIMEOUT_MS,
   );

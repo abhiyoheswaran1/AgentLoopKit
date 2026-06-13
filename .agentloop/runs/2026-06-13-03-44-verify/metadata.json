@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-03-44-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-03-44",
+  "createdAtEpochMs": 1781315057650,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-calm-check-gates-next-action-for-clean-passing-evidence.md",
+    "title": "Calm check-gates next action for clean passing evidence",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-03-41-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

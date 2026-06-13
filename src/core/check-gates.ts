@@ -131,6 +131,12 @@ function chooseNextAction(
       reason: 'Review task-folder hygiene diagnostics before refreshing handoff evidence.',
     };
   }
+  if (!input.dirty) {
+    return {
+      command: 'none',
+      reason: 'Gate evidence is complete and the repo is clean.',
+    };
+  }
   if (input.dirty && input.dirtyCoveredByLatestHandoffRun) {
     return {
       command: 'agentloop create-task',
@@ -168,6 +174,11 @@ function renderMarkdown(result: Omit<CheckGatesResult, 'markdown'>) {
       : []),
   ];
 
+  const nextAction =
+    result.nextAction.command === 'none'
+      ? `No command required.\n\n${result.nextAction.reason}`
+      : `Run ${inlineCode(result.nextAction.command)}.\n\n${result.nextAction.reason}`;
+
   return `# AgentLoopKit Gates
 
 - Overall status: ${inlineCode(result.overallStatus)}
@@ -181,9 +192,7 @@ ${gateLines}
 
 ## Next Action
 
-Run ${inlineCode(result.nextAction.command)}.
-
-${result.nextAction.reason}
+${nextAction}
 `;
 }
 
