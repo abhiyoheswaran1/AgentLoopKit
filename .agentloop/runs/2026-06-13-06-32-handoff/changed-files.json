@@ -1,0 +1,54 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/check-gates.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/handoff-coverage.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/check-gates.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-13-06-32-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-06-25-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-06-32-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-06-29-verify/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-06-32-ship/"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-13-treat-ship-runs-as-fresh-handoff-evidence.md"
+  }
+]

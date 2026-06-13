@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-06-33-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-06-33",
+  "createdAtEpochMs": 1781325198775,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-treat-ship-runs-as-fresh-handoff-evidence.md",
+    "title": "Treat ship runs as fresh handoff evidence",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-06-25-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-06-33-pr-summary.md",
+  "changedFileCount": 15
+}

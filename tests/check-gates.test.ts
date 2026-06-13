@@ -230,6 +230,75 @@ describe('check-gates command', () => {
     });
   });
 
+  test('does not request another handoff when latest ship run covers dirty evidence', async () => {
+    const dir = await createInitializedRepo();
+    const runId = '2026-06-13-01-12-ship';
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
+    await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/archive/2026-06-13-ship-flow.md'),
+      '# Ship flow\n\n- Status: done\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-13-01-06-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/handoffs/.gitkeep'), '');
+    await mkdir(path.join(dir, '.agentloop/runs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/runs/.gitkeep'), '');
+    await commitAll(dir, 'init');
+
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 2;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-13-01-12-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-13-01-12-ship-report.md'),
+      '# AgentLoopKit Ship Report\n\n- Review readiness score: `94`/100\n',
+    );
+    await writeJson(path.join(dir, '.agentloop/runs', runId, 'metadata.json'), {
+      id: runId,
+      command: 'ship',
+      createdAt: '2026-06-13-01-12',
+      createdAtEpochMs: 2_000,
+      task: {
+        path: '.agentloop/tasks/2026-06-13-ship-flow.md',
+        title: 'Ship flow',
+        status: 'done',
+      },
+      verificationReportPath: '.agentloop/reports/2026-06-13-01-06-verification-report.md',
+      handoffPath: '.agentloop/handoffs/2026-06-13-01-12-pr-summary.md',
+      shipReportPath: '.agentloop/reports/2026-06-13-01-12-ship-report.md',
+      score: 94,
+      changedFileCount: 1,
+    });
+    await writeJson(path.join(dir, '.agentloop/runs', runId, 'changed-files.json'), [
+      { status: 'M', path: 'src.ts' },
+    ]);
+
+    const result = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.overallStatus).toBe('pass');
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'handoff-summary',
+          status: 'pass',
+          message: 'Reviewer handoff found.',
+        }),
+      ]),
+    );
+    expect(output.nextAction.command).toBe('agentloop create-task');
+  });
+
   test('redacts local git root paths when requested', async () => {
     const dir = await createInitializedRepo();
     await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');

@@ -240,7 +240,7 @@ agentloop check-gates --redact-paths
 
 If the latest verification report is older than the active or newest open task, `check-gates` treats it as stale and asks you to rerun verification for that task.
 
-If the working tree has dirty files and the latest handoff run does not cover them, `check-gates` warns and asks you to refresh the handoff.
+If the working tree has dirty files and the latest review-evidence run does not cover them, `check-gates` warns and asks you to refresh the handoff. Review-evidence runs are `handoff` runs and `ship` runs that record a handoff path.
 
 Warnings keep exit code `0` by default. Use `--strict` in CI when warning gates should fail.
 

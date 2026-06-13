@@ -2,6 +2,29 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Ship Run Handoff Freshness
+
+- Task contract: `.agentloop/tasks/archive/2026-06-13-treat-ship-runs-as-fresh-handoff-evidence.md`
+- Trigger:
+  - GitHub CLI Smoke failed after the stale-handoff warning change.
+  - The smoke flow ran `agentloop ship` and then `agentloop review-context --json`; `review-context` reported warning gates because freshness only accepted a latest `handoff` run.
+- Product change:
+  - A latest `ship` run now counts as fresh review evidence when it has a handoff path and its recorded changed files cover the current dirty files.
+  - Stale warnings still apply when dirty files are not covered by the latest review-evidence run.
+- Verification:
+  - Red TDD run: `npm test -- tests/check-gates.test.ts` failed because a covering `ship` run still produced `overallStatus: warn`.
+  - Green focused run: `npm test -- tests/check-gates.test.ts` passed with 15 tests after updating the coverage helper.
+  - AgentLoop task verification passed and wrote `.agentloop/reports/2026-06-13-06-25-verification-report.md`.
+  - The exact local smoke script that failed in CI, `node scripts/smoke-cli.mjs`, passed after the fix.
+  - Affected consumer tests passed with 46 tests:
+    - `npm test -- tests/check-gates.test.ts tests/review-context.test.ts tests/status.test.ts tests/mcp-tools.test.ts`
+  - `npm run typecheck`, `npm run build`, `npm run lint`, and `npm run check:links` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - CI caught that `ship` must remain the main review-readiness path, not force an immediate extra handoff.
+- Improve:
+  - Add a direct smoke/local regression for `review-context` after `ship` if this flow regresses again.
+
 ## 2026-06-13: Stale Handoff Gate Warning
 
 - Task contract: `.agentloop/tasks/archive/2026-06-13-warn-on-stale-handoff-gate-evidence.md`
@@ -9,7 +32,7 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Dogfooding showed `check-gates` could pass with any handoff file while the next action still asked for a refreshed handoff.
   - Product panel signal: Lina wanted handoff evidence to match the current dirty files; Samir wanted strict CI gates to block stale reviewer evidence.
 - Product change:
-  - `check-gates` now warns when the working tree has dirty files that the latest handoff run does not cover.
+  - `check-gates` now warns when the working tree has dirty files that the latest handoff or handoff-producing ship run does not cover.
   - Strict mode fails on that warning.
   - Clean repos with existing handoff evidence still pass.
 - Verification:

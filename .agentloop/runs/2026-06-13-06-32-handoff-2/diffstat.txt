@@ -1,0 +1,8 @@
+ .agentloop/backlog.md        |  1 +
+ .agentloop/dogfood-log.md    | 19 +++++++++++-
+ CHANGELOG.md                 |  1 +
+ docs/check-gates.md          |  2 +-
+ docs/cli-reference.md        |  2 +-
+ src/core/handoff-coverage.ts | 15 +++++++---
+ tests/check-gates.test.ts    | 69 ++++++++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 102 insertions(+), 7 deletions(-)

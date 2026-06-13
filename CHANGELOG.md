@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fixed `agentloop check-gates` so `agentloop ship` remains fresh handoff evidence when its run covers the current dirty files.
 - Changed `agentloop check-gates` to warn when dirty files are not covered by the latest handoff run.
 - Added JSON dogfood summaries through `npm run dogfood:json` and `npm run dogfood:strict:json` for agents and CI logs.
 - Hardened post-verification gate detection so AgentLoop command words inside another shell command do not trigger noisy warnings.

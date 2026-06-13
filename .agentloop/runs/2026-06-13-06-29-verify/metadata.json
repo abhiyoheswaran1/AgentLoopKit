@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-06-29-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-06-29",
+  "createdAtEpochMs": 1781324956495,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-treat-ship-runs-as-fresh-handoff-evidence.md",
+    "title": "Treat ship runs as fresh handoff evidence",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-06-25-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 9
+}
