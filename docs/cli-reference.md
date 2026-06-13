@@ -180,6 +180,8 @@ agentloop prepare-pr --json --github-comment --redact-paths
 
 The readiness score is evidence-based. It scores task clarity, scope control, verification evidence, evidence freshness, policy and gate compliance, handoff readiness, and risk flags. It does not claim to measure code quality.
 
+`ship` scores the review evidence it creates during the command, so the generated handoff and ship run can satisfy handoff freshness without requiring an immediate extra `agentloop handoff` run.
+
 By default, `ship` reuses current verification evidence. Use `--run-verify` when you want it to run configured verification commands first. Use `--task-commands` with `--run-verify` to also run verification commands recorded in the task contract.
 
 Use `ship --github-comment` when CI needs compact review-readiness Markdown for a pull request comment. With `--json`, the comment appears as `githubComment`. Without `--json`, the command prints only the comment Markdown. AgentLoopKit does not read GitHub tokens, call GitHub APIs, or post comments by itself.

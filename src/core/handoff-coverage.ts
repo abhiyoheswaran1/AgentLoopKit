@@ -19,16 +19,38 @@ function isLatestReviewEvidenceRunArtifact(filePath: string, latestRun: RunSumma
   return normalizedPath === runPath || normalizedPath.startsWith(`${runPath}/`);
 }
 
+function isCoveredAgentLoopArtifactDirectory(
+  filePath: string,
+  coveredPaths: Set<string>,
+  latestRun: RunSummary | undefined,
+) {
+  const normalizedPath = filePath.replace(/\\/g, '/');
+  if (!normalizedPath.endsWith('/')) return false;
+  if (
+    !['.agentloop/handoffs/', '.agentloop/reports/', '.agentloop/runs/'].includes(normalizedPath)
+  ) {
+    return false;
+  }
+
+  if (isReviewEvidenceRun(latestRun)) {
+    const runPath = `.agentloop/runs/${latestRun.id}/`;
+    if (runPath.startsWith(normalizedPath)) return true;
+  }
+
+  return [...coveredPaths].some((coveredPath) => coveredPath.startsWith(normalizedPath));
+}
+
 export async function dirtyCoveredByLatestHandoffRun(
   cwd: string,
   changedFiles: GitFileStatus[],
   latestRun: RunSummary | undefined,
+  latestRunChangedFiles?: GitFileStatus[],
 ) {
   if (changedFiles.length === 0 || !isReviewEvidenceRun(latestRun)) return false;
 
   const latestRunRecord = await readRun(cwd, latestRun.id).catch(() => undefined);
   const coveredPaths = new Set(
-    (latestRunRecord?.changedFiles ?? []).map((changedFile) =>
+    (latestRunChangedFiles ?? latestRunRecord?.changedFiles ?? []).map((changedFile) =>
       normalizeGitStatusPath(changedFile.path),
     ),
   );
@@ -42,6 +64,7 @@ export async function dirtyCoveredByLatestHandoffRun(
 
   return changedFiles.every((changedFile) => {
     if (isLatestReviewEvidenceRunArtifact(changedFile.path, latestRun)) return true;
+    if (isCoveredAgentLoopArtifactDirectory(changedFile.path, coveredPaths, latestRun)) return true;
     return coveredPaths.has(normalizeGitStatusPath(changedFile.path));
   });
 }

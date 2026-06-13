@@ -2,6 +2,28 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Post-Ship Gate Reporting
+
+- Task contract: `.agentloop/tasks/archive/2026-06-13-report-post-ship-gate-state.md`
+- Trigger:
+  - Dogfooding showed `agentloop ship` could generate valid handoff and ship evidence while the same ship report still displayed the pre-run stale-handoff warning.
+  - Product panel signal: Lina and Nora want `ship` to behave as the one-command review-readiness flow without asking for an immediate duplicate handoff.
+- Product change:
+  - `ship` now asks `check-gates` to evaluate projected review evidence for the ship run being created.
+  - The fix does not create an extra handoff run for every `ship`.
+  - The handoff coverage helper now handles Git's untracked artifact-directory shorthand for generated AgentLoop evidence directories.
+- Verification:
+  - Red TDD run: `npm test -- tests/ship.test.ts` failed because `ship --json` still returned gate status `warn`.
+  - Green focused run: `npm test -- tests/ship.test.ts` passed with 6 tests.
+  - Paired regression run: `npm test -- tests/ship.test.ts tests/check-gates.test.ts` passed with 21 tests.
+  - AgentLoop task verification passed and wrote `.agentloop/reports/2026-06-13-06-58-verification-report.md`.
+  - Full `npm test` passed with 52 files and 495 tests.
+  - `agentloop ship --redact-paths` wrote `.agentloop/reports/2026-06-13-07-06-ship-report.md` with `Gates: pass` and review readiness `96`/100.
+- Worked well:
+  - The previous CI smoke fix made the post-ship inconsistency obvious enough to turn into a narrow regression test.
+- Improve:
+  - Consider switching Git status parsing to `--untracked-files=all` later if untracked directory shorthand causes more artifact coverage edge cases.
+
 ## 2026-06-13: Ship Run Handoff Freshness
 
 - Task contract: `.agentloop/tasks/archive/2026-06-13-treat-ship-runs-as-fresh-handoff-evidence.md`

@@ -123,6 +123,16 @@ describe('ship command', () => {
     expect(output.shipReportPath).not.toContain(dir);
     expect(output.handoffPath).not.toContain(dir);
     expect(output.verificationReportPath).not.toContain(dir);
+    expect(output.gates.overallStatus).toBe('pass');
+    expect(output.gates.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'handoff-summary',
+          status: 'pass',
+          message: 'Reviewer handoff found.',
+        }),
+      ]),
+    );
     expect(output.run.path).not.toContain(dir);
     expect(output.githubComment).toBeUndefined();
     expect(existsSync(path.join(dir, output.shipReportPath))).toBe(true);
@@ -135,6 +145,7 @@ describe('ship command', () => {
     expect(markdown).toContain('src/auth/callback.ts');
     expect(markdown).toContain('Review risk-sensitive files before merge.');
     expect(markdown).toContain('.agentloop/reports/');
+    expect(markdown).not.toContain('Latest handoff does not cover the current dirty files.');
     expect(markdown).not.toContain(dir);
   });
 

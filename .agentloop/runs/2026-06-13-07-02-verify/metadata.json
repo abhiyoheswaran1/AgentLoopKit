@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-07-02-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-07-02",
+  "createdAtEpochMs": 1781326938259,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-report-post-ship-gate-state.md",
+    "title": "Report post-ship gate state",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-06-58-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 10
+}

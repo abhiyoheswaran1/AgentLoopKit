@@ -220,13 +220,33 @@ export async function createShipReport(options: {
     reportPath: verificationReportPath,
     write: true,
   });
+  const handoffPath = handoff.outPath;
+  const shipReportPath = resolveOutputArtifactPath({
+    cwd: options.cwd,
+    artifactType: 'report',
+    requestedPath: path.join(options.config.paths.reportsDir, `${timestamp}-ship-report.md`),
+    expectedDir: options.config.paths.reportsDir,
+    expectedExtension: '.md',
+  });
   const gates = await checkGates({
     cwd: options.cwd,
     config: options.config,
     strict: options.strictGates,
     redactPaths: options.redactPaths,
+    projectedReviewEvidenceRun: {
+      id: `${timestamp}-ship`,
+      command: 'ship',
+      createdAt: timestamp,
+      task: task ? { path: task.path, title: task.title, status: task.status } : null,
+      ...(verificationReportPath
+        ? { verificationReportPath: relativePath(options.cwd, verificationReportPath) }
+        : {}),
+      shipReportPath: relativePath(options.cwd, shipReportPath) ?? shipReportPath,
+      ...(handoffPath ? { handoffPath: relativePath(options.cwd, handoffPath) } : {}),
+      changedFileCount: changedFiles.length,
+      changedFiles,
+    },
   });
-  const handoffPath = handoff.outPath;
   const readiness = evaluateReviewReadiness({
     task: task
       ? {
@@ -247,13 +267,6 @@ export async function createShipReport(options: {
     },
   });
 
-  const shipReportPath = resolveOutputArtifactPath({
-    cwd: options.cwd,
-    artifactType: 'report',
-    requestedPath: path.join(options.config.paths.reportsDir, `${timestamp}-ship-report.md`),
-    expectedDir: options.config.paths.reportsDir,
-    expectedExtension: '.md',
-  });
   const withoutMarkdown = {
     timestamp,
     readiness,

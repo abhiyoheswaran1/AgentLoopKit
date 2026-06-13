@@ -14,7 +14,7 @@ import {
 } from './git.js';
 import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
 import { inlineCode } from './markdown-format.js';
-import { listRuns } from './runs.js';
+import { listRuns, RunSummary } from './runs.js';
 import { inspectTaskDirectory } from './task-state.js';
 
 export type GateStatus = 'pass' | 'warn' | 'fail';
@@ -44,6 +44,10 @@ export type CheckGatesResult = {
     reason: string;
   };
   markdown: string;
+};
+
+export type ProjectedReviewEvidenceRun = RunSummary & {
+  changedFiles: Awaited<ReturnType<typeof parseGitStatus>>;
 };
 
 const requiredRootFiles = ['AGENTS.md', 'AGENTLOOP.md', 'agentloop.config.json'];
@@ -206,6 +210,7 @@ export async function checkGates(options: {
   config: AgentLoopConfig;
   strict?: boolean;
   redactPaths?: boolean;
+  projectedReviewEvidenceRun?: ProjectedReviewEvidenceRun;
 }): Promise<CheckGatesResult> {
   const strict = options.strict ?? false;
   const evidence = await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
@@ -265,11 +270,12 @@ export async function checkGates(options: {
 
   const inGit = await isInsideGitRepo(options.cwd);
   const changedFiles = inGit ? await parseGitStatus(await getGitStatus(options.cwd)) : [];
-  const latestRun = (await listRuns(options.cwd))[0];
+  const latestRun = options.projectedReviewEvidenceRun ?? (await listRuns(options.cwd))[0];
   const latestHandoffRunCoversDirtyFiles = await dirtyCoveredByLatestHandoffRun(
     options.cwd,
     changedFiles,
     latestRun,
+    options.projectedReviewEvidenceRun?.changedFiles,
   );
 
   if (handoffPath) {

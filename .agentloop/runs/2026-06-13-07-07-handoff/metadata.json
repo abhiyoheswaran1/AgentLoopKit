@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-07-07-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-07-07",
+  "createdAtEpochMs": 1781327243209,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-report-post-ship-gate-state.md",
+    "title": "Report post-ship gate state",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-06-58-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-07-07-pr-summary.md",
+  "changedFileCount": 14
+}
