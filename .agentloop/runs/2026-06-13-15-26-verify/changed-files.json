@@ -1,0 +1,78 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/harness/commands.md"
+  },
+  {
+    "status": "M",
+    "path": "AGENTS.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "scripts/dogfood.mjs"
+  },
+  {
+    "status": "M",
+    "path": "tests/dogfood-script.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-13-15-23-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-15-21-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-15-25-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-15-21-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-15-21-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-15-21-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-15-23-handoff/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-15-23-handoff/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-15-23-handoff/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-15-23-handoff/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-13-add-dependency-audit-to-dogfood-gate.md"
+  }
+]

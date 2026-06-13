@@ -31,7 +31,7 @@ Rules:
 - Use `agentloop npm-status --agentloopkit --expect-current` as an AgentLoopKit post-publish smoke check from any directory. It never publishes or reads credentials.
 - Run targeted checks while developing.
 - Run configured verification before claiming completion.
-- Dogfood projscan during implementation work in this repository.
+- Dogfood dependency audit and projscan during implementation work in this repository.
 - If a command fails, report the failure and fix it when reasonable.
 - If a command is not configured, say so in the handoff.
 

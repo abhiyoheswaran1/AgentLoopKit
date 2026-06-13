@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-15-27-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-15-27",
+  "createdAtEpochMs": 1781357240575,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-add-dependency-audit-to-dogfood-gate.md",
+    "title": "Add dependency audit to dogfood gate",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-15-25-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-15-27-pr-summary.md",
+  "changedFileCount": 13
+}

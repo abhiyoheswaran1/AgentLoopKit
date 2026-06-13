@@ -9546,3 +9546,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The dogfood script gave a compact proof that task hygiene, status, gates, artifacts, maintainer checks, review context, and ProjScan were all green.
 - Improve:
   - Add dependency-audit coverage to the standard dogfood gate so security drift is caught before release prep.
+
+## 2026-06-13: Dependency Audit In Dogfood Gate
+
+- Task contract: `.agentloop/tasks/2026-06-13-add-dependency-audit-to-dogfood-gate.md`
+- Trigger:
+  - The `0.29.0` release gate caught a high `esbuild` advisory during final release prep.
+  - The everyday dogfood gate did not run dependency audit, so dependency drift could wait until release work.
+- Product-panel decision:
+  - Samir wanted dependency advisories to block the normal self-check path before publish work starts.
+  - Maya kept the change to the existing dogfood script instead of adding another release-only command.
+  - Nora wanted JSON summaries to expose the new check as a normal named step.
+- Implementation:
+  - Added a read-only `dependency audit` step to `scripts/dogfood.mjs`.
+  - The step runs `npx --yes pnpm@10.12.1 audit --audit-level high`, matching the pinned package manager used in release verification.
+  - Updated README, CLI reference, AGENTS guidance, harness commands, and changelog.
+- Verification:
+  - Red run failed until the audit step existed:
+    - `npm test -- tests/dogfood-script.test.ts`
+  - Focused dogfood-script tests passed:
+    - `npm test -- tests/dogfood-script.test.ts`
+  - Task-command verification passed:
+    - `.agentloop/reports/2026-06-13-15-25-verification-report.md`
+    - `.agentloop/runs/2026-06-13-15-26-verify`
+  - Strict dogfood passed and included the new `dependency audit` step:
+    - `node scripts/dogfood.mjs --strict --json`
+  - Review gates passed:
+    - `node dist/cli/index.js check-gates --strict --redact-paths`
+    - `node dist/cli/index.js maintainer-check --redact-paths`
+- What worked well:
+  - Release dogfooding produced a small preventive gate instead of another manual checklist item.
+- Improve:
+  - Consider making the audit threshold configurable later if AgentLoopKit supports repo-local dogfood policy.

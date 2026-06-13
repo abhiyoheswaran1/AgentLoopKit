@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Added dependency audit to the repeatable dogfood gate so dependency advisories are caught before release prep.
 
 ## 0.29.0
 

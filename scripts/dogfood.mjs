@@ -42,6 +42,12 @@ export function createDogfoodSteps({ strict = false } = {}) {
       args: ['scripts/public-docs-hygiene.mjs'],
       allowFailure: false,
     },
+    {
+      name: 'dependency audit',
+      command: 'npx',
+      args: ['--yes', 'pnpm@10.12.1', 'audit', '--audit-level', 'high'],
+      allowFailure: false,
+    },
     agentloopStep('review evidence gates', gateArgs),
     agentloopStep('artifact inventory', ['artifacts', '--json']),
     agentloopStep('maintainer reviewability check', [
@@ -57,8 +63,8 @@ export function createDogfoodSteps({ strict = false } = {}) {
       allowFailure: false,
     },
   ];
-  steps[3].allowFailure = !strict;
-  steps[5].allowFailure = !strict;
+  steps[4].allowFailure = !strict;
+  steps[6].allowFailure = !strict;
   return steps;
 }
 
@@ -92,7 +98,7 @@ Usage:
   npm run dogfood:strict
   node scripts/dogfood.mjs --json
 
-Default mode runs read-only AgentLoopKit self-checks and ProjScan. Strict mode treats review-gate warnings as failures.
+Default mode runs read-only AgentLoopKit self-checks, dependency audit, and ProjScan. Strict mode treats review-gate warnings as failures.
 JSON mode prints a deterministic summary for agents and CI logs.
 
 This script does not publish packages, create tags, create GitHub releases, post comments, read token files, read .env contents, or run verification commands.`);

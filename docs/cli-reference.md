@@ -338,7 +338,7 @@ npm run dogfood:strict
 npm run dogfood:strict:json
 ```
 
-The dogfood scripts run AgentLoopKit's local self-check path for this repository. JSON mode prints one structured summary with mode, overall status, step results, exit codes, durations, and safety notes for agents and CI logs. It redacts the current workspace root as `[git-root]` before printing structured output.
+The dogfood scripts run AgentLoopKit's local self-check path for this repository, including public-doc hygiene, dependency audit, review gates, artifact inventory, maintainer reviewability, review context, and ProjScan health. JSON mode prints one structured summary with mode, overall status, step results, exit codes, durations, and safety notes for agents and CI logs. It redacts the current workspace root as `[git-root]` before printing structured output.
 
 The scripts do not publish packages, create tags, post comments, read tokens, read `.env` files, or run verification commands.
 
