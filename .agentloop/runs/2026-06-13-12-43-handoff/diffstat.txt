@@ -1,0 +1,12 @@
+ .agentloop/dogfood-log.md        | 34 +++++++++++++++++++++++++
+ CHANGELOG.md                     |  1 +
+ README.md                        |  2 +-
+ docs/cli-reference.md            |  3 +++
+ docs/doctor-risk-files.md        |  3 +++
+ docs/getting-started.md          |  3 +++
+ scripts/smoke-packed-release.mjs |  1 +
+ src/cli/commands/doctor.ts       |  9 +++++--
+ src/core/doctor.ts               | 43 +++++++++++++++++++++++++++++---
+ tests/doctor.test.ts             | 54 ++++++++++++++++++++++++++++++++++++++++
+ tests/release-smoke.test.ts      |  4 +--
+ 11 files changed, 148 insertions(+), 9 deletions(-)

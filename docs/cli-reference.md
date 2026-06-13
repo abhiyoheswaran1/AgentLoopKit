@@ -35,6 +35,7 @@ Configured paths must stay inside the current repo. Absolute paths, parent trave
 agentloop doctor
 agentloop doctor --json
 agentloop doctor --strict
+agentloop doctor --redact-paths
 ```
 
 `doctor` checks setup health, template manifest state, configured commands, Git root, current working tree, package manager detection, project type detection, missing commands, monorepo signals, and risk-file categories.
@@ -43,6 +44,8 @@ Env files are reported by path only. AgentLoopKit does not read `.env` contents.
 Risk-file scanning is bounded; on very large repos, doctor reports when the scan stops early so you can run targeted checks.
 
 Warnings keep exit code `0` by default. Use `--strict` when warnings should fail CI or a team setup gate.
+
+Use `--redact-paths` before pasting doctor output into a public issue, PR, or CI log. It hides the absolute Git root and keeps repo-relative risk-file paths readable. Default JSON keeps the absolute Git root for scripts that need it.
 
 ## Task Contracts
 

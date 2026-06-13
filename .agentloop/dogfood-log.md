@@ -9350,3 +9350,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The redaction work now exercises itself through the dogfood gate.
 - Improve:
   - Consider adding a dogfood JSON output regression that asserts no absolute Git root appears in the structured summary.
+
+## 2026-06-13: Add Redacted Doctor Output
+
+- Task contract: `.agentloop/tasks/archive/2026-06-13-add-redacted-doctor-output.md`
+- Trigger:
+  - `doctor` is one of the first commands users paste into issues, PRs, or CI logs.
+  - Other shareable commands already supported `--redact-paths`, but `doctor` still exposed the absolute Git root by default.
+- Product-panel decision:
+  - Samir wanted setup diagnostics to be safe to paste without relying on manual path editing.
+  - Nora wanted the same safety flag across first-run and review-readiness commands.
+  - Maya kept default output unchanged for scripts and limited redaction to explicit public-output mode.
+- Implementation:
+  - Added `--redact-paths` to `agentloop doctor`.
+  - Redacted the absolute Git root in human and JSON doctor output when requested.
+  - Updated README, getting-started docs, doctor risk-file docs, CLI reference, and public-docs hygiene checks.
+- Verification:
+  - Red run failed on the missing CLI flag:
+    - `npm test -- tests/doctor.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/doctor.test.ts tests/release-smoke.test.ts`
+  - Task-command verification passed:
+    - `.agentloop/reports/2026-06-13-12-35-verification-report.md`
+    - `.agentloop/runs/2026-06-13-12-36-verify`
+  - Full local gates passed:
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm test`
+    - `node dist/cli/index.js check-gates --redact-paths --strict`
+    - `npm run dogfood:strict:json`
+  - Dogfood strict mode included `npx --yes projscan doctor --format markdown` and passed.
+- What worked well:
+  - The public-docs guard now treats `doctor` as part of the same safe-share command family.
+- Improve:
+  - Consider deriving the README redaction command list from CLI command metadata instead of maintaining a separate smoke-test list.

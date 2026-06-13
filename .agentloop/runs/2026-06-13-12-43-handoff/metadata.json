@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-12-43-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-12-43",
+  "createdAtEpochMs": 1781347435319,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-add-redacted-doctor-output.md",
+    "title": "Add redacted doctor output",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-12-35-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-12-43-pr-summary-2.md",
+  "changedFileCount": 37
+}

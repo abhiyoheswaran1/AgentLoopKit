@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added `agentloop doctor --redact-paths` for safe public sharing of setup, Git-root, and risk-file output while keeping default doctor JSON unchanged for scripts.
 - Changed `agentloop ship` report and GitHub-comment readiness lists to escape Markdown control characters in warning, blocker, and next-action prose.
 - Changed `agentloop prepare-pr` to escape Markdown control characters in task-derived PR list prose and readiness comment lists.
 - Changed dogfood JSON summaries to redact the current workspace root from step arguments, command text, and child-process error messages.

@@ -206,6 +206,25 @@ async function resolveComparablePath(filePath: string) {
   }
 }
 
+function redactLocalGitRoot(value: string, gitRoot: string, redactPaths: boolean | undefined) {
+  if (!redactPaths || !gitRoot || gitRoot === path.parse(gitRoot).root) return value;
+
+  let redacted = value;
+  const candidates = new Set([gitRoot, gitRoot.replace(/\\/g, '/')]);
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    redacted = redacted.split(candidate).join('[git-root]');
+  }
+  return redacted;
+}
+
+function redactDoctorCheck(check: DoctorCheck, gitRoot: string, redactPaths: boolean | undefined) {
+  return {
+    ...check,
+    message: redactLocalGitRoot(check.message, gitRoot, redactPaths),
+  };
+}
+
 async function checkTemplateManifest(cwd: string): Promise<DoctorCheck> {
   const manifest = await readTextIfExists(path.join(cwd, AGENTLOOP_MANIFEST_FILE));
   if (!manifest) return check('Template manifest', 'warn', MISSING_MANIFEST_MESSAGE);
@@ -255,6 +274,7 @@ export async function runDoctor(options: {
   strict?: boolean;
   riskScanMaxDepth?: number;
   riskScanMaxEntries?: number;
+  redactPaths?: boolean;
 }): Promise<DoctorResult> {
   const cwd = options.cwd;
   const strict = options.strict ?? false;
@@ -398,8 +418,11 @@ export async function runDoctor(options: {
     checks.push(check('Tests', 'warn', 'no test command detected'));
   }
 
-  const warnings = checks.filter((item) => item.status === 'warn');
-  const serious = checks.filter((item) => item.status === 'fail');
+  const outputChecks = checks.map((item) =>
+    redactDoctorCheck(item, resolvedGitRoot, options.redactPaths),
+  );
+  const warnings = outputChecks.filter((item) => item.status === 'warn');
+  const serious = outputChecks.filter((item) => item.status === 'fail');
   const overallStatus = determineOverallStatus({ warnings, serious, strict });
   const nextActions = chooseDoctorNextActions(checks);
   const markdown = `# AgentLoopKit Doctor
@@ -407,7 +430,7 @@ export async function runDoctor(options: {
 - Overall status: ${inlineCode(overallStatus)}
 - Strict mode: ${inlineCode(strict ? 'enabled' : 'disabled')}
 
-${checks
+${outputChecks
   .map((item) => {
     return `- [${inlineCode(item.status)}] ${inlineCode(item.name)}: ${inlineCode(item.message)}`;
   })
@@ -416,5 +439,17 @@ ${checks
 ${renderNextActions(nextActions)}
 `;
 
-  return { checks, warnings, serious, strict, overallStatus, nextActions, git, markdown };
+  return {
+    checks: outputChecks,
+    warnings,
+    serious,
+    strict,
+    overallStatus,
+    nextActions,
+    git: {
+      ...git,
+      root: redactLocalGitRoot(git.root, resolvedGitRoot, options.redactPaths),
+    },
+    markdown,
+  };
 }

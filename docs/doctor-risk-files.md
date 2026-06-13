@@ -7,7 +7,10 @@ Run:
 ```bash
 agentloop doctor
 agentloop doctor --json
+agentloop doctor --redact-paths
 ```
+
+Use `--redact-paths` before sharing doctor output outside the repo. The flag hides the absolute Git root and leaves repo-relative risk-file paths readable.
 
 ## Categories
 

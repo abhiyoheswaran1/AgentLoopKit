@@ -27,11 +27,14 @@ Then check the setup:
 
 ```bash
 npx agentloopkit doctor
+npx agentloopkit doctor --redact-paths
 ```
 
 `doctor` detects common monorepo markers such as `pnpm-workspace.yaml`, package `workspaces`, Turbo, Nx, Lerna, and Rush config files. It reports them as warnings and suggests package-specific verification commands so you can confirm whether root-level checks are enough for the task.
 
 `doctor` reports the Git root and whether the AgentLoop target is the Git root. If a parent AgentLoop config exists, `doctor` uses that initialized root even when your shell is in a nested folder.
+
+Use `doctor --redact-paths` before pasting setup output into a public issue, PR, or CI log. It replaces the absolute Git root with `[git-root]`.
 
 `doctor` also checks `.agentloop/manifest.json`, which records the template generation used by `init`. Missing, stale, invalid, or newer manifests are warnings, not failures. See `template-migrations.md` before copying newer generated guidance into an existing repo.
 

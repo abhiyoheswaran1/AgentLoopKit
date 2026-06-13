@@ -55,6 +55,7 @@ const STALE_REPO_HARNESS_RELEASE_CLAIMS = [
 ];
 
 const README_REDACTION_COMMANDS = [
+  'doctor',
   'status',
   'next',
   'review-context',

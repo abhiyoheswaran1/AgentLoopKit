@@ -93,6 +93,60 @@ describe('doctor', () => {
     });
   });
 
+  test('redacts local git root paths when requested', async () => {
+    const dir = await makeTempDir();
+    const packageDir = path.join(dir, 'packages', 'web');
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await mkdir(packageDir, { recursive: true });
+    await writeJson(path.join(packageDir, 'package.json'), { name: 'demo-web' });
+    await initializeAgentLoop({ cwd: packageDir });
+
+    const root = await realpath(dir);
+    const defaultResult = await execa(tsxPath, [cliPath, 'doctor', '--json'], {
+      cwd: packageDir,
+      reject: false,
+    });
+    const redactedJsonResult = await execa(
+      tsxPath,
+      [cliPath, 'doctor', '--json', '--redact-paths'],
+      {
+        cwd: packageDir,
+        reject: false,
+      },
+    );
+    const redactedHumanResult = await execa(tsxPath, [cliPath, 'doctor', '--redact-paths'], {
+      cwd: packageDir,
+      reject: false,
+    });
+
+    expect(defaultResult.exitCode).toBe(0);
+    expect(JSON.parse(defaultResult.stdout).git.root).toBe(root);
+
+    expect(redactedJsonResult.exitCode).toBe(0);
+    const redacted = JSON.parse(redactedJsonResult.stdout);
+    expect(redacted.git.root).toBe('[git-root]');
+    expect(JSON.stringify(redacted)).not.toContain(root);
+    expect(redacted.checks).toEqual(
+      expect.arrayContaining([
+        {
+          name: 'Git root',
+          status: 'pass',
+          message: '[git-root]',
+        },
+        expect.objectContaining({
+          name: 'Current directory',
+          status: 'pass',
+          message: expect.stringContaining('[git-root]'),
+        }),
+      ]),
+    );
+
+    expect(redactedHumanResult.exitCode).toBe(0);
+    expect(redactedHumanResult.stdout).toContain('- [`pass`] `Git root`: `[git-root]`');
+    expect(redactedHumanResult.stdout).not.toContain(root);
+  });
+
   test('doctor human output warns when target is a git repository subdirectory', async () => {
     const dir = await makeTempDir();
     const packageDir = path.join(dir, 'packages', 'web');

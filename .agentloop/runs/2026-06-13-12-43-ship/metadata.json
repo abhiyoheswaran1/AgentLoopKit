@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-12-43-ship",
+  "command": "ship",
+  "createdAt": "2026-06-13-12-43",
+  "createdAtEpochMs": 1781347433947,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-add-redacted-doctor-output.md",
+    "title": "Add redacted doctor output",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-12-35-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-12-43-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-12-43-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 29
+}
