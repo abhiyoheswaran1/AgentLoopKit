@@ -473,12 +473,16 @@ describe('mcp tools', () => {
     );
     expect(maintainerCheckPayload.suggestedContributorRequest).toEqual(expect.any(String));
     expect(gatesPayload.strict).toBe(true);
-    expect(gatesPayload.overallStatus).toBe('pass');
+    expect(gatesPayload.overallStatus).toBe('fail');
     expect(gatesPayload.gates).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'task-contract', status: 'pass' }),
         expect.objectContaining({ id: 'verification-report', status: 'pass' }),
-        expect.objectContaining({ id: 'handoff-summary', status: 'pass' }),
+        expect.objectContaining({
+          id: 'handoff-summary',
+          status: 'warn',
+          message: 'Latest handoff does not cover the current dirty files.',
+        }),
       ]),
     );
     expect(gatesPayload.nextAction.command).toBe('agentloop handoff');
@@ -504,11 +508,16 @@ describe('mcp tools', () => {
       title: 'Verification Report',
     });
     expect(reviewContextPayload.status.nextAction.command).toBe('agentloop handoff');
-    expect(reviewContextPayload.gates.overallStatus).toBe('pass');
+    expect(reviewContextPayload.gates.overallStatus).toBe('warn');
     expect(reviewContextPayload.gates.gates).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'task-contract', status: 'pass' }),
         expect.objectContaining({ id: 'verification-report', status: 'pass' }),
+        expect.objectContaining({
+          id: 'handoff-summary',
+          status: 'warn',
+          message: 'Latest handoff does not cover the current dirty files.',
+        }),
       ]),
     );
     expect(reviewContextPayload.policies.summary.current).toBe(8);

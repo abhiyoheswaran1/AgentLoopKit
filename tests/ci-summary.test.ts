@@ -65,7 +65,16 @@ describe('ci-summary command', () => {
     expect(payload.ci.runUrl).toBe('https://github.com/owner/repo/actions/runs/12345');
     expect(payload.evidence.task.title).toBe('CI summary task');
     expect(payload.evidence.verification.overallStatus).toBe('pass');
-    expect(payload.gates.overallStatus).toBe('pass');
+    expect(payload.gates.overallStatus).toBe('warn');
+    expect(payload.gates.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'handoff-summary',
+          status: 'warn',
+          message: 'Latest handoff does not cover the current dirty files.',
+        }),
+      ]),
+    );
     expect(payload.writtenPath).toMatch(/ci-summary\.md$/);
 
     const markdown = await readFile(payload.writtenPath, 'utf8');

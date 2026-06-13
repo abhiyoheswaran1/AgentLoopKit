@@ -240,6 +240,8 @@ agentloop check-gates --redact-paths
 
 If the latest verification report is older than the active or newest open task, `check-gates` treats it as stale and asks you to rerun verification for that task.
 
+If the working tree has dirty files and the latest handoff run does not cover them, `check-gates` warns and asks you to refresh the handoff.
+
 Warnings keep exit code `0` by default. Use `--strict` in CI when warning gates should fail.
 
 Clean committed work does not fail strict gates only because there are no changed files. The Git context gate reports that state as pass when the repo is inside Git.

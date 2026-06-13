@@ -19,6 +19,15 @@ async function createInitializedRepo() {
   return dir;
 }
 
+async function commitAll(dir: string, message = 'baseline') {
+  await execa('git', ['add', '.'], { cwd: dir });
+  await execa(
+    'git',
+    ['-c', 'user.email=test@example.com', '-c', 'user.name=Test User', 'commit', '-m', message],
+    { cwd: dir },
+  );
+}
+
 describe('check-gates command', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
@@ -41,6 +50,7 @@ describe('check-gates command', () => {
       path.join(dir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
       '# PR Summary\n\nVerification status: Overall status: pass\n',
     );
+    await commitAll(dir);
 
     const result = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
       cwd: dir,
@@ -67,7 +77,7 @@ describe('check-gates command', () => {
         expect.objectContaining({ id: 'git-context', status: 'pass' }),
       ]),
     );
-    expect(output.nextAction.command).toBe('agentloop handoff');
+    expect(output.nextAction.command).toBe('none');
   });
 
   test('passes strict gates when latest run references an archived task contract', async () => {
@@ -103,6 +113,7 @@ describe('check-gates command', () => {
       score: 96,
       changedFileCount: 1,
     });
+    await commitAll(dir);
 
     const result = await execa(tsxPath, [cliPath, 'check-gates', '--strict', '--json'], {
       cwd: dir,
@@ -191,8 +202,32 @@ describe('check-gates command', () => {
 
     expect(uncoveredResult.exitCode).toBe(0);
     const uncoveredOutput = JSON.parse(uncoveredResult.stdout);
-    expect(uncoveredOutput.overallStatus).toBe('pass');
+    expect(uncoveredOutput.overallStatus).toBe('warn');
+    expect(uncoveredOutput.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'handoff-summary',
+          status: 'warn',
+          message: 'Latest handoff does not cover the current dirty files.',
+        }),
+      ]),
+    );
     expect(uncoveredOutput.nextAction.command).toBe('agentloop handoff');
+
+    const strictResult = await execa(tsxPath, [cliPath, 'check-gates', '--strict', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(strictResult.exitCode).toBe(1);
+    expect(JSON.parse(strictResult.stdout)).toMatchObject({
+      strict: true,
+      overallStatus: 'fail',
+      nextAction: {
+        command: 'agentloop handoff',
+        reason: 'Write a reviewer handoff after verification.',
+      },
+    });
   });
 
   test('redacts local git root paths when requested', async () => {
@@ -568,6 +603,7 @@ describe('check-gates command', () => {
       path.join(dir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
       '# PR Summary\n\nVerification status: Overall status: pass\n',
     );
+    await commitAll(dir);
 
     const defaultResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
       cwd: dir,

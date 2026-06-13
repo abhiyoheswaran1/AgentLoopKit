@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed `agentloop check-gates` to warn when dirty files are not covered by the latest handoff run.
 - Added JSON dogfood summaries through `npm run dogfood:json` and `npm run dogfood:strict:json` for agents and CI logs.
 - Hardened post-verification gate detection so AgentLoop command words inside another shell command do not trigger noisy warnings.
 - Broadened post-verification gate detection so `create-task` and `task doctor` warn when common AgentLoop review-readiness commands are listed as verification commands.

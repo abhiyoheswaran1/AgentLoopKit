@@ -263,13 +263,26 @@ export async function checkGates(options: {
     );
   }
 
+  const inGit = await isInsideGitRepo(options.cwd);
+  const changedFiles = inGit ? await parseGitStatus(await getGitStatus(options.cwd)) : [];
+  const latestRun = (await listRuns(options.cwd))[0];
+  const latestHandoffRunCoversDirtyFiles = await dirtyCoveredByLatestHandoffRun(
+    options.cwd,
+    changedFiles,
+    latestRun,
+  );
+
   if (handoffPath) {
+    const dirtyWithoutFreshHandoff =
+      changedFiles.length > 0 && !latestHandoffRunCoversDirtyFiles;
     gates.push(
       gate(
         'handoff-summary',
         'Handoff summary',
-        'pass',
-        'Reviewer handoff found.',
+        dirtyWithoutFreshHandoff ? 'warn' : 'pass',
+        dirtyWithoutFreshHandoff
+          ? 'Latest handoff does not cover the current dirty files.'
+          : 'Reviewer handoff found.',
         relativePath(options.cwd, handoffPath),
       ),
     );
@@ -318,14 +331,6 @@ export async function checkGates(options: {
     ),
   );
 
-  const inGit = await isInsideGitRepo(options.cwd);
-  const changedFiles = inGit ? await parseGitStatus(await getGitStatus(options.cwd)) : [];
-  const latestRun = (await listRuns(options.cwd))[0];
-  const latestHandoffRunCoversDirtyFiles = await dirtyCoveredByLatestHandoffRun(
-    options.cwd,
-    changedFiles,
-    latestRun,
-  );
   const gitRoot = inGit ? await getGitRoot(options.cwd) : '';
   const resolvedGitRoot = gitRoot ? await resolveComparablePath(gitRoot) : '';
   const gitTargetIsRoot = resolvedGitRoot

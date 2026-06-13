@@ -1,0 +1,11 @@
+ .agentloop/backlog.md        |  1 +
+ .agentloop/dogfood-log.md    | 27 +++++++++++++++++++++++++++
+ CHANGELOG.md                 |  1 +
+ docs/check-gates.md          |  1 +
+ docs/cli-reference.md        |  2 ++
+ src/core/check-gates.ts      | 25 +++++++++++++++----------
+ tests/check-gates.test.ts    | 40 ++++++++++++++++++++++++++++++++++++++--
+ tests/ci-summary.test.ts     | 11 ++++++++++-
+ tests/mcp-tools.test.ts      | 15 ++++++++++++---
+ tests/review-context.test.ts | 13 +++++++++++--
+ 10 files changed, 118 insertions(+), 18 deletions(-)

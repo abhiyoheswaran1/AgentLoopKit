@@ -109,7 +109,16 @@ describe('review-context command', () => {
       title: 'Verification Report',
       overallStatus: 'pass',
     });
-    expect(payload.gates.overallStatus).toBe('pass');
+    expect(payload.gates.overallStatus).toBe('warn');
+    expect(payload.gates.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'handoff-summary',
+          status: 'warn',
+          message: 'Latest handoff does not cover the current dirty files.',
+        }),
+      ]),
+    );
     expect(payload.policies.summary.current).toBe(8);
     expect(payload.artifacts.verificationReports.latest).toMatchObject({
       overallStatus: 'pass',
@@ -140,7 +149,7 @@ describe('review-context command', () => {
     expect(result.stdout).toContain('# AgentLoopKit Review Context');
     expect(result.stdout).toContain('- Active task: `Fix login redirect bug`');
     expect(result.stdout).toContain('- Latest verification: `pass`');
-    expect(result.stdout).toContain('- Gates: `pass`');
+    expect(result.stdout).toContain('- Gates: `warn`');
     expect(result.stdout).toContain('- Latest ship score: `94`/100');
     expect(result.stdout).toContain('Run `agentloop handoff`.');
     expect(result.stdout).not.toContain(dir);

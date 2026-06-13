@@ -2,6 +2,33 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Stale Handoff Gate Warning
+
+- Task contract: `.agentloop/tasks/archive/2026-06-13-warn-on-stale-handoff-gate-evidence.md`
+- Trigger:
+  - Dogfooding showed `check-gates` could pass with any handoff file while the next action still asked for a refreshed handoff.
+  - Product panel signal: Lina wanted handoff evidence to match the current dirty files; Samir wanted strict CI gates to block stale reviewer evidence.
+- Product change:
+  - `check-gates` now warns when the working tree has dirty files that the latest handoff run does not cover.
+  - Strict mode fails on that warning.
+  - Clean repos with existing handoff evidence still pass.
+- Verification:
+  - Red TDD run: `npm test -- tests/check-gates.test.ts` failed because uncovered dirty files still produced `overallStatus: pass`.
+  - Green focused run: `npm test -- tests/check-gates.test.ts` passed with 14 tests after the gate update and fixture cleanup.
+  - Affected consumer tests passed with 34 tests:
+    - `npm test -- tests/check-gates.test.ts tests/mcp-tools.test.ts tests/ci-summary.test.ts tests/review-context.test.ts`
+  - AgentLoop task verification passed and wrote `.agentloop/reports/2026-06-13-05-54-verification-report.md`.
+  - `npm run dogfood:strict:json` failed before handoff refresh, proving the new stale-handoff gate blocks strict dogfood.
+  - `agentloop handoff --write-run` refreshed handoff evidence for the current dirty files.
+  - `npm run dogfood:strict:json` passed after handoff refresh.
+  - Full `npm test` passed with 52 files and 494 tests.
+  - `npm run typecheck`, `npm run build`, `npm run lint`, and `npm run check:links` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- Worked well:
+  - Existing handoff-coverage helpers already had the path coverage model; the gate only needed to surface the result as evidence.
+- Improve:
+  - `maintainer-check` still reports handoff presence only; consider giving it the same dirty-file freshness signal.
+
 ## 2026-06-13: Dogfood JSON Summary
 
 - Task contract: `.agentloop/tasks/2026-06-13-add-dogfood-json-summary.md`

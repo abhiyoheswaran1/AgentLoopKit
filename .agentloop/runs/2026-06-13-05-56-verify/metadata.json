@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-05-56-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-05-56",
+  "createdAtEpochMs": 1781323003403,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-warn-on-stale-handoff-gate-evidence.md",
+    "title": "Warn on stale handoff gate evidence",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-05-54-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 14
+}
