@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* global console, process */
 import { spawn } from 'node:child_process';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const SAFE_ENV_KEYS = [
@@ -97,6 +98,23 @@ function formatCommand(step) {
   return [step.command, ...step.args].join(' ');
 }
 
+function redactWorkspacePath(value, workspaceRoot) {
+  if (typeof value !== 'string' || !workspaceRoot) return value;
+
+  const roots = new Set([
+    workspaceRoot,
+    workspaceRoot.replace(/\\/g, '/'),
+    workspaceRoot.replace(/\//g, '\\'),
+  ]);
+
+  let redacted = value;
+  for (const root of roots) {
+    if (!root) continue;
+    redacted = redacted.split(root).join('[git-root]');
+  }
+  return redacted;
+}
+
 async function spawnStep(step, env, options = {}) {
   const child = spawn(step.command, step.args, {
     env,
@@ -126,21 +144,23 @@ function normalizeProcessResult(result) {
   };
 }
 
-function createStepResult(step, processResult, durationMs) {
+function createStepResult(step, processResult, durationMs, workspaceRoot) {
   const exitCode = processResult.exitCode;
   const status = exitCode === 0 ? 'pass' : step.allowFailure ? 'allowed-failure' : 'fail';
   const result = {
     name: step.name,
-    command: step.command,
-    args: step.args,
-    commandText: formatCommand(step),
+    command: redactWorkspacePath(step.command, workspaceRoot),
+    args: step.args.map((arg) => redactWorkspacePath(arg, workspaceRoot)),
+    commandText: redactWorkspacePath(formatCommand(step), workspaceRoot),
     allowFailure: step.allowFailure,
     status,
     exitCode,
     durationMs,
   };
 
-  if (processResult.errorMessage) result.errorMessage = processResult.errorMessage;
+  if (processResult.errorMessage) {
+    result.errorMessage = redactWorkspacePath(processResult.errorMessage, workspaceRoot);
+  }
   return result;
 }
 
@@ -163,7 +183,7 @@ async function runStep(step, env, options) {
     };
   }
   const durationMs = Math.max(0, options.now() - startedAt);
-  const stepResult = createStepResult(step, processResult, durationMs);
+  const stepResult = createStepResult(step, processResult, durationMs, options.workspaceRoot);
 
   if (stepResult.status === 'allowed-failure' && !options.json) {
     options.logger.log(
@@ -201,6 +221,7 @@ export async function runDogfood(options = {}) {
     now = () => Date.now(),
   } = options;
 
+  const workspaceRoot = path.resolve(cwd);
   process.chdir(cwd);
   const env = buildDogfoodEnv();
   const steps = options.steps ?? createDogfoodSteps({ strict });
@@ -213,7 +234,7 @@ export async function runDogfood(options = {}) {
 
   const results = [];
   for (const step of steps) {
-    const result = await runStep(step, env, { json, logger, runProcess, now });
+    const result = await runStep(step, env, { json, logger, runProcess, now, workspaceRoot });
     results.push(result);
     if (result.status === 'fail') break;
   }

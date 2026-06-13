@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-11-42-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-11-42",
+  "createdAtEpochMs": 1781343772555,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-guard-dogfood-json-summary-redaction.md",
+    "title": "Guard dogfood JSON summary redaction",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-11-42-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

@@ -167,6 +167,40 @@ describe('dogfood script helpers', () => {
     });
   });
 
+  test('redacts the workspace root from JSON summaries', async () => {
+    const cwd = process.cwd();
+    const summary = await dogfood.runDogfood({
+      strict: true,
+      json: true,
+      cwd,
+      steps: [
+        {
+          name: 'path leak fixture',
+          command: 'node',
+          args: [cwd, `${cwd}/src/cli/index.ts`],
+          allowFailure: false,
+        },
+      ],
+      logger: { log: () => undefined, error: () => undefined },
+      now: (() => {
+        const values = [5000, 5011];
+        return () => values.shift() ?? 5011;
+      })(),
+      runProcess: async () => ({
+        exitCode: 7,
+        errorMessage: `failed while reading ${cwd}/agentloop.config.json`,
+      }),
+    });
+
+    const json = JSON.stringify(summary);
+    expect(json).not.toContain(cwd);
+    expect(summary.steps[0]).toMatchObject({
+      args: ['[git-root]', '[git-root]/src/cli/index.ts'],
+      commandText: 'node [git-root] [git-root]/src/cli/index.ts',
+      errorMessage: 'failed while reading [git-root]/agentloop.config.json',
+    });
+  });
+
   test('keeps allowed default-mode dogfood failures non-blocking in JSON summaries', async () => {
     const summary = await dogfood.runDogfood({
       strict: false,

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-11-47-ship",
+  "command": "ship",
+  "createdAt": "2026-06-13-11-47",
+  "createdAtEpochMs": 1781344036071,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-guard-dogfood-json-summary-redaction.md",
+    "title": "Guard dogfood JSON summary redaction",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-11-42-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-11-47-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-11-47-pr-summary.md",
+  "score": 100,
+  "changedFileCount": 10
+}

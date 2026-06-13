@@ -1,0 +1,6 @@
+ CHANGELOG.md                 |  1 +
+ README.md                    |  2 +-
+ docs/cli-reference.md        |  2 +-
+ scripts/dogfood.mjs          | 35 ++++++++++++++++++++++++++++-------
+ tests/dogfood-script.test.ts | 34 ++++++++++++++++++++++++++++++++++
+ 5 files changed, 65 insertions(+), 9 deletions(-)

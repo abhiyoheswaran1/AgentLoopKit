@@ -133,7 +133,7 @@ npm run dogfood:json
 npm run dogfood:strict:json
 ```
 
-The JSON summary reports the mode, overall status, step results, exit codes, durations, and safety notes.
+The JSON summary reports the mode, overall status, step results, exit codes, durations, and safety notes. It redacts the current workspace root as `[git-root]` before printing structured output.
 
 Run the public-doc check by itself when you edit README, examples, or release-channel docs:
 

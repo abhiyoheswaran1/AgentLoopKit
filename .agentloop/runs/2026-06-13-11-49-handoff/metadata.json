@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-11-49-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-11-49",
+  "createdAtEpochMs": 1781344142845,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-guard-dogfood-json-summary-redaction.md",
+    "title": "Guard dogfood JSON summary redaction",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-11-42-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-11-49-pr-summary.md",
+  "changedFileCount": 19
+}

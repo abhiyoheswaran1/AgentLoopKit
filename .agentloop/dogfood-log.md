@@ -2,6 +2,44 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Dogfood JSON Summary Redaction Guard
+
+- Task contract: `.agentloop/tasks/2026-06-13-guard-dogfood-json-summary-redaction.md`
+- Trigger:
+  - Dogfood now runs `review-context --json --redact-paths`, but the dogfood summary itself still echoed step arguments, command text, and child-process error messages.
+  - A failed or custom dogfood step could include the absolute workspace path in JSON copied into CI logs or public issues.
+- Product-panel decision:
+  - Samir required the summary layer to redact paths instead of relying only on child commands.
+  - Lina wanted the JSON format to stay useful for agents and CI.
+  - Maya kept the fix local to `scripts/dogfood.mjs` to avoid coupling the standalone Node script to TypeScript CLI internals.
+- Implementation:
+  - Added a local dogfood summary redaction helper that replaces the resolved workspace root with `[git-root]`.
+  - Redacted step `command`, `args`, `commandText`, and `errorMessage` before returning or printing JSON summaries.
+  - Documented the JSON redaction behavior in README and the CLI reference.
+- Verification:
+  - Red run failed because the JSON summary still contained the absolute workspace root:
+    - `npm test -- tests/dogfood-script.test.ts -t "redacts the workspace root from JSON summaries"`
+  - Focused green run passed:
+    - `npm test -- tests/dogfood-script.test.ts -t "redacts the workspace root from JSON summaries"`
+  - Dogfood script suite passed with `9` tests:
+    - `npm test -- tests/dogfood-script.test.ts`
+  - Public docs hygiene passed:
+    - `npm run check:public-docs`
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-13-11-42-verification-report.md`.
+  - Full lint and test suite passed:
+    - `npm run lint`
+    - `npm test` (`52` files, `512` tests)
+  - Ship evidence passed with a `100`/100 review-readiness score:
+    - `node dist/cli/index.js ship --redact-paths`
+  - Strict gates passed:
+    - `node dist/cli/index.js check-gates --redact-paths --strict`
+  - Dogfood strict JSON passed:
+    - `npm run dogfood:strict:json`
+- What worked well:
+  - The product caught a narrow safety gap inside its own dogfood reporting path.
+- Improve:
+  - Add the same explicit no-root assertion to packed release smoke if future release evidence starts printing dogfood summaries.
+
 ## 2026-06-13: Same-Minute Evidence Artifact Collision Guard
 
 - Task contract: `.agentloop/tasks/2026-06-13-avoid-same-minute-evidence-artifact-overwrites.md`

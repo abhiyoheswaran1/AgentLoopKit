@@ -1,0 +1,30 @@
+[
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "scripts/dogfood.mjs"
+  },
+  {
+    "status": "M",
+    "path": "tests/dogfood-script.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-11-42-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-13-guard-dogfood-json-summary-redaction.md"
+  }
+]
