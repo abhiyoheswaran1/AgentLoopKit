@@ -9467,3 +9467,47 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The release command now joins the same safe-share option family as doctor, gates, ship, prepare-pr, and maintainer-check.
 - Improve:
   - Consider deriving supported public-log redaction docs from command metadata instead of maintaining a separate README smoke list.
+
+## 2026-06-13: Add Run Ledger To Artifact Inventory
+
+- Task contract: `.agentloop/tasks/archive/2026-06-13-add-run-ledger-to-artifact-inventory.md`
+- Trigger:
+  - `agentloop artifacts` inventories local evidence, but it omitted `.agentloop/runs` even though the run ledger is now core review-readiness evidence.
+  - Agents and CI had to call a separate command to know whether run evidence existed.
+- Product-panel decision:
+  - Lina wanted one evidence inventory command before deciding what an agent should do next.
+  - Nora wanted `--type run --latest` to match existing artifact filters.
+  - Samir required run inventory to stay read-only and avoid leaking unsafe symlinked run roots.
+- Implementation:
+  - Added `runs.count` and `runs.latest` to artifact inventory JSON.
+  - Added `run` to supported artifact filters and latest-artifact output.
+  - Added concise Markdown output for the latest run command, score/status, changed-file count, and primary evidence path.
+  - Updated README, CLI reference, MCP docs, changelog, and backlog.
+- Bug pass:
+  - Review found that `artifacts` could fail when `.agentloop/runs` resolved outside the repo, unlike other artifact roots.
+  - Added a regression test and changed artifact inventory to treat unsafe run roots as missing evidence.
+- Verification:
+  - Red run failed before run support existed:
+    - `npm test -- tests/artifacts.test.ts`
+  - Focused run inventory tests passed:
+    - `npm test -- tests/artifacts.test.ts`
+  - Downstream command-surface tests passed:
+    - `npm test -- tests/artifacts.test.ts tests/mcp-tools.test.ts tests/completion.test.ts tests/cli-docs-drift.test.ts`
+  - Regression red run failed for unsafe run-ledger symlink roots:
+    - `npm test -- tests/artifacts.test.ts -t "does not inspect run ledger roots"`
+  - Regression green run passed:
+    - `npm test -- tests/artifacts.test.ts -t "does not inspect run ledger roots"`
+  - Task-command verification passed after the bug-pass fix:
+    - `.agentloop/reports/2026-06-13-14-11-verification-report.md`
+    - `.agentloop/runs/2026-06-13-14-17-verify`
+  - Local gates passed:
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run build`
+    - `npm run dogfood:strict:json`
+    - `node dist/cli/index.js check-gates --redact-paths --strict`
+    - `node dist/cli/index.js maintainer-check --redact-paths`
+- What worked well:
+  - Dogfooding exposed the missing run evidence directly through the existing inventory workflow.
+- Improve:
+  - Consider adding a compact `artifacts --type run --limit` later if repos with long run histories need more than latest/count.

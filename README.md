@@ -175,7 +175,7 @@ agentloopkit init
 | `agentloop show-run <id>`        | Show one local run ledger entry                                                |
 | `agentloop intent <file>`        | Show which runs touched a file and why                                         |
 | `agentloop maintainer-check`     | Check whether an AI-assisted PR is reviewable                                  |
-| `agentloop artifacts`            | Inventory local task, report, handoff, and badge evidence                      |
+| `agentloop artifacts`            | Inventory local tasks, reports, handoffs, badges, and run evidence             |
 | `agentloop report`               | Write a local static HTML evidence report                                      |
 | `agentloop badge`                | Write a local SVG evidence badge                                               |
 | `agentloop ci-summary`           | Summarize CI context and existing AgentLoop evidence                           |

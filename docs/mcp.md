@@ -39,7 +39,7 @@ Example MCP client configuration:
 | `agentloop_file_intent`                | Local run ledger matches for one repo-relative file path                                                                                                 |
 | `agentloop_maintainer_check`           | Local maintainer reviewability checks for AI-assisted changes                                                                                            |
 | `agentloop_check_gates`                | Local review gate status for task, verification, handoff, harness, policy, and git evidence                                                              |
-| `agentloop_artifacts`                  | Local artifact inventory metadata, with optional `type` and `latest` filters                                                                             |
+| `agentloop_artifacts`                  | Local artifact and run-ledger inventory metadata, with optional `type` and `latest` filters                                                              |
 | `agentloop_review_context`             | One reviewability snapshot that combines status, gates, policy status, artifact inventory, recent runs, and latest ship evidence                         |
 | `agentloop_list_handoffs`              | Recent reviewer handoff summaries                                                                                                                        |
 | `agentloop_latest_handoff`             | Latest reviewer handoff Markdown content                                                                                                                 |

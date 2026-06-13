@@ -292,6 +292,7 @@ See [pr-summaries.md](pr-summaries.md).
 agentloop artifacts
 agentloop artifacts --type verification
 agentloop artifacts --type ci-summary --latest
+agentloop artifacts --type run --latest
 agentloop artifacts --json
 agentloop artifacts --json --latest
 
@@ -304,7 +305,7 @@ agentloop badge --source gates
 agentloop badge --json
 ```
 
-`artifacts` inventories existing local AgentLoop evidence without writing files. It reports task counts, task statuses, latest verification report, latest handoff, HTML reports, badges, CI summaries, and release notes. Use `--type` to filter to `task`, `verification`, `handoff`, `html-report`, `badge`, `ci-summary`, or `release-notes`. Use `--latest` to print only the latest matching artifact entries. JSON output uses repo-relative paths and does not include artifact file contents.
+`artifacts` inventories existing local AgentLoop evidence without writing files. It reports task counts, task statuses, latest verification report, latest handoff, HTML reports, badges, CI summaries, release notes, and run ledger entries. Use `--type` to filter to `task`, `verification`, `handoff`, `html-report`, `badge`, `ci-summary`, `release-notes`, or `run`. Use `--latest` to print only the latest matching artifact entries. JSON output uses repo-relative paths and does not include artifact file contents.
 
 `report` writes a local static HTML evidence report from the current task, latest verification report, latest handoff, Git status, diff stats, and deterministic summary.
 

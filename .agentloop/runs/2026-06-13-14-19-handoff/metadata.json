@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-14-19-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-14-19",
+  "createdAtEpochMs": 1781353143964,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-add-run-ledger-to-artifact-inventory.md",
+    "title": "Add run ledger to artifact inventory",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-14-11-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-14-19-pr-summary.md",
+  "changedFileCount": 21
+}

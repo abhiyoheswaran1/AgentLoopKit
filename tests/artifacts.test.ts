@@ -37,6 +37,20 @@ async function writeEvidenceFile(
   await utimes(filePath, timestamp, timestamp);
 }
 
+async function writeRunMetadata(
+  dir: string,
+  runId: string,
+  metadata: Record<string, unknown>,
+  modifiedAt: string,
+) {
+  const runDir = path.join(dir, '.agentloop/runs', runId);
+  await mkdir(runDir, { recursive: true });
+  await writeFile(path.join(runDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
+  const timestamp = new Date(modifiedAt);
+  await utimes(runDir, timestamp, timestamp);
+  await utimes(path.join(runDir, 'metadata.json'), timestamp, timestamp);
+}
+
 async function createRepoWithArtifacts() {
   const dir = await makeTempDir();
   tempDirs.push(dir);
@@ -100,6 +114,32 @@ async function createRepoWithArtifacts() {
     '.agentloop/handoffs/2026-06-10-10-25-release-notes.md',
     '# Release Notes\n',
     '2026-06-10T10:25:00.000Z',
+  );
+  await writeRunMetadata(
+    dir,
+    '2026-06-10-10-30-verify',
+    {
+      id: '2026-06-10-10-30-verify',
+      command: 'verify',
+      createdAt: '2026-06-10-10-30',
+      overallStatus: 'pass',
+      changedFileCount: 2,
+      verificationReportPath: '.agentloop/reports/2026-06-10-10-00-verification-report.md',
+    },
+    '2026-06-10T10:30:00.000Z',
+  );
+  await writeRunMetadata(
+    dir,
+    '2026-06-10-10-35-ship',
+    {
+      id: '2026-06-10-10-35-ship',
+      command: 'ship',
+      createdAt: '2026-06-10-10-35',
+      score: 96,
+      changedFileCount: 3,
+      shipReportPath: '.agentloop/reports/2026-06-10-10-35-ship-report.md',
+    },
+    '2026-06-10T10:35:00.000Z',
   );
   await writeFile(path.join(dir, '.env'), 'AGENTLOOP_SECRET=do-not-print-this-fixture\n');
   return dir;
@@ -252,6 +292,17 @@ describe('artifacts command', () => {
           title: 'Release Notes',
         },
       },
+      runs: {
+        count: 2,
+        latest: {
+          id: '2026-06-10-10-35-ship',
+          command: 'ship',
+          createdAt: '2026-06-10-10-35',
+          score: 96,
+          changedFileCount: 3,
+          shipReportPath: '.agentloop/reports/2026-06-10-10-35-ship-report.md',
+        },
+      },
     });
   });
 
@@ -288,6 +339,10 @@ describe('artifacts command', () => {
     );
     expect(result.stdout).toContain(
       '- Latest release notes: `Release Notes` - `.agentloop/handoffs/2026-06-10-10-25-release-notes.md`',
+    );
+    expect(result.stdout).toContain('- Runs: 2');
+    expect(result.stdout).toContain(
+      '- Latest run: `2026-06-10-10-35-ship` `ship` score `96`/100 - `.agentloop/reports/2026-06-10-10-35-ship-report.md`',
     );
     expect(result.stdout).not.toContain('do-not-print-this-fixture');
   });
@@ -426,7 +481,41 @@ describe('artifacts command', () => {
           path: '.agentloop/handoffs/2026-06-10-10-25-release-notes.md',
           title: 'Release Notes',
         },
+        {
+          type: 'run',
+          id: '2026-06-10-10-35-ship',
+          command: 'ship',
+          createdAt: '2026-06-10-10-35',
+          score: 96,
+          changedFileCount: 3,
+          shipReportPath: '.agentloop/reports/2026-06-10-10-35-ship-report.md',
+        },
       ],
+    });
+  });
+
+  test('filters JSON inventory by run artifact type', async () => {
+    const dir = await createRepoWithArtifacts();
+
+    const result = await execa(tsxPath, [cliPath, 'artifacts', '--json', '--type', 'run'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      runs: {
+        count: 2,
+        latest: {
+          id: '2026-06-10-10-35-ship',
+          command: 'ship',
+          createdAt: '2026-06-10-10-35',
+          score: 96,
+          changedFileCount: 3,
+          shipReportPath: '.agentloop/reports/2026-06-10-10-35-ship-report.md',
+        },
+      },
     });
   });
 
@@ -453,6 +542,22 @@ describe('artifacts command', () => {
         },
       ],
     });
+  });
+
+  test('prints only latest matching run artifacts when type and latest are combined', async () => {
+    const dir = await createRepoWithArtifacts();
+
+    const result = await execa(tsxPath, [cliPath, 'artifacts', '--type', 'run', '--latest'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toBe(`# AgentLoopKit Artifacts
+
+- Latest run: \`2026-06-10-10-35-ship\` \`ship\` score \`96\`/100 - \`.agentloop/reports/2026-06-10-10-35-ship-report.md\`
+`);
   });
 
   test('prints only latest matching markdown artifacts when type and latest are combined', async () => {
@@ -538,6 +643,7 @@ Next step: run \`agentloop handoff\` to create a handoff summary.
       badges: { count: 0, latest: null },
       ciSummaries: { count: 0, latest: null },
       releaseNotes: { count: 0, latest: null },
+      runs: { count: 0, latest: null },
     });
     expect(existsSync(path.join(dir, '.agentloop'))).toBe(false);
   });
@@ -567,6 +673,7 @@ Next step: run \`agentloop handoff\` to create a handoff summary.
           'badge',
           'ci-summary',
           'release-notes',
+          'run',
         ],
       },
     });
@@ -616,6 +723,38 @@ Next step: run \`agentloop handoff\` to create a handoff summary.
       htmlReports: { count: 0, latest: null },
       badges: { count: 0, latest: null },
       ciSummaries: { count: 0, latest: null },
+    });
+  });
+
+  test('does not inspect run ledger roots that resolve outside the repository', async () => {
+    const dir = await makeTempDir();
+    const outsideRuns = await makeTempDir();
+    tempDirs.push(dir, outsideRuns);
+    await writeConfig(dir);
+    await mkdir(path.join(dir, '.agentloop'), { recursive: true });
+    await writeRunMetadata(
+      outsideRuns,
+      '2026-06-10-10-30-ship',
+      {
+        id: '2026-06-10-10-30-ship',
+        command: 'ship',
+        createdAt: '2026-06-10-10-30',
+        changedFileCount: 1,
+        shipReportPath: 'outside-secret-report.md',
+      },
+      '2026-06-10T10:30:00.000Z',
+    );
+    await symlink(outsideRuns, path.join(dir, '.agentloop/runs'), 'dir');
+
+    const result = await execa(tsxPath, [cliPath, 'artifacts', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).not.toContain('outside-secret-report');
+    expect(JSON.parse(result.stdout)).toMatchObject({
+      runs: { count: 0, latest: null },
     });
   });
 

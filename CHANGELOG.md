@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added run ledger entries to `agentloop artifacts`, including `--type run` and `--latest` support, so agents can discover local run evidence from the same inventory command.
 - Added `agentloop release-check --redact-paths` so release-readiness output can be pasted into public issues, PRs, or CI logs without exposing the local Git root.
 - Added `agentloop maintainer-check --redact-paths` so reviewer-readiness output uses the same public-log safety flag as doctor, status, gates, ship, and PR preparation.
 - Added `agentloop doctor --redact-paths` for safe public sharing of setup, Git-root, and risk-file output while keeping default doctor JSON unchanged for scripts.

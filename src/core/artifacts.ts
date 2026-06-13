@@ -9,6 +9,7 @@ import {
   resolvesInsidePath,
 } from './file-system.js';
 import { inlineCode } from './markdown-format.js';
+import { listRuns, RunSummary } from './runs.js';
 
 export const verificationReportPattern =
   /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report(?:-\d+)?\.md$/;
@@ -30,6 +31,7 @@ export const artifactInventoryTypes = [
   'badge',
   'ci-summary',
   'release-notes',
+  'run',
 ] as const;
 
 export type ArtifactType = 'task' | 'verification' | 'handoff';
@@ -99,6 +101,10 @@ export type ArtifactInventory = {
     count: number;
     latest: ArtifactInventoryNamedArtifact | null;
   };
+  runs: {
+    count: number;
+    latest: RunSummary | null;
+  };
 };
 
 export type ArtifactInventoryRenderOptions = {
@@ -113,7 +119,8 @@ export type LatestArtifactInventoryItem =
   | ({ type: 'html-report' } & ArtifactInventoryPathArtifact)
   | ({ type: 'badge' } & ArtifactInventoryPathArtifact)
   | ({ type: 'ci-summary' } & ArtifactInventoryNamedArtifact)
-  | ({ type: 'release-notes' } & ArtifactInventoryNamedArtifact);
+  | ({ type: 'release-notes' } & ArtifactInventoryNamedArtifact)
+  | ({ type: 'run' } & RunSummary);
 
 type InventoryFile = {
   filePath: string;
@@ -163,6 +170,7 @@ const artifactInventoryJsonKeys: Record<ArtifactInventoryFilterType, ArtifactInv
   badge: 'badges',
   'ci-summary': 'ciSummaries',
   'release-notes': 'releaseNotes',
+  run: 'runs',
 };
 
 const artifactInventoryDisplayLabels: Record<ArtifactInventoryFilterType, string> = {
@@ -173,6 +181,7 @@ const artifactInventoryDisplayLabels: Record<ArtifactInventoryFilterType, string
   badge: 'badge',
   'ci-summary': 'CI summary',
   'release-notes': 'release notes',
+  run: 'run ledger',
 };
 
 const artifactInventoryNextSteps: Record<ArtifactInventoryFilterType, string> = {
@@ -183,6 +192,7 @@ const artifactInventoryNextSteps: Record<ArtifactInventoryFilterType, string> = 
   badge: 'run `agentloop badge` to create a local SVG evidence badge.',
   'ci-summary': 'run `agentloop ci-summary --write` to create a local CI summary.',
   'release-notes': 'run `agentloop release-notes --write` to draft local release notes.',
+  run: 'run `agentloop ship` or `agentloop verify --write-run` to create a local run record.',
 };
 
 export function isArtifactInventoryType(value: string): value is ArtifactInventoryFilterType {
@@ -445,6 +455,15 @@ function countTaskStatuses(tasks: ArtifactInventoryTask[]) {
   );
 }
 
+async function listRunInventory(cwd: string) {
+  try {
+    return await listRuns(cwd);
+  } catch (error) {
+    if (error instanceof AgentLoopError && error.code === 'RUN_PATH_INVALID') return [];
+    throw error;
+  }
+}
+
 export async function getArtifactInventory(options: {
   cwd: string;
   config: AgentLoopConfig;
@@ -459,6 +478,7 @@ export async function getArtifactInventory(options: {
     badgeFiles,
     ciSummaryFiles,
     releaseNoteFiles,
+    runs,
   ] = await Promise.all([
     listInventoryFiles({
       cwd: options.cwd,
@@ -500,6 +520,7 @@ export async function getArtifactInventory(options: {
       extension: '.md',
       pattern: releaseNotesPattern,
     }),
+    listRunInventory(options.cwd),
   ]);
   const tasks = await Promise.all(taskFiles.map((file) => readTaskInventory(options.cwd, file)));
   const latestVerification = verificationFiles.at(-1)
@@ -549,6 +570,10 @@ export async function getArtifactInventory(options: {
       count: releaseNoteFiles.length,
       latest: latestReleaseNotes,
     },
+    runs: {
+      count: runs.length,
+      latest: runs[0] ?? null,
+    },
   };
 }
 
@@ -566,6 +591,24 @@ function formatNamedArtifact(label: string, artifact: ArtifactInventoryNamedArti
 
 function formatPathArtifact(label: string, artifact: ArtifactInventoryPathArtifact | null) {
   return artifact ? `- ${label}: ${inlineCode(artifact.path)}` : `- ${label}: not found`;
+}
+
+function runPrimaryArtifact(run: RunSummary) {
+  return run.shipReportPath ?? run.handoffPath ?? run.verificationReportPath;
+}
+
+function formatRunResult(run: RunSummary) {
+  if (typeof run.score === 'number') return `score ${inlineCode(String(run.score))}/100`;
+  if (run.overallStatus) return `status ${inlineCode(run.overallStatus)}`;
+  return `${inlineCode(String(run.changedFileCount))} changed file(s)`;
+}
+
+function formatRunArtifact(label: string, run: RunSummary | null) {
+  if (!run) return `- ${label}: not found`;
+  const artifactPath = runPrimaryArtifact(run);
+  return `- ${label}: ${inlineCode(run.id)} ${inlineCode(run.command)} ${formatRunResult(run)}${
+    artifactPath ? ` - ${inlineCode(artifactPath)}` : ''
+  }`;
 }
 
 function selectedArtifactTypes(options: ArtifactInventoryRenderOptions) {
@@ -593,6 +636,8 @@ function latestArtifactForType(
       return inventory.ciSummaries.latest ? { type, ...inventory.ciSummaries.latest } : null;
     case 'release-notes':
       return inventory.releaseNotes.latest ? { type, ...inventory.releaseNotes.latest } : null;
+    case 'run':
+      return inventory.runs.latest ? { type, ...inventory.runs.latest } : null;
   }
 }
 
@@ -642,6 +687,8 @@ function formatTypeCountLine(inventory: ArtifactInventory, type: ArtifactInvento
       return `- CI summaries: ${inventory.ciSummaries.count}`;
     case 'release-notes':
       return `- Release notes: ${inventory.releaseNotes.count}`;
+    case 'run':
+      return `- Runs: ${inventory.runs.count}`;
   }
 }
 
@@ -669,6 +716,8 @@ function formatTypeLatestLine(inventory: ArtifactInventory, type: ArtifactInvent
       return formatNamedArtifact('Latest CI summary', inventory.ciSummaries.latest);
     case 'release-notes':
       return formatNamedArtifact('Latest release notes', inventory.releaseNotes.latest);
+    case 'run':
+      return formatRunArtifact('Latest run', inventory.runs.latest);
   }
 }
 
@@ -752,5 +801,7 @@ ${formatPathArtifact('Latest badge', inventory.badges.latest)}
 ${formatNamedArtifact('Latest CI summary', inventory.ciSummaries.latest)}
 - Release notes: ${inventory.releaseNotes.count}
 ${formatNamedArtifact('Latest release notes', inventory.releaseNotes.latest)}
+- Runs: ${inventory.runs.count}
+${formatRunArtifact('Latest run', inventory.runs.latest)}
 `;
 }

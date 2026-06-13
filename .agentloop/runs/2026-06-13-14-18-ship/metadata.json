@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-14-18-ship",
+  "command": "ship",
+  "createdAt": "2026-06-13-14-18",
+  "createdAtEpochMs": 1781353139618,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-add-run-ledger-to-artifact-inventory.md",
+    "title": "Add run ledger to artifact inventory",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-14-11-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-14-18-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-14-18-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 13
+}
