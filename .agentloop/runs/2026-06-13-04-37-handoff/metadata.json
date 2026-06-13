@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-04-37-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-04-37",
+  "createdAtEpochMs": 1781318251894,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-broaden-post-verification-gate-detection.md",
+    "title": "Broaden post-verification gate detection",
+    "status": "proposed"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-04-30-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-04-37-pr-summary.md",
+  "changedFileCount": 13
+}

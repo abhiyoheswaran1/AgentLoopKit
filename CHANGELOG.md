@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Broadened post-verification gate detection so `create-task` and `task doctor` warn when common AgentLoop review-readiness commands are listed as verification commands.
 - Added `agentloop task doctor` diagnostics for task contracts that put likely post-verification gates under `Verification Commands`.
 - Fixed `agentloop check-gates` so clean passing evidence reports no required next command instead of asking for another handoff.
 - Added a human-readable `task done` next step that points users to handoff evidence before archival.

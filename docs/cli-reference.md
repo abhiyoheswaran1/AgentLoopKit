@@ -68,7 +68,7 @@ Task contracts record the problem statement, desired outcome, constraints, non-g
 
 `create-task` sets the new contract as the active task. With `--json`, output includes both `task` and `activeTask`. Use `task set <path>` when you need to switch back to an older or alternate contract.
 
-Use `--verification` for commands that `agentloop verify --task-commands` may run before the verification report exists. Use `--post-verification` for gates that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, or reviewer-handoff checks. Post-verification gates are recorded in the task contract but are not executed by `agentloop verify --task-commands`.
+Use `--verification` for commands that `agentloop verify --task-commands` may run before the verification report exists. Use `--post-verification` for gates that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, `agentloop maintainer-check`, or reviewer-handoff checks. Post-verification gates are recorded in the task contract but are not executed by `agentloop verify --task-commands`.
 
 When a `--verification` command looks like a post-verification gate, `create-task` prints a warning and JSON output includes a `warnings` array. AgentLoopKit does not move commands between sections; the warning tells you when to use `--post-verification`.
 

@@ -1,0 +1,11 @@
+ .agentloop/backlog.md               |  1 +
+ .agentloop/dogfood-log.md           | 19 +++++++++++++++++++
+ CHANGELOG.md                        |  1 +
+ docs/cli-reference.md               |  2 +-
+ docs/task-contracts.md              |  2 +-
+ docs/verification-reports.md        |  2 +-
+ src/core/post-verification-gates.ts | 20 ++++++++++++++++++++
+ src/templates/tasks/README.md       |  2 +-
+ tests/create-task.test.ts           | 20 ++++++++++++++++----
+ tests/task-state.test.ts            |  8 ++++++++
+ 10 files changed, 69 insertions(+), 8 deletions(-)

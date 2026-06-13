@@ -457,7 +457,9 @@ describe('create-task command', () => {
         '--out',
         '.agentloop/tasks/misplaced-gate.md',
         '--verification',
-        'npm run dogfood:strict',
+        'agentloop ship',
+        '--verification',
+        'npx --no-install agentloop prepare-pr --github-comment',
         '--json',
       ],
       { cwd: dir },
@@ -469,13 +471,23 @@ describe('create-task command', () => {
         code: 'POST_VERIFICATION_GATE_IN_VERIFICATION_COMMANDS',
         message:
           'Some verification commands look like post-verification gates. Move them to --post-verification if they need a fresh AgentLoop report.',
-        commands: ['npm run dogfood:strict'],
-        suggestion: 'Use --post-verification "npm run dogfood:strict".',
+        commands: [
+          'agentloop ship',
+          'npx --no-install agentloop prepare-pr --github-comment',
+        ],
+        suggestion:
+          'Use --post-verification for each listed command that needs a fresh AgentLoop report.',
       },
     ]);
 
     const markdown = await readFile(path.join(dir, '.agentloop/tasks/misplaced-gate.md'), 'utf8');
-    expect(markdown).toContain('## Verification Commands\n- npm run dogfood:strict');
+    expect(markdown).toContain(
+      [
+        '## Verification Commands',
+        '- agentloop ship',
+        '- npx --no-install agentloop prepare-pr --github-comment',
+      ].join('\n'),
+    );
     expect(markdown).toContain(
       '## Post-Verification Gates\n- No post-verification gate recorded.',
     );

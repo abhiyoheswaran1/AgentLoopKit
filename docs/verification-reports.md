@@ -42,7 +42,7 @@ Reports generated with `--task` include a `Task Context` section with the task p
 
 `--task` is metadata-only by default. Use `--task-commands` to also run commands listed under the task contract's `Verification Commands` section. This keeps task Markdown from executing unexpectedly when a maintainer only wants the task context in the report. Add `--only-task-commands` when you want the task contract commands to run without `test`, `lint`, `typecheck`, or `build` from `agentloop.config.json`. The shortcut requires both `--task` and `--task-commands`.
 
-`verify --task-commands` does not run commands under `Post-Verification Gates`. Put commands there when they need the report produced by `agentloop verify`, for example `npm run dogfood:strict`, `agentloop ship`, or a handoff check. Run those after the verification report exists.
+`verify --task-commands` does not run commands under `Post-Verification Gates`. Put commands there when they need the report produced by `agentloop verify`, for example `npm run dogfood:strict`, `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, `agentloop maintainer-check`, or a handoff check. Run those after the verification report exists.
 
 If `--task-commands` is requested but no runnable task commands are found, the report includes a `Task Commands` note. JSON output includes `taskCommands.requested`, `taskCommands.foundCount`, and `taskCommands.commands` for CI consumers.
 

@@ -2,6 +2,33 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Broaden Post-Verification Gate Detection
+
+- Task contract: `.agentloop/tasks/2026-06-13-broaden-post-verification-gate-detection.md`
+- Trigger:
+  - The previous task-doctor audit exposed a smaller follow-up: docs describe `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, and maintainer review checks as post-verification evidence gates, but the shared detector did not warn for the broader command set.
+- Product change:
+  - The shared post-verification gate detector now recognizes common AgentLoop review-readiness commands when invoked through `agentloop`, `agentloopkit`, `npx`, package exec, or the local CLI entrypoint.
+  - `create-task` and `task doctor` inherit the broader detection.
+  - The behavior remains read-only and advisory. AgentLoopKit does not move commands, run the gates, or edit existing contracts automatically.
+- Verification:
+  - Red TDD runs:
+    - `npm test -- tests/create-task.test.ts -t "post-verification gates"` failed because `agentloop ship` and `agentloop prepare-pr` produced no warning.
+    - `npm test -- tests/task-state.test.ts -t "post-verification gates"` failed because `task doctor` reported only the old narrower command set.
+  - Green focused runs passed after broadening the detector.
+  - `npm test -- tests/create-task.test.ts` passed with 21 tests.
+  - `npm test -- tests/task-state.test.ts` passed with 44 tests.
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-13-04-30-verification-report.md`.
+  - The verification run wrote `.agentloop/runs/2026-06-13-04-32-verify/`.
+  - Full `npm test` passed with 51 files and 470 tests.
+  - `npm run lint`, `npm run typecheck`, `npm run build`, `npm run check:links`, and `git diff --check` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - `agentloop ship --redact-paths` wrote `.agentloop/reports/2026-06-13-04-37-ship-report.md` with a 95/100 review-readiness score.
+- Worked well:
+  - Keeping the detector shared avoided drift between task creation and task-folder cleanup.
+- Improve:
+  - Keep the detector conservative. Do not warn for arbitrary project commands named `ship` unless they are clearly invoking AgentLoopKit.
+
 ## 2026-06-13: Task Doctor Post-Verification Gate Audit
 
 - Task contract: `.agentloop/tasks/2026-06-13-flag-post-verification-gate-mismatches-in-task-doctor.md`

@@ -497,6 +497,8 @@ describe('task command', () => {
         '- npm test',
         '- npm run dogfood:strict',
         '- node dist/cli/index.js check-gates --strict',
+        '- agentloop ship',
+        '- npx --no-install agentloop prepare-pr --github-comment',
         '',
         '## Post-Verification Gates',
         '- No post-verification gate recorded.',
@@ -525,6 +527,8 @@ describe('task command', () => {
         commands: [
           'npm run dogfood:strict',
           'node dist/cli/index.js check-gates --strict',
+          'agentloop ship',
+          'npx --no-install agentloop prepare-pr --github-comment',
         ],
         recommendation:
           'Move the listed command(s) from Verification Commands to Post-Verification Gates.',
@@ -538,6 +542,10 @@ describe('task command', () => {
     expect(humanResult.stdout).toContain(inlineCode('npm run dogfood:strict'));
     expect(humanResult.stdout).toContain(
       inlineCode('node dist/cli/index.js check-gates --strict'),
+    );
+    expect(humanResult.stdout).toContain(inlineCode('agentloop ship'));
+    expect(humanResult.stdout).toContain(
+      inlineCode('npx --no-install agentloop prepare-pr --github-comment'),
     );
     expect(humanResult.stdout).toContain('Move the listed command(s) from Verification Commands');
   });
