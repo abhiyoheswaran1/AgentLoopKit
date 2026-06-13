@@ -1,0 +1,26 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "scripts/smoke-packed-release.mjs"
+  },
+  {
+    "status": "M",
+    "path": "tests/release-smoke.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-11-12-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-13-guard-readme-redaction-guidance.md"
+  }
+]

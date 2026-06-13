@@ -167,6 +167,24 @@ describe('release smoke script helpers', () => {
     ).not.toThrow();
   });
 
+  test('rejects incomplete README redaction guidance', () => {
+    const readme = [
+      'Use `--redact-paths` with `status`, `next`, `check-gates`, `ship`, or `prepare-pr` before pasting output into a public issue, PR, or CI log.',
+    ].join('\n');
+
+    expect(() => smoke.assertReadmeRedactionGuidance(readme)).toThrow(
+      'README redaction guidance is missing `review-context`',
+    );
+  });
+
+  test('accepts README redaction guidance with every shareable redaction command', () => {
+    const readme = [
+      'Use `--redact-paths` with `status`, `next`, `review-context`, `check-gates`, `ship`, or `prepare-pr` before pasting output into a public issue, PR, or CI log.',
+    ].join('\n');
+
+    expect(() => smoke.assertReadmeRedactionGuidance(readme)).not.toThrow();
+  });
+
   test('rejects stale planned-release batch guidance in repo harness files', () => {
     expect(() =>
       smoke.assertRepoHarnessAvoidsStaleReleaseBatch([

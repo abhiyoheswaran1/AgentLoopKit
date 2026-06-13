@@ -54,6 +54,15 @@ const STALE_REPO_HARNESS_RELEASE_CLAIMS = [
   },
 ];
 
+const README_REDACTION_COMMANDS = [
+  'status',
+  'next',
+  'review-context',
+  'check-gates',
+  'ship',
+  'prepare-pr',
+];
+
 const SAFE_ENV_KEYS = [
   'APPDATA',
   'CI',
@@ -180,6 +189,25 @@ export function assertRepoHarnessAvoidsStaleReleaseBatch(files) {
         `${toPosixPath(file.filePath)} contains stale repo harness release guidance: ${staleClaim.label}. Keep release gating generic after a batch ships.`,
       );
     }
+  }
+}
+
+export function assertReadmeRedactionGuidance(content) {
+  const guidanceLine = content
+    .split(/\r?\n/)
+    .find((line) => line.includes('--redact-paths') && line.includes('public'));
+
+  if (!guidanceLine) {
+    return;
+  }
+
+  const missingCommand = README_REDACTION_COMMANDS.find(
+    (command) => !guidanceLine.includes(`\`${command}\``),
+  );
+  if (missingCommand) {
+    throw new Error(
+      `README redaction guidance is missing \`${missingCommand}\`. Keep public-log safety guidance aligned with supported CLI flags.`,
+    );
   }
 }
 
@@ -331,6 +359,10 @@ export async function runPublicDocsHygiene({ cwd = process.cwd(), version } = {}
   const publicDocFiles = await collectPublicDocPinFiles(cwd);
   assertPublicDocsDoNotPinVersions(publicDocFiles);
   assertPublicDocsAvoidUnsupportedClaims(publicDocFiles);
+  const readme = publicDocFiles.find((file) => toPosixPath(file.filePath) === 'README.md');
+  if (readme) {
+    assertReadmeRedactionGuidance(readme.content);
+  }
 
   const repoHarnessFiles = await collectRepoHarnessFiles(cwd);
   assertRepoHarnessAvoidsStaleReleaseBatch(repoHarnessFiles);

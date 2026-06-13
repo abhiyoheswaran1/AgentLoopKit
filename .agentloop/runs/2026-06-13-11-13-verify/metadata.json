@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-11-13-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-11-13",
+  "createdAtEpochMs": 1781341986632,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-guard-readme-redaction-guidance.md",
+    "title": "Guard README redaction guidance",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-11-12-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 6
+}

@@ -9185,3 +9185,33 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The follow-up surfaced directly from the previous dogfood note about shortcut command safety flags.
 - Improve:
   - Consider adding public-docs hygiene coverage that keeps README redaction guidance aligned with supported CLI flags.
+
+## 2026-06-13: Guard README Redaction Guidance
+
+- Task contract: `.agentloop/tasks/2026-06-13-guard-readme-redaction-guidance.md`
+- Trigger:
+  - The previous redaction fixes required manual README updates, which could drift from the CLI surface again.
+  - Public docs hygiene already protects npm-facing docs from stale release and safety claims, so this belongs in the same guard layer.
+- Product-panel decision:
+  - Samir wanted safety guidance to fail closed when new public-log flags are added.
+  - Elias wanted README safety copy to stay complete because npm uses the same file.
+  - Maya kept the guard narrow: inspect the README redaction sentence only when it exists.
+- Implementation:
+  - Added `assertReadmeRedactionGuidance` to public-docs hygiene.
+  - The guard checks that the README sentence lists `status`, `next`, `review-context`, `check-gates`, `ship`, and `prepare-pr`.
+  - Added release-smoke helper tests for missing and complete redaction guidance.
+- Verification:
+  - Red run failed because the new assertion did not exist:
+    - `npm test -- tests/release-smoke.test.ts -t "redaction guidance"`
+  - Focused green run passed:
+    - `npm test -- tests/release-smoke.test.ts -t "redaction guidance"`
+  - Task commands passed:
+    - `npm test -- tests/release-smoke.test.ts -t redaction`
+    - `npm run check:public-docs`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run build`
+- What worked well:
+  - A dogfood note became a release-safety test instead of another manual checklist item.
+- Improve:
+  - If more commands gain `--redact-paths`, consider deriving the expected README command list from CLI help output.
