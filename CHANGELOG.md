@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added a human-readable `task done` next step that points users to handoff evidence before archival.
 - Added the same handoff next-step guidance to successful human-readable bulk task archive output.
 - Added a human-readable `task archive` next step that points maintainers to `agentloop handoff --write-run`.
 - Fixed `agentloop handoff` so it can preserve archived completed task context from recent run evidence when no active task exists.

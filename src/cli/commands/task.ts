@@ -77,6 +77,9 @@ function printUpdatedTask(task: ActiveTask, options: { json?: boolean }) {
   }
   console.log(`Updated task status: ${inlineCode(task.title)} (${inlineCode(task.status)})`);
   console.log(inlineCode(task.path));
+  if (task.status.trim().toLowerCase() === 'done') {
+    console.log('Next step: run `agentloop handoff --write-run`, then archive the task.');
+  }
 }
 
 function printArchivedTask(task: ArchivedTask, options: { json?: boolean }) {

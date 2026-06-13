@@ -8663,3 +8663,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The previous dogfood improvement immediately suggested the adjacent bulk archive path.
 - Improve:
   - Consider extracting the archive handoff next-step copy into a shared constant if another command needs it.
+
+## 2026-06-13: Print Task Done Handoff Next Step
+
+- Task contract: `.agentloop/tasks/2026-06-13-print-task-done-handoff-next-step.md`
+- Trigger:
+  - The archive commands now point users to `agentloop handoff --write-run`.
+  - `task done` still confirmed only the status update, leaving the handoff-before-archive step implicit.
+- Product-panel decision:
+  - Nora wanted the loop to guide users from done to handoff to archive.
+  - Lina wanted the message during long autonomous sessions.
+  - Samir required JSON output to remain unchanged.
+  - Maya limited the change to human output when the resulting status is `done`.
+- Implementation:
+  - Added a done-status next-step line:
+    - `Next step: run agentloop handoff --write-run, then archive the task.`
+  - Kept JSON output unchanged.
+- Verification:
+  - Red run failed because `task done` output lacked the next step:
+    - `npm test -- tests/task-state.test.ts -t "prints task lifecycle human output"`
+  - Focused green run passed.
+  - Full task-state suite passed with `43` tests:
+    - `npm test -- tests/task-state.test.ts`
+- What worked well:
+  - The CLI now guides the most common done-to-handoff-to-archive path.
+- Improve:
+  - Consider sharing the next-step strings across task lifecycle commands.

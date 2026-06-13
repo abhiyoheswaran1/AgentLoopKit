@@ -379,11 +379,19 @@ describe('task command', () => {
     );
     expect(statusResult.stdout).toContain(inlineCode(taskPath));
 
+    const doneResult = await execa(tsxPath, [cliPath, 'task', 'done', taskPath], { cwd: dir });
+    expect(doneResult.stdout).toContain(
+      `Updated task status: ${inlineCode('Active `task`')} (${inlineCode('done')})`,
+    );
+    expect(doneResult.stdout).toContain(
+      'Next step: run `agentloop handoff --write-run`, then archive the task.',
+    );
+
     const archiveResult = await execa(tsxPath, [cliPath, 'task', 'archive', taskPath], {
       cwd: dir,
     });
     expect(archiveResult.stdout).toContain(
-      `Archived task: ${inlineCode('Active `task`')} (${inlineCode('review')})`,
+      `Archived task: ${inlineCode('Active `task`')} (${inlineCode('done')})`,
     );
     expect(archiveResult.stdout).toContain(
       `${inlineCode(taskPath)} -> ${inlineCode('.agentloop/tasks/archive/2026-06-09-active`task.md')}`,
