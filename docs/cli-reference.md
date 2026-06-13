@@ -34,11 +34,15 @@ Configured paths must stay inside the current repo. Absolute paths, parent trave
 ```bash
 agentloop upgrade-harness
 agentloop upgrade-harness --dry-run
+agentloop upgrade-harness --details
+agentloop upgrade-harness --suggestions
 agentloop upgrade-harness --json
 agentloop upgrade-harness --json --redact-paths
 ```
 
 `upgrade-harness` inspects existing generated guidance after a CLI upgrade. It reads `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, `.agentloop/README.md`, and `.agentloop/manifest.json`, then reports whether the harness mentions the current review-readiness loop: `ship`, `prepare-pr`, run ledger or file intent, `maintainer-check`, `review-context`, and upgrade guidance.
+
+Use `--details` or `--suggestions` when you want copyable Markdown guidance for missing current-loop topics. JSON output includes the same suggestions as structured data.
 
 The command is read-only. It does not overwrite guidance, merge templates, create tasks, run verification commands, read `.env` contents, call external APIs, or upload files. Use `init --dry-run` after `upgrade-harness` when you also want to see missing generated files.
 
@@ -355,15 +359,24 @@ See [ci-summary.md](ci-summary.md).
 ## Dogfood Scripts
 
 ```bash
+npm run test:quick
+npm run test:unit
+npm run test:integration
+npm run test:release
 npm run dogfood
 npm run dogfood:json
 npm run dogfood:strict
 npm run dogfood:strict:json
+npm run release-flow
 ```
+
+`test:quick` runs the fast unit-oriented suite through `test:unit`. `test:integration` runs slower CLI workflow tests. `test:release` runs the full Vitest suite through `npm test`.
 
 The dogfood scripts run AgentLoopKit's local self-check path for this repository, including public-doc hygiene, dependency audit, review gates, artifact inventory, maintainer reviewability, review context, and ProjScan health. JSON mode prints one structured summary with mode, overall status, step results, exit codes, durations, and safety notes for agents and CI logs. It redacts the current workspace root as `[git-root]` before printing structured output.
 
 The scripts do not publish packages, create tags, post comments, read tokens, read `.env` files, or run verification commands.
+
+`release-flow` runs the local release gate: prepublish metadata check, lint, typecheck, full tests, build, public docs hygiene, link checking, strict dogfood, packed release smoke, and `agentloop release-check --strict --redact-paths`. It does not publish packages, create tags, or create GitHub releases.
 
 ## Release Notes And npm Status
 

@@ -74,17 +74,30 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.30.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.30.0>
-- Release asset: `agentloopkit-0.30.0.tgz`
-- Release asset SHA-256: `405f3126d5f15dd8ba8e4a209b7844881680b5911590332776a42f120f49512b`
-- Release tag: `v0.30.0` at commit `9c760380d6e776359923d1cda8ba81b3e95132b8`
-- CI run: `27473628782`
-- CLI Smoke run: `27473628790`
-- Publish workflow run: `27473635243`
-- Docker workflow run: `27473635222`
-- MCP Registry workflow run: `27473746085`
-- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.30.0`
+- Current npm release: `agentloopkit@0.31.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.31.0>
+- Release asset: `agentloopkit-0.31.0.tgz`
+- Release asset SHA-256: pending release upload verification
+- Release tag: `v0.31.0` at the published release commit
+- CI run: pending GitHub Actions verification
+- CLI Smoke run: pending GitHub Actions verification
+- Publish workflow run: pending npm trusted publishing verification
+- Docker workflow run: pending GHCR verification
+- MCP Registry workflow run: pending registry verification
+- Post-publish npm proof: pending `npm view agentloopkit version versions --json`
+
+## 0.31.0 release summary
+
+Included:
+
+- read-only `agentloop upgrade-harness --details` and `--suggestions` output for copyable older-repo guidance
+- `agentloop doctor` recommendations when generated harness guidance misses the current review-readiness loop
+- split `test:unit`, `test:integration`, and `test:release` scripts plus a full `release-flow` wrapper
+- `docs/upgrading-existing-repos.md` for safe upgrades from older AgentLoopKit installs
+- client-specific read-only MCP setup examples for Claude Code, Cursor, Gemini CLI, OpenCode, and Codex
+- realistic bugfix PR and dependency-upgrade examples using `create-task`, `verify`, `ship`, and `prepare-pr`
+
+Release verification covers local task-linked verification, public docs hygiene, link checks, release-smoke checks, strict dogfood, project release checks, and the full `release-flow` gate before publish.
 
 ## 0.30.0 release summary
 
@@ -1198,9 +1211,9 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.30.0` is public.
-- npm latest is `agentloopkit@0.30.0`.
-- GHCR and MCP Registry workflows passed for `0.30.0`.
+- GitHub release `v0.31.0` is public.
+- npm latest is `agentloopkit@0.31.0`.
+- GHCR and MCP Registry workflow proof is pending for `0.31.0`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

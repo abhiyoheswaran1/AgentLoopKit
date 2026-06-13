@@ -1,0 +1,20 @@
+ CHANGELOG.md                          |  7 ++-
+ README.md                             | 10 +++-
+ docs/claude-code.md                   |  6 +++
+ docs/cli-reference.md                 | 13 +++++
+ docs/codex.md                         |  6 +++
+ docs/cursor.md                        |  6 +++
+ docs/gemini-cli.md                    |  6 +++
+ docs/getting-started.md               |  4 +-
+ docs/mcp.md                           | 92 +++++++++++++++++++++++++++++++++--
+ docs/opencode.md                      |  6 +++
+ docs/template-migrations.md           |  3 +-
+ examples/dependency-upgrade/README.md | 33 +++++++++++++
+ package.json                          |  6 ++-
+ src/cli/commands/upgrade-harness.ts   | 58 +++++++++++++++++-----
+ src/core/doctor.ts                    | 22 +++++++++
+ src/core/upgrade-harness.ts           | 61 +++++++++++++++++++++++
+ tests/doctor.test.ts                  | 34 +++++++++++++
+ tests/examples.test.ts                | 38 +++++++++++++++
+ tests/upgrade-harness.test.ts         | 46 ++++++++++++++++--
+ 19 files changed, 431 insertions(+), 26 deletions(-)

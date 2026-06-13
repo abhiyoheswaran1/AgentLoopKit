@@ -20,3 +20,9 @@ Claude Code should use:
 - handoffs in `.agentloop/handoffs/`
 
 If your Claude Code setup uses a separate instruction file, link or paste `.agentloop/agents/claude-code.md` there.
+
+## Optional MCP Context
+
+AgentLoopKit includes a read-only MCP server for local repo evidence. Claude Code supports project `.mcp.json` files and `claude mcp add`.
+
+See [mcp.md](mcp.md#claude-code) for the current AgentLoopKit server entry.

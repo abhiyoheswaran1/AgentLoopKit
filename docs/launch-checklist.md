@@ -8,8 +8,8 @@ For a read-only registry check, see [npm-status.md](npm-status.md).
 
 ## Current Release Policy
 
-- Current public package line: `0.30.0`.
-- Active release candidate: none.
+- Current public package line: `0.31.0`.
+- Active release candidate: `0.31.0` until post-publish proof is recorded.
 - Do not bump versions, create tags, publish npm, publish GitHub Releases, publish GHCR, or publish MCP Registry entries during active implementation.
 - Cut the next version only when the maintainer asks for release prep.
 - Use GitHub Releases and npm trusted publishing as the public source of truth.
@@ -37,11 +37,14 @@ For a read-only registry check, see [npm-status.md](npm-status.md).
 - [ ] `npm run lint`
 - [ ] `npm run typecheck`
 - [ ] `npm test`
-- [ ] `npx pnpm@10.12.1 check:links`
+- [ ] `npm run check:public-docs`
+- [ ] `npm run check:links`
 - [ ] `node scripts/prepublish-check.mjs`
 - [ ] `git diff --check`
 - [ ] `npm run build`
+- [ ] `npm run dogfood:strict`
 - [ ] `npm run smoke:release`
+- [ ] `npm run release-flow`
 - [ ] `node scripts/smoke-cli.mjs`
 - [ ] `node dist/cli/index.js artifacts --json`
 - [ ] `npx --yes projscan doctor --format markdown`

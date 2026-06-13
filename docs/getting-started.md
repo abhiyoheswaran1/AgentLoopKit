@@ -59,7 +59,7 @@ Use the latest CLI in an existing AgentLoopKit repo before changing local guidan
 cd /path/to/existing/repo
 npx --yes agentloopkit@latest version
 npx --yes agentloopkit@latest doctor --redact-paths
-npx --yes agentloopkit@latest upgrade-harness --dry-run --redact-paths
+npx --yes agentloopkit@latest upgrade-harness --details --redact-paths
 npx --yes agentloopkit@latest init --dry-run
 ```
 
@@ -84,6 +84,8 @@ pnpm up -D agentloopkit@latest
 # or
 npm install -D agentloopkit@latest
 ```
+
+See `upgrading-existing-repos.md` for the full safe-upgrade path, including local-only harnesses and manual guidance refreshes.
 
 For stack-specific command examples, see `stack-recipes.md`, including Next.js, React/Vite, Remix, SvelteKit, Node API, Django, FastAPI, Python, docs-only, empty-repo, and monorepo recipes.
 For sensitive changes, see `security-review.md` and `../examples/security-review/README.md` for a scoped security-review task, verification report, and PR summary. AgentLoopKit records review evidence; it does not prove code is secure.

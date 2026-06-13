@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-14-00-18-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-14-00-18",
+  "createdAtEpochMs": 1781389096650,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-improve-adoption-polish-and-release-workflow.md",
+    "title": "Improve adoption polish and release workflow",
+    "status": "proposed"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-14-00-13-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-14-00-18-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-14-00-18-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 25
+}

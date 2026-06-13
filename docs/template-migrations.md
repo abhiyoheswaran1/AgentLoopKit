@@ -16,6 +16,7 @@ Then inspect the local harness:
 
 ```bash
 npx --yes agentloopkit@latest upgrade-harness --dry-run --redact-paths
+npx --yes agentloopkit@latest upgrade-harness --details --redact-paths
 npx --yes agentloopkit@latest upgrade-harness --json
 npx --yes agentloopkit@latest init --dry-run
 ```
@@ -29,7 +30,7 @@ npx --yes agentloopkit@latest init --dry-run
 - `agentloop review-context`
 - `agentloop upgrade-harness`
 
-The command writes nothing. Use it as a checklist, then manually copy the relevant guidance into `AGENTS.md`, `AGENTLOOP.md`, or `.agentloop/harness/*`.
+The command writes nothing. Use `--details` for copyable guidance, then manually copy the relevant sections into `AGENTS.md`, `AGENTLOOP.md`, or `.agentloop/harness/*`.
 
 `init --dry-run` shows missing generated files. A non-dry `init` creates missing files and skips existing ones. It does not merge templates into files that already exist.
 

@@ -36,6 +36,39 @@ agentloop create-task --type dependency-upgrade --title "Upgrade validation libr
   --rollback "Revert package.json and pnpm-lock.yaml"
 ```
 
+## Verify
+
+```bash
+agentloop verify --task-commands
+```
+
+For dependency work, keep install and test commands explicit in the task contract. If the repo config already runs the same command, AgentLoopKit de-duplicates exact command strings.
+
+## Ship
+
+```bash
+agentloop ship
+```
+
+`ship` checks that the task, verification evidence, gates, changed files, handoff readiness, and risk flags are ready for review. It does not inspect package registries or prove the dependency is safe.
+
+## Prepare The PR
+
+```bash
+agentloop prepare-pr
+agentloop prepare-pr --github-comment
+```
+
+Use the generated PR body to show which package files changed, what verification ran, what risks remain, and how to roll back.
+
+## Maintainer Check
+
+```bash
+agentloop maintainer-check
+```
+
+Maintainers should look closely at lockfile churn, install scripts, native builds, and transitive dependency changes.
+
 ## Review focus
 
 - package name, old version, and new version

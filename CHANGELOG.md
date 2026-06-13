@@ -2,7 +2,16 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+<!-- No unreleased changes yet. -->
+
+## 0.31.0
+
+- Added `agentloop upgrade-harness --details` and `--suggestions` for copyable current-loop guidance in older repos.
+- Changed `agentloop doctor` to recommend `agentloop upgrade-harness --details` when generated guidance misses current review-readiness topics.
+- Added `test:unit`, `test:integration`, `test:release`, and `release-flow` scripts so maintainers can use a faster dev loop while keeping the full release gate intact.
+- Added `docs/upgrading-existing-repos.md` for safe older-repo upgrades.
+- Expanded MCP client setup docs for Claude Code, Cursor, Gemini CLI, OpenCode, and Codex.
+- Added a bugfix PR example and expanded the dependency-upgrade example around `create-task`, `verify`, `ship`, and `prepare-pr`.
 
 ## 0.30.0
 

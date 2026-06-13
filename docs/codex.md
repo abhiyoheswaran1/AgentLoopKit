@@ -23,3 +23,9 @@ Codex should:
 - produce a handoff summary before stopping
 
 AgentLoopKit does not replace Codex. It gives Codex a repo-local engineering loop.
+
+## Optional MCP Context
+
+AgentLoopKit includes a read-only MCP server for task, verification, ship, run-ledger, and handoff context. Codex MCP setup uses Codex `config.toml` entries under `mcp_servers`.
+
+See [mcp.md](mcp.md#codex) for the current AgentLoopKit server entry.

@@ -8,6 +8,7 @@ import { inlineCode } from './markdown-format.js';
 import { detectPackageManager } from './package-manager.js';
 import { detectMonorepo, detectPackageScripts, detectProjectType } from './project-detection.js';
 import { detectRiskFileScan } from './safety.js';
+import { inspectHarnessUpgrade } from './upgrade-harness.js';
 
 export type DoctorCheck = {
   name: string;
@@ -99,6 +100,16 @@ function chooseDoctorNextActions(checks: DoctorCheck[]): DoctorNextAction[] {
         'refresh-harness',
         'agentloop init',
         'Refresh missing or stale AgentLoopKit harness metadata without overwriting existing files.',
+      ),
+    );
+  }
+
+  if (hasWarnOrFail(checks, 'Harness guidance')) {
+    actions.push(
+      nextAction(
+        'upgrade-harness',
+        'agentloop upgrade-harness --details',
+        'Generated guidance is missing current-loop topics such as ship, prepare-pr, run ledger, review context, or maintainer-check.',
       ),
     );
   }
@@ -343,6 +354,17 @@ export async function runDoctor(options: {
     checks.push(check(file, exists ? 'pass' : 'warn', exists ? 'found' : 'missing'));
   }
   checks.push(await checkTemplateManifest(cwd));
+
+  const harnessUpgrade = await inspectHarnessUpgrade({ cwd });
+  checks.push(
+    check(
+      'Harness guidance',
+      harnessUpgrade.status === 'pass' ? 'pass' : 'warn',
+      harnessUpgrade.status === 'pass'
+        ? 'generated guidance mentions the current review-readiness loop'
+        : 'generated guidance is missing current review-readiness loop topics; run agentloop upgrade-harness --details for copyable suggestions',
+    ),
+  );
 
   try {
     await loadAgentLoopConfig(cwd);

@@ -23,9 +23,13 @@ Example MCP client configuration:
 
 ## Client Setup Examples
 
-Use the same server definition in any MCP client that accepts stdio server configuration. Exact settings file locations vary by client, so prefer the client's current MCP settings UI or docs for where to paste it.
+Use the same stdio server command in clients that support MCP. Run the client from a repository that already has `agentloop.config.json`, or configure the client to start the server with that repository as its working directory.
 
-Claude Code, Claude Desktop, Cursor, OpenCode, Gemini CLI, Codex surfaces with MCP support, and other MCP clients can use this shape:
+### Claude Code
+
+Claude Code supports project-scoped MCP configuration in `.mcp.json` at the project root, plus CLI setup through `claude mcp add`.
+
+Project `.mcp.json`:
 
 ```json
 {
@@ -38,7 +42,80 @@ Claude Code, Claude Desktop, Cursor, OpenCode, Gemini CLI, Codex surfaces with M
 }
 ```
 
-For a repo-pinned install, use the local binary:
+Or add it with Claude Code:
+
+```bash
+claude mcp add --scope project --transport stdio agentloopkit -- npx --yes agentloopkit@latest mcp-server
+```
+
+Use project scope when you want the repo to share this read-only AgentLoopKit context. Use Claude Code local or user scope when the MCP setup should stay private to your machine.
+
+### Cursor
+
+Cursor supports project MCP configuration in `.cursor/mcp.json` and user-wide MCP configuration in `~/.cursor/mcp.json`.
+
+Project `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "agentloopkit": {
+      "command": "npx",
+      "args": ["--yes", "agentloopkit@latest", "mcp-server"]
+    }
+  }
+}
+```
+
+### Gemini CLI
+
+Gemini CLI stores user settings in `~/.gemini/settings.json` and workspace settings in `.gemini/settings.json`. Its MCP docs also include `gemini mcp add`; use the current Gemini CLI help when you prefer command-based setup.
+
+Workspace `.gemini/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "agentloopkit": {
+      "command": "npx",
+      "args": ["--yes", "agentloopkit@latest", "mcp-server"]
+    }
+  }
+}
+```
+
+### OpenCode
+
+OpenCode config uses an `mcp` object in `opencode.json` or `opencode.jsonc`.
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "agentloopkit": {
+      "type": "local",
+      "command": ["npx", "--yes", "agentloopkit@latest", "mcp-server"],
+      "enabled": true,
+    },
+  },
+}
+```
+
+### Codex
+
+Codex configuration uses `config.toml` and MCP server entries under `mcp_servers`. Use the official Codex config reference for the current user and project config locations.
+
+Example TOML:
+
+```toml
+[mcp_servers.agentloopkit]
+command = "npx"
+args = ["--yes", "agentloopkit@latest", "mcp-server"]
+```
+
+### Repo-Pinned Install
+
+If the repo installs AgentLoopKit as a dev dependency, use the local binary shape when your client resolves commands from the repository:
 
 ```json
 {
@@ -50,6 +127,15 @@ For a repo-pinned install, use the local binary:
   }
 }
 ```
+
+### Client Docs Checked
+
+- Claude Code: <https://docs.anthropic.com/en/docs/claude-code/mcp>
+- Cursor: <https://cursor.com/docs/mcp>
+- Gemini CLI: <https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md>
+- Gemini CLI settings: <https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/settings.md>
+- OpenCode: <https://opencode.ai/docs/mcp-servers/>
+- Codex config reference: <https://developers.openai.com/codex/config-reference>
 
 Run the MCP server from a repository that already has `agentloop.config.json`. The server reads that repo's local AgentLoopKit evidence and returns display-safe paths. It does not initialize the repo for you.
 

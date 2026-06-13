@@ -12,16 +12,16 @@ For a compact current-state summary, see [release-status.md](release-status.md).
 
 ## Current State
 
-As of June 13, 2026:
+As of June 14, 2026:
 
-- npm latest is `agentloopkit@0.30.0`.
-- GitHub release `v0.30.0` is public with attached `agentloopkit-0.30.0.tgz`.
+- npm latest is `agentloopkit@0.31.0`.
+- GitHub release `v0.31.0` is public with attached `agentloopkit-0.31.0.tgz`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - GitHub releases publish npm through trusted publishing.
 - GHCR and MCP Registry publishing run from GitHub release workflows after npm succeeds.
-- Release tag `v0.30.0` points at commit `9c760380d6e776359923d1cda8ba81b3e95132b8`.
+- Release tag `v0.31.0` points at the published release commit.
 
-The `0.30.0` release completed through GitHub release automation, npm trusted publishing, Docker/GHCR, MCP Registry, and published-package smoke checks.
+The `0.31.0` release uses GitHub release automation, npm trusted publishing, Docker/GHCR, MCP Registry, and published-package smoke checks.
 
 ## Release Rule
 
@@ -56,13 +56,10 @@ Before a new public release:
 Run these before publishing:
 
 ```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm pack
-npm run smoke:release
+npm run release-flow
 ```
+
+`release-flow` runs the local metadata guard, lint, typecheck, full tests, build, public-doc hygiene, link checking, strict dogfood gate, packed-package smoke, and strict `agentloop release-check`.
 
 `prepublishOnly` runs the local changelog metadata guard, typecheck, tests, and build.
 

@@ -27,6 +27,13 @@ export type HarnessUpgradeFile = {
   missingTopics: HarnessTopicId[];
 };
 
+export type HarnessUpgradeSuggestion = {
+  topic: HarnessTopicId;
+  title: string;
+  targetFiles: string[];
+  copyMarkdown: string;
+};
+
 export type HarnessManifestStatus = {
   path: string;
   exists: boolean;
@@ -42,6 +49,7 @@ export type HarnessUpgradeReport = {
   targetDirectory: string;
   manifest: HarnessManifestStatus;
   files: HarnessUpgradeFile[];
+  suggestions: HarnessUpgradeSuggestion[];
   nextSteps: string[];
 };
 
@@ -65,6 +73,39 @@ const HARNESS_FILES = [
   path.posix.join(AGENTLOOP_DIR, 'harness', 'commands.md'),
   path.posix.join(AGENTLOOP_DIR, 'README.md'),
 ] as const;
+
+const TOPIC_SUGGESTIONS: Record<HarnessTopicId, { title: string; copyMarkdown: string }> = {
+  ship: {
+    title: 'Review-readiness ship gate',
+    copyMarkdown:
+      '- Before review, run `agentloop ship` to check task clarity, verification freshness, gates, handoff readiness, and risk flags.',
+  },
+  'prepare-pr': {
+    title: 'PR preparation from evidence',
+    copyMarkdown:
+      '- After `agentloop ship`, run `agentloop prepare-pr` to generate a PR title and reviewer-ready body from local evidence.',
+  },
+  'run-ledger': {
+    title: 'Local run ledger and file intent',
+    copyMarkdown:
+      '- Use `agentloop runs`, `agentloop show-run <id>`, and `agentloop intent <file>` to inspect local run history and file intent.',
+  },
+  'maintainer-check': {
+    title: 'Maintainer reviewability check',
+    copyMarkdown:
+      '- Run `agentloop maintainer-check` when evaluating whether an AI-assisted PR has enough task and verification evidence to review.',
+  },
+  'review-context': {
+    title: 'Read-only agent context snapshot',
+    copyMarkdown:
+      '- Use `agentloop review-context` when an agent needs one read-only snapshot of task, policy, report, run, gate, and next-action state.',
+  },
+  'upgrade-safety': {
+    title: 'Safe harness upgrades',
+    copyMarkdown:
+      '- Run `agentloop upgrade-harness --details` after updating AgentLoopKit to see which local guidance files need manual edits. It writes nothing.',
+  },
+};
 
 function repoPath(cwd: string, relativePath: string) {
   return path.join(cwd, ...relativePath.split('/'));
@@ -174,6 +215,24 @@ function buildNextSteps(report: Pick<HarnessUpgradeReport, 'manifest' | 'files'>
   return nextSteps;
 }
 
+function buildSuggestions(files: HarnessUpgradeFile[]): HarnessUpgradeSuggestion[] {
+  return TOPICS.flatMap((topic) => {
+    const targetFiles = files
+      .filter((file) => file.missingTopics.includes(topic.id))
+      .map((file) => file.path);
+    if (!targetFiles.length) return [];
+
+    return [
+      {
+        topic: topic.id,
+        title: TOPIC_SUGGESTIONS[topic.id].title,
+        targetFiles,
+        copyMarkdown: TOPIC_SUGGESTIONS[topic.id].copyMarkdown,
+      },
+    ];
+  });
+}
+
 export async function inspectHarnessUpgrade(options: {
   cwd: string;
   dryRun?: boolean;
@@ -181,6 +240,7 @@ export async function inspectHarnessUpgrade(options: {
   const cwd = path.resolve(options.cwd);
   const manifest = await inspectManifest(cwd);
   const files = await Promise.all(HARNESS_FILES.map((file) => inspectHarnessFile(cwd, file)));
+  const suggestions = buildSuggestions(files);
   const status: HarnessUpgradeStatus =
     manifest.status === 'current' && files.every((file) => file.status === 'current')
       ? 'pass'
@@ -193,6 +253,7 @@ export async function inspectHarnessUpgrade(options: {
     targetDirectory: cwd,
     manifest,
     files,
+    suggestions,
   };
 
   return {

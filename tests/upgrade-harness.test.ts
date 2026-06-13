@@ -64,6 +64,44 @@ describe('upgrade-harness command', () => {
     await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toBe(before);
   });
 
+  test('prints copyable suggestions for missing current-loop topics', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeOldHarness(dir);
+    const before = await readFile(path.join(dir, 'AGENTS.md'), 'utf8');
+
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'upgrade-harness', '--suggestions', '--json'],
+      {
+        cwd: dir,
+      },
+    );
+    const humanResult = await execa(tsxPath, [cliPath, 'upgrade-harness', '--details'], {
+      cwd: dir,
+    });
+
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.suggestions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          topic: 'ship',
+          targetFiles: expect.arrayContaining(['AGENTS.md', 'AGENTLOOP.md']),
+          copyMarkdown: expect.stringContaining('agentloop ship'),
+        }),
+        expect.objectContaining({
+          topic: 'prepare-pr',
+          copyMarkdown: expect.stringContaining('agentloop prepare-pr'),
+        }),
+      ]),
+    );
+    expect(humanResult.stdout).toContain('## Copyable Guidance');
+    expect(humanResult.stdout).toContain('### ship');
+    expect(humanResult.stdout).toContain('agentloop ship');
+    expect(humanResult.stdout).toContain('agentloop prepare-pr');
+    await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toBe(before);
+  });
+
   test('passes for a freshly initialized current harness', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -111,11 +149,9 @@ describe('upgrade-harness command', () => {
     tempDirs.push(dir);
     await writeOldHarness(dir);
 
-    const result = await execa(
-      tsxPath,
-      [cliPath, 'upgrade-harness', '--json', '--redact-paths'],
-      { cwd: dir },
-    );
+    const result = await execa(tsxPath, [cliPath, 'upgrade-harness', '--json', '--redact-paths'], {
+      cwd: dir,
+    });
 
     const output = JSON.parse(result.stdout);
     expect(output.targetDirectory).toBe('[agentloop-root]');

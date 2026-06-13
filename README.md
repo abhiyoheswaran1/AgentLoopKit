@@ -89,7 +89,7 @@ Repos that already use AgentLoopKit can update the CLI without rewriting local h
 cd /path/to/existing/repo
 npx --yes agentloopkit@latest version
 npx --yes agentloopkit@latest doctor --redact-paths
-npx --yes agentloopkit@latest upgrade-harness --dry-run --redact-paths
+npx --yes agentloopkit@latest upgrade-harness --details --redact-paths
 npx --yes agentloopkit@latest init --dry-run
 ```
 
@@ -227,13 +227,17 @@ Maintainers can run a faster focused sanity set while iterating:
 
 ```bash
 npm run test:quick
+npm run test:integration
 ```
 
 Run the full suite before release:
 
 ```bash
-npm test
+npm run test:release
+npm run release-flow
 ```
+
+`test:quick` runs the fast unit-oriented set. `test:integration` runs slower CLI workflow coverage. `test:release` is the full Vitest suite. `release-flow` runs the local release gate without publishing packages, creating tags, or creating GitHub releases.
 
 ## Agent Setup
 
@@ -282,6 +286,7 @@ Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-g
 
 - [Getting started](docs/getting-started.md)
 - [CLI reference](docs/cli-reference.md)
+- [Upgrading existing repos](docs/upgrading-existing-repos.md)
 - [Configuration](docs/configuration.md)
 - [Task contracts](docs/task-contracts.md)
 - [Verification reports](docs/verification-reports.md)
@@ -301,6 +306,7 @@ Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-g
 See `examples/` for sample generated harnesses and CI recipes:
 
 - [End-to-end workflow](examples/end-to-end/README.md)
+- [Bugfix PR](examples/bugfix-pr/README.md)
 - [Next.js app](examples/nextjs-app/README.md)
 - [Node API](examples/node-api/README.md)
 - [Python service](examples/python-service/README.md)

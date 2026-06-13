@@ -259,6 +259,40 @@ describe('doctor', () => {
     expect(result.markdown).not.toContain('do-not-print');
   });
 
+  test('recommends upgrade-harness when generated guidance misses the current loop', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, 'AGENTS.md'),
+      '# AGENTS\n\nUse `agentloop verify` and `agentloop handoff` before review.\n',
+    );
+    await writeFile(
+      path.join(dir, 'AGENTLOOP.md'),
+      '# AGENTLOOP\n\nRun `agentloop create-task`, `agentloop verify`, and `agentloop handoff`.\n',
+    );
+
+    const result = await runDoctor({ cwd: dir });
+
+    expect(result.checks).toContainEqual({
+      name: 'Harness guidance',
+      status: 'warn',
+      message:
+        'generated guidance is missing current review-readiness loop topics; run agentloop upgrade-harness --details for copyable suggestions',
+    });
+    expect(result.nextActions).toEqual(
+      expect.arrayContaining([
+        {
+          id: 'upgrade-harness',
+          command: 'agentloop upgrade-harness --details',
+          reason:
+            'Generated guidance is missing current-loop topics such as ship, prepare-pr, run ledger, review context, or maintainer-check.',
+        },
+      ]),
+    );
+    expect(result.markdown).toContain('Run `agentloop upgrade-harness --details`');
+  });
+
   test('doctor human output renders check values with safe inline code when paths contain backticks', async () => {
     const parent = await makeTempDir();
     const dir = path.join(parent, 'doctor`repo');
