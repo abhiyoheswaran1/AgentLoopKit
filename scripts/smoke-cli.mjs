@@ -199,6 +199,19 @@ async function smokeCli({ keep = false } = {}) {
     }
     console.log('Init smoke passed.');
 
+    const harnessUpgrade = parseJson(
+      (await runAgentLoop(['upgrade-harness', '--json', '--redact-paths'], { cwd: smokeRepo }))
+        .stdout,
+      'upgrade-harness',
+    );
+    assert(harnessUpgrade.status === 'pass', 'upgrade-harness did not pass after fresh init.');
+    assert(harnessUpgrade.writesFiles === false, 'upgrade-harness should be read-only.');
+    assert(
+      harnessUpgrade.targetDirectory === '[agentloop-root]',
+      'upgrade-harness did not redact the target directory.',
+    );
+    console.log('Harness upgrade smoke passed.');
+
     const doctor = parseJson(
       (await runAgentLoop(['doctor', '--json'], { cwd: smokeRepo })).stdout,
       'doctor',

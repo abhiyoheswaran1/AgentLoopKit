@@ -29,6 +29,29 @@ agentloop init --json
 
 Configured paths must stay inside the current repo. Absolute paths, parent traversal, Windows drive-qualified paths, and null bytes are rejected before AgentLoopKit reads or writes configured artifacts.
 
+## Upgrade Harness
+
+```bash
+agentloop upgrade-harness
+agentloop upgrade-harness --dry-run
+agentloop upgrade-harness --json
+agentloop upgrade-harness --json --redact-paths
+```
+
+`upgrade-harness` inspects existing generated guidance after a CLI upgrade. It reads `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, `.agentloop/README.md`, and `.agentloop/manifest.json`, then reports whether the harness mentions the current review-readiness loop: `ship`, `prepare-pr`, run ledger or file intent, `maintainer-check`, `review-context`, and upgrade guidance.
+
+The command is read-only. It does not overwrite guidance, merge templates, create tasks, run verification commands, read `.env` contents, call external APIs, or upload files. Use `init --dry-run` after `upgrade-harness` when you also want to see missing generated files.
+
+Use `--redact-paths` before pasting output into a public issue, PR, or CI log. It replaces the absolute AgentLoop root with `[agentloop-root]`.
+
+Existing repos can use the latest CLI before refreshing old guidance:
+
+```bash
+npx --yes agentloopkit@latest upgrade-harness --dry-run
+npx --yes agentloopkit@latest ship
+npx --yes agentloopkit@latest prepare-pr
+```
+
 ## Doctor
 
 ```bash

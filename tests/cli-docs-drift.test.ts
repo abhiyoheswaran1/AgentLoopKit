@@ -27,6 +27,7 @@ const publicCommands = [
   'report',
   'badge',
   'artifacts',
+  'upgrade-harness',
   'ci-summary',
   'release-notes',
   'release-check',

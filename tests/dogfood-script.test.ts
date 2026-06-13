@@ -11,6 +11,7 @@ describe('dogfood script helpers', () => {
       'current loop status',
       'public docs hygiene',
       'dependency audit',
+      'harness upgrade audit',
       'review evidence gates',
       'artifact inventory',
       'maintainer reviewability check',
@@ -42,11 +43,20 @@ describe('dogfood script helpers', () => {
       '--no-install',
       'tsx',
       'src/cli/index.ts',
+      'upgrade-harness',
+      '--json',
+      '--redact-paths',
+    ]);
+    expect(steps[4].allowFailure).toBe(false);
+    expect(steps[5].args).toEqual([
+      '--no-install',
+      'tsx',
+      'src/cli/index.ts',
       'check-gates',
       '--redact-paths',
     ]);
-    expect(steps[4].allowFailure).toBe(true);
-    expect(steps[6].args).toEqual([
+    expect(steps[5].allowFailure).toBe(true);
+    expect(steps[7].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
@@ -54,8 +64,8 @@ describe('dogfood script helpers', () => {
       '--json',
       '--redact-paths',
     ]);
-    expect(steps[6].allowFailure).toBe(true);
-    expect(steps[7].args).toEqual([
+    expect(steps[7].allowFailure).toBe(true);
+    expect(steps[8].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
@@ -63,14 +73,14 @@ describe('dogfood script helpers', () => {
       '--json',
       '--redact-paths',
     ]);
-    expect(steps[8].command).toBe('npx');
-    expect(steps[8].args).toEqual(['--yes', 'projscan', 'doctor', '--format', 'markdown']);
+    expect(steps[9].command).toBe('npx');
+    expect(steps[9].args).toEqual(['--yes', 'projscan', 'doctor', '--format', 'markdown']);
   });
 
   test('adds strict gate mode only when requested', () => {
     const steps = dogfood.createDogfoodSteps({ strict: true });
 
-    expect(steps[4].args).toEqual([
+    expect(steps[5].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
@@ -78,8 +88,8 @@ describe('dogfood script helpers', () => {
       '--redact-paths',
       '--strict',
     ]);
-    expect(steps[4].allowFailure).toBe(false);
-    expect(steps[6].allowFailure).toBe(false);
+    expect(steps[5].allowFailure).toBe(false);
+    expect(steps[7].allowFailure).toBe(false);
   });
 
   test('parses JSON mode without changing strict mode parsing', () => {

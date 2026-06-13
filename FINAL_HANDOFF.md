@@ -74,7 +74,34 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.29.0`
+- Current npm release: `agentloopkit@0.30.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.30.0>
+- Release asset: `agentloopkit-0.30.0.tgz`
+- Release asset SHA-256: `405f3126d5f15dd8ba8e4a209b7844881680b5911590332776a42f120f49512b`
+- Release tag: `v0.30.0` at the published release commit
+- CI run: pending GitHub Actions proof
+- CLI Smoke run: pending GitHub Actions proof
+- Publish workflow run: pending GitHub Actions proof
+- Docker workflow run: pending GitHub Actions proof
+- MCP Registry workflow run: pending GitHub Actions proof
+- Post-publish npm proof: pending `npm view agentloopkit version versions --json`
+
+## 0.30.0 release summary
+
+Included:
+
+- read-only `agentloop upgrade-harness` for existing repos with older generated guidance
+- safer existing-repo upgrade docs that explain why `init` skips user-edited files
+- current main-loop docs around `verify`, `ship`, `prepare-pr`, and `maintainer-check`
+- MCP client setup examples for the read-only server
+- `npm run test:quick` for focused maintainer iteration while keeping the full suite as the release gate
+- harness-upgrade and dependency-audit coverage in the project self-check gate
+
+Release verification covered local task-linked verification, public docs hygiene, link checks, release-smoke checks, project self-checks, and ProjScan before publish.
+
+## Previous release
+
+- Previous npm release: `agentloopkit@0.29.0`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.29.0>
 - Release asset: `agentloopkit-0.29.0.tgz`
 - Release asset SHA-256: `2b295ff9e865069b64a80930d3b45b5ca0fe6bf8726d31b3a1de21e4362a0da4`
@@ -98,9 +125,9 @@ Included:
 
 Release verification covered local release gates, npm trusted publishing, GitHub release assets, GHCR publishing through the Docker workflow, MCP Registry publishing, and clean-directory published-package smoke.
 
-## Previous release
+## Earlier release
 
-- Previous npm release: `agentloopkit@0.28.7`
+- Earlier npm release: `agentloopkit@0.28.7`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.28.7>
 - Release asset: `agentloopkit-0.28.7.tgz`
 - Release asset SHA-256: `cd2c1b019e6f2b9e5a88576548da4f81048ca24cd9a3e5edd34141b82d08d27b`
@@ -1171,9 +1198,9 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.29.0` is public.
-- npm latest is `agentloopkit@0.29.0`.
-- GHCR and MCP Registry workflows passed for `0.29.0`.
+- GitHub release `v0.30.0` is public.
+- npm latest is `agentloopkit@0.30.0`.
+- GHCR and MCP Registry workflows passed for `0.30.0`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

@@ -34,14 +34,16 @@ agentloop task archive .agentloop/tasks/<task-file>.md
 agentloop task doctor
 ```
 
-Use `agentloop task done` after verification and handoff when the active task is ready to close. Archive only after a task is done. The archive command moves one named Markdown file into `.agentloop/tasks/archive/` and keeps normal task lists focused. Use `agentloop task doctor` when old task files or misplaced post-verification gates need a read-only cleanup checklist.
+Use `agentloop task done` after verification and handoff or ship evidence when the active task is ready to close. Archive only after a task is done. The archive command moves one named Markdown file into `.agentloop/tasks/archive/` and keeps normal task lists focused. Use `agentloop task doctor` when old task files or misplaced post-verification gates need a read-only cleanup checklist.
 
 4. Check current loop state:
 
 ```bash
 agentloop status
 agentloop next
+agentloop review-context
 agentloop artifacts
+agentloop upgrade-harness
 ```
 
 5. Inspect safety policies when the task touches protected areas:
@@ -61,47 +63,70 @@ agentloop verify
 agentloop verify --task <path> --task-commands
 ```
 
-7. Generate a reviewer handoff:
+7. Ship review-readiness evidence:
+
+```bash
+agentloop ship
+agentloop prepare-pr
+agentloop maintainer-check
+```
+
+`ship` writes a Markdown readiness report under `reports/`, calculates an evidence score, and records a run under `.agentloop/runs/`. The score checks whether reviewers have task, verification, gate, handoff, and risk evidence. It does not measure code quality.
+`prepare-pr` drafts a PR title, grouped body, reviewer checklist, risks, rollback notes, and optional GitHub-comment Markdown.
+`maintainer-check` is read-only and helps reviewers decide whether an AI-assisted PR has enough evidence to review.
+
+8. Optional: generate a reviewer handoff:
 
 ```bash
 agentloop handoff
 ```
 
-8. Optional: write a local HTML evidence report:
+9. Optional: inspect run history and file intent:
+
+```bash
+agentloop runs
+agentloop runs --latest
+agentloop show-run <id>
+agentloop intent <file>
+```
+
+The run ledger uses local metadata only. It helps agents and reviewers see which runs touched a file and why.
+
+10. Optional: write a local HTML evidence report:
 
 ```bash
 agentloop report
 ```
 
-9. Optional: write a local SVG evidence badge:
+11. Optional: write a local SVG evidence badge:
 
 ```bash
 agentloop badge
 agentloop badge --source gates
 ```
 
-10. Optional: write a CI summary:
+12. Optional: write a CI summary:
 
 ```bash
 agentloop ci-summary
 agentloop ci-summary --write
 ```
 
-11. Optional: draft release notes:
+13. Optional: draft release notes:
 
 ```bash
 agentloop release-notes
 agentloop release-notes --write
 ```
 
-12. Optional: check npm registry catch-up:
+14. Optional: check npm registry catch-up:
 
 ```bash
 agentloop npm-status
 agentloop npm-status --agentloopkit --expect-current
 ```
 
-13. Check review gates:
+15. Check review gates:
 
 ```bash
 agentloop check-gates
@@ -109,7 +134,9 @@ agentloop check-gates --strict
 ```
 
 `check-gates` inspects local evidence. It does not run tests or call an LLM.
-`artifacts` inventories existing local task, report, handoff, badge, CI summary, and release-note evidence without writing files.
+`review-context` returns one read-only snapshot with status, gates, policies, artifacts, recent runs, latest ship evidence, and next action.
+`artifacts` inventories existing local task, report, handoff, badge, CI summary, release-note, and run evidence without writing files.
+`upgrade-harness` reads existing generated guidance and reports missing current-loop topics such as `ship`, `prepare-pr`, `runs`, `intent`, `review-context`, and `maintainer-check`. It does not overwrite edited harness files.
 `report` reads local evidence and writes one static HTML file under `reports/`.
 `badge` reads local evidence and writes SVG files under `reports/`.
 `ci-summary` reads allowlisted CI provenance and local evidence, then writes Markdown under `reports/` when `--write` is passed.

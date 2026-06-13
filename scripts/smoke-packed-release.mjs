@@ -63,6 +63,7 @@ const README_REDACTION_COMMANDS = [
   'ship',
   'prepare-pr',
   'maintainer-check',
+  'upgrade-harness',
   'release-check',
 ];
 

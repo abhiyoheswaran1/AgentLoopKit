@@ -179,7 +179,7 @@ describe('release smoke script helpers', () => {
 
   test('accepts README redaction guidance with every shareable redaction command', () => {
     const readme = [
-      'Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-gates`, `ship`, `prepare-pr`, `maintainer-check`, or `release-check` before pasting output into a public issue, PR, or CI log.',
+      'Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-gates`, `ship`, `prepare-pr`, `maintainer-check`, `upgrade-harness`, or `release-check` before pasting output into a public issue, PR, or CI log.',
     ].join('\n');
 
     expect(() => smoke.assertReadmeRedactionGuidance(readme)).not.toThrow();

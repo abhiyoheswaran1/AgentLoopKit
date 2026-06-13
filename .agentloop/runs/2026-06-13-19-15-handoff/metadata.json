@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-19-15-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-19-15",
+  "createdAtEpochMs": 1781370913654,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-improve-upgrade-path-and-docs-polish.md",
+    "title": "Improve upgrade path and docs polish",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-18-58-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-19-15-pr-summary.md",
+  "changedFileCount": 40
+}

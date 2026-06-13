@@ -26,6 +26,7 @@ const topLevelCommands = [
   ['report', 'Write a local HTML evidence report'],
   ['badge', 'Write a local SVG evidence badge'],
   ['artifacts', 'Inventory local AgentLoop evidence'],
+  ['upgrade-harness', 'Inspect generated harness upgrade gaps'],
   ['ci-summary', 'Summarize CI context and AgentLoop evidence'],
   ['release-notes', 'Generate deterministic release notes'],
   ['release-check', 'Check local release readiness'],

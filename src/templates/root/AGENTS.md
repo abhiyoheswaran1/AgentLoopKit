@@ -12,16 +12,22 @@ Before changing code:
 - Use `agentloop task show <path>` to read a task contract without changing active state.
 - Use `agentloop task set <path>` when the active task is ambiguous.
 - Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
-- Use `agentloop task done` after verification and handoff when the active task is ready to close.
-- Use `agentloop task archive <path>` only after verification and handoff are complete.
+- Use `agentloop task done` after verification and review-readiness evidence when the active task is ready to close.
+- Use `agentloop task archive <path>` only after verification and handoff or ship evidence are complete.
 - Use `agentloop task doctor` when old task files or misplaced post-verification gates need a read-only cleanup checklist.
 - Run `agentloop status` when you need the pinned active task, latest open task, parked deferred tasks, verification, dirty-file, and next-action state.
 - Run `agentloop next` when you only need the next recommended loop command.
-- Run `agentloop artifacts` when you need a read-only inventory of local task, report, handoff, badge, CI summary, and release-note evidence.
+- Run `agentloop review-context` when an agent needs one read-only snapshot of task, gate, policy, artifact, run, and next-action state.
+- Run `agentloop artifacts` when you need a read-only inventory of local task, report, handoff, badge, CI summary, release-note, and run evidence.
+- Run `agentloop upgrade-harness` after updating AgentLoopKit to see whether older generated guidance should be reviewed manually.
 - Run `agentloop policy list`, `agentloop policy show <policy>`, and `agentloop policy status` before touching security, dependency, database, git, public API, or secret-handling areas.
 - Treat local `.agentloop/policies/*.md` files as the repo's safety guidance. A `modified` policy is a local decision to review, not a failure.
-- Run `agentloop check-gates` before stopping to check review evidence.
-- Run `agentloop report` after verification and handoff when a local HTML evidence artifact helps review.
+- Run `agentloop ship` before review to score evidence readiness, write a ship report, and record a run under `.agentloop/runs/`.
+- Run `agentloop prepare-pr` after `ship` when a reviewer needs a PR title, grouped body, risks, rollback notes, and checklist.
+- Run `agentloop maintainer-check` when evaluating whether an AI-assisted PR has enough evidence to review.
+- Run `agentloop runs`, `agentloop show-run <id>`, and `agentloop intent <file>` to inspect local run history and file intent.
+- Run `agentloop check-gates` when you need a quick evidence gate without the full ship report.
+- Run `agentloop report` after verification and handoff or ship evidence when a local HTML evidence artifact helps review.
 - Run `agentloop badge` when a local SVG evidence badge helps review or CI artifact uploads.
 - Run `agentloop ci-summary --write` in CI when reviewers need a compact provenance and evidence summary.
 - Run `agentloop release-notes --write` before a release when reviewers need local release-note evidence.
@@ -31,7 +37,7 @@ Before changing code:
 - Do not run destructive git or filesystem commands unless the user asks for them.
 - Do not read or print secrets. If env files exist, mention only their paths.
 - Run the configured verification commands before claiming completion.
-- Generate a handoff summary with changed files, tests run, risks, and rollback notes.
+- Generate review evidence with changed files, tests run, risks, rollback notes, and reviewer checklist.
 
 Agent roster:
 

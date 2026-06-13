@@ -26,6 +26,7 @@ import { preparePrCommand } from './commands/prepare-pr.js';
 import { intentCommand, runsCommand, showRunCommand } from './commands/runs.js';
 import { maintainerCheckCommand } from './commands/maintainer-check.js';
 import { reviewContextCommand } from './commands/review-context.js';
+import { upgradeHarnessCommand } from './commands/upgrade-harness.js';
 import { getPackageVersion } from '../core/version.js';
 
 const program = new Command();
@@ -54,6 +55,7 @@ program.addCommand(maintainerCheckCommand());
 program.addCommand(reportCommand());
 program.addCommand(badgeCommand());
 program.addCommand(artifactsCommand());
+program.addCommand(upgradeHarnessCommand());
 program.addCommand(ciSummaryCommand());
 program.addCommand(releaseNotesCommand());
 program.addCommand(releaseCheckCommand());

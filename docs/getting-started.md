@@ -10,7 +10,7 @@ npx agentloopkit init
 
 `init` writes files into the current directory. The output shows the target folder, detected project type, package manager, Git status, Git root, configured commands, and file counts. When the target is a Git subdirectory, `init` warns that files will be written there instead of the Git root. Use `--dry-run` first when you want to see the same plan without writing files.
 
-After setup, repo commands search upward for the nearest `agentloop.config.json`. You can run `status`, `create-task`, `verify`, and `handoff` from nested folders, and AgentLoopKit still uses the initialized root.
+After setup, repo commands search upward for the nearest `agentloop.config.json`. You can run `status`, `create-task`, `verify`, `ship`, `prepare-pr`, and `handoff` from nested folders, and AgentLoopKit still uses the initialized root.
 
 Do not run non-dry `init` from `~` unless you intentionally want AgentLoopKit files in your home directory. AgentLoopKit refuses that by default; pass `--force` only when you mean it.
 
@@ -51,6 +51,40 @@ In monorepos, root checks do not always prove that one package was tested. Add p
 
 AgentLoopKit records and runs the commands you configure. It does not infer package graphs or run workspace commands on its own.
 
+## Existing Repos And Harness Upgrades
+
+Use the latest CLI in an existing AgentLoopKit repo before changing local guidance files:
+
+```bash
+cd /path/to/existing/repo
+npx --yes agentloopkit@latest version
+npx --yes agentloopkit@latest doctor --redact-paths
+npx --yes agentloopkit@latest upgrade-harness --dry-run --redact-paths
+npx --yes agentloopkit@latest init --dry-run
+```
+
+`upgrade-harness` reads existing `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, and `.agentloop/README.md`. It reports whether those files mention the current review-readiness loop: `ship`, `prepare-pr`, run ledger, file intent, `review-context`, `maintainer-check`, and upgrade guidance. It writes nothing.
+
+`init --dry-run` shows missing generated files. A non-dry `init` creates missing files and skips existing ones. AgentLoopKit does not overwrite edited harness files or merge templates automatically.
+
+You can use the latest loop even if old generated docs have not been refreshed:
+
+```bash
+npx --yes agentloopkit@latest create-task --type bugfix --title "Fix checkout bug"
+npx --yes agentloopkit@latest verify
+npx --yes agentloopkit@latest ship
+npx --yes agentloopkit@latest prepare-pr
+npx --yes agentloopkit@latest maintainer-check
+```
+
+If the repo pins AgentLoopKit as a dev dependency, update the package first:
+
+```bash
+pnpm up -D agentloopkit@latest
+# or
+npm install -D agentloopkit@latest
+```
+
 For stack-specific command examples, see `stack-recipes.md`, including Next.js, React/Vite, Remix, SvelteKit, Node API, Django, FastAPI, Python, docs-only, empty-repo, and monorepo recipes.
 For sensitive changes, see `security-review.md` and `../examples/security-review/README.md` for a scoped security-review task, verification report, and PR summary. AgentLoopKit records review evidence; it does not prove code is secure.
 For package and lockfile changes, see `dependency-upgrades.md` and `../examples/dependency-upgrade/README.md`.
@@ -83,8 +117,8 @@ npx agentloopkit task current
 ```
 
 Use `task status` to keep the task contract current during the loop. Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Use `deferred` for parked work that should stay in the task folder without becoming the next unpinned task.
-Use `task done` after verification and handoff when the active task is ready to close.
-After verification and handoff, use `npx agentloopkit task archive <path>` to move a finished contract into `.agentloop/tasks/archive/` without deleting it.
+Use `task done` after verification and review-readiness evidence when the active task is ready to close.
+After verification and handoff or ship evidence, use `npx agentloopkit task archive <path>` to move a finished contract into `.agentloop/tasks/archive/` without deleting it.
 Use `task doctor` when a repo has old task files, stale status lines, or misplaced post-verification gates and you need a read-only cleanup checklist before choosing the next active task.
 
 Check the current loop state:
@@ -131,9 +165,14 @@ After implementation:
 npx agentloopkit verify
 npx agentloopkit status
 npx agentloopkit next
+npx agentloopkit ship
+npx agentloopkit prepare-pr
+npx agentloopkit maintainer-check
 npx agentloopkit handoff
 npx agentloopkit check-gates
 npx agentloopkit check-gates --strict
+npx agentloopkit runs --latest
+npx agentloopkit intent <file>
 npx agentloopkit report
 npx agentloopkit badge
 npx agentloopkit ci-summary
@@ -141,9 +180,13 @@ npx agentloopkit release-notes
 npx agentloopkit npm-status
 ```
 
-`check-gates` does not run tests. It checks whether task, verification, handoff, task-folder hygiene, harness, policy, and git evidence exists before review.
+`ship` is the main review-readiness command. It checks task evidence, changed files, verification freshness, gates, handoff evidence, and risks. It writes a ship report, records a run under `.agentloop/runs/`, and calculates an evidence score that does not claim to measure code quality.
+`prepare-pr` generates PR copy from local evidence. It does not read GitHub tokens, call GitHub APIs, or post comments.
+`maintainer-check` is a read-only reviewability check for AI-assisted PRs. It checks task evidence, fresh verification, handoff or ship coverage, risky file areas, lockfile changes, migrations, and generated output.
+`runs` and `intent` inspect local run metadata. They do not read target file contents.
+`check-gates` does not run tests. It checks whether task, verification, handoff or ship, task-folder hygiene, harness, policy, and git evidence exists before review.
 Use `--strict` in CI when warning gates should fail.
-`report` writes a local static HTML evidence page after `verify` and `handoff`.
+`report` writes a local static HTML evidence page after `verify` and handoff or ship evidence.
 `badge` writes a local SVG status badge from existing verification or gate evidence.
 `ci-summary` writes or prints a small CI provenance and evidence summary without running checks.
 `release-notes` drafts local release notes from package metadata, changelog, git history, task, verification, and CI summary evidence without creating tags or publishing packages.

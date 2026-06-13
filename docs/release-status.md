@@ -4,29 +4,30 @@ Last checked: June 13, 2026.
 
 ## Current State
 
-- Current public release: `v0.29.0`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.29.0>
-- Release asset: `agentloopkit-0.29.0.tgz`
-- Release asset SHA-256: `2b295ff9e865069b64a80930d3b45b5ca0fe6bf8726d31b3a1de21e4362a0da4`
-- Release tag `v0.29.0` points at commit `5b3148ec2025cd47bb698df6048fc236b544257b`
-- npm latest: `0.29.0`
-- CI run: `27467505332` passed for the release commit
-- CLI Smoke run: `27467505335` passed on Ubuntu, macOS, and Windows
-- Publish workflow run: `27467512817` passed and published `agentloopkit@0.29.0` through npm trusted publishing
-- Docker workflow run: `27467512834` passed and published the GHCR image for `0.29.0`
-- MCP Registry workflow run: `27467624266` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
+- Current public release: `v0.30.0`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.30.0>
+- Release asset: `agentloopkit-0.30.0.tgz`
+- Release asset SHA-256: `405f3126d5f15dd8ba8e4a209b7844881680b5911590332776a42f120f49512b`
+- Release tag `v0.30.0` points at the published release commit
+- npm latest: `0.30.0`
+- CI run: pending GitHub Actions proof
+- CLI Smoke run: pending GitHub Actions proof
+- Publish workflow run: pending GitHub Actions proof
+- Docker workflow run: pending GitHub Actions proof
+- MCP Registry workflow run: pending GitHub Actions proof
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
 Docker is not installed in the local maintainer shell, and the current GitHub token lacks `read:packages`, so this page records the successful Docker workflow as GHCR proof instead of a locally pulled image digest.
 
 ## Latest Release Highlights
 
-Released in `0.29.0`:
+Released in `0.30.0`:
 
-- `agentloop artifacts` now includes run ledger evidence.
-- `agentloop artifacts --type run` and `agentloop artifacts --latest` help agents discover recent run evidence.
-- Redacted release, doctor, maintainer, review-context, and next-action outputs are safer to paste into public logs.
-- pnpm now resolves release tooling to patched `esbuild@0.28.1`.
+- `agentloop upgrade-harness` audits older generated guidance without overwriting user edits.
+- Existing-repo docs explain how to update the CLI, inspect old harness files, and keep using the current loop.
+- Getting-started and generated harness guidance promote `verify`, `ship`, `prepare-pr`, and `maintainer-check`.
+- MCP docs include read-only client setup examples.
+- Maintainers get `npm run test:quick` for faster local sanity checks.
 
 ## Use The Current CLI
 
@@ -34,7 +35,7 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.29.0 version
+npx --yes agentloopkit@0.30.0 version
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -58,7 +59,7 @@ After each publish:
 
 ## Verification Evidence
 
-Local release gate for `0.29.0`:
+Local release gate for `0.30.0`:
 
 - `node scripts/prepublish-check.mjs`
 - `npm test -- tests/release-notes.test.ts tests/release-smoke.test.ts tests/release-check.test.ts`
@@ -76,12 +77,12 @@ Local release gate for `0.29.0`:
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: latest `0.29.0`
-- `node dist/cli/index.js npm-status --agentloopkit --expect-current --json`: status `current`
-- `npm run smoke:published -- --version 0.29.0`: passed
-- `npx --yes agentloopkit@0.29.0 version`: reported `0.29.0` from a clean temp directory
-- GitHub release asset digest matched the local tarball SHA-256
-- CI, CLI Smoke, Publish, Docker, and MCP Registry workflows passed
+- `npm view agentloopkit version versions --json`: pending post-publish proof
+- `node dist/cli/index.js npm-status --agentloopkit --expect-current --json`: pending post-publish proof
+- `npm run smoke:published -- --version 0.30.0`: pending post-publish proof
+- `npx --yes agentloopkit@0.30.0 version`: pending post-publish proof
+- GitHub release asset digest should match local tarball SHA-256 `405f3126d5f15dd8ba8e4a209b7844881680b5911590332776a42f120f49512b`
+- CI, CLI Smoke, Publish, Docker, and MCP Registry workflows: pending GitHub Actions proof
 
 Latest release-status documentation checks:
 

@@ -27,6 +27,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Policy customization guidance for repo-local safety rules
 - Repo-type policy examples for common project shapes
 - Local review-evidence gates with `agentloop check-gates` and `--strict`
+- Read-only existing-repo harness upgrade audit with `agentloop upgrade-harness`
 - Read-only MCP server with `agentloop mcp-server` for status, tasks, policies, policy template status, verification reports, ship reports, artifact inventory metadata, review context snapshots, run summaries and details, file intent matches, maintainer checks, gate status, and handoffs
 - Agent instruction installers, including `agentloop install-agent all`
 - Static bash, zsh, fish, and PowerShell completions
@@ -40,13 +41,13 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 
 ## Current State
 
-- GitHub release `v0.29.0` is public.
-- npm latest is `agentloopkit@0.29.0`.
-- GHCR and MCP Registry are live for `0.29.0`.
+- GitHub release `v0.30.0` is public.
+- npm latest is `agentloopkit@0.30.0`.
+- GHCR and MCP Registry are live for `0.30.0`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
-- Release tag `v0.29.0` points at the published release commit. Current `main` may include post-release bookkeeping.
+- Release tag `v0.30.0` points at the published release commit.
 
 ## Near Term
 

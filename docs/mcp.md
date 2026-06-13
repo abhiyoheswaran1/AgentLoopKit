@@ -21,6 +21,40 @@ Example MCP client configuration:
 }
 ```
 
+## Client Setup Examples
+
+Use the same server definition in any MCP client that accepts stdio server configuration. Exact settings file locations vary by client, so prefer the client's current MCP settings UI or docs for where to paste it.
+
+Claude Code, Claude Desktop, Cursor, OpenCode, Gemini CLI, Codex surfaces with MCP support, and other MCP clients can use this shape:
+
+```json
+{
+  "mcpServers": {
+    "agentloopkit": {
+      "command": "npx",
+      "args": ["--yes", "agentloopkit@latest", "mcp-server"]
+    }
+  }
+}
+```
+
+For a repo-pinned install, use the local binary:
+
+```json
+{
+  "mcpServers": {
+    "agentloopkit": {
+      "command": "agentloop",
+      "args": ["mcp-server"]
+    }
+  }
+}
+```
+
+Run the MCP server from a repository that already has `agentloop.config.json`. The server reads that repo's local AgentLoopKit evidence and returns display-safe paths. It does not initialize the repo for you.
+
+Ask the agent to call read-only tools such as `agentloop_review_context`, `agentloop_status`, `agentloop_latest_ship_report`, `agentloop_list_runs`, `agentloop_file_intent`, or `agentloop_maintainer_check` before reviewing an agent-generated change.
+
 ## Tools
 
 | Tool                                   | Reads                                                                                                                                                    |

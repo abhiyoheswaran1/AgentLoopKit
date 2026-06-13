@@ -55,7 +55,7 @@ npx agentloopkit init
 
 `init` writes files into the current directory. `--dry-run` previews the same plan and writes nothing.
 
-After setup, non-init commands search upward for the nearest `agentloop.config.json` and use that folder as the AgentLoop root. You can run `agentloop status`, `agentloop verify`, or `agentloop handoff` from a nested source folder and still write tasks, reports, and handoffs to the initialized repo root.
+After setup, non-init commands search upward for the nearest `agentloop.config.json` and use that folder as the AgentLoop root. You can run `agentloop status`, `agentloop verify`, `agentloop ship`, or `agentloop prepare-pr` from a nested source folder and still write tasks, reports, runs, and handoffs to the initialized repo root.
 
 Do not run `init` from your home directory unless you intend to configure your home folder. If you want local agent guidance but do not want to commit the generated files, use local-only mode:
 
@@ -81,6 +81,30 @@ pnpm add -D agentloopkit
 pnpm agentloop init
 ```
 
+## Existing Repos
+
+Repos that already use AgentLoopKit can update the CLI without rewriting local harness files:
+
+```bash
+cd /path/to/existing/repo
+npx --yes agentloopkit@latest version
+npx --yes agentloopkit@latest doctor --redact-paths
+npx --yes agentloopkit@latest upgrade-harness --dry-run --redact-paths
+npx --yes agentloopkit@latest init --dry-run
+```
+
+`init` skips existing generated files and appends to unmarked `AGENTS.md` files instead of overwriting maintainer edits. Use `upgrade-harness` to find older guidance that does not mention the current review-readiness loop, then copy only the useful pieces into `AGENTS.md`, `AGENTLOOP.md`, or `.agentloop/harness/*`.
+
+You can use the latest loop before refreshing old guidance:
+
+```bash
+npx --yes agentloopkit@latest create-task --type bugfix --title "Fix checkout bug"
+npx --yes agentloopkit@latest verify
+npx --yes agentloopkit@latest ship
+npx --yes agentloopkit@latest prepare-pr
+npx --yes agentloopkit@latest maintainer-check
+```
+
 ## Core Workflow
 
 ```bash
@@ -99,7 +123,7 @@ agentloop prepare-pr
 
 `create-task` sets the new contract as the active task. Use `agentloop task set <path>` only when you need to switch to another contract.
 Add `--include-config-commands` when you want the task contract to copy non-empty `test`, `lint`, `typecheck`, and `build` commands from `agentloop.config.json`. Task creation records those commands; it does not run them. Use `verify --task-commands --only-task-commands` when the active contract already includes the full check list.
-After verification and handoff, use `agentloop task done` to close the active task before starting unrelated work.
+After verification and `ship`, use `agentloop prepare-pr` for reviewer copy and `agentloop task done` to close the active task before starting unrelated work.
 
 Use `agentloop status` or `agentloop next` when an agent needs the next local action without reading every file:
 
@@ -124,7 +148,7 @@ AgentLoopKit uses its own loop in this repo. Contributors can run the same local
 npm run dogfood
 ```
 
-That command checks task-folder hygiene, current loop status, public docs hygiene, dependency audit results, review gates, artifact inventory, maintainer reviewability, agent review context, and ProjScan health. It does not publish packages, create tags, post comments, read tokens, read `.env` contents, or run verification commands.
+That command checks task-folder hygiene, current loop status, public docs hygiene, dependency audit results, harness upgrade state, review gates, artifact inventory, maintainer reviewability, agent review context, and ProjScan health. It does not publish packages, create tags, post comments, read tokens, read `.env` contents, or run verification commands.
 
 Use JSON output when an agent or CI job needs a structured dogfood summary:
 
@@ -176,6 +200,7 @@ agentloopkit init
 | `agentloop intent <file>`        | Show which runs touched a file and why                                         |
 | `agentloop maintainer-check`     | Check whether an AI-assisted PR is reviewable                                  |
 | `agentloop artifacts`            | Inventory local tasks, reports, handoffs, badges, and run evidence             |
+| `agentloop upgrade-harness`      | Inspect older generated guidance without overwriting local edits               |
 | `agentloop report`               | Write a local static HTML evidence report                                      |
 | `agentloop badge`                | Write a local SVG evidence badge                                               |
 | `agentloop ci-summary`           | Summarize CI context and existing AgentLoop evidence                           |
@@ -189,7 +214,7 @@ agentloopkit init
 | `agentloop completion <shell>`   | Print shell completion scripts                                                 |
 | `agentloop version`              | Print the CLI version                                                          |
 
-Clean up finished task contracts after verification and handoff:
+Clean up finished task contracts after verification and review-readiness evidence:
 
 ```bash
 agentloop task archive --status done --dry-run
@@ -197,6 +222,18 @@ agentloop task archive --status done
 ```
 
 See [docs/cli-reference.md](docs/cli-reference.md) for command examples, JSON modes, and safety notes.
+
+Maintainers can run a faster focused sanity set while iterating:
+
+```bash
+npm run test:quick
+```
+
+Run the full suite before release:
+
+```bash
+npm test
+```
 
 ## Agent Setup
 
@@ -237,8 +274,9 @@ For narrower evidence history, `agentloop verify --write-run` and `agentloop han
 
 `agentloop status` includes the newest local run ledger entry when `.agentloop/runs/` exists, so agents can see the latest review-readiness or verification evidence without opening every report.
 Run ledger output uses safe display paths: `.agentloop/...` for AgentLoopKit artifacts, repo-relative paths for repo files, and filenames for older outside absolute paths.
-Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-gates`, `ship`, `prepare-pr`, `maintainer-check`, or `release-check` before pasting output into a public issue, PR, or CI log. That mode replaces the absolute Git root with `[git-root]`.
+Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-gates`, `ship`, `prepare-pr`, `maintainer-check`, `upgrade-harness`, or `release-check` before pasting output into a public issue, PR, or CI log. That mode replaces local root paths with a placeholder.
 `agentloop review-context --json` gives non-MCP agents one read-only local snapshot with status, gates, policies, artifacts, recent runs, latest ship evidence, and the next action.
+`agentloop upgrade-harness` is read-only. It tells existing users which generated guidance files need manual review after a CLI upgrade. It does not merge templates or overwrite local edits.
 
 ## More Docs
 
@@ -253,6 +291,7 @@ Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-g
 - [PR summaries and handoffs](docs/pr-summaries.md)
 - [Policies](docs/policies.md)
 - [MCP server](docs/mcp.md)
+- [Template and harness upgrades](docs/template-migrations.md)
 - [CI examples](docs/github-actions.md)
 - [Distribution channels](docs/distribution-channels.md)
 - [Comparison](docs/comparison.md)

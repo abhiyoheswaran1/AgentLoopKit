@@ -1,0 +1,124 @@
+import path from 'node:path';
+import { mkdir, readFile, realpath, writeFile } from 'node:fs/promises';
+import { execa } from 'execa';
+import { afterEach, describe, expect, test } from 'vitest';
+import { initializeAgentLoop } from '../src/core/init.js';
+import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
+
+const cliPath = path.resolve('src/cli/index.ts');
+const tsxPath = path.resolve('node_modules/.bin/tsx');
+let tempDirs: string[] = [];
+
+async function writeOldHarness(dir: string) {
+  await writeJson(path.join(dir, 'package.json'), { name: 'old-harness' });
+  await initializeAgentLoop({ cwd: dir });
+  await writeFile(
+    path.join(dir, 'AGENTS.md'),
+    '# AGENTS\n\nUse `agentloop verify` and `agentloop handoff` before review.\n',
+  );
+  await writeFile(
+    path.join(dir, 'AGENTLOOP.md'),
+    '# AGENTLOOP\n\nRun `agentloop create-task`, `agentloop verify`, and `agentloop handoff`.\n',
+  );
+  await writeFile(
+    path.join(dir, '.agentloop', 'harness', 'commands.md'),
+    '# Commands\n\nUse `agentloop check-gates` before handing off work.\n',
+  );
+}
+
+describe('upgrade-harness command', () => {
+  afterEach(async () => {
+    await Promise.all(tempDirs.map(removeTempDir));
+    tempDirs = [];
+  });
+
+  test('warns about older harness guidance without writing files', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeOldHarness(dir);
+    const before = await readFile(path.join(dir, 'AGENTS.md'), 'utf8');
+
+    const result = await execa(tsxPath, [cliPath, 'upgrade-harness', '--dry-run', '--json'], {
+      cwd: dir,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(output.status).toBe('warn');
+    expect(output.dryRun).toBe(true);
+    expect(output.writesFiles).toBe(false);
+    expect(output.files).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: 'AGENTS.md',
+          status: 'review',
+          missingTopics: expect.arrayContaining(['ship', 'prepare-pr', 'run-ledger']),
+        }),
+      ]),
+    );
+    expect(output.nextSteps).toEqual(
+      expect.arrayContaining([
+        'Run `agentloop upgrade-harness` after updating the CLI to inspect existing harness guidance.',
+        'Manually copy the relevant guidance into AGENTS.md, AGENTLOOP.md, or .agentloop/harness/*; AgentLoopKit will not overwrite local edits.',
+      ]),
+    );
+    await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toBe(before);
+  });
+
+  test('passes for a freshly initialized current harness', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'current-harness',
+      scripts: { test: 'vitest' },
+    });
+    await initializeAgentLoop({ cwd: dir });
+
+    const result = await execa(tsxPath, [cliPath, 'upgrade-harness', '--json'], { cwd: dir });
+
+    const output = JSON.parse(result.stdout);
+    expect(output.status).toBe('pass');
+    expect(output.writesFiles).toBe(false);
+    expect(output.files).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: 'AGENTS.md', status: 'current', missingTopics: [] }),
+        expect.objectContaining({ path: 'AGENTLOOP.md', status: 'current', missingTopics: [] }),
+      ]),
+    );
+  });
+
+  test('uses the discovered AgentLoop root from nested directories', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'nested-harness',
+      scripts: { test: 'vitest' },
+    });
+    await initializeAgentLoop({ cwd: dir });
+    const nestedDir = path.join(dir, 'src', 'feature');
+    await mkdir(nestedDir, { recursive: true });
+
+    const result = await execa(tsxPath, [cliPath, 'upgrade-harness', '--json'], {
+      cwd: nestedDir,
+    });
+
+    const output = JSON.parse(result.stdout);
+    expect(output.status).toBe('pass');
+    expect(output.targetDirectory).toBe(await realpath(dir));
+  });
+
+  test('redacts the target directory for shareable JSON output', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeOldHarness(dir);
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'upgrade-harness', '--json', '--redact-paths'],
+      { cwd: dir },
+    );
+
+    const output = JSON.parse(result.stdout);
+    expect(output.targetDirectory).toBe('[agentloop-root]');
+    expect(result.stdout).not.toContain(dir);
+  });
+});

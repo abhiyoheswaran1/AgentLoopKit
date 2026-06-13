@@ -72,6 +72,7 @@ Add one Vitest case for existing behavior.
 
 ```bash
 npx pnpm@10.12.1 test tests/<area>.test.ts
+npx pnpm@10.12.1 test:quick
 npx pnpm@10.12.1 test
 npx projscan doctor --format markdown
 ```

@@ -6,6 +6,7 @@ Thanks for improving AgentLoopKit.
 
 ```bash
 pnpm install
+pnpm test:quick
 pnpm test
 pnpm typecheck
 pnpm check:links
@@ -43,6 +44,18 @@ npx agentloopkit status
 
 If the repo has an active task contract, read it first. For behavior changes, add or update a Vitest test before changing production code.
 
+Use the fast sanity set while iterating:
+
+```bash
+pnpm test:quick
+```
+
+Run the full suite before opening or updating a PR:
+
+```bash
+pnpm test
+```
+
 Good first contribution areas:
 
 - docs pages and examples
@@ -74,6 +87,7 @@ Run:
 ```bash
 pnpm lint
 pnpm typecheck
+pnpm test:quick
 pnpm test
 pnpm check:links
 pnpm build

@@ -48,6 +48,11 @@ export function createDogfoodSteps({ strict = false } = {}) {
       args: ['--yes', 'pnpm@10.12.1', 'audit', '--audit-level', 'high'],
       allowFailure: false,
     },
+    agentloopStep('harness upgrade audit', [
+      'upgrade-harness',
+      '--json',
+      '--redact-paths',
+    ]),
     agentloopStep('review evidence gates', gateArgs),
     agentloopStep('artifact inventory', ['artifacts', '--json']),
     agentloopStep('maintainer reviewability check', [
@@ -63,8 +68,8 @@ export function createDogfoodSteps({ strict = false } = {}) {
       allowFailure: false,
     },
   ];
-  steps[4].allowFailure = !strict;
-  steps[6].allowFailure = !strict;
+  steps[5].allowFailure = !strict;
+  steps[7].allowFailure = !strict;
   return steps;
 }
 
