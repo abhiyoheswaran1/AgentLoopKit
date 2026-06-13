@@ -1145,9 +1145,9 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.28.3` is public.
-- npm latest is `0.28.3`; registry versions include `0.28.3`.
-- GHCR and MCP Registry workflows passed for `0.28.3`.
+- GitHub release `v0.28.7` is public.
+- npm latest is `agentloopkit@0.28.7`.
+- GHCR and MCP Registry workflows passed for `0.28.7`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.
@@ -1158,7 +1158,7 @@ Current publish state:
 ```bash
 npx agentloopkit init
 npx agentloopkit doctor
-npx --yes agentloopkit@0.24.5 version
+npx --yes agentloopkit@latest version
 ```
 
 Pinned team usage:

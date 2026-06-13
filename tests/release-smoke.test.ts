@@ -298,4 +298,82 @@ describe('release smoke script helpers', () => {
       'README.md contains maintainer-only release chatter',
     );
   });
+
+  test('public docs hygiene rejects stale final handoff current release copy', async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), 'agentloopkit-final-handoff-hygiene-'));
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    await mkdir(path.join(dir, 'examples'), { recursive: true });
+    await mkdir(path.join(dir, '.github'), { recursive: true });
+
+    await writeFile(path.join(dir, 'package.json'), JSON.stringify({ version: '9.8.7' }));
+    await writeFile(path.join(dir, 'README.md'), 'Run `npx agentloopkit init`.\n');
+    await writeFile(path.join(dir, 'docs', 'guide.md'), 'No cloud backend.\n');
+    await writeFile(path.join(dir, 'examples', 'README.md'), 'Example.\n');
+    await writeFile(path.join(dir, '.github', 'PULL_REQUEST_TEMPLATE.md'), 'Checklist.\n');
+    await writeFile(path.join(dir, 'AGENTS.md'), 'Keep release guidance generic.\n');
+    await writeFile(path.join(dir, 'AGENTLOOP.md'), 'Use the local loop.\n');
+    await writeFile(
+      path.join(dir, 'ROADMAP.md'),
+      [
+        '# Roadmap',
+        '',
+        '## Current State',
+        '',
+        '- GitHub release `v9.8.7` is public.',
+        '- npm latest is `agentloopkit@9.8.7`.',
+        '- GHCR and MCP Registry are live for `9.8.7`.',
+        '- Release tag `v9.8.7` points at the published release commit.',
+      ].join('\n'),
+    );
+    await writeFile(
+      path.join(dir, 'FINAL_HANDOFF.md'),
+      [
+        '# AgentLoopKit Final Handoff',
+        '',
+        '## Current publish state',
+        '',
+        '- GitHub release `v9.8.6` is public.',
+        '- npm latest is `0.28.3`; registry versions include `0.28.3`.',
+        '- Do not publish stale intermediate versions from current `main`.',
+        '',
+        '## How users install it',
+        '',
+        '```bash',
+        'npx --yes agentloopkit@0.24.5 version',
+        '```',
+      ].join('\n'),
+    );
+
+    await expect(smoke.runPublicDocsHygiene({ cwd: dir })).rejects.toThrow(
+      'FINAL_HANDOFF.md current state is stale',
+    );
+  });
+
+  test('public docs hygiene rejects stale final handoff publish-state label copy', () => {
+    const content = [
+      '# AgentLoopKit Final Handoff',
+      '',
+      '## How to publish to npm',
+      '',
+      'Current publish state:',
+      '',
+      '- GitHub release `v9.8.6` is public.',
+      '- npm latest is `9.8.6`; registry versions include `9.8.6`.',
+      '- Releases now publish through GitHub Releases and trusted publishing.',
+      '',
+      '## How users install it',
+      '',
+      '```bash',
+      'npx agentloopkit init',
+      '```',
+    ].join('\n');
+
+    expect(() =>
+      smoke.assertFinalHandoffCurrentReleaseState({
+        filePath: 'FINAL_HANDOFF.md',
+        content,
+        version: '9.8.7',
+      }),
+    ).toThrow('FINAL_HANDOFF.md current state is stale: expected current GitHub release v9.8.7');
+  });
 });

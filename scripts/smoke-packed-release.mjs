@@ -196,6 +196,32 @@ function roadmapCurrentState(content) {
   return sectionLines.join('\n');
 }
 
+function markdownSection(content, heading) {
+  const lines = content.split(/\r?\n/);
+  const start = lines.findIndex((line) => line.trim() === heading);
+  if (start === -1) return '';
+
+  const sectionLines = [];
+  for (const line of lines.slice(start + 1)) {
+    if (/^##\s+/.test(line)) break;
+    sectionLines.push(line);
+  }
+  return sectionLines.join('\n');
+}
+
+function markdownLabeledBlock(content, label) {
+  const lines = content.split(/\r?\n/);
+  const start = lines.findIndex((line) => line.trim() === label);
+  if (start === -1) return '';
+
+  const blockLines = [];
+  for (const line of lines.slice(start + 1)) {
+    if (/^##\s+/.test(line)) break;
+    blockLines.push(line);
+  }
+  return blockLines.join('\n');
+}
+
 function assertRoadmapLine(section, expectedLine, filePath, message) {
   if (!section.includes(expectedLine)) {
     throw new Error(`${toPosixPath(filePath)} current state is stale: expected ${message}.`);
@@ -234,6 +260,41 @@ export function assertRoadmapCurrentReleaseState({ filePath, content, version })
   ) {
     throw new Error(
       `${toPosixPath(filePath)} current state is stale: expected release tag v${version}.`,
+    );
+  }
+}
+
+export function assertFinalHandoffCurrentReleaseState({ filePath, content, version }) {
+  const publishState =
+    markdownSection(content, '## Current publish state') ||
+    markdownLabeledBlock(content, 'Current publish state:');
+  if (publishState.trim()) {
+    const expectedRelease = `GitHub release \`v${version}\` is public.`;
+    if (!publishState.includes(expectedRelease)) {
+      throw new Error(
+        `${toPosixPath(filePath)} current state is stale: expected current GitHub release v${version}.`,
+      );
+    }
+
+    const expectedNpmVersion = new RegExp(
+      `npm latest is (?:\`agentloopkit@${version}\`|\`${version}\`)`,
+    );
+    if (!expectedNpmVersion.test(publishState)) {
+      throw new Error(
+        `${toPosixPath(filePath)} current state is stale: expected npm latest ${version}.`,
+      );
+    }
+  }
+
+  const installSection = markdownSection(content, '## How users install it');
+  if (!installSection.trim()) return;
+
+  const staleInstallPin = findAgentLoopVersionPins(installSection).find(
+    (pinnedVersion) => pinnedVersion !== version,
+  );
+  if (staleInstallPin) {
+    throw new Error(
+      `${toPosixPath(filePath)} install section contains stale AgentLoopKit version pin ${staleInstallPin}.`,
     );
   }
 }
@@ -279,6 +340,16 @@ export async function runPublicDocsHygiene({ cwd = process.cwd(), version } = {}
     content: await readFile(path.join(cwd, 'ROADMAP.md'), 'utf8'),
     version: expectedVersion,
   });
+
+  try {
+    assertFinalHandoffCurrentReleaseState({
+      filePath: 'FINAL_HANDOFF.md',
+      content: await readFile(path.join(cwd, 'FINAL_HANDOFF.md'), 'utf8'),
+      version: expectedVersion,
+    });
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
 
   return {
     version: expectedVersion,

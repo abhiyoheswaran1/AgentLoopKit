@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added public-docs hygiene coverage for stale root `FINAL_HANDOFF.md` current-release and install guidance, and refreshed the current handoff copy.
 - Changed `agentloop verify --task-commands` to use the active task when `--task` is omitted, and to exit before running commands when no explicit or active task exists.
 - Fixed generated handoff and ship report writes so repeated same-minute runs allocate suffixed Markdown artifact paths instead of overwriting earlier evidence.
 - Changed git status collection to request individual untracked files, so new folders appear as file-level evidence in status, ship, handoff, run-ledger, and maintainer outputs.

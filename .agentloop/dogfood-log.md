@@ -9094,3 +9094,32 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - AgentLoopKit’s own run ledger exposed a real evidence-quality issue before release.
 - Improve:
   - Consider applying the same “explicit or active task” rule to other task-sensitive commands if dogfooding finds fallback ambiguity.
+
+## 2026-06-13: Clean Stale Root Handoff Release Copy
+
+- Task contract: `.agentloop/tasks/2026-06-13-clean-stale-root-handoff-release-copy.md`
+- Trigger:
+  - A release-readiness audit found `FINAL_HANDOFF.md` still presenting `0.28.3` publish state as current guidance.
+  - The same root handoff install section still pinned `agentloopkit@0.24.5`.
+- Product-panel decision:
+  - Elias wanted root docs to be safe for a GitHub visitor.
+  - Samir wanted stale publish instructions caught before releases.
+  - Nora wanted normal install examples to use current npm paths, not old recovery pins.
+  - Maya kept the guard section-specific so historical release evidence can remain.
+- Implementation:
+  - Refreshed the current publish state and install examples in `FINAL_HANDOFF.md`.
+  - Extended public-docs hygiene to check root handoff current publish guidance and install pins.
+  - Added regression coverage for both stale final-handoff shapes.
+- Verification:
+  - Red run showed stale final handoff content was ignored:
+    - `npm test -- tests/release-smoke.test.ts -t "final handoff"`
+  - Red run showed the labeled `Current publish state:` block was ignored:
+    - `npm test -- tests/release-smoke.test.ts -t "publish-state"`
+  - Focused green run passed:
+    - `npm test -- tests/release-smoke.test.ts -t "final handoff|publish-state|public docs hygiene"`
+  - Public docs hygiene passed:
+    - `npm run check:public-docs`
+- What worked well:
+  - The npm-status recommendation led to a real public-doc cleanup instead of another feature.
+- Improve:
+  - Consider whether `FINAL_HANDOFF.md` should be split into current handoff plus archived release history after the next release.

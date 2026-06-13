@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-10-22-ship",
+  "command": "ship",
+  "createdAt": "2026-06-13-10-22",
+  "createdAtEpochMs": 1781338951497,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-clean-stale-root-handoff-release-copy.md",
+    "title": "Clean stale root handoff release copy",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-10-20-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-10-22-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-10-22-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 19
+}

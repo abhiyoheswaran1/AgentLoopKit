@@ -1,0 +1,7 @@
+ .agentloop/backlog.md            |  1 +
+ .agentloop/dogfood-log.md        | 29 +++++++++++++++
+ CHANGELOG.md                     |  1 +
+ FINAL_HANDOFF.md                 |  8 ++---
+ scripts/smoke-packed-release.mjs | 71 ++++++++++++++++++++++++++++++++++++
+ tests/release-smoke.test.ts      | 78 ++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 184 insertions(+), 4 deletions(-)

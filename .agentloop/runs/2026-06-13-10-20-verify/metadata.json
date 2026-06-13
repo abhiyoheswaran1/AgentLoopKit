@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-10-20-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-10-20",
+  "createdAtEpochMs": 1781338857571,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-clean-stale-root-handoff-release-copy.md",
+    "title": "Clean stale root handoff release copy",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-10-20-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 8
+}
