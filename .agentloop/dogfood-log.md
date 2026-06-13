@@ -8942,3 +8942,30 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The previous dogfood task exposed this adjacent CLI inconsistency.
 - Improve:
   - Consider centralizing `none` next-action rendering if another command adopts it.
+
+## 2026-06-13: Warn Maintainers About Stale Handoff Evidence
+
+- Task contract: `.agentloop/tasks/2026-06-13-warn-maintainers-about-stale-handoff-evidence.md`
+- Trigger:
+  - `check-gates` had learned to warn when dirty files were not covered by the latest handoff or ship run.
+  - `maintainer-check` still passed when any older PR summary existed.
+- Product-panel decision:
+  - Samir blocked false review evidence.
+  - Lina wanted maintainers to see whether the current diff is covered, not only whether a handoff file exists.
+  - Maya pushed for reusing the existing handoff coverage helper instead of duplicating evidence logic.
+- Implementation:
+  - `maintainer-check` now uses the latest run ledger and shared handoff coverage helper.
+  - Dirty files with only an old PR summary produce a `handoff-summary` warning.
+  - Dirty files covered by the latest handoff or ship run still pass.
+- Verification:
+  - Red run failed on the old stale-handoff pass:
+    - `npm test -- tests/maintainer-check.test.ts`
+  - Focused green run passed with `4` tests:
+    - `npm test -- tests/maintainer-check.test.ts`
+  - Full suite passed with `52` files and `497` tests:
+    - `npm test`
+  - Typecheck, lint, build, AgentLoop verify, strict gates, maintainer-check, dogfood strict, and projscan passed.
+- What worked well:
+  - The stricter gate caught our own stale handoff state before final handoff was refreshed.
+- Improve:
+  - `status --brief` still recommends `agentloop handoff` after strict gates pass with covered dirty files; review whether it should mirror `check-gates` in a future task.

@@ -4,6 +4,8 @@ import { AgentLoopConfig } from './config.js';
 import { latestMarkdownFile, prSummaryPattern } from './artifacts.js';
 import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
 import { getGitStatus, parseGitStatus } from './git.js';
+import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
+import { listRuns } from './runs.js';
 import { readTaskContract } from './task-state.js';
 
 export type MaintainerCheckStatus = 'pass' | 'warn' | 'fail';
@@ -105,17 +107,35 @@ export async function runMaintainerCheck(options: {
     checks.push(check('verification-evidence', 'fail', 'Verification evidence is missing.'));
   }
 
+  const changedFileStatuses = await parseGitStatus(await getGitStatus(options.cwd));
+  const latestRun = (await listRuns(options.cwd))[0];
+  const latestHandoffRunCoversDirtyFiles = await dirtyCoveredByLatestHandoffRun(
+    options.cwd,
+    changedFileStatuses,
+    latestRun,
+  );
   const handoff = await latestMarkdownFile(path.join(options.cwd, options.config.paths.handoffsDir), {
     pattern: prSummaryPattern,
     rootDir: options.cwd,
   });
-  checks.push(
-    handoff
-      ? check('handoff-summary', 'pass', 'Reviewer handoff found.', relativePath(options.cwd, handoff))
-      : check('handoff-summary', 'warn', 'Reviewer handoff is missing.'),
-  );
+  if (handoff) {
+    const staleHandoffForDirtyFiles =
+      changedFileStatuses.length > 0 && !latestHandoffRunCoversDirtyFiles;
+    checks.push(
+      check(
+        'handoff-summary',
+        staleHandoffForDirtyFiles ? 'warn' : 'pass',
+        staleHandoffForDirtyFiles
+          ? 'Latest handoff does not cover the current dirty files.'
+          : 'Reviewer handoff found.',
+        relativePath(options.cwd, handoff),
+      ),
+    );
+  } else {
+    checks.push(check('handoff-summary', 'warn', 'Reviewer handoff is missing.'));
+  }
 
-  const changedFiles = (await parseGitStatus(await getGitStatus(options.cwd))).map((file) =>
+  const changedFiles = changedFileStatuses.map((file) =>
     file.path.replace(/\\/g, '/'),
   );
   checks.push(

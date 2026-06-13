@@ -225,6 +225,8 @@ agentloop maintainer-check --json
 
 `maintainer-check` helps maintainers evaluate AI-assisted pull requests. It checks for a task contract, fresh verification evidence, handoff evidence, changed file count, dependency and lockfile changes, migrations, auth/security-sensitive files, and generated output files.
 
+When the repo has dirty files, handoff evidence must come from the latest handoff or ship run and cover those files. An older PR summary still appears in the output, but `maintainer-check` warns that it is stale.
+
 If a verified task was archived after handoff, `maintainer-check` can use the latest run ledger entry when it still points to an existing archived task contract.
 
 It is read-only. It does not write reports, run verification commands, call GitHub APIs, read tokens, or upload files.

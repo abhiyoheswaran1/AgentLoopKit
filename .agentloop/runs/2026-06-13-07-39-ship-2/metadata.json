@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-07-39-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-13-07-39",
+  "createdAtEpochMs": 1781329189312,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-warn-maintainers-about-stale-handoff-evidence.md",
+    "title": "Warn maintainers about stale handoff evidence",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-07-34-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-07-39-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-07-39-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 21
+}
