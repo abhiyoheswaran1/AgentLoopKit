@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-12-02-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-12-02",
+  "createdAtEpochMs": 1781344955400,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-escape-prepare-pr-list-markdown.md",
+    "title": "Escape prepare-pr list Markdown",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-12-01-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 8
+}

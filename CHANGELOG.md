@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed `agentloop prepare-pr` to escape Markdown control characters in task-derived PR list prose and readiness comment lists.
 - Changed dogfood JSON summaries to redact the current workspace root from step arguments, command text, and child-process error messages.
 - Changed the dogfood gate to run `agentloop review-context --json --redact-paths`, matching the public-log safety behavior used by status and gates.
 - Added public-docs hygiene coverage that keeps README `--redact-paths` guidance aligned with supported shareable CLI commands.

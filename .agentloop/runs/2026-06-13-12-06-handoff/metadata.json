@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-12-06-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-12-06",
+  "createdAtEpochMs": 1781345189652,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-escape-prepare-pr-list-markdown.md",
+    "title": "Escape prepare-pr list Markdown",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-12-01-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-12-06-pr-summary-2.md",
+  "changedFileCount": 19
+}

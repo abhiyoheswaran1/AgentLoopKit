@@ -2,6 +2,44 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Prepare PR Markdown List Escaping
+
+- Task contract: `.agentloop/tasks/2026-06-13-escape-prepare-pr-list-markdown.md`
+- Trigger:
+  - `prepare-pr` copied task acceptance criteria and risk notes into PR Markdown list items as raw prose.
+  - A task line such as `[ ] Do not render as a checkbox` could become a real checklist item in the generated PR body.
+- Product-panel decision:
+  - Samir wanted PR-facing generated Markdown to avoid unintended structure.
+  - Tom wanted deterministic output instead of trusting reviewers to notice malformed PR text.
+  - Nora kept the copy readable by escaping only list prose, not changing task contracts or file-path inline code.
+- Implementation:
+  - Added a small Markdown prose escaping helper.
+  - `prepare-pr` now escapes Markdown control characters in task-derived acceptance criteria, risk notes, blockers, warnings, and next-action lists.
+  - Documented the `prepare-pr` behavior in the CLI reference.
+- Verification:
+  - Red run failed because generated PR Markdown still rendered a checkbox, heading marker, and link from task prose:
+    - `npm test -- tests/prepare-pr.test.ts -t "escapes Markdown control characters"`
+  - Focused green run passed:
+    - `npm test -- tests/prepare-pr.test.ts -t "escapes Markdown control characters"`
+  - Full prepare-pr suite passed with `6` tests:
+    - `npm test -- tests/prepare-pr.test.ts`
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-13-12-01-verification-report.md`.
+  - Full lint, public-doc hygiene, and test suite passed:
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm test` (`52` files, `513` tests)
+  - Ship evidence passed with a `96`/100 review-readiness score:
+    - `node dist/cli/index.js ship --redact-paths`
+  - Strict gates and maintainer-check passed:
+    - `node dist/cli/index.js check-gates --redact-paths --strict`
+    - `node dist/cli/index.js maintainer-check --json`
+  - Dogfood strict JSON passed:
+    - `npm run dogfood:strict:json`
+- What worked well:
+  - A user-facing PR description issue stayed isolated to one renderer and one small formatting helper.
+- Improve:
+  - Apply the same prose escaping helper to ship report readiness lists if public copy starts accepting user-controlled text there.
+
 ## 2026-06-13: Dogfood JSON Summary Redaction Guard
 
 - Task contract: `.agentloop/tasks/2026-06-13-guard-dogfood-json-summary-redaction.md`

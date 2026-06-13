@@ -13,6 +13,14 @@ export function inlineCode(content: string) {
   return `${fence}${needsPadding ? ` ${content} ` : content}${fence}`;
 }
 
+export function escapeMarkdownProse(content: string) {
+  return content
+    .replace(/\\/g, '\\\\')
+    .replace(/([[\]()*_{}#+!|>])/g, '\\$1')
+    .replace(/^(\s*)([-=])/g, '$1\\$2')
+    .replace(/^(\s*)(\d+)\./g, '$1$2\\.');
+}
+
 export function fencedCodeBlock(info: string, content: string) {
   const fence = '`'.repeat(Math.max(3, longestBacktickRun(content) + 1));
   return `${fence}${info}

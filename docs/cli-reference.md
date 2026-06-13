@@ -191,7 +191,8 @@ Use `ship --github-comment` when CI needs compact review-readiness Markdown for 
 
 `prepare-pr` generates a PR title and body from the active task, changed files, verification evidence, ship report, gates, risk notes, and rollback notes. It groups changed files by review area so reviewers can scan risk-sensitive paths, source, tests, AgentLoop evidence, docs, CI, config, and other files. `--github-comment` includes Markdown suitable for a PR comment. The CLI does not read GitHub tokens or post comments by itself.
 
-PR-facing Markdown uses repo-relative AgentLoop artifact paths. JSON output keeps path fields unchanged for scripts.
+PR-facing Markdown uses repo-relative AgentLoop artifact paths. `prepare-pr` escapes Markdown control characters in task-derived list prose, so acceptance criteria and risk notes do not turn into unintended checkboxes, headings, or links.
+JSON output keeps path fields unchanged for scripts.
 Use `--redact-paths` with `ship` or `prepare-pr` before copying review-readiness output into public logs or PR comments. It hides the absolute Git root inside embedded gate evidence while keeping repo-relative AgentLoop artifact paths.
 
 When a fresh ship run already matches the active task, current verification report, existing ship report, and non-generated changed files, `prepare-pr` reuses that run instead of writing a duplicate run ledger entry. If the evidence is missing or no longer matches, it refreshes ship evidence first.

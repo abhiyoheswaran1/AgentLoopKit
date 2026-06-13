@@ -4,7 +4,7 @@ import { AgentLoopConfig } from './config.js';
 import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import { getGitStatus, GitFileStatus, parseGitStatus } from './git.js';
-import { inlineCode } from './markdown-format.js';
+import { escapeMarkdownProse, inlineCode } from './markdown-format.js';
 import { resolveOutputArtifactPath } from './artifacts.js';
 import { createShipReport, ShipResult } from './ship.js';
 import { listRuns, readRun } from './runs.js';
@@ -65,7 +65,9 @@ function listItems(section: string) {
 }
 
 function renderMarkdownList(values: string[], fallback: string) {
-  return values.length ? values.map((value) => `- ${value}`).join('\n') : `- ${fallback}`;
+  return values.length
+    ? values.map((value) => `- ${escapeMarkdownProse(value)}`).join('\n')
+    : `- ${escapeMarkdownProse(fallback)}`;
 }
 
 function relativePath(cwd: string, filePath: string) {

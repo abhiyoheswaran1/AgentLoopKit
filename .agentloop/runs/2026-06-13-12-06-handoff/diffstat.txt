@@ -1,0 +1,7 @@
+ .agentloop/dogfood-log.md   | 26 +++++++++++++++++++++++
+ CHANGELOG.md                |  1 +
+ docs/cli-reference.md       |  3 ++-
+ src/core/markdown-format.ts |  8 +++++++
+ src/core/prepare-pr.ts      |  6 ++++--
+ tests/prepare-pr.test.ts    | 52 ++++++++++++++++++++++++++++++++++++++++-----
+ 6 files changed, 88 insertions(+), 8 deletions(-)

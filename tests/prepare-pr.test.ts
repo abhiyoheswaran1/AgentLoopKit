@@ -16,9 +16,21 @@ async function git(cwd: string, args: string[]) {
   return execa('git', args, { cwd });
 }
 
-async function createPreparePrFixture() {
+async function createPreparePrFixture(
+  options: {
+    acceptanceCriteria?: string;
+    riskNotes?: string;
+  } = {},
+) {
   const dir = await makeTempDir();
   tempDirs.push(dir);
+  const acceptanceCriteria =
+    options.acceptanceCriteria ??
+    `- Password-reset login redirects to the requested page.
+- Existing session login still redirects to the dashboard.
+- Reviewer can see every acceptance criterion in the PR body.`;
+  const riskNotes =
+    options.riskNotes ?? '- Auth flow touched; review redirect edge cases.';
 
   await git(dir, ['init', '-q']);
   await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
@@ -61,15 +73,13 @@ Login redirects users to the wrong page after password reset.
 Users land on the intended destination after a successful login.
 
 ## Acceptance Criteria
-- Password-reset login redirects to the requested page.
-- Existing session login still redirects to the dashboard.
-- Reviewer can see every acceptance criterion in the PR body.
+${acceptanceCriteria}
 
 ## Verification Commands
 - npm test -- auth
 
 ## Risk Notes
-- Auth flow touched; review redirect edge cases.
+${riskNotes}
 
 ## Rollback Notes
 Revert the auth callback change.
@@ -133,6 +143,38 @@ describe('prepare-pr command', () => {
       runId: shipRuns[0].id,
     });
   });
+
+  test(
+    'escapes Markdown control characters in generated PR body and GitHub comment lists',
+    async () => {
+      const dir = await createPreparePrFixture({
+        acceptanceCriteria: `- [ ] Do not render as a checkbox.
+- # Do not render as a heading.
+- See [runbook](https://example.com).`,
+        riskNotes: '- Auth *flow* touched; review [runbook](https://example.com).',
+      });
+      await writeFile(path.join(dir, 'src/auth/[callback].ts'), 'export const extra = true;\n');
+      await git(dir, ['add', '-N', 'src/auth/[callback].ts']);
+
+      const output = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'prepare-pr', '--json', '--github-comment'], { cwd: dir }))
+          .stdout,
+      );
+
+      expect(output.body).toContain('- \\[ \\] Do not render as a checkbox.');
+      expect(output.body).toContain('- \\# Do not render as a heading.');
+      expect(output.body).toContain('- See \\[runbook\\]\\(https://example.com\\).');
+      expect(output.body).toContain(
+        '- Auth \\*flow\\* touched; review \\[runbook\\]\\(https://example.com\\).',
+      );
+      expect(output.body).not.toContain('- [ ] Do not render as a checkbox.');
+      expect(output.body).not.toContain('- # Do not render as a heading.');
+      expect(output.body).not.toContain('- See [runbook](https://example.com).');
+      expect(output.githubComment).toContain('src/auth/\\[callback\\].ts');
+      expect(output.githubComment).not.toContain('src/auth/[callback].ts');
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
 
   test('accepts redacted output when refreshing ship evidence', async () => {
     const dir = await createPreparePrFixture();
