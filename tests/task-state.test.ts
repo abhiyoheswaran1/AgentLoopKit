@@ -483,6 +483,65 @@ describe('task command', () => {
     );
   });
 
+  test('reports post-verification gates recorded as verification commands', async () => {
+    const { dir } = await createTaskStateFixture();
+    const taskPath = '.agentloop/tasks/2026-06-09-gate-mismatch.md';
+    await writeFile(
+      path.join(dir, taskPath),
+      [
+        '# Gate mismatch',
+        '',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        '- npm test',
+        '- npm run dogfood:strict',
+        '- node dist/cli/index.js check-gates --strict',
+        '',
+        '## Post-Verification Gates',
+        '- No post-verification gate recorded.',
+        '',
+      ].join('\n'),
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'task', 'doctor', '--json'], { cwd: dir });
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.taskDoctor).toMatchObject({
+      overallStatus: 'warn',
+      counts: {
+        checked: 2,
+        diagnostics: 1,
+        terminalTasks: 0,
+        missingStatuses: 0,
+        unsupportedStatuses: 0,
+      },
+    });
+    expect(output.taskDoctor.diagnostics).toContainEqual(
+      expect.objectContaining({
+        id: 'post-verification-gate-in-verification-commands',
+        severity: 'warn',
+        path: taskPath,
+        status: 'in-progress',
+        commands: [
+          'npm run dogfood:strict',
+          'node dist/cli/index.js check-gates --strict',
+        ],
+        recommendation:
+          'Move the listed command(s) from Verification Commands to Post-Verification Gates.',
+      }),
+    );
+
+    const humanResult = await execa(tsxPath, [cliPath, 'task', 'doctor'], { cwd: dir });
+    expect(humanResult.stdout).toContain(
+      inlineCode('post-verification-gate-in-verification-commands'),
+    );
+    expect(humanResult.stdout).toContain(inlineCode('npm run dogfood:strict'));
+    expect(humanResult.stdout).toContain(
+      inlineCode('node dist/cli/index.js check-gates --strict'),
+    );
+    expect(humanResult.stdout).toContain('Move the listed command(s) from Verification Commands');
+  });
+
   test('prints task doctor diagnostics with Markdown-safe inline values', async () => {
     const { dir } = await createTaskStateFixture();
     const legacyTaskPath = '.agentloop/tasks/2026-06-09-legacy`task.md';

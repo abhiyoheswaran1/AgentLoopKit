@@ -147,6 +147,9 @@ function printTaskDoctor(result: TaskDoctorResult, options: { json?: boolean }) 
     console.log(`  Path: ${inlineCode(diagnostic.path)}`);
     console.log(`  Status: ${inlineCode(diagnostic.status)}`);
     console.log(`  ${inlineCode(diagnostic.message)}`);
+    if (diagnostic.commands?.length) {
+      console.log(`  Commands: ${diagnostic.commands.map(inlineCode).join(', ')}`);
+    }
     console.log(`  Recommendation: ${inlineCode(diagnostic.recommendation)}`);
   }
 

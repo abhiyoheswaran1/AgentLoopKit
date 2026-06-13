@@ -2,6 +2,33 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Task Doctor Post-Verification Gate Audit
+
+- Task contract: `.agentloop/tasks/2026-06-13-flag-post-verification-gate-mismatches-in-task-doctor.md`
+- Trigger:
+  - Dogfooding showed `create-task` warns when commands like `npm run dogfood:strict`, `agentloop check-gates --strict`, or `agentloop release-check --strict` are placed under `Verification Commands`.
+  - Existing task contracts could still carry that mismatch without a read-only cleanup diagnostic.
+- Product change:
+  - `agentloop task doctor` now reports `post-verification-gate-in-verification-commands` for likely post-verification gates listed under `Verification Commands`.
+  - JSON diagnostics include the flagged commands.
+  - Human output prints the flagged commands with Markdown-safe inline formatting.
+  - The command remains read-only and does not move commands, edit task files, or run the gates.
+- Verification:
+  - Red TDD run: `npm test -- tests/task-state.test.ts -t "post-verification gates"` failed because task doctor returned `pass` with zero diagnostics.
+  - Green focused run: the same test passed after adding the shared detector and task-doctor diagnostic.
+  - Full task-state run: `npm test -- tests/task-state.test.ts` passed with 44 tests.
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-13-04-08-verification-report.md`.
+  - The verification run wrote `.agentloop/runs/2026-06-13-04-10-verify/`.
+  - Full `npm test` passed with 51 files and 470 tests.
+  - `npm run lint`, `npm run typecheck`, `npm run build`, `npm run check:links`, and `git diff --check` passed.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+  - `agentloop ship --redact-paths` wrote `.agentloop/reports/2026-06-13-04-17-ship-report.md` with a 95/100 review-readiness score.
+  - Final handoff evidence was written after archiving the completed task.
+- Worked well:
+  - The new doctor diagnostic turns a dogfood release-process mistake into a reusable cleanup check for existing repos.
+- Improve:
+  - Consider surfacing the same mismatch in `check-gates` task hygiene output only as a link to `task doctor`, not as another duplicate parser.
+
 ## 2026-06-13: Post-Verification Gate Warnings
 
 - Task contract: `.agentloop/tasks/2026-06-13-warn-about-post-verification-gates-during-task-creation.md`

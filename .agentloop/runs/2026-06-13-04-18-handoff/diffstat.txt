@@ -1,0 +1,19 @@
+ .agentloop/backlog.md                            |  1 +
+ .agentloop/dogfood-log.md                        | 20 ++++++++
+ .agentloop/harness/commands.md                   |  2 +-
+ AGENTLOOP.md                                     |  2 +-
+ AGENTS.md                                        |  2 +-
+ CHANGELOG.md                                     |  1 +
+ docs/getting-started.md                          |  2 +-
+ docs/status.md                                   |  4 +-
+ docs/task-contracts.md                           |  3 +-
+ src/cli/commands/create-task.ts                  | 13 +-----
+ src/cli/commands/task.ts                         |  3 ++
+ src/core/task-state.ts                           | 39 ++++++++++++++++
+ src/templates/harness/commands.md                |  2 +-
+ src/templates/root/AGENTLOOP.md                  |  2 +-
+ src/templates/root/AGENTS.md                     |  2 +-
+ src/templates/root/agentloop-directory-readme.md |  2 +-
+ src/templates/tasks/README.md                    |  2 +-
+ tests/task-state.test.ts                         | 59 ++++++++++++++++++++++++
+ 18 files changed, 138 insertions(+), 23 deletions(-)

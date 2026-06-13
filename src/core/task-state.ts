@@ -10,6 +10,7 @@ import {
   resolvesInsidePath,
   writeTextFile,
 } from './file-system.js';
+import { findLikelyPostVerificationGates } from './post-verification-gates.js';
 
 type TaskState = {
   version: 1;
@@ -47,6 +48,7 @@ export type TaskDoctorDiagnostic = {
   id:
     | 'legacy-task-status'
     | 'missing-task-status'
+    | 'post-verification-gate-in-verification-commands'
     | 'terminal-task-in-active-folder'
     | 'unsupported-task-status';
   severity: 'warn';
@@ -55,6 +57,7 @@ export type TaskDoctorDiagnostic = {
   status: string;
   message: string;
   recommendation: string;
+  commands?: string[];
 };
 
 export type TaskDoctorResult = {
@@ -220,6 +223,22 @@ function extractHeading(markdown: string, fallback: string) {
 
 function extractTaskStatus(markdown: string) {
   return markdown.match(/^- Status:\s*(.+)$/im)?.[1]?.trim() || 'unknown';
+}
+
+function extractMarkdownListSection(markdown: string, heading: string) {
+  const lines = markdown.split('\n');
+  const headingIndex = lines.findIndex((line) => line.trim() === `## ${heading}`);
+  if (headingIndex === -1) return [];
+
+  const sectionLines: string[] = [];
+  for (const line of lines.slice(headingIndex + 1)) {
+    if (/^##\s+/.test(line)) break;
+    sectionLines.push(line);
+  }
+
+  return sectionLines
+    .map((line) => line.match(/^\s*-\s+(.+)$/)?.[1]?.trim() ?? '')
+    .filter(Boolean);
 }
 
 function parseTaskStatus(status: string): TaskStatus {
@@ -476,6 +495,7 @@ export async function inspectTaskDirectory(options: {
 
   for (const task of tasks) {
     const status = task.status.trim().toLowerCase();
+    const taskContent = await readFile(path.resolve(options.cwd, task.path), 'utf8');
     if (status === 'unknown') {
       diagnostics.push({
         id: 'missing-task-status',
@@ -525,6 +545,25 @@ export async function inspectTaskDirectory(options: {
         status,
         message: 'Terminal task contract is still in the active task folder.',
         recommendation: `Run \`agentloop task archive ${task.path}\` after verification and handoff.`,
+      });
+      continue;
+    }
+
+    const misplacedPostVerificationGates = findLikelyPostVerificationGates(
+      extractMarkdownListSection(taskContent, 'Verification Commands'),
+    );
+    if (misplacedPostVerificationGates.length > 0) {
+      diagnostics.push({
+        id: 'post-verification-gate-in-verification-commands',
+        severity: 'warn',
+        path: task.path,
+        title: task.title,
+        status,
+        message:
+          'Task contract records likely post-verification gate command(s) under Verification Commands.',
+        recommendation:
+          'Move the listed command(s) from Verification Commands to Post-Verification Gates.',
+        commands: misplacedPostVerificationGates,
       });
     }
   }

@@ -43,4 +43,4 @@ For unsupported `--type` values, `agentloop create-task --json` returns a parsea
 `agentloop task status --json` updates only the task contract's `- Status:` line. Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Use `deferred` for parked work that should stay visible without becoming the next unpinned task.
 `agentloop task done --json` marks the active task `done`. Pass a path when the task is not active.
 `agentloop task archive --json` moves one named task contract into `.agentloop/tasks/archive/` after verification and handoff. It preserves the Markdown file and refuses to overwrite an existing archive file.
-`agentloop task doctor --json` reports task-folder hygiene issues without editing, archiving, or deleting task files.
+`agentloop task doctor --json` reports task-folder hygiene issues without editing, archiving, or deleting task files. It also warns when likely post-verification gates are listed under `Verification Commands`.

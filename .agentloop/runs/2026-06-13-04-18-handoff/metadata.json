@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-04-18-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-04-18",
+  "createdAtEpochMs": 1781317083903,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-flag-post-verification-gate-mismatches-in-task-doctor.md",
+    "title": "Flag post-verification gate mismatches in task doctor",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-04-08-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-04-18-pr-summary.md",
+  "changedFileCount": 26
+}

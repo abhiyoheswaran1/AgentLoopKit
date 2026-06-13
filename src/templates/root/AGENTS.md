@@ -14,7 +14,7 @@ Before changing code:
 - Use `agentloop task status <path> <status>` to update task state without hand-editing Markdown.
 - Use `agentloop task done` after verification and handoff when the active task is ready to close.
 - Use `agentloop task archive <path>` only after verification and handoff are complete.
-- Use `agentloop task doctor` when old task files need a read-only cleanup checklist.
+- Use `agentloop task doctor` when old task files or misplaced post-verification gates need a read-only cleanup checklist.
 - Run `agentloop status` when you need the pinned active task, latest open task, parked deferred tasks, verification, dirty-file, and next-action state.
 - Run `agentloop next` when you only need the next recommended loop command.
 - Run `agentloop artifacts` when you need a read-only inventory of local task, report, handoff, badge, CI summary, and release-note evidence.

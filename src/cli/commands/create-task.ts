@@ -4,6 +4,7 @@ import { AgentLoopConfig } from '../../core/config.js';
 import { TASK_TYPES } from '../../core/constants.js';
 import { AgentLoopError } from '../../core/errors.js';
 import { inlineCode } from '../../core/markdown-format.js';
+import { findLikelyPostVerificationGates } from '../../core/post-verification-gates.js';
 import { createTaskContractFile, TaskOutputPathError, TaskType } from '../../core/task-contract.js';
 import { setActiveTask } from '../../core/task-state.js';
 import { loadWorkspaceForJsonCommand } from '../json-errors.js';
@@ -66,18 +67,8 @@ type CreateTaskWarning = {
   suggestion: string;
 };
 
-const POST_VERIFICATION_GATE_PATTERNS = [
-  /\bdogfood:strict\b/,
-  /\bcheck-gates\b[\s\S]*\s--strict\b/,
-  /\brelease-check\b[\s\S]*\s--strict\b/,
-];
-
-function looksLikePostVerificationGate(command: string) {
-  return POST_VERIFICATION_GATE_PATTERNS.some((pattern) => pattern.test(command));
-}
-
 function postVerificationGateWarnings(commands: string[] | undefined): CreateTaskWarning[] {
-  const flaggedCommands = uniqueCommands((commands ?? []).filter(looksLikePostVerificationGate));
+  const flaggedCommands = findLikelyPostVerificationGates(commands);
   if (flaggedCommands.length === 0) return [];
 
   const suggestion =

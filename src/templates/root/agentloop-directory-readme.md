@@ -34,7 +34,7 @@ agentloop task archive .agentloop/tasks/<task-file>.md
 agentloop task doctor
 ```
 
-Use `agentloop task done` after verification and handoff when the active task is ready to close. Archive only after a task is done. The archive command moves one named Markdown file into `.agentloop/tasks/archive/` and keeps normal task lists focused. Use `agentloop task doctor` when old task files need a read-only cleanup checklist.
+Use `agentloop task done` after verification and handoff when the active task is ready to close. Archive only after a task is done. The archive command moves one named Markdown file into `.agentloop/tasks/archive/` and keeps normal task lists focused. Use `agentloop task doctor` when old task files or misplaced post-verification gates need a read-only cleanup checklist.
 
 4. Check current loop state:
 

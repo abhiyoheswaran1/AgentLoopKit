@@ -82,7 +82,7 @@ npx agentloopkit task current
 Use `task status` to keep the task contract current during the loop. Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Use `deferred` for parked work that should stay in the task folder without becoming the next unpinned task.
 Use `task done` after verification and handoff when the active task is ready to close.
 After verification and handoff, use `npx agentloopkit task archive <path>` to move a finished contract into `.agentloop/tasks/archive/` without deleting it.
-Use `task doctor` when a repo has old task files and you need a read-only cleanup checklist before choosing the next active task.
+Use `task doctor` when a repo has old task files, stale status lines, or misplaced post-verification gates and you need a read-only cleanup checklist before choosing the next active task.
 
 Check the current loop state:
 
