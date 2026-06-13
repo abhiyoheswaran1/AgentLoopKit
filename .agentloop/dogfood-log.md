@@ -8689,3 +8689,26 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The CLI now guides the most common done-to-handoff-to-archive path.
 - Improve:
   - Consider sharing the next-step strings across task lifecycle commands.
+
+## 2026-06-13: Consolidate Task Lifecycle Next-Step Copy
+
+- Task contract: `.agentloop/tasks/2026-06-13-consolidate-task-lifecycle-next-step-copy.md`
+- Trigger:
+  - The task done, single archive, and bulk archive commands now print related next-step messages.
+  - Keeping those strings inline makes future wording drift more likely.
+- Product-panel decision:
+  - Maya wanted a no-behavior refactor before the copy spreads further.
+  - Nora wanted exact CLI text preserved.
+  - Samir required JSON output to stay unchanged.
+- Implementation:
+  - Extracted task lifecycle next-step strings into named constants in the task command module.
+  - Kept human output text unchanged.
+- Verification:
+  - Baseline focused task-state suite passed before the refactor:
+    - `npm test -- tests/task-state.test.ts`
+  - Focused task-state suite passed after the refactor with `43` tests:
+    - `npm test -- tests/task-state.test.ts`
+- What worked well:
+  - The previous dogfood note pointed directly at this maintenance improvement.
+- Improve:
+  - If another command needs task lifecycle copy, consider moving these constants to a shared CLI messages module.

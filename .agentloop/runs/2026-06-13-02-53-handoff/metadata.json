@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-02-53-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-02-53",
+  "createdAtEpochMs": 1781312011356,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-consolidate-task-lifecycle-next-step-copy.md",
+    "title": "Consolidate task lifecycle next-step copy",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-02-50-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-02-53-pr-summary.md",
+  "changedFileCount": 6
+}

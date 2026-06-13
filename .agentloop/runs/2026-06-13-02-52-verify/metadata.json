@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-02-52-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-02-52",
+  "createdAtEpochMs": 1781311927195,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-consolidate-task-lifecycle-next-step-copy.md",
+    "title": "Consolidate task lifecycle next-step copy",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-02-50-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 5
+}

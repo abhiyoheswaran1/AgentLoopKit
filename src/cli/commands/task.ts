@@ -26,6 +26,12 @@ import type {
 import { inlineCode } from '../../core/markdown-format.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
+const TASK_DONE_NEXT_STEP = 'Next step: run `agentloop handoff --write-run`, then archive the task.';
+const TASK_ARCHIVE_NEXT_STEP =
+  'Next step: run `agentloop handoff --write-run` to capture reviewer evidence for the archived task.';
+const BULK_TASK_ARCHIVE_NEXT_STEP =
+  'Next step: run `agentloop handoff --write-run` to capture reviewer evidence for the archived tasks.';
+
 function printTask(
   task: Awaited<ReturnType<typeof getActiveTask>> | null,
   options: { json?: boolean },
@@ -78,7 +84,7 @@ function printUpdatedTask(task: ActiveTask, options: { json?: boolean }) {
   console.log(`Updated task status: ${inlineCode(task.title)} (${inlineCode(task.status)})`);
   console.log(inlineCode(task.path));
   if (task.status.trim().toLowerCase() === 'done') {
-    console.log('Next step: run `agentloop handoff --write-run`, then archive the task.');
+    console.log(TASK_DONE_NEXT_STEP);
   }
 }
 
@@ -89,9 +95,7 @@ function printArchivedTask(task: ArchivedTask, options: { json?: boolean }) {
   }
   console.log(`Archived task: ${inlineCode(task.title)} (${inlineCode(task.status)})`);
   console.log(`${inlineCode(task.previousPath)} -> ${inlineCode(task.path)}`);
-  console.log(
-    'Next step: run `agentloop handoff --write-run` to capture reviewer evidence for the archived task.',
-  );
+  console.log(TASK_ARCHIVE_NEXT_STEP);
 }
 
 function printBulkTaskArchive(result: BulkTaskArchiveResult, options: { json?: boolean }) {
@@ -111,9 +115,7 @@ function printBulkTaskArchive(result: BulkTaskArchiveResult, options: { json?: b
     console.log(`  ${inlineCode(task.previousPath)} -> ${inlineCode(task.path)}`);
   }
   if (!result.dryRun) {
-    console.log(
-      'Next step: run `agentloop handoff --write-run` to capture reviewer evidence for the archived tasks.',
-    );
+    console.log(BULK_TASK_ARCHIVE_NEXT_STEP);
   }
 }
 
