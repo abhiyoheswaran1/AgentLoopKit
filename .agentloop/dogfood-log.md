@@ -8712,3 +8712,28 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The previous dogfood note pointed directly at this maintenance improvement.
 - Improve:
   - If another command needs task lifecycle copy, consider moving these constants to a shared CLI messages module.
+
+## 2026-06-13: Calm Status Next Action For Parked Deferred Tasks
+
+- Task contract: `.agentloop/tasks/2026-06-13-calm-status-next-action-for-parked-deferred-tasks.md`
+- Trigger:
+  - After the repo was clean, `agentloop status --brief` still recommended `agentloop create-task` because one deferred task was parked.
+  - That made a clean state look like unfinished work.
+- Product-panel decision:
+  - Nora wanted `status` and `next` to avoid noisy instructions when no current work exists.
+  - Lina wanted deferred tasks to stay visible so agents do not lose future work.
+  - Tom wanted deterministic output that does not pretend a parked task needs action.
+  - Maya kept dirty missing-task states unchanged.
+- Implementation:
+  - `status` and `next` now return `command: "none"` when only deferred tasks exist and the repo is clean.
+  - Human output prints `No command required.` for that state.
+  - Dirty repos without task evidence still recommend `agentloop create-task`.
+- Verification:
+  - Red run failed on the old `agentloop create-task` recommendation:
+    - `npm test -- tests/status.test.ts tests/next.test.ts`
+  - Focused green run passed with `38` tests:
+    - `npm test -- tests/status.test.ts tests/next.test.ts`
+- What worked well:
+  - Dogfooding exposed a small but important difference between parked future work and current work.
+- Improve:
+  - Consider whether `check-gates` should also use `none` for clean evidenced states in a future task.

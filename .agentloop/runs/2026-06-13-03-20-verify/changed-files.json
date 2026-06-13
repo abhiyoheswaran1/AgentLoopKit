@@ -1,0 +1,34 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/commands/next.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/status.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/next.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/status.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-03-17-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-13-calm-status-next-action-for-parked-deferred-tasks.md"
+  }
+]

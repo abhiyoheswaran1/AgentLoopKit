@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-03-23-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-03-23",
+  "createdAtEpochMs": 1781313829039,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-13-calm-status-next-action-for-parked-deferred-tasks.md",
+    "title": "Calm status next action for parked deferred tasks",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-03-17-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-03-23-pr-summary.md",
+  "changedFileCount": 9
+}

@@ -313,7 +313,7 @@ describe('next command', () => {
     expect(await exists(path.join(dir, '.agentloop/state.json'))).toBe(false);
   });
 
-  test('does not recommend a deferred task as the next action', async () => {
+  test('does not recommend a command when only deferred tasks are parked in a clean repo', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await execa('git', ['init', '-q'], { cwd: dir });
@@ -321,6 +321,21 @@ describe('next command', () => {
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-10-deferred-task.md'),
       '# Deferred task\n\n- Status: deferred\n',
+    );
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa(
+      'git',
+      [
+        '-c',
+        'user.name=AgentLoopKit Test',
+        '-c',
+        'user.email=test@example.com',
+        'commit',
+        '-m',
+        'baseline',
+        '-q',
+      ],
+      { cwd: dir },
     );
 
     const result = await execa(tsxPath, [cliPath, 'next', '--json'], {
@@ -339,8 +354,45 @@ describe('next command', () => {
         status: 'deferred',
       },
     ]);
-    expect(next.command).toBe('agentloop create-task');
-    expect(next.reason).toContain('1 deferred task contract is parked');
+    expect(next.command).toBe('none');
+    expect(next.reason).toContain('1 deferred task contract is parked, and the repo is clean');
+  });
+
+  test('prints no required command when only deferred tasks are parked in a clean repo', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-deferred-task.md'),
+      '# Deferred task\n\n- Status: deferred\n',
+    );
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa(
+      'git',
+      [
+        '-c',
+        'user.name=AgentLoopKit Test',
+        '-c',
+        'user.email=test@example.com',
+        'commit',
+        '-m',
+        'baseline',
+        '-q',
+      ],
+      { cwd: dir },
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'next'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('# AgentLoopKit Next Action');
+    expect(result.stdout).toContain('No command required.');
+    expect(result.stdout).toContain('Deferred tasks: 1 parked - `Deferred task`');
+    expect(result.stdout).toContain('1 deferred task contract is parked, and the repo is clean');
   });
 
   test('recommends archiving a pinned done task', async () => {

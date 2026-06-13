@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-03-20-verify",
+  "command": "verify",
+  "createdAt": "2026-06-13-03-20",
+  "createdAtEpochMs": 1781313635644,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-calm-status-next-action-for-parked-deferred-tasks.md",
+    "title": "Calm status next action for parked deferred tasks",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-03-17-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 8
+}

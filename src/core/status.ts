@@ -165,6 +165,12 @@ function chooseNextAction(input: {
     }
     if (input.deferredTasks.length > 0) {
       const count = input.deferredTasks.length;
+      if (!input.dirty) {
+        return {
+          command: 'none',
+          reason: `${count} deferred task contract${count === 1 ? ' is' : 's are'} parked, and the repo is clean. Start a new task only when there is current work, or move a deferred task back to proposed when it is ready.`,
+        };
+      }
       return {
         command: 'agentloop create-task',
         reason: `${count} deferred task contract${count === 1 ? ' is' : 's are'} parked. Create a new task for current work, or move a deferred task back to proposed when it is ready.`,
@@ -323,6 +329,11 @@ function renderMarkdown(result: StatusRenderInput) {
   const latestReport = formatReportMarkdown(result.latestReport);
   const latestRun = formatRunSummaryMarkdown(result.latestRun);
 
+  const nextAction =
+    result.nextAction.command === 'none'
+      ? `No command required.\n\n${result.nextAction.reason}`
+      : `Run ${inlineCode(result.nextAction.command)}.\n\n${result.nextAction.reason}`;
+
   return `# AgentLoopKit Status
 
 - Project: ${inlineCode(result.project.name || 'unnamed')} (${inlineCode(result.project.type)})
@@ -339,9 +350,7 @@ ${gitLines.join('\n')}
 
 ## Next Action
 
-Run ${inlineCode(result.nextAction.command)}.
-
-${result.nextAction.reason}
+${nextAction}
 `;
 }
 

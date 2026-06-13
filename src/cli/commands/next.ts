@@ -58,12 +58,14 @@ function renderNextAction(result: NextActionResult) {
   const workingTree = result.workingTree.dirty
     ? `dirty (${result.workingTree.changedFileCount} changed file(s))`
     : 'clean';
+  const nextAction =
+    result.command === 'none'
+      ? `No command required.\n\n${result.reason}`
+      : `Run ${inlineCode(result.command)}.\n\n${result.reason}`;
 
   return `# AgentLoopKit Next Action
 
-Run ${inlineCode(result.command)}.
-
-${result.reason}
+${nextAction}
 
 - Active task: ${formatTask(result.activeTask)}
 - Latest open task: ${formatTask(result.latestTask)}

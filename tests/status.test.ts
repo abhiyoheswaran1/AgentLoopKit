@@ -661,10 +661,13 @@ describe('status command', () => {
         status: 'deferred',
       },
     ]);
-    expect(status.nextAction.command).toBe('agentloop create-task');
-    expect(status.nextAction.reason).toContain('1 deferred task contract is parked');
+    expect(status.nextAction.command).toBe('none');
+    expect(status.nextAction.reason).toContain(
+      '1 deferred task contract is parked, and the repo is clean',
+    );
     expect(markdownResult.stdout).toContain('Active task: none active; 1 deferred task parked.');
     expect(markdownResult.stdout).toContain('Deferred tasks: 1 parked - `Deferred task`');
+    expect(markdownResult.stdout).toContain('No command required.');
   });
 
   test('prefers explicit active task state over modified time fallback', async () => {
