@@ -77,14 +77,14 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Current npm release: `agentloopkit@0.29.0`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.29.0>
 - Release asset: `agentloopkit-0.29.0.tgz`
-- Release asset SHA-256: pending local pack verification
-- Release tag: `v0.29.0` at the published release commit
-- CI run: pending release workflow verification
-- CLI Smoke run: pending release workflow verification
-- Publish workflow run: pending release workflow verification
-- Docker workflow run: pending release workflow verification
-- MCP Registry workflow run: pending release workflow verification
-- Post-publish npm proof: pending `npm view agentloopkit version versions --json`
+- Release asset SHA-256: `2b295ff9e865069b64a80930d3b45b5ca0fe6bf8726d31b3a1de21e4362a0da4`
+- Release tag: `v0.29.0` at commit `5b3148ec2025cd47bb698df6048fc236b544257b`
+- CI run: `27467505332`
+- CLI Smoke run: `27467505335`
+- Publish workflow run: `27467512817`
+- Docker workflow run: `27467512834`
+- MCP Registry workflow run: `27467624266`
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.29.0`
 
 ## 0.29.0 release summary
 
@@ -96,7 +96,7 @@ Included:
 - pnpm dependency resolution pinned to patched `esbuild@0.28.1`
 - synchronized package metadata, changelog, roadmap state, and MCP `server.json`
 
-Release verification covers local release gates, npm trusted publishing, GitHub release assets, GHCR publishing through the Docker workflow, MCP Registry publishing, and clean-directory published-package smoke.
+Release verification covered local release gates, npm trusted publishing, GitHub release assets, GHCR publishing through the Docker workflow, MCP Registry publishing, and clean-directory published-package smoke.
 
 ## Previous release
 

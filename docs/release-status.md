@@ -7,14 +7,14 @@ Last checked: June 13, 2026.
 - Current public release: `v0.29.0`
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.29.0>
 - Release asset: `agentloopkit-0.29.0.tgz`
-- Release asset SHA-256: pending local pack verification
-- Release tag `v0.29.0` points at the published release commit
+- Release asset SHA-256: `2b295ff9e865069b64a80930d3b45b5ca0fe6bf8726d31b3a1de21e4362a0da4`
+- Release tag `v0.29.0` points at commit `5b3148ec2025cd47bb698df6048fc236b544257b`
 - npm latest: `0.29.0`
-- CI run: pending release workflow verification
-- CLI Smoke run: pending release workflow verification
-- Publish workflow run: pending release workflow verification
-- Docker workflow run: pending release workflow verification
-- MCP Registry workflow run: pending release workflow verification
+- CI run: `27467505332` passed for the release commit
+- CLI Smoke run: `27467505335` passed on Ubuntu, macOS, and Windows
+- Publish workflow run: `27467512817` passed and published `agentloopkit@0.29.0` through npm trusted publishing
+- Docker workflow run: `27467512834` passed and published the GHCR image for `0.29.0`
+- MCP Registry workflow run: `27467624266` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
 Docker is not installed in the local maintainer shell, and the current GitHub token lacks `read:packages`, so this page records the successful Docker workflow as GHCR proof instead of a locally pulled image digest.
@@ -76,17 +76,17 @@ Local release gate for `0.29.0`:
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: pending post-publish verification
-- `node dist/cli/index.js npm-status --agentloopkit --expect-current --json`: pending post-publish verification
-- `npm run smoke:published -- --version 0.29.0`: pending post-publish verification
-- `npx --yes agentloopkit@0.29.0 version`: pending post-publish verification
-- GitHub release asset digest: pending local pack verification
-- CI, CLI Smoke, Publish, Docker, and MCP Registry workflows: pending release workflow verification
+- `npm view agentloopkit version versions --json`: latest `0.29.0`
+- `node dist/cli/index.js npm-status --agentloopkit --expect-current --json`: status `current`
+- `npm run smoke:published -- --version 0.29.0`: passed
+- `npx --yes agentloopkit@0.29.0 version`: reported `0.29.0` from a clean temp directory
+- GitHub release asset digest matched the local tarball SHA-256
+- CI, CLI Smoke, Publish, Docker, and MCP Registry workflows passed
 
 Latest release-status documentation checks:
 
 - `npm run dogfood:strict`
-- `npm run check:links`: 1452 Markdown files checked
+- `npm run check:links`: 1763 Markdown files checked
 - `node scripts/prepublish-check.mjs`
 - `git diff --check`
 - `npx --yes pnpm@10.12.1 audit --audit-level high`

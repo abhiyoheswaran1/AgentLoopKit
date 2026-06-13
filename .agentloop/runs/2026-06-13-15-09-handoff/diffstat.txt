@@ -1,0 +1,5 @@
+ .agentloop/tasks/2026-06-13-release-0-29-0.md | 73 ---------------------------
+ FINAL_HANDOFF.md                              | 18 +++----
+ docs/npm-publishing.md                        |  2 +-
+ docs/release-status.md                        | 28 +++++-----
+ 4 files changed, 24 insertions(+), 97 deletions(-)
