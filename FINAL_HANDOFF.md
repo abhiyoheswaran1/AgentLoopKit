@@ -77,14 +77,14 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Current npm release: `agentloopkit@0.31.0`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.31.0>
 - Release asset: `agentloopkit-0.31.0.tgz`
-- Release asset SHA-256: pending release upload verification
-- Release tag: `v0.31.0` at the published release commit
-- CI run: pending GitHub Actions verification
-- CLI Smoke run: pending GitHub Actions verification
-- Publish workflow run: pending npm trusted publishing verification
-- Docker workflow run: pending GHCR verification
-- MCP Registry workflow run: pending registry verification
-- Post-publish npm proof: pending `npm view agentloopkit version versions --json`
+- Release asset SHA-256: `b71c4ae4cb585c09539a9975dc92db246e71c466a8bdeaa8ac494a79a91dfda6`
+- Release tag: `v0.31.0` at commit `32705b3d432ecf95539b3acb3387ba7e6d0608f0`
+- CI run: `27481159779`
+- CLI Smoke run: `27481159776`
+- Publish workflow run: `27481179756`
+- Docker workflow run: `27481179766`
+- MCP Registry workflow run: `27481285194`
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.31.0`
 
 ## 0.31.0 release summary
 
@@ -1213,7 +1213,7 @@ Current publish state:
 
 - GitHub release `v0.31.0` is public.
 - npm latest is `agentloopkit@0.31.0`.
-- GHCR and MCP Registry workflow proof is pending for `0.31.0`.
+- GHCR and MCP Registry workflows passed for `0.31.0`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.
