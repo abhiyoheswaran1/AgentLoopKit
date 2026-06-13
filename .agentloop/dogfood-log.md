@@ -2,6 +2,38 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-13: Ship Readiness Markdown List Escaping
+
+- Task contract: `.agentloop/tasks/2026-06-13-escape-ship-readiness-markdown-lists.md`
+- Trigger:
+  - Ship reports and ship GitHub comments used raw Markdown list prose for readiness warnings, blockers, and next actions.
+  - Readiness warnings can include repo file paths, so a path such as `src/auth/[callback].ts` could render as Markdown syntax in public evidence.
+- Product-panel decision:
+  - Samir wanted the same PR-facing safety posture as `prepare-pr`.
+  - Tom wanted ship evidence to stay deterministic and inspectable.
+  - Maya reused the existing prose escaping helper instead of adding a second formatting path.
+- Implementation:
+  - `ship` now escapes Markdown control characters in readiness warning, blocker, and next-action list prose.
+  - JSON readiness arrays stay unchanged for scripts.
+- Verification:
+  - Red run failed because the ship report still rendered `src/auth/[callback].ts` raw in the warnings list:
+    - `npm test -- tests/ship.test.ts -t "escapes Markdown control characters"`
+  - Focused green run passed:
+    - `npm test -- tests/ship.test.ts -t "escapes Markdown control characters"`
+  - Full ship suite passed with `8` tests:
+    - `npm test -- tests/ship.test.ts`
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-13-12-15-verification-report.md`.
+  - Full lint, public-doc hygiene, and test suite passed:
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm test` (`52` files, `514` tests)
+  - Ship evidence passed with a `100`/100 review-readiness score:
+    - `node dist/cli/index.js ship --redact-paths`
+- What worked well:
+  - The previous `prepare-pr` formatter generalized cleanly to ship evidence.
+- Improve:
+  - Audit any remaining public Markdown list renderers that accept file paths or task text.
+
 ## 2026-06-13: Prepare PR Markdown List Escaping
 
 - Task contract: `.agentloop/tasks/2026-06-13-escape-prepare-pr-list-markdown.md`

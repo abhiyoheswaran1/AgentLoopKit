@@ -7,7 +7,7 @@ import { formatTimestamp } from './dates.js';
 import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
 import { getGitDiffStat, getGitStatus, parseGitStatus } from './git.js';
 import { writeTextFile } from './file-system.js';
-import { fencedCodeBlock, inlineCode } from './markdown-format.js';
+import { escapeMarkdownProse, fencedCodeBlock, inlineCode } from './markdown-format.js';
 import { summarizeRepository } from './pr-summary.js';
 import { toSafeDisplayPath } from './display-path.js';
 import {
@@ -63,7 +63,9 @@ function renderDimensionLines(readiness: ReviewReadinessResult) {
 }
 
 function renderList(values: string[], fallback: string) {
-  return values.length ? values.map((value) => `- ${value}`).join('\n') : `- ${fallback}`;
+  return values.length
+    ? values.map((value) => `- ${escapeMarkdownProse(value)}`).join('\n')
+    : `- ${escapeMarkdownProse(fallback)}`;
 }
 
 function renderChangedFiles(changedFiles: ShipRenderInput['changedFiles']) {

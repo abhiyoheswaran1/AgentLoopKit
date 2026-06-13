@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-12-20-ship",
+  "command": "ship",
+  "createdAt": "2026-06-13-12-20",
+  "createdAtEpochMs": 1781346057218,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-escape-ship-readiness-markdown-lists.md",
+    "title": "Escape ship readiness Markdown lists",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-12-15-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-12-20-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-12-20-pr-summary.md",
+  "score": 100,
+  "changedFileCount": 9
+}

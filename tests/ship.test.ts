@@ -247,6 +247,38 @@ describe('ship command', () => {
   });
 
   test(
+    'escapes Markdown control characters in ship report and GitHub comment readiness lists',
+    async () => {
+      const dir = await createShipFixture();
+      await writeFile(path.join(dir, 'src/auth/[callback].ts'), 'export const extra = true;\n');
+      await git(dir, ['add', '-N', 'src/auth/[callback].ts']);
+
+      const result = await execa(tsxPath, [cliPath, 'ship', '--json', '--github-comment'], {
+        cwd: dir,
+      });
+      const output = JSON.parse(result.stdout);
+      const markdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
+
+      expect(output.readiness.warnings).toContain(
+        'Risk-sensitive files changed: src/auth/[callback].ts, src/auth/callback.ts',
+      );
+      expect(markdown).toContain(
+        '- Risk-sensitive files changed: src/auth/\\[callback\\].ts, src/auth/callback.ts',
+      );
+      expect(output.githubComment).toContain(
+        '- Risk-sensitive files changed: src/auth/\\[callback\\].ts, src/auth/callback.ts',
+      );
+      expect(markdown).not.toContain(
+        '- Risk-sensitive files changed: src/auth/[callback].ts, src/auth/callback.ts',
+      );
+      expect(output.githubComment).not.toContain(
+        '- Risk-sensitive files changed: src/auth/[callback].ts, src/auth/callback.ts',
+      );
+    },
+    CLI_SHIP_TEST_TIMEOUT_MS,
+  );
+
+  test(
     'redacts nested gate git root paths when requested',
     async () => {
       const dir = await createShipFixture();

@@ -1,0 +1,5 @@
+ .agentloop/dogfood-log.md | 25 +++++++++++++++++++++++++
+ CHANGELOG.md              |  1 +
+ src/core/ship.ts          |  6 ++++--
+ tests/ship.test.ts        | 32 ++++++++++++++++++++++++++++++++
+ 4 files changed, 62 insertions(+), 2 deletions(-)
