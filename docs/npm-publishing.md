@@ -19,9 +19,9 @@ As of June 13, 2026:
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - GitHub releases publish npm through trusted publishing.
 - GHCR and MCP Registry publishing run from GitHub release workflows after npm succeeds.
-- Release tag `v0.30.0` points at the published release commit.
+- Release tag `v0.30.0` points at commit `9c760380d6e776359923d1cda8ba81b3e95132b8`.
 
-The `0.30.0` release uses GitHub release automation, npm trusted publishing, Docker/GHCR, MCP Registry, and published-package smoke checks. Post-publish run IDs and registry proof are tracked in [release-status.md](release-status.md).
+The `0.30.0` release completed through GitHub release automation, npm trusted publishing, Docker/GHCR, MCP Registry, and published-package smoke checks.
 
 ## Release Rule
 

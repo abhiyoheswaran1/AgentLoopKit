@@ -78,13 +78,13 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.30.0>
 - Release asset: `agentloopkit-0.30.0.tgz`
 - Release asset SHA-256: `405f3126d5f15dd8ba8e4a209b7844881680b5911590332776a42f120f49512b`
-- Release tag: `v0.30.0` at the published release commit
-- CI run: pending GitHub Actions proof
-- CLI Smoke run: pending GitHub Actions proof
-- Publish workflow run: pending GitHub Actions proof
-- Docker workflow run: pending GitHub Actions proof
-- MCP Registry workflow run: pending GitHub Actions proof
-- Post-publish npm proof: pending `npm view agentloopkit version versions --json`
+- Release tag: `v0.30.0` at commit `9c760380d6e776359923d1cda8ba81b3e95132b8`
+- CI run: `27473628782`
+- CLI Smoke run: `27473628790`
+- Publish workflow run: `27473635243`
+- Docker workflow run: `27473635222`
+- MCP Registry workflow run: `27473746085`
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.30.0`
 
 ## 0.30.0 release summary
 
