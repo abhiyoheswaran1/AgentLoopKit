@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed the dogfood gate to run `agentloop review-context --json --redact-paths`, matching the public-log safety behavior used by status and gates.
 - Added public-docs hygiene coverage that keeps README `--redact-paths` guidance aligned with supported shareable CLI commands.
 - Changed `agentloop review-context` to accept `--redact-paths`, matching the shareable-output behavior of status and gate snapshots.
 - Changed `agentloop next` to accept `--redact-paths` in human and JSON output, matching the shareable-output behavior of `status`.

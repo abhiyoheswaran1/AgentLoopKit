@@ -37,6 +37,14 @@ describe('dogfood script helpers', () => {
     ]);
     expect(steps[3].allowFailure).toBe(true);
     expect(steps[5].allowFailure).toBe(true);
+    expect(steps[6].args).toEqual([
+      '--no-install',
+      'tsx',
+      'src/cli/index.ts',
+      'review-context',
+      '--json',
+      '--redact-paths',
+    ]);
     expect(steps[7].command).toBe('npx');
     expect(steps[7].args).toEqual(['--yes', 'projscan', 'doctor', '--format', 'markdown']);
   });

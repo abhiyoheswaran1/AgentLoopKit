@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-13-11-31-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-13-11-31",
+  "createdAtEpochMs": 1781343110250,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-use-redacted-review-context-in-dogfood-gate.md",
+    "title": "Use redacted review context in dogfood gate",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-11-26-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-11-31-pr-summary.md",
+  "changedFileCount": 17
+}

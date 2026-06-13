@@ -9215,3 +9215,30 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - A dogfood note became a release-safety test instead of another manual checklist item.
 - Improve:
   - If more commands gain `--redact-paths`, consider deriving the expected README command list from CLI help output.
+
+## 2026-06-13: Use Redacted Review Context In Dogfood Gate
+
+- Task contract: `.agentloop/tasks/2026-06-13-use-redacted-review-context-in-dogfood-gate.md`
+- Trigger:
+  - The dogfood script used redacted status and gate output but still ran `review-context --json` without `--redact-paths`.
+  - After `review-context` gained the flag, AgentLoopKit’s own self-check should use the safer public-log mode.
+- Product-panel decision:
+  - Samir wanted every copyable dogfood surface to follow the same redaction rule.
+  - Lina wanted agent-readable dogfood summaries to stay useful without leaking local roots.
+  - Maya kept the change to the dogfood step plan and its test.
+- Implementation:
+  - Changed the dogfood `agent review context` step to run `review-context --json --redact-paths`.
+  - Added a step-plan assertion for the new argument.
+- Verification:
+  - Red run failed on the missing argument:
+    - `npm test -- tests/dogfood-script.test.ts -t "default read-only dogfood step plan"`
+  - Focused green run passed:
+    - `npm test -- tests/dogfood-script.test.ts -t "default read-only dogfood step plan"`
+  - Full dogfood-script suite, public-docs hygiene, typecheck, lint, and build passed.
+  - AgentLoop task-command verification passed:
+    - `.agentloop/reports/2026-06-13-11-26-verification-report.md`
+    - `.agentloop/runs/2026-06-13-11-26-verify`
+- What worked well:
+  - The redaction work now exercises itself through the dogfood gate.
+- Improve:
+  - Consider adding a dogfood JSON output regression that asserts no absolute Git root appears in the structured summary.

@@ -1,0 +1,38 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "scripts/dogfood.mjs"
+  },
+  {
+    "status": "M",
+    "path": "tests/dogfood-script.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-13-11-26-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-11-26-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-11-26-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-13-11-26-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-13-use-redacted-review-context-in-dogfood-gate.md"
+  }
+]

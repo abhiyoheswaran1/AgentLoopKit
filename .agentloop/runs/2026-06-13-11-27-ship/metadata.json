@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-13-11-27-ship",
+  "command": "ship",
+  "createdAt": "2026-06-13-11-27",
+  "createdAtEpochMs": 1781342824738,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-use-redacted-review-context-in-dogfood-gate.md",
+    "title": "Use redacted review context in dogfood gate",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-13-11-26-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-13-11-27-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-13-11-27-pr-summary.md",
+  "score": 100,
+  "changedFileCount": 9
+}
