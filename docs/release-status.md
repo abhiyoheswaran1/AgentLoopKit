@@ -4,31 +4,31 @@ Last checked: June 14, 2026.
 
 ## Current State
 
-- Current public release: `v0.31.0`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.31.0>
-- Release asset: `agentloopkit-0.31.0.tgz`
-- Release asset SHA-256: `b71c4ae4cb585c09539a9975dc92db246e71c466a8bdeaa8ac494a79a91dfda6`
-- Release tag `v0.31.0` points at commit `32705b3d432ecf95539b3acb3387ba7e6d0608f0`
-- npm latest: `0.31.0`
-- CI run: `27481159779` passed for the release commit
-- CLI Smoke run: `27481159776` passed on Ubuntu, macOS, and Windows
-- Publish workflow run: `27481179756` passed and published `agentloopkit@0.31.0` through npm trusted publishing
-- Docker workflow run: `27481179766` passed and published the GHCR image for `0.31.0`
-- MCP Registry workflow run: `27481285194` passed and published registry metadata for `io.github.abhiyoheswaran1/agentloopkit`
+- Current public release: `v0.32.0`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.32.0>
+- Release asset: `agentloopkit-0.32.0.tgz`
+- Release asset SHA-256: pending until the release tarball is attached
+- Release tag `v0.32.0` points at the published release commit
+- npm latest: `0.32.0`
+- CI run: pending until release workflows complete
+- CLI Smoke run: pending until release workflows complete
+- Publish workflow run: pending until npm trusted publishing completes
+- Docker workflow run: pending until GHCR publishing completes
+- MCP Registry workflow run: pending until registry publishing completes
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
 Docker is not installed in the local maintainer shell, and the current GitHub token lacks `read:packages`, so this page records the successful Docker workflow as GHCR proof instead of a locally pulled image digest.
 
 ## Latest Release Highlights
 
-Released in `0.31.0`:
+Released in `0.32.0`:
 
-- `agentloop upgrade-harness --details` and `--suggestions` print copyable current-loop guidance for older repos.
-- `agentloop doctor` recommends `upgrade-harness` when generated guidance misses `ship`, `prepare-pr`, the run ledger, review context, or maintainer checks.
-- `npm run test:unit`, `test:integration`, `test:release`, and `release-flow` separate fast development checks from the full release gate.
-- Existing-repo docs explain how to update the CLI, inspect old harness files, and keep using the current acceptance loop.
-- MCP docs include client setup examples for Claude Code, Cursor, Gemini CLI, OpenCode, and Codex.
-- Public examples cover bugfix PR and dependency-upgrade workflows from task contract to PR preparation.
+- `agentloop schemastore` prints a ready-to-submit SchemaStore catalog entry without writing files or calling APIs.
+- `agentloop policy packs`, `policy pack show`, and `policy pack apply` add safe bundled and repo-local policy pack workflows.
+- Bundled `agentloop-baseline` and `maintainer-review` policy packs copy missing policy files without overwriting local edits.
+- `agentloop github import` imports explicit local issue and PR JSON into `.agentloop/github/context.json` without tokens, API calls, or env-file reads.
+- Docs now cover SchemaStore support, GitHub metadata import, Windows package-manager planning, and editor-extension validation gates.
+- Fast test coverage now includes SchemaStore, policy packs, GitHub metadata, roadmap-channel checks, and CLI docs drift.
 
 ## Use The Current CLI
 
@@ -36,7 +36,7 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.31.0 version
+npx --yes agentloopkit@0.32.0 version
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -60,7 +60,7 @@ After each publish:
 
 ## Verification Evidence
 
-Local release gate for `0.31.0`:
+Local release gate for `0.32.0`:
 
 - `node scripts/prepublish-check.mjs`
 - `npm run lint`
@@ -77,12 +77,12 @@ Local release gate for `0.31.0`:
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: latest `0.31.0`
+- `npm view agentloopkit version versions --json`: latest `0.32.0`
 - `node dist/cli/index.js npm-status --agentloopkit --expect-current --json`: status `current`
-- `npm run smoke:published -- --version 0.31.0`: passed
-- `npx --yes agentloopkit@0.31.0 version`: reported `0.31.0` from a clean temporary directory
-- GitHub release asset digest matched local tarball SHA-256 `b71c4ae4cb585c09539a9975dc92db246e71c466a8bdeaa8ac494a79a91dfda6`
-- CI, CLI Smoke, Publish, Docker, and MCP Registry workflows passed
+- `npm run smoke:published -- --version 0.32.0`: pending until npm publish completes
+- `npx --yes agentloopkit@0.32.0 version`: pending until npm publish completes
+- GitHub release asset digest: pending until the release tarball is attached
+- CI, CLI Smoke, Publish, Docker, and MCP Registry workflows: pending until GitHub Actions complete
 
 Latest release-status documentation checks:
 

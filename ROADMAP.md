@@ -46,14 +46,14 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 
 ## Current State
 
-- GitHub release `v0.31.0` is public.
-- npm latest is `agentloopkit@0.31.0`.
-- GHCR and MCP Registry are live for `0.31.0`.
+- GitHub release `v0.32.0` is public.
+- npm latest is `agentloopkit@0.32.0`.
+- GHCR and MCP Registry are live for `0.32.0`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
-- Release tag `v0.31.0` points at the published release commit.
-- Published release commit: `32705b3d432ecf95539b3acb3387ba7e6d0608f0`.
+- Release tag `v0.32.0` points at the published release commit.
+- Published release commit: `pending until release workflow completes`.
 
 ## Near Term
 

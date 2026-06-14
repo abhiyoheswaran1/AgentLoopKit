@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.32.0
+
 - Added `agentloop schemastore` and `agentloop schemastore --json` for a ready-to-submit SchemaStore catalog entry without calling GitHub APIs or writing files.
 - Added optional local policy-pack config plus `agentloop policy packs`, `agentloop policy pack show`, and `agentloop policy pack apply` for safe bundled and repo-local policy guidance.
 - Added bundled `agentloop-baseline` and `maintainer-review` policy packs that copy missing policy files without overwriting existing repo policies.
