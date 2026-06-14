@@ -4,6 +4,11 @@
 
 - No unreleased changes yet.
 
+## 0.32.1
+
+- Changed release-status documentation to record verified `0.32.0` npm, GitHub release, GHCR, and MCP Registry proof.
+- Added AgentLoop dogfood evidence for the `0.32.0` release gate and archived the completed release task.
+
 ## 0.32.0
 
 - Added `agentloop schemastore` and `agentloop schemastore --json` for a ready-to-submit SchemaStore catalog entry without calling GitHub APIs or writing files.

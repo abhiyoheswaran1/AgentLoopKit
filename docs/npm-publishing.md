@@ -14,14 +14,14 @@ For a compact current-state summary, see [release-status.md](release-status.md).
 
 As of June 14, 2026:
 
-- npm latest is `agentloopkit@0.32.0`.
-- GitHub release `v0.32.0` is public with attached `agentloopkit-0.32.0.tgz`.
+- npm latest is `agentloopkit@0.32.1`.
+- GitHub release `v0.32.1` is public with attached `agentloopkit-0.32.1.tgz`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - GitHub releases publish npm through trusted publishing.
 - GHCR and MCP Registry publishing run from GitHub release workflows after npm succeeds.
-- Release tag `v0.32.0` points at commit `93890cebfa0c97b729a9b7dad65209705608d1e3`.
+- Release tag `v0.32.1` points at the published release commit.
 
-The `0.32.0` release completed through GitHub release automation, npm trusted publishing, Docker/GHCR, MCP Registry, and published-package smoke checks.
+The `0.32.1` release completed through GitHub release automation, npm trusted publishing, Docker/GHCR, MCP Registry, and published-package smoke checks.
 
 ## Release Rule
 
