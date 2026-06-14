@@ -3,6 +3,7 @@ import path from 'node:path';
 import { z } from 'zod';
 import { CONFIG_FILE } from './constants.js';
 import { ConfigError } from './errors.js';
+import { CONFIG_SCHEMA_URL } from './schema-url.js';
 
 export const ProjectTypeSchema = z.enum([
   'nextjs',
@@ -25,6 +26,11 @@ export const CommandConfigSchema = z.object({
 });
 
 const configPathKeys = ['root', 'agentloopDir', 'tasksDir', 'reportsDir', 'handoffsDir'] as const;
+
+export const PolicyPackConfigSchema = z.object({
+  name: z.string().min(1),
+  path: z.string().optional(),
+});
 
 function configPathIssue(configPath: string) {
   if (!configPath.trim()) return 'empty';
@@ -83,6 +89,11 @@ export const AgentLoopConfigSchema = z
       includeRisks: z.boolean(),
       includeRollback: z.boolean(),
     }),
+    policies: z
+      .object({
+        packs: z.array(PolicyPackConfigSchema).default([]),
+      })
+      .default({ packs: [] }),
   })
   .superRefine((config, ctx) => {
     for (const key of configPathKeys) {
@@ -92,6 +103,16 @@ export const AgentLoopConfigSchema = z
         code: z.ZodIssueCode.custom,
         path: ['paths', key],
         message: configPathIssueMessage(key, issue),
+      });
+    }
+    for (const [index, policyPack] of config.policies.packs.entries()) {
+      if (!policyPack.path) continue;
+      const issue = configPathIssue(policyPack.path);
+      if (!issue) continue;
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['policies', 'packs', index, 'path'],
+        message: configPathIssueMessage(`policies.packs[${index}].path`, issue),
       });
     }
   });
@@ -115,9 +136,6 @@ export type DefaultConfigInput = {
   packageManager?: PackageManager;
   commands?: Partial<CommandConfig>;
 };
-
-const CONFIG_SCHEMA_URL =
-  'https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agentloop.config.schema.json';
 
 export function createDefaultConfig(input: DefaultConfigInput = {}): AgentLoopConfig {
   return {
@@ -155,6 +173,9 @@ export function createDefaultConfig(input: DefaultConfigInput = {}): AgentLoopCo
       includeVerification: true,
       includeRisks: true,
       includeRollback: true,
+    },
+    policies: {
+      packs: [],
     },
   };
 }

@@ -1,0 +1,6 @@
+{
+  "name": "AgentLoopKit Configuration",
+  "description": "Configuration for AgentLoopKit repo-level agentic engineering workflows.",
+  "fileMatch": ["agentloop.config.json"],
+  "url": "https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agentloop.config.schema.json"
+}

@@ -2,6 +2,45 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-14: Roadmap Adoption Channels And Policy Packs
+
+- Task contract: `.agentloop/tasks/2026-06-14-implement-roadmap-adoption-channels-and-policy-packs.md`
+- Trigger:
+  - The roadmap still listed adoption-channel work after `0.31.0`: SchemaStore support, configurable policy packs, GitHub metadata import, Windows package-manager planning, and editor-extension decision gates.
+- Implementation:
+  - Added `agentloop schemastore` for the local SchemaStore catalog entry.
+  - Added bundled and repo-local policy packs with safe list/show/apply commands.
+  - Added `agentloop github import` for explicit local issue/PR JSON import into `.agentloop/github/context.json`.
+  - Added docs for SchemaStore, GitHub metadata import, Windows package managers, and VS Code/Open VSX validation gates.
+  - Expanded fast test coverage so this command surface runs in `npm run test:quick`.
+- Bug pass:
+  - Added manifest validation so policy packs reject traversal-style policy filenames before reading or writing.
+  - Restricted GitHub metadata output to `.agentloop/github/` and refused `.env` outputs.
+  - Updated shell completion tests for the new policy-pack subcommands.
+- Verification:
+  - Focused tests passed:
+    - `npm test -- tests/policy-packs.test.ts tests/github-metadata.test.ts`
+    - `npm test -- tests/completion.test.ts`
+  - Fast suite passed:
+    - `npm run test:unit` (`18` files, `71` tests)
+  - Full suite passed:
+    - `npm test` (`58` files, `546` tests)
+  - Build and docs checks passed:
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run build`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-14-09-33-verification-report.md`.
+  - Strict dogfood passed, including dependency audit and ProjScan:
+    - `npm run dogfood:strict`
+  - Ship evidence was generated with an `88`/100 review-readiness score:
+    - `.agentloop/reports/2026-06-14-09-44-ship-report.md`
+- What worked well:
+  - Dogfood forced the batch through fresh verification, handoff, gates, maintainer review, review context, and ProjScan instead of relying on raw terminal output.
+- Improve:
+  - Consider feeding imported GitHub metadata into `ship`, `prepare-pr`, or `maintainer-check` once the local context format settles.
+
 ## 2026-06-13: Ship Readiness Markdown List Escaping
 
 - Task contract: `.agentloop/tasks/2026-06-13-escape-ship-readiness-markdown-lists.md`

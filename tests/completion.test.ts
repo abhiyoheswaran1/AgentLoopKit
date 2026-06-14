@@ -21,6 +21,8 @@ describe('completion scripts', () => {
     expect(script).toContain('policy:List or inspect local AgentLoopKit policies');
     expect(script).toContain('show:Show a local policy');
     expect(script).toContain('status:Show local policy template status');
+    expect(script).toContain('packs:List policy packs');
+    expect(script).toContain('pack:Inspect or apply a policy pack');
     expect(script).toContain('task:List, inspect, update, complete, or archive task contracts');
     expect(script).toContain('doctor:Check task folder hygiene');
     expect(script).toContain('status:Update a task contract status');
@@ -45,7 +47,7 @@ describe('completion scripts', () => {
     expect(script).toContain('npm-status');
     expect(script).toContain('next');
     expect(script).toContain('list show set status done archive current clear doctor');
-    expect(script).toContain('compgen -W "list show status"');
+    expect(script).toContain('compgen -W "list show status packs pack"');
     expect(script).toContain(`compgen -W "${TASK_TYPES.join(' ')}"`);
     expect(script).toContain(
       'codex claude-code cursor opencode gemini-cli github-copilot-cli generic all',
@@ -58,6 +60,9 @@ describe('completion scripts', () => {
     expect(script).toContain('complete -c agentloop');
     expect(script).toContain("complete -c agentloop -n '__fish_seen_subcommand_from task'");
     expect(script).toContain("complete -c agentloop -n '__fish_seen_subcommand_from policy'");
+    expect(script).toContain(
+      "complete -c agentloop -n '__fish_seen_subcommand_from policy' -a 'list show status packs pack'",
+    );
     expect(script).toContain("complete -c agentloop -n '__fish_seen_subcommand_from create-task'");
     expect(script).toContain(`-a '${TASK_TYPES.join(' ')}'`);
     expect(script).toContain('review');

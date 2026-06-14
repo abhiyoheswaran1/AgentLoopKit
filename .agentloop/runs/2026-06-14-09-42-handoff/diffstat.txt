@@ -1,0 +1,21 @@
+ CHANGELOG.md                              |   7 +-
+ README.md                                 |   6 ++
+ ROADMAP.md                                |  12 ++-
+ docs/cli-reference.md                     |  38 +++++++-
+ docs/configuration.md                     |  22 ++++-
+ docs/designs/vscode-open-vsx-extension.md |  15 +++-
+ docs/distribution-channels.md             |   8 +-
+ docs/policies.md                          |  77 ++++++++++++++--
+ package.json                              |   2 +-
+ schema/agentloop.config.schema.json       |  31 +++++++
+ src/cli/commands/policy.ts                | 142 ++++++++++++++++++++++++++++++
+ src/cli/index.ts                          |   4 +
+ src/core/completions.ts                   |   4 +
+ src/core/config.ts                        |  27 +++++-
+ src/templates/root/agentloop.config.json  |   3 +
+ tests/cli-docs-drift.test.ts              |   2 +
+ tests/completion.test.ts                  |   7 +-
+ tests/config.test.ts                      |  29 ++++++
+ tests/package-scripts.test.ts             |   3 +
+ tests/schema.test.ts                      |   2 +
+ 20 files changed, 418 insertions(+), 23 deletions(-)

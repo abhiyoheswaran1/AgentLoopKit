@@ -209,6 +209,8 @@ agentloopkit init
 | `agentloop npm-status`           | Check npm registry status without publishing                                   |
 | `agentloop mcp-server`           | Start the read-only MCP stdio server                                           |
 | `agentloop policy ...`           | Read and compare local safety policies                                         |
+| `agentloop schemastore`          | Print the config schema catalog entry                                          |
+| `agentloop github import`        | Import explicit local GitHub issue or PR JSON                                  |
 | `agentloop install-agent <name>` | Add agent-specific instructions                                                |
 | `agentloop list-templates`       | List bundled templates                                                         |
 | `agentloop completion <shell>`   | Print shell completion scripts                                                 |
@@ -281,6 +283,8 @@ Run ledger output uses safe display paths: `.agentloop/...` for AgentLoopKit art
 Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-gates`, `ship`, `prepare-pr`, `maintainer-check`, `upgrade-harness`, or `release-check` before pasting output into a public issue, PR, or CI log. That mode replaces local root paths with a placeholder.
 `agentloop review-context --json` gives non-MCP agents one read-only local snapshot with status, gates, policies, artifacts, recent runs, latest ship evidence, and the next action.
 `agentloop upgrade-harness` is read-only. It tells existing users which generated guidance files need manual review after a CLI upgrade. It does not merge templates or overwrite local edits.
+`agentloop schemastore --json` prints the catalog entry for `agentloop.config.json`. Use it when preparing a SchemaStore contribution; the CLI does not submit that contribution for you.
+`agentloop github import --issue-json issue.json --pr-json pr.json` imports explicit local GitHub metadata into `.agentloop/github/context.json`. It does not call GitHub APIs, read tokens, or run `gh`.
 
 ## More Docs
 
@@ -295,6 +299,8 @@ Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-g
 - [HTML reports](docs/html-reports.md)
 - [PR summaries and handoffs](docs/pr-summaries.md)
 - [Policies](docs/policies.md)
+- [SchemaStore support](docs/schemastore.md)
+- [GitHub metadata import](docs/github-metadata.md)
 - [MCP server](docs/mcp.md)
 - [Template and harness upgrades](docs/template-migrations.md)
 - [CI examples](docs/github-actions.md)

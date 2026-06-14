@@ -33,6 +33,8 @@ const publicCommands = [
   'release-check',
   'npm-status',
   'mcp-server',
+  'schemastore',
+  'github',
   'policy',
   'task',
   'install-agent',

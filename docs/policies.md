@@ -12,6 +12,9 @@ agentloop policy status
 agentloop policy list --json
 agentloop policy show security --json
 agentloop policy status --json
+agentloop policy packs
+agentloop policy pack show agentloop-baseline
+agentloop policy pack apply agentloop-baseline --dry-run
 ```
 
 `policy list` reads Markdown files from `.agentloop/policies/` and prints their titles and paths. `policy show` accepts a policy slug, such as `security`, or the generated filename, such as `security-policy.md`.
@@ -26,16 +29,76 @@ When `agentloop.config.json` is invalid, policy commands with `--json` return a 
 - `missing`: bundled template has no matching local file
 - `extra`: local file has no matching bundled template
 
-The command is read-only. It does not enforce policy, scan code, call a service, read `.env` contents, download remote policy packs, or rewrite local policy files. It only reads Markdown files from `.agentloop/policies/` and bundled AgentLoopKit templates.
+The list, show, and status commands are read-only. They do not enforce policy, scan code, call a service, read `.env` contents, download remote policy packs, or rewrite local policy files. They read Markdown files from `.agentloop/policies/` and bundled AgentLoopKit templates.
+
+## Policy packs
+
+Policy packs group policy Markdown files so maintainers can copy missing policy guidance into a repo without overwriting local edits.
+
+Bundled packs:
+
+- `agentloop-baseline`: the standard AgentLoopKit safety policies
+- `maintainer-review`: reviewability rules for maintainers evaluating agent-generated changes
+
+List packs:
+
+```bash
+agentloop policy packs
+agentloop policy packs --json
+```
+
+Show one pack:
+
+```bash
+agentloop policy pack show agentloop-baseline
+agentloop policy pack show maintainer-review --json
+```
+
+Apply one pack:
+
+```bash
+agentloop policy pack apply maintainer-review --dry-run
+agentloop policy pack apply maintainer-review
+```
+
+`apply` writes only missing files under `.agentloop/policies/`. Existing policy files are skipped. There is no overwrite flag.
+
+Local organization packs are configured in `agentloop.config.json`:
+
+```json
+{
+  "policies": {
+    "packs": [
+      {
+        "name": "org-review",
+        "path": ".agentloop/policy-packs/org-review"
+      }
+    ]
+  }
+}
+```
+
+Each local pack needs a manifest:
+
+```json
+{
+  "name": "org-review",
+  "title": "Org Review Pack",
+  "description": "Local organization review rules.",
+  "policies": ["review-evidence-policy.md"]
+}
+```
+
+Policy files live under the pack's `policies/` directory. AgentLoopKit reads local packs only when you run `policy packs`, `policy pack show`, or `policy pack apply`.
 
 ## How to read status
 
-| Status | What it means | Maintainer action |
-| ------ | ------------- | ----------------- |
-| `current` | The local policy matches the bundled AgentLoopKit template. | No action unless your repo needs stricter guidance. |
-| `modified` | The local policy differs from the bundled template. | Review the local text. Treat it as a repo decision, not an error. |
-| `missing` | A bundled policy template has no matching local file. | Decide whether the repo needs that policy. Run `agentloop init` only if you want to restore missing generated files. |
-| `extra` | The repo has a policy file that is not bundled with AgentLoopKit. | Keep it if it captures repo-specific rules. Review it like any other policy file. |
+| Status     | What it means                                                     | Maintainer action                                                                                                    |
+| ---------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `current`  | The local policy matches the bundled AgentLoopKit template.       | No action unless your repo needs stricter guidance.                                                                  |
+| `modified` | The local policy differs from the bundled template.               | Review the local text. Treat it as a repo decision, not an error.                                                    |
+| `missing`  | A bundled policy template has no matching local file.             | Decide whether the repo needs that policy. Run `agentloop init` only if you want to restore missing generated files. |
+| `extra`    | The repo has a policy file that is not bundled with AgentLoopKit. | Keep it if it captures repo-specific rules. Review it like any other policy file.                                    |
 
 Local policy files are the source of truth for the repo. Bundled templates are comparison material. Agents should follow `.agentloop/policies/*.md` during repo work, even when `policy status` reports `modified`.
 

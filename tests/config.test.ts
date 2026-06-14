@@ -33,6 +33,7 @@ describe('config', () => {
     expect(config.project.name).toBe('demo');
     expect(config.paths.agentloopDir).toBe('.agentloop');
     expect(config.commands.test).toBe('pnpm test');
+    expect(config.policies.packs).toEqual([]);
   });
 
   test('rejects invalid config versions', () => {
@@ -101,6 +102,34 @@ describe('config', () => {
         },
       }),
     ).toThrow(/parent traversal/i);
+  });
+
+  test('defaults missing policy pack config and validates local policy pack paths', () => {
+    const config = createDefaultConfig();
+    const legacyConfig: Partial<typeof config> = { ...config };
+    delete legacyConfig.policies;
+
+    expect(parseAgentLoopConfig(legacyConfig).policies.packs).toEqual([]);
+    expect(
+      parseAgentLoopConfig({
+        ...config,
+        policies: {
+          packs: [{ name: 'org-review', path: '.agentloop/policy-packs/org-review' }],
+        },
+      }).policies.packs,
+    ).toEqual([{ name: 'org-review', path: '.agentloop/policy-packs/org-review' }]);
+    expect(() =>
+      parseAgentLoopConfig({
+        ...config,
+        policies: { packs: [{ name: 'outside', path: '../policy-packs/outside' }] },
+      }),
+    ).toThrow(/parent traversal/i);
+    expect(() =>
+      parseAgentLoopConfig({
+        ...config,
+        policies: { packs: [{ name: 'absolute', path: '/tmp/policy-pack' }] },
+      }),
+    ).toThrow(/repo-relative/i);
   });
 
   test('rejects malformed config JSON as a config error', async () => {

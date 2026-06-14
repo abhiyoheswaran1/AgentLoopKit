@@ -53,7 +53,7 @@ If this moves from design to build:
 2. Depend on the user's installed `agentloop` binary, or run `npx --yes agentloopkit@latest` only when the user chooses that mode.
 3. Use VS Code's `child_process` or terminal APIs to run the same CLI commands users already run.
 4. Keep extension tests focused on command registration, command construction, and refusal of unsafe dynamic input.
-5. Publish to the VS Code Marketplace and Open VSX only after the same source package passes CI.
+5. Prepare marketplace packaging only after the extension source package passes CI and the validation gates below.
 
 ## Maintenance Cost
 
@@ -69,6 +69,19 @@ Build only after at least one of these signals appears:
 - contributors struggle to discover task, verify, and handoff commands from generated files.
 
 When that signal exists, create a new task contract for the extension MVP. Until then, keep the roadmap entry as deferred.
+
+## Validation Gates
+
+Do not publish to the VS Code Marketplace or Open VSX until all gates pass:
+
+- at least one real issue asks for command-palette access to existing CLI commands;
+- the extension MVP uses the installed `agentloop` binary or explicit `npx --yes agentloopkit@<version>`;
+- tests cover command construction and refusal of unsafe dynamic input;
+- no command reads `.env` contents, tokens, or hidden workspace files;
+- no command posts comments or uploads artifacts;
+- CI verifies the extension package without weakening the CLI release gate.
+
+The first validation build should stay private or unpublished. Use it to prove command-palette shortcuts help users before adding marketplace release work.
 
 ## Non-Goals
 

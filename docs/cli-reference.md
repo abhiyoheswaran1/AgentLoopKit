@@ -412,6 +412,35 @@ These commands do not create tags, publish packages, read tokens, read `.env` fi
 
 See [release-notes.md](release-notes.md) and [npm-status.md](npm-status.md).
 
+## SchemaStore
+
+```bash
+agentloop schemastore
+agentloop schemastore --json
+```
+
+`schemastore` prints the catalog entry for `agentloop.config.json`. Maintainers can use the JSON output when preparing a SchemaStore contribution.
+
+It does not write files, open a pull request, call SchemaStore, call GitHub APIs, read tokens, or modify package metadata.
+
+See [schemastore.md](schemastore.md).
+
+## GitHub Metadata
+
+```bash
+agentloop github import --issue-json issue.json
+agentloop github import --pr-json pr.json
+agentloop github import --issue-json issue.json --pr-json pr.json
+agentloop github import --issue-json issue.json --dry-run
+agentloop github import --issue-json issue.json --json
+```
+
+`github import` reads explicit local JSON files from `gh issue view --json ...`, `gh pr view --json ...`, or compatible GitHub API output. It normalizes issue and pull request metadata into `.agentloop/github/context.json`. If you pass `--output`, the path must stay under `.agentloop/github/`.
+
+It does not run `gh`, call GitHub APIs, read GitHub tokens, read `.env` files, post comments, upload files, or execute commands from issue or pull request text.
+
+See [github-metadata.md](github-metadata.md).
+
 ## MCP Server
 
 ```bash
@@ -433,11 +462,18 @@ agentloop policy status
 agentloop policy list --json
 agentloop policy show security --json
 agentloop policy status --json
+agentloop policy packs
+agentloop policy packs --json
+agentloop policy pack show agentloop-baseline
+agentloop policy pack apply agentloop-baseline --dry-run
+agentloop policy pack apply agentloop-baseline
 ```
 
 `policy` reads Markdown files from `.agentloop/policies/`. `policy status` compares local Markdown with bundled templates and reports `current`, `modified`, `missing`, and `extra` files.
 
-It does not enforce compliance, scan source code, fetch remote policy packs, or mutate policy files.
+`policy packs` lists bundled packs and local organization packs configured in `agentloop.config.json`. `policy pack apply` copies missing policy files and skips existing files. It does not overwrite local policy edits.
+
+It does not enforce compliance, scan source code, fetch remote policy packs, read `.env` files, or call a service.
 
 See [policies.md](policies.md).
 

@@ -32,6 +32,8 @@ const topLevelCommands = [
   ['release-check', 'Check local release readiness'],
   ['npm-status', 'Check npm registry catch-up status'],
   ['mcp-server', 'Start the read-only MCP stdio server'],
+  ['schemastore', 'Print SchemaStore catalog entry'],
+  ['github', 'Import explicit local GitHub metadata'],
   ['policy', 'List or inspect local AgentLoopKit policies'],
   ['task', 'List, inspect, update, complete, or archive task contracts'],
   ['install-agent', 'Install agent-specific instructions'],
@@ -57,6 +59,8 @@ const policyCommandSpecs = [
   ['list', 'List local policies'],
   ['show', 'Show a local policy'],
   ['status', 'Show local policy template status'],
+  ['packs', 'List policy packs'],
+  ['pack', 'Inspect or apply a policy pack'],
 ] as const;
 const policyCommands = policyCommandSpecs.map(([name]) => name);
 const taskStatuses = TASK_STATUSES;

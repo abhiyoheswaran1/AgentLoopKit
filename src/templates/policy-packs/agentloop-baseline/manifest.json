@@ -1,0 +1,15 @@
+{
+  "name": "agentloop-baseline",
+  "title": "AgentLoopKit Baseline Policies",
+  "description": "The bundled AgentLoopKit policy set for local-first agentic engineering.",
+  "policies": [
+    "database-change-policy.md",
+    "dependency-change-policy.md",
+    "git-policy.md",
+    "no-destructive-actions.md",
+    "public-api-change-policy.md",
+    "secrets-policy.md",
+    "security-policy.md",
+    "ui-change-policy.md"
+  ]
+}

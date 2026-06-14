@@ -36,7 +36,12 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Composite GitHub Action wrapper for running AgentLoopKit commands in CI
 - Dockerfile and GHCR release workflow for a minimal `agentloop` image
 - MCP Registry metadata and publish workflow for the read-only server
+- SchemaStore catalog entry helper with `agentloop schemastore`
+- Configurable local policy packs with `agentloop policy packs`, `policy pack show`, and `policy pack apply`
+- Explicit local GitHub issue/PR metadata import with `agentloop github import`
 - Stack recipes for Next.js, React/Vite, Node API, Python, docs-only, empty repos, and monorepos
+- Windows package-manager design notes for Scoop and WinGet without public availability claims
+- VS Code/Open VSX extension validation gates before any editor marketplace release
 - Launch visuals generated from committed Playwright and VHS sources
 
 ## Current State
@@ -56,13 +61,14 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Keep the README focused on user install and usage, not release operations.
 - Keep GHCR and MCP Registry release proof current after each release.
 - Keep the SchemaStore catalog entry current if the config schema URL changes.
+- Keep bundled policy packs small, safe, and useful for real maintainers.
 
 ## Later
 
 - Keep the VS Code/Open VSX extension deferred until command-palette shortcuts prove necessary. See `docs/designs/vscode-open-vsx-extension.md`.
-- Evaluate Scoop and WinGet after Windows smoke tests and release checksums are stable.
-- Add configurable organization policy packs.
-- Add GitHub issue and PR metadata import.
+- Evaluate Scoop and WinGet after Windows smoke tests, release checksums, and user demand are stable. See `docs/designs/windows-package-managers.md`.
+- Add richer examples for local organization policy packs after maintainers use the baseline packs in real repos.
+- Decide whether imported GitHub metadata should feed `ship`, `prepare-pr`, or `maintainer-check` once the read-only import format proves stable.
 - Evaluate paid team features only after npm publishing is stable and the open-source CLI matures.
 
 ## Non-Goals

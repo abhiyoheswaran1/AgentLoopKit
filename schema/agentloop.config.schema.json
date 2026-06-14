@@ -147,6 +147,37 @@
           "type": "boolean"
         }
       }
+    },
+    "policies": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional local organization policy packs. Paths must be repo-relative and are read only when policy-pack commands run.",
+      "required": ["packs"],
+      "properties": {
+        "packs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "path": {
+                "type": "string",
+                "description": "A non-empty repo-relative path; absolute or Windows drive-qualified paths, parent traversal segments, and null bytes are rejected.",
+                "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$"
+              }
+            }
+          },
+          "default": []
+        }
+      },
+      "default": {
+        "packs": []
+      }
     }
   }
 }

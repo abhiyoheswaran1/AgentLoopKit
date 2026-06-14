@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-14-09-47-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-14-09-47",
+  "createdAtEpochMs": 1781423268391,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-13-improve-adoption-polish-and-release-workflow.md",
+    "title": "Improve adoption polish and release workflow",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-14-09-33-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-14-09-47-pr-summary-2.md",
+  "changedFileCount": 73
+}

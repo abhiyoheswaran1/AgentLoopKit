@@ -80,10 +80,10 @@ See [mcp.md](mcp.md).
 
 ## Planned Channels
 
-| Priority | Channel                      | Why it matters                                                | Decision                                                               |
-| -------- | ---------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| P2       | VS Code / Open VSX extension | Helps editor-first users run the loop without leaving the IDE | Deferred; see [extension design](designs/vscode-open-vsx-extension.md) |
-| P2       | Scoop / WinGet               | Better Windows install path for CLI users                     | Later, after Windows smoke tests and release checksums                 |
+| Priority | Channel                      | Why it matters                                                | Decision                                                                            |
+| -------- | ---------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| P2       | VS Code / Open VSX extension | Helps editor-first users run the loop without leaving the IDE | Deferred; see [extension design](designs/vscode-open-vsx-extension.md)              |
+| P2       | Scoop / WinGet               | Better Windows install path for CLI users                     | Deferred; see [Windows package manager design](designs/windows-package-managers.md) |
 
 ## Channel Rules
 

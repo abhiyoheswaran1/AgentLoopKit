@@ -22,6 +22,8 @@ describe('config JSON schema', () => {
     expect(JSON.stringify(schema.properties)).toContain('"const":1');
     expect(JSON.stringify(schema.properties)).toContain('nextjs');
     expect(JSON.stringify(schema.properties)).toContain('protectEnvFiles');
+    expect(JSON.stringify(schema.properties)).toContain('"policies"');
+    expect(JSON.stringify(schema.properties)).toContain('"packs"');
     expect(JSON.stringify(schema.properties)).toContain('repo-relative path');
     expect(paths?.reportsDir?.pattern).toContain('(?![A-Za-z]:)');
     expect(paths?.reportsDir?.pattern).toContain('[\\\\/]');

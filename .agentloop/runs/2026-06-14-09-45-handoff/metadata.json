@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-14-09-45-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-14-09-45",
+  "createdAtEpochMs": 1781423102498,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-14-implement-roadmap-adoption-channels-and-policy-packs.md",
+    "title": "Implement roadmap adoption channels and policy packs",
+    "status": "proposed"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-14-09-33-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-14-09-45-pr-summary.md",
+  "changedFileCount": 63
+}

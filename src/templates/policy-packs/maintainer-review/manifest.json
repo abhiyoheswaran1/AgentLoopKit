@@ -1,0 +1,6 @@
+{
+  "name": "maintainer-review",
+  "title": "Maintainer Review Policies",
+  "description": "Reviewability rules for maintainers evaluating agent-generated changes.",
+  "policies": ["maintainer-evidence-policy.md", "review-risk-policy.md"]
+}

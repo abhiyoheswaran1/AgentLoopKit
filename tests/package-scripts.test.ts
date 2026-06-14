@@ -10,6 +10,9 @@ describe('package scripts', () => {
     expect(packageJson.scripts['test:quick']).toBe('npm run test:unit');
     expect(packageJson.scripts['test:unit']).toContain('tests/config.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/template-renderer.test.ts');
+    expect(packageJson.scripts['test:unit']).toContain('tests/schemastore.test.ts');
+    expect(packageJson.scripts['test:unit']).toContain('tests/policy-packs.test.ts');
+    expect(packageJson.scripts['test:unit']).toContain('tests/github-metadata.test.ts');
     expect(packageJson.scripts['test:unit']).not.toContain('tests/doctor.test.ts');
     expect(packageJson.scripts['test:unit']).not.toContain('tests/upgrade-harness.test.ts');
     expect(packageJson.scripts['test:integration']).toContain('tests/doctor.test.ts');
