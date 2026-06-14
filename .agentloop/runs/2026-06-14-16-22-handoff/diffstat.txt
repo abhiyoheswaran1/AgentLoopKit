@@ -1,0 +1,7 @@
+ .agentloop/dogfood-log.md                          | 33 +++++++++++
+ .../2026-06-14-release-agentloopkit-0-32-1.md      | 66 ----------------------
+ FINAL_HANDOFF.md                                   | 25 ++++----
+ ROADMAP.md                                         |  2 +-
+ docs/npm-publishing.md                             |  2 +-
+ docs/release-status.md                             | 32 +++++------
+ 6 files changed, 64 insertions(+), 96 deletions(-)

@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-14
 - Task type: release
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 `main` contains post-release proof documentation and AgentLoop dogfood evidence that landed after the `0.32.0` release tag. Cut a small patch release so npm, GitHub Releases, GHCR, MCP Registry, and the public release docs match the current repository state before starting the next roadmap implementation batch.

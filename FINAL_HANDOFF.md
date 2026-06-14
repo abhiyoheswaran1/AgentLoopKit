@@ -77,17 +77,17 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Current npm release: `agentloopkit@0.32.1`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.32.1>
 - Release asset: `agentloopkit-0.32.1.tgz`
-- Release asset SHA-256: pending until the release tarball is attached
-- Release tag: `v0.32.1` at the published release commit
-- CI run: pending until release workflows complete
-- CLI Smoke run: pending until release workflows complete
-- Publish workflow run: pending until npm trusted publishing completes
-- Docker workflow run: pending until GHCR publishing completes
-- MCP Registry workflow run: pending until registry publishing completes
-- Post-publish npm proof: pending until npm publish completes
-- Published-package smoke: pending until npm publish completes
-- GHCR proof: pending until the Docker workflow completes
-- MCP Registry proof: pending until registry publishing completes
+- Release asset SHA-256: `d2219319f29f0adbba2d4736b2ef494838ab0aac72d64756e5a9bf1737cf756a`
+- Release tag: `v0.32.1` at commit `0e53496a1a5704959e8f92a573bf09401c34b6ef`
+- CI run: `27501492254`, success
+- CLI Smoke run: `27501492259`, success
+- Publish workflow run: `27501495780`, success
+- Docker workflow run: `27501495776`, success
+- MCP Registry workflow run: `27501633646`, success
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.32.1`
+- Published-package smoke: `npm run smoke:published -- --version 0.32.1` passed
+- GHCR proof: registry tags include `latest`, `0.32`, and `0.32.1`
+- MCP Registry proof: public registry search marks `0.32.1` as latest for `io.github.abhiyoheswaran1/agentloopkit`
 
 ## 0.32.1 release summary
 
@@ -1235,7 +1235,8 @@ Current publish state:
 
 - GitHub release `v0.32.1` is public.
 - npm latest is `agentloopkit@0.32.1`.
-- GHCR and MCP Registry workflows passed for `0.32.1`.
+- GHCR tags include `latest`, `0.32`, and `0.32.1`.
+- MCP Registry lists `0.32.1` as latest.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

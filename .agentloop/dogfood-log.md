@@ -9645,3 +9645,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Keep using the archived-task cleanup as part of the release stop condition.
   - Add a small release-status helper later if the same workflow IDs and registry proofs stay manual.
+
+## 2026-06-14: Release 0.32.1 Gate And Post-Release Proof
+
+- Task contract: `.agentloop/tasks/archive/2026-06-14-release-agentloopkit-0-32-1.md`
+- Trigger:
+  - Post-release proof docs and dogfood evidence landed after the `0.32.0` tag and needed a patch release before new roadmap feature work.
+- Implementation:
+  - Bumped `package.json` and `server.json` to `0.32.1`.
+  - Added a `0.32.1` changelog section.
+  - Updated release-status docs, npm publishing docs, roadmap state, launch checklist, and final handoff.
+  - Published `v0.32.1` through GitHub Releases and npm trusted publishing.
+- Verification:
+  - Task-linked verification passed:
+    - `.agentloop/reports/2026-06-14-15-55-verification-report.md`
+    - `.agentloop/runs/2026-06-14-16-00-verify`
+  - `npm run release-flow` passed on the clean release commit.
+  - GitHub release asset digest:
+    - `d2219319f29f0adbba2d4736b2ef494838ab0aac72d64756e5a9bf1737cf756a`
+  - Release workflows passed:
+    - CI: `27501492254`
+    - CLI Smoke: `27501492259`
+    - Publish: `27501495780`
+    - Docker/GHCR: `27501495776`
+    - MCP Registry: `27501633646`
+  - `node dist/cli/index.js npm-status --agentloopkit --expect-current` passed.
+  - `npm run smoke:published -- --version 0.32.1` passed.
+  - GHCR tags include `latest`, `0.32`, and `0.32.1`.
+  - MCP Registry search marks `0.32.1` as latest.
+- What worked well:
+  - Strict dogfood blocked the first `release-flow` run until a handoff covered the dirty release-prep files.
+  - The second `release-flow` run on a clean release commit passed end to end.
+- Improve:
+  - Consider a `release-proof` helper that gathers workflow IDs, tarball digest, npm status, GHCR tags, and MCP Registry latest into a single local report.

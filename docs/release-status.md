@@ -7,19 +7,19 @@ Last checked: June 14, 2026.
 - Current public release: `v0.32.1`
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.32.1>
 - Release asset: `agentloopkit-0.32.1.tgz`
-- Release asset SHA-256: pending until the release tarball is attached
-- Release tag `v0.32.1` points at the published release commit
+- Release asset SHA-256: `d2219319f29f0adbba2d4736b2ef494838ab0aac72d64756e5a9bf1737cf756a`
+- Release tag `v0.32.1` points at commit `0e53496a1a5704959e8f92a573bf09401c34b6ef`
 - npm latest: `0.32.1`
-- CI run: pending until release workflows complete
-- CLI Smoke run: pending until release workflows complete
-- Publish workflow run: pending until npm trusted publishing completes
-- Docker workflow run: pending until GHCR publishing completes
-- MCP Registry workflow run: pending until registry publishing completes
+- CI run: `27501492254`, success
+- CLI Smoke run: `27501492259`, success
+- Publish workflow run: `27501495780`, success
+- Docker workflow run: `27501495776`, success
+- MCP Registry workflow run: `27501633646`, success
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
-GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`. The public registry tag list should include `0.32.1` and `0.32` after release workflows finish.
+GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`. The public registry tag list includes `latest`, `0.32`, and `0.32.1`.
 
-The MCP Registry public API should list `io.github.abhiyoheswaran1/agentloopkit` version `0.32.1` as latest after registry publishing finishes.
+The MCP Registry public API lists `io.github.abhiyoheswaran1/agentloopkit` version `0.32.1` as latest, with npm package `agentloopkit@0.32.1`.
 
 ## Latest Release Highlights
 
@@ -75,18 +75,18 @@ Local release gate for `0.32.1`:
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: pending until npm publish completes
-- `node dist/cli/index.js npm-status --agentloopkit --expect-current`: pending until npm publish completes
-- `npm run smoke:published -- --version 0.32.1`: pending until npm publish completes
-- `npx --yes agentloopkit@0.32.1 version`: pending until npm publish completes
-- GitHub release asset digest: pending until the release tarball is attached
-- GHCR tag list: pending until the Docker workflow completes
-- MCP Registry search: pending until registry publishing completes
+- `npm view agentloopkit version versions --json`: latest `0.32.1`
+- `node dist/cli/index.js npm-status --agentloopkit --expect-current`: latest matches local package version
+- `npm run smoke:published -- --version 0.32.1`: passed
+- `npx --yes agentloopkit@0.32.1 version`: `0.32.1`
+- GitHub release asset digest: `d2219319f29f0adbba2d4736b2ef494838ab0aac72d64756e5a9bf1737cf756a`
+- GHCR tag list includes `latest`, `0.32`, and `0.32.1`
+- MCP Registry search marks `0.32.1` as latest
 
 Latest release-status documentation checks:
 
 - `npm run dogfood:strict`
-- `npm run check:links`: 1825 Markdown files checked
+- `npm run check:links`: 1833 Markdown files checked
 - `node scripts/prepublish-check.mjs`
 - `git diff --check`
 - `npx --yes pnpm@10.12.1 audit --audit-level high`
