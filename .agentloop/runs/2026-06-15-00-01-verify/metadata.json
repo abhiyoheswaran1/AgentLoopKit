@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-00-01-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-00-01",
+  "createdAtEpochMs": 1781474470487,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-14-harden-oss-roadmap-release-proof-and-public-docs.md",
+    "title": "Harden OSS roadmap release proof and public docs",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-14-23-58-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 46
+}

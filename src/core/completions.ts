@@ -30,6 +30,7 @@ const topLevelCommands = [
   ['ci-summary', 'Summarize CI context and AgentLoop evidence'],
   ['release-notes', 'Generate deterministic release notes'],
   ['release-check', 'Check local release readiness'],
+  ['release-proof', 'Check post-release evidence across public channels'],
   ['npm-status', 'Check npm registry catch-up status'],
   ['mcp-server', 'Start the read-only MCP stdio server'],
   ['schemastore', 'Print SchemaStore catalog entry'],

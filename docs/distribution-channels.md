@@ -27,6 +27,7 @@ For each release:
 7. Let `.github/workflows/docker.yml` publish the GHCR image from the GitHub release.
 8. Let `.github/workflows/publish-mcp.yml` submit MCP Registry metadata after npm publishes.
 9. Verify npm with `agentloop npm-status --agentloopkit --expect-current`.
+10. Verify cross-channel proof with `agentloop release-proof`.
 
 Do not put temporary publish failures, local auth state, or registry repair notes in the README.
 
@@ -65,6 +66,8 @@ docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:<versi
 ```
 
 The image does not bundle project dependencies. Users still install their own repo dependencies before running verification commands that require them.
+
+After release workflows finish, run `agentloop release-proof` from the release commit to check npm, GitHub Releases, GHCR, and MCP Registry evidence against the local package version.
 
 ## MCP Registry
 

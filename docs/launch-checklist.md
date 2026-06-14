@@ -79,6 +79,7 @@ For a read-only registry check, see [npm-status.md](npm-status.md).
 - [ ] `npm view agentloopkit version`
 - [ ] `npm view agentloopkit versions --json`
 - [ ] `agentloop npm-status --agentloopkit --expect-current`
+- [ ] `agentloop release-proof`
 - [ ] `npx --yes agentloopkit@<version> version`
 - [ ] `npm run smoke:published -- --version <version>`
 - [ ] GitHub release asset digest matches the local tarball SHA-256.

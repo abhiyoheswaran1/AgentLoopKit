@@ -126,7 +126,14 @@ agentloop npm-status
 agentloop npm-status --agentloopkit --expect-current
 ```
 
-15. Check review gates:
+15. Optional: check post-release proof:
+
+```bash
+agentloop release-proof
+agentloop release-proof --strict
+```
+
+16. Check review gates:
 
 ```bash
 agentloop check-gates
@@ -141,6 +148,7 @@ agentloop check-gates --strict
 `badge` reads local evidence and writes SVG files under `reports/`.
 `ci-summary` reads allowlisted CI provenance and local evidence, then writes Markdown under `reports/` when `--write` is passed.
 `release-notes` reads local package, changelog, git, task, verification, and CI-summary evidence, then writes Markdown under `handoffs/` when `--write` is passed.
+`release-proof` checks post-release proof across npm, GitHub Releases, GHCR, and MCP Registry.
 `npm-status` compares local package metadata with npm registry metadata. Use `--agentloopkit` when checking AgentLoopKit itself from a release smoke directory, CI workspace, or another folder. It does not publish packages or read credentials.
 Use `--strict` in CI when warning gates should fail.
 
@@ -151,6 +159,8 @@ When GitHub Actions runs `agentloop verify`, the report records allowlisted CI p
 Use `agentloop ci-summary --write` after verification and handoff when CI should upload one compact Markdown summary. It does not run checks or replace the verification report.
 
 Use `agentloop release-notes --write` before a release when CI or maintainers need a local release-note draft. It does not create tags, publish packages, call provider APIs, or read tokens.
+
+Use `agentloop release-proof` after public release workflows finish when CI or maintainers need proof that npm, GitHub Releases, GHCR, and MCP Registry match the local package version. It does not publish, tag, upload, post comments, or read tokens.
 
 Use `agentloop npm-status --agentloopkit --expect-current` after AgentLoopKit npm publish when CI or maintainers need proof that npm latest matches the running AgentLoopKit package version. It refuses `.env` paths for `--registry-json` and does not publish packages, read tokens, read `.env` files, or change package metadata.
 

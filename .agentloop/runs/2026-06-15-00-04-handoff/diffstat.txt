@@ -1,0 +1,26 @@
+ .agentloop/README.md                             |  1 +
+ .agentloop/backlog.md                            |  3 ++
+ .agentloop/dogfood-log.md                        | 60 ++++++++++++++++++++++++
+ .agentloop/harness/commands.md                   |  3 ++
+ AGENTLOOP.md                                     |  2 +-
+ AGENTS.md                                        |  1 +
+ CHANGELOG.md                                     |  3 ++
+ DECISIONS.md                                     |  8 ++++
+ README.md                                        |  5 +-
+ docs/cli-reference.md                            | 13 ++++-
+ docs/distribution-channels.md                    |  3 ++
+ docs/launch-checklist.md                         |  1 +
+ docs/npm-publishing.md                           |  2 +
+ docs/release-checklist-example.md                |  3 ++
+ package.json                                     |  2 +-
+ scripts/smoke-packed-release.mjs                 | 20 +++++++-
+ src/cli/index.ts                                 |  2 +
+ src/core/completions.ts                          |  1 +
+ src/templates/harness/commands.md                |  3 ++
+ src/templates/root/AGENTLOOP.md                  |  2 +-
+ src/templates/root/AGENTS.md                     |  1 +
+ src/templates/root/agentloop-directory-readme.md | 12 ++++-
+ tests/cli-docs-drift.test.ts                     |  1 +
+ tests/package-scripts.test.ts                    |  2 +
+ tests/release-smoke.test.ts                      |  2 +-
+ 25 files changed, 147 insertions(+), 9 deletions(-)

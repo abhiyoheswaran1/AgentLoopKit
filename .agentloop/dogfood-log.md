@@ -9723,3 +9723,63 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider whether imported GitHub metadata should influence `ship` scoring only after real maintainers use the read-only context flow.
   - Add more organization policy-pack examples only after teams report concrete gaps.
+
+## 2026-06-14: OSS Roadmap Hardening And Release Proof
+
+- Task contract: `.agentloop/tasks/2026-06-14-harden-oss-roadmap-release-proof-and-public-docs.md`
+- Trigger:
+  - The near-term OSS roadmap needs a stronger release proof loop and public-doc trust guard before the next release.
+- Planned implementation:
+  - Add read-only `agentloop release-proof`.
+  - Strengthen public-doc hygiene for unsupported channel claims, internal chatter, fake adoption language, and premature Pro/SaaS copy.
+  - Keep GitHub metadata, SchemaStore, and policy packs within local-first boundaries.
+- Planned verification:
+  - Focused release-proof tests first.
+  - `npm run test:unit`
+  - `npm run test:integration`
+  - `npm run check:public-docs`
+  - `npm run check:links`
+  - `npm run build`
+  - `npm run dogfood:strict`
+  - `node dist/cli/index.js ship --redact-paths`
+  - `node dist/cli/index.js prepare-pr --stdout --redact-paths`
+- What worked well so far:
+  - The task contract forced this batch to stay around release proof and public trust instead of drifting into deferred package-manager channels.
+- Verification:
+  - Focused release-proof tests passed:
+    - `npx vitest run tests/release-proof.test.ts`
+  - Unit suite passed:
+    - `npm run test:unit`
+    - 20 files, 81 tests
+  - Integration suite passed:
+    - `npm run test:integration`
+    - 13 files, 178 tests
+  - Full Vitest passed:
+    - `npm test`
+    - 60 files, 558 tests
+  - Static checks passed:
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run build`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+  - Live release proof passed for the current public release:
+    - `npx tsx src/cli/index.ts release-proof --json --timeout-ms 10000`
+    - npm, GitHub Release, GHCR, and MCP Registry all matched `agentloopkit@0.32.1`.
+  - ProjScan passed after removing token-like test fixture names:
+    - `npx --yes projscan doctor --format markdown`
+    - A 100/100
+  - Task-linked AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-14-23-58-verification-report.md`
+    - `.agentloop/runs/2026-06-15-00-01-verify`
+  - Ship evidence passed:
+    - `.agentloop/reports/2026-06-15-00-01-ship-report.md`
+    - Review-readiness score: 92/100
+  - PR handoff generated:
+    - `.agentloop/handoffs/2026-06-15-00-01-pr-summary.md`
+- What worked well:
+  - Dogfood caught stale verification before strict gates could pass.
+  - Live release-proof exposed GHCR's anonymous bearer challenge requirement; the command now handles it without reading credentials.
+  - ProjScan caught token-like test fixture names before handoff.
+- Improve:
+  - Use the new release-proof command in the next approved release handoff instead of manually stitching together registry proof.

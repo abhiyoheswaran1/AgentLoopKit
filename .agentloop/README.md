@@ -39,6 +39,7 @@ agentloop upgrade-harness
 agentloop report
 agentloop badge
 agentloop ci-summary
+agentloop release-proof
 ```
 
 Use `npx projscan doctor --format markdown` during implementation work in this repository.

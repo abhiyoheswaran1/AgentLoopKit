@@ -32,6 +32,15 @@ const UNSUPPORTED_PUBLIC_CLAIMS = [
   { label: 'Homebrew claim', pattern: /\bHomebrew\b/i },
   { label: 'brew install command', pattern: /\bbrew\s+install\b/i },
   { label: 'retired Homebrew tap repo', pattern: /homebrew-agentloopkit/i },
+  { label: 'unsupported adoption claim', pattern: /\bdevelopers love\b/i },
+  { label: 'unsupported user-interview claim', pattern: /\busers told us\b/i },
+  { label: 'unsupported real-feedback claim', pattern: /\breal feedback shows\b/i },
+  { label: 'unsupported adoption claim', pattern: /\bteams are using\b/i },
+  { label: 'unsupported interview claim', pattern: /\bbased on interviews\b/i },
+  { label: 'premature Pro claim', pattern: /\bAgentLoopKit Pro\b/i },
+  { label: 'premature Pro upgrade copy', pattern: /\bupgrade to\b.*\bPro\b/i },
+  { label: 'premature paid-plan copy', pattern: /\bpaid team plans?\b/i },
+  { label: 'premature hosted-dashboard copy', pattern: /\bhosted dashboards?\b/i },
 ];
 
 const INTERNAL_CHATTER_CLAIMS = [
@@ -65,6 +74,7 @@ const README_REDACTION_COMMANDS = [
   'maintainer-check',
   'upgrade-harness',
   'release-check',
+  'release-proof',
 ];
 
 const SAFE_ENV_KEYS = [
@@ -104,6 +114,10 @@ function isGeneratedAgentLoopArtifact(filePath) {
   return toPosixPath(filePath).split('/').includes('.agentloop');
 }
 
+function isInternalPlanningArtifact(filePath) {
+  return toPosixPath(filePath).startsWith('docs/superpowers/');
+}
+
 async function collectMarkdownFiles(rootDir, relativePath) {
   const absolutePath = path.join(rootDir, relativePath);
   let fileStat;
@@ -114,14 +128,16 @@ async function collectMarkdownFiles(rootDir, relativePath) {
   }
 
   if (fileStat.isFile()) {
-    return isMarkdownFile(relativePath) && !isGeneratedAgentLoopArtifact(relativePath)
+    return isMarkdownFile(relativePath) &&
+      !isGeneratedAgentLoopArtifact(relativePath) &&
+      !isInternalPlanningArtifact(relativePath)
       ? [relativePath]
       : [];
   }
   if (!fileStat.isDirectory()) {
     return [];
   }
-  if (isGeneratedAgentLoopArtifact(relativePath)) {
+  if (isGeneratedAgentLoopArtifact(relativePath) || isInternalPlanningArtifact(relativePath)) {
     return [];
   }
 

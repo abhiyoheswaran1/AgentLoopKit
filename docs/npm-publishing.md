@@ -135,6 +135,7 @@ Before claiming a publish completed, verify:
 npm view agentloopkit version
 npm view agentloopkit versions --json
 agentloop npm-status --agentloopkit --expect-current
+agentloop release-proof
 npx --yes agentloopkit@<version> version
 ```
 
@@ -145,6 +146,7 @@ After each publish:
 - update [release-status.md](release-status.md) with the new npm proof;
 - update `CHANGELOG.md`, `docs/launch-checklist.md`, and `FINAL_HANDOFF.md` as needed;
 - verify the GitHub release asset and npm package install;
+- run `agentloop release-proof` after GitHub Release, GHCR, and MCP Registry workflows finish;
 - keep README install commands focused on normal npm/npx usage.
 
 ## Package Contents

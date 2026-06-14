@@ -387,3 +387,11 @@ The default human output stays unchanged for scripts and existing users. JSON ou
 The roadmap is a public trust document. If it says an older version is the current public release after a newer version ships, users get conflicting release guidance.
 
 Release smoke now checks only the `ROADMAP.md` `Current State` block against `package.json.version`. The guard is local and deterministic. It does not call npm, GitHub, GHCR, or MCP Registry, and it does not rewrite documentation automatically.
+
+## 2026-06-14: Release Proof Is Evidence Collection, Not Publishing
+
+`agentloop release-proof` is a post-release evidence command. It checks whether npm, GitHub Releases, GHCR, and MCP Registry proof match the local package version, and it reports missing proof without creating or repairing release channels.
+
+The command can query public metadata with a timeout, or read captured JSON files passed with explicit flags. It refuses `.env` capture paths before reading them. It does not publish packages, create tags, create GitHub releases, upload files, post comments, read npm tokens, read GitHub tokens, or change package metadata.
+
+Public-doc hygiene now skips `docs/superpowers/` because those files are internal implementation plans, not user-facing documentation. The guard still scans README, normal docs, examples, GitHub docs, `ROADMAP.md`, and the root handoff for unsupported public claims.

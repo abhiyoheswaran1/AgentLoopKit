@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added `agentloop release-proof` to check post-release npm, GitHub Release, GHCR, and MCP Registry evidence without publishing, tagging, uploading, or reading tokens.
+- Added release-proof documentation and generated harness guidance for post-release evidence collection.
+- Changed public-doc hygiene to block fake adoption language, premature Pro/SaaS upgrade copy, and internal planning docs from public-doc scans.
 - Added local GitHub metadata summaries to `review-context`, `prepare-pr`, and `maintainer-check` from `.agentloop/github/context.json`.
 - Added organization policy-pack workflow examples for repo-local team review rules.
 - Fixed imported GitHub metadata reading so normalized `bodyExcerpt` fields survive the import-to-review round trip.

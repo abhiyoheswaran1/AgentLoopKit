@@ -31,6 +31,7 @@ const publicCommands = [
   'ci-summary',
   'release-notes',
   'release-check',
+  'release-proof',
   'npm-status',
   'mcp-server',
   'schemastore',

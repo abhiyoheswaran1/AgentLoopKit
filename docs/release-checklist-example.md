@@ -30,6 +30,7 @@ agentloop create-task --type release --title "Prepare AgentLoopKit release" \
   --acceptance "package.json and CHANGELOG.md agree on the intended version" \
   --acceptance "The full local release gate passes" \
   --acceptance "Post-publish npm proof is recorded before claiming availability" \
+  --acceptance "Post-publish release proof matches npm, GitHub Releases, GHCR, and MCP Registry" \
   --verification "agentloop npm-status --agentloopkit --expect-current" \
   --verification "npm run smoke:release" \
   --verification "npx pnpm@10.12.1 check:links" \
@@ -48,6 +49,7 @@ agentloop create-task --type release --title "Prepare AgentLoopKit release" \
 - GitHub release URL after publication;
 - npm version proof after publication;
 - Docker, GHCR, MCP Registry, or other channel workflow URLs when those workflows run.
+- `agentloop release-proof` output after public channel workflows finish.
 
 ## Handoff Checklist
 
@@ -59,6 +61,7 @@ Before stopping, write a handoff that states:
 - whether the GitHub release was created;
 - whether npm published through trusted publishing;
 - post-publish `agentloop npm-status --agentloopkit --expect-current` result;
+- post-publish `agentloop release-proof` result;
 - exact next maintainer action if any step is incomplete;
 - rollback or corrective-release path.
 
