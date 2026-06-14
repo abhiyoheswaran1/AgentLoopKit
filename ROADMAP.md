@@ -39,6 +39,8 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - SchemaStore catalog entry helper with `agentloop schemastore`
 - Configurable local policy packs with `agentloop policy packs`, `policy pack show`, and `policy pack apply`
 - Explicit local GitHub issue/PR metadata import with `agentloop github import`
+- Imported GitHub issue/PR metadata in `review-context`, `prepare-pr`, and `maintainer-check`
+- Organization policy-pack workflow examples for repo-local team review rules
 - Stack recipes for Next.js, React/Vite, Node API, Python, docs-only, empty repos, and monorepos
 - Windows package-manager design notes for Scoop and WinGet without public availability claims
 - VS Code/Open VSX extension validation gates before any editor marketplace release
@@ -62,13 +64,14 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Keep GHCR and MCP Registry release proof current after each release.
 - Keep the SchemaStore catalog entry current if the config schema URL changes.
 - Keep bundled policy packs small, safe, and useful for real maintainers.
+- Keep local GitHub metadata consumption read-only and optional while teams try it in real repos.
 
 ## Later
 
 - Keep the VS Code/Open VSX extension deferred until command-palette shortcuts prove necessary. See `docs/designs/vscode-open-vsx-extension.md`.
 - Evaluate Scoop and WinGet after Windows smoke tests, release checksums, and user demand are stable. See `docs/designs/windows-package-managers.md`.
-- Add richer examples for local organization policy packs after maintainers use the baseline packs in real repos.
-- Decide whether imported GitHub metadata should feed `ship`, `prepare-pr`, or `maintainer-check` once the read-only import format proves stable.
+- Collect real feedback on organization policy-pack examples before adding more bundled packs.
+- Evaluate whether imported GitHub metadata should affect `ship` scoring after the read-only context format proves stable.
 - Evaluate paid team features only after npm publishing is stable and the open-source CLI matures.
 
 ## Non-Goals

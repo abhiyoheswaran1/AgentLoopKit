@@ -6,7 +6,7 @@ import { initializeAgentLoop } from '../src/core/init.js';
 import { createTaskContractFile } from '../src/core/task-contract.js';
 import { loadAgentLoopConfig } from '../src/core/config.js';
 import { setActiveTask } from '../src/core/task-state.js';
-import { makeTempDir, removeTempDir } from './helpers.js';
+import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
@@ -86,6 +86,32 @@ async function createRepoWithReviewContextEvidence() {
     path.join(dir, '.agentloop/runs/2026-06-10-12-32-ship/diffstat.txt'),
     ' src/auth/redirect.ts | 4 ++++\n',
   );
+  await writeJson(path.join(dir, '.agentloop/github/context.json'), {
+    issue: {
+      number: 42,
+      title: 'Login redirect drops target',
+      state: 'OPEN',
+      url: 'https://github.com/example/app/issues/42',
+      author: 'octocat',
+      labels: ['bug', 'ai-review'],
+      bodyExcerpt: 'Users lose redirect targets after reset.',
+    },
+    pullRequest: {
+      number: 77,
+      title: 'Fix login redirect',
+      state: 'OPEN',
+      url: 'https://github.com/example/app/pull/77',
+      author: 'contributor',
+      labels: ['bugfix'],
+      isDraft: false,
+      baseRefName: 'main',
+      headRefName: 'fix/login-redirect',
+      changedFiles: 3,
+      additions: 42,
+      deletions: 9,
+      bodyExcerpt: 'Implements the redirect fix.',
+    },
+  });
   return dir;
 }
 
@@ -133,6 +159,20 @@ describe('review-context command', () => {
       score: 94,
       shipReportPath: '.agentloop/reports/2026-06-10-12-32-ship-report.md',
     });
+    expect(payload.githubMetadata).toMatchObject({
+      status: 'present',
+      path: '.agentloop/github/context.json',
+      issue: {
+        number: 42,
+        title: 'Login redirect drops target',
+        bodyExcerpt: 'Users lose redirect targets after reset.',
+      },
+      pullRequest: {
+        number: 77,
+        title: 'Fix login redirect',
+        bodyExcerpt: 'Implements the redirect fix.',
+      },
+    });
     expect(payload.safety).toEqual({
       readOnly: true,
       includesMarkdownContent: false,
@@ -151,6 +191,7 @@ describe('review-context command', () => {
     expect(result.stdout).toContain('- Latest verification: `pass`');
     expect(result.stdout).toContain('- Gates: `warn`');
     expect(result.stdout).toContain('- Latest ship score: `94`/100');
+    expect(result.stdout).toContain('- GitHub metadata: issue `#42` `OPEN`, PR `#77` `OPEN`');
     expect(result.stdout).toContain('Run `agentloop handoff`.');
     expect(result.stdout).not.toContain(dir);
     expect(result.stdout).not.toContain('Review handoff.');

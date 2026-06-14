@@ -30,6 +30,24 @@ Supported fields include:
 - PR base/head branch
 - PR changed file, addition, and deletion counts
 
+## Where Imported Context Appears
+
+AgentLoopKit reads `.agentloop/github/context.json` when you run:
+
+```bash
+agentloop review-context
+agentloop prepare-pr
+agentloop maintainer-check
+```
+
+`review-context` shows a short issue and PR summary for agents that need one local snapshot before review.
+
+`prepare-pr` adds an `Imported GitHub Context` section to the generated PR body. It includes the metadata file path, issue or PR number, state, title, URL, labels, branch names, changed-file count, and short body excerpts when present.
+
+`maintainer-check` reports imported metadata as an optional pass check. Missing metadata is not a warning or failure. Invalid local metadata is a warning because reviewers cannot trust that context.
+
+AgentLoopKit treats issue and PR text as untrusted prose. It escapes Markdown-sensitive characters before rendering PR-facing output.
+
 Safety rules:
 
 - You choose the JSON files explicitly.

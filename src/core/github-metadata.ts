@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { AgentLoopConfig } from './config.js';
 import { AgentLoopError } from './errors.js';
-import { resolvesInsidePath, writeTextFile } from './file-system.js';
+import { pathExists, resolvesInsidePath, writeTextFile } from './file-system.js';
 
 export type NormalizedGithubItem = {
   number: number | null;
@@ -37,6 +37,24 @@ export type GithubMetadataImportResult = {
     readsEnvFiles: false;
   };
 };
+
+export type GithubMetadataContext =
+  | {
+      status: 'missing';
+      path: string;
+    }
+  | {
+      status: 'invalid';
+      path: string;
+      message: string;
+    }
+  | {
+      status: 'present';
+      path: string;
+      issue?: NormalizedGithubItem;
+      pullRequest?: NormalizedGithubPullRequest;
+      safety: GithubMetadataImportResult['safety'];
+    };
 
 type JsonRecord = Record<string, unknown>;
 
@@ -95,7 +113,7 @@ function normalizeGithubItem(raw: JsonRecord): NormalizedGithubItem {
     url: stringValue(raw.url),
     author: authorLogin(raw.author),
     labels: labels(raw.labels),
-    bodyExcerpt: bodyExcerpt(raw.body),
+    bodyExcerpt: bodyExcerpt(raw.body ?? raw.bodyExcerpt),
   };
 }
 
@@ -109,6 +127,77 @@ function normalizeGithubPullRequest(raw: JsonRecord): NormalizedGithubPullReques
     additions: numberValue(raw.additions),
     deletions: numberValue(raw.deletions),
   };
+}
+
+function itemRecord(value: unknown) {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as JsonRecord)
+    : undefined;
+}
+
+function contextPath(cwd: string, config: AgentLoopConfig) {
+  return path.resolve(cwd, config.paths.agentloopDir, 'github/context.json');
+}
+
+function normalizeStoredGithubContext(raw: JsonRecord, storedPath: string): GithubMetadataContext {
+  const issueRecord = itemRecord(raw.issue);
+  const pullRequestRecord = itemRecord(raw.pullRequest);
+  const issue = issueRecord ? normalizeGithubItem(issueRecord) : undefined;
+  const pullRequest = pullRequestRecord ? normalizeGithubPullRequest(pullRequestRecord) : undefined;
+
+  return {
+    status: 'present',
+    path: storedPath,
+    ...(issue ? { issue } : {}),
+    ...(pullRequest ? { pullRequest } : {}),
+    safety: {
+      readsOnlyExplicitJson: true,
+      callsGithubApi: false,
+      readsTokens: false,
+      readsEnvFiles: false,
+    },
+  };
+}
+
+export async function readGithubMetadataContext(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+}): Promise<GithubMetadataContext> {
+  const absolutePath = contextPath(options.cwd, options.config);
+  const storedPath = toStoredPath(options.cwd, absolutePath);
+  const metadataRoot = path.resolve(options.cwd, options.config.paths.agentloopDir, 'github');
+  if (
+    !resolvesInsidePath(options.cwd, metadataRoot) ||
+    !resolvesInsidePath(metadataRoot, absolutePath)
+  ) {
+    return {
+      status: 'invalid',
+      path: storedPath,
+      message: 'GitHub metadata context path must stay under .agentloop/github.',
+    };
+  }
+  if (!(await pathExists(absolutePath))) {
+    return { status: 'missing', path: storedPath };
+  }
+
+  try {
+    const parsed = JSON.parse(await readFile(absolutePath, 'utf8')) as unknown;
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return {
+        status: 'invalid',
+        path: storedPath,
+        message: 'GitHub metadata context must be a JSON object.',
+      };
+    }
+    return normalizeStoredGithubContext(parsed as JsonRecord, storedPath);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      status: 'invalid',
+      path: storedPath,
+      message: `GitHub metadata context could not be read: ${message}`,
+    };
+  }
 }
 
 async function readExplicitJson(options: { cwd: string; requestedPath: string }) {

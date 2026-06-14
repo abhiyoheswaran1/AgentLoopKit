@@ -1,5 +1,13 @@
 # Decisions
 
+## 2026-06-14: Imported GitHub Metadata Feeds Review Evidence Only
+
+`agentloop github import` remains the only path for GitHub issue and PR context. It reads explicit local JSON files and writes normalized context under `.agentloop/github/context.json`.
+
+`review-context`, `prepare-pr`, and `maintainer-check` may read that local file to give agents and reviewers more context. Missing metadata is neutral. Invalid local metadata is a warning only where reviewers need to know the context cannot be trusted.
+
+The CLI still does not call GitHub APIs, read GitHub tokens, read `.env` files, post comments, or execute commands from issue and PR text. PR-facing output treats imported prose as untrusted and escapes Markdown before rendering it.
+
 ## 2026-06-12: Prepare-pr Uses Archived Latest-Run Task Evidence
 
 `agentloop prepare-pr` should reuse the same task-evidence model as `agentloop ship`. When a fresh ship run references a task that has since moved into `.agentloop/tasks/archive/`, `prepare-pr` may use that archived task as read-only PR context and may reuse the fresh ship run instead of writing duplicate ship evidence.

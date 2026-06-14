@@ -284,7 +284,7 @@ Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-g
 `agentloop review-context --json` gives non-MCP agents one read-only local snapshot with status, gates, policies, artifacts, recent runs, latest ship evidence, and the next action.
 `agentloop upgrade-harness` is read-only. It tells existing users which generated guidance files need manual review after a CLI upgrade. It does not merge templates or overwrite local edits.
 `agentloop schemastore --json` prints the catalog entry for `agentloop.config.json`. Use it when preparing a SchemaStore contribution; the CLI does not submit that contribution for you.
-`agentloop github import --issue-json issue.json --pr-json pr.json` imports explicit local GitHub metadata into `.agentloop/github/context.json`. It does not call GitHub APIs, read tokens, or run `gh`.
+`agentloop github import --issue-json issue.json --pr-json pr.json` imports explicit local GitHub metadata into `.agentloop/github/context.json`. `review-context`, `prepare-pr`, and `maintainer-check` use that local context when it exists. Missing metadata does not block the loop. The CLI does not call GitHub APIs, read tokens, or run `gh`.
 
 ## More Docs
 

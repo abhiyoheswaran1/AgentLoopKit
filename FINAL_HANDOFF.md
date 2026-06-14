@@ -47,6 +47,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - repo-relative AgentLoop artifact paths in PR-facing Markdown, public JSON, and human write-confirmation output
 - deterministic review-readiness scoring that does not claim to measure code quality
 - PR description generation with `agentloop prepare-pr`
+- optional imported GitHub issue and PR context in `review-context`, `prepare-pr`, and `maintainer-check`
 - `prepare-pr` reuse of matching fresh ship evidence to avoid duplicate run ledger entries
 - `prepare-pr --json` evidence-source reporting for reused versus refreshed ship evidence
 - `prepare-pr` grouped changed-file sections for reviewer scanning
@@ -70,6 +71,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - framework-specific task recipes for Remix, SvelteKit, Django, and FastAPI
 - dependency-upgrade workflow docs and a lockfile-review example artifact set
 - release-checklist example for GitHub-current/npm-lag maintainer handoffs
+- organization policy-pack workflow examples for repo-local team review rules
 - internal product panel, target personas, simulated interview cycles, backlog, and dogfood log
 
 ## Current release
@@ -89,12 +91,21 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - GHCR proof: registry tags include `latest`, `0.32`, and `0.32.1`
 - MCP Registry proof: public registry search marks `0.32.1` as latest for `io.github.abhiyoheswaran1/agentloopkit`
 
+## Post-0.32.1 work in progress
+
+- `review-context`, `prepare-pr`, and `maintainer-check` now read `.agentloop/github/context.json` when present.
+- `prepare-pr` includes imported issue and PR context in the generated PR body.
+- `maintainer-check` treats missing GitHub metadata as neutral and invalid local metadata as a warning.
+- Imported issue and PR prose is escaped before rendering reviewer-facing Markdown.
+- Docs now include organization policy-pack workflow examples.
+- This work is not in the `0.32.1` npm package until the next approved release.
+
 ## 0.32.1 release summary
 
 Included:
 
-- post-release proof documentation for `0.32.0`
-- archived AgentLoop release task evidence for the `0.32.0` release gate
+- post-release proof documentation for `0.32.1`
+- archived AgentLoop release task evidence for the `0.32.1` release gate
 - dogfood log entry covering release-flow, published-package smoke, GHCR proof, MCP Registry proof, strict dogfood, and ProjScan
 
 ## 0.32.0 release summary
@@ -2164,21 +2175,19 @@ Strongest signals:
 
 Top remaining items:
 
-1. Complete npm browser/OTP authentication or trusted publishing for the current release line, now `agentloopkit@0.24.0`.
-2. Optional schema-store submission after npm publishing is stable.
-3. Remove the temporary GitHub tarball fallback from README after npm reports `0.24.0` or newer.
-4. Evaluate organization policy packs only after local policy workflows mature.
-5. Add GitHub issue and PR metadata import after the local workflow matures.
+1. Keep GitHub Release, npm, GHCR, and MCP Registry proof current after each approved release.
+2. Collect real feedback on organization policy-pack examples before adding more bundled packs.
+3. Evaluate whether imported GitHub metadata should affect `ship` scoring after the read-only context format proves stable.
+4. Keep public docs focused on user setup and review-readiness usage.
+5. Defer VS Code/Open VSX, Scoop, and WinGet until demand justifies the maintenance cost.
 
 ## Known limitations
 
-- GitHub releases through `v0.24.0` are public, but npm still shows `agentloopkit@0.1.1` until npm publish succeeds.
-- npm should jump from `0.1.1` to the current GitHub release because public GitHub tags already occupy the intermediate versions.
-- Do not publish stale intermediate versions to npm from current `main`. Publish each version only from its matching release commit or release tarball.
-- Local `npm publish --access public` for `0.16.0` passed `prepublishOnly`, then npm stopped at `EOTP` for browser/OTP authentication.
-- The release-triggered GitHub Publish workflow for `v0.16.0` passed checks and failed at npm authorization with `E404`.
-- GitHub release `v0.16.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.16.0
-- GitHub release `v0.16.0` tarball SHA-256: `687dac923ee3976e4975641a20844ece4ce41c2123794423c46cd72091f8cb18`.
+- The next roadmap batch is unreleased until the maintainer approves a version cut.
+- Imported GitHub metadata is local context only. AgentLoopKit does not call GitHub APIs, post comments, or score code quality from issue text.
+- Organization policy packs are repo-local examples. AgentLoopKit does not fetch remote packs or enforce compliance.
+- `ship` still scores review evidence, not implementation correctness.
+- Editor extensions and Windows package-manager releases remain deferred.
 - GitHub release `v0.17.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.17.0
 - GitHub release `v0.17.0` tarball SHA-256: `8b7bb6ae9307e79cf97e20e405a1cef6a4aefcc48466d865758cc87f3439d49c`.
 - GitHub release `v0.18.0`: https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.18.0

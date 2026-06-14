@@ -1,0 +1,22 @@
+ .agentloop/backlog.md                              |  9 +++
+ .agentloop/dogfood-log.md                          | 45 +++++++++++
+ ...improve-adoption-polish-and-release-workflow.md | 75 -----------------
+ CHANGELOG.md                                       |  8 +-
+ DECISIONS.md                                       |  8 ++
+ FINAL_HANDOFF.md                                   | 37 +++++----
+ README.md                                          |  2 +-
+ ROADMAP.md                                         |  7 +-
+ docs/cli-reference.md                              | 12 ++-
+ docs/getting-started.md                            |  1 +
+ docs/github-metadata.md                            | 18 +++++
+ docs/policies.md                                   | 77 ++++++++++++++++++
+ docs/policy-examples.md                            | 51 ++++++++++++
+ src/core/github-metadata.ts                        | 93 +++++++++++++++++++++-
+ src/core/maintainer-check.ts                       | 71 ++++++++++++-----
+ src/core/prepare-pr.ts                             | 88 ++++++++++++++++++--
+ src/core/review-context.ts                         | 27 ++++++-
+ tests/github-metadata.test.ts                      | 55 ++++++++++++-
+ tests/maintainer-check.test.ts                     | 61 +++++++++++++-
+ tests/prepare-pr.test.ts                           | 92 +++++++++++++++++++--
+ tests/review-context.test.ts                       | 43 +++++++++-
+ 21 files changed, 739 insertions(+), 141 deletions(-)

@@ -6,6 +6,7 @@ import {
 } from './artifacts.js';
 import { checkGates } from './check-gates.js';
 import { inlineCode } from './markdown-format.js';
+import { readGithubMetadataContext, type GithubMetadataContext } from './github-metadata.js';
 import { getPolicyStatus } from './policy.js';
 import { listRuns } from './runs.js';
 import { getAgentLoopStatus } from './status.js';
@@ -15,7 +16,7 @@ export async function getReviewContext(options: {
   config: AgentLoopConfig;
   redactPaths?: boolean;
 }) {
-  const [status, gates, policies, inventory, runs] = await Promise.all([
+  const [status, gates, policies, inventory, runs, githubMetadata] = await Promise.all([
     getAgentLoopStatus({
       cwd: options.cwd,
       config: options.config,
@@ -25,6 +26,7 @@ export async function getReviewContext(options: {
     getPolicyStatus({ cwd: options.cwd, config: options.config }),
     getArtifactInventory({ cwd: options.cwd, config: options.config }),
     listRuns(options.cwd),
+    readGithubMetadataContext({ cwd: options.cwd, config: options.config }),
   ]);
   const recentRuns = runs.slice(0, 5);
   const latestShip =
@@ -62,6 +64,7 @@ export async function getReviewContext(options: {
           shipReportPath: latestShip.shipReportPath,
         }
       : null,
+    githubMetadata,
     safety: {
       readOnly: true,
       includesMarkdownContent: false,
@@ -104,6 +107,27 @@ function formatRecentRuns(runs: Awaited<ReturnType<typeof getReviewContext>>['re
     .join('\n');
 }
 
+function formatGithubMetadata(metadata: GithubMetadataContext) {
+  if (metadata.status === 'missing') return `missing - ${inlineCode(metadata.path)}`;
+  if (metadata.status === 'invalid') {
+    return `invalid - ${inlineCode(metadata.path)}: ${inlineCode(metadata.message)}`;
+  }
+
+  const parts: string[] = [];
+  if (metadata.issue) {
+    const number = metadata.issue.number === null ? 'unknown' : `#${metadata.issue.number}`;
+    parts.push(`issue ${inlineCode(number)} ${inlineCode(metadata.issue.state || 'unknown')}`);
+  }
+  if (metadata.pullRequest) {
+    const number =
+      metadata.pullRequest.number === null ? 'unknown' : `#${metadata.pullRequest.number}`;
+    parts.push(`PR ${inlineCode(number)} ${inlineCode(metadata.pullRequest.state || 'unknown')}`);
+  }
+  return parts.length
+    ? `${parts.join(', ')} - ${inlineCode(metadata.path)}`
+    : `present - ${inlineCode(metadata.path)}`;
+}
+
 export function renderReviewContextMarkdown(context: Awaited<ReturnType<typeof getReviewContext>>) {
   const policy = context.policies.summary;
   const artifacts = context.artifacts;
@@ -122,6 +146,7 @@ export function renderReviewContextMarkdown(context: Awaited<ReturnType<typeof g
     String(artifacts.verificationReports.count),
   )} verification report(s), ${inlineCode(String(artifacts.handoffs.count))} handoff(s)
 - Latest ship score: ${formatLatestShip(context.latestShip)}
+- GitHub metadata: ${formatGithubMetadata(context.githubMetadata)}
 - Working tree: ${inlineCode(
     context.status.workingTree.dirty
       ? `dirty (${context.status.workingTree.changedFileCount})`

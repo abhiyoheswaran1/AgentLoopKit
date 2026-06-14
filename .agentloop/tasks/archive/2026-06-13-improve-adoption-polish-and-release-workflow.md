@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-13
 - Task type: feature
-- Status: review
+- Status: done
 
 ## Problem Statement
 AgentLoopKit has the main acceptance-layer loop, but existing users and maintainers need clearer upgrade guidance, doctor suggestions, faster dev tests, MCP examples, public workflows, and a repeatable release gate before the next version.

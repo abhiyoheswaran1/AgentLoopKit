@@ -23,7 +23,11 @@ async function createMaintainerFixture() {
   await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
   await git(dir, ['config', 'user.name', 'AgentLoopKit Test']);
 
-  const config = createDefaultConfig({ name: 'demo', type: 'typescript-package', packageManager: 'npm' });
+  const config = createDefaultConfig({
+    name: 'demo',
+    type: 'typescript-package',
+    packageManager: 'npm',
+  });
   await writeJson(path.join(dir, 'agentloop.config.json'), config);
   await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
   await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
@@ -133,7 +137,9 @@ describe('maintainer-check command', () => {
       ]),
     );
     expect(output.maintainerChecklist).toContain('Review auth/security-sensitive files manually.');
-    expect(output.suggestedContributorRequest).toContain('Please confirm the auth/security-sensitive changes were reviewed manually.');
+    expect(output.suggestedContributorRequest).toContain(
+      'Please confirm the auth/security-sensitive changes were reviewed manually.',
+    );
   });
 
   test('warns when the latest handoff does not cover the current dirty files', async () => {
@@ -154,7 +160,9 @@ describe('maintainer-check command', () => {
         expect.objectContaining({ id: 'auth-security-files', status: 'pass' }),
       ]),
     );
-    expect(output.suggestedContributorRequest).toContain('Please address the AgentLoopKit maintainer warnings');
+    expect(output.suggestedContributorRequest).toContain(
+      'Please address the AgentLoopKit maintainer warnings',
+    );
   });
 
   test('passes handoff evidence when the latest handoff run covers the current dirty files', async () => {
@@ -170,6 +178,53 @@ describe('maintainer-check command', () => {
           id: 'handoff-summary',
           status: 'pass',
           message: 'Reviewer handoff found.',
+        }),
+      ]),
+    );
+  });
+
+  test('reports imported GitHub metadata as optional review context', async () => {
+    const dir = await createReviewableFixture({ freshHandoffRun: true });
+    await writeJson(path.join(dir, '.agentloop/github/context.json'), {
+      issue: {
+        number: 42,
+        title: 'Login redirect drops target',
+        state: 'OPEN',
+        url: 'https://github.com/example/app/issues/42',
+        author: 'octocat',
+        labels: ['bug'],
+        bodyExcerpt: 'Users lose redirect targets after reset.',
+      },
+      pullRequest: {
+        number: 77,
+        title: 'Fix login redirect',
+        state: 'OPEN',
+        url: 'https://github.com/example/app/pull/77',
+        author: 'contributor',
+        labels: ['bugfix'],
+        isDraft: false,
+        baseRefName: 'main',
+        headRefName: 'fix/login-redirect',
+        changedFiles: 3,
+        additions: 42,
+        deletions: 9,
+        bodyExcerpt: 'Implements the redirect fix.',
+      },
+    });
+    await git(dir, ['add', '.agentloop/github/context.json']);
+    await git(dir, ['commit', '-m', 'Add GitHub metadata context']);
+
+    const result = await execa(tsxPath, [cliPath, 'maintainer-check', '--json'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+
+    expect(output.status).toBe('pass');
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'github-metadata',
+          status: 'pass',
+          message: 'Imported GitHub metadata found: issue #42: PR #77',
+          path: '.agentloop/github/context.json',
         }),
       ]),
     );

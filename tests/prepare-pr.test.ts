@@ -29,14 +29,17 @@ async function createPreparePrFixture(
     `- Password-reset login redirects to the requested page.
 - Existing session login still redirects to the dashboard.
 - Reviewer can see every acceptance criterion in the PR body.`;
-  const riskNotes =
-    options.riskNotes ?? '- Auth flow touched; review redirect edge cases.';
+  const riskNotes = options.riskNotes ?? '- Auth flow touched; review redirect edge cases.';
 
   await git(dir, ['init', '-q']);
   await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
   await git(dir, ['config', 'user.name', 'AgentLoopKit Test']);
 
-  const config = createDefaultConfig({ name: 'demo', type: 'typescript-package', packageManager: 'npm' });
+  const config = createDefaultConfig({
+    name: 'demo',
+    type: 'typescript-package',
+    packageManager: 'npm',
+  });
   await writeJson(path.join(dir, 'agentloop.config.json'), config);
   await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
   await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
@@ -129,13 +132,17 @@ describe('prepare-pr command', () => {
     expect(output.body).toContain('.agentloop/reports/');
     expect(output.body).not.toContain(dir);
     expect(output.githubComment).toContain('## AgentLoopKit Review Readiness');
-    expect(output.githubComment).toContain('This is a review-readiness score, not a code-quality score.');
+    expect(output.githubComment).toContain(
+      'This is a review-readiness score, not a code-quality score.',
+    );
     expect(output.githubComment).toContain('.agentloop/reports/');
     expect(output.githubComment).not.toContain(dir);
     expect(output.shipReportPath).toMatch(/\.agentloop\/reports\/.+-ship-report\.md$/);
     expect(output.shipReportPath).not.toContain(dir);
     expect(output.handoffPath).not.toContain(dir);
-    const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
+    const runs = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout,
+    );
     const shipRuns = runs.runs.filter((run: { command: string }) => run.command === 'ship');
     expect(shipRuns).toHaveLength(1);
     expect(output.shipEvidence).toMatchObject({
@@ -176,6 +183,73 @@ describe('prepare-pr command', () => {
     CLI_PREPARE_PR_TEST_TIMEOUT_MS,
   );
 
+  test(
+    'includes imported GitHub issue and pull request context in PR output',
+    async () => {
+      const dir = await createPreparePrFixture();
+      await writeJson(path.join(dir, '.agentloop/github/context.json'), {
+        issue: {
+          number: 42,
+          title: 'Fix [login](https://example.com) redirect',
+          state: 'OPEN',
+          url: 'https://github.com/example/app/issues/42',
+          author: 'octocat',
+          labels: ['bug', 'agent-review'],
+          bodyExcerpt: 'User loses *redirect* target.\nSecond line.',
+        },
+        pullRequest: {
+          number: 77,
+          title: 'Agent fix for login redirect',
+          state: 'OPEN',
+          url: 'https://github.com/example/app/pull/77',
+          author: 'contributor',
+          labels: ['bugfix'],
+          isDraft: false,
+          baseRefName: 'main',
+          headRefName: 'fix/login-redirect',
+          changedFiles: 3,
+          additions: 42,
+          deletions: 9,
+          bodyExcerpt: 'Implements [the fix](https://example.com).',
+        },
+      });
+
+      const output = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'prepare-pr', '--json'], { cwd: dir })).stdout,
+      );
+
+      expect(output.githubMetadata).toMatchObject({
+        status: 'present',
+        path: '.agentloop/github/context.json',
+        issue: {
+          number: 42,
+          title: 'Fix [login](https://example.com) redirect',
+          bodyExcerpt: 'User loses *redirect* target.\nSecond line.',
+        },
+        pullRequest: {
+          number: 77,
+          headRefName: 'fix/login-redirect',
+          bodyExcerpt: 'Implements [the fix](https://example.com).',
+        },
+      });
+      expect(output.body).toContain('## Imported GitHub Context');
+      expect(output.body).toContain('- Metadata file: `.agentloop/github/context.json`');
+      expect(output.body).toContain(
+        '- Issue: `#42` `OPEN` - Fix \\[login\\]\\(https://example.com\\) redirect',
+      );
+      expect(output.body).toContain('- Issue labels: `bug`, `agent-review`');
+      expect(output.body).toContain(
+        '- Issue excerpt: User loses \\*redirect\\* target. Second line.',
+      );
+      expect(output.body).toContain('- PR branch: `fix/login-redirect` -> `main`');
+      expect(output.body).toContain(
+        '- PR excerpt: Implements \\[the fix\\]\\(https://example.com\\).',
+      );
+      expect(output.body).not.toContain(dir);
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
+
   test('accepts redacted output when refreshing ship evidence', async () => {
     const dir = await createPreparePrFixture();
     const realRoot = await realpath(dir);
@@ -205,7 +279,9 @@ describe('prepare-pr command', () => {
       const prepared = JSON.parse(
         (await execa(tsxPath, [cliPath, 'prepare-pr', '--write', '--json'], { cwd: dir })).stdout,
       );
-      const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
+      const runs = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout,
+      );
       const shipRuns = runs.runs.filter((run: { command: string }) => run.command === 'ship');
 
       expect(prepared.shipReportPath).toBe(ship.shipReportPath);
@@ -238,7 +314,9 @@ describe('prepare-pr command', () => {
       const prepared = JSON.parse(
         (await execa(tsxPath, [cliPath, 'prepare-pr', '--write', '--json'], { cwd: dir })).stdout,
       );
-      const runs = JSON.parse((await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout);
+      const runs = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'runs', '--json'], { cwd: dir })).stdout,
+      );
       const shipRuns = runs.runs.filter((run: { command: string }) => run.command === 'ship');
 
       expect(archivedShip.task).toMatchObject({

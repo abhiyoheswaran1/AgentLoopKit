@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-14-16-58-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-14-16-58",
+  "createdAtEpochMs": 1781449080175,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-14-improve-roadmap-adoption-evidence.md",
+    "title": "Improve roadmap adoption evidence",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-14-16-45-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-14-16-57-pr-summary.md",
+  "changedFileCount": 59
+}

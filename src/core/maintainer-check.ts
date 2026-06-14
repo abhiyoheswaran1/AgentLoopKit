@@ -4,6 +4,7 @@ import { AgentLoopConfig } from './config.js';
 import { latestMarkdownFile, prSummaryPattern } from './artifacts.js';
 import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
 import { getGitStatus, parseGitStatus } from './git.js';
+import { readGithubMetadataContext } from './github-metadata.js';
 import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
 import { listRuns } from './runs.js';
 import { readTaskContract } from './task-state.js';
@@ -30,20 +31,25 @@ function relativePath(cwd: string, filePath: string | undefined) {
 }
 
 function extractOverallStatus(markdown: string | undefined) {
-  return markdown?.match(/Overall status:\s*([a-z-]+)/i)?.[1]?.trim().toLowerCase() ?? 'missing';
+  return (
+    markdown
+      ?.match(/Overall status:\s*([a-z-]+)/i)?.[1]
+      ?.trim()
+      .toLowerCase() ?? 'missing'
+  );
 }
 
 function check(id: string, status: MaintainerCheckStatus, message: string, filePath?: string) {
   return { id, status, message, ...(filePath ? { path: filePath } : {}) };
 }
 
-function redactLocalRoot(value: string | undefined, root: string, redactPaths: boolean | undefined) {
+function redactLocalRoot(
+  value: string | undefined,
+  root: string,
+  redactPaths: boolean | undefined,
+) {
   if (!value || !redactPaths || !root || root === path.parse(root).root) return value;
-  return value
-    .split(root)
-    .join('[git-root]')
-    .split(root.replace(/\\/g, '/'))
-    .join('[git-root]');
+  return value.split(root).join('[git-root]').split(root.replace(/\\/g, '/')).join('[git-root]');
 }
 
 function redactCheck(check: MaintainerCheck, root: string, redactPaths: boolean | undefined) {
@@ -94,9 +100,7 @@ export async function runMaintainerCheck(options: {
       config: options.config,
       taskPath: evidence.taskPath,
     });
-    checks.push(
-      check('task-contract', 'pass', `Task contract found: ${task.title}`, task.path),
-    );
+    checks.push(check('task-contract', 'pass', `Task contract found: ${task.title}`, task.path));
   } else {
     checks.push(check('task-contract', 'fail', 'Task contract is missing.'));
   }
@@ -126,16 +130,23 @@ export async function runMaintainerCheck(options: {
   }
 
   const changedFileStatuses = await parseGitStatus(await getGitStatus(options.cwd));
+  const githubMetadata = await readGithubMetadataContext({
+    cwd: options.cwd,
+    config: options.config,
+  });
   const latestRun = (await listRuns(options.cwd))[0];
   const latestHandoffRunCoversDirtyFiles = await dirtyCoveredByLatestHandoffRun(
     options.cwd,
     changedFileStatuses,
     latestRun,
   );
-  const handoff = await latestMarkdownFile(path.join(options.cwd, options.config.paths.handoffsDir), {
-    pattern: prSummaryPattern,
-    rootDir: options.cwd,
-  });
+  const handoff = await latestMarkdownFile(
+    path.join(options.cwd, options.config.paths.handoffsDir),
+    {
+      pattern: prSummaryPattern,
+      rootDir: options.cwd,
+    },
+  );
   if (handoff) {
     const staleHandoffForDirtyFiles =
       changedFileStatuses.length > 0 && !latestHandoffRunCoversDirtyFiles;
@@ -153,8 +164,29 @@ export async function runMaintainerCheck(options: {
     checks.push(check('handoff-summary', 'warn', 'Reviewer handoff is missing.'));
   }
 
-  const changedFiles = changedFileStatuses.map((file) =>
-    file.path.replace(/\\/g, '/'),
+  const changedFiles = changedFileStatuses.map((file) => file.path.replace(/\\/g, '/'));
+  checks.push(
+    check(
+      'github-metadata',
+      githubMetadata.status === 'invalid' ? 'warn' : 'pass',
+      githubMetadata.status === 'present'
+        ? [
+            'Imported GitHub metadata found',
+            githubMetadata.issue?.number !== null && githubMetadata.issue?.number !== undefined
+              ? `issue #${githubMetadata.issue.number}`
+              : undefined,
+            githubMetadata.pullRequest?.number !== null &&
+            githubMetadata.pullRequest?.number !== undefined
+              ? `PR #${githubMetadata.pullRequest.number}`
+              : undefined,
+          ]
+            .filter(Boolean)
+            .join(': ')
+        : githubMetadata.status === 'invalid'
+          ? githubMetadata.message
+          : 'No imported GitHub metadata found; optional context not provided.',
+      githubMetadata.status === 'missing' ? undefined : githubMetadata.path,
+    ),
   );
   checks.push(
     check(
@@ -227,10 +259,7 @@ export async function runMaintainerCheck(options: {
     status,
     checks: outputChecks,
     maintainerChecklist,
-    suggestedContributorRequest: redactLocalRoot(
-      contributorRequest(outputChecks),
-      options.cwd,
-      options.redactPaths,
-    ) ?? '',
+    suggestedContributorRequest:
+      redactLocalRoot(contributorRequest(outputChecks), options.cwd, options.redactPaths) ?? '',
   };
 }

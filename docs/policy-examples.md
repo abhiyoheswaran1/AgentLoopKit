@@ -161,6 +161,57 @@ agentloop handoff
 
 Use `check-gates --strict` as a review-evidence gate, not as a substitute for code review.
 
+## Organization Policy Pack
+
+Use when a team wants the same local AgentLoop policy files across several repos.
+
+Suggested pack manifest:
+
+```json
+{
+  "name": "org-review",
+  "title": "Organization Review Pack",
+  "description": "Shared review rules for agent-assisted changes.",
+  "policies": [
+    "review-evidence-policy.md",
+    "dependency-review-policy.md",
+    "release-evidence-policy.md"
+  ]
+}
+```
+
+Suggested `review-evidence-policy.md`:
+
+```markdown
+# Review Evidence Policy
+
+- Agent-assisted PRs should include a task contract, verification report, ship report, and PR description.
+- Run `agentloop maintainer-check` before review when AgentLoopKit evidence exists.
+- Imported issue or PR metadata can help reviewers, but missing metadata must not block local review evidence.
+```
+
+Suggested `release-evidence-policy.md`:
+
+```markdown
+# Release Evidence Policy
+
+- Release changes must include `agentloop release-check --strict` output.
+- Public docs must not mention unsupported release channels.
+- Record npm, GitHub release, container, and MCP Registry proof only after each channel reports the new version.
+```
+
+Good workflow:
+
+```bash
+agentloop policy packs
+agentloop policy pack show org-review
+agentloop policy pack apply org-review --dry-run
+agentloop policy pack apply org-review
+agentloop policy status
+```
+
+Keep organization packs inside the repo or copy them from a reviewed internal template. AgentLoopKit does not fetch remote policy packs.
+
 ## How to apply an example
 
 1. Pick the example closest to your repo.

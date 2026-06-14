@@ -157,7 +157,7 @@ agentloop review-context --json
 agentloop review-context --redact-paths
 ```
 
-`review-context` prints one read-only local snapshot for agents and scripts that do not use MCP. It combines active task state, latest verification, review gates, policy status, artifact inventory, recent run ledger entries, latest ship score, working-tree state, safety notes, and the next recommended action.
+`review-context` prints one read-only local snapshot for agents and scripts that do not use MCP. It combines active task state, latest verification, review gates, policy status, artifact inventory, recent run ledger entries, latest ship score, optional imported GitHub issue or PR metadata, working-tree state, safety notes, and the next recommended action.
 
 The command does not run verification, write files, include full Markdown artifact bodies, read `.env` contents, call external APIs, or post to GitHub.
 
@@ -219,9 +219,9 @@ By default, `ship` reuses current verification evidence. Use `--run-verify` when
 
 Use `ship --github-comment` when CI needs compact review-readiness Markdown for a pull request comment. With `--json`, the comment appears as `githubComment`. Without `--json`, the command prints only the comment Markdown. AgentLoopKit does not read GitHub tokens, call GitHub APIs, or post comments by itself.
 
-`prepare-pr` generates a PR title and body from the active task, changed files, verification evidence, ship report, gates, risk notes, and rollback notes. It groups changed files by review area so reviewers can scan risk-sensitive paths, source, tests, AgentLoop evidence, docs, CI, config, and other files. `--github-comment` includes Markdown suitable for a PR comment. The CLI does not read GitHub tokens or post comments by itself.
+`prepare-pr` generates a PR title and body from the active task, changed files, verification evidence, ship report, gates, risk notes, rollback notes, and optional imported GitHub issue or PR metadata. It groups changed files by review area so reviewers can scan risk-sensitive paths, source, tests, AgentLoop evidence, docs, CI, config, and other files. `--github-comment` includes Markdown suitable for a PR comment. The CLI does not read GitHub tokens or post comments by itself.
 
-PR-facing Markdown uses repo-relative AgentLoop artifact paths. `prepare-pr` escapes Markdown control characters in task-derived list prose, so acceptance criteria and risk notes do not turn into unintended checkboxes, headings, or links.
+PR-facing Markdown uses repo-relative AgentLoop artifact paths. `prepare-pr` escapes Markdown control characters in task-derived list prose and imported issue or PR excerpts, so acceptance criteria, risk notes, and GitHub metadata do not turn into unintended checkboxes, headings, or links.
 JSON output keeps path fields unchanged for scripts.
 Use `--redact-paths` with `ship` or `prepare-pr` before copying review-readiness output into public logs or PR comments. It hides the absolute Git root inside embedded gate evidence while keeping repo-relative AgentLoop artifact paths.
 
@@ -258,11 +258,13 @@ agentloop maintainer-check --json
 agentloop maintainer-check --redact-paths
 ```
 
-`maintainer-check` helps maintainers evaluate AI-assisted pull requests. It checks for a task contract, fresh verification evidence, handoff evidence, changed file count, dependency and lockfile changes, migrations, auth/security-sensitive files, and generated output files.
+`maintainer-check` helps maintainers evaluate AI-assisted pull requests. It checks for a task contract, fresh verification evidence, handoff evidence, optional imported GitHub issue or PR metadata, changed file count, dependency and lockfile changes, migrations, auth/security-sensitive files, and generated output files.
 
 When the repo has dirty files, handoff evidence must come from the latest handoff or ship run and cover those files. An older PR summary still appears in the output, but `maintainer-check` warns that it is stale.
 
 If a verified task was archived after handoff, `maintainer-check` can use the latest run ledger entry when it still points to an existing archived task contract.
+
+Missing imported GitHub metadata is neutral. Invalid local metadata is a warning because reviewers cannot rely on it.
 
 Use `--redact-paths` before pasting maintainer-check output into a public issue, PR, or CI log. Default JSON keeps existing repo-relative paths unchanged for scripts.
 
@@ -436,6 +438,8 @@ agentloop github import --issue-json issue.json --json
 ```
 
 `github import` reads explicit local JSON files from `gh issue view --json ...`, `gh pr view --json ...`, or compatible GitHub API output. It normalizes issue and pull request metadata into `.agentloop/github/context.json`. If you pass `--output`, the path must stay under `.agentloop/github/`.
+
+`review-context`, `prepare-pr`, and `maintainer-check` read that local context file when it exists. Missing metadata does not block review evidence. PR-facing output escapes issue and PR prose before rendering it.
 
 It does not run `gh`, call GitHub APIs, read GitHub tokens, read `.env` files, post comments, upload files, or execute commands from issue or pull request text.
 

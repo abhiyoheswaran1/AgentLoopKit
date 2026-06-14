@@ -1,9 +1,9 @@
 import path from 'node:path';
-import { readFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
-import { importGithubMetadata } from '../src/core/github-metadata.js';
+import { importGithubMetadata, readGithubMetadataContext } from '../src/core/github-metadata.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -93,6 +93,57 @@ describe('GitHub metadata import', () => {
     );
     expect(written.issue.bodyExcerpt).toBe('Users lose redirect targets after reset.');
     expect(written.pullRequest.bodyExcerpt).toBe('Implements the redirect fix.');
+  });
+
+  test('reads normalized imported context without requiring raw issue or PR body fields', async () => {
+    const { dir, config } = await createGithubFixture();
+
+    await importGithubMetadata({
+      cwd: dir,
+      config,
+      issueJsonPath: 'issue.json',
+      prJsonPath: 'pr.json',
+    });
+
+    const context = await readGithubMetadataContext({ cwd: dir, config });
+
+    expect(context).toMatchObject({
+      status: 'present',
+      path: '.agentloop/github/context.json',
+      issue: {
+        number: 42,
+        title: 'Login redirect drops target',
+        bodyExcerpt: 'Users lose redirect targets after reset.',
+      },
+      pullRequest: {
+        number: 77,
+        title: 'Fix login redirect',
+        bodyExcerpt: 'Implements the redirect fix.',
+      },
+      safety: {
+        callsGithubApi: false,
+        readsTokens: false,
+        readsEnvFiles: false,
+      },
+    });
+  });
+
+  test('reports missing and invalid imported context as local read results', async () => {
+    const { dir, config } = await createGithubFixture();
+
+    await expect(readGithubMetadataContext({ cwd: dir, config })).resolves.toEqual({
+      status: 'missing',
+      path: '.agentloop/github/context.json',
+    });
+
+    await mkdir(path.join(dir, '.agentloop/github'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/github/context.json'), '[');
+
+    await expect(readGithubMetadataContext({ cwd: dir, config })).resolves.toMatchObject({
+      status: 'invalid',
+      path: '.agentloop/github/context.json',
+      message: expect.stringContaining('could not be read'),
+    });
   });
 
   test('supports dry-run import without writing context files', async () => {

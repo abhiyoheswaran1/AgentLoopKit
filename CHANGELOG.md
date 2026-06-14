@@ -2,12 +2,14 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Added local GitHub metadata summaries to `review-context`, `prepare-pr`, and `maintainer-check` from `.agentloop/github/context.json`.
+- Added organization policy-pack workflow examples for repo-local team review rules.
+- Fixed imported GitHub metadata reading so normalized `bodyExcerpt` fields survive the import-to-review round trip.
 
 ## 0.32.1
 
-- Changed release-status documentation to record verified `0.32.0` npm, GitHub release, GHCR, and MCP Registry proof.
-- Added AgentLoop dogfood evidence for the `0.32.0` release gate and archived the completed release task.
+- Changed release-status documentation to record verified `0.32.1` npm, GitHub release, GHCR, and MCP Registry proof.
+- Added AgentLoop dogfood evidence for the `0.32.1` release gate and archived the completed release task.
 
 ## 0.32.0
 

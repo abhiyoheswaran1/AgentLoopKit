@@ -91,6 +91,83 @@ Each local pack needs a manifest:
 
 Policy files live under the pack's `policies/` directory. AgentLoopKit reads local packs only when you run `policy packs`, `policy pack show`, or `policy pack apply`.
 
+### Organization policy-pack workflow
+
+Use local packs when a team wants the same review rules across several repos without a service or remote policy download.
+
+Example layout:
+
+```text
+.agentloop/policy-packs/org-review/
+  manifest.json
+  policies/
+    review-evidence-policy.md
+    dependency-review-policy.md
+```
+
+Example manifest:
+
+```json
+{
+  "name": "org-review",
+  "title": "Organization Review Pack",
+  "description": "Shared review evidence rules for this organization.",
+  "policies": ["review-evidence-policy.md", "dependency-review-policy.md"]
+}
+```
+
+Example `review-evidence-policy.md`:
+
+```markdown
+# Review Evidence Policy
+
+- PRs that use a coding agent should include a task contract, verification report, and `agentloop prepare-pr` output.
+- Maintainers should run `agentloop maintainer-check` before review when AgentLoopKit evidence exists.
+- Changes to auth, billing, migrations, deployment, or lockfiles need explicit risk notes and rollback notes.
+```
+
+Example `dependency-review-policy.md`:
+
+```markdown
+# Dependency Review Policy
+
+- Dependency changes must explain why the package changed.
+- Lockfile changes must stay scoped to the dependency work.
+- Verification must include the package manager's install or audit command when the repo has one.
+```
+
+Then configure the pack:
+
+```json
+{
+  "policies": {
+    "packs": [
+      {
+        "name": "org-review",
+        "path": ".agentloop/policy-packs/org-review"
+      }
+    ]
+  }
+}
+```
+
+Preview before writing:
+
+```bash
+agentloop policy packs
+agentloop policy pack show org-review
+agentloop policy pack apply org-review --dry-run
+```
+
+Apply when the plan looks right:
+
+```bash
+agentloop policy pack apply org-review
+agentloop policy status
+```
+
+`apply` copies missing files into `.agentloop/policies/` and skips existing files. It does not merge, overwrite, download, or enforce policy text.
+
 ## How to read status
 
 | Status     | What it means                                                     | Maintainer action                                                                                                    |

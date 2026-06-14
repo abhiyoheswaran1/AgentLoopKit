@@ -9678,3 +9678,48 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The second `release-flow` run on a clean release commit passed end to end.
 - Improve:
   - Consider a `release-proof` helper that gathers workflow IDs, tarball digest, npm status, GHCR tags, and MCP Registry latest into a single local report.
+
+## 2026-06-14: Roadmap Adoption Evidence Batch
+
+- Task contract: `.agentloop/tasks/2026-06-14-improve-roadmap-adoption-evidence.md`
+- Trigger:
+  - After `0.32.1`, simulated product research and roadmap audit pointed to adoption polish: make imported GitHub metadata useful in review surfaces and document organization policy-pack workflows.
+- Implementation:
+  - Fixed local GitHub metadata reading so imported `bodyExcerpt` fields survive the import-to-review round trip.
+  - Added optional GitHub issue/PR metadata summaries to `review-context`.
+  - Added an `Imported GitHub Context` section to `prepare-pr` output.
+  - Added a `github-metadata` check to `maintainer-check`.
+  - Documented org policy-pack layout, manifests, dry-run apply, no-overwrite behavior, and examples.
+  - Recorded simulated research cycle 110 and backlog decisions.
+- Verification:
+  - Focused metadata and review-surface tests passed:
+    - `npx vitest run tests/github-metadata.test.ts tests/review-context.test.ts tests/prepare-pr.test.ts tests/maintainer-check.test.ts`
+  - Local checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run test:unit`
+    - `npm run test:integration`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Task-linked AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-14-16-45-verification-report.md`
+    - `.agentloop/runs/2026-06-14-16-47-verify`
+  - `agentloop ship --redact-paths` passed with a `96/100` review-readiness score:
+    - `.agentloop/reports/2026-06-14-16-48-ship-report.md`
+    - `.agentloop/runs/2026-06-14-16-48-ship`
+  - `npm run dogfood:strict` passed and included ProjScan A `100/100`.
+  - Full Vitest passed after the dogfood gate:
+    - `npm test`
+    - 58 files, 550 tests
+  - Final refreshed ship evidence passed with a `92/100` review-readiness score after the dogfood log update:
+    - `.agentloop/reports/2026-06-14-16-49-ship-report.md`
+    - `.agentloop/runs/2026-06-14-16-49-ship`
+  - Final strict review gate passed:
+    - `node dist/cli/index.js check-gates --strict --redact-paths`
+- What worked well:
+  - Dogfooding exposed that imported metadata needed to be consumed by existing review commands, not left as a file agents parse manually.
+  - The product stayed within the local-first boundary: no GitHub tokens, API calls, comment posting, telemetry, or `.env` reads.
+- Improve:
+  - Consider whether imported GitHub metadata should influence `ship` scoring only after real maintainers use the read-only context flow.
+  - Add more organization policy-pack examples only after teams report concrete gaps.

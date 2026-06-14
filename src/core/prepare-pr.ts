@@ -4,6 +4,7 @@ import { AgentLoopConfig } from './config.js';
 import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import { getGitStatus, GitFileStatus, parseGitStatus } from './git.js';
+import { readGithubMetadataContext, type GithubMetadataContext } from './github-metadata.js';
 import { escapeMarkdownProse, inlineCode } from './markdown-format.js';
 import { resolveOutputArtifactPath } from './artifacts.js';
 import { createShipReport, ShipResult } from './ship.js';
@@ -23,6 +24,7 @@ export type PreparePrResult = {
     source: 'reused' | 'refreshed';
     runId?: string;
   };
+  githubMetadata: GithubMetadataContext;
   readiness: ShipResult['readiness'];
   changedFiles: ShipResult['changedFiles'];
 };
@@ -79,7 +81,10 @@ function resolveMaybeRepoPath(cwd: string, filePath: string) {
 }
 
 function extractOverallStatus(markdown: string | undefined): ShipResult['verification']['status'] {
-  const status = markdown?.match(/Overall status:\s*([a-z-]+)/i)?.[1]?.trim().toLowerCase();
+  const status = markdown
+    ?.match(/Overall status:\s*([a-z-]+)/i)?.[1]
+    ?.trim()
+    .toLowerCase();
   if (status === 'pass' || status === 'fail') return status;
   if (status) return 'unknown';
   return 'missing';
@@ -115,7 +120,71 @@ function verificationLine(ship: PreparePrShipEvidence, cwd: string) {
   return `Overall status: ${ship.verification.status}${report}`;
 }
 
-function buildPrBody(input: { cwd: string; task: TaskContract | null; ship: PreparePrShipEvidence }) {
+function escapedInlineProse(value: string) {
+  return escapeMarkdownProse(value.replace(/\s+/g, ' ').trim());
+}
+
+function githubItemLine(
+  label: string,
+  item: { number: number | null; title: string; state: string; url: string },
+) {
+  const number = item.number === null ? 'unknown' : `#${item.number}`;
+  const suffix = item.url ? ` (${inlineCode(item.url)})` : '';
+  return `- ${label}: ${inlineCode(number)} ${inlineCode(item.state || 'unknown')} - ${escapedInlineProse(
+    item.title || 'Untitled',
+  )}${suffix}`;
+}
+
+function renderGithubMetadataSection(metadata: GithubMetadataContext) {
+  if (metadata.status === 'missing') return '';
+  if (metadata.status === 'invalid') {
+    return `## Imported GitHub Context
+
+- Metadata file: ${inlineCode(metadata.path)}
+- Status: invalid
+- Reason: ${escapeMarkdownProse(metadata.message)}
+`;
+  }
+
+  const lines = [`- Metadata file: ${inlineCode(metadata.path)}`];
+  if (metadata.issue) {
+    lines.push(githubItemLine('Issue', metadata.issue));
+    if (metadata.issue.labels.length) {
+      lines.push(
+        `- Issue labels: ${metadata.issue.labels.map((label) => inlineCode(label)).join(', ')}`,
+      );
+    }
+    if (metadata.issue.bodyExcerpt) {
+      lines.push(`- Issue excerpt: ${escapedInlineProse(metadata.issue.bodyExcerpt)}`);
+    }
+  }
+  if (metadata.pullRequest) {
+    lines.push(githubItemLine('Pull request', metadata.pullRequest));
+    lines.push(
+      `- PR branch: ${inlineCode(metadata.pullRequest.headRefName || 'unknown')} -> ${inlineCode(
+        metadata.pullRequest.baseRefName || 'unknown',
+      )}`,
+    );
+    if (metadata.pullRequest.changedFiles !== null) {
+      lines.push(`- PR changed files: ${inlineCode(String(metadata.pullRequest.changedFiles))}`);
+    }
+    if (metadata.pullRequest.bodyExcerpt) {
+      lines.push(`- PR excerpt: ${escapedInlineProse(metadata.pullRequest.bodyExcerpt)}`);
+    }
+  }
+
+  return `## Imported GitHub Context
+
+${lines.join('\n')}
+`;
+}
+
+function buildPrBody(input: {
+  cwd: string;
+  task: TaskContract | null;
+  ship: PreparePrShipEvidence;
+  githubMetadata: GithubMetadataContext;
+}) {
   const title = input.task?.title ?? 'AgentLoopKit review-ready changes';
   const taskContent = input.task?.content ?? '';
   const desiredOutcome = sectionContent(taskContent, 'Desired Outcome');
@@ -147,6 +216,8 @@ ${renderMarkdownList(acceptance, 'No acceptance criteria were recorded.')}
 ## Verification Evidence
 
 - ${verificationLine(input.ship, input.cwd)}
+
+${renderGithubMetadataSection(input.githubMetadata)}
 
 ## Reviewer Checklist
 
@@ -205,7 +276,10 @@ async function findReusableShipEvidence(options: {
   for (const run of await listRuns(options.cwd)) {
     if (run.command !== 'ship' || run.score === undefined) continue;
     if (run.task?.path !== taskPath) continue;
-    if (!run.shipReportPath || !(await pathExists(resolveMaybeRepoPath(options.cwd, run.shipReportPath)))) {
+    if (
+      !run.shipReportPath ||
+      !(await pathExists(resolveMaybeRepoPath(options.cwd, run.shipReportPath)))
+    ) {
       continue;
     }
     if (
@@ -273,7 +347,10 @@ export async function preparePullRequest(options: {
 }) {
   const preparedShip =
     (await findReusableShipEvidence(options)) ?? (await refreshShipEvidence(options));
-  const evidence = await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
+  const [evidence, githubMetadata] = await Promise.all([
+    resolveCurrentOrLatestRunTaskVerificationEvidence(options),
+    readGithubMetadataContext({ cwd: options.cwd, config: options.config }),
+  ]);
   const task = evidence.taskPath
     ? await readTaskContract({
         cwd: options.cwd,
@@ -281,7 +358,7 @@ export async function preparePullRequest(options: {
         taskPath: evidence.taskPath,
       })
     : null;
-  const body = buildPrBody({ cwd: options.cwd, task, ship: preparedShip });
+  const body = buildPrBody({ cwd: options.cwd, task, ship: preparedShip, githubMetadata });
   const githubComment = options.githubComment
     ? buildGithubComment(preparedShip, options.cwd)
     : undefined;
@@ -309,6 +386,7 @@ export async function preparePullRequest(options: {
       : {}),
     ...(writtenPath ? { writtenPath: relativePath(options.cwd, writtenPath) } : {}),
     shipEvidence: preparedShip.shipEvidence,
+    githubMetadata,
     readiness: preparedShip.readiness,
     changedFiles: preparedShip.changedFiles,
   } satisfies PreparePrResult;

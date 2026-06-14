@@ -1,0 +1,90 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "DECISIONS.md"
+  },
+  {
+    "status": "M",
+    "path": "FINAL_HANDOFF.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "ROADMAP.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/getting-started.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/github-metadata.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/policies.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/policy-examples.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/github-metadata.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/maintainer-check.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/prepare-pr.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/review-context.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/github-metadata.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/maintainer-check.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/prepare-pr.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/review-context.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-14-16-45-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/research/interview-cycle-110.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-14-improve-roadmap-adoption-evidence.md"
+  }
+]

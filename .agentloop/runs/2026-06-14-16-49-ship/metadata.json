@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-14-16-49-ship",
+  "command": "ship",
+  "createdAt": "2026-06-14-16-49",
+  "createdAtEpochMs": 1781448576077,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-14-improve-roadmap-adoption-evidence.md",
+    "title": "Improve roadmap adoption evidence",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-14-16-45-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-14-16-49-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-14-16-49-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 34
+}
