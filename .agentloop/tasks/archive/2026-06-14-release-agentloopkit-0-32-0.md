@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-14
 - Task type: release
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 Describe the problem this task should solve.

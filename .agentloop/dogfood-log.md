@@ -9617,3 +9617,31 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Release dogfooding produced a small preventive gate instead of another manual checklist item.
 - Improve:
   - Consider making the audit threshold configurable later if AgentLoopKit supports repo-local dogfood policy.
+
+## 2026-06-14: Release 0.32.0 Gate And Post-Release Proof
+
+- Task contract: `.agentloop/tasks/archive/2026-06-14-release-agentloopkit-0-32-0.md`
+- Trigger:
+  - The roadmap adoption tooling needed a public release through GitHub Releases, npm trusted publishing, GHCR, and MCP Registry.
+- Implementation:
+  - Bumped `package.json` and `server.json` to `0.32.0`.
+  - Moved changelog entries into `0.32.0`.
+  - Generated release notes, created GitHub release `v0.32.0`, and let release workflows publish npm, GHCR, and MCP Registry metadata.
+  - Updated release-status docs with workflow IDs, release asset digest, npm proof, GHCR tag proof, and MCP Registry proof.
+- Verification:
+  - Full release task verification passed:
+    - `.agentloop/reports/2026-06-14-14-17-verification-report.md`
+    - `.agentloop/runs/2026-06-14-14-23-verify`
+  - `npm run release-flow` passed on the release commit before tagging.
+  - `npm run smoke:published -- --version 0.32.0` passed after publish.
+  - `node dist/cli/index.js npm-status --agentloopkit --expect-current` passed.
+  - GHCR public tags include `0.32.0` and `0.32`.
+  - MCP Registry search marks `0.32.0` as latest.
+  - `npm run dogfood:strict` passed after the release task was archived.
+  - `npx --yes projscan doctor --format markdown` reported A 100/100.
+- What worked well:
+  - Dogfood caught the completed release task still sitting in the active task folder before the final status commit.
+  - The published-package smoke checked both direct `npx` usage and installed bin aliases from clean temp directories.
+- Improve:
+  - Keep using the archived-task cleanup as part of the release stop condition.
+  - Add a small release-status helper later if the same workflow IDs and registry proofs stay manual.

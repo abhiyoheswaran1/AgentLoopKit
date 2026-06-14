@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-14-14-48-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-14-14-48",
+  "createdAtEpochMs": 1781441314347,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-14-release-agentloopkit-0-32-0.md",
+    "title": "Release AgentLoopKit 0.32.0",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-14-14-17-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-14-14-48-pr-summary.md",
+  "changedFileCount": 7
+}

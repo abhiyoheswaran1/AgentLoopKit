@@ -77,14 +77,17 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Current npm release: `agentloopkit@0.32.0`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.32.0>
 - Release asset: `agentloopkit-0.32.0.tgz`
-- Release asset SHA-256: pending until the release tarball is attached
-- Release tag: `v0.32.0` at the published release commit
-- CI run: pending until release workflows complete
-- CLI Smoke run: pending until release workflows complete
-- Publish workflow run: pending until npm trusted publishing completes
-- Docker workflow run: pending until GHCR publishing completes
-- MCP Registry workflow run: pending until registry publishing completes
-- Post-publish npm proof: `npm view agentloopkit version versions --json` should report latest `0.32.0`
+- Release asset SHA-256: `04384dba7fc8cb719ee8670694aa317ddda315f14f2729d16b29e5a8d6d67943`
+- Release tag: `v0.32.0` at commit `93890cebfa0c97b729a9b7dad65209705608d1e3`
+- CI run: `27498958901`, success
+- CLI Smoke run: `27498958900`, success
+- Publish workflow run: `27498962164`, success
+- Docker workflow run: `27498962166`, success
+- MCP Registry workflow run: `27499084983`, success
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.32.0`
+- Published-package smoke: `npm run smoke:published -- --version 0.32.0` passed
+- GHCR proof: registry tags include `0.32.0` and `0.32`
+- MCP Registry proof: public registry search marks `0.32.0` as latest for `io.github.abhiyoheswaran1/agentloopkit`
 
 ## 0.32.0 release summary
 
@@ -1224,7 +1227,8 @@ Current publish state:
 
 - GitHub release `v0.32.0` is public.
 - npm latest is `agentloopkit@0.32.0`.
-- GHCR and MCP Registry workflows passed for `0.32.0`.
+- GHCR tags include `0.32.0` and `0.32`.
+- MCP Registry lists `0.32.0` as latest.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.
