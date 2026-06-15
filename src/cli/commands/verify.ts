@@ -181,6 +181,7 @@ export function verifyCommand() {
     .option('--timeout-ms <ms>', 'per-command timeout in milliseconds')
     .option('--progress', 'print bounded per-command progress in human output')
     .option('--write-run', 'write a local run ledger entry under .agentloop/runs')
+    .option('--redact-paths', 'redact local absolute paths in public output and written reports')
     .action(async (options: Record<string, unknown>) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json === true);
       if (!workspace) return;
@@ -233,6 +234,7 @@ export function verifyCommand() {
           },
           customCommands: options.command as string[],
           timeoutMs: parseTimeoutMs(options.timeoutMs),
+          redactPaths: options.redactPaths === true,
           onProgress:
             options.progress === true && options.json !== true ? printVerificationProgress : undefined,
         });

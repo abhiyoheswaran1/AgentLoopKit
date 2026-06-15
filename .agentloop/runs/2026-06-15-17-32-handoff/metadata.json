@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-17-32-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-17-32",
+  "createdAtEpochMs": 1781537547096,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-redact-verification-report-paths.md",
+    "title": "Redact verification report paths",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-17-24-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-17-32-pr-summary.md",
+  "changedFileCount": 20
+}

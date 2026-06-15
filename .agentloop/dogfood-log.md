@@ -9871,3 +9871,44 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - AgentFlight and ProjScan gave independent session and repo-health checks without changing the product boundary.
 - Improve:
   - Consider adding a small docs note in task authoring examples that plain list commands are easiest to edit, while inline-code commands are accepted.
+
+## 2026-06-15: Redacted Verification Reports
+
+- Task contract: `.agentloop/tasks/2026-06-15-redact-verification-report-paths.md`
+- AgentFlight session: `af-20260615-151245-redact-verification-report-paths`
+- Trigger:
+  - The previous dogfood pass required manual redaction of local absolute paths inside generated verification reports before committing evidence.
+  - Verification reports are often copied into PRs, issues, and run ledgers, so they need the same explicit public-output safety mode as status, gates, handoff, ship, and prepare-pr.
+- Implementation:
+  - Added `agentloop verify --redact-paths`.
+  - Added a shared local-root redaction helper that handles the repo root and macOS `/private/var` temp-path aliases.
+  - Redacted verification report Markdown, JSON `markdown`, command-output excerpts, and run-ledger verification report copies only when the flag is passed.
+  - Updated README, CLI reference, verification report docs, and changelog.
+- Verification:
+  - Red-green test cycle:
+    - Initial `npm test -- tests/verification.test.ts` failed on missing redaction and unknown `--redact-paths`.
+    - Retried `npm test -- tests/verification.test.ts` passed after implementation: 47 tests.
+  - `npm test -- tests/pr-summary.test.ts` passed: 12 tests.
+  - `npm run test:unit` passed: 21 files, 84 tests.
+  - `npm run typecheck` passed.
+  - `npm run check:public-docs` passed.
+  - `npm run check:links` passed.
+  - `npm run build` passed.
+  - Built CLI smoke passed:
+    - `node dist/cli/index.js verify --no-test --no-lint --no-typecheck --no-build --command 'node -e "console.log(process.cwd())"' --json --redact-paths`
+    - JSON command output was `[git-root]`.
+  - Task-linked AgentLoop verification passed with `--redact-paths`:
+    - `.agentloop/reports/2026-06-15-17-24-verification-report.md`
+    - `.agentloop/runs/2026-06-15-17-27-verify`
+  - `npm run dogfood:strict` passed after fresh handoff evidence.
+  - `npx --yes agentflight doctor` passed.
+  - `npx --yes agentflight verify -- npm test -- tests/verification.test.ts tests/pr-summary.test.ts` passed:
+    - 2 files, 59 tests
+    - `.agentflight/evidence/af-20260615-151245-redact-verification-report-paths/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-151245-redact-verification-report-paths/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+- What worked well:
+  - Dogfooding converted a manual cleanup step into a product capability.
+  - The same helper now serves PR summaries and verification reports, reducing drift in public-output safety behavior.
+- Improve:
+  - Consider whether other command-specific run artifacts need opt-in redaction tests when new public-output flags are added.

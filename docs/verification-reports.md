@@ -34,6 +34,7 @@ agentloop verify --task .agentloop/tasks/add-settings-page.md --task-commands --
 agentloop verify --command "node smoke-test.js"
 agentloop verify --timeout-ms 120000
 agentloop verify --progress
+agentloop verify --redact-paths
 agentloop verify --json
 ```
 
@@ -64,6 +65,8 @@ Use `--timeout-ms` to set a per-command timeout for long or risky checks. Timed-
 Use `--progress` when a long verification run should show bounded terminal progress. It prints one start line and one finish line per command with elapsed time. It does not stream child-process output to the terminal, and `--json` keeps stdout as JSON even when `--progress` is present.
 
 Long command output is shortened in the command section. AgentLoopKit keeps the beginning and ending output with a truncation marker, so setup context and final error lines remain visible without committing huge logs.
+
+Use `--redact-paths` when verification evidence will be committed or pasted into a public issue, PR, or CI log. It replaces the local repo root with `[git-root]` in report Markdown and command-output excerpts, including reports copied into `.agentloop/runs/` by `--write-run`. It does not change which commands run.
 
 ## CI Context
 

@@ -68,6 +68,38 @@ describe('verification', () => {
     expect(result.markdown).toContain('ok');
   });
 
+  test('redacts local root paths from markdown reports when requested', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(process.cwd() + \\"/src/index.ts\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-15-17-10',
+      nowIso: '2026-06-15T17:10:00.000Z',
+      redactPaths: true,
+    });
+    const written = await readFile(result.reportPath, 'utf8');
+
+    expect(result.markdown).not.toContain(dir);
+    expect(written).not.toContain(dir);
+    expect(result.markdown).toContain('[git-root]/src/index.ts');
+    expect(written).toContain('[git-root]/src/index.ts');
+    expect(result.commands[0]?.output).toContain('[git-root]/src/index.ts');
+  });
+
   test('emits bounded progress events for executed verification commands', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -1619,6 +1651,51 @@ describe('verification', () => {
     const markdown = await readFile(resolveOutputPath(dir, output.reportPath), 'utf8');
     expect(markdown).toContain(`- Path: ${inlineCode('.agentloop/tasks/active-task.md')}`);
     expect(markdown).not.toContain(dir);
+  });
+
+  test('CLI verify redacts report and run ledger markdown with --redact-paths', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: 'node -e "console.log(process.cwd() + \\"/src/index.ts\\")"',
+            lint: '',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'verify', '--json', '--write-run', '--redact-paths'],
+      { cwd: dir },
+    );
+    const output = JSON.parse(result.stdout);
+    const reportMarkdown = await readFile(resolveOutputPath(dir, output.reportPath), 'utf8');
+    const runMarkdown = await readFile(
+      resolveOutputPath(dir, path.join(output.run.path, 'verification-report.md')),
+      'utf8',
+    );
+
+    expect(output.markdown).not.toContain(dir);
+    expect(output.commands[0].output).not.toContain(dir);
+    expect(reportMarkdown).not.toContain(dir);
+    expect(runMarkdown).not.toContain(dir);
+    expect(output.markdown).toContain('[git-root]/src/index.ts');
+    expect(output.commands[0].output).toContain('[git-root]/src/index.ts');
+    expect(reportMarkdown).toContain('[git-root]/src/index.ts');
+    expect(runMarkdown).toContain('[git-root]/src/index.ts');
   });
 
   test('CLI verify can run only task verification commands', async () => {

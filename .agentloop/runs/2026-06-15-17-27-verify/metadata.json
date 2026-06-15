@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-17-27-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-17-27",
+  "createdAtEpochMs": 1781537241335,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-redact-verification-report-paths.md",
+    "title": "Redact verification report paths",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-17-24-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 11
+}

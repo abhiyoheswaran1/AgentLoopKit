@@ -175,6 +175,7 @@ agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands --only-t
 agentloop verify --timeout-ms 120000
 agentloop verify --progress
 agentloop verify --write-run
+agentloop verify --redact-paths
 ```
 
 `verify` reads `agentloop.config.json`, runs configured commands, captures output excerpts, and writes a Markdown report under `.agentloop/reports/`.
@@ -186,6 +187,8 @@ Verification runs each exact command string once. If a command appears in both `
 `verify --task-commands` does not run `Post-Verification Gates`. Run those after the verification report exists.
 
 Use `--write-run` when you want verification to also create a local run ledger entry under `.agentloop/runs/`. The run records the verification report path, task reference when available, current changed files, and overall verification status.
+
+Use `--redact-paths` before copying verification output into public issues, PRs, or CI logs. It replaces the local repo root with `[git-root]` in the generated Markdown report, JSON `markdown`, command-output excerpts, and run-ledger verification report copies. Default output keeps raw command output for private local debugging.
 
 Use `--progress` for long local checks. It prints bounded start/finish lines for each command and keeps raw command output in the verification report. JSON output remains parseable when `--json` and `--progress` are combined.
 

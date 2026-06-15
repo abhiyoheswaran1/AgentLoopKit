@@ -1,0 +1,10 @@
+ .agentloop/dogfood-log.md    | 41 +++++++++++++++++++++++
+ CHANGELOG.md                 |  1 +
+ README.md                    |  2 +-
+ docs/cli-reference.md        |  3 ++
+ docs/verification-reports.md |  3 ++
+ src/cli/commands/verify.ts   |  2 ++
+ src/core/pr-summary.ts       | 16 ++-------
+ src/core/verification.ts     | 22 ++++++++++---
+ tests/verification.test.ts   | 77 ++++++++++++++++++++++++++++++++++++++++++++
+ 9 files changed, 147 insertions(+), 20 deletions(-)

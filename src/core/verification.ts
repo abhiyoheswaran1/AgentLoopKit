@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFile } from 'node:fs/promises';
+import { readFile, realpath } from 'node:fs/promises';
 import { execa } from 'execa';
 import { AgentLoopConfig } from './config.js';
 import { resolveOutputArtifactPath } from './artifacts.js';
@@ -7,6 +7,7 @@ import { formatTimestamp } from './dates.js';
 import { getGitBranch, getGitCommit, getGitStatus } from './git.js';
 import { isInsidePath, normalizeExistingAncestor, writeTextFile } from './file-system.js';
 import { fencedCodeBlock, inlineCode } from './markdown-format.js';
+import { redactLocalRoots } from './redaction.js';
 
 export type VerificationCommandKey = 'test' | 'lint' | 'typecheck' | 'build' | 'custom' | 'task';
 
@@ -68,6 +69,7 @@ export type VerificationOptions = {
   customCommands?: string[];
   timeoutMs?: number;
   onProgress?: (event: VerificationProgressEvent) => void;
+  redactPaths?: boolean;
 };
 
 export type VerificationResult = {
@@ -547,6 +549,16 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
     results.push(result);
   }
 
+  const redactionRoots = options.redactPaths
+    ? [options.cwd, await realpath(options.cwd).catch(() => options.cwd)]
+    : [];
+  const redactValue = (value: string) =>
+    redactionRoots.length ? redactLocalRoots(value, redactionRoots) : value;
+  const reportResults = results.map((result) => ({
+    ...result,
+    output: redactValue(result.output),
+  }));
+
   const overallStatus =
     results.length === 0 ? 'not-run' : results.every((result) => result.passed) ? 'pass' : 'fail';
   const branch = await getGitBranch(options.cwd);
@@ -568,12 +580,12 @@ ${renderCiContext(ciContext)}
 ${taskContext}
 ${renderTaskCommandContext(commandSelection)}
 ${renderDuplicateCommandContext(commandSelection)}
-${renderFailureSummary(results)}
+${renderFailureSummary(reportResults)}
 ## Commands Run
 ${
-  results.length === 0
+  reportResults.length === 0
     ? 'No verification commands were configured or selected.'
-    : results
+    : reportResults
         .map(
           (result) => `### ${result.key}: ${inlineCode(result.command)}
 
@@ -602,7 +614,7 @@ ${
   await writeTextFile(reportPath, markdown);
   return {
     overallStatus,
-    commands: results,
+    commands: reportResults,
     notRun,
     taskCommands: {
       requested: commandSelection.taskCommandsRequested,

@@ -12,6 +12,7 @@ import {
 } from './evidence.js';
 import { fencedCodeBlock, inlineCode } from './markdown-format.js';
 import { classifyChangedFiles, renderChangeAreas, renderChangedFileLine } from './change-areas.js';
+import { redactLocalRoots } from './redaction.js';
 
 export type PrSummaryInput = {
   timestamp: string;
@@ -125,20 +126,7 @@ ${renderReviewFocus(input.changedFiles)}
 }
 
 function redactLocalGitRoot(value: string, gitRoot: string, redactPaths: boolean | undefined) {
-  if (!redactPaths || !gitRoot || gitRoot === path.parse(gitRoot).root) return value;
-
-  const roots = new Set([
-    gitRoot,
-    gitRoot.replace(/\\/g, '/'),
-    gitRoot.replace(/\//g, '\\'),
-  ]);
-
-  let redacted = value;
-  for (const root of roots) {
-    if (!root) continue;
-    redacted = redacted.split(root).join('[git-root]');
-  }
-  return redacted;
+  return redactPaths ? redactLocalRoots(value, [gitRoot]) : value;
 }
 
 export async function summarizeRepository(options: {
