@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-15
 - Task type: release
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 Unreleased release-proof work is on main but not published.

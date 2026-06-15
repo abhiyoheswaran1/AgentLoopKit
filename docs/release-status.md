@@ -7,14 +7,14 @@ Last checked: June 15, 2026.
 - Current public release: `v0.33.0`
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.33.0>
 - Release asset: `agentloopkit-0.33.0.tgz`
-- Release asset SHA-256: recorded after GitHub release asset upload.
-- Release tag `v0.33.0` points at the published release commit.
+- Release asset SHA-256: `63d5486600cd212a2b521d34639358726e4e91225f0f099abf3387e8891baee7`
+- Release tag `v0.33.0` points at commit `bc39e81085186f64fe0cf0a92a6c2da4dcf0cc70`
 - npm latest: `0.33.0`
-- CI run: recorded after release workflows finish.
-- CLI Smoke run: recorded after release workflows finish.
-- Publish workflow run: recorded after release workflows finish.
-- Docker workflow run: recorded after release workflows finish.
-- MCP Registry workflow run: recorded after release workflows finish.
+- CI run: `27526213991`, success
+- CLI Smoke run: `27526213989`, success
+- Publish workflow run: `27526226093`, success
+- Docker workflow run: `27526226088`, success
+- MCP Registry workflow run: `27526361078`, success
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
 GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`. The public registry tag list includes `latest`, `0.33`, and `0.33.0`.
@@ -81,7 +81,7 @@ Post-publish checks:
 - `node dist/cli/index.js npm-status --agentloopkit --expect-current`: latest matches local package version
 - `npm run smoke:published -- --version 0.33.0`: passed
 - `npx --yes agentloopkit@0.33.0 version`: `0.33.0`
-- GitHub release asset digest: recorded after release asset upload
+- GitHub release asset digest: `63d5486600cd212a2b521d34639358726e4e91225f0f099abf3387e8891baee7`
 - GHCR tag list includes `latest`, `0.33`, and `0.33.0`
 - MCP Registry search marks `0.33.0` as latest
 
