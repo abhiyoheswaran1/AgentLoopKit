@@ -288,6 +288,7 @@ Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-g
 `agentloop schemastore --json` prints the catalog entry for `agentloop.config.json`. Use it when preparing a SchemaStore contribution; the CLI does not submit that contribution for you.
 `agentloop github import --issue-json issue.json --pr-json pr.json` imports explicit local GitHub metadata into `.agentloop/github/context.json`. `review-context`, `prepare-pr`, and `maintainer-check` use that local context when it exists. Missing metadata does not block the loop. The CLI does not call GitHub APIs, read tokens, or run `gh`.
 `agentloop release-proof` checks post-release evidence for npm, GitHub Releases, GHCR, and MCP Registry. Use `--only <channel>` to re-check one channel. It can query public metadata or read captured JSON files that you pass explicitly. It does not publish, tag, upload, post comments, or read tokens.
+Shell completions include the `release-proof --only` channel values: `npm`, `github-release`, `ghcr`, and `mcp-registry`.
 
 ## More Docs
 

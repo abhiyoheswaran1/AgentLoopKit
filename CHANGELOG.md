@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added shell completion values for `agentloop release-proof --only` channels.
 - Added `agentloop release-proof --only <channel>` for targeted npm, GitHub Release, GHCR, or MCP Registry proof checks.
 - Changed imported GitHub metadata normalization to bound long titles, states, URLs, authors, labels, branch names, and body excerpts before storage or rendering.
 - Fixed local policy-pack reading so symlinked policy files must resolve inside the pack's `policies/` directory and the repository.

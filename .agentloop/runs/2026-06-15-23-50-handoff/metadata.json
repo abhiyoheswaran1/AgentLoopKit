@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-23-50-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-23-50",
+  "createdAtEpochMs": 1781560233342,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-complete-release-proof-channel-completions.md",
+    "title": "Complete release-proof channel completions",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-23-48-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-23-50-pr-summary.md",
+  "changedFileCount": 21
+}

@@ -135,6 +135,12 @@ Prefer high-value, low-complexity improvements. Safety and trust override the sc
 
 ## Backlog Items
 
+## Current Research Cycle 114 Decisions
+
+| Item                                    | Source persona    | Problem                                                                                                   | Proposed solution                                                                                              | Priority | Effort | Adoption impact | Risk | Decision | Notes                                                                                                                     |
+| --------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Release-proof channel completion values | Nora, Elias, Lina | `release-proof --only` accepts fixed channel ids, but shell completions did not help users discover them. | Add `npm`, `github-release`, `ghcr`, and `mcp-registry` values to bash, zsh, fish, and PowerShell completions. | P1       | S      | medium          | low  | do now   | Keep this as completion-only polish. No release behavior change, registry call, publish action, version bump, or release. |
+
 ## Current Research Cycle 113 Decisions
 
 | Item                            | Source persona            | Problem                                                                                                                                                                                 | Proposed solution                                                                                                                              | Priority | Effort | Adoption impact | Risk   | Decision | Notes                                                                                                                                                                                                                         |

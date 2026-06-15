@@ -1,5 +1,6 @@
 import { AgentLoopError } from './errors.js';
 import { TASK_TYPES } from './constants.js';
+import { releaseProofChannelIds } from './release-proof.js';
 import { TASK_STATUSES } from './task-state.js';
 
 export const COMPLETION_SHELLS = ['bash', 'zsh', 'fish', 'powershell', 'pwsh'] as const;
@@ -66,6 +67,7 @@ const policyCommandSpecs = [
 const policyCommands = policyCommandSpecs.map(([name]) => name);
 const taskStatuses = TASK_STATUSES;
 const taskTypes = TASK_TYPES;
+const releaseProofChannels = releaseProofChannelIds;
 const agentNames = [
   'codex',
   'claude-code',
@@ -100,6 +102,12 @@ _agentloop_completion() {
     create-task)
       if [[ "$previous" == "--type" ]]; then
         COMPREPLY=( $(compgen -W "${taskTypes.join(' ')}" -- "$current") )
+        return 0
+      fi
+      ;;
+    release-proof)
+      if [[ "$previous" == "--only" ]]; then
+        COMPREPLY=( $(compgen -W "${releaseProofChannels.join(' ')}" -- "$current") )
         return 0
       fi
       ;;
@@ -177,6 +185,11 @@ _agentloop() {
             _values 'task type' ${taskTypes.map((type) => `"${type}"`).join(' ')}
           fi
           ;;
+        release-proof)
+          if [[ "\${words[CURRENT-1]}" == "--only" ]]; then
+            _values 'release proof channel' ${releaseProofChannels.map((channel) => `"${channel}"`).join(' ')}
+          fi
+          ;;
         policy)
           _describe 'policy command' policyCommandSpecs
           ;;
@@ -222,6 +235,7 @@ ${fishLine('__fish_use_subcommand', topCommands, 'AgentLoopKit command')}
 complete -c agentloop -n '__fish_seen_subcommand_from task' -a '${taskCommands.join(' ')}' -d 'Task command'
 complete -c agentloop -n '__fish_seen_subcommand_from policy' -a '${policyCommands.join(' ')}' -d 'Policy command'
 complete -c agentloop -n '__fish_seen_subcommand_from create-task' -a '${taskTypes.join(' ')}' -d 'Task type'
+complete -c agentloop -n '__fish_seen_subcommand_from release-proof' -a '${releaseProofChannels.join(' ')}' -d 'Release proof channel'
 complete -c agentloop -n '__fish_seen_subcommand_from status' -a '${taskStatuses.join(' ')}' -d 'Task status'
 complete -c agentloop -n '__fish_seen_subcommand_from install-agent' -a '${agentNames.join(' ')}' -d 'Agent name'
 complete -c agentloop -n '__fish_seen_subcommand_from completion' -a '${COMPLETION_SHELLS.join(' ')}' -d 'Shell'
@@ -229,6 +243,7 @@ complete -c agentloopkit -n '__fish_use_subcommand' -a '${topCommands.join(' ')}
 complete -c agentloopkit -n '__fish_seen_subcommand_from task' -a '${taskCommands.join(' ')}' -d 'Task command'
 complete -c agentloopkit -n '__fish_seen_subcommand_from policy' -a '${policyCommands.join(' ')}' -d 'Policy command'
 complete -c agentloopkit -n '__fish_seen_subcommand_from create-task' -a '${taskTypes.join(' ')}' -d 'Task type'
+complete -c agentloopkit -n '__fish_seen_subcommand_from release-proof' -a '${releaseProofChannels.join(' ')}' -d 'Release proof channel'
 complete -c agentloopkit -n '__fish_seen_subcommand_from status' -a '${taskStatuses.join(' ')}' -d 'Task status'
 complete -c agentloopkit -n '__fish_seen_subcommand_from install-agent' -a '${agentNames.join(' ')}' -d 'Agent name'
 complete -c agentloopkit -n '__fish_seen_subcommand_from completion' -a '${COMPLETION_SHELLS.join(' ')}' -d 'Shell'
@@ -250,6 +265,7 @@ $AgentLoopTaskCommands = ${powerShellArray(taskCommands)}
 $AgentLoopPolicyCommands = ${powerShellArray(policyCommands)}
 $AgentLoopTaskStatuses = ${powerShellArray(taskStatuses)}
 $AgentLoopTaskTypes = ${powerShellArray(taskTypes)}
+$AgentLoopReleaseProofChannels = ${powerShellArray(releaseProofChannels)}
 $AgentLoopAgents = ${powerShellArray(agentNames)}
 $AgentLoopShells = ${powerShellArray(COMPLETION_SHELLS)}
 
@@ -272,6 +288,11 @@ Register-ArgumentCompleter -Native -CommandName agentloop, agentloopkit -ScriptB
       'create-task' {
         if ($words.Count -gt 2 -and ($words[-1] -eq '--type' -or ($words.Count -gt 3 -and $words[-2] -eq '--type'))) {
           $values = $AgentLoopTaskTypes
+        }
+      }
+      'release-proof' {
+        if ($words.Count -gt 2 -and ($words[-1] -eq '--only' -or ($words.Count -gt 3 -and $words[-2] -eq '--only'))) {
+          $values = $AgentLoopReleaseProofChannels
         }
       }
       'policy' { $values = $AgentLoopPolicyCommands }

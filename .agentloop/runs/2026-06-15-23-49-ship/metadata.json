@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-23-49-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-23-49",
+  "createdAtEpochMs": 1781560142662,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-complete-release-proof-channel-completions.md",
+    "title": "Complete release-proof channel completions",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-23-48-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-23-49-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-23-49-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 12
+}

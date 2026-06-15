@@ -3,11 +3,14 @@ import { execa } from 'execa';
 import { describe, expect, test } from 'vitest';
 import { TASK_TYPES } from '../src/core/constants.js';
 import { renderCompletionScript } from '../src/core/completions.js';
+import { releaseProofChannelIds } from '../src/core/release-proof.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 describe('completion scripts', () => {
+  const releaseProofChannels = releaseProofChannelIds.join(' ');
+
   test('renders zsh completions for commands, task statuses, and agent names', () => {
     const script = renderCompletionScript('zsh');
 
@@ -29,9 +32,13 @@ describe('completion scripts', () => {
     expect(script).toContain('done:Mark a task contract done');
     expect(script).toContain('in-progress');
     expect(script).toContain('deferred');
-    expect(script).toContain('_values \'task type\'');
+    expect(script).toContain("_values 'task type'");
+    expect(script).toContain("_values 'release proof channel'");
     for (const type of TASK_TYPES) {
       expect(script).toContain(`"${type}"`);
+    }
+    for (const channel of releaseProofChannelIds) {
+      expect(script).toContain(`"${channel}"`);
     }
     expect(script).toContain('claude-code');
     expect(script).toContain('github-copilot-cli');
@@ -49,6 +56,7 @@ describe('completion scripts', () => {
     expect(script).toContain('list show set status done archive current clear doctor');
     expect(script).toContain('compgen -W "list show status packs pack"');
     expect(script).toContain(`compgen -W "${TASK_TYPES.join(' ')}"`);
+    expect(script).toContain(`compgen -W "${releaseProofChannels}"`);
     expect(script).toContain(
       'codex claude-code cursor opencode gemini-cli github-copilot-cli generic all',
     );
@@ -65,6 +73,12 @@ describe('completion scripts', () => {
     );
     expect(script).toContain("complete -c agentloop -n '__fish_seen_subcommand_from create-task'");
     expect(script).toContain(`-a '${TASK_TYPES.join(' ')}'`);
+    expect(script).toContain(
+      `complete -c agentloop -n '__fish_seen_subcommand_from release-proof' -a '${releaseProofChannels}'`,
+    );
+    expect(script).toContain(
+      `complete -c agentloopkit -n '__fish_seen_subcommand_from release-proof' -a '${releaseProofChannels}'`,
+    );
     expect(script).toContain('review');
     expect(script).not.toContain('config.fish');
   });
@@ -89,8 +103,12 @@ describe('completion scripts', () => {
     expect(script).toContain("'in-progress'");
     expect(script).toContain("'deferred'");
     expect(script).toContain('$AgentLoopTaskTypes');
+    expect(script).toContain('$AgentLoopReleaseProofChannels');
     for (const type of TASK_TYPES) {
       expect(script).toContain(`'${type}'`);
+    }
+    for (const channel of releaseProofChannelIds) {
+      expect(script).toContain(`'${channel}'`);
     }
     expect(script).toContain("'claude-code'");
     expect(script).toContain("'github-copilot-cli'");

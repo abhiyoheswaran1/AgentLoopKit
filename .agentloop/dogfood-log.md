@@ -10502,3 +10502,40 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The existing release-proof source metadata shape let selected mode stay explicit without removing JSON fields.
 - Improve:
   - If maintainers need repeated targeted checks in CI, consider a documented matrix example that runs each channel separately after release workflows finish.
+
+## 2026-06-15: Release-Proof Channel Completion Values
+
+- Task contract: `.agentloop/tasks/2026-06-15-complete-release-proof-channel-completions.md`
+- AgentFlight session: `af-20260615-214526-complete-release-proof-channel-completions`
+- Trigger:
+  - `release-proof --only` accepted fixed channel ids, but bash, zsh, fish, and PowerShell completions did not surface those values.
+  - Product-panel read: Nora wanted fewer memorized flags, Elias wanted release-maintenance polish, and Lina wanted agent sessions to discover valid channel names without opening docs.
+- Implementation:
+  - Added red tests for release-proof channel values in every generated shell completion script.
+  - Reused the release-proof channel constant in completion rendering.
+  - Documented the completion behavior in README, getting-started, and CLI reference.
+- Verification:
+  - Red-focused test:
+    - `npm test -- tests/completion.test.ts` failed because the generated scripts did not include release-proof channel values.
+  - Green-focused checks:
+    - `npm test -- tests/completion.test.ts`
+    - `npm test -- tests/completion.test.ts tests/cli-docs-drift.test.ts tests/release-proof.test.ts`
+    - `npm run typecheck`
+    - `npm run check:public-docs`
+  - Task verification passed:
+    - `npm test -- tests/completion.test.ts`
+    - `npm test -- tests/completion.test.ts tests/cli-docs-drift.test.ts tests/release-proof.test.ts`
+    - `.agentloop/reports/2026-06-15-23-48-verification-report.md`
+    - `.agentloop/runs/2026-06-15-23-48-verify`
+  - `npx --yes agentflight verify -- npm test -- tests/completion.test.ts` passed:
+    - `.agentflight/evidence/af-20260615-214526-complete-release-proof-channel-completions/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-214526-complete-release-proof-channel-completions/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+  - `npm run lint`, `npm run build`, `npm run check:links`, and full `npm test` passed.
+  - `npm run dogfood:strict` first failed because current handoff evidence did not cover the dirty file set.
+  - After running `agentloop handoff --write-run --redact-paths`, `npm run dogfood:strict` passed.
+- What worked well:
+  - TDD caught all four renderer gaps before code changes.
+  - The dogfood gate forced current handoff evidence instead of accepting a PR description alone.
+- Improve:
+  - Consider deeper option-value completions later for other fixed flags, but avoid turning completions into a large dynamic subsystem.
