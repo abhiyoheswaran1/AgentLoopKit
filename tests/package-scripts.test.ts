@@ -15,6 +15,7 @@ describe('package scripts', () => {
     expect(packageJson.scripts['test:unit']).toContain('tests/github-metadata.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/release-proof.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/public-docs-hygiene.test.ts');
+    expect(packageJson.scripts['test:unit']).toContain('tests/dogfood-start-script.test.ts');
     expect(packageJson.scripts['test:unit']).not.toContain('tests/doctor.test.ts');
     expect(packageJson.scripts['test:unit']).not.toContain('tests/upgrade-harness.test.ts');
     expect(packageJson.scripts['test:integration']).toContain('tests/doctor.test.ts');
@@ -40,5 +41,16 @@ describe('package scripts', () => {
     expect(releaseFlow).toContain('node dist/cli/index.js release-check --strict --redact-paths');
     expect(releaseFlow).not.toMatch(/\bnpm\s+publish\b/);
     expect(releaseFlow).not.toMatch(/\bgh\s+release\b/);
+  });
+
+  test('defines repo-local dogfood start helper without making it a release action', async () => {
+    const packageJson = JSON.parse(await readFile('package.json', 'utf8')) as {
+      scripts: Record<string, string>;
+    };
+    const dogfoodStart = packageJson.scripts['dogfood:start'];
+
+    expect(dogfoodStart).toBe('node scripts/dogfood-start.mjs');
+    expect(dogfoodStart).not.toMatch(/\bnpm\s+publish\b/);
+    expect(dogfoodStart).not.toMatch(/\bgh\s+release\b/);
   });
 });

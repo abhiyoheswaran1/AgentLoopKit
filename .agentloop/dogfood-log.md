@@ -10029,3 +10029,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Encoding the operational lesson as a test keeps the harness honest.
 - Improve:
   - Consider adding an AgentLoopKit command or dogfood helper that starts companion tools and creates a task in the right order.
+
+## 2026-06-15: Repeatable Dogfood Start Helper
+
+- Task contract: `.agentloop/tasks/2026-06-15-add-repeatable-dogfood-start-helper.md`
+- AgentFlight session: `af-20260615-164557-add-repeatable-dogfood-start-helper`
+- Trigger:
+  - The previous task sequencing guard still relied on agents remembering four manual commands.
+  - Product-panel read: Maya and Samir wanted a small repo-local helper instead of a public CLI surface; Lina wanted AgentFlight, AgentLoopKit, and ProjScan in the actual workflow.
+- Implementation:
+  - Added `scripts/dogfood-start.mjs`, a repo-local helper that starts AgentFlight, creates the AgentLoop task, prints AgentLoop status, and starts ProjScan in that order.
+  - Added `npm run dogfood:start`.
+  - Added `--dry-run` support so agents can inspect planned commands without writing state.
+  - Added `tests/dogfood-start-script.test.ts` for command order, dry-run behavior, required title validation, and token-safe environment filtering.
+  - Updated `.agentloop/harness/autonomous-dogfooding.md` to use the helper as the default session-start path.
+- Verification:
+  - Red-green test cycle:
+    - Initial `npm test -- tests/dogfood-start-script.test.ts tests/package-scripts.test.ts` failed because the helper and package script did not exist.
+    - Focused test rerun passed: `npm test -- tests/dogfood-start-script.test.ts tests/package-scripts.test.ts`.
+  - Helper dry-run passed:
+    - `npm run dogfood:start -- --title "Dry run dogfood start helper" --type feature --problem "Verify planned command output" --outcome "No state is written" --dry-run`
+  - Task-linked AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-15-18-51-verification-report.md`
+    - `.agentloop/runs/2026-06-15-18-52-verify`
+  - `npm run dogfood:strict` initially failed because the current dirty files had no fresh handoff.
+  - After `agentloop handoff --write-run --redact-paths`, `npm run dogfood:strict` passed.
+  - `npx --yes agentflight verify -- npm test -- tests/dogfood-start-script.test.ts` passed:
+    - `.agentflight/evidence/af-20260615-164557-add-repeatable-dogfood-start-helper/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-164557-add-repeatable-dogfood-start-helper/verification-1.stderr.txt`
+  - ProjScan passed inside the strict dogfood gate with A `100/100`.
+- What worked well:
+  - The product’s own strict gate caught stale handoff evidence immediately.
+  - The helper keeps companion-tool orchestration local to the repo instead of expanding AgentLoopKit’s public product surface.
+- Improve:
+  - Consider adding JSON output to `dogfood:start` only if agents need machine-readable startup summaries later.

@@ -1,0 +1,5 @@
+ .agentloop/harness/autonomous-dogfooding.md |  7 +++----
+ package.json                                |  3 ++-
+ tests/autonomous-dogfood.test.ts            | 11 ++---------
+ tests/package-scripts.test.ts               | 12 ++++++++++++
+ 4 files changed, 19 insertions(+), 14 deletions(-)

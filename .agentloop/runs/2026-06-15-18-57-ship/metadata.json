@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-18-57-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-18-57",
+  "createdAtEpochMs": 1781542677247,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-add-repeatable-dogfood-start-helper.md",
+    "title": "Add repeatable dogfood start helper",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-18-51-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-18-57-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-18-57-pr-summary-3.md",
+  "score": 92,
+  "changedFileCount": 32
+}

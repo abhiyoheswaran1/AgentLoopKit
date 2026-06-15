@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-18-56-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-18-56",
+  "createdAtEpochMs": 1781542611972,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-add-repeatable-dogfood-start-helper.md",
+    "title": "Add repeatable dogfood start helper",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-18-51-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-18-56-pr-summary.md",
+  "changedFileCount": 17
+}

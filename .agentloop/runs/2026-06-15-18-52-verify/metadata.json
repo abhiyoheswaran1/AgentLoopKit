@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-18-52-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-18-52",
+  "createdAtEpochMs": 1781542372589,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-add-repeatable-dogfood-start-helper.md",
+    "title": "Add repeatable dogfood start helper",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-18-51-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 8
+}

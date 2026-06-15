@@ -21,11 +21,10 @@ Do not skip the task contract. Do not skip verification. Do not cut a version un
 Start the flight recorder first, wait for it to finish, then create or update the AgentLoop task contract. Do not start AgentFlight and `agentloop create-task` in parallel. Parallel starts can leave a generic AgentFlight-derived task contract active instead of the detailed AgentLoop task.
 
 ```bash
-npx --yes agentflight start --task "Describe the change" --yes
-agentloop create-task --type feature --title "Describe the change"
-agentloop status --brief --redact-paths
-npx --yes projscan start
+npm run dogfood:start -- --title "Describe the change" --type feature --problem "Why this task matters" --outcome "What should be true when it is done"
 ```
+
+Use `--dry-run` first when you want to inspect the exact local commands without writing AgentFlight, AgentLoopKit, or ProjScan state.
 
 If a task already exists, read it first:
 
