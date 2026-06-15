@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-00-50-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-00-50",
+  "createdAtEpochMs": 1781563820706,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-check-gates-output-markdown-safe.md",
+    "title": "Make check-gates output Markdown-safe",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-00-49-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 31
+}

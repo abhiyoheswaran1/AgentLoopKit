@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-00-50-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-00-50",
+  "createdAtEpochMs": 1781563828294,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-check-gates-output-markdown-safe.md",
+    "title": "Make check-gates output Markdown-safe",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-00-49-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-00-50-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-00-50-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 34
+}

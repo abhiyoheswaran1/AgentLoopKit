@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 117 Decisions
+
+| item                             | source persona   | problem                                                                                          | proposed solution                                                                         | priority | effort | adoption impact | risk | decision | notes                                                                                      |
+| -------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ------------------------------------------------------------------------------------------ |
+| Markdown-safe check-gates output | Samir, Nora, Tom | Gate output is often pasted into PRs, but task paths, refs, or gate messages can break Markdown. | Render human check-gates dynamic values as single-line inline code; keep JSON raw values. | P1       | S      | medium          | low  | do now   | Safety/trust polish only. No gate semantics, strict-mode exit-code, or JSON shape changes. |
+
 ## Current Research Cycle 116 Decisions
 
 | item                        | source persona   | problem                                                                                         | proposed solution                                                                                          | priority | effort | adoption impact | risk | decision | notes                                                                                                    |
@@ -33,10 +39,10 @@ Prefer high-value, low-complexity improvements. Safety and trust override the sc
 
 | Item                                 | Stars | Usefulness | Explain | Compatibility | Simplicity | Maintenance | Trust | Optionality | Total |
 | ------------------------------------ | ----: | ---------: | ------: | ------------: | ---------: | ----------: | ----: | ----------: | ----: |
+| Markdown-safe check-gates output     |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
 | Markdown-safe doctor output          |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
 | Markdown-safe release-check output   |     3 |          4 |       5 |             4 |          5 |           5 |     5 |           3 |    34 |
 | Markdown-safe CI summary output      |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
-| Markdown-safe check-gates output     |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
 | Markdown-safe artifacts output       |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
 | Markdown-safe status and next output |     3 |          4 |       5 |             5 |          5 |           5 |     5 |           2 |    34 |
 | Generate `.agentloop/README.md`      |     4 |          5 |       5 |             4 |          5 |           5 |     3 |           2 |    34 |

@@ -154,26 +154,30 @@ function chooseNextAction(
   };
 }
 
+function gateInlineCode(value: string) {
+  return inlineCode(value.replace(/\r/g, '\\r').replace(/\n/g, '\\n'));
+}
+
 function renderMarkdown(result: Omit<CheckGatesResult, 'markdown'>) {
   const gateLines = result.gates
     .map((item) => {
-      const suffix = item.path ? ` - ${inlineCode(item.path)}` : '';
-      return `- [${inlineCode(item.status)}] ${inlineCode(item.name)}: ${inlineCode(
+      const suffix = item.path ? ` - ${gateInlineCode(item.path)}` : '';
+      return `- [${gateInlineCode(item.status)}] ${gateInlineCode(item.name)}: ${gateInlineCode(
         item.message,
       )}${suffix}`;
     })
     .join('\n');
   const gitLine = result.git.isRepository
-    ? `${inlineCode(result.git.branch || 'unknown branch')}${
-        result.git.commit ? ` @ ${inlineCode(result.git.commit)}` : ''
+    ? `${gateInlineCode(result.git.branch || 'unknown branch')}${
+        result.git.commit ? ` @ ${gateInlineCode(result.git.commit)}` : ''
       }`
-    : inlineCode('not inside a git repository');
+    : gateInlineCode('not inside a git repository');
   const gitLines = [
     `- Git: ${gitLine}`,
     ...(result.git.isRepository
       ? [
-          `- Git root: ${inlineCode(result.git.root)}`,
-          `- Git target: ${inlineCode(result.git.targetIsRoot ? 'root directory' : 'subdirectory')}`,
+          `- Git root: ${gateInlineCode(result.git.root)}`,
+          `- Git target: ${gateInlineCode(result.git.targetIsRoot ? 'root directory' : 'subdirectory')}`,
         ]
       : []),
   ];
@@ -181,14 +185,14 @@ function renderMarkdown(result: Omit<CheckGatesResult, 'markdown'>) {
   const nextAction =
     result.nextAction.command === 'none'
       ? `No command required.\n\n${result.nextAction.reason}`
-      : `Run ${inlineCode(result.nextAction.command)}.\n\n${result.nextAction.reason}`;
+      : `Run ${gateInlineCode(result.nextAction.command)}.\n\n${result.nextAction.reason}`;
 
   return `# AgentLoopKit Gates
 
-- Overall status: ${inlineCode(result.overallStatus)}
-- Strict mode: ${inlineCode(result.strict ? 'enabled (warnings fail)' : 'disabled')}
+- Overall status: ${gateInlineCode(result.overallStatus)}
+- Strict mode: ${gateInlineCode(result.strict ? 'enabled (warnings fail)' : 'disabled')}
 ${gitLines.join('\n')}
-- Changed files: ${inlineCode(String(result.git.changedFileCount))}
+- Changed files: ${gateInlineCode(String(result.git.changedFileCount))}
 
 ## Gates
 
@@ -279,8 +283,7 @@ export async function checkGates(options: {
   );
 
   if (handoffPath) {
-    const dirtyWithoutFreshHandoff =
-      changedFiles.length > 0 && !latestHandoffRunCoversDirtyFiles;
+    const dirtyWithoutFreshHandoff = changedFiles.length > 0 && !latestHandoffRunCoversDirtyFiles;
     gates.push(
       gate(
         'handoff-summary',

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-00-51-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-00-51",
+  "createdAtEpochMs": 1781563862319,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-make-check-gates-output-markdown-safe.md",
+    "title": "Make check-gates output Markdown-safe",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-00-49-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-00-51-pr-summary.md",
+  "changedFileCount": 20
+}

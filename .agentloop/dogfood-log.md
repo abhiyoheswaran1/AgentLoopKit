@@ -2,6 +2,47 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Check-Gates Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-check-gates-output-markdown-safe.md`
+- Trigger:
+  - `agentloop check-gates` is pasted into PRs, CI logs, and agent handoffs.
+  - Dogfooding showed that inline code handled backticks, but line breaks in dynamic task paths could still split Markdown lists.
+- Implementation:
+  - Added a check-gates-only single-line inline-code renderer for human-readable Markdown output.
+  - Kept check-gates JSON values raw for automation.
+  - Added a regression test with an active task path containing a line break and Markdown checklist text.
+  - Updated CLI reference, check-gates docs, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized safe copy/paste behavior for review evidence.
+  - Nora wanted the terminal report to stay readable without changing command semantics.
+  - Tom wanted deterministic output that fails closed in Markdown.
+  - Maya kept the fix local to check-gates instead of changing shared Markdown helpers.
+- Verification:
+  - Red TDD run failed before single-line dynamic rendering existed:
+    - `npm test -- tests/check-gates.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/check-gates.test.ts`
+  - Focused adjacent tests passed:
+    - `npm test -- tests/check-gates.test.ts tests/status.test.ts tests/cli-docs-drift.test.ts`
+  - Static and docs checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - AgentLoopKit task verification passed and wrote run evidence:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-check-gates-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/check-gates.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The first red test exposed a real task-discovery constraint: fallback discovery ignores malformed newline task filenames.
+  - Setting an explicit active task path reproduced the Markdown rendering bug without changing task discovery behavior.
+- Improve:
+  - Continue the Markdown-safe output pass for other pasteable commands with command-specific regression tests.
+
 ## 2026-06-16: Markdown-Safe Doctor Output
 
 - Task contract: `.agentloop/tasks/archive/2026-06-16-make-doctor-output-markdown-safe.md`

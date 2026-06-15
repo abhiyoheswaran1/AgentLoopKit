@@ -304,14 +304,10 @@ describe('check-gates command', () => {
     await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
     const realRoot = await realpath(dir);
 
-    const jsonResult = await execa(
-      tsxPath,
-      [cliPath, 'check-gates', '--json', '--redact-paths'],
-      {
-        cwd: dir,
-        reject: false,
-      },
-    );
+    const jsonResult = await execa(tsxPath, [cliPath, 'check-gates', '--json', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
     const humanResult = await execa(tsxPath, [cliPath, 'check-gates', '--redact-paths'], {
       cwd: dir,
       reject: false,
@@ -588,6 +584,53 @@ describe('check-gates command', () => {
     );
   });
 
+  test('renders markdown gate values as single-line inline code when evidence contains line breaks', async () => {
+    const dir = await createInitializedRepo();
+    const taskFileName = '2026-06-11-active\n- [x] injected.md';
+    const taskRelativePath = `.agentloop/tasks/${taskFileName}`;
+    await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
+    await writeFile(
+      path.join(dir, taskRelativePath),
+      'No heading, so check-gates falls back to the filename.\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({ version: 1, activeTaskPath: taskRelativePath }, null, 2),
+    );
+
+    const humanResult = await execa(tsxPath, [cliPath, 'check-gates'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(humanResult.exitCode).toBe(1);
+    expect(humanResult.stdout).toContain(
+      '- [`pass`] `Task contract`: `2026-06-11-active\\n- [x] injected` - `.agentloop/tasks/2026-06-11-active\\n- [x] injected.md`',
+    );
+    expect(humanResult.stdout).toContain(
+      'Run `agentloop verify --task .agentloop/tasks/2026-06-11-active\\n- [x] injected.md`.',
+    );
+    expect(humanResult.stdout).not.toContain('\n- [x] injected`:');
+    expect(humanResult.stdout).not.toContain('\n- [x] injected.md`');
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'task-contract',
+          message: '2026-06-11-active\n- [x] injected',
+          path: '.agentloop/tasks/2026-06-11-active\n- [x] injected.md',
+        }),
+      ]),
+    );
+    expect(output.nextAction.command).toBe(
+      'agentloop verify --task .agentloop/tasks/2026-06-11-active\n- [x] injected.md',
+    );
+  });
+
   test('warns and fails predictably when review evidence is missing', async () => {
     const dir = await createInitializedRepo();
     await execa('git', ['add', '.'], { cwd: dir });
@@ -726,25 +769,25 @@ describe('check-gates command', () => {
     'passes strict gates for clean verified evidence with no changed files',
     async () => {
       const dir = await createInitializedRepo();
-    await writeFile(
-      path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
-      '# Demo task\n\n- Status: in-progress\n',
-    );
-    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
-    await writeFile(
-      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
-      '# Verification Report\n\nOverall status: pass\n',
-    );
-    await writeFile(
-      path.join(dir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
-      '# PR Summary\n\nVerification status: Overall status: pass\n',
-    );
-    await execa('git', ['add', '.'], { cwd: dir });
-    await execa(
-      'git',
-      ['-c', 'user.email=test@example.com', '-c', 'user.name=Test User', 'commit', '-m', 'init'],
-      { cwd: dir },
-    );
+      await writeFile(
+        path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+        '# Demo task\n\n- Status: in-progress\n',
+      );
+      await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+      await writeFile(
+        path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+        '# Verification Report\n\nOverall status: pass\n',
+      );
+      await writeFile(
+        path.join(dir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
+        '# PR Summary\n\nVerification status: Overall status: pass\n',
+      );
+      await execa('git', ['add', '.'], { cwd: dir });
+      await execa(
+        'git',
+        ['-c', 'user.email=test@example.com', '-c', 'user.name=Test User', 'commit', '-m', 'init'],
+        { cwd: dir },
+      );
 
       const defaultResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
         cwd: dir,

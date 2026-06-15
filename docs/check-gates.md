@@ -25,6 +25,7 @@ agentloop check-gates --redact-paths
 
 Use `--redact-paths` before pasting gate output into a public issue, PR, or CI log. It replaces the absolute Git root with `[git-root]` while preserving repo-relative AgentLoop artifact paths.
 Default JSON keeps the absolute Git root for scripts that need it.
+Human-readable output keeps dynamic values inside single-line inline code. Task paths, branch names, and gate messages with unusual characters stay on one Markdown list line. JSON output keeps raw values for scripts.
 
 Statuses:
 
