@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-20-46-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-20-46",
+  "createdAtEpochMs": 1781549213002,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-limit-stale-evidence-preview-output.md",
+    "title": "Limit stale evidence preview output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-20-44-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 18
+}

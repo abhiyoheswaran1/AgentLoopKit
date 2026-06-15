@@ -35,6 +35,44 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Consider a future `--limit` option if large repos want shorter previews.
 
+## 2026-06-15: Bounded Stale Evidence Preview
+
+- Task contract: `.agentloop/tasks/2026-06-15-limit-stale-evidence-preview-output.md`
+- Trigger:
+  - Running `agentloop artifacts --stale --json` on this repo showed more than a thousand stale candidates.
+  - The preview stayed safe, but the default terminal shape needed a way to stay scannable.
+- Implementation:
+  - Added `agentloop artifacts --stale --limit <count>`.
+  - Added `candidateCount`, `shownCandidateCount`, `hiddenCandidateCount`, `keptCount`, and `limit` to stale-preview JSON.
+  - Rejected invalid limits and `--limit` without `--stale` with structured JSON errors.
+  - Updated CLI reference and getting-started docs.
+- Product-panel decision:
+  - Nora wanted terminal output users can scan.
+  - Lina wanted agents to request bounded output during long autonomous sessions.
+  - Samir kept the command read-only and blocked any cleanup side effect.
+  - Maya kept the feature inside the existing artifacts command instead of creating a new cleanup subsystem.
+- Verification:
+  - Red run failed before `--limit` and count fields existed:
+    - `npm test -- tests/artifacts.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/artifacts.test.ts`
+  - Task verification passed:
+    - `npm run test:unit`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+  - Build passed:
+    - `npm run build`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/artifacts.test.ts`
+  - Strict dogfood passed, including AgentFlight doctor and ProjScan doctor:
+    - `npm run dogfood:strict`
+- What worked well:
+  - The live limited JSON smoke showed `3` displayed candidates and `1149` hidden candidates in this repo.
+- Improve:
+  - Consider a future `--type ship-report` stale filter if users ask for ship-report-only cleanup previews.
+
 ## 2026-06-15: Self-Dogfood Instruction Drift Guard
 
 - Task contract: `.agentloop/tasks/archive/2026-06-15-guard-self-dogfood-instruction-drift.md`

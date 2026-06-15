@@ -671,6 +671,11 @@ describe('artifacts command', () => {
         mode: 'preview',
         writesFiles: false,
         deletesFiles: false,
+        candidateCount: 4,
+        keptCount: 4,
+        shownCandidateCount: 4,
+        hiddenCandidateCount: 0,
+        limit: null,
         candidates: [
           {
             type: 'verification',
@@ -735,10 +740,44 @@ describe('artifacts command', () => {
     expect(markdownResult.stdout).toContain(
       '- `verification` `.agentloop/reports/2026-06-10-09-00-verification-report.md` - Older verification report; latest verification evidence is kept.',
     );
-    expect(markdownResult.stdout).toContain(
+        expect(markdownResult.stdout).toContain(
       '- `run` `.agentloop/runs/2026-06-10-09-30-verify` - Older run ledger entry; latest run evidence is kept.',
     );
+    expect(markdownResult.stdout).toContain('- Showing `4` of `4` candidate(s).');
     expect(await snapshotTree(path.join(dir, '.agentloop'))).toEqual(before);
+  });
+
+  test('limits stale evidence preview output and reports hidden candidates', async () => {
+    const dir = await createRepoWithStaleEvidence();
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--stale', '--limit', '2', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'artifacts', '--stale', '--limit', '2'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(jsonResult.stderr).toBe('');
+    const json = JSON.parse(jsonResult.stdout);
+    expect(json.stale.candidateCount).toBe(4);
+    expect(json.stale.shownCandidateCount).toBe(2);
+    expect(json.stale.hiddenCandidateCount).toBe(2);
+    expect(json.stale.limit).toBe(2);
+    expect(json.stale.candidates).toHaveLength(2);
+    expect(json.stale.candidates.map((candidate: { path: string }) => candidate.path)).toEqual([
+      '.agentloop/reports/2026-06-10-09-00-verification-report.md',
+      '.agentloop/handoffs/2026-06-10-09-05-pr-summary.md',
+    ]);
+
+    expect(markdownResult.exitCode).toBe(0);
+    expect(markdownResult.stderr).toBe('');
+    expect(markdownResult.stdout).toContain('- Showing `2` of `4` candidate(s).');
+    expect(markdownResult.stdout).toContain('- Hidden candidates: `2`.');
+    expect(markdownResult.stdout).toContain('Run `agentloop artifacts --stale --json` for full candidate data.');
+    expect(markdownResult.stdout).not.toContain('.agentloop/reports/2026-06-10-09-10-ship-report.md');
   });
 
   test('prints a next step when filtered markdown finds no artifacts', async () => {
@@ -861,6 +900,52 @@ Next step: run \`agentloop handoff\` to create a handoff summary.
         code: 'CONFLICTING_ARTIFACT_OPTIONS',
         message: 'Cannot combine --stale and --latest.',
         options: ['stale', 'latest'],
+      },
+    });
+  });
+
+  test('rejects invalid stale preview limits as JSON', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--stale', '--limit', '0', '--json'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'INVALID_ARTIFACT_LIMIT',
+        message: 'Artifact limit must be a positive integer.',
+        value: '0',
+      },
+    });
+  });
+
+  test('rejects limit without stale preview as JSON', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'artifacts', '--limit', '2', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'LIMIT_REQUIRES_STALE_PREVIEW',
+        message: 'Use --limit with --stale.',
+        options: ['limit', 'stale'],
       },
     });
   });

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-20-49-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-20-49",
+  "createdAtEpochMs": 1781549403566,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-limit-stale-evidence-preview-output.md",
+    "title": "Limit stale evidence preview output",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-20-44-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-20-49-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-20-49-pr-summary-2.md",
+  "score": 96,
+  "changedFileCount": 17
+}

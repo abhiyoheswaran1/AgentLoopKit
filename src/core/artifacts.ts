@@ -134,6 +134,11 @@ export type StaleArtifactPreview = {
   mode: 'preview';
   writesFiles: false;
   deletesFiles: false;
+  candidateCount: number;
+  keptCount: number;
+  shownCandidateCount: number;
+  hiddenCandidateCount: number;
+  limit: number | null;
   candidates: StaleArtifactPreviewItem[];
   kept: StaleArtifactPreviewItem[];
   safety: {
@@ -678,6 +683,7 @@ export async function getStaleArtifactPreview(options: {
   cwd: string;
   config: AgentLoopConfig;
   type?: ArtifactInventoryFilterType;
+  limit?: number;
 }): Promise<StaleArtifactPreview> {
   const reportsDir = options.config.paths.reportsDir;
   const handoffsDir = options.config.paths.handoffsDir;
@@ -754,11 +760,20 @@ export async function getStaleArtifactPreview(options: {
     }
   }
 
+  const candidateCount = candidates.length;
+  const shownCandidates =
+    typeof options.limit === 'number' ? candidates.slice(0, options.limit) : candidates;
+
   return {
     mode: 'preview',
     writesFiles: false,
     deletesFiles: false,
-    candidates,
+    candidateCount,
+    keptCount: kept.length,
+    shownCandidateCount: shownCandidates.length,
+    hiddenCandidateCount: candidateCount - shownCandidates.length,
+    limit: options.limit ?? null,
+    candidates: shownCandidates,
     kept,
     safety: {
       readOnly: true,
@@ -877,6 +892,12 @@ export function renderStaleArtifactPreviewMarkdown(preview: StaleArtifactPreview
         )
         .join('\n')
     : '- No stale evidence candidates found.';
+  const hiddenLines = preview.hiddenCandidateCount
+    ? [
+        `- Hidden candidates: ${inlineCode(String(preview.hiddenCandidateCount))}.`,
+        '- Run `agentloop artifacts --stale --json` for full candidate data.',
+      ].join('\n')
+    : '';
   const keptLines = preview.kept.length
     ? preview.kept
         .map((item) => `- ${inlineCode(item.type)} ${inlineCode(item.path)} - ${item.reason}`)
@@ -889,6 +910,8 @@ This is a read-only preview. No files were deleted.
 
 ## Candidates
 ${candidateLines}
+- Showing ${inlineCode(String(preview.shownCandidateCount))} of ${inlineCode(String(preview.candidateCount))} candidate(s).
+${hiddenLines}
 
 ## Kept
 ${keptLines}
