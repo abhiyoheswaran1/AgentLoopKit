@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-15
 - Task type: feature
-- Status: proposed
+- Status: done
 
 ## Problem Statement
 AgentLoopKit is already used to build AgentLoopKit, but the repository needs a clearer autonomous operating harness that future Codex sessions can follow. The harness should also dogfood Baseframe Labs companion tools, especially ProjScan and AgentFlight, while keeping the near-term OSS maintenance duties enforceable.

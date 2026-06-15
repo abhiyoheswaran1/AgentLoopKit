@@ -1,0 +1,30 @@
+[
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-15-harden-agentloopkit-autonomous-dogfood-harness.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-15-16-24-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-16-24-handoff/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-16-24-handoff/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-16-24-handoff/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-16-24-handoff/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-15-harden-agentloopkit-autonomous-dogfood-harness.md"
+  }
+]
