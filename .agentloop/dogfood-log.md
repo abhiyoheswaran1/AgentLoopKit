@@ -2,6 +2,39 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-15: Stale Evidence Preview
+
+- Task contract: `.agentloop/tasks/2026-06-15-preview-stale-agentloop-evidence.md`
+- Trigger:
+  - The repo now writes useful verification, handoff, ship, and run-ledger evidence on most meaningful changes.
+  - Dogfooding showed that older local evidence can make review folders noisy, but any cleanup path must stay explicit and safe.
+- Implementation:
+  - Added `agentloop artifacts --stale` as a read-only preview for older verification reports, handoff summaries, ship reports, and run entries.
+  - Kept the latest verification, handoff, ship report, latest run, and artifacts referenced by the latest run out of stale candidates.
+  - Added JSON output with safety notes for agents and CI.
+  - Updated README, CLI reference, and getting-started docs with concise user-facing guidance.
+- Product-panel decision:
+  - Samir blocked automatic deletion and required explicit read-only safety notes.
+  - Lina wanted agents to see what can be cleaned without losing current review evidence.
+  - Maya kept this as an `artifacts` flag instead of a new cleanup subsystem.
+  - Tom wanted deterministic evidence selection rather than vague “old files” language.
+- Verification:
+  - Red run failed before the `--stale` flag existed:
+    - `npm test -- tests/artifacts.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/artifacts.test.ts`
+  - Task verification passed and wrote fresh AgentLoop verification evidence.
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/artifacts.test.ts`
+  - Strict dogfood passed, including public-doc hygiene, dependency audit, AgentFlight doctor, and ProjScan doctor:
+    - `npm run dogfood:strict`
+  - Ship evidence passed with a `96`/100 review-readiness score.
+- What worked well:
+  - The new command immediately showed how much local evidence this repo has accumulated.
+  - The no-mutation test protects the safety promise.
+- Improve:
+  - Consider a future `--limit` option if large repos want shorter previews.
+
 ## 2026-06-15: Self-Dogfood Instruction Drift Guard
 
 - Task contract: `.agentloop/tasks/archive/2026-06-15-guard-self-dogfood-instruction-drift.md`

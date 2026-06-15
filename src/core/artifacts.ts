@@ -122,6 +122,30 @@ export type LatestArtifactInventoryItem =
   | ({ type: 'release-notes' } & ArtifactInventoryNamedArtifact)
   | ({ type: 'run' } & RunSummary);
 
+export type StaleArtifactPreviewType = 'verification' | 'handoff' | 'ship-report' | 'run';
+
+export type StaleArtifactPreviewItem = {
+  type: StaleArtifactPreviewType;
+  path: string;
+  reason: string;
+};
+
+export type StaleArtifactPreview = {
+  mode: 'preview';
+  writesFiles: false;
+  deletesFiles: false;
+  candidates: StaleArtifactPreviewItem[];
+  kept: StaleArtifactPreviewItem[];
+  safety: {
+    readOnly: true;
+    deletesFiles: false;
+    writesFiles: false;
+    readsEnvFiles: false;
+    followsSymlinkedArtifactRoots: false;
+  };
+  nextSteps: string[];
+};
+
 type InventoryFile = {
   filePath: string;
   name: string;
@@ -577,6 +601,179 @@ export async function getArtifactInventory(options: {
   };
 }
 
+function staleCandidateReason(type: StaleArtifactPreviewType) {
+  switch (type) {
+    case 'verification':
+      return 'Older verification report; latest verification evidence is kept.';
+    case 'handoff':
+      return 'Older handoff summary; latest handoff evidence is kept.';
+    case 'ship-report':
+      return 'Older ship report; latest ship evidence is kept.';
+    case 'run':
+      return 'Older run ledger entry; latest run evidence is kept.';
+  }
+}
+
+function staleKeptReason(type: StaleArtifactPreviewType) {
+  switch (type) {
+    case 'verification':
+      return 'Latest verification report.';
+    case 'handoff':
+      return 'Latest handoff summary.';
+    case 'ship-report':
+      return 'Latest ship report.';
+    case 'run':
+      return 'Latest run ledger entry.';
+  }
+}
+
+function previewItem(
+  type: StaleArtifactPreviewType,
+  pathValue: string,
+  reason: string,
+): StaleArtifactPreviewItem {
+  return { type, path: pathValue, reason };
+}
+
+function runPath(run: RunSummary) {
+  return `.agentloop/runs/${run.id}`;
+}
+
+function keepLatestFile(
+  kept: StaleArtifactPreviewItem[],
+  protectedPaths: Set<string>,
+  cwd: string,
+  type: StaleArtifactPreviewType,
+  file?: InventoryFile,
+) {
+  if (!file) return;
+  const relativePath = displayPath(cwd, file.filePath);
+  protectedPaths.add(relativePath);
+  kept.push(previewItem(type, relativePath, staleKeptReason(type)));
+}
+
+function collectStaleFiles(
+  candidates: StaleArtifactPreviewItem[],
+  protectedPaths: Set<string>,
+  cwd: string,
+  type: StaleArtifactPreviewType,
+  files: InventoryFile[],
+) {
+  for (const file of files) {
+    const relativePath = displayPath(cwd, file.filePath);
+    if (protectedPaths.has(relativePath)) continue;
+    candidates.push(previewItem(type, relativePath, staleCandidateReason(type)));
+  }
+}
+
+function includeStaleType(
+  filter: ArtifactInventoryFilterType | undefined,
+  type: StaleArtifactPreviewType,
+) {
+  if (!filter) return true;
+  return filter === type;
+}
+
+export async function getStaleArtifactPreview(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  type?: ArtifactInventoryFilterType;
+}): Promise<StaleArtifactPreview> {
+  const reportsDir = options.config.paths.reportsDir;
+  const handoffsDir = options.config.paths.handoffsDir;
+  const [verificationFiles, handoffFiles, shipReportFiles, runs] = await Promise.all([
+    listInventoryFiles({
+      cwd: options.cwd,
+      dir: reportsDir,
+      extension: '.md',
+      pattern: verificationReportPattern,
+    }),
+    listInventoryFiles({
+      cwd: options.cwd,
+      dir: handoffsDir,
+      extension: '.md',
+      pattern: prSummaryPattern,
+    }),
+    listInventoryFiles({
+      cwd: options.cwd,
+      dir: reportsDir,
+      extension: '.md',
+      pattern: shipReportPattern,
+    }),
+    listRunInventory(options.cwd),
+  ]);
+
+  const candidates: StaleArtifactPreviewItem[] = [];
+  const kept: StaleArtifactPreviewItem[] = [];
+  const protectedPaths = new Set<string>();
+
+  const latestVerification = verificationFiles.at(-1);
+  const latestHandoff = handoffFiles.at(-1);
+  const latestShipReport = shipReportFiles.at(-1);
+  const latestRun = runs[0];
+
+  if (includeStaleType(options.type, 'verification')) {
+    keepLatestFile(kept, protectedPaths, options.cwd, 'verification', latestVerification);
+  }
+  if (includeStaleType(options.type, 'handoff')) {
+    keepLatestFile(kept, protectedPaths, options.cwd, 'handoff', latestHandoff);
+  }
+  if (!options.type) {
+    keepLatestFile(kept, protectedPaths, options.cwd, 'ship-report', latestShipReport);
+  }
+  if (includeStaleType(options.type, 'run') && latestRun) {
+    const latestRunPath = runPath(latestRun);
+    protectedPaths.add(latestRunPath);
+    kept.push(previewItem('run', latestRunPath, staleKeptReason('run')));
+  }
+
+  if (latestRun) {
+    for (const artifactPath of [
+      latestRun.verificationReportPath,
+      latestRun.handoffPath,
+      latestRun.shipReportPath,
+    ]) {
+      if (artifactPath) protectedPaths.add(artifactPath);
+    }
+  }
+
+  if (includeStaleType(options.type, 'verification')) {
+    collectStaleFiles(candidates, protectedPaths, options.cwd, 'verification', verificationFiles);
+  }
+  if (includeStaleType(options.type, 'handoff')) {
+    collectStaleFiles(candidates, protectedPaths, options.cwd, 'handoff', handoffFiles);
+  }
+  if (!options.type) {
+    collectStaleFiles(candidates, protectedPaths, options.cwd, 'ship-report', shipReportFiles);
+  }
+  if (includeStaleType(options.type, 'run')) {
+    for (const run of runs) {
+      const relativePath = runPath(run);
+      if (protectedPaths.has(relativePath)) continue;
+      candidates.push(previewItem('run', relativePath, staleCandidateReason('run')));
+    }
+  }
+
+  return {
+    mode: 'preview',
+    writesFiles: false,
+    deletesFiles: false,
+    candidates,
+    kept,
+    safety: {
+      readOnly: true,
+      deletesFiles: false,
+      writesFiles: false,
+      readsEnvFiles: false,
+      followsSymlinkedArtifactRoots: false,
+    },
+    nextSteps: [
+      'Review candidates before deleting anything manually.',
+      'Keep evidence referenced by the latest verification, handoff, ship, and run records.',
+    ],
+  };
+}
+
 function formatTaskCounts(byStatus: Record<string, number>) {
   const entries = Object.entries(byStatus).sort(([left], [right]) => left.localeCompare(right));
   if (!entries.length) return '';
@@ -665,6 +862,46 @@ export function renderArtifactInventoryJson(
   }
 
   return inventory;
+}
+
+export function renderStaleArtifactPreviewJson(preview: StaleArtifactPreview) {
+  return { stale: preview };
+}
+
+export function renderStaleArtifactPreviewMarkdown(preview: StaleArtifactPreview) {
+  const candidateLines = preview.candidates.length
+    ? preview.candidates
+        .map(
+          (candidate) =>
+            `- ${inlineCode(candidate.type)} ${inlineCode(candidate.path)} - ${candidate.reason}`,
+        )
+        .join('\n')
+    : '- No stale evidence candidates found.';
+  const keptLines = preview.kept.length
+    ? preview.kept
+        .map((item) => `- ${inlineCode(item.type)} ${inlineCode(item.path)} - ${item.reason}`)
+        .join('\n')
+    : '- No latest evidence found to protect.';
+
+  return `# AgentLoopKit Stale Evidence Preview
+
+This is a read-only preview. No files were deleted.
+
+## Candidates
+${candidateLines}
+
+## Kept
+${keptLines}
+
+## Safety
+- Writes files: no
+- Deletes files: no
+- Reads env files: no
+- Follows symlinked artifact roots: no
+
+## Next Steps
+${preview.nextSteps.map((step) => `- ${step}`).join('\n')}
+`;
 }
 
 function countForType(inventory: ArtifactInventory, type: ArtifactInventoryFilterType) {

@@ -174,6 +174,7 @@ npx agentloopkit handoff
 npx agentloopkit check-gates
 npx agentloopkit check-gates --strict
 npx agentloopkit runs --latest
+npx agentloopkit artifacts --stale
 npx agentloopkit intent <file>
 npx agentloopkit report
 npx agentloopkit badge
@@ -187,6 +188,7 @@ npx agentloopkit npm-status
 `maintainer-check` is a read-only reviewability check for AI-assisted PRs. It checks task evidence, fresh verification, handoff or ship coverage, risky file areas, lockfile changes, migrations, and generated output.
 If you import local issue or PR JSON with `agentloop github import`, `review-context`, `prepare-pr`, and `maintainer-check` include that context in their output. Missing GitHub metadata is not a blocker.
 `runs` and `intent` inspect local run metadata. They do not read target file contents.
+`artifacts --stale` previews older local evidence candidates. It does not delete files or write cleanup changes.
 `check-gates` does not run tests. It checks whether task, verification, handoff or ship, task-folder hygiene, harness, policy, and git evidence exists before review.
 Use `--strict` in CI when warning gates should fail.
 `report` writes a local static HTML evidence page after `verify` and handoff or ship evidence.

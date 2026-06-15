@@ -135,6 +135,13 @@ Prefer high-value, low-complexity improvements. Safety and trust override the sc
 
 ## Backlog Items
 
+## Current Research Cycle 113 Decisions
+
+| Item | Source persona | Problem | Proposed solution | Priority | Effort | Adoption impact | Risk | Decision | Notes |
+| ---- | -------------- | ------- | ----------------- | -------- | ------ | --------------- | ---- | -------- | ----- |
+| Stale evidence preview | Lina, Samir, Maya, Tom | Long-running AgentLoopKit dogfood creates many reports, handoffs, and run entries. Users need a safe way to see older evidence before choosing manual cleanup. | Add `agentloop artifacts --stale` with JSON and Markdown output, keep latest evidence protected, and state that it writes and deletes nothing. | P1 | S | medium | low | do now | Implemented as a read-only preview only. No automatic deletion, retention policy, `.env` reads, symlink-root traversal, command execution, version bump, or release. |
+| Stale evidence retention policy | Platform Engineer, Rachel | Teams may later want a repeatable retention policy for local evidence folders. | Defer any delete/archive automation until preview usage proves the candidate model is clear. | P3 | M | low | medium | later | Future work must require explicit flags and strong dry-run behavior. |
+
 ## Current Research Cycle 112 Decisions
 
 | Item | Source persona | Problem | Proposed solution | Priority | Effort | Adoption impact | Risk | Decision | Notes |

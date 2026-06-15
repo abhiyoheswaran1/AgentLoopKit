@@ -194,6 +194,77 @@ async function createRepoWithMarkdownEdgeArtifacts() {
   return dir;
 }
 
+async function createRepoWithStaleEvidence() {
+  const dir = await makeTempDir();
+  tempDirs.push(dir);
+  await writeConfig(dir);
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/reports/2026-06-10-09-00-verification-report.md',
+    '# Old Verification\n\nOverall status: fail\n',
+    '2026-06-10T09:00:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/reports/2026-06-10-10-00-verification-report.md',
+    '# Latest Verification\n\nOverall status: pass\n',
+    '2026-06-10T10:00:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/handoffs/2026-06-10-09-05-pr-summary.md',
+    '# Old Handoff\n',
+    '2026-06-10T09:05:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/handoffs/2026-06-10-10-05-pr-summary.md',
+    '# Latest Handoff\n',
+    '2026-06-10T10:05:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/reports/2026-06-10-09-10-ship-report.md',
+    '# Old Ship Report\n',
+    '2026-06-10T09:10:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/reports/2026-06-10-10-10-ship-report.md',
+    '# Latest Ship Report\n',
+    '2026-06-10T10:10:00.000Z',
+  );
+  await writeRunMetadata(
+    dir,
+    '2026-06-10-09-30-verify',
+    {
+      id: '2026-06-10-09-30-verify',
+      command: 'verify',
+      createdAt: '2026-06-10-09-30',
+      overallStatus: 'fail',
+      changedFileCount: 2,
+      verificationReportPath: '.agentloop/reports/2026-06-10-09-00-verification-report.md',
+    },
+    '2026-06-10T09:30:00.000Z',
+  );
+  await writeRunMetadata(
+    dir,
+    '2026-06-10-10-30-ship',
+    {
+      id: '2026-06-10-10-30-ship',
+      command: 'ship',
+      createdAt: '2026-06-10-10-30',
+      score: 96,
+      changedFileCount: 3,
+      verificationReportPath: '.agentloop/reports/2026-06-10-10-00-verification-report.md',
+      handoffPath: '.agentloop/handoffs/2026-06-10-10-05-pr-summary.md',
+      shipReportPath: '.agentloop/reports/2026-06-10-10-10-ship-report.md',
+    },
+    '2026-06-10T10:30:00.000Z',
+  );
+  return dir;
+}
+
 async function snapshotTree(root: string): Promise<TreeSnapshotEntry[]> {
   if (!existsSync(root)) return [];
   const entries: TreeSnapshotEntry[] = [];
@@ -580,6 +651,96 @@ describe('artifacts command', () => {
 `);
   });
 
+  test('previews stale evidence candidates without mutating files', async () => {
+    const dir = await createRepoWithStaleEvidence();
+    const before = await snapshotTree(path.join(dir, '.agentloop'));
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--stale', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'artifacts', '--stale'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(jsonResult.stderr).toBe('');
+    expect(JSON.parse(jsonResult.stdout)).toEqual({
+      stale: {
+        mode: 'preview',
+        writesFiles: false,
+        deletesFiles: false,
+        candidates: [
+          {
+            type: 'verification',
+            path: '.agentloop/reports/2026-06-10-09-00-verification-report.md',
+            reason: 'Older verification report; latest verification evidence is kept.',
+          },
+          {
+            type: 'handoff',
+            path: '.agentloop/handoffs/2026-06-10-09-05-pr-summary.md',
+            reason: 'Older handoff summary; latest handoff evidence is kept.',
+          },
+          {
+            type: 'ship-report',
+            path: '.agentloop/reports/2026-06-10-09-10-ship-report.md',
+            reason: 'Older ship report; latest ship evidence is kept.',
+          },
+          {
+            type: 'run',
+            path: '.agentloop/runs/2026-06-10-09-30-verify',
+            reason: 'Older run ledger entry; latest run evidence is kept.',
+          },
+        ],
+        kept: [
+          {
+            type: 'verification',
+            path: '.agentloop/reports/2026-06-10-10-00-verification-report.md',
+            reason: 'Latest verification report.',
+          },
+          {
+            type: 'handoff',
+            path: '.agentloop/handoffs/2026-06-10-10-05-pr-summary.md',
+            reason: 'Latest handoff summary.',
+          },
+          {
+            type: 'ship-report',
+            path: '.agentloop/reports/2026-06-10-10-10-ship-report.md',
+            reason: 'Latest ship report.',
+          },
+          {
+            type: 'run',
+            path: '.agentloop/runs/2026-06-10-10-30-ship',
+            reason: 'Latest run ledger entry.',
+          },
+        ],
+        safety: {
+          readOnly: true,
+          deletesFiles: false,
+          writesFiles: false,
+          readsEnvFiles: false,
+          followsSymlinkedArtifactRoots: false,
+        },
+        nextSteps: [
+          'Review candidates before deleting anything manually.',
+          'Keep evidence referenced by the latest verification, handoff, ship, and run records.',
+        ],
+      },
+    });
+    expect(markdownResult.exitCode).toBe(0);
+    expect(markdownResult.stderr).toBe('');
+    expect(markdownResult.stdout).toContain('# AgentLoopKit Stale Evidence Preview');
+    expect(markdownResult.stdout).toContain('This is a read-only preview. No files were deleted.');
+    expect(markdownResult.stdout).toContain(
+      '- `verification` `.agentloop/reports/2026-06-10-09-00-verification-report.md` - Older verification report; latest verification evidence is kept.',
+    );
+    expect(markdownResult.stdout).toContain(
+      '- `run` `.agentloop/runs/2026-06-10-09-30-verify` - Older run ledger entry; latest run evidence is kept.',
+    );
+    expect(await snapshotTree(path.join(dir, '.agentloop'))).toEqual(before);
+  });
+
   test('prints a next step when filtered markdown finds no artifacts', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -675,6 +836,31 @@ Next step: run \`agentloop handoff\` to create a handoff summary.
           'release-notes',
           'run',
         ],
+      },
+    });
+  });
+
+  test('rejects contradictory stale and latest flags as JSON', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--stale', '--latest', '--json'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'CONFLICTING_ARTIFACT_OPTIONS',
+        message: 'Cannot combine --stale and --latest.',
+        options: ['stale', 'latest'],
       },
     });
   });

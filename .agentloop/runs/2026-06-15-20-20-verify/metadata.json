@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-20-20-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-20-20",
+  "createdAtEpochMs": 1781547650784,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-preview-stale-agentloop-evidence.md",
+    "title": "Preview stale AgentLoop evidence",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-20-19-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 26
+}
