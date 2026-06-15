@@ -10063,3 +10063,39 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The helper keeps companion-tool orchestration local to the repo instead of expanding AgentLoopKit’s public product surface.
 - Improve:
   - Consider adding JSON output to `dogfood:start` only if agents need machine-readable startup summaries later.
+
+## 2026-06-15: Source-First Dogfood Start Helper
+
+- Task contract: `.agentloop/tasks/2026-06-15-make-dogfood-start-source-first.md`
+- AgentFlight session: `af-20260615-170712-make-dogfood-start-source-first`
+- Trigger:
+  - Dogfooding the new `dogfood:start` helper exposed a contributor-readiness bug: the helper called `node dist/cli/index.js` for AgentLoop commands.
+  - That works after a build, but can fail in fresh local development sessions where `dist/` has not been produced yet.
+- Implementation:
+  - Updated `scripts/dogfood-start.mjs` so AgentLoop steps use `npx --no-install tsx src/cli/index.ts`.
+  - Updated `tests/dogfood-start-script.test.ts` to fail if `dogfood:start` regresses to `dist/cli/index.js`.
+- Verification:
+  - Dry-run reproduced the problem before the fix:
+    - `npm run dogfood:start -- --title "Make dogfood start source-first" ... --dry-run`
+    - Planned output included `node dist/cli/index.js`.
+  - Red-green focused test:
+    - `npm test -- tests/dogfood-start-script.test.ts` failed on `node dist/cli/index.js`.
+    - After the helper change, `npm test -- tests/dogfood-start-script.test.ts` passed.
+  - Source-first dry-run passed and printed:
+    - `npx --no-install tsx src/cli/index.ts create-task ...`
+    - `npx --no-install tsx src/cli/index.ts status --brief --redact-paths`
+  - Task-linked AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-15-19-09-verification-report.md`
+    - `.agentloop/runs/2026-06-15-19-10-verify`
+  - `npm run dogfood:strict` initially failed because the current dirty files had no fresh handoff.
+  - After `agentloop handoff --write-run --redact-paths`, `npm run dogfood:strict` passed.
+  - `npx --yes agentflight verify -- npm test -- tests/dogfood-start-script.test.ts` passed:
+    - `.agentflight/evidence/af-20260615-170712-make-dogfood-start-source-first/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-170712-make-dogfood-start-source-first/verification-1.stderr.txt`
+  - `npm run build` passed.
+  - ProjScan passed inside the strict dogfood gate with A `100/100`.
+- What worked well:
+  - Using the new helper immediately found its first practical bug.
+  - The regression is now encoded as a deterministic unit test instead of a maintainer memory.
+- Improve:
+  - If `dogfood:start` gains JSON output later, ensure JSON mode also avoids built `dist/` paths.

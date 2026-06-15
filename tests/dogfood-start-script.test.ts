@@ -34,9 +34,11 @@ describe('dogfood start script helpers', () => {
       args: ['--yes', 'agentflight', 'start', '--task', 'Add review helper', '--yes'],
     });
     expect(steps[1]).toMatchObject({
-      command: 'node',
+      command: 'npx',
       args: [
-        'dist/cli/index.js',
+        '--no-install',
+        'tsx',
+        'src/cli/index.ts',
         'create-task',
         '--type',
         'feature',
@@ -53,13 +55,25 @@ describe('dogfood start script helpers', () => {
       ],
     });
     expect(steps[2]).toMatchObject({
-      command: 'node',
-      args: ['dist/cli/index.js', 'status', '--brief', '--redact-paths'],
+      command: 'npx',
+      args: [
+        '--no-install',
+        'tsx',
+        'src/cli/index.ts',
+        'status',
+        '--brief',
+        '--redact-paths',
+      ],
     });
     expect(steps[3]).toMatchObject({
       command: 'npx',
       args: ['--yes', 'projscan', 'start'],
     });
+
+    const commandText = steps
+      .map((step: { command: string; args: string[] }) => [step.command, ...step.args].join(' '))
+      .join('\n');
+    expect(commandText).not.toContain('dist/cli/index.js');
   });
 
   test('dry-run reports planned commands without running child processes', async () => {

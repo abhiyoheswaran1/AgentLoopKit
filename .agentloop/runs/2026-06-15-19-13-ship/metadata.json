@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-19-13-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-19-13",
+  "createdAtEpochMs": 1781543616620,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-make-dogfood-start-source-first.md",
+    "title": "Make dogfood start source-first",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-19-09-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-19-13-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-19-13-pr-summary-4.md",
+  "score": 92,
+  "changedFileCount": 28
+}

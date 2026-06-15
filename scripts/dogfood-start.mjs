@@ -35,6 +35,8 @@ const FORWARDED_CREATE_TASK_FLAGS = new Set([
   '--rollback',
 ]);
 
+const AGENTLOOP_SOURCE_CLI = ['--no-install', 'tsx', 'src/cli/index.ts'];
+
 function formatCommand(step) {
   return [step.command, ...step.args].join(' ');
 }
@@ -115,9 +117,9 @@ export function createDogfoodStartSteps(options) {
     },
     {
       name: 'agentloop task contract',
-      command: 'node',
+      command: 'npx',
       args: [
-        'dist/cli/index.js',
+        ...AGENTLOOP_SOURCE_CLI,
         'create-task',
         '--type',
         type,
@@ -128,8 +130,8 @@ export function createDogfoodStartSteps(options) {
     },
     {
       name: 'agentloop status',
-      command: 'node',
-      args: ['dist/cli/index.js', 'status', '--brief', '--redact-paths'],
+      command: 'npx',
+      args: [...AGENTLOOP_SOURCE_CLI, 'status', '--brief', '--redact-paths'],
     },
     {
       name: 'projscan project scan',

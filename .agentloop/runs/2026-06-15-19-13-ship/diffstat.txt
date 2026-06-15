@@ -1,0 +1,4 @@
+ .agentloop/dogfood-log.md          | 36 ++++++++++++++++++++++++++++++++++++
+ scripts/dogfood-start.mjs          | 10 ++++++----
+ tests/dogfood-start-script.test.ts | 22 ++++++++++++++++++----
+ 3 files changed, 60 insertions(+), 8 deletions(-)

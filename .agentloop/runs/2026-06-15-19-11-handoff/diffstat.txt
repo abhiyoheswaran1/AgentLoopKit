@@ -1,0 +1,3 @@
+ scripts/dogfood-start.mjs          | 10 ++++++----
+ tests/dogfood-start-script.test.ts | 22 ++++++++++++++++++----
+ 2 files changed, 24 insertions(+), 8 deletions(-)

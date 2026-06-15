@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-19-11-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-19-11",
+  "createdAtEpochMs": 1781543466014,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-make-dogfood-start-source-first.md",
+    "title": "Make dogfood start source-first",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-19-09-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-19-11-pr-summary.md",
+  "changedFileCount": 7
+}

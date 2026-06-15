@@ -1,0 +1,18 @@
+[
+  {
+    "status": "M",
+    "path": "scripts/dogfood-start.mjs"
+  },
+  {
+    "status": "M",
+    "path": "tests/dogfood-start-script.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-15-19-09-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-15-make-dogfood-start-source-first.md"
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-19-10-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-19-10",
+  "createdAtEpochMs": 1781543414126,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-make-dogfood-start-source-first.md",
+    "title": "Make dogfood start source-first",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-19-09-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 4
+}
