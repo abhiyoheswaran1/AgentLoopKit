@@ -8,19 +8,15 @@ import {
   pathExists,
   resolvesInsidePath,
 } from './file-system.js';
-import { inlineCode } from './markdown-format.js';
+import { singleLineInlineCode as inlineCode } from './markdown-format.js';
 import { listRuns, RunSummary } from './runs.js';
 
 export const verificationReportPattern =
   /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report(?:-\d+)?\.md$/;
-export const shipReportPattern =
-  /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ship-report(?:-\d+)?\.md$/;
-export const prSummaryPattern =
-  /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-pr-summary(?:-\d+)?\.md$/;
-export const ciSummaryPattern =
-  /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ci-summary(?:-\d+)?\.md$/;
-export const releaseNotesPattern =
-  /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-release-notes(?:-\d+)?\.md$/;
+export const shipReportPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ship-report(?:-\d+)?\.md$/;
+export const prSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-pr-summary(?:-\d+)?\.md$/;
+export const ciSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ci-summary(?:-\d+)?\.md$/;
+export const releaseNotesPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-release-notes(?:-\d+)?\.md$/;
 export const generatedMarkdownPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-.+\.md$/;
 export const defaultStaleArtifactMarkdownLimit = 50;
 

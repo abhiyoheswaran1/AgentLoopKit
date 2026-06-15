@@ -2,6 +2,46 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Artifacts Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-artifacts-output-markdown-safe.md`
+- Trigger:
+  - `agentloop artifacts` is a read-only evidence inventory that agents paste into reviews, CI logs, and handoffs.
+  - Dogfooding found the same Markdown list-splitting risk already fixed in `doctor`, `check-gates`, `status`, and `next`.
+- Implementation:
+  - Switched `src/core/artifacts.ts` human rendering to `singleLineInlineCode`.
+  - Kept artifact discovery, filtering, stale-preview behavior, and JSON output unchanged.
+  - Added regression tests for line breaks in task artifact metadata and stale run-ledger candidate paths.
+  - Updated the CLI reference, getting-started guide, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized safe paste behavior in public logs.
+  - Nora wanted artifact inventory output to stay readable in reviewer handoffs.
+  - Lina wanted long-running agent sessions to avoid malformed evidence blocks.
+  - Maya accepted the change because it reuses the existing shared helper and avoids new dependencies.
+- Verification:
+  - Red TDD run failed before single-line artifact rendering existed:
+    - `npm test -- tests/artifacts.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/artifacts.test.ts`
+    - `npm test -- tests/artifacts.test.ts tests/cli-docs-drift.test.ts`
+  - Static and docs checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - AgentLoopKit task verification passed and wrote run evidence:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-artifacts-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/artifacts.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The red test showed the exact Markdown split before the helper change.
+  - Reusing `singleLineInlineCode` kept the fix small and consistent with recent output hardening work.
+- Improve:
+  - Continue the same treatment for other paste-heavy commands only when tests show a real human-output risk.
+
 ## 2026-06-16: Markdown-Safe Status And Next Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-status-and-next-output-markdown-safe.md`

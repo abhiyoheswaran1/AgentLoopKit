@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 119 Decisions
+
+| item                           | source persona    | problem                                                                                           | proposed solution                                                                 | priority | effort | adoption impact | risk | decision | notes                                                                                    |
+| ------------------------------ | ----------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ---------------------------------------------------------------------------------------- |
+| Markdown-safe artifacts output | Samir, Nora, Lina | Agents paste `artifacts` into reviews and logs, but artifact paths or run IDs can split Markdown. | Render human artifact inventory values as single-line inline code; keep JSON raw. | P1       | S      | medium          | low  | do now   | No artifact discovery, stale-preview, cleanup, command-execution, or JSON-shape changes. |
+
 ## Current Research Cycle 118 Decisions
 
 | item                                 | source persona    | problem                                                                                      | proposed solution                                                                         | priority | effort | adoption impact | risk | decision | notes                                                                                |

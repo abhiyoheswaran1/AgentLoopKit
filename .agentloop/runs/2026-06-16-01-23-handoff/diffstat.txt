@@ -1,0 +1,8 @@
+ .agentloop/backlog.md     |   6 ++
+ .agentloop/dogfood-log.md |  40 +++++++++++
+ CHANGELOG.md              |   1 +
+ docs/cli-reference.md     |   1 +
+ docs/getting-started.md   |   1 +
+ src/core/artifacts.ts     |  14 ++--
+ tests/artifacts.test.ts   | 179 ++++++++++++++++++++++++++++++++++++++++++----
+ 7 files changed, 219 insertions(+), 23 deletions(-)

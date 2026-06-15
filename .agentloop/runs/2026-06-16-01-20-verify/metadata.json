@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-01-20-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-01-20",
+  "createdAtEpochMs": 1781565640994,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-artifacts-output-markdown-safe.md",
+    "title": "Make artifacts output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-01-20-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 8
+}

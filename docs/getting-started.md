@@ -193,6 +193,7 @@ npx agentloopkit npm-status
 If you import local issue or PR JSON with `agentloop github import`, `review-context`, `prepare-pr`, and `maintainer-check` include that context in their output. Missing GitHub metadata is not a blocker.
 `runs` and `intent` inspect local run metadata. They do not read target file contents.
 `artifacts --stale` previews older local evidence candidates and caps terminal output by default. Add `--type ship-report` when you only want ship report candidates, or `--limit <count>` to change the cap. JSON output stays complete unless you pass `--limit`. The command does not delete files or write cleanup changes.
+Human-readable `artifacts` output keeps artifact titles, paths, statuses, and run IDs on one Markdown line. JSON output keeps raw values for scripts.
 `check-gates` does not run tests. It checks whether task, verification, handoff or ship, task-folder hygiene, harness, policy, and git evidence exists before review.
 Use `--strict` in CI when warning gates should fail.
 `report` writes a local static HTML evidence page after `verify` and handoff or ship evidence.

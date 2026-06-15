@@ -212,6 +212,32 @@ async function createRepoWithMarkdownEdgeArtifacts() {
   return dir;
 }
 
+async function createRepoWithLineBreakArtifactMetadata() {
+  const dir = await makeTempDir();
+  tempDirs.push(dir);
+  await writeConfig(dir);
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/tasks/2026-06-11-active\n- [x] injected.md',
+    'No heading, so artifacts falls back to the filename.\n\n- Status: review\n',
+    '2026-06-11T09:00:00.000Z',
+  );
+  await writeRunMetadata(
+    dir,
+    '2026-06-11-10-35-ship\n- [x] injected',
+    {
+      id: '2026-06-11-10-35-ship\n- [x] injected',
+      command: 'ship',
+      createdAt: '2026-06-11-10-35',
+      score: 96,
+      changedFileCount: 3,
+      shipReportPath: '.agentloop/reports/2026-06-11-10-35-ship\n- [x] injected.md',
+    },
+    '2026-06-11T10:35:00.000Z',
+  );
+  return dir;
+}
+
 async function createRepoWithStaleEvidence() {
   const dir = await makeTempDir();
   tempDirs.push(dir);
@@ -276,6 +302,52 @@ async function createRepoWithStaleEvidence() {
       changedFileCount: 3,
       verificationReportPath: '.agentloop/reports/2026-06-10-10-00-verification-report.md',
       handoffPath: '.agentloop/handoffs/2026-06-10-10-05-pr-summary.md',
+      shipReportPath: '.agentloop/reports/2026-06-10-10-10-ship-report.md',
+    },
+    '2026-06-10T10:30:00.000Z',
+  );
+  return dir;
+}
+
+async function createRepoWithLineBreakStaleEvidence() {
+  const dir = await makeTempDir();
+  tempDirs.push(dir);
+  await writeConfig(dir);
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/reports/2026-06-10-09-00-verification-report.md',
+    '# Old Verification\n\nOverall status: fail\n',
+    '2026-06-10T09:00:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/reports/2026-06-10-10-00-verification-report.md',
+    '# Latest Verification\n\nOverall status: pass\n',
+    '2026-06-10T10:00:00.000Z',
+  );
+  await writeRunMetadata(
+    dir,
+    '2026-06-10-09-30-verify\n- [x] injected',
+    {
+      id: '2026-06-10-09-30-verify\n- [x] injected',
+      command: 'verify',
+      createdAt: '2026-06-10-09-30',
+      overallStatus: 'fail',
+      changedFileCount: 2,
+      verificationReportPath: '.agentloop/reports/2026-06-10-09-00-verification-report.md',
+    },
+    '2026-06-10T09:30:00.000Z',
+  );
+  await writeRunMetadata(
+    dir,
+    '2026-06-10-10-30-ship',
+    {
+      id: '2026-06-10-10-30-ship',
+      command: 'ship',
+      createdAt: '2026-06-10-10-30',
+      score: 96,
+      changedFileCount: 3,
+      verificationReportPath: '.agentloop/reports/2026-06-10-10-00-verification-report.md',
       shipReportPath: '.agentloop/reports/2026-06-10-10-10-ship-report.md',
     },
     '2026-06-10T10:30:00.000Z',
@@ -527,6 +599,51 @@ describe('artifacts command', () => {
     });
     expect(inventory.shipReports.latest).toMatchObject({
       title: 'Ship `report`',
+    });
+  });
+
+  test('renders markdown inventory values as single-line inline code when artifact metadata contains line breaks', async () => {
+    const dir = await createRepoWithLineBreakArtifactMetadata();
+
+    const fullResult = await execa(tsxPath, [cliPath, 'artifacts'], {
+      cwd: dir,
+      reject: false,
+    });
+    const latestTaskResult = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--type', 'task', '--latest'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(fullResult.exitCode).toBe(0);
+    expect(fullResult.stderr).toBe('');
+    expect(fullResult.stdout).toContain(
+      '- Latest task: `2026-06-11-active\\n- [x] injected` (`review`) - `.agentloop/tasks/2026-06-11-active\\n- [x] injected.md`',
+    );
+    expect(fullResult.stdout).toContain(
+      '- Latest run: `2026-06-11-10-35-ship\\n- [x] injected` `ship` score `96`/100 - `.agentloop/reports/2026-06-11-10-35-ship\\n- [x] injected.md`',
+    );
+    expect(fullResult.stdout).not.toContain('\n- [x] injected`:');
+    expect(fullResult.stdout).not.toContain('\n- [x] injected.md`');
+    expect(latestTaskResult.stdout).toContain(
+      '- Latest task: `2026-06-11-active\\n- [x] injected` (`review`) - `.agentloop/tasks/2026-06-11-active\\n- [x] injected.md`',
+    );
+    const inventory = JSON.parse(jsonResult.stdout);
+    expect(inventory.tasks.latest).toMatchObject({
+      path: '.agentloop/tasks/2026-06-11-active\n- [x] injected.md',
+      title: '2026-06-11-active\n- [x] injected',
+      status: 'review',
+    });
+    expect(inventory.runs.latest).toMatchObject({
+      id: '2026-06-11-10-35-ship\n- [x] injected',
+      shipReportPath: '.agentloop/reports/2026-06-11-10-35-ship\n- [x] injected.md',
     });
   });
 
@@ -903,6 +1020,36 @@ describe('artifacts command', () => {
     expect(await snapshotTree(path.join(dir, '.agentloop'))).toEqual(before);
   });
 
+  test('renders stale preview values as single-line inline code when candidate paths contain line breaks', async () => {
+    const dir = await createRepoWithLineBreakStaleEvidence();
+    const before = await snapshotTree(path.join(dir, '.agentloop'));
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--stale', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'artifacts', '--stale'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(jsonResult.stderr).toBe('');
+    const json = JSON.parse(jsonResult.stdout);
+    expect(json.stale.candidates).toContainEqual({
+      type: 'run',
+      path: '.agentloop/runs/2026-06-10-09-30-verify\n- [x] injected',
+      reason: 'Older run ledger entry; latest run evidence is kept.',
+    });
+    expect(markdownResult.exitCode).toBe(0);
+    expect(markdownResult.stderr).toBe('');
+    expect(markdownResult.stdout).toContain(
+      '- `run` `.agentloop/runs/2026-06-10-09-30-verify\\n- [x] injected` - Older run ledger entry; latest run evidence is kept.',
+    );
+    expect(markdownResult.stdout).not.toContain('\n- [x] injected` - Older run ledger entry');
+    expect(await snapshotTree(path.join(dir, '.agentloop'))).toEqual(before);
+  });
+
   test('caps markdown stale evidence preview by default while JSON remains complete', async () => {
     const dir = await createRepoWithManyStaleEvidenceCandidates();
 
@@ -942,10 +1089,14 @@ describe('artifacts command', () => {
   test('limits stale evidence preview output and reports hidden candidates', async () => {
     const dir = await createRepoWithStaleEvidence();
 
-    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--stale', '--limit', '2', '--json'], {
-      cwd: dir,
-      reject: false,
-    });
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--stale', '--limit', '2', '--json'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
     const markdownResult = await execa(tsxPath, [cliPath, 'artifacts', '--stale', '--limit', '2'], {
       cwd: dir,
       reject: false,
@@ -968,8 +1119,12 @@ describe('artifacts command', () => {
     expect(markdownResult.stderr).toBe('');
     expect(markdownResult.stdout).toContain('- Showing `2` of `4` candidate(s).');
     expect(markdownResult.stdout).toContain('- Hidden candidates: `2`.');
-    expect(markdownResult.stdout).toContain('Run `agentloop artifacts --stale --json` for full candidate data.');
-    expect(markdownResult.stdout).not.toContain('.agentloop/reports/2026-06-10-09-10-ship-report.md');
+    expect(markdownResult.stdout).toContain(
+      'Run `agentloop artifacts --stale --json` for full candidate data.',
+    );
+    expect(markdownResult.stdout).not.toContain(
+      '.agentloop/reports/2026-06-10-09-10-ship-report.md',
+    );
   });
 
   test('prints a next step when filtered markdown finds no artifacts', async () => {
@@ -1078,14 +1233,10 @@ Next step: run \`agentloop handoff\` to create a handoff summary.
     tempDirs.push(dir);
     await writeConfig(dir);
 
-    const result = await execa(
-      tsxPath,
-      [cliPath, 'artifacts', '--stale', '--latest', '--json'],
-      {
-        cwd: dir,
-        reject: false,
-      },
-    );
+    const result = await execa(tsxPath, [cliPath, 'artifacts', '--stale', '--latest', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
 
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toBe('');

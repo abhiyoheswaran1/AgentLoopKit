@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-01-23-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-01-23",
+  "createdAtEpochMs": 1781565784564,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-artifacts-output-markdown-safe.md",
+    "title": "Make artifacts output Markdown-safe",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-01-20-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-01-23-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-01-23-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 12
+}
