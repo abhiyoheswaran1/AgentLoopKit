@@ -10352,3 +10352,39 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The command now works for both MCP and non-MCP release channels while preserving explicit warnings.
 - Improve:
   - Consider adding `release-proof --only <channel>` later if maintainers want targeted checks without running live metadata requests for every channel.
+
+## 2026-06-15: Public Docs Trust Hygiene V2
+
+- Task contract: `.agentloop/tasks/2026-06-15-strengthen-public-docs-trust-hygiene.md`
+- AgentFlight session: `af-20260615-204705-strengthen-public-docs-trust-hygiene`
+- Trigger:
+  - Public-doc hygiene already blocked Homebrew claims, a few fake adoption phrases, and maintainer-only release chatter.
+  - Product-panel read: Elias wanted README/npm trust guardrails to catch more launch-copy mistakes; Nora wanted maintainers to know the next fix instead of shipping vague marketing; Tom wanted deterministic checks instead of taste debates.
+- Implementation:
+  - Added regression coverage for unsupported marketplace and package-manager availability claims.
+  - Added regression coverage that allows deferred channel design docs to discuss future validation gates.
+  - Split public-doc claim checks into adoption/testimonial claims and channel availability claims.
+  - Added stronger blockers for unsupported trust, production-team, case-study, testimonial, VS Code Marketplace, Open VSX, Scoop, and WinGet claims.
+  - Updated maintenance guard docs without adding inactive-channel install copy to normal public docs.
+- Verification:
+  - Red-green focused test:
+    - `npm test -- tests/public-docs-hygiene.test.ts` failed because the new unsupported-channel claim was accepted.
+    - After the guard change, `npm test -- tests/public-docs-hygiene.test.ts` passed with 5 tests.
+  - `npm run check:public-docs` initially caught the docs examples as literal unsupported claims.
+  - After rewriting the maintenance guidance, `npm run check:public-docs` passed across 73 public docs and 2 repo harness files.
+  - Task-linked AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-15-22-51-verification-report.md`
+    - `.agentloop/runs/2026-06-15-22-51-verify`
+  - `npx --yes agentflight verify -- npm test -- tests/public-docs-hygiene.test.ts` passed:
+    - `.agentflight/evidence/af-20260615-204705-strengthen-public-docs-trust-hygiene/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-204705-strengthen-public-docs-trust-hygiene/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+  - `npm run build` passed.
+  - `npm run dogfood:strict` initially failed on task placeholders and missing handoff evidence, then passed after task cleanup and handoff generation.
+  - `agentloop ship --json --redact-paths` wrote `.agentloop/reports/2026-06-15-22-52-ship-report.md` with review-readiness score `96`/100.
+  - `npm run check:links` passed across 2057 Markdown files.
+- What worked well:
+  - The guard caught our own docs phrasing immediately.
+  - Tests keep detailed blocked examples out of public docs while still proving the checker behavior.
+- Improve:
+  - If more deferred-channel design docs are added, include a narrow allowlist entry and a test showing why the document is safe.

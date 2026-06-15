@@ -42,6 +42,15 @@ npm run check:links
 
 Public docs must avoid internal process notes, fake adoption claims, unsupported release channels, and premature paid-plan copy.
 
+The hygiene check blocks examples such as:
+
+- unsupported marketplace or package-manager availability claims
+- install commands for channels AgentLoopKit has not verified and documented as supported
+- adoption or customer-proof copy without public evidence
+- premature Pro, SaaS, hosted-dashboard, or paid-plan copy
+
+Design notes may discuss deferred channels when they clearly frame them as future work and validation gates.
+
 ## Release Proof
 
 After release workflows finish, run:

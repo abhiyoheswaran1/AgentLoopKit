@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-22-53-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-22-53",
+  "createdAtEpochMs": 1781556787094,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-strengthen-public-docs-trust-hygiene.md",
+    "title": "Strengthen public docs trust hygiene",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-22-51-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-22-53-pr-summary.md",
+  "changedFileCount": 28
+}

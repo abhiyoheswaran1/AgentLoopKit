@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-22-52-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-22-52",
+  "createdAtEpochMs": 1781556752794,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-strengthen-public-docs-trust-hygiene.md",
+    "title": "Strengthen public docs trust hygiene",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-22-51-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-22-52-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-22-52-pr-summary-2.md",
+  "score": 96,
+  "changedFileCount": 15
+}

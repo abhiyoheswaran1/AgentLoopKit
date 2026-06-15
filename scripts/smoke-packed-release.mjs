@@ -27,20 +27,65 @@ const RELEASE_HISTORY_DOCS = new Set([
   'docs/npm-publishing.md',
   'docs/release-status.md',
 ]);
+const FUTURE_CHANNEL_DESIGN_DOCS = new Set([
+  'docs/designs/vscode-open-vsx-extension.md',
+  'docs/designs/windows-package-managers.md',
+]);
 
-const UNSUPPORTED_PUBLIC_CLAIMS = [
-  { label: 'Homebrew claim', pattern: /\bHomebrew\b/i },
-  { label: 'brew install command', pattern: /\bbrew\s+install\b/i },
-  { label: 'retired Homebrew tap repo', pattern: /homebrew-agentloopkit/i },
+const UNSUPPORTED_ADOPTION_CLAIMS = [
   { label: 'unsupported adoption claim', pattern: /\bdevelopers love\b/i },
   { label: 'unsupported user-interview claim', pattern: /\busers told us\b/i },
   { label: 'unsupported real-feedback claim', pattern: /\breal feedback shows\b/i },
   { label: 'unsupported adoption claim', pattern: /\bteams are using\b/i },
   { label: 'unsupported interview claim', pattern: /\bbased on interviews\b/i },
+  { label: 'unsupported trust claim', pattern: /\btrusted by\b/i },
+  {
+    label: 'unsupported production-team claim',
+    pattern: /\bused by\s+(?:thousands|millions|production teams|enterprise teams|real teams|customers)\b/i,
+  },
+  {
+    label: 'unsupported case-study claim',
+    pattern: /\bcase studies?\s+(?:show|prove|demonstrate|confirm)\b/i,
+  },
+  { label: 'unsupported testimonial claim', pattern: /\btestimonials?\b/i },
   { label: 'premature Pro claim', pattern: /\bAgentLoopKit Pro\b/i },
   { label: 'premature Pro upgrade copy', pattern: /\bupgrade to\b.*\bPro\b/i },
   { label: 'premature paid-plan copy', pattern: /\bpaid team plans?\b/i },
   { label: 'premature hosted-dashboard copy', pattern: /\bhosted dashboards?\b/i },
+];
+
+const UNSUPPORTED_CHANNEL_CLAIMS = [
+  { label: 'Homebrew claim', pattern: /\bHomebrew\b/i },
+  { label: 'brew install command', pattern: /\bbrew\s+install\b/i },
+  { label: 'retired Homebrew tap repo', pattern: /homebrew-agentloopkit/i },
+  {
+    label: 'VS Code Marketplace availability claim',
+    pattern:
+      /\b(?:available|published|live|released)\s+(?:on|in|from)\s+(?:the\s+)?VS Code Marketplace\b/i,
+  },
+  {
+    label: 'VS Code Marketplace install claim',
+    pattern: /\b(?:install|download)\s+(?:it\s+)?(?:from|via|with)\s+(?:the\s+)?VS Code Marketplace\b/i,
+  },
+  {
+    label: 'Open VSX availability claim',
+    pattern:
+      /\b(?:available|published|live|released)\s+(?:on|in|from)\s+(?:the\s+)?Open VSX\b/i,
+  },
+  {
+    label: 'Open VSX install claim',
+    pattern: /\b(?:install|download)\s+(?:it\s+)?(?:from|via|with)\s+(?:the\s+)?Open VSX\b/i,
+  },
+  { label: 'Scoop install command', pattern: /\bscoop\s+install\s+agentloopkit\b/i },
+  { label: 'WinGet install command', pattern: /\bwinget\s+install\s+agentloopkit\b/i },
+  {
+    label: 'Scoop availability claim',
+    pattern: /\b(?:available|published|live|released)\s+(?:on|through|via)\s+Scoop\b/i,
+  },
+  {
+    label: 'WinGet availability claim',
+    pattern: /\b(?:available|published|live|released)\s+(?:on|through|via)\s+WinGet\b/i,
+  },
 ];
 
 const INTERNAL_CHATTER_CLAIMS = [
@@ -175,13 +220,22 @@ export function assertPublicDocsDoNotPinVersions(files) {
 export function assertPublicDocsAvoidUnsupportedClaims(files) {
   for (const file of files) {
     const filePath = toPosixPath(file.filePath);
-    const unsupportedClaim = UNSUPPORTED_PUBLIC_CLAIMS.find((claim) =>
+    const unsupportedAdoptionClaim = UNSUPPORTED_ADOPTION_CLAIMS.find((claim) =>
       claim.pattern.test(file.content),
     );
 
-    if (unsupportedClaim) {
+    if (unsupportedAdoptionClaim) {
       throw new Error(
-        `${filePath} contains unsupported public claim: ${unsupportedClaim.label}. Only document channels after they are verified and intentionally supported.`,
+        `${filePath} contains unsupported public claim: ${unsupportedAdoptionClaim.label}. Do not claim adoption, testimonials, or commercial plans without real public evidence and approved positioning.`,
+      );
+    }
+
+    const unsupportedChannelClaim = UNSUPPORTED_CHANNEL_CLAIMS.find((claim) =>
+      claim.pattern.test(file.content),
+    );
+    if (unsupportedChannelClaim && !FUTURE_CHANNEL_DESIGN_DOCS.has(filePath)) {
+      throw new Error(
+        `${filePath} contains unsupported public claim: ${unsupportedChannelClaim.label}. Only document channels after they are verified and intentionally supported.`,
       );
     }
 

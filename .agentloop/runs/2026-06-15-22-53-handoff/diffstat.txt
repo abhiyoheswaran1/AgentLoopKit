@@ -1,0 +1,6 @@
+ .agentloop/backlog.md             |  2 +-
+ .agentloop/dogfood-log.md         | 25 ++++++++++++++
+ docs/maintenance-guards.md        |  9 ++++++
+ scripts/smoke-packed-release.mjs  | 68 +++++++++++++++++++++++++++++++++++----
+ tests/public-docs-hygiene.test.ts | 48 +++++++++++++++++++++++++++
+ 5 files changed, 144 insertions(+), 8 deletions(-)

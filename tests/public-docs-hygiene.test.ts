@@ -64,6 +64,54 @@ describe('public docs hygiene', () => {
     );
   });
 
+  test('rejects unsupported marketplace and package-manager availability claims', async () => {
+    const dir = await makeFixture(
+      [
+        '# AgentLoopKit',
+        '',
+        'AgentLoopKit is trusted by thousands of production teams.',
+        'Install it from the VS Code Marketplace, Open VSX, Scoop, or WinGet.',
+        '`scoop install agentloopkit`',
+        '`winget install agentloopkit`',
+        '',
+      ].join('\n'),
+    );
+
+    await expect(runHygiene({ cwd: dir, version: '1.2.3' })).rejects.toThrow(
+      'unsupported public claim',
+    );
+  });
+
+  test('allows deferred channel design docs to describe future gates', async () => {
+    const dir = await makeFixture('# AgentLoopKit\n\nUse `npx agentloopkit init`.\n');
+    await mkdir(path.join(dir, 'docs/designs'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'docs/designs/windows-package-managers.md'),
+      [
+        '# Windows Package Manager Design',
+        '',
+        'Defer public Scoop and WinGet install claims.',
+        '',
+        'Do not claim `scoop install agentloopkit` until a Scoop bucket manifest is tested.',
+        'Do not claim `winget install agentloopkit` until a WinGet manifest is validated.',
+        '',
+      ].join('\n'),
+    );
+    await writeFile(
+      path.join(dir, 'docs/designs/vscode-open-vsx-extension.md'),
+      [
+        '# VS Code and Open VSX Extension Design',
+        '',
+        'Do not publish to the VS Code Marketplace or Open VSX until validation gates pass.',
+        '',
+      ].join('\n'),
+    );
+
+    await expect(runHygiene({ cwd: dir, version: '1.2.3' })).resolves.toMatchObject({
+      version: '1.2.3',
+    });
+  });
+
   test('ignores internal planning docs when checking public claims', async () => {
     const dir = await makeFixture('# AgentLoopKit\n\nUse `npx agentloopkit init`.\n');
     await mkdir(path.join(dir, 'docs/superpowers/plans'), { recursive: true });
