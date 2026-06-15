@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import {
   artifactInventoryTypes,
+  defaultStaleArtifactMarkdownLimit,
   getArtifactInventory,
   getStaleArtifactPreview,
   isArtifactInventoryType,
@@ -110,11 +111,12 @@ export function artifactsCommand() {
       };
 
       if (options.stale) {
+        const staleLimit = limit ?? (options.json ? undefined : defaultStaleArtifactMarkdownLimit);
         const preview = await getStaleArtifactPreview({
           cwd: workspace.cwd,
           config: workspace.config,
           type: renderOptions.type,
-          limit,
+          limit: staleLimit,
         });
         if (options.json) {
           console.log(JSON.stringify(renderStaleArtifactPreviewJson(preview), null, 2));

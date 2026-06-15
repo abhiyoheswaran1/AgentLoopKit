@@ -22,6 +22,7 @@ export const ciSummaryPattern =
 export const releaseNotesPattern =
   /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-release-notes(?:-\d+)?\.md$/;
 export const generatedMarkdownPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-.+\.md$/;
+export const defaultStaleArtifactMarkdownLimit = 50;
 
 export const artifactInventoryTypes = [
   'task',

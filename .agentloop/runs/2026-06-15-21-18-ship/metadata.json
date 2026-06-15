@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-21-18-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-21-18",
+  "createdAtEpochMs": 1781551091190,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-bound-stale-preview-markdown-by-default.md",
+    "title": "Bound stale preview markdown by default",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-21-15-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-21-18-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-21-18-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 27
+}

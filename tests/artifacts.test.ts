@@ -265,6 +265,22 @@ async function createRepoWithStaleEvidence() {
   return dir;
 }
 
+async function createRepoWithManyStaleEvidenceCandidates() {
+  const dir = await createRepoWithStaleEvidence();
+
+  for (let index = 0; index < 55; index += 1) {
+    const minute = String(index).padStart(2, '0');
+    await writeEvidenceFile(
+      dir,
+      `.agentloop/reports/2026-06-10-08-${minute}-verification-report.md`,
+      `# Old Verification ${minute}\n\nOverall status: fail\n`,
+      `2026-06-10T08:${minute}:00.000Z`,
+    );
+  }
+
+  return dir;
+}
+
 async function snapshotTree(root: string): Promise<TreeSnapshotEntry[]> {
   if (!existsSync(root)) return [];
   const entries: TreeSnapshotEntry[] = [];
@@ -740,11 +756,47 @@ describe('artifacts command', () => {
     expect(markdownResult.stdout).toContain(
       '- `verification` `.agentloop/reports/2026-06-10-09-00-verification-report.md` - Older verification report; latest verification evidence is kept.',
     );
-        expect(markdownResult.stdout).toContain(
+    expect(markdownResult.stdout).toContain(
       '- `run` `.agentloop/runs/2026-06-10-09-30-verify` - Older run ledger entry; latest run evidence is kept.',
     );
     expect(markdownResult.stdout).toContain('- Showing `4` of `4` candidate(s).');
     expect(await snapshotTree(path.join(dir, '.agentloop'))).toEqual(before);
+  });
+
+  test('caps markdown stale evidence preview by default while JSON remains complete', async () => {
+    const dir = await createRepoWithManyStaleEvidenceCandidates();
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--stale', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'artifacts', '--stale'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(jsonResult.stderr).toBe('');
+    const json = JSON.parse(jsonResult.stdout);
+    expect(json.stale.candidateCount).toBe(59);
+    expect(json.stale.shownCandidateCount).toBe(59);
+    expect(json.stale.hiddenCandidateCount).toBe(0);
+    expect(json.stale.limit).toBeNull();
+    expect(json.stale.candidates).toHaveLength(59);
+
+    expect(markdownResult.exitCode).toBe(0);
+    expect(markdownResult.stderr).toBe('');
+    expect(markdownResult.stdout).toContain('- Showing `50` of `59` candidate(s).');
+    expect(markdownResult.stdout).toContain('- Hidden candidates: `9`.');
+    expect(markdownResult.stdout).toContain(
+      'Run `agentloop artifacts --stale --json` for full candidate data.',
+    );
+    expect(markdownResult.stdout).toContain(
+      '.agentloop/reports/2026-06-10-08-00-verification-report.md',
+    );
+    expect(markdownResult.stdout).not.toContain(
+      '.agentloop/reports/2026-06-10-08-54-verification-report.md',
+    );
   });
 
   test('limits stale evidence preview output and reports hidden candidates', async () => {

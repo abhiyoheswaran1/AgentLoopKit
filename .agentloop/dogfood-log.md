@@ -2,6 +2,43 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-15: Default Bounded Stale Evidence Preview
+
+- Task contract: `.agentloop/tasks/2026-06-15-bound-stale-preview-markdown-by-default.md`
+- Trigger:
+  - `agentloop artifacts --stale --limit <count>` made long evidence histories scannable, but plain Markdown output could still print every stale candidate.
+  - The product-panel decision kept JSON complete for agents and scripts while making terminal output safe to read by default.
+- Implementation:
+  - Added a 50-candidate default cap for Markdown `agentloop artifacts --stale`.
+  - Kept `agentloop artifacts --stale --json` complete unless the caller passes `--limit`.
+  - Kept explicit `--limit <count>` as the override for Markdown and JSON.
+  - Updated README, CLI reference, getting-started docs, and backlog notes.
+- Product-panel decision:
+  - Nora wanted default terminal output users can scan.
+  - Lina wanted long autonomous sessions to inspect evidence without flooding the console.
+  - Samir kept the preview read-only and blocked cleanup automation.
+  - Maya kept the behavior in the CLI boundary instead of adding another core mode.
+- Verification:
+  - Red TDD run failed before the default Markdown cap existed:
+    - `npm test -- tests/artifacts.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/artifacts.test.ts`
+  - AgentLoopKit task verification passed and wrote run evidence:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-15-bound-stale-preview-markdown-by-default.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+  - Build passed:
+    - `npm run build`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/artifacts.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+  - Strict dogfood passed after generating fresh handoff evidence:
+    - `npm run dogfood:strict`
+- What worked well:
+  - The red test showed the exact terminal-flooding behavior and kept JSON default behavior unchanged.
+  - Strict dogfood caught stale handoff evidence before the task could be called done.
+- Improve:
+  - If users ask for narrower cleanup previews, consider type-specific stale filters such as ship-report-only output.
+
 ## 2026-06-15: Stale Evidence Preview
 
 - Task contract: `.agentloop/tasks/2026-06-15-preview-stale-agentloop-evidence.md`
