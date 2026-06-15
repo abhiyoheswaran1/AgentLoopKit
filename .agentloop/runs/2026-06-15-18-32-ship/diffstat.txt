@@ -1,0 +1,3 @@
+ .agentloop/harness/autonomous-dogfooding.md |  4 +++-
+ tests/autonomous-dogfood.test.ts            | 15 +++++++++++++++
+ 2 files changed, 18 insertions(+), 1 deletion(-)

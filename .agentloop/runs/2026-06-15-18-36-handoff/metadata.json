@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-18-36-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-18-36",
+  "createdAtEpochMs": 1781541392468,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-guard-dogfood-task-sequencing.md",
+    "title": "Guard dogfood task sequencing",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-18-31-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-18-36-pr-summary.md",
+  "changedFileCount": 16
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/harness/autonomous-dogfooding.md"
+  },
+  {
+    "status": "M",
+    "path": "tests/autonomous-dogfood.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-15-18-31-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-18-31-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-18-31-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-18-31-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-15-guard-dogfood-task-sequencing.md"
+  }
+]

@@ -9993,3 +9993,39 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The new placeholder diagnostic found the malformed dogfood task immediately after the AgentFlight/AgentLoop race.
 - Improve:
   - Start AgentFlight sessions and AgentLoop task creation sequentially. Do not create task contracts in parallel.
+
+## 2026-06-15: Dogfood Task Sequencing Guard
+
+- Task contract: `.agentloop/tasks/2026-06-15-guard-dogfood-task-sequencing.md`
+- AgentFlight session: `af-20260615-162841-guard-dogfood-task-sequencing`
+- Trigger:
+  - Two dogfood tasks exposed the same workflow mistake: AgentFlight start and AgentLoop task creation were launched in parallel.
+  - Parallel task setup can leave a generic AgentFlight-derived task contract active instead of the detailed AgentLoop task.
+- Implementation:
+  - Updated `.agentloop/harness/autonomous-dogfooding.md` to start AgentFlight first, wait for it to finish, then create the AgentLoop task.
+  - Added a guard test in `tests/autonomous-dogfood.test.ts` so the sequencing rule cannot be removed silently.
+- Verification:
+  - Red-green test cycle:
+    - Initial `npm test -- tests/autonomous-dogfood.test.ts` failed because the guide used the unsafe order.
+    - Retried `npm test -- tests/autonomous-dogfood.test.ts` passed after the guide update: 4 tests.
+  - Task-linked AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-15-18-31-verification-report.md`
+    - `.agentloop/runs/2026-06-15-18-31-verify`
+  - Static checks passed:
+    - `npm run test:unit`
+    - `npm run typecheck`
+    - `npm run lint`
+  - Ship evidence passed:
+    - `.agentloop/reports/2026-06-15-18-32-ship-report.md`
+    - Review-readiness score: 100/100
+  - `npm run dogfood:strict` passed.
+  - `npx --yes agentflight doctor` passed.
+  - `npx --yes agentflight verify -- npm test -- tests/autonomous-dogfood.test.ts` passed:
+    - `.agentflight/evidence/af-20260615-162841-guard-dogfood-task-sequencing/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-162841-guard-dogfood-task-sequencing/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+- What worked well:
+  - The new placeholder task diagnostic helped expose weak task setup immediately.
+  - Encoding the operational lesson as a test keeps the harness honest.
+- Improve:
+  - Consider adding an AgentLoopKit command or dogfood helper that starts companion tools and creates a task in the right order.

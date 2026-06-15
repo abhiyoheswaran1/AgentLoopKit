@@ -56,6 +56,21 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     expect(dogfoodGuide).toContain('Synthetic feedback is internal decision support, not public evidence.');
   });
 
+  test('keeps AgentFlight and AgentLoop task setup sequential to avoid generic task races', async () => {
+    const dogfoodGuide = await readFile('.agentloop/harness/autonomous-dogfooding.md', 'utf8');
+    const agentflightStart = dogfoodGuide.indexOf(
+      'npx --yes agentflight start --task "Describe the change" --yes',
+    );
+    const agentloopCreateTask = dogfoodGuide.indexOf(
+      'agentloop create-task --type feature --title "Describe the change"',
+    );
+
+    expect(dogfoodGuide).toContain('Do not start AgentFlight and `agentloop create-task` in parallel.');
+    expect(agentflightStart).toBeGreaterThanOrEqual(0);
+    expect(agentloopCreateTask).toBeGreaterThanOrEqual(0);
+    expect(agentflightStart).toBeLessThan(agentloopCreateTask);
+  });
+
   test('keeps near-term maintenance duties tied to explicit guardrails', async () => {
     const roadmap = await readFile('ROADMAP.md', 'utf8');
     const distribution = await readFile('docs/distribution-channels.md', 'utf8');

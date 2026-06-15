@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-18-31-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-18-31",
+  "createdAtEpochMs": 1781541109153,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-guard-dogfood-task-sequencing.md",
+    "title": "Guard dogfood task sequencing",
+    "status": "proposed"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-18-31-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 4
+}

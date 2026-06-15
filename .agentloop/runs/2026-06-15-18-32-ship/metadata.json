@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-18-32-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-18-32",
+  "createdAtEpochMs": 1781541161468,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-guard-dogfood-task-sequencing.md",
+    "title": "Guard dogfood task sequencing",
+    "status": "proposed"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-18-31-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-18-32-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-18-32-pr-summary.md",
+  "score": 100,
+  "changedFileCount": 7
+}
