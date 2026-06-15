@@ -1,0 +1,8 @@
+ CHANGELOG.md             |   1 +
+ docs/cli-reference.md    |   2 +
+ docs/status.md           |   4 +-
+ docs/task-contracts.md   |   3 +-
+ src/cli/commands/task.ts |   3 ++
+ src/core/task-state.ts   |  78 +++++++++++++++++++++++++++++++++
+ tests/task-state.test.ts | 111 +++++++++++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 199 insertions(+), 3 deletions(-)

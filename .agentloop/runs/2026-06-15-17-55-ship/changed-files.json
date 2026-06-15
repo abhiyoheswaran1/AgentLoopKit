@@ -1,0 +1,50 @@
+[
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/status.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/task-contracts.md"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/commands/task.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/task-state.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/task-state.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-15-17-52-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-17-55-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-17-55-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-17-55-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-15-warn-on-placeholder-task-contracts.md"
+  }
+]

@@ -131,6 +131,8 @@ Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review
 
 Archive task contracts after verification and handoff, not as a substitute for either. Use `task archive --status done --dry-run` to preview a bulk cleanup, then run `task archive --status done` to move finished contracts into `.agentloop/tasks/archive/`. Bulk archive only accepts `done`; parked or active work still requires an explicit path.
 
+`task doctor` is read-only. It warns about missing, legacy, unsupported, and terminal statuses, likely post-verification gates listed under `Verification Commands`, and open task contracts that still contain AgentLoopKit placeholder text in review-critical sections. Replace placeholder sections before asking an agent to implement the task. `deferred` tasks are treated as parked backlog and do not trigger placeholder warnings.
+
 ## Status And Next
 
 ```bash

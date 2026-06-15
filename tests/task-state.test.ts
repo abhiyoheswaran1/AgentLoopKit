@@ -550,6 +550,117 @@ describe('task command', () => {
     expect(humanResult.stdout).toContain('Move the listed command(s) from Verification Commands');
   });
 
+  test('reports active task contracts that still contain review-critical placeholders', async () => {
+    const { dir } = await createTaskStateFixture();
+    const taskPath = '.agentloop/tasks/2026-06-09-placeholder.md';
+    const content = [
+      '# Placeholder task',
+      '',
+      '- Type: feature',
+      '- Status: in-progress',
+      '',
+      '## Problem Statement',
+      'Describe the problem this task should solve.',
+      '',
+      '## Desired Outcome',
+      'Describe the concrete result expected from this task.',
+      '',
+      '## Likely Files or Areas',
+      '- None recorded yet.',
+      '',
+      '## Acceptance Criteria',
+      '- Add acceptance criteria before implementation starts.',
+      '',
+      '## Verification Commands',
+      '- No verification command recorded.',
+      '',
+      '## Rollback Notes',
+      'Document how to revert or disable this change.',
+      '',
+    ].join('\n');
+    await writeFile(path.join(dir, taskPath), content);
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'task', 'doctor', '--json'], { cwd: dir });
+    const output = JSON.parse(jsonResult.stdout);
+
+    expect(output.taskDoctor).toMatchObject({
+      overallStatus: 'warn',
+      counts: {
+        checked: 2,
+        diagnostics: 1,
+        terminalTasks: 0,
+        missingStatuses: 0,
+        unsupportedStatuses: 0,
+      },
+    });
+    expect(output.taskDoctor.diagnostics).toContainEqual(
+      expect.objectContaining({
+        id: 'placeholder-task-section',
+        severity: 'warn',
+        path: taskPath,
+        status: 'in-progress',
+        sections: [
+          'Problem Statement',
+          'Desired Outcome',
+          'Likely Files or Areas',
+          'Acceptance Criteria',
+          'Verification Commands',
+          'Rollback Notes',
+        ],
+        recommendation:
+          'Replace placeholder section(s) with task-specific scope, acceptance, verification, and rollback evidence before implementation continues.',
+      }),
+    );
+
+    const humanResult = await execa(tsxPath, [cliPath, 'task', 'doctor'], { cwd: dir });
+    expect(humanResult.stdout).toContain(inlineCode('placeholder-task-section'));
+    expect(humanResult.stdout).toContain('Sections:');
+    expect(humanResult.stdout).toContain(inlineCode('Acceptance Criteria'));
+    expect(await readFile(path.join(dir, taskPath), 'utf8')).toBe(content);
+  });
+
+  test('does not report placeholder diagnostics for deferred backlog tasks', async () => {
+    const { dir } = await createTaskStateFixture();
+    const taskPath = '.agentloop/tasks/2026-06-09-deferred-placeholder.md';
+    await writeFile(
+      path.join(dir, taskPath),
+      [
+        '# Deferred placeholder task',
+        '',
+        '- Status: deferred',
+        '',
+        '## Problem Statement',
+        'Describe the problem this task should solve.',
+        '',
+        '## Acceptance Criteria',
+        '- Add acceptance criteria before implementation starts.',
+        '',
+        '## Verification Commands',
+        '- No verification command recorded.',
+        '',
+        '## Rollback Notes',
+        'Document how to revert or disable this change.',
+        '',
+      ].join('\n'),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'doctor', '--json'], { cwd: dir });
+
+    expect(JSON.parse(result.stdout)).toEqual({
+      taskDoctor: {
+        overallStatus: 'pass',
+        counts: {
+          checked: 2,
+          diagnostics: 0,
+          terminalTasks: 0,
+          missingStatuses: 0,
+          unsupportedStatuses: 0,
+        },
+        diagnostics: [],
+      },
+    });
+  });
+
   test('prints task doctor diagnostics with Markdown-safe inline values', async () => {
     const { dir } = await createTaskStateFixture();
     const legacyTaskPath = '.agentloop/tasks/2026-06-09-legacy`task.md';

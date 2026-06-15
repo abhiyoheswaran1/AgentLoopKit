@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-18-05-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-18-05",
+  "createdAtEpochMs": 1781539504030,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-warn-on-placeholder-task-contracts.md",
+    "title": "Warn on placeholder task contracts",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-17-52-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-18-05-pr-summary.md",
+  "changedFileCount": 29
+}

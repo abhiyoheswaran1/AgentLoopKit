@@ -79,7 +79,7 @@ agentloop task clear
 `agentloop task status --json` updates only the task contract's `- Status:` line. Status is not verification evidence.
 `agentloop task done --json` marks the active task `done`. Pass a path when you need to finish a task that is not active.
 `agentloop task archive --json` moves one named contract into `.agentloop/tasks/archive/`, preserves Markdown content, refuses collisions, and clears the active pointer if needed. `agentloop task archive --status done --dry-run` previews a batch cleanup; `agentloop task archive --status done` archives finished contracts and leaves parked or active tasks alone.
-`agentloop task doctor --json` checks for missing, legacy, unsupported, and terminal statuses in the active task directory without writing state. It also warns when a task contract lists likely post-verification gates under `Verification Commands`.
+`agentloop task doctor --json` checks for missing, legacy, unsupported, and terminal statuses in the active task directory without writing state. It also warns when a task contract lists likely post-verification gates under `Verification Commands`, or when an open task contract still contains placeholder text in review-critical sections. `deferred` tasks stay parked and do not trigger placeholder warnings.
 
 The command suggests one next action:
 
@@ -98,4 +98,4 @@ When `.agentloop/runs/` exists, `status` includes the newest run entry in Markdo
 Older verification reports remain on disk, but `status` and `next` ignore them as current evidence for a newer in-progress task. Moving a task to `review` or `done` after verification does not erase the latest report from the loop state.
 If a task stays pinned in `review` after verification passes and the repo becomes clean, `status` and `next` point you at `agentloop task done`. If a task stays pinned after it reaches `done`, they point you at `agentloop task archive <path>` so the next session starts clean.
 When no active task is pinned, `status` and `next` report the newest open contract as `latestTask`, leave `activeTask` null, and recommend `agentloop task set <path>` before continuing. They keep tasks marked `deferred`, `done`, `completed`, or `verified` out of `latestTask`. Deferred tasks stay visible as parked work in `deferredTasks`. If every task contract is terminal or deferred, they recommend `agentloop create-task` instead of resurfacing old work.
-Run `agentloop task doctor` when a repo has many old task files, stale status lines, or misplaced post-verification gates and you need a cleanup checklist before choosing the next task.
+Run `agentloop task doctor` when a repo has many old task files, stale status lines, placeholder contracts, or misplaced post-verification gates and you need a cleanup checklist before choosing the next task.

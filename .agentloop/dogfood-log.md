@@ -9912,3 +9912,49 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The same helper now serves PR summaries and verification reports, reducing drift in public-output safety behavior.
 - Improve:
   - Consider whether other command-specific run artifacts need opt-in redaction tests when new public-output flags are added.
+
+## 2026-06-15: Placeholder Task Doctor Warnings
+
+- Task contract: `.agentloop/tasks/2026-06-15-warn-on-placeholder-task-contracts.md`
+- AgentFlight session: `af-20260615-154013-warn-on-placeholder-task-contracts`
+- Trigger:
+  - Dogfooding exposed that generic task contracts with default placeholder guidance could pass `agentloop task doctor`.
+  - Weak task contracts make later verification and handoff evidence look stronger than it is.
+- Implementation:
+  - Added a read-only `placeholder-task-section` task doctor diagnostic for open tasks.
+  - Reported the exact review-critical sections still using AgentLoopKit placeholder text.
+  - Kept `deferred` tasks exempt so parked backlog ideas can remain rough without breaking the active queue.
+  - Updated task-contract, CLI-reference, status docs, and changelog.
+- Verification:
+  - Red-green test cycle:
+    - Initial `npm test -- tests/task-state.test.ts` failed because `task doctor` returned `pass` for a placeholder task.
+    - Retried `npm test -- tests/task-state.test.ts` passed after implementation: 46 tests.
+  - `npm run test:unit` passed: 21 files, 84 tests.
+  - `npm run typecheck` passed.
+  - `npm run check:public-docs` passed.
+  - `npm run check:links` passed.
+  - `npm run build` passed.
+  - Task-linked AgentLoop verification passed with `--redact-paths`:
+    - `.agentloop/reports/2026-06-15-17-52-verification-report.md`
+    - `.agentloop/runs/2026-06-15-17-55-verify`
+  - Ship evidence passed:
+    - `.agentloop/reports/2026-06-15-17-55-ship-report.md`
+    - Review-readiness score: 96/100
+  - Reviewer handoff generated:
+    - `.agentloop/handoffs/2026-06-15-17-55-pr-summary.md`
+  - `npm run dogfood:strict` passed.
+  - `npx --yes agentflight doctor` passed.
+  - `npx --yes agentflight verify -- npm test -- tests/task-state.test.ts` passed:
+    - 1 file, 46 tests
+    - `.agentflight/evidence/af-20260615-154013-warn-on-placeholder-task-contracts/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-154013-warn-on-placeholder-task-contracts/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+  - `npm run lint` passed.
+  - Full Vitest passed:
+    - `npm test`
+    - 61 files, 568 tests
+- What worked well:
+  - The product caught a real dogfood workflow weakness and turned it into a deterministic CLI warning.
+  - AgentLoopKit, AgentFlight, and ProjScan all contributed separate evidence without adding cloud or token requirements.
+- Improve:
+  - The task-state integration test file now takes about two minutes locally. Keep it in release gates, but consider splitting faster task-doctor unit coverage from slower end-to-end CLI coverage.

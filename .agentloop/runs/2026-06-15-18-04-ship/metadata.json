@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-18-04-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-18-04",
+  "createdAtEpochMs": 1781539480334,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-warn-on-placeholder-task-contracts.md",
+    "title": "Warn on placeholder task contracts",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-17-52-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-18-04-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-18-04-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 21
+}

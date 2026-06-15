@@ -1,0 +1,9 @@
+ .agentloop/dogfood-log.md |  46 +++++++++++++++++++
+ CHANGELOG.md              |   1 +
+ docs/cli-reference.md     |   2 +
+ docs/status.md            |   4 +-
+ docs/task-contracts.md    |   3 +-
+ src/cli/commands/task.ts  |   3 ++
+ src/core/task-state.ts    |  78 ++++++++++++++++++++++++++++++++
+ tests/task-state.test.ts  | 111 ++++++++++++++++++++++++++++++++++++++++++++++
+ 8 files changed, 245 insertions(+), 3 deletions(-)

@@ -48,6 +48,7 @@ export type TaskDoctorDiagnostic = {
   id:
     | 'legacy-task-status'
     | 'missing-task-status'
+    | 'placeholder-task-section'
     | 'post-verification-gate-in-verification-commands'
     | 'terminal-task-in-active-folder'
     | 'unsupported-task-status';
@@ -58,6 +59,7 @@ export type TaskDoctorDiagnostic = {
   message: string;
   recommendation: string;
   commands?: string[];
+  sections?: string[];
 };
 
 export type TaskDoctorResult = {
@@ -101,6 +103,33 @@ export class TaskPathError extends AgentLoopError {
 const TERMINAL_TASK_STATUSES = new Set(['done', 'completed', 'verified']);
 const NON_FALLBACK_TASK_STATUSES = new Set(['deferred', ...TERMINAL_TASK_STATUSES]);
 const LEGACY_TASK_STATUSES = new Set(['completed', 'verified']);
+const OPEN_TASK_STATUSES = new Set(['proposed', 'in-progress', 'blocked', 'review']);
+const REVIEW_CRITICAL_PLACEHOLDERS = [
+  {
+    heading: 'Problem Statement',
+    placeholder: 'Describe the problem this task should solve.',
+  },
+  {
+    heading: 'Desired Outcome',
+    placeholder: 'Describe the concrete result expected from this task.',
+  },
+  {
+    heading: 'Likely Files or Areas',
+    placeholder: 'None recorded yet.',
+  },
+  {
+    heading: 'Acceptance Criteria',
+    placeholder: 'Add acceptance criteria before implementation starts.',
+  },
+  {
+    heading: 'Verification Commands',
+    placeholder: 'No verification command recorded.',
+  },
+  {
+    heading: 'Rollback Notes',
+    placeholder: 'Document how to revert or disable this change.',
+  },
+] as const;
 
 function repoPath(...segments: string[]) {
   return segments.join('/');
@@ -239,6 +268,37 @@ function extractMarkdownListSection(markdown: string, heading: string) {
   return sectionLines
     .map((line) => line.match(/^\s*-\s+(.+)$/)?.[1]?.trim() ?? '')
     .filter(Boolean);
+}
+
+function extractMarkdownSectionLines(markdown: string, heading: string) {
+  const lines = markdown.split('\n');
+  const headingIndex = lines.findIndex((line) => line.trim() === `## ${heading}`);
+  if (headingIndex === -1) return [];
+
+  const sectionLines: string[] = [];
+  for (const line of lines.slice(headingIndex + 1)) {
+    if (/^##\s+/.test(line)) break;
+    sectionLines.push(line);
+  }
+
+  return sectionLines.map((line) => line.trim()).filter(Boolean);
+}
+
+function normalizeTaskSectionLine(line: string) {
+  return line.replace(/^\s*-\s+/, '').replace(/\s+/g, ' ').trim();
+}
+
+function findPlaceholderTaskSections(markdown: string) {
+  const sections: string[] = [];
+
+  for (const { heading, placeholder } of REVIEW_CRITICAL_PLACEHOLDERS) {
+    const sectionLines = extractMarkdownSectionLines(markdown, heading);
+    if (sectionLines.some((line) => normalizeTaskSectionLine(line) === placeholder)) {
+      sections.push(heading);
+    }
+  }
+
+  return sections;
 }
 
 function parseTaskStatus(status: string): TaskStatus {
@@ -565,6 +625,24 @@ export async function inspectTaskDirectory(options: {
           'Move the listed command(s) from Verification Commands to Post-Verification Gates.',
         commands: misplacedPostVerificationGates,
       });
+    }
+
+    if (OPEN_TASK_STATUSES.has(status)) {
+      const placeholderSections = findPlaceholderTaskSections(taskContent);
+      if (placeholderSections.length > 0) {
+        diagnostics.push({
+          id: 'placeholder-task-section',
+          severity: 'warn',
+          path: task.path,
+          title: task.title,
+          status,
+          message:
+            'Task contract still contains placeholder guidance in review-critical section(s).',
+          recommendation:
+            'Replace placeholder section(s) with task-specific scope, acceptance, verification, and rollback evidence before implementation continues.',
+          sections: placeholderSections,
+        });
+      }
     }
   }
 

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added `agentloop task doctor` warnings for open task contracts that still contain AgentLoopKit placeholder text in review-critical sections.
 - Added `--redact-paths` to `agentloop verify` so verification reports and run-ledger copies can be shared without exposing local absolute roots from command output.
 - Added `--redact-paths` to `agentloop summarize` and `agentloop handoff` so reviewer Markdown can be shared without exposing local absolute roots.
 - Changed `agentloop verify --task-commands` to accept verification commands written as Markdown inline-code list items.

@@ -150,6 +150,9 @@ function printTaskDoctor(result: TaskDoctorResult, options: { json?: boolean }) 
     if (diagnostic.commands?.length) {
       console.log(`  Commands: ${diagnostic.commands.map(inlineCode).join(', ')}`);
     }
+    if (diagnostic.sections?.length) {
+      console.log(`  Sections: ${diagnostic.sections.map(inlineCode).join(', ')}`);
+    }
     console.log(`  Recommendation: ${inlineCode(diagnostic.recommendation)}`);
   }
 

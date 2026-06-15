@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-17-55-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-17-55",
+  "createdAtEpochMs": 1781538900250,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-warn-on-placeholder-task-contracts.md",
+    "title": "Warn on placeholder task contracts",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-17-52-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 9
+}
