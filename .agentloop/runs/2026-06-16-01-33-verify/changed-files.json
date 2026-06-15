@@ -1,0 +1,30 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/release-check.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/release-check.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-16-01-33-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-16-make-release-check-output-markdown-safe.md"
+  }
+]

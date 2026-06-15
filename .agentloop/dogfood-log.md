@@ -2,6 +2,46 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Release-Check Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-release-check-output-markdown-safe.md`
+- Trigger:
+  - `agentloop release-check` output is pasted into release PRs, issues, and CI logs.
+  - Package metadata and check messages could split Markdown list items when they contained line breaks.
+- Implementation:
+  - Switched `src/core/release-check.ts` human rendering to `singleLineInlineCode`.
+  - Kept release readiness logic, strict-mode exit codes, redact-path behavior, and JSON output unchanged.
+  - Added a regression test that keeps release-check Markdown on one line while JSON preserves raw package metadata.
+  - Updated the CLI reference, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized release-log paste safety.
+  - Nora wanted release readiness output to stay readable in PR comments.
+  - Elias wanted release docs to describe the behavior without internal release chatter.
+  - Maya accepted the narrow import change because the behavior matches the existing shared helper.
+- Verification:
+  - Red TDD run failed before single-line release-check rendering existed:
+    - `npm test -- tests/release-check.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/release-check.test.ts`
+    - `npm test -- tests/release-check.test.ts tests/cli-docs-drift.test.ts`
+  - Static and docs checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - AgentLoopKit task verification passed and wrote run evidence:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-release-check-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/release-check.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The test reproduced the exact list-splitting issue with package metadata.
+  - Reusing `singleLineInlineCode` kept the change aligned with the recent output-hardening pass.
+- Improve:
+  - Continue with `ci-summary` next if the backlog still prioritizes paste-heavy command output.
+
 ## 2026-06-16: Markdown-Safe Artifacts Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-artifacts-output-markdown-safe.md`

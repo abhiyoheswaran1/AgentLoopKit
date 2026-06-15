@@ -175,9 +175,7 @@ describe('release-check command', () => {
     const strictOutput = JSON.parse(strictResult.stdout);
     expect(strictOutput.overallStatus).toBe('fail');
     expect(strictOutput.checks).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: 'release-notes', status: 'warn' }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ id: 'release-notes', status: 'warn' })]),
     );
   });
 
@@ -280,14 +278,10 @@ describe('release-check command', () => {
         reject: false,
       },
     );
-    const redactedHumanResult = await execa(
-      tsxPath,
-      [cliPath, 'release-check', '--redact-paths'],
-      {
-        cwd: nestedDir,
-        reject: false,
-      },
-    );
+    const redactedHumanResult = await execa(tsxPath, [cliPath, 'release-check', '--redact-paths'], {
+      cwd: nestedDir,
+      reject: false,
+    });
 
     expect(defaultResult.exitCode).toBe(0);
     expect(JSON.parse(defaultResult.stdout).git.root).toBe(root);
@@ -390,6 +384,70 @@ describe('release-check command', () => {
           expect.objectContaining({
             id: 'package-metadata',
             message: 'package.json declares demo`pkg@1.2.3`rc',
+            path: 'package.json',
+          }),
+        ]),
+      );
+    },
+    CLI_RELEASE_CHECK_TEST_TIMEOUT_MS,
+  );
+
+  test(
+    'renders markdown check values as single-line inline code when release data contains line breaks',
+    async () => {
+      const dir = await createReleaseRepo();
+      await writeFile(
+        path.join(dir, 'package.json'),
+        JSON.stringify(
+          {
+            name: 'demo\n- [x] injected',
+            version: '1.2.3',
+            scripts: {
+              test: 'echo test',
+              lint: 'echo lint',
+              typecheck: 'echo typecheck',
+              build: 'echo build',
+              'smoke:release': 'echo smoke',
+            },
+          },
+          null,
+          2,
+        ),
+      );
+      await writeFile(
+        path.join(dir, 'CHANGELOG.md'),
+        '# Changelog\n\n## 1.2.3\n\n- Prepared release evidence.\n',
+      );
+      await writeFile(
+        path.join(dir, '.agentloop/handoffs/2026-06-11-10-10-release-notes.md'),
+        '# Release Notes\n\n## 1.2.3\n\nRelease evidence.\n',
+      );
+
+      const humanResult = await execa(tsxPath, [cliPath, 'release-check'], {
+        cwd: dir,
+        reject: false,
+      });
+      const jsonResult = await execa(tsxPath, [cliPath, 'release-check', '--json'], {
+        cwd: dir,
+        reject: false,
+      });
+
+      expect(humanResult.exitCode).toBe(0);
+      expect(humanResult.stdout).toContain('- Package: `demo\\n- [x] injected@1.2.3`');
+      expect(humanResult.stdout).toContain(
+        '- [`pass`] `Package metadata`: `package.json declares demo\\n- [x] injected@1.2.3` - `package.json`',
+      );
+      expect(humanResult.stdout).not.toContain('\n- [x] injected@1.2.3`');
+      const output = JSON.parse(jsonResult.stdout);
+      expect(output.package).toEqual({
+        name: 'demo\n- [x] injected',
+        version: '1.2.3',
+      });
+      expect(output.checks).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'package-metadata',
+            message: 'package.json declares demo\n- [x] injected@1.2.3',
             path: 'package.json',
           }),
         ]),

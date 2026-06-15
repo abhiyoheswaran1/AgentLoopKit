@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 120 Decisions
+
+| item                               | source persona     | problem                                                                                                  | proposed solution                                                                           | priority | effort | adoption impact | risk | decision | notes                                                                                     |
+| ---------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ----------------------------------------------------------------------------------------- |
+| Markdown-safe release-check output | Samir, Nora, Elias | Maintainers paste `release-check` into release PRs and CI logs, but package metadata can split Markdown. | Render human release-check dynamic values as single-line inline code; keep JSON raw values. | P1       | S      | medium          | low  | do now   | No release readiness, strict-mode, redact-path, publish, registry, or JSON-shape changes. |
+
 ## Current Research Cycle 119 Decisions
 
 | item                           | source persona    | problem                                                                                           | proposed solution                                                                 | priority | effort | adoption impact | risk | decision | notes                                                                                    |

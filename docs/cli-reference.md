@@ -442,6 +442,7 @@ agentloop npm-status --registry-json npm-view.json
 `release-check` checks local release readiness from package metadata, changelog entries, release scripts, git state, current verification evidence, reviewer handoff, and generated release notes. It warns when `CHANGELOG.md` still has `Unreleased` entries, verification predates the current task, or the latest generated release notes do not mention the local package version. Use `--strict` when warnings should fail CI or a maintainer release gate.
 
 Use `--redact-paths` before pasting release-check output into a public issue, PR, or CI log. Default JSON keeps the absolute Git root for scripts that need it.
+Human-readable `release-check` output keeps package metadata, check messages, paths, refs, and commands on one Markdown line. JSON output keeps raw values for scripts.
 
 `release-proof` checks post-release evidence across public release channels. It reports whether npm, GitHub Releases, GHCR, and MCP Registry proof match the local package version. Use `--only <channel>` to re-check one channel after a delayed workflow. Use captured JSON flags when you want deterministic CI or release notes without live registry calls. Use `--strict` when missing proof should fail the command.
 

@@ -13,7 +13,7 @@ import {
   isInsideGitRepo,
   parseGitStatus,
 } from './git.js';
-import { inlineCode } from './markdown-format.js';
+import { singleLineInlineCode as inlineCode } from './markdown-format.js';
 
 export type ReleaseCheckStatus = 'pass' | 'warn' | 'fail';
 
@@ -76,13 +76,13 @@ function relativePath(cwd: string, filePath: string) {
   return path.relative(cwd, filePath).split(path.sep).join('/') || '.';
 }
 
-function redactLocalRoot(value: string | undefined, root: string, redactPaths: boolean | undefined) {
+function redactLocalRoot(
+  value: string | undefined,
+  root: string,
+  redactPaths: boolean | undefined,
+) {
   if (!value || !redactPaths || !root || root === path.parse(root).root) return value;
-  return value
-    .split(root)
-    .join('[git-root]')
-    .split(root.replace(/\\/g, '/'))
-    .join('[git-root]');
+  return value.split(root).join('[git-root]').split(root.replace(/\\/g, '/')).join('[git-root]');
 }
 
 function redactReleaseCheck(
@@ -167,7 +167,11 @@ async function latestEvidencePath(options: { cwd: string; dir: string; pattern: 
   return filePath ? relativePath(options.cwd, filePath) : undefined;
 }
 
-async function releaseNotesMentionVersion(cwd: string, filePath: string | undefined, version: string) {
+async function releaseNotesMentionVersion(
+  cwd: string,
+  filePath: string | undefined,
+  version: string,
+) {
   if (!filePath) return false;
   try {
     const markdown = await readFile(path.join(cwd, filePath), 'utf8');
@@ -543,7 +547,8 @@ export async function checkReleaseReadiness(options: {
       isRepository: inGit,
       branch: inGit ? await getGitBranch(options.cwd) : '',
       commit: inGit ? await getGitCommit(options.cwd) : '',
-      root: redactLocalRoot(resolvedGitRoot, resolvedGitRoot, options.redactPaths) ?? resolvedGitRoot,
+      root:
+        redactLocalRoot(resolvedGitRoot, resolvedGitRoot, options.redactPaths) ?? resolvedGitRoot,
       targetIsRoot,
       changedFileCount: changedFiles.length,
     },

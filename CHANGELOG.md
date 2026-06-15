@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Made human-readable `release-check` output render dynamic values as single-line inline code while preserving raw JSON values.
 - Made human-readable `artifacts` output render dynamic values as single-line inline code while preserving raw JSON values.
 - Made human-readable `status` and `next` output render dynamic values as single-line inline code while preserving raw JSON values.
 - Made human-readable `check-gates` output render dynamic values as single-line inline code while preserving raw JSON values.
