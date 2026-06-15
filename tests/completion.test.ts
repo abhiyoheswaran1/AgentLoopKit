@@ -4,12 +4,20 @@ import { describe, expect, test } from 'vitest';
 import { TASK_TYPES } from '../src/core/constants.js';
 import { renderCompletionScript } from '../src/core/completions.js';
 import { releaseProofChannelIds } from '../src/core/release-proof.js';
+import { artifactInventoryTypes } from '../src/core/artifacts.js';
+import { BADGE_SOURCES } from '../src/core/badge.js';
+import { TASK_STATUSES } from '../src/core/task-state.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 describe('completion scripts', () => {
+  const artifactTypes = artifactInventoryTypes.join(' ');
+  const badgeSources = BADGE_SOURCES.join(' ');
+  const outputFormats = 'markdown json';
+  const archiveStatuses = 'done';
   const releaseProofChannels = releaseProofChannelIds.join(' ');
+  const taskStatuses = TASK_STATUSES.join(' ');
 
   test('renders zsh completions for commands, task statuses, and agent names', () => {
     const script = renderCompletionScript('zsh');
@@ -34,8 +42,18 @@ describe('completion scripts', () => {
     expect(script).toContain('deferred');
     expect(script).toContain("_values 'task type'");
     expect(script).toContain("_values 'release proof channel'");
+    expect(script).toContain("_values 'artifact type'");
+    expect(script).toContain("_values 'badge source'");
+    expect(script).toContain("_values 'output format'");
+    expect(script).toContain('_values \'archive status\' "done"');
     for (const type of TASK_TYPES) {
       expect(script).toContain(`"${type}"`);
+    }
+    for (const type of artifactInventoryTypes) {
+      expect(script).toContain(`"${type}"`);
+    }
+    for (const source of BADGE_SOURCES) {
+      expect(script).toContain(`"${source}"`);
     }
     for (const channel of releaseProofChannelIds) {
       expect(script).toContain(`"${channel}"`);
@@ -56,7 +74,12 @@ describe('completion scripts', () => {
     expect(script).toContain('list show set status done archive current clear doctor');
     expect(script).toContain('compgen -W "list show status packs pack"');
     expect(script).toContain(`compgen -W "${TASK_TYPES.join(' ')}"`);
+    expect(script).toContain(`compgen -W "${artifactTypes}"`);
+    expect(script).toContain(`compgen -W "${badgeSources}"`);
+    expect(script).toContain(`compgen -W "${outputFormats}"`);
     expect(script).toContain(`compgen -W "${releaseProofChannels}"`);
+    expect(script).toContain(`compgen -W "${taskStatuses}"`);
+    expect(script).toContain(`compgen -W "${archiveStatuses}"`);
     expect(script).toContain(
       'codex claude-code cursor opencode gemini-cli github-copilot-cli generic all',
     );
@@ -78,6 +101,21 @@ describe('completion scripts', () => {
     );
     expect(script).toContain(
       `complete -c agentloopkit -n '__fish_seen_subcommand_from release-proof' -a '${releaseProofChannels}'`,
+    );
+    expect(script).toContain(
+      `complete -c agentloop -n '__fish_seen_subcommand_from artifacts' -a '${artifactTypes}'`,
+    );
+    expect(script).toContain(
+      `complete -c agentloop -n '__fish_seen_subcommand_from badge' -a '${badgeSources}'`,
+    );
+    expect(script).toContain(
+      `complete -c agentloop -n '__fish_seen_subcommand_from summarize' -a '${outputFormats}'`,
+    );
+    expect(script).toContain(
+      `complete -c agentloopkit -n '__fish_seen_subcommand_from handoff' -a '${outputFormats}'`,
+    );
+    expect(script).toContain(
+      `complete -c agentloop -n '__fish_seen_subcommand_from archive' -l status -a '${archiveStatuses}'`,
     );
     expect(script).toContain('review');
     expect(script).not.toContain('config.fish');
@@ -103,9 +141,19 @@ describe('completion scripts', () => {
     expect(script).toContain("'in-progress'");
     expect(script).toContain("'deferred'");
     expect(script).toContain('$AgentLoopTaskTypes');
+    expect(script).toContain('$AgentLoopArtifactTypes');
+    expect(script).toContain('$AgentLoopBadgeSources');
+    expect(script).toContain('$AgentLoopOutputFormats');
+    expect(script).toContain('$AgentLoopArchiveStatuses');
     expect(script).toContain('$AgentLoopReleaseProofChannels');
     for (const type of TASK_TYPES) {
       expect(script).toContain(`'${type}'`);
+    }
+    for (const type of artifactInventoryTypes) {
+      expect(script).toContain(`'${type}'`);
+    }
+    for (const source of BADGE_SOURCES) {
+      expect(script).toContain(`'${source}'`);
     }
     for (const channel of releaseProofChannelIds) {
       expect(script).toContain(`'${channel}'`);

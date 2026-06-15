@@ -2,6 +2,48 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Fixed Option Shell Completions
+
+- Task contract: `.agentloop/tasks/archive/2026-06-15-complete-fixed-option-completions.md`
+- Trigger:
+  - Dogfooding showed several commands already accepted fixed values but shell completions only exposed some of them.
+  - Agent users should not have to jump back to docs to remember artifact types, badge sources, the supported archive status, or output formats.
+- Implementation:
+  - Added completion values for `artifacts --type`, `badge --source`, `summarize --format`, `handoff --format`, and `task archive --status done`.
+  - Reused existing constants for artifact types, badge sources, and task statuses.
+  - Updated README, getting-started, CLI reference, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Nora prioritized smoother CLI empty states and fewer docs lookups.
+  - Lina wanted long-running agent sessions to get better command suggestions.
+  - Maya kept the change small and limited to existing fixed values.
+  - Samir kept completion scripts read-only with no shell profile edits.
+- Verification:
+  - Red TDD run failed before fixed values were included:
+    - `npm test -- tests/completion.test.ts`
+  - Focused task verification passed and wrote AgentLoop evidence:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-15-complete-fixed-option-completions.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+  - Focused adjacent tests passed:
+    - `npm test -- tests/completion.test.ts tests/cli-docs-drift.test.ts tests/artifacts.test.ts tests/badge.test.ts tests/handoff.test.ts tests/task-archive.test.ts`
+  - Static and docs checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full Vitest passed:
+    - `npm test`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/completion.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+  - Strict dogfood passed:
+    - `npm run dogfood:strict`
+- What worked well:
+  - Test-first coverage caught missing values for all supported shell renderers.
+  - Reusing constants avoided duplicating CLI value lists in the completion generator.
+- Improve:
+  - Consider a future completion docs page only if users need install snippets for specific shells.
+
 ## 2026-06-15: Ship Report Artifact Filtering
 
 - Task contract: `.agentloop/tasks/archive/2026-06-15-filter-ship-report-artifacts.md`

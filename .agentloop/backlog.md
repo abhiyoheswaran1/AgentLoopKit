@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 115 Decisions
+
+| item                                    | source persona  | problem                                                                 | proposed solution                                                                                                   | priority | effort | adoption impact | risk | decision | notes                                                                                         |
+| --------------------------------------- | --------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | --------------------------------------------------------------------------------------------- |
+| Complete fixed option shell completions | Nora, Lina, Dev | Several existing fixed CLI values required memorization or docs lookup. | Suggest artifact types, badge sources, the done-only task archive status, and summarize/handoff formats in scripts. | P2       | S      | medium          | low  | do now   | Small DX improvement that makes frequent CLI use smoother without changing command semantics. |
+
 ## Candidate Scoring
 
 | Item                                 | Stars | Usefulness | Explain | Compatibility | Simplicity | Maintenance | Trust | Optionality | Total |

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-00-13-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-00-13",
+  "createdAtEpochMs": 1781561592136,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-complete-fixed-option-completions.md",
+    "title": "Complete fixed option completions",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-00-12-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 33
+}

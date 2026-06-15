@@ -1,5 +1,7 @@
 import { AgentLoopError } from './errors.js';
 import { TASK_TYPES } from './constants.js';
+import { artifactInventoryTypes } from './artifacts.js';
+import { BADGE_SOURCES } from './badge.js';
 import { releaseProofChannelIds } from './release-proof.js';
 import { TASK_STATUSES } from './task-state.js';
 
@@ -65,6 +67,10 @@ const policyCommandSpecs = [
   ['pack', 'Inspect or apply a policy pack'],
 ] as const;
 const policyCommands = policyCommandSpecs.map(([name]) => name);
+const artifactTypes = artifactInventoryTypes;
+const badgeSources = BADGE_SOURCES;
+const outputFormats = ['markdown', 'json'] as const;
+const archiveStatuses = ['done'] as const;
 const taskStatuses = TASK_STATUSES;
 const taskTypes = TASK_TYPES;
 const releaseProofChannels = releaseProofChannelIds;
@@ -111,11 +117,35 @@ _agentloop_completion() {
         return 0
       fi
       ;;
+    artifacts)
+      if [[ "$previous" == "--type" ]]; then
+        COMPREPLY=( $(compgen -W "${artifactTypes.join(' ')}" -- "$current") )
+        return 0
+      fi
+      ;;
+    badge)
+      if [[ "$previous" == "--source" ]]; then
+        COMPREPLY=( $(compgen -W "${badgeSources.join(' ')}" -- "$current") )
+        return 0
+      fi
+      ;;
+    summarize|handoff)
+      if [[ "$previous" == "--format" ]]; then
+        COMPREPLY=( $(compgen -W "${outputFormats.join(' ')}" -- "$current") )
+        return 0
+      fi
+      ;;
     task)
       case "\${COMP_WORDS[2]}" in
         status)
           if [[ \${COMP_CWORD} -eq 4 ]]; then
             COMPREPLY=( $(compgen -W "${taskStatuses.join(' ')}" -- "$current") )
+            return 0
+          fi
+          ;;
+        archive)
+          if [[ "$previous" == "--status" ]]; then
+            COMPREPLY=( $(compgen -W "${archiveStatuses.join(' ')}" -- "$current") )
             return 0
           fi
           ;;
@@ -176,6 +206,8 @@ _agentloop() {
         task)
           if [[ "$words[3]" == "status" && CURRENT -eq 5 ]]; then
             _values 'task status' ${taskStatuses.map((status) => `"${status}"`).join(' ')}
+          elif [[ "$words[3]" == "archive" && "\${words[CURRENT-1]}" == "--status" ]]; then
+            _values 'archive status' ${archiveStatuses.map((status) => `"${status}"`).join(' ')}
           else
             _describe 'task command' taskCommandSpecs
           fi
@@ -188,6 +220,21 @@ _agentloop() {
         release-proof)
           if [[ "\${words[CURRENT-1]}" == "--only" ]]; then
             _values 'release proof channel' ${releaseProofChannels.map((channel) => `"${channel}"`).join(' ')}
+          fi
+          ;;
+        artifacts)
+          if [[ "\${words[CURRENT-1]}" == "--type" ]]; then
+            _values 'artifact type' ${artifactTypes.map((type) => `"${type}"`).join(' ')}
+          fi
+          ;;
+        badge)
+          if [[ "\${words[CURRENT-1]}" == "--source" ]]; then
+            _values 'badge source' ${badgeSources.map((source) => `"${source}"`).join(' ')}
+          fi
+          ;;
+        summarize|handoff)
+          if [[ "\${words[CURRENT-1]}" == "--format" ]]; then
+            _values 'output format' ${outputFormats.map((format) => `"${format}"`).join(' ')}
           fi
           ;;
         policy)
@@ -236,7 +283,12 @@ complete -c agentloop -n '__fish_seen_subcommand_from task' -a '${taskCommands.j
 complete -c agentloop -n '__fish_seen_subcommand_from policy' -a '${policyCommands.join(' ')}' -d 'Policy command'
 complete -c agentloop -n '__fish_seen_subcommand_from create-task' -a '${taskTypes.join(' ')}' -d 'Task type'
 complete -c agentloop -n '__fish_seen_subcommand_from release-proof' -a '${releaseProofChannels.join(' ')}' -d 'Release proof channel'
+complete -c agentloop -n '__fish_seen_subcommand_from artifacts' -a '${artifactTypes.join(' ')}' -d 'Artifact type'
+complete -c agentloop -n '__fish_seen_subcommand_from badge' -a '${badgeSources.join(' ')}' -d 'Badge source'
+complete -c agentloop -n '__fish_seen_subcommand_from summarize' -a '${outputFormats.join(' ')}' -d 'Output format'
+complete -c agentloop -n '__fish_seen_subcommand_from handoff' -a '${outputFormats.join(' ')}' -d 'Output format'
 complete -c agentloop -n '__fish_seen_subcommand_from status' -a '${taskStatuses.join(' ')}' -d 'Task status'
+complete -c agentloop -n '__fish_seen_subcommand_from archive' -l status -a '${archiveStatuses.join(' ')}' -d 'Archive status'
 complete -c agentloop -n '__fish_seen_subcommand_from install-agent' -a '${agentNames.join(' ')}' -d 'Agent name'
 complete -c agentloop -n '__fish_seen_subcommand_from completion' -a '${COMPLETION_SHELLS.join(' ')}' -d 'Shell'
 complete -c agentloopkit -n '__fish_use_subcommand' -a '${topCommands.join(' ')}' -d 'AgentLoopKit command'
@@ -244,7 +296,12 @@ complete -c agentloopkit -n '__fish_seen_subcommand_from task' -a '${taskCommand
 complete -c agentloopkit -n '__fish_seen_subcommand_from policy' -a '${policyCommands.join(' ')}' -d 'Policy command'
 complete -c agentloopkit -n '__fish_seen_subcommand_from create-task' -a '${taskTypes.join(' ')}' -d 'Task type'
 complete -c agentloopkit -n '__fish_seen_subcommand_from release-proof' -a '${releaseProofChannels.join(' ')}' -d 'Release proof channel'
+complete -c agentloopkit -n '__fish_seen_subcommand_from artifacts' -a '${artifactTypes.join(' ')}' -d 'Artifact type'
+complete -c agentloopkit -n '__fish_seen_subcommand_from badge' -a '${badgeSources.join(' ')}' -d 'Badge source'
+complete -c agentloopkit -n '__fish_seen_subcommand_from summarize' -a '${outputFormats.join(' ')}' -d 'Output format'
+complete -c agentloopkit -n '__fish_seen_subcommand_from handoff' -a '${outputFormats.join(' ')}' -d 'Output format'
 complete -c agentloopkit -n '__fish_seen_subcommand_from status' -a '${taskStatuses.join(' ')}' -d 'Task status'
+complete -c agentloopkit -n '__fish_seen_subcommand_from archive' -l status -a '${archiveStatuses.join(' ')}' -d 'Archive status'
 complete -c agentloopkit -n '__fish_seen_subcommand_from install-agent' -a '${agentNames.join(' ')}' -d 'Agent name'
 complete -c agentloopkit -n '__fish_seen_subcommand_from completion' -a '${COMPLETION_SHELLS.join(' ')}' -d 'Shell'
 `;
@@ -263,6 +320,10 @@ function renderPowerShell() {
 $AgentLoopCommands = ${powerShellArray(topCommands)}
 $AgentLoopTaskCommands = ${powerShellArray(taskCommands)}
 $AgentLoopPolicyCommands = ${powerShellArray(policyCommands)}
+$AgentLoopArtifactTypes = ${powerShellArray(artifactTypes)}
+$AgentLoopBadgeSources = ${powerShellArray(badgeSources)}
+$AgentLoopOutputFormats = ${powerShellArray(outputFormats)}
+$AgentLoopArchiveStatuses = ${powerShellArray(archiveStatuses)}
 $AgentLoopTaskStatuses = ${powerShellArray(taskStatuses)}
 $AgentLoopTaskTypes = ${powerShellArray(taskTypes)}
 $AgentLoopReleaseProofChannels = ${powerShellArray(releaseProofChannels)}
@@ -281,6 +342,8 @@ Register-ArgumentCompleter -Native -CommandName agentloop, agentloopkit -ScriptB
       'task' {
         if ($words.Count -gt 2 -and $words[2] -eq 'status') {
           $values = $AgentLoopTaskStatuses
+        } elseif ($words.Count -gt 3 -and $words[2] -eq 'archive' -and ($words[-1] -eq '--status' -or $words[-2] -eq '--status')) {
+          $values = $AgentLoopArchiveStatuses
         } else {
           $values = $AgentLoopTaskCommands
         }
@@ -293,6 +356,26 @@ Register-ArgumentCompleter -Native -CommandName agentloop, agentloopkit -ScriptB
       'release-proof' {
         if ($words.Count -gt 2 -and ($words[-1] -eq '--only' -or ($words.Count -gt 3 -and $words[-2] -eq '--only'))) {
           $values = $AgentLoopReleaseProofChannels
+        }
+      }
+      'artifacts' {
+        if ($words.Count -gt 2 -and ($words[-1] -eq '--type' -or ($words.Count -gt 3 -and $words[-2] -eq '--type'))) {
+          $values = $AgentLoopArtifactTypes
+        }
+      }
+      'badge' {
+        if ($words.Count -gt 2 -and ($words[-1] -eq '--source' -or ($words.Count -gt 3 -and $words[-2] -eq '--source'))) {
+          $values = $AgentLoopBadgeSources
+        }
+      }
+      'summarize' {
+        if ($words.Count -gt 2 -and ($words[-1] -eq '--format' -or ($words.Count -gt 3 -and $words[-2] -eq '--format'))) {
+          $values = $AgentLoopOutputFormats
+        }
+      }
+      'handoff' {
+        if ($words.Count -gt 2 -and ($words[-1] -eq '--format' -or ($words.Count -gt 3 -and $words[-2] -eq '--format'))) {
+          $values = $AgentLoopOutputFormats
         }
       }
       'policy' { $values = $AgentLoopPolicyCommands }

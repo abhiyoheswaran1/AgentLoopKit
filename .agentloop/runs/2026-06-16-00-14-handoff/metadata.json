@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-00-14-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-00-14",
+  "createdAtEpochMs": 1781561694422,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-complete-fixed-option-completions.md",
+    "title": "Complete fixed option completions",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-00-12-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-00-14-pr-summary-2.md",
+  "changedFileCount": 44
+}

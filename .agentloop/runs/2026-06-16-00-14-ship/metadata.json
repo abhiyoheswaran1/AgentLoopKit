@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-00-14-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-00-14",
+  "createdAtEpochMs": 1781561685872,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-complete-fixed-option-completions.md",
+    "title": "Complete fixed option completions",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-00-12-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-00-14-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-00-14-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 36
+}

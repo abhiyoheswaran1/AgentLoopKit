@@ -154,7 +154,7 @@ npx agentloopkit completion powershell
 ```
 
 These commands print scripts to stdout. AgentLoopKit does not edit shell profile files.
-The generated scripts include the fixed `release-proof --only` channel values for npm, GitHub Releases, GHCR, and MCP Registry.
+Generated scripts include fixed values for task types and status transitions, the `done` archive status, agent names, policy subcommands, completion shells, artifact types, badge sources, `summarize` and `handoff` formats, and `release-proof --only` channels.
 
 Ask your coding agent to read:
 

@@ -547,7 +547,7 @@ agentloop version
 
 `completion` prints completion scripts to stdout. It does not edit `.zshrc`, `.bashrc`, fish config, PowerShell startup files, or other shell profile files.
 
-Generated scripts include nested values for task types, task statuses, agent names, policy subcommands, completion shells, and `release-proof --only` channels.
+Generated scripts include nested values for task types and status transitions, the `done` archive status, agent names, policy subcommands, completion shells, artifact types, badge sources, `summarize` and `handoff` formats, and `release-proof --only` channels.
 
 `version` prints the installed AgentLoopKit CLI version.
 
