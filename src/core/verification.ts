@@ -195,12 +195,20 @@ function parseTaskVerificationCommands(markdown: string) {
     if (!inSection) continue;
 
     const match = line.match(/^\s*-\s+(.+?)\s*$/);
-    const command = match?.[1]?.trim();
+    const command = normalizeTaskVerificationCommand(match?.[1]);
     if (!command || command === 'No verification command recorded.') continue;
     commands.push(command);
   }
 
   return commands;
+}
+
+function normalizeTaskVerificationCommand(raw: string | undefined) {
+  const command = raw?.trim();
+  if (!command) return undefined;
+
+  const inlineCodeMatch = command.match(/^(`+)([\s\S]*?)\1$/);
+  return inlineCodeMatch?.[2]?.trim() || command;
 }
 
 function resolveTaskPath(cwd: string, config: AgentLoopConfig, taskPath: string | undefined) {

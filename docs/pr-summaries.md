@@ -37,6 +37,8 @@ Changed-file paths are kept as evidence, but path labels use Markdown inline-cod
 
 Use `agentloop summarize` to preview the same deterministic summary without writing a file. `agentloop summarize --write` remains available for scripts that already use it.
 
+Use `agentloop summarize --redact-paths` or `agentloop handoff --redact-paths` before copying reviewer Markdown into a public issue, PR, or CI log. That mode replaces local absolute roots with `[git-root]` without changing repo-relative changed-file paths.
+
 Explicit `--task` and `--verification` inputs must point to existing Markdown artifacts inside `.agentloop/tasks/` and `.agentloop/reports/`. With `--json`, invalid input paths return a structured `ARTIFACT_PATH_INVALID` error and `handoff` does not write a summary.
 Handoff output directories must resolve inside the current repo. With `--json`, a configured `.agentloop/handoffs/` symlink that points outside the repo returns `OUTPUT_PATH_INVALID` and writes no summary.
 With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` object and `handoff` does not write a summary.

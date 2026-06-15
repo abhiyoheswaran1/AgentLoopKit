@@ -1,12 +1,15 @@
 import path from 'node:path';
-import { mkdir, utimes, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, utimes, writeFile } from 'node:fs/promises';
+import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { generatePrSummary, summarizeRepository } from '../src/core/pr-summary.js';
 import { createDefaultConfig } from '../src/core/config.js';
 import { fencedCodeBlock, inlineCode } from '../src/core/markdown-format.js';
-import { makeTempDir, removeTempDir } from './helpers.js';
+import { CLI_PROCESS_TIMEOUT_MS, makeTempDir, removeTempDir } from './helpers.js';
 
 let tempDirs: string[] = [];
+const cliPath = path.resolve('src/cli/index.ts');
+const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 describe('PR summary generation', () => {
   afterEach(async () => {
@@ -234,5 +237,54 @@ describe('PR summary generation', () => {
     const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
 
     expect(summary.markdown).toContain(`Task context: ${inlineCode('Explicit task')}`);
+  });
+
+  test('redacts local root paths from written handoff Markdown when requested', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-15-demo.md'),
+      `# Demo ${dir}/src/index.ts\n\n- Status: proposed\n`,
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-15-12-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const summary = await summarizeRepository({
+      cwd: dir,
+      config,
+      timestamp: '2026-06-15-12-05',
+      write: true,
+      redactPaths: true,
+    });
+    const written = await readFile(summary.outPath, 'utf8');
+
+    expect(written).not.toContain(dir);
+    expect(written).toContain('[git-root]/src/index.ts');
+  });
+
+  test('accepts --redact-paths on handoff and summarize commands', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await execa(tsxPath, [cliPath, 'init'], { cwd: dir, timeout: CLI_PROCESS_TIMEOUT_MS });
+
+    const handoff = await execa(tsxPath, [cliPath, 'handoff', '--redact-paths', '--no-write'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+    const summarize = await execa(tsxPath, [cliPath, 'summarize', '--redact-paths'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+
+    expect(handoff.exitCode).toBe(0);
+    expect(handoff.stdout).toContain('# PR Summary');
+    expect(summarize.exitCode).toBe(0);
+    expect(summarize.stdout).toContain('# PR Summary');
   });
 });

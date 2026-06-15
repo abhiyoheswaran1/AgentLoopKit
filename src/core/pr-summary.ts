@@ -124,6 +124,23 @@ ${renderReviewFocus(input.changedFiles)}
   return { markdown };
 }
 
+function redactLocalGitRoot(value: string, gitRoot: string, redactPaths: boolean | undefined) {
+  if (!redactPaths || !gitRoot || gitRoot === path.parse(gitRoot).root) return value;
+
+  const roots = new Set([
+    gitRoot,
+    gitRoot.replace(/\\/g, '/'),
+    gitRoot.replace(/\//g, '\\'),
+  ]);
+
+  let redacted = value;
+  for (const root of roots) {
+    if (!root) continue;
+    redacted = redacted.split(root).join('[git-root]');
+  }
+  return redacted;
+}
+
 export async function summarizeRepository(options: {
   cwd: string;
   config: AgentLoopConfig;
@@ -131,6 +148,7 @@ export async function summarizeRepository(options: {
   reportPath?: string;
   timestamp?: string;
   write?: boolean;
+  redactPaths?: boolean;
 }) {
   const timestamp = options.timestamp ?? formatTimestamp();
   const status = await getGitStatus(options.cwd);
@@ -177,6 +195,7 @@ export async function summarizeRepository(options: {
     verificationMarkdown,
     diffStat,
   });
+  const markdown = redactLocalGitRoot(summary.markdown, options.cwd, options.redactPaths);
   const defaultOutPath = path.join(options.config.paths.handoffsDir, `${timestamp}-pr-summary.md`);
   const outPath = options.write
     ? await resolveUniqueOutputArtifactPath({
@@ -187,6 +206,6 @@ export async function summarizeRepository(options: {
         expectedExtension: '.md',
       })
     : path.join(options.cwd, defaultOutPath);
-  if (options.write) await writeTextFile(outPath, summary.markdown);
-  return { ...summary, outPath, changedFiles, diffStat, taskPath, reportPath };
+  if (options.write) await writeTextFile(outPath, markdown);
+  return { ...summary, markdown, outPath, changedFiles, diffStat, taskPath, reportPath };
 }

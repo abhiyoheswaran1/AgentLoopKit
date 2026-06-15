@@ -20,6 +20,8 @@ Task contracts turn fuzzy requests into scoped engineering work. A good contract
 
 Use verification commands for checks that `agentloop verify --task-commands` can run before a report exists. Use post-verification gates for checks that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, `agentloop maintainer-check`, or reviewer handoff checks.
 
+Verification command list items may be written as plain list text or Markdown inline code, for example `- npm test` or ``- `npm test` ``. AgentLoopKit unwraps one balanced inline-code wrapper before execution.
+
 Supported task types are `feature`, `bugfix`, `refactor`, `tests`, `test-generation`, `docs`, `release`, `security-review`, `dependency-upgrade`, and `migration`.
 
 In monorepos, include package-specific verification commands when root commands do not prove the touched package. Examples include `pnpm --filter <package> test`, `npm --workspace <package> test`, or a package-local command from inside `packages/<name>`.

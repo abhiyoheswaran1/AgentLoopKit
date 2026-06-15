@@ -100,6 +100,8 @@ Task contracts record the problem statement, desired outcome, constraints, non-g
 
 Use `--verification` for commands that `agentloop verify --task-commands` may run before the verification report exists. Use `--post-verification` for gates that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, `agentloop maintainer-check`, or reviewer-handoff checks. Post-verification gates are recorded in the task contract but are not executed by `agentloop verify --task-commands`.
 
+Task verification command list items may be written as plain Markdown list text or as inline code, for example `- npm test` or ``- `npm test` ``. AgentLoopKit unwraps one balanced inline-code wrapper before execution.
+
 When a `--verification` command looks like a post-verification gate, `create-task` prints a warning and JSON output includes a `warnings` array. AgentLoopKit does not move commands between sections; the warning tells you when to use `--post-verification`.
 
 Use `--include-config-commands` to copy non-empty `test`, `lint`, `typecheck`, and `build` commands from `agentloop.config.json` into the contract's `Verification Commands` section. AgentLoopKit de-duplicates exact command strings and does not run those commands during task creation.
@@ -300,9 +302,11 @@ agentloop summarize
 agentloop summarize --json
 agentloop summarize --write
 agentloop summarize --write-run
+agentloop summarize --redact-paths
 agentloop handoff
 agentloop handoff --json
 agentloop handoff --write-run
+agentloop handoff --redact-paths
 ```
 
 `summarize` previews a deterministic reviewer summary. `handoff` writes that summary to `.agentloop/handoffs/`.
@@ -312,6 +316,8 @@ The summary reads Git status, Git diff stats, active task or newest open task, c
 Use `--write-run` when you want a summary or handoff to also create a local run ledger entry under `.agentloop/runs/`. For `summarize`, this does not write a handoff file unless you also pass `--write`; for `handoff`, the handoff file is written by default.
 
 If the latest verification report is older than the task, `summarize` and `handoff` leave verification as missing instead of showing stale passing evidence.
+
+Use `--redact-paths` before copying summary or handoff output into public issues, PRs, or CI logs. It replaces local absolute roots in the Markdown with `[git-root]` while keeping repo-relative changed-file paths readable.
 
 See [pr-summaries.md](pr-summaries.md).
 

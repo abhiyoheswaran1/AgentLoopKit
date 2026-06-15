@@ -9826,3 +9826,48 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - ProjScan caught token-like test fixture names before handoff.
 - Improve:
   - Use the new release-proof command in the next approved release handoff instead of manually stitching together registry proof.
+
+## 2026-06-15: Redacted Handoffs And Task Command Parsing
+
+- Task contract: `.agentloop/tasks/archive/2026-06-15-support-redacted-handoff-output.md`
+- AgentFlight session: `af-20260615-143433-support-redacted-handoff-output`
+- Trigger:
+  - While dogfooding, `agentloop handoff --redact-paths` failed with `error: unknown option '--redact-paths'`.
+  - A subsequent AgentLoop task verification run failed because verification commands written as Markdown inline code were executed with the backticks included.
+- Implementation:
+  - Added `--redact-paths` support to `agentloop summarize` and `agentloop handoff`.
+  - Redacted local absolute roots from generated reviewer Markdown only when the flag is passed.
+  - Hardened `agentloop verify --task-commands` so one balanced Markdown inline-code wrapper is unwrapped before execution.
+  - Updated README, CLI reference, PR-summary docs, task template docs, and changelog.
+- Verification:
+  - `npm test -- tests/pr-summary.test.ts` passed.
+  - `npm test -- tests/verification.test.ts` passed.
+  - `npm run test:unit` passed.
+  - `npm run typecheck` passed.
+  - `npm run check:public-docs` passed.
+  - `npm run check:links` passed.
+  - `npm run build` passed.
+  - Built CLI smoke passed:
+    - `node dist/cli/index.js handoff --redact-paths --no-write`
+    - `node dist/cli/index.js summarize --redact-paths`
+  - First task-linked AgentLoop verification intentionally failed, exposing the inline-code command parsing bug:
+    - `.agentloop/reports/2026-06-15-16-43-verification-report.md`
+    - `.agentloop/runs/2026-06-15-16-43-verify`
+  - Retried task-linked AgentLoop verification passed after the parser fix:
+    - `.agentloop/reports/2026-06-15-16-48-verification-report.md`
+    - `.agentloop/runs/2026-06-15-16-52-verify`
+  - Reviewer handoff generated:
+    - `.agentloop/handoffs/2026-06-15-16-57-pr-summary.md`
+    - `.agentloop/runs/2026-06-15-16-57-handoff`
+  - `npm run dogfood:strict` passed after the fresh handoff was written.
+  - `npx --yes agentflight doctor` passed.
+  - `npx --yes agentflight verify -- npm test -- tests/pr-summary.test.ts tests/verification.test.ts` passed:
+    - 2 files, 57 tests
+    - `.agentflight/evidence/af-20260615-143433-support-redacted-handoff-output/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-143433-support-redacted-handoff-output/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+- What worked well:
+  - Using AgentLoopKit on its own repo found two real user-facing bugs before release.
+  - AgentFlight and ProjScan gave independent session and repo-health checks without changing the product boundary.
+- Improve:
+  - Consider adding a small docs note in task authoring examples that plain list commands are easiest to edit, while inline-code commands are accepted.

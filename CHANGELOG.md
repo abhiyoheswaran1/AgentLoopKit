@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added `--redact-paths` to `agentloop summarize` and `agentloop handoff` so reviewer Markdown can be shared without exposing local absolute roots.
+- Changed `agentloop verify --task-commands` to accept verification commands written as Markdown inline-code list items.
 - Added a repo-local autonomous dogfood guide for AgentLoopKit, ProjScan, AgentFlight, product-panel review, and simulated research cycles.
 - Added AgentFlight health to the project dogfood gate while keeping the script read-only and release-safe.
 - Added `npm run maintenance:check` for the recurring near-term guard covering unit checks, public-doc hygiene, link checks, and strict dogfood.

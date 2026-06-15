@@ -101,6 +101,7 @@ async function runSummaryCommand(options: Record<string, unknown>, defaultWrite:
       taskPath: typeof options.task === 'string' ? options.task : undefined,
       reportPath,
       write: writeOption,
+      redactPaths: options.redactPaths === true,
     });
   } catch (error) {
     if (json && error instanceof ArtifactPathError) {
@@ -153,6 +154,7 @@ export function summarizeCommand() {
     .option('--write', 'write summary to .agentloop/handoffs')
     .option('--write-run', 'write a local run ledger entry under .agentloop/runs')
     .option('--json', 'print JSON output')
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .action((options: Record<string, unknown>) => runSummaryCommand(options, false));
 }
 
@@ -166,5 +168,6 @@ export function handoffCommand() {
     .option('--no-write', 'print handoff without writing a file')
     .option('--write-run', 'write a local run ledger entry under .agentloop/runs')
     .option('--json', 'print JSON output')
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .action((options: Record<string, unknown>) => runSummaryCommand(options, true));
 }

@@ -774,6 +774,54 @@ describe('verification', () => {
     expect(await readFile(path.join(dir, 'task-command-ran.txt'), 'utf8')).toBe('yes');
   });
 
+  test('runs inline-code task verification commands with explicit opt-in', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/task-commands.md'),
+      [
+        '# Inline task command opt-in',
+        '',
+        '- Task type: docs',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        '- `node -e "require(\'fs\').writeFileSync(\'inline-task-command-ran.txt\', \'yes\'); console.log(\'inline-task-check\')"`',
+        '',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: '.agentloop/tasks/task-commands.md',
+      taskCommands: true,
+      reportTimestamp: '2026-06-15-12-06',
+      nowIso: '2026-06-15T12:06:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('pass');
+    expect(result.taskCommands).toEqual({
+      requested: true,
+      foundCount: 1,
+      commands: [
+        "node -e \"require('fs').writeFileSync('inline-task-command-ran.txt', 'yes'); console.log('inline-task-check')\"",
+      ],
+    });
+    expect(result.commands).toEqual([
+      expect.objectContaining({
+        key: 'task',
+        command:
+          "node -e \"require('fs').writeFileSync('inline-task-command-ran.txt', 'yes'); console.log('inline-task-check')\"",
+        passed: true,
+        output: expect.stringContaining('inline-task-check'),
+      }),
+    ]);
+    expect(await readFile(path.join(dir, 'inline-task-command-ran.txt'), 'utf8')).toBe('yes');
+  });
+
   test('runs exact duplicate configured and task commands only once', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
