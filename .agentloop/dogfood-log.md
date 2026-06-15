@@ -2,6 +2,48 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Status And Next Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-status-and-next-output-markdown-safe.md`
+- Trigger:
+  - `agentloop status` and `agentloop next` are frequent agent-orientation commands.
+  - Dogfooding showed that task titles and paths with line breaks could split Markdown list items in human output.
+- Implementation:
+  - Added `singleLineInlineCode` as an additive Markdown helper.
+  - Used it in human-readable `status` and `next` output.
+  - Kept `status --json` and `next --json` raw for automation.
+  - Added line-break regression tests for both commands.
+  - Updated status docs, CLI reference, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized safe paste behavior for public logs and PRs.
+  - Nora wanted the next-action report to stay readable in agent handoffs.
+  - Lina wanted long-running sessions to avoid malformed orientation blocks.
+  - Maya accepted an additive shared helper because three commands now need the same rendering behavior.
+- Verification:
+  - Red TDD run failed before single-line dynamic rendering existed:
+    - `npm test -- tests/status.test.ts tests/next.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/status.test.ts tests/next.test.ts`
+  - Focused adjacent tests passed:
+    - `npm test -- tests/status.test.ts tests/next.test.ts tests/cli-docs-drift.test.ts`
+  - Static and docs checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - AgentLoopKit task verification passed and wrote run evidence:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-status-and-next-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/status.test.ts tests/next.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - Reusing a helper kept behavior consistent across both commands without changing JSON output.
+  - Explicit active task paths reproduced the Markdown issue without changing task discovery.
+- Improve:
+  - Consider moving doctor and check-gates to the shared helper in a later cleanup after their tests stay green.
+
 ## 2026-06-16: Markdown-Safe Check-Gates Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-check-gates-output-markdown-safe.md`

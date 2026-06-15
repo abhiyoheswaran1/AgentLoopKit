@@ -151,6 +151,7 @@ agentloop next --redact-paths
 Use `--brief` when an agent or script needs one compact human-readable line plus the reason. Brief output includes the latest run evidence when `.agentloop/runs/` exists. `next` uses the same decision rules but prints only the next action. These commands do not run verification commands, call an LLM, read `.env` contents, or write task state.
 
 Use `status --redact-paths` or `next --redact-paths` before pasting output into public logs. It replaces the absolute Git root with `[git-root]` and keeps repo-relative AgentLoop artifact paths. Default JSON keeps the absolute Git root for scripts that need it.
+Human-readable `status` and `next` output keep dynamic values inside single-line inline code. Task titles, task paths, branch names, and report paths with unusual characters stay on one Markdown line. JSON output keeps raw values for scripts.
 
 See [status.md](status.md).
 

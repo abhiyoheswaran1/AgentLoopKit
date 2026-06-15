@@ -38,6 +38,7 @@ agentloop next --json --redact-paths
 
 `--redact-paths` replaces the absolute Git root with `[git-root]`. It keeps repo-relative AgentLoop artifact paths such as `.agentloop/reports/...`.
 The default JSON output still returns the absolute Git root for scripts that need it.
+Human-readable `status` and `next` output keep dynamic values inside single-line inline code. Task titles, task paths, branch names, and report paths with unusual characters stay on one Markdown line. JSON output keeps raw values for scripts.
 
 Use brief output when an agent prompt, shell script, or status line does not need the full Markdown block:
 

@@ -13,6 +13,10 @@ export function inlineCode(content: string) {
   return `${fence}${needsPadding ? ` ${content} ` : content}${fence}`;
 }
 
+export function singleLineInlineCode(content: string) {
+  return inlineCode(content.replace(/\r/g, '\\r').replace(/\n/g, '\\n'));
+}
+
 export function escapeMarkdownProse(content: string) {
   return content
     .replace(/\\/g, '\\\\')

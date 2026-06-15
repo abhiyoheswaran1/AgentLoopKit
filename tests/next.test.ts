@@ -183,6 +183,49 @@ describe('next command', () => {
     expect(next.latestReport.overallStatus).toBe('pass');
   });
 
+  test('renders next markdown values as single-line inline code when task data contains line breaks', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    const taskPath = '.agentloop/tasks/2026-06-10-active\n- [x] injected.md';
+    await writeFile(path.join(dir, 'changed.txt'), 'pending change\n');
+    await writeFile(
+      path.join(dir, taskPath),
+      'No heading, so next falls back to the filename.\n\n- Status: in-progress\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({ version: 1, activeTaskPath: taskPath }, null, 2),
+    );
+
+    const humanResult = await execa(tsxPath, [cliPath, 'next'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'next', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain(
+      '- Active task: `2026-06-10-active\\n- [x] injected` (`in-progress`) - `.agentloop/tasks/2026-06-10-active\\n- [x] injected.md`',
+    );
+    expect(humanResult.stdout).toContain(
+      'Run `agentloop verify`.\n\nA task exists, but no verification report was found.',
+    );
+    expect(humanResult.stdout).not.toContain('\n- [x] injected`:');
+    expect(humanResult.stdout).not.toContain('\n- [x] injected.md`');
+    const next = JSON.parse(jsonResult.stdout);
+    expect(next.activeTask).toMatchObject({
+      title: '2026-06-10-active\n- [x] injected',
+      status: 'in-progress',
+      path: '.agentloop/tasks/2026-06-10-active\n- [x] injected.md',
+    });
+    expect(next.command).toBe('agentloop verify');
+  });
+
   test('points back to verification when the latest report failed', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -444,7 +487,16 @@ describe('next command', () => {
     await execa('git', ['add', '.'], { cwd: dir });
     await execa(
       'git',
-      ['-c', 'user.name=AgentLoopKit Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'baseline', '-q'],
+      [
+        '-c',
+        'user.name=AgentLoopKit Test',
+        '-c',
+        'user.email=test@example.com',
+        'commit',
+        '-m',
+        'baseline',
+        '-q',
+      ],
       { cwd: dir },
     );
     await mkdir(runsDir, { recursive: true });

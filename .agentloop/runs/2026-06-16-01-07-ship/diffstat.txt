@@ -1,0 +1,11 @@
+ .agentloop/backlog.md       |   6 ++
+ .agentloop/dogfood-log.md   |  42 ++++++++++
+ CHANGELOG.md                |   1 +
+ docs/cli-reference.md       |   1 +
+ docs/status.md              |   1 +
+ src/cli/commands/next.ts    |  12 +--
+ src/core/markdown-format.ts |   4 +
+ src/core/status.ts          |  38 ++++-----
+ tests/next.test.ts          |  54 ++++++++++++-
+ tests/status.test.ts        | 189 +++++++++++++++++++++++++++++---------------
+ 10 files changed, 257 insertions(+), 91 deletions(-)

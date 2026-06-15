@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { loadAgentLoopWorkspace } from '../../core/config.js';
 import { ConfigError } from '../../core/errors.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode } from '../../core/markdown-format.js';
 import { AgentLoopStatusResult, getAgentLoopStatus } from '../../core/status.js';
 import { printAgentLoopJsonError } from '../json-errors.js';
 
@@ -20,19 +20,19 @@ function formatTask(
   task: AgentLoopStatusResult['activeTask'] | AgentLoopStatusResult['latestTask'],
 ) {
   if (!task) return 'none';
-  return `${inlineCode(task.title)} (${inlineCode(task.status)}) - ${inlineCode(task.path)}`;
+  return `${singleLineInlineCode(task.title)} (${singleLineInlineCode(task.status)}) - ${singleLineInlineCode(task.path)}`;
 }
 
 function formatReport(result: NextActionResult) {
   if (!result.latestReport) return 'none';
-  return `${inlineCode(result.latestReport.overallStatus)} - ${inlineCode(result.latestReport.path)}`;
+  return `${singleLineInlineCode(result.latestReport.overallStatus)} - ${singleLineInlineCode(result.latestReport.path)}`;
 }
 
 function formatDeferredTasks(tasks: AgentLoopStatusResult['deferredTasks']) {
   if (!tasks.length) return 'none';
   const titles = tasks
     .slice(0, 3)
-    .map((task) => inlineCode(task.title))
+    .map((task) => singleLineInlineCode(task.title))
     .join(', ');
   const remaining = tasks.length > 3 ? `, +${tasks.length - 3} more` : '';
   return `${tasks.length} parked - ${titles}${remaining}`;
@@ -61,7 +61,7 @@ function renderNextAction(result: NextActionResult) {
   const nextAction =
     result.command === 'none'
       ? `No command required.\n\n${result.reason}`
-      : `Run ${inlineCode(result.command)}.\n\n${result.reason}`;
+      : `Run ${singleLineInlineCode(result.command)}.\n\n${result.reason}`;
 
   return `# AgentLoopKit Next Action
 
@@ -71,7 +71,7 @@ ${nextAction}
 - Latest open task: ${formatTask(result.latestTask)}
 - Deferred tasks: ${formatDeferredTasks(result.deferredTasks)}
 - Latest verification: ${formatReport(result)}
-- Working tree: ${inlineCode(workingTree)}
+- Working tree: ${singleLineInlineCode(workingTree)}
 `;
 }
 

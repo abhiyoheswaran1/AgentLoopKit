@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Made human-readable `status` and `next` output render dynamic values as single-line inline code while preserving raw JSON values.
 - Made human-readable `check-gates` output render dynamic values as single-line inline code while preserving raw JSON values.
 - Added a `Package name` doctor check and made human-readable doctor output render dynamic values as single-line inline code while preserving raw JSON values.
 - Added shell completion values for artifact types, badge sources, `summarize` and `handoff` formats, and the `task archive --status done` value.

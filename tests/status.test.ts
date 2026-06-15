@@ -336,6 +336,49 @@ describe('status command', () => {
     expect(status.latestReport.overallStatus).toBe('pass');
   });
 
+  test('renders status markdown values as single-line inline code when task data contains line breaks', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    const taskPath = '.agentloop/tasks/2026-06-10-active\n- [x] injected.md';
+    await writeFile(path.join(dir, 'changed.txt'), 'pending change\n');
+    await writeFile(
+      path.join(dir, taskPath),
+      'No heading, so status falls back to the filename.\n\n- Status: in-progress\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({ version: 1, activeTaskPath: taskPath }, null, 2),
+    );
+
+    const humanResult = await execa(tsxPath, [cliPath, 'status'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain(
+      '- Active task: `2026-06-10-active\\n- [x] injected` (`in-progress`) - `.agentloop/tasks/2026-06-10-active\\n- [x] injected.md`',
+    );
+    expect(humanResult.stdout).toContain(
+      'Run `agentloop verify`.\n\nA task exists, but no verification report was found.',
+    );
+    expect(humanResult.stdout).not.toContain('\n- [x] injected`:');
+    expect(humanResult.stdout).not.toContain('\n- [x] injected.md`');
+    const status = JSON.parse(jsonResult.stdout);
+    expect(status.activeTask).toMatchObject({
+      title: '2026-06-10-active\n- [x] injected',
+      status: 'in-progress',
+      path: '.agentloop/tasks/2026-06-10-active\n- [x] injected.md',
+    });
+    expect(status.nextAction.command).toBe('agentloop verify');
+  });
+
   test('prints compact status with --brief', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -379,62 +422,66 @@ describe('status command', () => {
     expect(output.brief).toContain('next="agentloop handoff"');
   });
 
-  test('shows latest run ledger evidence in JSON, markdown, and brief status', async () => {
-    const dir = await makeTempDir();
-    tempDirs.push(dir);
-    await execa('git', ['init', '-q'], { cwd: dir });
-    await initializeAgentLoop({ cwd: dir });
-    await mkdir(path.join(dir, '.agentloop/runs/2026-06-12-10-00-ship'), { recursive: true });
-    await writeFile(
-      path.join(dir, '.agentloop/runs/2026-06-12-10-00-ship/metadata.json'),
-      JSON.stringify(
-        {
-          id: '2026-06-12-10-00-ship',
-          command: 'ship',
-          createdAt: '2026-06-12-10-00',
-          task: {
-            path: '.agentloop/tasks/2026-06-12-review-login.md',
-            title: 'Review login redirect',
-            status: 'review',
+  test(
+    'shows latest run ledger evidence in JSON, markdown, and brief status',
+    async () => {
+      const dir = await makeTempDir();
+      tempDirs.push(dir);
+      await execa('git', ['init', '-q'], { cwd: dir });
+      await initializeAgentLoop({ cwd: dir });
+      await mkdir(path.join(dir, '.agentloop/runs/2026-06-12-10-00-ship'), { recursive: true });
+      await writeFile(
+        path.join(dir, '.agentloop/runs/2026-06-12-10-00-ship/metadata.json'),
+        JSON.stringify(
+          {
+            id: '2026-06-12-10-00-ship',
+            command: 'ship',
+            createdAt: '2026-06-12-10-00',
+            task: {
+              path: '.agentloop/tasks/2026-06-12-review-login.md',
+              title: 'Review login redirect',
+              status: 'review',
+            },
+            verificationReportPath: '/tmp/demo/.agentloop/reports/verify.md',
+            shipReportPath: '/tmp/demo/.agentloop/reports/ship.md',
+            score: 91,
+            changedFileCount: 4,
           },
-          verificationReportPath: '/tmp/demo/.agentloop/reports/verify.md',
-          shipReportPath: '/tmp/demo/.agentloop/reports/ship.md',
-          score: 91,
-          changedFileCount: 4,
-        },
-        null,
-        2,
-      ),
-    );
+          null,
+          2,
+        ),
+      );
 
-    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
-      cwd: dir,
-      reject: false,
-    });
-    const markdownResult = await execa(tsxPath, [cliPath, 'status'], {
-      cwd: dir,
-      reject: false,
-    });
-    const briefResult = await execa(tsxPath, [cliPath, 'status', '--brief'], {
-      cwd: dir,
-      reject: false,
-    });
+      const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
+        cwd: dir,
+        reject: false,
+      });
+      const markdownResult = await execa(tsxPath, [cliPath, 'status'], {
+        cwd: dir,
+        reject: false,
+      });
+      const briefResult = await execa(tsxPath, [cliPath, 'status', '--brief'], {
+        cwd: dir,
+        reject: false,
+      });
 
-    expect(jsonResult.exitCode).toBe(0);
-    const status = JSON.parse(jsonResult.stdout);
-    expect(status.latestRun).toMatchObject({
-      id: '2026-06-12-10-00-ship',
-      command: 'ship',
-      score: 91,
-      changedFileCount: 4,
-      shipReportPath: '.agentloop/reports/ship.md',
-    });
-    expect(markdownResult.stdout).toContain(
-      '- Latest run: `ship` `91`/100 - `2026-06-12-10-00-ship`',
-    );
-    expect(markdownResult.stdout).toContain('`.agentloop/reports/ship.md`');
-    expect(briefResult.stdout).toContain('run="ship 91/100"');
-  }, CLI_STATUS_TEST_TIMEOUT_MS);
+      expect(jsonResult.exitCode).toBe(0);
+      const status = JSON.parse(jsonResult.stdout);
+      expect(status.latestRun).toMatchObject({
+        id: '2026-06-12-10-00-ship',
+        command: 'ship',
+        score: 91,
+        changedFileCount: 4,
+        shipReportPath: '.agentloop/reports/ship.md',
+      });
+      expect(markdownResult.stdout).toContain(
+        '- Latest run: `ship` `91`/100 - `2026-06-12-10-00-ship`',
+      );
+      expect(markdownResult.stdout).toContain('`.agentloop/reports/ship.md`');
+      expect(briefResult.stdout).toContain('run="ship 91/100"');
+    },
+    CLI_STATUS_TEST_TIMEOUT_MS,
+  );
 
   test('points back to verification when the latest report failed', async () => {
     const dir = await makeTempDir();
@@ -737,10 +784,7 @@ describe('status command', () => {
     await execa('git', ['init', '-q'], { cwd: dir });
     await initializeAgentLoop({ cwd: dir });
     const runsDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-ship');
-    const archivedTaskPath = path.join(
-      dir,
-      '.agentloop/tasks/archive/2026-06-12-fix-login.md',
-    );
+    const archivedTaskPath = path.join(dir, '.agentloop/tasks/archive/2026-06-12-fix-login.md');
     await mkdir(runsDir, { recursive: true });
     await mkdir(path.dirname(archivedTaskPath), { recursive: true });
     await writeFile(archivedTaskPath, '# Fix login redirect bug\n\n- Status: done\n');
@@ -798,10 +842,7 @@ describe('status command', () => {
     const dir = await makeTempDir();
     const runId = '2026-06-13-00-33-handoff';
     const runsDir = path.join(dir, '.agentloop/runs', runId);
-    const archivedTaskPath = path.join(
-      dir,
-      '.agentloop/tasks/archive/2026-06-13-docs-hygiene.md',
-    );
+    const archivedTaskPath = path.join(dir, '.agentloop/tasks/archive/2026-06-13-docs-hygiene.md');
     tempDirs.push(dir);
     await execa('git', ['init', '-q'], { cwd: dir });
     await initializeAgentLoop({ cwd: dir });
@@ -815,7 +856,16 @@ describe('status command', () => {
     await execa('git', ['add', '.'], { cwd: dir });
     await execa(
       'git',
-      ['-c', 'user.name=AgentLoopKit Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'baseline', '-q'],
+      [
+        '-c',
+        'user.name=AgentLoopKit Test',
+        '-c',
+        'user.email=test@example.com',
+        'commit',
+        '-m',
+        'baseline',
+        '-q',
+      ],
       { cwd: dir },
     );
     await mkdir(runsDir, { recursive: true });
@@ -904,7 +954,16 @@ describe('status command', () => {
     await execa('git', ['add', '.'], { cwd: dir });
     await execa(
       'git',
-      ['-c', 'user.name=AgentLoopKit Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'baseline', '-q'],
+      [
+        '-c',
+        'user.name=AgentLoopKit Test',
+        '-c',
+        'user.email=test@example.com',
+        'commit',
+        '-m',
+        'baseline',
+        '-q',
+      ],
       { cwd: dir },
     );
     await mkdir(runsDir, { recursive: true });

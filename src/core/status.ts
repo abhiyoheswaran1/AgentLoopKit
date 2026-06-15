@@ -14,7 +14,7 @@ import {
 import { latestMarkdownFile } from './artifacts.js';
 import { verificationReportPattern } from './artifacts.js';
 import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
-import { inlineCode } from './markdown-format.js';
+import { singleLineInlineCode } from './markdown-format.js';
 import { listRuns, RunSummary } from './runs.js';
 import { getActiveTaskPath, getFallbackTaskPath, listTasks } from './task-state.js';
 
@@ -227,17 +227,17 @@ function chooseNextAction(input: {
 }
 
 function formatMarkdownList(values: string[]) {
-  return values.length ? values.map((value) => inlineCode(value)).join(', ') : 'none';
+  return values.length ? values.map((value) => singleLineInlineCode(value)).join(', ') : 'none';
 }
 
 function formatTaskMarkdown(task: StatusTask | null | undefined) {
   if (!task) return 'No open task found.';
-  return `${inlineCode(task.title)} (${inlineCode(task.status)}) - ${inlineCode(task.path)}`;
+  return `${singleLineInlineCode(task.title)} (${singleLineInlineCode(task.status)}) - ${singleLineInlineCode(task.path)}`;
 }
 
 function formatReportMarkdown(report: StatusReport | undefined) {
   if (!report) return 'No verification report found.';
-  return `${inlineCode(report.overallStatus)} - ${inlineCode(report.path)}`;
+  return `${singleLineInlineCode(report.overallStatus)} - ${singleLineInlineCode(report.path)}`;
 }
 
 function formatRunSummaryMarkdown(run: RunSummary | undefined) {
@@ -245,12 +245,12 @@ function formatRunSummaryMarkdown(run: RunSummary | undefined) {
   const result =
     run.score === undefined
       ? run.overallStatus
-        ? inlineCode(run.overallStatus)
-        : `${inlineCode(String(run.changedFileCount))} changed file(s)`
-      : `${inlineCode(String(run.score))}/100`;
+        ? singleLineInlineCode(run.overallStatus)
+        : `${singleLineInlineCode(String(run.changedFileCount))} changed file(s)`
+      : `${singleLineInlineCode(String(run.score))}/100`;
   const artifactPath = run.shipReportPath ?? run.handoffPath ?? run.verificationReportPath;
-  return `${inlineCode(run.command)} ${result} - ${inlineCode(run.id)}${
-    artifactPath ? ` - ${inlineCode(artifactPath)}` : ''
+  return `${singleLineInlineCode(run.command)} ${result} - ${singleLineInlineCode(run.id)}${
+    artifactPath ? ` - ${singleLineInlineCode(artifactPath)}` : ''
   }`;
 }
 
@@ -259,7 +259,7 @@ function formatDeferredTaskSummaryMarkdown(tasks: StatusTask[]) {
   const count = tasks.length;
   const titles = tasks
     .slice(0, 3)
-    .map((task) => inlineCode(task.title))
+    .map((task) => singleLineInlineCode(task.title))
     .join(', ');
   const remaining = count > 3 ? `, +${count - 3} more` : '';
   return `${count} parked - ${titles}${remaining}`;
@@ -304,16 +304,16 @@ Reason: ${result.nextAction.reason}`;
 
 function renderMarkdown(result: StatusRenderInput) {
   const gitLine = result.git.isRepository
-    ? `${inlineCode(result.git.branch || 'unknown branch')}${
-        result.git.commit ? ` @ ${inlineCode(result.git.commit)}` : ''
+    ? `${singleLineInlineCode(result.git.branch || 'unknown branch')}${
+        result.git.commit ? ` @ ${singleLineInlineCode(result.git.commit)}` : ''
       }`
-    : inlineCode('not inside a git repository');
+    : singleLineInlineCode('not inside a git repository');
   const gitLines = [
     `- Git: ${gitLine}`,
     ...(result.git.isRepository
       ? [
-          `- Git root: ${inlineCode(result.git.root)}`,
-          `- Git target: ${inlineCode(result.git.targetIsRoot ? 'root directory' : 'subdirectory')}`,
+          `- Git root: ${singleLineInlineCode(result.git.root)}`,
+          `- Git target: ${singleLineInlineCode(result.git.targetIsRoot ? 'root directory' : 'subdirectory')}`,
           ...(result.git.targetIsRoot
             ? []
             : [
@@ -339,14 +339,14 @@ function renderMarkdown(result: StatusRenderInput) {
   const nextAction =
     result.nextAction.command === 'none'
       ? `No command required.\n\n${result.nextAction.reason}`
-      : `Run ${inlineCode(result.nextAction.command)}.\n\n${result.nextAction.reason}`;
+      : `Run ${singleLineInlineCode(result.nextAction.command)}.\n\n${result.nextAction.reason}`;
 
   return `# AgentLoopKit Status
 
-- Project: ${inlineCode(result.project.name || 'unnamed')} (${inlineCode(result.project.type)})
-- Package manager: ${inlineCode(result.project.packageManager)}
+- Project: ${singleLineInlineCode(result.project.name || 'unnamed')} (${singleLineInlineCode(result.project.type)})
+- Package manager: ${singleLineInlineCode(result.project.packageManager)}
 ${gitLines.join('\n')}
-- Working tree: ${inlineCode(workingTree)}
+- Working tree: ${singleLineInlineCode(workingTree)}
 - Active task: ${activeTask}
 - Latest open task: ${latestTask}
 - Deferred tasks: ${formatDeferredTaskSummaryMarkdown(result.deferredTasks)}

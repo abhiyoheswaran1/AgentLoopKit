@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 118 Decisions
+
+| item                                 | source persona    | problem                                                                                      | proposed solution                                                                         | priority | effort | adoption impact | risk | decision | notes                                                                                |
+| ------------------------------------ | ----------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ------------------------------------------------------------------------------------ |
+| Markdown-safe status and next output | Samir, Nora, Lina | Agents paste `status` and `next` into handoffs, but task paths or titles can break Markdown. | Render human status/next dynamic values as single-line inline code; keep JSON raw values. | P1       | S      | medium          | low  | do now   | No next-action semantic changes, command execution changes, or brief-output changes. |
+
 ## Current Research Cycle 117 Decisions
 
 | item                             | source persona   | problem                                                                                          | proposed solution                                                                         | priority | effort | adoption impact | risk | decision | notes                                                                                      |
