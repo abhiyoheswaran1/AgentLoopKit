@@ -41,8 +41,13 @@ Before changing code:
 - Do not read or print secrets. If env files exist, mention only their paths.
 - Run the configured verification commands before claiming completion.
 - Run `npm run dogfood` during meaningful AgentLoopKit changes to exercise the local self-check path, including dependency audit. Use `npm run dogfood:strict` before final handoff or release prep when warnings should block progress.
+- Run `npm run maintenance:check` for the near-term maintenance guard covering unit checks, public-doc hygiene, link checks, and strict dogfood.
+- Use AgentFlight for meaningful autonomous sessions: `npx --yes agentflight start --task "<task>" --yes`, `npx --yes agentflight status`, `npx --yes agentflight doctor`, and `npx --yes agentflight report`.
+- Use ProjScan during implementation: `npx --yes projscan doctor --format markdown`, `npx --yes projscan start`, or a more specific ProjScan command when repo-risk context is needed.
+- Before making product-direction decisions, review `.agentloop/product-panel.md`, `.agentloop/user-personas.md`, `.agentloop/backlog.md`, and the latest files under `.agentloop/research/`.
+- Treat `.agentloop/research/` and product-panel output as simulated internal decision support. Do not present it as real user feedback, adoption, testimonials, or interviews in public docs.
+- Follow `.agentloop/harness/autonomous-dogfooding.md` for the full AgentLoopKit + ProjScan + AgentFlight dogfood loop.
 - Generate review evidence with changed files, tests run, risks, rollback notes, and reviewer checklist.
-- During implementation in this repository, dogfood `projscan` with `npx projscan doctor --format markdown` or a more specific `projscan` command.
 
 Agent roster:
 
@@ -58,6 +63,7 @@ Use these roles as routing hints when a coding-agent session needs focused exper
 - Agent Compatibility Engineer: Use for Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and generic-agent guidance. Keeps instructions tool-agnostic unless behavior is implemented.
 - MCP and Automation Engineer: Use for read-only MCP server behavior, GitHub Action usage, CI summaries, and automation docs. Keeps automation local-first and reviewable.
 - Repo Steward: Use for cleanup, file organization, small diffs, issue templates, contribution paths, and preserving unrelated user work.
+- Dogfood Steward: Use for AgentLoopKit, ProjScan, and AgentFlight evidence. Owns `.agentloop/dogfood-log.md`, `.agentloop/harness/autonomous-dogfooding.md`, AgentFlight reports, ProjScan health signals, and proof that this repo follows its own loop.
 
 When splitting work across agents:
 

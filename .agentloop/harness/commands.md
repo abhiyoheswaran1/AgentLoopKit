@@ -8,6 +8,8 @@ Detected during AgentLoopKit init:
 - Build: npx pnpm@10.12.1 build
 - Format: npx pnpm@10.12.1 format
 - Repo health: npx projscan doctor --format markdown
+- AgentFlight health: npx agentflight doctor
+- Maintenance guard: npm run maintenance:check
 
 Rules:
 
@@ -40,7 +42,11 @@ Rules:
 - Use `agentloop release-proof` after public release workflows finish to check npm, GitHub Releases, GHCR, and MCP Registry proof against local package metadata.
 - Run targeted checks while developing.
 - Run configured verification before claiming completion.
-- Dogfood dependency audit and projscan during implementation work in this repository.
+- Dogfood dependency audit, AgentFlight, and ProjScan during implementation work in this repository.
+- Use `npx --yes agentflight start --task "<task>" --yes` at the beginning of meaningful autonomous work.
+- Use `npx --yes agentflight status`, `npx --yes agentflight doctor`, and `npx --yes agentflight report` before final handoff when a session record helps review.
+- Use `.agentloop/product-panel.md`, `.agentloop/user-personas.md`, `.agentloop/backlog.md`, and `.agentloop/research/` to guide product decisions. Treat those files as internal decision support, not public evidence.
+- Use `.agentloop/harness/autonomous-dogfooding.md` for the full self-dogfood workflow.
 - If a command fails, report the failure and fix it when reasonable.
 - If a command is not configured, say so in the handoff.
 

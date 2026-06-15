@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-16-05-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-16-05",
+  "createdAtEpochMs": 1781532358904,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-harden-agentloopkit-autonomous-dogfood-harness.md",
+    "title": "Harden AgentLoopKit autonomous dogfood harness",
+    "status": "proposed"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-15-59-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-16-05-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-16-05-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 26
+}

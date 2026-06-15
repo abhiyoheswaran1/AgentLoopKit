@@ -42,6 +42,10 @@ Local files under `.agentloop/policies/` are the repo's policy source of truth. 
 
 Agents may work autonomously inside the task contract. They should stop and ask before changing protected areas, adding dependencies, introducing breaking public APIs, or taking destructive actions.
 
+For meaningful work in this repo, follow `.agentloop/harness/autonomous-dogfooding.md`. Use AgentLoopKit for task contracts, verification, ship reports, handoffs, run history, and gates. Use ProjScan for local repo-health and risk context. Use AgentFlight for local session recording and handoff proof.
+
+Before making product-direction decisions, read `.agentloop/product-panel.md`, `.agentloop/user-personas.md`, `.agentloop/backlog.md`, and the latest files under `.agentloop/research/`. Treat those research files as simulated internal decision support, not public user evidence.
+
 No agent should claim completion without verification evidence or a clear statement of what was not verified.
 
 ## Release Cadence

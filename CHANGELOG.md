@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Added a repo-local autonomous dogfood guide for AgentLoopKit, ProjScan, AgentFlight, product-panel review, and simulated research cycles.
+- Added AgentFlight health to the project dogfood gate while keeping the script read-only and release-safe.
+- Added `npm run maintenance:check` for the recurring near-term guard covering unit checks, public-doc hygiene, link checks, and strict dogfood.
+- Added maintainer guard documentation for release proof, SchemaStore freshness, small policy packs, and read-only GitHub metadata.
 
 ## 0.33.0
 

@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "projectName": "AgentLoopKit",
+  "createdAt": "2026-06-15T13:46:17.126Z",
+  "engines": {
+    "projscan": {
+      "enabled": true,
+      "mode": "npx"
+    },
+    "agentloopkit": {
+      "enabled": true,
+      "mode": "npx"
+    }
+  },
+  "verification": {
+    "commands": [
+      "npm run typecheck",
+      "npm run lint",
+      "npm test",
+      "npm run build"
+    ]
+  },
+  "changedFileFilters": {
+    "ignore": [
+      ".projscan-memory/**",
+      ".projscan-cache/**",
+      ".agentflight/current/**"
+    ]
+  },
+  "privacy": {
+    "localOnly": true,
+    "telemetry": false
+  }
+}

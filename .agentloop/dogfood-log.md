@@ -2,6 +2,49 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-15: Autonomous Dogfood Harness And Maintenance Guard
+
+- Task contract: `.agentloop/tasks/2026-06-15-harden-agentloopkit-autonomous-dogfood-harness.md`
+- Trigger:
+  - The maintainer asked AgentLoopKit development to dogfood AgentLoopKit, ProjScan, and AgentFlight in full force.
+  - The near-term roadmap needed recurring guardrails for release-flow health, public-doc hygiene, release proof, SchemaStore freshness, small policy packs, and read-only GitHub metadata.
+- Implementation:
+  - Added `.agentloop/harness/autonomous-dogfooding.md` as the repo-local workflow for AgentLoopKit, ProjScan, AgentFlight, product-panel review, and simulated research cycles.
+  - Added `.agentflight/config.json` with local-first privacy, AgentLoopKit and ProjScan engines, verification commands, and ignored local cache/session artifacts.
+  - Added AgentFlight doctor to `scripts/dogfood.mjs`.
+  - Added `npm run maintenance:check` for unit tests, public-doc hygiene, link checking, and strict dogfood.
+  - Added `docs/maintenance-guards.md` for release proof, public docs, SchemaStore, policy packs, and read-only GitHub metadata maintenance.
+  - Updated AGENTS, AGENTLOOP, harness commands, repo map, backlog, and internal research cycle 112 so future agents can follow the same loop.
+- Product-panel decision:
+  - Abhi kept the scope on maintenance discipline and dogfooding instead of a new product surface.
+  - Maya kept the implementation to a script, docs, config, and tests.
+  - Elias pushed public docs to stay user-facing.
+  - Samir required ignored local AgentFlight and ProjScan artifacts plus no release actions.
+  - Lina wanted AgentFlight and ProjScan in the actual dogfood gate, not only mentioned in docs.
+- Verification:
+  - Focused tests passed:
+    - `npm test -- tests/autonomous-dogfood.test.ts tests/dogfood-script.test.ts`
+  - Fast unit suite passed:
+    - `npm run test:unit` (`21` files, `84` tests)
+  - Static and build checks passed:
+    - `npm run lint`
+    - `npm run typecheck`
+    - `npm run check:public-docs`
+    - `npm run check:links` (`1889` Markdown files checked)
+    - `npm run build`
+  - AgentLoop verification passed and wrote `.agentloop/reports/2026-06-15-15-59-verification-report.md`.
+  - Ship evidence passed with a `92`/100 review-readiness score and the expected broad-change warning.
+  - Strict gate passed:
+    - `node dist/cli/index.js check-gates --redact-paths --strict`
+  - Maintenance guard passed end to end:
+    - `npm run maintenance:check`
+  - Dogfood strict passed inside the maintenance guard, including dependency audit, AgentFlight doctor, and ProjScan doctor.
+- What worked well:
+  - The new dogfood gate caught stale verification and stale handoff evidence before it could be claimed as done.
+  - AgentFlight doctor and ProjScan doctor fit the local-first maintenance flow without adding tokens or network-only product behavior.
+- Improve:
+  - Consider adding `agentloop verify --only-task-commands --write-run` to future task contracts when the goal is a narrow post-edit evidence refresh. `verify --task-commands` also runs configured repo verification, which is valid but slower.
+
 ## 2026-06-14: Roadmap Adoption Channels And Policy Packs
 
 - Task contract: `.agentloop/tasks/2026-06-14-implement-roadmap-adoption-channels-and-policy-packs.md`

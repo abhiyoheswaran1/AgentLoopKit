@@ -135,6 +135,14 @@ Prefer high-value, low-complexity improvements. Safety and trust override the sc
 
 ## Backlog Items
 
+## Current Research Cycle 112 Decisions
+
+| Item | Source persona | Problem | Proposed solution | Priority | Effort | Adoption impact | Risk | Decision | Notes |
+| ---- | -------------- | ------- | ----------------- | -------- | ------ | --------------- | ---- | -------- | ----- |
+| Autonomous dogfood guide | Lina, Nora, Tom | Future agents had multiple useful tools but no single repo-local guide for how to use AgentLoopKit, ProjScan, AgentFlight, product-panel review, and simulated research together. | Add `.agentloop/harness/autonomous-dogfooding.md` and point AGENTS/harness docs at it. | P1 | S | medium | low | do now | Internal harness only. Public docs must not claim simulated feedback as real evidence. |
+| AgentFlight in dogfood gate | Lina, Samir, Maya | AgentLoopKit dogfood checked its own loop and ProjScan, but not the local session recorder the maintainer wants agents to use. | Add AgentFlight doctor to `scripts/dogfood.mjs` and configure `.agentflight/config.json` with local-first privacy and ignored local artifacts. | P1 | S | medium | low | do now | Does not read tokens, `.env` files, or publish. Live session JSON stays out of normal commits. |
+| Near-term maintenance guard | Elias, Platform Engineer, Samir | The roadmap asks to keep release proof, public docs, SchemaStore, policy packs, and read-only GitHub metadata healthy, but there was no short recurring gate. | Add `npm run maintenance:check` and `docs/maintenance-guards.md`. | P1 | S | medium | low | do now | This is not the release gate and does not cut versions. |
+
 ## Current Research Cycle 110 Decisions
 
 | Item | Source persona | Problem | Proposed solution | Priority | Effort | Adoption impact | Risk | Decision | Notes |

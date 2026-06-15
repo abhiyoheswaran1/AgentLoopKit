@@ -1,0 +1,106 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/harness/autonomous-work-rules.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/harness/commands.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/harness/repo-map.md"
+  },
+  {
+    "status": "M",
+    "path": ".gitignore"
+  },
+  {
+    "status": "M",
+    "path": "AGENTLOOP.md"
+  },
+  {
+    "status": "M",
+    "path": "AGENTS.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "package.json"
+  },
+  {
+    "status": "M",
+    "path": "scripts/dogfood.mjs"
+  },
+  {
+    "status": "M",
+    "path": "tests/dogfood-script.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentflight/config.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentflight/evidence/.gitkeep"
+  },
+  {
+    "status": "??",
+    "path": ".agentflight/reports/.gitkeep"
+  },
+  {
+    "status": "??",
+    "path": ".agentflight/sessions/.gitkeep"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/harness/autonomous-dogfooding.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-15-15-59-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/research/interview-cycle-112.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-16-05-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-16-05-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-16-05-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-15-harden-agentloopkit-autonomous-dogfood-harness.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/maintenance-guards.md"
+  },
+  {
+    "status": "??",
+    "path": "tests/autonomous-dogfood.test.ts"
+  }
+]

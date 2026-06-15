@@ -374,7 +374,7 @@ npm run release-flow
 
 `test:quick` runs the fast unit-oriented suite through `test:unit`. `test:integration` runs slower CLI workflow tests. `test:release` runs the full Vitest suite through `npm test`.
 
-The dogfood scripts run AgentLoopKit's local self-check path for this repository, including public-doc hygiene, dependency audit, review gates, artifact inventory, maintainer reviewability, review context, and ProjScan health. JSON mode prints one structured summary with mode, overall status, step results, exit codes, durations, and safety notes for agents and CI logs. It redacts the current workspace root as `[git-root]` before printing structured output.
+The dogfood scripts run AgentLoopKit's local self-check path for this repository, including public-doc hygiene, dependency audit, review gates, artifact inventory, maintainer reviewability, review context, AgentFlight health, and ProjScan health. JSON mode prints one structured summary with mode, overall status, step results, exit codes, durations, and safety notes for agents and CI logs. It redacts the current workspace root as `[git-root]` before printing structured output.
 
 The scripts do not publish packages, create tags, post comments, read tokens, read `.env` files, or run verification commands.
 

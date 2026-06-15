@@ -3,6 +3,14 @@ dist/
 coverage/
 .turbo/
 .agentloop/state.json
+.projscan-memory/
+.projscan-cache/
+.agentflight/current/
+.agentflight/sessions/*.json
+.agentflight/evidence/*
+!.agentflight/evidence/.gitkeep
+.agentflight/reports/*
+!.agentflight/reports/.gitkeep
 .DS_Store
 *.log
 *.tgz

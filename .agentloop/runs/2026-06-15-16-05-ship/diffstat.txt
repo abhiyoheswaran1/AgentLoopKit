@@ -1,0 +1,14 @@
+ .agentloop/backlog.md                       | 8 ++++++++
+ .agentloop/harness/autonomous-work-rules.md | 7 +++++++
+ .agentloop/harness/commands.md              | 8 +++++++-
+ .agentloop/harness/repo-map.md              | 5 +++++
+ .gitignore                                  | 8 ++++++++
+ AGENTLOOP.md                                | 4 ++++
+ AGENTS.md                                   | 8 +++++++-
+ CHANGELOG.md                                | 5 ++++-
+ README.md                                   | 2 +-
+ docs/cli-reference.md                       | 2 +-
+ package.json                                | 3 ++-
+ scripts/dogfood.mjs                         | 8 +++++++-
+ tests/dogfood-script.test.ts                | 8 +++++++-
+ 13 files changed, 68 insertions(+), 8 deletions(-)

@@ -62,6 +62,12 @@ export function createDogfoodSteps({ strict = false } = {}) {
     ]),
     agentloopStep('agent review context', ['review-context', '--json', '--redact-paths']),
     {
+      name: 'agentflight session health',
+      command: 'npx',
+      args: ['--yes', 'agentflight', 'doctor'],
+      allowFailure: false,
+    },
+    {
       name: 'projscan project health',
       command: 'npx',
       args: ['--yes', 'projscan', 'doctor', '--format', 'markdown'],
@@ -103,7 +109,7 @@ Usage:
   npm run dogfood:strict
   node scripts/dogfood.mjs --json
 
-Default mode runs read-only AgentLoopKit self-checks, dependency audit, and ProjScan. Strict mode treats review-gate warnings as failures.
+Default mode runs read-only AgentLoopKit self-checks, dependency audit, AgentFlight, and ProjScan. Strict mode treats review-gate warnings as failures.
 JSON mode prints a deterministic summary for agents and CI logs.
 
 This script does not publish packages, create tags, create GitHub releases, post comments, read token files, read .env contents, or run verification commands.`);

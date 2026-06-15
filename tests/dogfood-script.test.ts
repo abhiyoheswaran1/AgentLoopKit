@@ -16,6 +16,7 @@ describe('dogfood script helpers', () => {
       'artifact inventory',
       'maintainer reviewability check',
       'agent review context',
+      'agentflight session health',
       'projscan project health',
     ]);
 
@@ -74,7 +75,10 @@ describe('dogfood script helpers', () => {
       '--redact-paths',
     ]);
     expect(steps[9].command).toBe('npx');
-    expect(steps[9].args).toEqual(['--yes', 'projscan', 'doctor', '--format', 'markdown']);
+    expect(steps[9].args).toEqual(['--yes', 'agentflight', 'doctor']);
+    expect(steps[9].allowFailure).toBe(false);
+    expect(steps[10].command).toBe('npx');
+    expect(steps[10].args).toEqual(['--yes', 'projscan', 'doctor', '--format', 'markdown']);
   });
 
   test('adds strict gate mode only when requested', () => {
@@ -267,6 +271,8 @@ describe('dogfood script helpers', () => {
     expect(commandText).not.toMatch(/\bpack\b/);
     expect(commandText).not.toMatch(/\btoken\b/i);
     expect(commandText).toContain('npx --yes pnpm@10.12.1 audit --audit-level high');
+    expect(commandText).toContain('npx --yes agentflight doctor');
+    expect(commandText).toContain('npx --yes projscan doctor --format markdown');
   });
 
   test('builds child process env without inheriting token-like variables', () => {
