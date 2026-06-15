@@ -46,7 +46,7 @@ agentloop maintainer-check
 
 `maintainer-check` reports imported metadata as an optional pass check. Missing metadata is not a warning or failure. Invalid local metadata is a warning because reviewers cannot trust that context.
 
-AgentLoopKit treats issue and PR text as untrusted prose. It escapes Markdown-sensitive characters before rendering PR-facing output.
+AgentLoopKit treats issue and PR text as untrusted prose. It bounds long titles, states, URLs, authors, labels, branch names, and body excerpts before storing or rendering them. It also escapes Markdown-sensitive characters before rendering PR-facing output.
 
 Safety rules:
 

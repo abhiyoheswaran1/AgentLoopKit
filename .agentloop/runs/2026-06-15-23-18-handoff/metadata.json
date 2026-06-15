@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-23-18-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-23-18",
+  "createdAtEpochMs": 1781558304201,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-bound-imported-github-metadata-fields.md",
+    "title": "Bound imported GitHub metadata fields",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-23-17-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-23-18-pr-summary.md",
+  "changedFileCount": 19
+}

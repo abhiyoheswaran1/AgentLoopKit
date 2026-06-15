@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-23-17-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-23-17",
+  "createdAtEpochMs": 1781558249792,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-bound-imported-github-metadata-fields.md",
+    "title": "Bound imported GitHub metadata fields",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-23-17-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 11
+}

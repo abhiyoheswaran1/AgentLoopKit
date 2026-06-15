@@ -1,0 +1,6 @@
+ .agentloop/backlog.md         | 69 ++++++++++++++++++++++---------------------
+ .agentloop/dogfood-log.md     | 21 +++++++++++++
+ docs/github-metadata.md       |  2 +-
+ src/core/github-metadata.ts   | 42 ++++++++++++++++++++------
+ tests/github-metadata.test.ts | 64 +++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 154 insertions(+), 44 deletions(-)

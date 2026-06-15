@@ -128,6 +128,70 @@ describe('GitHub metadata import', () => {
     });
   });
 
+  test('bounds untrusted metadata fields during import and context reads', async () => {
+    const { dir, config } = await createGithubFixture();
+    const longTitle = 'T'.repeat(260);
+    const longState = 'S'.repeat(90);
+    const longUrl = `https://github.com/example/app/issues/${'u'.repeat(600)}`;
+    const longAuthor = 'author-'.repeat(30);
+    const longBranch = `feature/${'branch-'.repeat(40)}`;
+    const manyLabels = Array.from({ length: 25 }, (_, index) => ({
+      name: `label-${index}-${'x'.repeat(100)}`,
+    }));
+
+    await writeJson(path.join(dir, 'large-issue.json'), {
+      number: 1,
+      title: longTitle,
+      state: longState,
+      url: longUrl,
+      author: { login: longAuthor },
+      labels: manyLabels,
+      body: 'B'.repeat(700),
+    });
+    await writeJson(path.join(dir, 'large-pr.json'), {
+      number: 2,
+      title: longTitle,
+      state: longState,
+      url: longUrl,
+      author: { login: longAuthor },
+      labels: manyLabels,
+      isDraft: false,
+      baseRefName: longBranch,
+      headRefName: longBranch,
+      changedFiles: 1,
+      additions: 1,
+      deletions: 1,
+      body: 'P'.repeat(700),
+    });
+
+    const result = await importGithubMetadata({
+      cwd: dir,
+      config,
+      issueJsonPath: 'large-issue.json',
+      prJsonPath: 'large-pr.json',
+    });
+
+    expect(result.issue?.title).toContain('[truncated]');
+    expect(result.issue?.title.length).toBeLessThan(longTitle.length);
+    expect(result.issue?.state).toContain('[truncated]');
+    expect(result.issue?.url).toContain('[truncated]');
+    expect(result.issue?.author).toContain('[truncated]');
+    expect(result.issue?.labels).toHaveLength(20);
+    expect(result.issue?.labels[0]).toContain('[truncated]');
+    expect(result.issue?.labels.some((label) => label.startsWith('label-24'))).toBe(false);
+    expect(result.issue?.bodyExcerpt).toContain('[truncated]');
+    expect(result.pullRequest?.baseRefName).toContain('[truncated]');
+    expect(result.pullRequest?.headRefName).toContain('[truncated]');
+
+    const context = await readGithubMetadataContext({ cwd: dir, config });
+
+    expect(context.status).toBe('present');
+    if (context.status === 'present') {
+      expect(context.issue?.labels).toHaveLength(20);
+      expect(context.pullRequest?.headRefName).toContain('[truncated]');
+    }
+  });
+
   test('reports missing and invalid imported context as local read results', async () => {
     const { dir, config } = await createGithubFixture();
 

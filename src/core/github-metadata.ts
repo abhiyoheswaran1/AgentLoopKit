@@ -58,6 +58,19 @@ export type GithubMetadataContext =
 
 type JsonRecord = Record<string, unknown>;
 
+const GITHUB_METADATA_LIMITS = {
+  title: 200,
+  state: 50,
+  url: 500,
+  author: 100,
+  label: 80,
+  labels: 20,
+  refName: 120,
+  bodyExcerpt: 500,
+} as const;
+
+const TRUNCATED_MARKER = '\n[truncated]';
+
 function toStoredPath(cwd: string, absolutePath: string) {
   return path.relative(cwd, absolutePath).split(path.sep).join('/');
 }
@@ -71,6 +84,13 @@ function stringValue(value: unknown) {
   return typeof value === 'string' ? value : '';
 }
 
+function boundedString(value: unknown, maxLength: number) {
+  const text = stringValue(value).replace(/\r\n/g, '\n');
+  return text.length <= maxLength
+    ? text
+    : `${text.slice(0, maxLength).trimEnd()}${TRUNCATED_MARKER}`;
+}
+
 function numberValue(value: unknown) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
@@ -80,9 +100,9 @@ function booleanValue(value: unknown) {
 }
 
 function authorLogin(value: unknown) {
-  if (typeof value === 'string') return value;
+  if (typeof value === 'string') return boundedString(value, GITHUB_METADATA_LIMITS.author);
   if (value && typeof value === 'object' && 'login' in value) {
-    return stringValue((value as { login?: unknown }).login);
+    return boundedString((value as { login?: unknown }).login, GITHUB_METADATA_LIMITS.author);
   }
   return '';
 }
@@ -97,20 +117,24 @@ function labels(value: unknown) {
       }
       return '';
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    .slice(0, GITHUB_METADATA_LIMITS.labels)
+    .map((label) => boundedString(label, GITHUB_METADATA_LIMITS.label));
 }
 
 function bodyExcerpt(value: unknown) {
   const body = stringValue(value).replace(/\r\n/g, '\n').trim();
-  return body.length <= 500 ? body : `${body.slice(0, 500).trimEnd()}\n[truncated]`;
+  return body.length <= GITHUB_METADATA_LIMITS.bodyExcerpt
+    ? body
+    : `${body.slice(0, GITHUB_METADATA_LIMITS.bodyExcerpt).trimEnd()}${TRUNCATED_MARKER}`;
 }
 
 function normalizeGithubItem(raw: JsonRecord): NormalizedGithubItem {
   return {
     number: numberValue(raw.number),
-    title: stringValue(raw.title),
-    state: stringValue(raw.state),
-    url: stringValue(raw.url),
+    title: boundedString(raw.title, GITHUB_METADATA_LIMITS.title),
+    state: boundedString(raw.state, GITHUB_METADATA_LIMITS.state),
+    url: boundedString(raw.url, GITHUB_METADATA_LIMITS.url),
     author: authorLogin(raw.author),
     labels: labels(raw.labels),
     bodyExcerpt: bodyExcerpt(raw.body ?? raw.bodyExcerpt),
@@ -121,8 +145,8 @@ function normalizeGithubPullRequest(raw: JsonRecord): NormalizedGithubPullReques
   return {
     ...normalizeGithubItem(raw),
     isDraft: booleanValue(raw.isDraft),
-    baseRefName: stringValue(raw.baseRefName),
-    headRefName: stringValue(raw.headRefName),
+    baseRefName: boundedString(raw.baseRefName, GITHUB_METADATA_LIMITS.refName),
+    headRefName: boundedString(raw.headRefName, GITHUB_METADATA_LIMITS.refName),
     changedFiles: numberValue(raw.changedFiles),
     additions: numberValue(raw.additions),
     deletions: numberValue(raw.deletions),

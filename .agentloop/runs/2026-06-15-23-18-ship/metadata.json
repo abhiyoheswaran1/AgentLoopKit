@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-23-18-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-23-18",
+  "createdAtEpochMs": 1781558329311,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-bound-imported-github-metadata-fields.md",
+    "title": "Bound imported GitHub metadata fields",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-23-17-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-23-18-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-23-18-pr-summary-2.md",
+  "score": 96,
+  "changedFileCount": 24
+}

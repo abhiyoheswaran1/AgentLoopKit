@@ -10420,3 +10420,41 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - TDD found the sharper boundary issue at the individual policy file level.
 - Improve:
   - Keep policy packs local and small unless real maintainers ask for more pack-management surface.
+
+## 2026-06-15: Bounded Imported GitHub Metadata
+
+- Task contract: `.agentloop/tasks/2026-06-15-bound-imported-github-metadata-fields.md`
+- AgentFlight session: `af-20260615-211130-bound-imported-github-metadata-fields`
+- Trigger:
+  - GitHub metadata import already stayed local and read-only, but long user-supplied titles, labels, URLs, authors, and branch names could still flood review output.
+  - Product-panel read: Samir wanted untrusted text bounded before it reaches reviewer evidence; Lina wanted `review-context` and `prepare-pr` to stay scannable; Tom wanted deterministic limits instead of subjective cleanup.
+- Implementation:
+  - Added a red regression for oversized issue and PR metadata.
+  - Added bounded normalization for titles, states, URLs, authors, labels, label count, PR branch names, and body excerpts.
+  - Documented that imported metadata is bounded before storage and rendering.
+- Verification:
+  - Red-focused test:
+    - `npm test -- tests/github-metadata.test.ts` failed because long titles were stored without a truncation marker.
+  - Green-focused test:
+    - `npm test -- tests/github-metadata.test.ts` passed with 8 tests.
+  - Task verification passed:
+    - `npm test -- tests/github-metadata.test.ts tests/prepare-pr.test.ts tests/review-context.test.ts tests/maintainer-check.test.ts`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `.agentloop/reports/2026-06-15-23-17-verification-report.md`
+    - `.agentloop/runs/2026-06-15-23-17-verify`
+  - `npx --yes agentflight verify -- npm test -- tests/github-metadata.test.ts` passed:
+    - `.agentflight/evidence/af-20260615-211130-bound-imported-github-metadata-fields/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-211130-bound-imported-github-metadata-fields/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+  - `npm run build` passed.
+  - `npm run check:public-docs` passed.
+  - `npm run dogfood:strict` initially failed because rollback notes still contained placeholder text.
+  - After replacing rollback notes and refreshing handoff evidence, `npm run dogfood:strict` passed.
+  - `agentloop ship --json --redact-paths` wrote `.agentloop/reports/2026-06-15-23-18-ship-report.md` with review-readiness score `96`/100.
+  - `agentloop prepare-pr --write --redact-paths` wrote `.agentloop/handoffs/2026-06-15-23-18-pr-description.md`.
+- What worked well:
+  - The existing context read path already normalizes stored metadata, so one boundary covers both import and later review commands.
+  - The strict dogfood gate caught weak rollback notes before the task was closed.
+- Improve:
+  - Keep imported GitHub metadata out of `ship` scoring until maintainers ask for that signal.
