@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-23-03-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-23-03",
+  "createdAtEpochMs": 1781557429365,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-harden-local-policy-pack-boundaries.md",
+    "title": "Harden local policy pack boundaries",
+    "status": "proposed"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-23-03-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 8
+}

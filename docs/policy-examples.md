@@ -211,6 +211,7 @@ agentloop policy status
 ```
 
 Keep organization packs inside the repo or copy them from a reviewed internal template. AgentLoopKit does not fetch remote policy packs.
+Do not symlink pack policy files to shared files outside the repo; copy reviewed Markdown into the local pack instead.
 
 ## How to apply an example
 

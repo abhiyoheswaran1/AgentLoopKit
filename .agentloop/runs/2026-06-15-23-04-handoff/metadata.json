@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-23-04-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-23-04",
+  "createdAtEpochMs": 1781557475950,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-harden-local-policy-pack-boundaries.md",
+    "title": "Harden local policy pack boundaries",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-23-03-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-23-04-pr-summary.md",
+  "changedFileCount": 11
+}

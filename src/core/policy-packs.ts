@@ -152,9 +152,25 @@ async function readPackAt(options: {
 }): Promise<PolicyPack> {
   const manifestPath = path.join(options.packRoot, 'manifest.json');
   const manifest = normalizeManifest(await readJsonFile<unknown>(manifestPath), manifestPath);
+  const policyDirectory = path.join(options.packRoot, 'policies');
+  if (options.source === 'local' && !resolvesInsidePath(options.cwd, policyDirectory)) {
+    throw new PolicyPackManifestError(
+      manifestPath,
+      'policies directory must stay inside the repository.',
+    );
+  }
   const policies = await Promise.all(
     [...manifest.policies].sort().map(async (fileName) => {
-      const policyPath = path.join(options.packRoot, 'policies', fileName);
+      const policyPath = path.join(policyDirectory, fileName);
+      if (
+        !resolvesInsidePath(policyDirectory, policyPath) ||
+        (options.source === 'local' && !resolvesInsidePath(options.cwd, policyPath))
+      ) {
+        throw new PolicyPackManifestError(
+          manifestPath,
+          `policy file must stay inside the pack policies directory: ${fileName}`,
+        );
+      }
       const content = await readFile(policyPath, 'utf8');
       return {
         fileName,

@@ -10388,3 +10388,35 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Tests keep detailed blocked examples out of public docs while still proving the checker behavior.
 - Improve:
   - If more deferred-channel design docs are added, include a narrow allowlist entry and a test showing why the document is safe.
+
+## 2026-06-15: Local Policy Pack Boundary Hardening
+
+- Task contract: `.agentloop/tasks/2026-06-15-harden-local-policy-pack-boundaries.md`
+- AgentFlight session: `af-20260615-210016-harden-local-policy-pack-boundaries`
+- Trigger:
+  - Policy packs are meant to stay local and review-focused.
+  - Product-panel read: Samir wanted filesystem boundaries checked before policy content reads; Maya wanted the fix to preserve the existing simple pack model; Rachel wanted organization packs to remain practical without becoming a governance platform.
+- Implementation:
+  - Added a regression test for a local pack policy file symlinked to a file outside the pack policy directory.
+  - Added realpath boundary checks before reading each policy file.
+  - Documented that local pack paths and policy files must resolve inside the repo and pack `policies/` directory.
+- Verification:
+  - Red-green focused test:
+    - `npm test -- tests/policy-packs.test.ts` failed because the symlinked outside policy content was read.
+    - After the boundary check, `npm test -- tests/policy-packs.test.ts` passed with 6 tests.
+  - Task-linked AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-15-23-03-verification-report.md`
+    - `.agentloop/runs/2026-06-15-23-03-verify`
+  - `npx --yes agentflight verify -- npm test -- tests/policy-packs.test.ts` passed:
+    - `.agentflight/evidence/af-20260615-210016-harden-local-policy-pack-boundaries/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-210016-harden-local-policy-pack-boundaries/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+  - `npm run build` passed.
+  - `npm run dogfood:strict` initially failed because the dirty files had no fresh handoff evidence.
+  - After handoff generation, `npm run dogfood:strict` passed.
+  - `agentloop ship --json --redact-paths` wrote `.agentloop/reports/2026-06-15-23-05-ship-report.md` with review-readiness score `96`/100.
+  - The task was marked done and archived under `.agentloop/tasks/archive/`.
+- What worked well:
+  - TDD found the sharper boundary issue at the individual policy file level.
+- Improve:
+  - Keep policy packs local and small unless real maintainers ask for more pack-management surface.

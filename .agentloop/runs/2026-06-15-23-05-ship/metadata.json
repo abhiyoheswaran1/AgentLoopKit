@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-23-05-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-23-05",
+  "createdAtEpochMs": 1781557502588,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-harden-local-policy-pack-boundaries.md",
+    "title": "Harden local policy pack boundaries",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-23-03-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-23-05-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-23-05-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 16
+}

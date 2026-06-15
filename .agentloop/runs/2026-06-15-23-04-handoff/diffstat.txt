@@ -1,0 +1,7 @@
+ .agentloop/backlog.md      |  2 +-
+ .agentloop/dogfood-log.md  | 29 +++++++++++++++++++++++++++++
+ docs/policies.md           |  1 +
+ docs/policy-examples.md    |  1 +
+ src/core/policy-packs.ts   | 18 +++++++++++++++++-
+ tests/policy-packs.test.ts | 23 ++++++++++++++++++++++-
+ 6 files changed, 71 insertions(+), 3 deletions(-)

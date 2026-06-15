@@ -90,6 +90,7 @@ Each local pack needs a manifest:
 ```
 
 Policy files live under the pack's `policies/` directory. AgentLoopKit reads local packs only when you run `policy packs`, `policy pack show`, or `policy pack apply`.
+Local pack paths and policy files must resolve inside the repository and the pack's `policies/` directory. AgentLoopKit rejects symlinked policy files that point outside that boundary before reading their contents.
 
 ### Organization policy-pack workflow
 

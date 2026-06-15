@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -153,6 +153,27 @@ describe('policy packs', () => {
     );
     await expect(applyPolicyPack({ cwd: dir, config, packName: 'org-review' })).rejects.toThrow(
       /must be a simple Markdown filename/i,
+    );
+  });
+
+  test('rejects policy files that resolve outside the pack policy directory', async () => {
+    const { dir, config } = await createPolicyPackFixture();
+    const outsideDir = await makeTempDir('agentloopkit-outside-policy-pack-');
+    tempDirs.push(outsideDir);
+    const outsidePolicy = path.join(outsideDir, 'review-evidence-policy.md');
+    const linkedPolicy = path.join(
+      dir,
+      '.agentloop/policy-packs/org-review/policies/review-evidence-policy.md',
+    );
+    await writeFile(outsidePolicy, '# Outside Policy\n\nThis content must not be read.\n');
+    await rm(linkedPolicy);
+    await symlink(outsidePolicy, linkedPolicy);
+
+    await expect(readPolicyPack({ cwd: dir, config, packName: 'org-review' })).rejects.toThrow(
+      PolicyPackManifestError,
+    );
+    await expect(applyPolicyPack({ cwd: dir, config, packName: 'org-review' })).rejects.toThrow(
+      /must stay inside the pack policies directory/i,
     );
   });
 
