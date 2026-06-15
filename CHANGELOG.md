@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.33.0
+
 - Added `agentloop release-proof` to check post-release npm, GitHub Release, GHCR, and MCP Registry evidence without publishing, tagging, uploading, or reading tokens.
 - Added release-proof documentation and generated harness guidance for post-release evidence collection.
 - Changed public-doc hygiene to block fake adoption language, premature Pro/SaaS upgrade copy, and internal planning docs from public-doc scans.

@@ -1,0 +1,9 @@
+ CHANGELOG.md             |  4 ++++
+ FINAL_HANDOFF.md         | 55 ++++++++++++++++++++++++------------------------
+ ROADMAP.md               | 10 ++++-----
+ docs/launch-checklist.md |  2 +-
+ docs/npm-publishing.md   | 10 ++++-----
+ docs/release-status.md   | 52 +++++++++++++++++++++++----------------------
+ package.json             |  2 +-
+ server.json              |  4 ++--
+ 8 files changed, 73 insertions(+), 66 deletions(-)

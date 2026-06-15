@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-07-23-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-07-23",
+  "createdAtEpochMs": 1781501039816,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-release-agentloopkit-0-33-0.md",
+    "title": "Release AgentLoopKit 0.33.0",
+    "status": "proposed"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-07-18-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 15
+}

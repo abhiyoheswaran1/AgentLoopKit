@@ -76,29 +76,30 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.32.1`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.32.1>
-- Release asset: `agentloopkit-0.32.1.tgz`
-- Release asset SHA-256: `d2219319f29f0adbba2d4736b2ef494838ab0aac72d64756e5a9bf1737cf756a`
-- Release tag: `v0.32.1` at commit `0e53496a1a5704959e8f92a573bf09401c34b6ef`
-- CI run: `27501492254`, success
-- CLI Smoke run: `27501492259`, success
-- Publish workflow run: `27501495780`, success
-- Docker workflow run: `27501495776`, success
-- MCP Registry workflow run: `27501633646`, success
-- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.32.1`
-- Published-package smoke: `npm run smoke:published -- --version 0.32.1` passed
-- GHCR proof: registry tags include `latest`, `0.32`, and `0.32.1`
-- MCP Registry proof: public registry search marks `0.32.1` as latest for `io.github.abhiyoheswaran1/agentloopkit`
+- Current npm release: `agentloopkit@0.33.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.33.0>
+- Release asset: `agentloopkit-0.33.0.tgz`
+- Release asset SHA-256: recorded after GitHub release asset upload
+- Release tag: `v0.33.0` at the published release commit
+- CI run: recorded after release workflows finish
+- CLI Smoke run: recorded after release workflows finish
+- Publish workflow run: recorded after release workflows finish
+- Docker workflow run: recorded after release workflows finish
+- MCP Registry workflow run: recorded after release workflows finish
+- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.33.0`
+- Published-package smoke: `npm run smoke:published -- --version 0.33.0` passed
+- GHCR proof: registry tags include `latest`, `0.33`, and `0.33.0`
+- MCP Registry proof: public registry search marks `0.33.0` as latest for `io.github.abhiyoheswaran1/agentloopkit`
 
-## Post-0.32.1 work in progress
+## 0.33.0 release summary
 
-- `review-context`, `prepare-pr`, and `maintainer-check` now read `.agentloop/github/context.json` when present.
-- `prepare-pr` includes imported issue and PR context in the generated PR body.
-- `maintainer-check` treats missing GitHub metadata as neutral and invalid local metadata as a warning.
-- Imported issue and PR prose is escaped before rendering reviewer-facing Markdown.
-- Docs now include organization policy-pack workflow examples.
-- This work is not in the `0.32.1` npm package until the next approved release.
+Included:
+
+- `agentloop release-proof` for post-release npm, GitHub Release, GHCR, and MCP Registry evidence
+- imported local GitHub issue and PR summaries in `review-context`, `prepare-pr`, and `maintainer-check`
+- public-doc hygiene that rejects fake adoption language, premature Pro/SaaS upgrade copy, and internal planning copy
+- organization policy-pack workflow examples for repo-local team review rules
+- dogfood evidence for the `0.33.0` release gate
 
 ## 0.32.1 release summary
 
@@ -1244,10 +1245,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.32.1` is public.
-- npm latest is `agentloopkit@0.32.1`.
-- GHCR tags include `latest`, `0.32`, and `0.32.1`.
-- MCP Registry lists `0.32.1` as latest.
+- GitHub release `v0.33.0` is public.
+- npm latest is `agentloopkit@0.33.0`.
+- GHCR tags include `latest`, `0.33`, and `0.33.0`.
+- MCP Registry lists `0.33.0` as latest.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.
