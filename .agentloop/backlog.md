@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 121 Decisions
+
+| item                            | source persona    | problem                                                                                               | proposed solution                                                                        | priority | effort | adoption impact | risk | decision | notes                                                                                 |
+| ------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ------------------------------------------------------------------------------------- |
+| Markdown-safe CI summary output | Samir, Nora, Lina | Agents paste `ci-summary` into PRs and CI logs, but local evidence paths can split Markdown lists. | Render human CI summary dynamic values as single-line inline code; keep JSON raw values. | P1       | S      | medium          | low  | do now   | No CI detection, provider API, artifact discovery, gate semantic, or JSON-shape changes. |
+
 ## Current Research Cycle 120 Decisions
 
 | item                               | source persona     | problem                                                                                                  | proposed solution                                                                           | priority | effort | adoption impact | risk | decision | notes                                                                                     |

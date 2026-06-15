@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-01-50-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-01-50",
+  "createdAtEpochMs": 1781567423646,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-ci-summary-output-markdown-safe.md",
+    "title": "Make ci-summary output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-01-48-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-01-50-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-01-50-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 12
+}

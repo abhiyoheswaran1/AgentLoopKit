@@ -3,7 +3,7 @@ import { mkdir, readdir, readFile, rm, symlink, writeFile } from 'node:fs/promis
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
-import { inlineCode } from '../src/core/markdown-format.js';
+import { singleLineInlineCode } from '../src/core/markdown-format.js';
 import { makeTempDir, removeTempDir } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -89,7 +89,7 @@ describe('ci-summary command', () => {
 
   test('prints written CI summary paths with Markdown-safe inline values', async () => {
     const dir = await createRepoWithEvidence();
-    const outPath = path.join(dir, '.agentloop/reports/ci`summary.md');
+    const outPath = path.join(dir, '.agentloop/reports/ci`summary\nmanual.md');
 
     const result = await execa(tsxPath, [cliPath, 'ci-summary', '--write', '--out', outPath], {
       cwd: dir,
@@ -97,7 +97,7 @@ describe('ci-summary command', () => {
     });
 
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain(`CI summary written: ${inlineCode(outPath)}`);
+    expect(result.stdout).toContain(`CI summary written: ${singleLineInlineCode(outPath)}`);
   });
 
   test('writes markdown-safe CI metadata when values contain backticks', async () => {
@@ -123,6 +123,54 @@ describe('ci-summary command', () => {
     const markdown = await readFile(payload.writtenPath, 'utf8');
     expect(markdown).toContain('- Workflow: `` CI `nightly` ``');
     expect(markdown).toContain('- Ref: `` refs/heads/feature/`agentloop` ``');
+  });
+
+  test('writes single-line markdown evidence paths when task data contains line breaks', async () => {
+    const dir = await createRepoWithEvidence();
+    const taskFileName = '2026-06-10-ci\n-summary.md';
+    await writeFile(
+      path.join(dir, '.agentloop/tasks', taskFileName),
+      '# CI path task\n\n- Status: in-progress\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      `${JSON.stringify(
+        {
+          version: 1,
+          activeTaskPath: `.agentloop/tasks/${taskFileName}`,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'ci-summary', '--json', '--write'], {
+      cwd: dir,
+      reject: false,
+      env: {
+        GITHUB_ACTIONS: 'true',
+        GITHUB_SERVER_URL: 'https://github.com',
+        GITHUB_REPOSITORY: 'owner/repo',
+        GITHUB_RUN_ID: '12345',
+        GITHUB_RUN_ATTEMPT: '2',
+        GITHUB_WORKFLOW: 'CI',
+        GITHUB_EVENT_NAME: 'pull_request',
+        GITHUB_REF: 'refs/heads/feature',
+        GITHUB_SHA: 'abcdef123456',
+      },
+    });
+
+    expect(result.exitCode).toBe(0);
+    const payload = JSON.parse(result.stdout);
+    const markdown = await readFile(payload.writtenPath, 'utf8');
+    expect(payload.evidence.task.path).toBe('.agentloop/tasks/2026-06-10-ci\n-summary.md');
+    expect(markdown).toContain(
+      '- Task: `CI path task` - `.agentloop/tasks/2026-06-10-ci\\n-summary.md`',
+    );
+    expect(markdown).toContain(
+      '- [`pass`] `Task contract`: `CI path task` - `.agentloop/tasks/2026-06-10-ci\\n-summary.md`',
+    );
+    expect(markdown).not.toContain('ci\n-summary.md`');
   });
 
   test('writes markdown-safe CI evidence and gate details when values contain backticks', async () => {

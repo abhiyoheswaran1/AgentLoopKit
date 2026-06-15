@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-01-51-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-01-51",
+  "createdAtEpochMs": 1781567460766,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-make-ci-summary-output-markdown-safe.md",
+    "title": "Make ci-summary output Markdown-safe",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-01-48-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-01-51-pr-summary.md",
+  "changedFileCount": 20
+}

@@ -10,7 +10,7 @@ import {
   verificationReportPattern,
 } from './artifacts.js';
 import { checkGates, CheckGatesResult } from './check-gates.js';
-import { inlineCode } from './markdown-format.js';
+import { singleLineInlineCode as inlineCode } from './markdown-format.js';
 import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 import { detectCiContext, VerificationCiContext } from './verification.js';
 

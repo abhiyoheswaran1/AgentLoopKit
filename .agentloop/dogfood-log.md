@@ -2,6 +2,52 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe CI Summary Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-ci-summary-output-markdown-safe.md`
+- Trigger:
+  - `agentloop ci-summary` is designed for CI logs, PR comments, and local reviewer evidence.
+  - Local AgentLoop evidence paths can preserve unusual filenames, including line breaks, and split Markdown list items.
+- Implementation:
+  - Switched `src/core/ci-summary.ts` human rendering to `singleLineInlineCode`.
+  - Switched the `src/cli/commands/ci-summary.ts` written-path message to `singleLineInlineCode`.
+  - Kept CI provider detection, artifact lookup, write behavior, gate semantics, and JSON output unchanged.
+  - Added regression tests for line breaks in task evidence paths and custom written output paths.
+  - Updated the CLI reference, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized safe CI-log and PR-comment copy/paste behavior.
+  - Nora wanted CI evidence to remain readable when agents quote it in handoffs.
+  - Lina wanted long-running agent sessions to avoid malformed evidence blocks.
+  - Maya accepted the narrow helper swap because it follows the existing Markdown-safe rendering pattern.
+- Verification:
+  - Red TDD runs failed before single-line CI summary rendering existed:
+    - `npm test -- tests/ci-summary.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/ci-summary.test.ts`
+    - `npm test -- tests/ci-summary.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, and build checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+  - AgentLoopKit task verification, ship, handoff, and strict dogfood gates passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-ci-summary-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+    - `npm run dogfood:strict`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/ci-summary.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The first attempted CI metadata test showed that CI env values are already normalized upstream.
+  - The final regression targets preserved local evidence paths, which is the real remaining renderer risk.
+- Improve:
+  - Continue auditing paste-heavy human output, but avoid broad helper swaps without command-specific tests.
+
 ## 2026-06-16: Markdown-Safe Release-Check Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-release-check-output-markdown-safe.md`

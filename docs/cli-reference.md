@@ -376,6 +376,8 @@ agentloop ci-summary --write
 
 `ci-summary` reads allowlisted CI provenance fields and existing AgentLoop artifacts. It reports provider, workflow or pipeline, event, ref, commit, and run URL when supported environment variables are present.
 
+Human-readable `ci-summary` output keeps CI evidence paths, gate details, and written output paths on one Markdown line. JSON output keeps raw values for scripts.
+
 It does not call CI provider APIs, read secrets, upload files, run tests, or dump arbitrary environment variables.
 
 See [ci-summary.md](ci-summary.md).

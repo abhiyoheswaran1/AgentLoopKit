@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
 import { getCiSummary } from '../../core/ci-summary.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import {
   loadWorkspaceForJsonCommand,
   printOutputPathJsonError,
