@@ -1,0 +1,4 @@
+ .agentloop/backlog.md     |  1 +
+ .agentloop/dogfood-log.md | 33 +++++++++++++++++++++++
+ scripts/smoke-cli.mjs     | 68 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 101 insertions(+), 1 deletion(-)

@@ -2,7 +2,7 @@
 /* global console, process */
 import { spawn } from 'node:child_process';
 import { realpathSync } from 'node:fs';
-import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, stat, utimes, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -139,6 +139,24 @@ async function prepareSmokeRepo(tempRoot) {
   );
   await runRequired('git', ['init', '-q'], { cwd: smokeRepo });
   return smokeRepo;
+}
+
+async function writeOldShipReportFixture(root) {
+  const reportPath = path.join(root, '.agentloop', 'reports', '2020-01-01-00-00-ship-report.md');
+  await mkdir(path.dirname(reportPath), { recursive: true });
+  await writeFile(
+    reportPath,
+    [
+      '# AgentLoopKit Ship Report',
+      '',
+      '- Fixture: stale ship report for built CLI smoke coverage.',
+      '- Safety: local temp repo only.',
+      '',
+    ].join('\n'),
+  );
+  const timestamp = new Date('2020-01-01T00:00:00.000Z');
+  await utimes(reportPath, timestamp, timestamp);
+  return '.agentloop/reports/2020-01-01-00-00-ship-report.md';
 }
 
 async function smokeCli({ keep = false } = {}) {
@@ -383,6 +401,8 @@ async function smokeCli({ keep = false } = {}) {
     assert(Array.isArray(gates.gates), 'check-gates JSON did not include gates.');
     console.log(`Check-gates smoke passed with status ${gates.overallStatus}.`);
 
+    const oldShipReportPath = await writeOldShipReportFixture(smokeRepo);
+
     const ship = parseJson(
       (await runAgentLoop(['ship', '--json', '--github-comment'], { cwd: smokeRepo })).stdout,
       'ship',
@@ -397,6 +417,52 @@ async function smokeCli({ keep = false } = {}) {
       'ship JSON did not include GitHub comment markdown.',
     );
     console.log('Ship smoke passed.');
+
+    const shipReportArtifacts = parseJson(
+      (await runAgentLoop(['artifacts', '--type', 'ship-report', '--json'], { cwd: smokeRepo }))
+        .stdout,
+      'artifacts ship-report',
+    );
+    assert(
+      shipReportArtifacts.shipReports?.count >= 1,
+      'artifacts --type ship-report JSON did not include a ship report count.',
+    );
+    assert(
+      shipReportArtifacts.shipReports?.latest?.path === ship.shipReportPath,
+      'artifacts --type ship-report JSON did not point at the latest ship report.',
+    );
+
+    const staleShipReportArtifacts = parseJson(
+      (
+        await runAgentLoop(['artifacts', '--stale', '--type', 'ship-report', '--json'], {
+          cwd: smokeRepo,
+        })
+      ).stdout,
+      'artifacts stale ship-report',
+    );
+    assert(
+      staleShipReportArtifacts.stale?.safety?.readOnly === true,
+      'artifacts --stale --type ship-report did not report read-only safety.',
+    );
+    assert(
+      staleShipReportArtifacts.stale?.deletesFiles === false,
+      'artifacts --stale --type ship-report reported destructive behavior.',
+    );
+    assert(
+      staleShipReportArtifacts.stale?.candidateCount === 1,
+      'artifacts --stale --type ship-report did not report the expected stale ship report.',
+    );
+    assert(
+      staleShipReportArtifacts.stale?.candidates?.[0]?.path === oldShipReportPath,
+      'artifacts --stale --type ship-report did not point at the stale fixture.',
+    );
+    assert(
+      staleShipReportArtifacts.stale?.candidates?.every(
+        (candidate) => candidate.type === 'ship-report',
+      ),
+      'artifacts --stale --type ship-report included a non-ship-report candidate.',
+    );
+    console.log('Ship report artifact smoke passed.');
 
     const statusWithRun = parseJson(
       (await runAgentLoop(['status', '--json'], { cwd: smokeRepo })).stdout,

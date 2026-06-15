@@ -10281,3 +10281,40 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The regression is now encoded as a deterministic unit test instead of a maintainer memory.
 - Improve:
   - If `dogfood:start` gains JSON output later, ensure JSON mode also avoids built `dist/` paths.
+
+## 2026-06-15: Ship Report Artifact Smoke Coverage
+
+- Task contract: `.agentloop/tasks/2026-06-15-smoke-ship-report-artifact-filters.md`
+- AgentFlight session: `af-20260615-200716-smoke-ship-report-artifact-filters`
+- Trigger:
+  - Source tests covered `artifacts --type ship-report`, but the built CLI smoke did not prove the packaged binary could inventory ship reports or preview stale ship-report candidates.
+  - Product-panel read: Samir wanted the stale preview safety flags covered in the release smoke; Lina wanted the smoke to exercise the actual review-readiness evidence path.
+- Implementation:
+  - Added a local old ship-report fixture inside the temporary smoke repo.
+  - Extended `scripts/smoke-cli.mjs` to assert `artifacts --type ship-report --json`.
+  - Extended `scripts/smoke-cli.mjs` to assert `artifacts --stale --type ship-report --json`, including read-only safety, non-destructive behavior, candidate count, candidate type, and fixture path.
+- Verification:
+  - Red-green smoke cycle:
+    - Initial `node scripts/smoke-cli.mjs` failed because no stale ship-report candidate existed.
+    - After adding the local stale fixture, `node scripts/smoke-cli.mjs` passed.
+  - Task-linked AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-15-22-20-verification-report.md`
+    - `.agentloop/runs/2026-06-15-22-23-verify`
+  - Fresh handoff evidence was generated:
+    - `.agentloop/handoffs/2026-06-15-22-23-pr-summary.md`
+    - `.agentloop/runs/2026-06-15-22-23-handoff`
+  - Review-readiness ship evidence was generated:
+    - `.agentloop/reports/2026-06-15-22-27-ship-report.md`
+    - `.agentloop/runs/2026-06-15-22-27-ship`
+    - Score: `92`/100, with the expected broad-change warning from generated dogfood evidence.
+  - `npx --yes agentflight verify -- node scripts/smoke-cli.mjs` passed:
+    - `.agentflight/evidence/af-20260615-200716-smoke-ship-report-artifact-filters/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-200716-smoke-ship-report-artifact-filters/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+  - `npm run dogfood:strict` initially failed because the dirty files had no fresh handoff.
+  - After `agentloop handoff --write-run --redact-paths`, `npm run dogfood:strict` passed.
+- What worked well:
+  - TDD caught that the new smoke assertion was meaningful before the fixture was added.
+  - The strict dogfood gate again forced fresh reviewer handoff evidence before the work could be considered ready.
+- Improve:
+  - Consider adding a lighter release-smoke grouping later if full CLI smoke runtime becomes too slow for everyday development.

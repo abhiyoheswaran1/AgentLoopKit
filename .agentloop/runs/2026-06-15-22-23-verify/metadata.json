@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-22-23-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-22-23",
+  "createdAtEpochMs": 1781555003953,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-smoke-ship-report-artifact-filters.md",
+    "title": "Smoke ship report artifact filters",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-22-20-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 14
+}

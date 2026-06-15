@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-22-18-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-22-18",
+  "createdAtEpochMs": 1781554727212,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-smoke-ship-report-artifact-filters.md",
+    "title": "Smoke ship report artifact filters",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-22-12-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-22-18-pr-summary.md",
+  "changedFileCount": 6
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "status": "M",
+    "path": "scripts/smoke-cli.mjs"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-15-22-12-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-15-smoke-ship-report-artifact-filters.md"
+  }
+]
