@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-18-16-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-18-16",
+  "createdAtEpochMs": 1781540177302,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-fix-cli-smoke-placeholder-contract-regression.md",
+    "title": "Fix CLI smoke placeholder contract regression",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-18-15-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

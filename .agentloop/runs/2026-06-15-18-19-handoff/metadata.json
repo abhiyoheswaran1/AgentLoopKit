@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-18-19-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-18-19",
+  "createdAtEpochMs": 1781540363327,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-fix-cli-smoke-placeholder-contract-regression.md",
+    "title": "Fix CLI smoke placeholder contract regression",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-18-15-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-18-19-pr-summary-2.md",
+  "changedFileCount": 23
+}

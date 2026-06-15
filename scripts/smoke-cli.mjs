@@ -240,6 +240,8 @@ async function smokeCli({ keep = false } = {}) {
             'The CLI completes a local smoke flow without publishing.',
             '--constraint',
             'Do not publish, upload, or call external APIs.',
+            '--likely-file',
+            'dist/cli/index.js',
             '--acceptance',
             'The smoke flow completes on every supported CI OS.',
             '--verify-command',

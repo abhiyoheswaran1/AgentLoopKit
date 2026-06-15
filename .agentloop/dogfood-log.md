@@ -9958,3 +9958,38 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - AgentLoopKit, AgentFlight, and ProjScan all contributed separate evidence without adding cloud or token requirements.
 - Improve:
   - The task-state integration test file now takes about two minutes locally. Keep it in release gates, but consider splitting faster task-doctor unit coverage from slower end-to-end CLI coverage.
+
+## 2026-06-15: CLI Smoke Placeholder Contract Fix
+
+- Task contract: `.agentloop/tasks/2026-06-15-fix-cli-smoke-placeholder-contract-regression.md`
+- AgentFlight session: `af-20260615-161356-fix-cli-smoke-placeholder-contract-regression`
+- Trigger:
+  - The pushed CLI Smoke workflow failed on Linux, macOS, and Windows after `task doctor` started warning on placeholder task sections.
+  - The smoke fixture created a task without `Likely Files or Areas`, so `review-context` saw warning gates after `ship`.
+- Implementation:
+  - Kept the placeholder diagnostic unchanged.
+  - Updated the smoke fixture to include `--likely-file dist/cli/index.js` when it creates the smoke task.
+  - Repaired a dogfood task creation race where AgentFlight and AgentLoop task creation were started in parallel.
+- Verification:
+  - Local smoke passed:
+    - `node scripts/smoke-cli.mjs`
+  - Task-linked AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-15-18-15-verification-report.md`
+    - `.agentloop/runs/2026-06-15-18-16-verify`
+  - Static checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+  - Ship evidence passed:
+    - `.agentloop/reports/2026-06-15-18-16-ship-report.md`
+    - Review-readiness score: 100/100
+  - `npm run dogfood:strict` passed.
+  - `npx --yes agentflight doctor` passed.
+  - `npx --yes agentflight verify -- node scripts/smoke-cli.mjs` passed:
+    - `.agentflight/evidence/af-20260615-161356-fix-cli-smoke-placeholder-contract-regression/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-161356-fix-cli-smoke-placeholder-contract-regression/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+- What worked well:
+  - CI exposed that our own smoke fixture was weaker than the product now expects from users.
+  - The new placeholder diagnostic found the malformed dogfood task immediately after the AgentFlight/AgentLoop race.
+- Improve:
+  - Start AgentFlight sessions and AgentLoop task creation sequentially. Do not create task contracts in parallel.
