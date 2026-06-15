@@ -7,7 +7,9 @@ import { checkNpmStatus } from './npm-status.js';
 
 export type ReleaseProofStatus = 'pass' | 'warn' | 'fail';
 
-export type ReleaseProofChannelId = 'npm' | 'github-release' | 'ghcr' | 'mcp-registry';
+export const releaseProofChannelIds = ['npm', 'github-release', 'ghcr', 'mcp-registry'] as const;
+
+export type ReleaseProofChannelId = (typeof releaseProofChannelIds)[number];
 
 export type ReleaseProofChannel = {
   id: ReleaseProofChannelId;
@@ -34,6 +36,7 @@ export type ReleaseProofResult = {
     tagExists: boolean;
     commit: string;
   };
+  checkedChannels: ReleaseProofChannelId[];
   channels: ReleaseProofChannel[];
   sources: {
     npm: ReleaseProofSource;
@@ -148,6 +151,10 @@ function sourceFromError(command: string, error: string): ReleaseProofSource {
   return { command, exitCode: 1, error };
 }
 
+function sourceFromSkipped(channelId: ReleaseProofChannelId): ReleaseProofSource {
+  return { command: `skipped release-proof channel: ${channelId}`, exitCode: 0 };
+}
+
 function parseCapturedJson(json: string, command: string): HttpJsonResult {
   try {
     return {
@@ -255,7 +262,10 @@ async function fetchGhcrTagsJson(url: string, timeoutMs: number): Promise<HttpJs
     const token = valueAsString(tokenJson.token);
     if (!token) {
       return {
-        source: sourceFromError(`GET ${url}`, 'anonymous GHCR token response did not include a token'),
+        source: sourceFromError(
+          `GET ${url}`,
+          'anonymous GHCR token response did not include a token',
+        ),
       };
     }
 
@@ -270,10 +280,7 @@ async function fetchGhcrTagsJson(url: string, timeoutMs: number): Promise<HttpJs
     const retryBody = await retry.text();
     if (!retry.ok) {
       return {
-        source: sourceFromError(
-          `GET ${url}`,
-          `HTTP ${retry.status}: ${retryBody.slice(0, 200)}`,
-        ),
+        source: sourceFromError(`GET ${url}`, `HTTP ${retry.status}: ${retryBody.slice(0, 200)}`),
       };
     }
     return {
@@ -333,10 +340,15 @@ function mcpServerRecord(value: unknown) {
   const servers = Array.isArray(record.servers)
     ? record.servers.map(valueAsRecord).filter((item): item is Record<string, unknown> => !!item)
     : [];
-  return servers.map((item) => valueAsRecord(item.server) ?? item).find((item) => valueAsString(item.name));
+  return servers
+    .map((item) => valueAsRecord(item.server) ?? item)
+    .find((item) => valueAsString(item.name));
 }
 
-function mcpRegistryProof(value: unknown, options: { version: string; packageName: string; mcpName: string }) {
+function mcpRegistryProof(
+  value: unknown,
+  options: { version: string; packageName: string; mcpName: string },
+) {
   const server = mcpServerRecord(value);
   const packages = Array.isArray(server?.packages)
     ? server.packages.map(valueAsRecord).filter((item): item is Record<string, unknown> => !!item)
@@ -349,7 +361,8 @@ function mcpRegistryProof(value: unknown, options: { version: string; packageNam
       valueAsString(item.identifier) === options.packageName &&
       valueAsString(item.version) === options.version,
   );
-  const matches = serverName === options.mcpName && serverVersion === options.version && matchingPackage;
+  const matches =
+    serverName === options.mcpName && serverVersion === options.version && matchingPackage;
 
   return {
     status: matches ? ('pass' as const) : ('warn' as const),
@@ -421,6 +434,7 @@ function renderMarkdown(result: Omit<ReleaseProofResult, 'markdown'>) {
 - Package: ${inlineCode(`${result.package.name}@${result.package.version}`)}
 - Git tag: ${inlineCode(result.git.tag)} (${result.git.tagExists ? 'found' : 'missing'})
 - Commit: ${inlineCode(result.git.commit || 'unknown')}
+- Checked channels: ${result.checkedChannels.map((item) => inlineCode(item)).join(', ')}
 
 ## Channels
 
@@ -447,6 +461,7 @@ export async function checkReleaseProof(options: {
   githubReleaseJson?: string;
   ghcrTagsJson?: string;
   mcpRegistryJson?: string;
+  only?: ReleaseProofChannelId;
   timeoutMs?: number;
 }): Promise<ReleaseProofResult> {
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
@@ -455,65 +470,87 @@ export async function checkReleaseProof(options: {
   const gitTag = `v${version}`;
   const gitTagFound = await gitTagExists(options.cwd, version);
   const commit = await gitCommit(options.cwd);
+  const checkedChannels = options.only ? [options.only] : [...releaseProofChannelIds];
+  const shouldCheck = (channelId: ReleaseProofChannelId) => checkedChannels.includes(channelId);
   const repo = githubRepoFromUrl(packageMetadata.repositoryUrl);
-  const mcpName = packageMetadata.mcpName ?? (await readServerMcpName(options.cwd));
+  const mcpName = shouldCheck('mcp-registry')
+    ? (packageMetadata.mcpName ?? (await readServerMcpName(options.cwd)))
+    : undefined;
 
-  const npmStatus = await checkNpmStatus({
-    cwd: options.cwd,
-    packageName: packageMetadata.name,
-    localVersion: version,
-    registryJson: options.npmRegistryJson,
-    timeoutMs,
-  });
-  const npmChannel = channel(
-    'npm',
-    'npm',
-    npmStatus.status === 'current' ? 'pass' : 'warn',
-    npmStatus.status === 'current'
-      ? `npm latest matches ${packageMetadata.name}@${version}.`
-      : `npm latest does not match ${packageMetadata.name}@${version}.`,
-  );
+  const npmStatus = shouldCheck('npm')
+    ? await checkNpmStatus({
+        cwd: options.cwd,
+        packageName: packageMetadata.name,
+        localVersion: version,
+        registryJson: options.npmRegistryJson,
+        timeoutMs,
+      })
+    : {
+        source: sourceFromSkipped('npm'),
+        status: 'unknown' as const,
+      };
+  const npmChannel = shouldCheck('npm')
+    ? channel(
+        'npm',
+        'npm',
+        npmStatus.status === 'current' ? 'pass' : 'warn',
+        npmStatus.status === 'current'
+          ? `npm latest matches ${packageMetadata.name}@${version}.`
+          : `npm latest does not match ${packageMetadata.name}@${version}.`,
+      )
+    : undefined;
 
   const githubUrl = repo
     ? `https://api.github.com/repos/${repo.owner}/${repo.repo}/releases/tags/${encodeURIComponent(gitTag)}`
     : undefined;
-  const githubResult = options.githubReleaseJson
-    ? parseCapturedJson(options.githubReleaseJson, 'captured GitHub release JSON')
-    : githubUrl
-      ? await fetchJson(githubUrl, timeoutMs)
+  const githubResult = shouldCheck('github-release')
+    ? options.githubReleaseJson
+      ? parseCapturedJson(options.githubReleaseJson, 'captured GitHub release JSON')
+      : githubUrl
+        ? await fetchJson(githubUrl, timeoutMs)
+        : {
+            source: sourceFromError(
+              'GitHub release proof',
+              'package.json repository is not a GitHub repository URL',
+            ),
+          }
+    : { source: sourceFromSkipped('github-release') };
+  const githubProof = shouldCheck('github-release')
+    ? githubResult.value
+      ? githubReleaseProof(githubResult.value, version)
       : {
-          source: sourceFromError(
-            'GitHub release proof',
-            'package.json repository is not a GitHub repository URL',
-          ),
-        };
-  const githubProof = githubResult.value
-    ? githubReleaseProof(githubResult.value, version)
-    : {
-        status: 'warn' as const,
-        message: `GitHub release proof could not be read: ${githubResult.source.error ?? 'unknown error'}.`,
-        url: undefined,
-      };
+          status: 'warn' as const,
+          message: `GitHub release proof could not be read: ${githubResult.source.error ?? 'unknown error'}.`,
+          url: undefined,
+        }
+    : undefined;
 
   const owner = repo?.owner.toLowerCase();
   const imageName = packageMetadata.name.toLowerCase();
   const ghcrUrl = owner ? `https://ghcr.io/v2/${owner}/${imageName}/tags/list` : undefined;
-  const ghcrResult = options.ghcrTagsJson
-    ? parseCapturedJson(options.ghcrTagsJson, 'captured GHCR tag JSON')
-    : ghcrUrl
-      ? await fetchGhcrTagsJson(ghcrUrl, timeoutMs)
+  const ghcrResult = shouldCheck('ghcr')
+    ? options.ghcrTagsJson
+      ? parseCapturedJson(options.ghcrTagsJson, 'captured GHCR tag JSON')
+      : ghcrUrl
+        ? await fetchGhcrTagsJson(ghcrUrl, timeoutMs)
+        : {
+            source: sourceFromError(
+              'GHCR tag proof',
+              'package.json repository owner was not found',
+            ),
+          }
+    : { source: sourceFromSkipped('ghcr') };
+  const ghcr = shouldCheck('ghcr')
+    ? ghcrResult.value
+      ? ghcrProof(ghcrResult.value, version)
       : {
-          source: sourceFromError('GHCR tag proof', 'package.json repository owner was not found'),
-        };
-  const ghcr = ghcrResult.value
-    ? ghcrProof(ghcrResult.value, version)
-    : {
-        status: 'warn' as const,
-        message: `GHCR proof could not be read: ${ghcrResult.source.error ?? 'unknown error'}.`,
-      };
+          status: 'warn' as const,
+          message: `GHCR proof could not be read: ${ghcrResult.source.error ?? 'unknown error'}.`,
+        }
+    : undefined;
 
-  const mcpResult =
-    !mcpName
+  const mcpResult = shouldCheck('mcp-registry')
+    ? !mcpName
       ? {
           source: sourceFromError(
             'MCP Registry proof',
@@ -527,9 +564,10 @@ export async function checkReleaseProof(options: {
               mcpName,
             )}/versions/latest`,
             timeoutMs,
-          );
-  const mcp =
-    !mcpName
+          )
+    : { source: sourceFromSkipped('mcp-registry') };
+  const mcp = shouldCheck('mcp-registry')
+    ? !mcpName
       ? {
           status: 'warn' as const,
           message:
@@ -544,14 +582,23 @@ export async function checkReleaseProof(options: {
         : {
             status: 'warn' as const,
             message: `MCP Registry proof could not be read: ${mcpResult.source.error ?? 'unknown error'}.`,
-          };
+          }
+    : undefined;
 
   const channels = [
     npmChannel,
-    channel('github-release', 'GitHub release', githubProof.status, githubProof.message, githubProof.url),
-    channel('ghcr', 'GHCR', ghcr.status, ghcr.message),
-    channel('mcp-registry', 'MCP Registry', mcp.status, mcp.message),
-  ];
+    githubProof
+      ? channel(
+          'github-release',
+          'GitHub release',
+          githubProof.status,
+          githubProof.message,
+          githubProof.url,
+        )
+      : undefined,
+    ghcr ? channel('ghcr', 'GHCR', ghcr.status, ghcr.message) : undefined,
+    mcp ? channel('mcp-registry', 'MCP Registry', mcp.status, mcp.message) : undefined,
+  ].filter((item): item is ReleaseProofChannel => Boolean(item));
   const status = overallStatus(channels, options.strict ?? false, gitTagFound);
   const withoutMarkdown = {
     overallStatus: status,
@@ -564,6 +611,7 @@ export async function checkReleaseProof(options: {
       tagExists: gitTagFound,
       commit,
     },
+    checkedChannels,
     channels,
     sources: {
       npm: npmStatus.source,

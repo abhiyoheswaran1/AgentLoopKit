@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-23-38-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-23-38",
+  "createdAtEpochMs": 1781559486340,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-add-targeted-release-proof-channel-checks.md",
+    "title": "Add targeted release-proof channel checks",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-23-36-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-23-38-pr-summary.md",
+  "changedFileCount": 28
+}

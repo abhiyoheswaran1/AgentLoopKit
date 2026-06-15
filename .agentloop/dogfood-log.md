@@ -10458,3 +10458,47 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The strict dogfood gate caught weak rollback notes before the task was closed.
 - Improve:
   - Keep imported GitHub metadata out of `ship` scoring until maintainers ask for that signal.
+
+## 2026-06-15: Targeted Release-Proof Channel Checks
+
+- Task contract: `.agentloop/tasks/2026-06-15-add-targeted-release-proof-channel-checks.md`
+- AgentFlight session: `af-20260615-212903-add-targeted-release-proof-channel-checks`
+- Trigger:
+  - `release-proof` checks npm, GitHub Releases, GHCR, and MCP Registry together, but release workflows can finish at different times.
+  - Product-panel read: Elias wanted faster release proof follow-up, Samir wanted no publishing or credential surface, and Nora wanted one explicit flag instead of separate commands.
+- Implementation:
+  - Added red tests for `checkReleaseProof({ only: 'npm' })`, CLI `release-proof --only npm`, and invalid `--only` JSON errors.
+  - Added selected-channel checking while preserving the default all-channel result.
+  - Marked unselected channel sources as skipped in JSON output.
+  - Updated README, CLI reference, release-proof docs, and changelog.
+- Verification:
+  - Red-focused test:
+    - `npm test -- tests/release-proof.test.ts` failed because `--only` was unknown and the core still checked all channels.
+  - Green-focused checks:
+    - `npm test -- tests/release-proof.test.ts`
+    - `npm test -- tests/release-proof.test.ts tests/cli-docs-drift.test.ts tests/public-docs-hygiene.test.ts`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+  - Task verification passed:
+    - `npm test -- tests/release-proof.test.ts`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `.agentloop/reports/2026-06-15-23-36-verification-report.md`
+    - `.agentloop/runs/2026-06-15-23-36-verify`
+  - `npx --yes agentflight verify -- npm test -- tests/release-proof.test.ts` passed:
+    - `.agentflight/evidence/af-20260615-212903-add-targeted-release-proof-channel-checks/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-212903-add-targeted-release-proof-channel-checks/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+  - `npm run build` passed.
+  - Built CLI smoke confirmed `node dist/cli/index.js release-proof --help` exposes `--only <channel>`.
+  - `npm run dogfood:strict` passed with the task in review.
+  - `agentloop ship --json --redact-paths` wrote `.agentloop/reports/2026-06-15-23-37-ship-report.md` with review-readiness score `96`/100.
+  - `agentloop prepare-pr --write --redact-paths` wrote `.agentloop/handoffs/2026-06-15-23-37-pr-description.md`.
+- What worked well:
+  - The existing release-proof source metadata shape let selected mode stay explicit without removing JSON fields.
+- Improve:
+  - If maintainers need repeated targeted checks in CI, consider a documented matrix example that runs each channel separately after release workflows finish.

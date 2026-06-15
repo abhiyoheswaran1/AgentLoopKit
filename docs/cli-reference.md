@@ -417,6 +417,10 @@ agentloop release-proof
 agentloop release-proof --json
 agentloop release-proof --strict
 agentloop release-proof --redact-paths
+agentloop release-proof --only npm
+agentloop release-proof --only github-release
+agentloop release-proof --only ghcr
+agentloop release-proof --only mcp-registry
 agentloop release-proof --npm-registry-json npm-view.json
 agentloop release-proof --github-release-json github-release.json
 agentloop release-proof --ghcr-tags-json ghcr-tags.json
@@ -435,7 +439,7 @@ agentloop npm-status --registry-json npm-view.json
 
 Use `--redact-paths` before pasting release-check output into a public issue, PR, or CI log. Default JSON keeps the absolute Git root for scripts that need it.
 
-`release-proof` checks post-release evidence across public release channels. It reports whether npm, GitHub Releases, GHCR, and MCP Registry proof match the local package version. Use captured JSON flags when you want deterministic CI or release notes without live registry calls. Use `--strict` when missing proof should fail the command.
+`release-proof` checks post-release evidence across public release channels. It reports whether npm, GitHub Releases, GHCR, and MCP Registry proof match the local package version. Use `--only <channel>` to re-check one channel after a delayed workflow. Use captured JSON flags when you want deterministic CI or release notes without live registry calls. Use `--strict` when missing proof should fail the command.
 
 `npm-status` checks registry state without publishing. It validates package names before running `npm view --json <package> version versions`, unless you pass captured registry JSON. It refuses `.env` and `.env.*` paths for `--registry-json`.
 

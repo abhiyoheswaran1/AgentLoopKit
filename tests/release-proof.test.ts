@@ -198,6 +198,35 @@ describe('release proof', () => {
     });
   });
 
+  test('checks only the requested release proof channel', async () => {
+    const dir = await createReleaseProofRepo();
+    const fixtures = proofFixtures();
+
+    const result = await checkReleaseProof({
+      cwd: dir,
+      only: 'npm',
+      npmRegistryJson: fixtures.npmRegistryJson,
+    });
+
+    expect(result.overallStatus).toBe('pass');
+    expect(result.channels).toEqual([expect.objectContaining({ id: 'npm', status: 'pass' })]);
+    expect(result.sources.npm.command).toContain('npm view');
+    expect(result.sources.githubRelease).toMatchObject({
+      command: 'skipped release-proof channel: github-release',
+      exitCode: 0,
+    });
+    expect(result.sources.ghcr).toMatchObject({
+      command: 'skipped release-proof channel: ghcr',
+      exitCode: 0,
+    });
+    expect(result.sources.mcpRegistry).toMatchObject({
+      command: 'skipped release-proof channel: mcp-registry',
+      exitCode: 0,
+    });
+    expect(result.markdown).toContain('Checked channels: `npm`');
+    expect(result.markdown).not.toContain('GitHub release proof could not be read');
+  });
+
   test('CLI prints JSON release proof from captured fixture files', async () => {
     const dir = await createReleaseProofRepo();
     const paths = await writeFixtureFiles(dir);
@@ -230,6 +259,66 @@ describe('release proof', () => {
     expect(output.sources.githubRelease.command).toContain('captured GitHub release JSON');
     expect(output.sources.ghcr.command).toContain('captured GHCR tag JSON');
     expect(output.sources.mcpRegistry.command).toContain('captured MCP Registry JSON');
+  });
+
+  test('CLI prints selected channel proof with --only', async () => {
+    const dir = await createReleaseProofRepo();
+    const paths = await writeFixtureFiles(dir);
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'release-proof',
+        '--json',
+        '--only',
+        'npm',
+        '--npm-registry-json',
+        paths.npmRegistryJsonPath,
+      ],
+      { cwd: dir },
+    );
+
+    expect(result.stderr).toBe('');
+    const output = JSON.parse(result.stdout);
+    expect(output.overallStatus).toBe('pass');
+    expect(output.channels).toEqual([expect.objectContaining({ id: 'npm', status: 'pass' })]);
+    expect(output.sources.githubRelease.command).toBe(
+      'skipped release-proof channel: github-release',
+    );
+    expect(output.sources.ghcr.command).toBe('skipped release-proof channel: ghcr');
+    expect(output.sources.mcpRegistry.command).toBe('skipped release-proof channel: mcp-registry');
+  });
+
+  test('CLI rejects invalid --only values before reading proof files', async () => {
+    const dir = await createReleaseProofRepo();
+    const missingCapturePath = path.join(dir, 'missing-npm-view.json');
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'release-proof',
+        '--json',
+        '--only',
+        'homebrew',
+        '--npm-registry-json',
+        missingCapturePath,
+      ],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).not.toContain(missingCapturePath);
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'RELEASE_PROOF_ONLY_INVALID',
+        message: 'Release proof --only must be one of: npm, github-release, ghcr, mcp-registry.',
+        requestedOnly: 'homebrew',
+        allowed: ['npm', 'github-release', 'ghcr', 'mcp-registry'],
+      },
+    });
   });
 
   test('CLI prints JSON warning instead of crashing when MCP metadata is absent', async () => {

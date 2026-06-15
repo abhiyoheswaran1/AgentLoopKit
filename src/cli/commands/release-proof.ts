@@ -1,16 +1,26 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Command } from 'commander';
-import { checkReleaseProof } from '../../core/release-proof.js';
+import {
+  checkReleaseProof,
+  releaseProofChannelIds,
+  type ReleaseProofChannelId,
+} from '../../core/release-proof.js';
 import { resolveAgentLoopWorkspaceCwd } from '../../core/config.js';
 
 type ReleaseProofCapture = 'npm-registry' | 'github-release' | 'ghcr' | 'mcp-registry';
-type ReleaseProofCaptureErrorReason =
-  | 'missing'
-  | 'unreadable'
-  | 'invalid-json'
-  | 'env-file';
+type ReleaseProofCaptureErrorReason = 'missing' | 'unreadable' | 'invalid-json' | 'env-file';
 type ReleaseProofTimeoutErrorReason = 'not-positive-integer';
+
+class ReleaseProofOnlyError extends Error {
+  public readonly code = 'RELEASE_PROOF_ONLY_INVALID';
+  public readonly allowed = [...releaseProofChannelIds];
+
+  constructor(public readonly requestedOnly: string) {
+    super(`Release proof --only must be one of: ${releaseProofChannelIds.join(', ')}.`);
+    this.name = 'ReleaseProofOnlyError';
+  }
+}
 
 class ReleaseProofCaptureError extends Error {
   public readonly code = 'RELEASE_PROOF_CAPTURE_INVALID';
@@ -43,6 +53,21 @@ function parseTimeout(value: unknown) {
     throw new ReleaseProofTimeoutError(rawValue);
   }
   return parsed;
+}
+
+function parseOnly(value: unknown): ReleaseProofChannelId | undefined {
+  if (value === undefined) return undefined;
+  const requestedOnly = typeof value === 'string' ? value : String(value);
+  if ((releaseProofChannelIds as readonly string[]).includes(requestedOnly)) {
+    return requestedOnly as ReleaseProofChannelId;
+  }
+  throw new ReleaseProofOnlyError(requestedOnly);
+}
+
+function captureMatchesOnly(proof: ReleaseProofCapture, only: ReleaseProofChannelId | undefined) {
+  if (!only) return true;
+  if (proof === 'npm-registry') return only === 'npm';
+  return proof === only;
 }
 
 function captureLabel(proof: ReleaseProofCapture) {
@@ -139,12 +164,34 @@ function printTimeoutError(error: ReleaseProofTimeoutError) {
   process.exitCode = 1;
 }
 
+function printOnlyError(error: ReleaseProofOnlyError) {
+  console.log(
+    JSON.stringify(
+      {
+        error: {
+          code: error.code,
+          message: error.message,
+          requestedOnly: error.requestedOnly,
+          allowed: error.allowed,
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  process.exitCode = 1;
+}
+
 export function releaseProofCommand() {
   return new Command('release-proof')
     .description('Check post-release evidence across public release channels')
     .option('--json', 'print machine-readable output')
     .option('--strict', 'treat warning checks as failures')
-    .option('--redact-paths', 'accepted for output consistency; release proof prints no local roots')
+    .option(
+      '--redact-paths',
+      'accepted for output consistency; release proof prints no local roots',
+    )
+    .option('--only <channel>', `check one channel only (${releaseProofChannelIds.join(', ')})`)
     .option('--timeout-ms <ms>', 'public metadata check timeout in milliseconds', '15000')
     .option(
       '--npm-registry-json <path>',
@@ -158,6 +205,7 @@ export function releaseProofCommand() {
         json?: boolean;
         strict?: boolean;
         redactPaths?: boolean;
+        only?: string;
         timeoutMs: string;
         npmRegistryJson?: string;
         githubReleaseJson?: string;
@@ -169,22 +217,32 @@ export function releaseProofCommand() {
         let githubReleaseJson: string | undefined;
         let ghcrTagsJson: string | undefined;
         let mcpRegistryJson: string | undefined;
+        let only: ReleaseProofChannelId | undefined;
 
         try {
+          only = parseOnly(options.only);
           timeoutMs = parseTimeout(options.timeoutMs);
-          npmRegistryJson = options.npmRegistryJson
-            ? await readCaptureJsonFile('npm-registry', options.npmRegistryJson)
-            : undefined;
-          githubReleaseJson = options.githubReleaseJson
-            ? await readCaptureJsonFile('github-release', options.githubReleaseJson)
-            : undefined;
-          ghcrTagsJson = options.ghcrTagsJson
-            ? await readCaptureJsonFile('ghcr', options.ghcrTagsJson)
-            : undefined;
-          mcpRegistryJson = options.mcpRegistryJson
-            ? await readCaptureJsonFile('mcp-registry', options.mcpRegistryJson)
-            : undefined;
+          npmRegistryJson =
+            options.npmRegistryJson && captureMatchesOnly('npm-registry', only)
+              ? await readCaptureJsonFile('npm-registry', options.npmRegistryJson)
+              : undefined;
+          githubReleaseJson =
+            options.githubReleaseJson && captureMatchesOnly('github-release', only)
+              ? await readCaptureJsonFile('github-release', options.githubReleaseJson)
+              : undefined;
+          ghcrTagsJson =
+            options.ghcrTagsJson && captureMatchesOnly('ghcr', only)
+              ? await readCaptureJsonFile('ghcr', options.ghcrTagsJson)
+              : undefined;
+          mcpRegistryJson =
+            options.mcpRegistryJson && captureMatchesOnly('mcp-registry', only)
+              ? await readCaptureJsonFile('mcp-registry', options.mcpRegistryJson)
+              : undefined;
         } catch (error) {
+          if (options.json && error instanceof ReleaseProofOnlyError) {
+            printOnlyError(error);
+            return;
+          }
           if (options.json && error instanceof ReleaseProofTimeoutError) {
             printTimeoutError(error);
             return;
@@ -199,6 +257,7 @@ export function releaseProofCommand() {
         const result = await checkReleaseProof({
           cwd: await resolveAgentLoopWorkspaceCwd(process.cwd()),
           strict: options.strict,
+          only,
           timeoutMs,
           npmRegistryJson,
           githubReleaseJson,

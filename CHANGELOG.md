@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added `agentloop release-proof --only <channel>` for targeted npm, GitHub Release, GHCR, or MCP Registry proof checks.
+- Changed imported GitHub metadata normalization to bound long titles, states, URLs, authors, labels, branch names, and body excerpts before storage or rendering.
+- Fixed local policy-pack reading so symlinked policy files must resolve inside the pack's `policies/` directory and the repository.
+- Hardened public-doc hygiene checks against unsupported channel claims, fake adoption copy, testimonial language, and premature Pro/SaaS upgrade copy.
 - Added `agentloop task doctor` warnings for open task contracts that still contain AgentLoopKit placeholder text in review-critical sections.
 - Added `--redact-paths` to `agentloop verify` so verification reports and run-ledger copies can be shared without exposing local absolute roots from command output.
 - Added `--redact-paths` to `agentloop summarize` and `agentloop handoff` so reviewer Markdown can be shared without exposing local absolute roots.

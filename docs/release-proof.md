@@ -14,11 +14,17 @@ agentloop release-proof
 agentloop release-proof --json
 agentloop release-proof --strict
 agentloop release-proof --redact-paths
+agentloop release-proof --only npm
+agentloop release-proof --only github-release
+agentloop release-proof --only ghcr
+agentloop release-proof --only mcp-registry
 ```
 
 The command compares each channel with the local `package.json` version. It also checks whether the local git tag `v<version>` exists.
 
 If a repository does not publish an MCP server, `release-proof` still checks npm, GitHub Releases, and GHCR. The MCP Registry channel reports a warning instead of stopping the command. Use `--strict` when that warning should fail a release gate.
+
+Use `--only <channel>` when one workflow lagged and you want to re-check that channel without querying the others. Selected-channel mode still checks the local git tag and compares the selected channel with the local package version. JSON output marks unselected channel sources as skipped.
 
 ## Captured Proof
 
@@ -86,6 +92,8 @@ Human output includes:
 JSON output includes the same fields plus source metadata for each proof channel.
 
 For MCP Registry proof, AgentLoopKit looks for `package.json` `mcpName` or `server.json` `name`. Repositories without either field get an MCP warning while the other channels continue to report normally.
+
+When you combine `--only` with captured JSON flags, AgentLoopKit reads only the selected channel's capture file. It ignores captured files for unselected channels.
 
 ## Exit Codes
 

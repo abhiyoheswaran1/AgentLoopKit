@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-23-36-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-23-36",
+  "createdAtEpochMs": 1781559384555,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-add-targeted-release-proof-channel-checks.md",
+    "title": "Add targeted release-proof channel checks",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-23-36-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 11
+}
