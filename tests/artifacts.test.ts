@@ -93,6 +93,12 @@ async function createRepoWithArtifacts() {
   );
   await writeEvidenceFile(
     dir,
+    '.agentloop/reports/2026-06-10-10-07-ship-report.md',
+    '# Old Ship Report\n',
+    '2026-06-10T10:07:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
     '.agentloop/reports/2026-06-10-10-10-agentloop-report.html',
     '<!doctype html><title>AgentLoopKit Report</title>',
     '2026-06-10T10:10:00.000Z',
@@ -141,6 +147,12 @@ async function createRepoWithArtifacts() {
     },
     '2026-06-10T10:35:00.000Z',
   );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/reports/2026-06-10-10-35-ship-report.md',
+    '# Latest Ship Report\n',
+    '2026-06-10T10:35:00.000Z',
+  );
   await writeFile(path.join(dir, '.env'), 'AGENTLOOP_SECRET=do-not-print-this-fixture\n');
   return dir;
 }
@@ -166,6 +178,12 @@ async function createRepoWithMarkdownEdgeArtifacts() {
     '.agentloop/handoffs/2026-06-11-10-05-pr-summary.md',
     '# Handoff `summary`\n',
     '2026-06-11T10:05:00.000Z',
+  );
+  await writeEvidenceFile(
+    dir,
+    '.agentloop/reports/2026-06-11-10-07-ship-report.md',
+    '# Ship `report`\n',
+    '2026-06-11T10:07:00.000Z',
   );
   await writeEvidenceFile(
     dir,
@@ -353,6 +371,13 @@ describe('artifacts command', () => {
           title: 'Latest Handoff',
         },
       },
+      shipReports: {
+        count: 2,
+        latest: {
+          path: '.agentloop/reports/2026-06-10-10-35-ship-report.md',
+          title: 'Latest Ship Report',
+        },
+      },
       htmlReports: {
         count: 1,
         latest: {
@@ -415,6 +440,10 @@ describe('artifacts command', () => {
     expect(result.stdout).toContain(
       '- Latest handoff: `Latest Handoff` - `.agentloop/handoffs/2026-06-10-10-05-pr-summary.md`',
     );
+    expect(result.stdout).toContain('- Ship reports: 2');
+    expect(result.stdout).toContain(
+      '- Latest ship report: `Latest Ship Report` - `.agentloop/reports/2026-06-10-10-35-ship-report.md`',
+    );
     expect(result.stdout).toContain(
       '- Latest HTML report: `.agentloop/reports/2026-06-10-10-10-agentloop-report.html`',
     );
@@ -467,6 +496,9 @@ describe('artifacts command', () => {
       '- Latest handoff: `` Handoff `summary` `` - `.agentloop/handoffs/2026-06-11-10-05-pr-summary.md`',
     );
     expect(fullResult.stdout).toContain(
+      '- Latest ship report: `` Ship `report` `` - `.agentloop/reports/2026-06-11-10-07-ship-report.md`',
+    );
+    expect(fullResult.stdout).toContain(
       '- Latest HTML report: ``.agentloop/reports/agentloop`report.html``',
     );
     expect(fullResult.stdout).toContain(
@@ -493,6 +525,9 @@ describe('artifacts command', () => {
       title: 'Verification `report`',
       overallStatus: 'pass',
     });
+    expect(inventory.shipReports.latest).toMatchObject({
+      title: 'Ship `report`',
+    });
   });
 
   test('filters JSON inventory by artifact type', async () => {
@@ -516,6 +551,27 @@ describe('artifacts command', () => {
           path: '.agentloop/reports/2026-06-10-10-00-verification-report.md',
           title: 'Latest Verification',
           overallStatus: 'pass',
+        },
+      },
+    });
+  });
+
+  test('filters JSON inventory by ship report artifact type', async () => {
+    const dir = await createRepoWithArtifacts();
+
+    const result = await execa(tsxPath, [cliPath, 'artifacts', '--json', '--type', 'ship-report'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      shipReports: {
+        count: 2,
+        latest: {
+          path: '.agentloop/reports/2026-06-10-10-35-ship-report.md',
+          title: 'Latest Ship Report',
         },
       },
     });
@@ -549,6 +605,11 @@ describe('artifacts command', () => {
           type: 'handoff',
           path: '.agentloop/handoffs/2026-06-10-10-05-pr-summary.md',
           title: 'Latest Handoff',
+        },
+        {
+          type: 'ship-report',
+          path: '.agentloop/reports/2026-06-10-10-35-ship-report.md',
+          title: 'Latest Ship Report',
         },
         {
           type: 'html-report',
@@ -667,6 +728,26 @@ describe('artifacts command', () => {
 `);
   });
 
+  test('prints only latest matching ship report artifact in markdown', async () => {
+    const dir = await createRepoWithArtifacts();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--type', 'ship-report', '--latest'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toBe(`# AgentLoopKit Artifacts
+
+- Latest ship report: \`Latest Ship Report\` - \`.agentloop/reports/2026-06-10-10-35-ship-report.md\`
+`);
+  });
+
   test('previews stale evidence candidates without mutating files', async () => {
     const dir = await createRepoWithStaleEvidence();
     const before = await snapshotTree(path.join(dir, '.agentloop'));
@@ -760,6 +841,65 @@ describe('artifacts command', () => {
       '- `run` `.agentloop/runs/2026-06-10-09-30-verify` - Older run ledger entry; latest run evidence is kept.',
     );
     expect(markdownResult.stdout).toContain('- Showing `4` of `4` candidate(s).');
+    expect(await snapshotTree(path.join(dir, '.agentloop'))).toEqual(before);
+  });
+
+  test('filters stale evidence preview to ship report candidates', async () => {
+    const dir = await createRepoWithStaleEvidence();
+    const before = await snapshotTree(path.join(dir, '.agentloop'));
+
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--stale', '--type', 'ship-report', '--json'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+    const markdownResult = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--stale', '--type', 'ship-report'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(jsonResult.stderr).toBe('');
+    expect(JSON.parse(jsonResult.stdout)).toMatchObject({
+      stale: {
+        candidateCount: 1,
+        keptCount: 1,
+        shownCandidateCount: 1,
+        hiddenCandidateCount: 0,
+        limit: null,
+        candidates: [
+          {
+            type: 'ship-report',
+            path: '.agentloop/reports/2026-06-10-09-10-ship-report.md',
+            reason: 'Older ship report; latest ship evidence is kept.',
+          },
+        ],
+        kept: [
+          {
+            type: 'ship-report',
+            path: '.agentloop/reports/2026-06-10-10-10-ship-report.md',
+            reason: 'Latest ship report.',
+          },
+        ],
+      },
+    });
+
+    expect(markdownResult.exitCode).toBe(0);
+    expect(markdownResult.stderr).toBe('');
+    expect(markdownResult.stdout).toContain(
+      '- `ship-report` `.agentloop/reports/2026-06-10-09-10-ship-report.md` - Older ship report; latest ship evidence is kept.',
+    );
+    expect(markdownResult.stdout).toContain('- Showing `1` of `1` candidate(s).');
+    expect(markdownResult.stdout).not.toContain('verification-report.md');
+    expect(markdownResult.stdout).not.toContain('pr-summary.md');
+    expect(markdownResult.stdout).not.toContain('.agentloop/runs/');
     expect(await snapshotTree(path.join(dir, '.agentloop'))).toEqual(before);
   });
 
@@ -891,6 +1031,7 @@ Next step: run \`agentloop handoff\` to create a handoff summary.
       tasks: { count: 0, byStatus: {}, latest: null },
       verificationReports: { count: 0, latest: null },
       handoffs: { count: 0, latest: null },
+      shipReports: { count: 0, latest: null },
       htmlReports: { count: 0, latest: null },
       badges: { count: 0, latest: null },
       ciSummaries: { count: 0, latest: null },
@@ -921,6 +1062,7 @@ Next step: run \`agentloop handoff\` to create a handoff summary.
           'task',
           'verification',
           'handoff',
+          'ship-report',
           'html-report',
           'badge',
           'ci-summary',

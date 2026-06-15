@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-21-52-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-21-52",
+  "createdAtEpochMs": 1781553175799,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-filter-ship-report-artifacts.md",
+    "title": "Filter ship report artifacts",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-21-50-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-21-52-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-21-52-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 26
+}

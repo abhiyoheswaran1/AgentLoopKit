@@ -28,6 +28,7 @@ export const artifactInventoryTypes = [
   'task',
   'verification',
   'handoff',
+  'ship-report',
   'html-report',
   'badge',
   'ci-summary',
@@ -86,6 +87,10 @@ export type ArtifactInventory = {
     count: number;
     latest: ArtifactInventoryNamedArtifact | null;
   };
+  shipReports: {
+    count: number;
+    latest: ArtifactInventoryNamedArtifact | null;
+  };
   htmlReports: {
     count: number;
     latest: ArtifactInventoryPathArtifact | null;
@@ -117,6 +122,7 @@ export type LatestArtifactInventoryItem =
   | ({ type: 'task' } & ArtifactInventoryTask)
   | ({ type: 'verification' } & ArtifactInventoryVerification)
   | ({ type: 'handoff' } & ArtifactInventoryNamedArtifact)
+  | ({ type: 'ship-report' } & ArtifactInventoryNamedArtifact)
   | ({ type: 'html-report' } & ArtifactInventoryPathArtifact)
   | ({ type: 'badge' } & ArtifactInventoryPathArtifact)
   | ({ type: 'ci-summary' } & ArtifactInventoryNamedArtifact)
@@ -196,6 +202,7 @@ const artifactInventoryJsonKeys: Record<ArtifactInventoryFilterType, ArtifactInv
   task: 'tasks',
   verification: 'verificationReports',
   handoff: 'handoffs',
+  'ship-report': 'shipReports',
   'html-report': 'htmlReports',
   badge: 'badges',
   'ci-summary': 'ciSummaries',
@@ -207,6 +214,7 @@ const artifactInventoryDisplayLabels: Record<ArtifactInventoryFilterType, string
   task: 'task',
   verification: 'verification report',
   handoff: 'handoff',
+  'ship-report': 'ship report',
   'html-report': 'HTML report',
   badge: 'badge',
   'ci-summary': 'CI summary',
@@ -218,6 +226,7 @@ const artifactInventoryNextSteps: Record<ArtifactInventoryFilterType, string> = 
   task: 'run `agentloop create-task` to create a task contract.',
   verification: 'run `agentloop verify` to create a verification report.',
   handoff: 'run `agentloop handoff` to create a handoff summary.',
+  'ship-report': 'run `agentloop ship` to create a review-readiness ship report.',
   'html-report': 'run `agentloop report` to create a local HTML report.',
   badge: 'run `agentloop badge` to create a local SVG evidence badge.',
   'ci-summary': 'run `agentloop ci-summary --write` to create a local CI summary.',
@@ -504,6 +513,7 @@ export async function getArtifactInventory(options: {
     taskFiles,
     verificationFiles,
     handoffFiles,
+    shipReportFiles,
     htmlReportFiles,
     badgeFiles,
     ciSummaryFiles,
@@ -527,6 +537,12 @@ export async function getArtifactInventory(options: {
       dir: handoffsDir,
       extension: '.md',
       pattern: prSummaryPattern,
+    }),
+    listInventoryFiles({
+      cwd: options.cwd,
+      dir: reportsDir,
+      extension: '.md',
+      pattern: shipReportPattern,
     }),
     listInventoryFiles({
       cwd: options.cwd,
@@ -559,6 +575,9 @@ export async function getArtifactInventory(options: {
   const latestHandoff = handoffFiles.at(-1)
     ? await readNamedInventory(options.cwd, handoffFiles.at(-1) as InventoryFile)
     : null;
+  const latestShipReport = shipReportFiles.at(-1)
+    ? await readNamedInventory(options.cwd, shipReportFiles.at(-1) as InventoryFile)
+    : null;
   const latestCiSummary = ciSummaryFiles.at(-1)
     ? await readNamedInventory(options.cwd, ciSummaryFiles.at(-1) as InventoryFile)
     : null;
@@ -579,6 +598,10 @@ export async function getArtifactInventory(options: {
     handoffs: {
       count: handoffFiles.length,
       latest: latestHandoff,
+    },
+    shipReports: {
+      count: shipReportFiles.length,
+      latest: latestShipReport,
     },
     htmlReports: {
       count: htmlReportFiles.length,
@@ -725,7 +748,7 @@ export async function getStaleArtifactPreview(options: {
   if (includeStaleType(options.type, 'handoff')) {
     keepLatestFile(kept, protectedPaths, options.cwd, 'handoff', latestHandoff);
   }
-  if (!options.type) {
+  if (includeStaleType(options.type, 'ship-report')) {
     keepLatestFile(kept, protectedPaths, options.cwd, 'ship-report', latestShipReport);
   }
   if (includeStaleType(options.type, 'run') && latestRun) {
@@ -750,7 +773,7 @@ export async function getStaleArtifactPreview(options: {
   if (includeStaleType(options.type, 'handoff')) {
     collectStaleFiles(candidates, protectedPaths, options.cwd, 'handoff', handoffFiles);
   }
-  if (!options.type) {
+  if (includeStaleType(options.type, 'ship-report')) {
     collectStaleFiles(candidates, protectedPaths, options.cwd, 'ship-report', shipReportFiles);
   }
   if (includeStaleType(options.type, 'run')) {
@@ -841,6 +864,8 @@ function latestArtifactForType(
         : null;
     case 'handoff':
       return inventory.handoffs.latest ? { type, ...inventory.handoffs.latest } : null;
+    case 'ship-report':
+      return inventory.shipReports.latest ? { type, ...inventory.shipReports.latest } : null;
     case 'html-report':
       return inventory.htmlReports.latest ? { type, ...inventory.htmlReports.latest } : null;
     case 'badge':
@@ -940,6 +965,8 @@ function formatTypeCountLine(inventory: ArtifactInventory, type: ArtifactInvento
       return `- Verification reports: ${inventory.verificationReports.count}`;
     case 'handoff':
       return `- Handoffs: ${inventory.handoffs.count}`;
+    case 'ship-report':
+      return `- Ship reports: ${inventory.shipReports.count}`;
     case 'html-report':
       return `- HTML reports: ${inventory.htmlReports.count}`;
     case 'badge':
@@ -969,6 +996,8 @@ function formatTypeLatestLine(inventory: ArtifactInventory, type: ArtifactInvent
         : '- Latest verification: not found';
     case 'handoff':
       return formatNamedArtifact('Latest handoff', inventory.handoffs.latest);
+    case 'ship-report':
+      return formatNamedArtifact('Latest ship report', inventory.shipReports.latest);
     case 'html-report':
       return formatPathArtifact('Latest HTML report', inventory.htmlReports.latest);
     case 'badge':
@@ -1054,6 +1083,8 @@ ${
 }
 - Handoffs: ${inventory.handoffs.count}
 ${formatNamedArtifact('Latest handoff', inventory.handoffs.latest)}
+- Ship reports: ${inventory.shipReports.count}
+${formatNamedArtifact('Latest ship report', inventory.shipReports.latest)}
 - HTML reports: ${inventory.htmlReports.count}
 ${formatPathArtifact('Latest HTML report', inventory.htmlReports.latest)}
 - Badges: ${inventory.badges.count}

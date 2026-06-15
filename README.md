@@ -199,7 +199,7 @@ agentloopkit init
 | `agentloop show-run <id>`        | Show one local run ledger entry                                                |
 | `agentloop intent <file>`        | Show which runs touched a file and why                                         |
 | `agentloop maintainer-check`     | Check whether an AI-assisted PR is reviewable                                  |
-| `agentloop artifacts`            | Inventory local tasks, reports, handoffs, badges, and run evidence             |
+| `agentloop artifacts`            | Inventory local tasks, reports, ship reports, badges, and run evidence         |
 | `agentloop artifacts --stale`    | Preview capped older local evidence candidates without deleting files          |
 | `agentloop upgrade-harness`      | Inspect older generated guidance without overwriting local edits               |
 | `agentloop report`               | Write a local static HTML evidence report                                      |

@@ -2,6 +2,50 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-15: Ship Report Artifact Filtering
+
+- Task contract: `.agentloop/tasks/archive/2026-06-15-filter-ship-report-artifacts.md`
+- Trigger:
+  - Ship reports are core review-readiness evidence, but `agentloop artifacts --type ship-report` did not work.
+  - Dogfooding stale evidence previews showed ship reports internally, but users could not inspect only ship report inventory or stale candidates.
+- Implementation:
+  - Added `ship-report` as a supported artifact inventory type.
+  - Added `shipReports` counts and latest ship report metadata to JSON inventory.
+  - Added Markdown inventory lines for ship report counts and latest ship report.
+  - Added `agentloop artifacts --type ship-report`, `--type ship-report --latest`, and `--stale --type ship-report`.
+  - Updated README, CLI reference, getting-started docs, and backlog notes.
+- Product-panel decision:
+  - Lina wanted precise evidence inspection during long agent runs.
+  - Nora wanted the command grammar to stay consistent instead of adding a stale-only special case.
+  - Samir kept the command read-only and blocked cleanup automation.
+  - Tom wanted deterministic local evidence, not vague artifact buckets.
+- Verification:
+  - Red TDD run failed before `ship-report` was a supported artifact type:
+    - `npm test -- tests/artifacts.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/artifacts.test.ts`
+  - Unit, typecheck, lint, public-doc hygiene, and link checks passed:
+    - `npm run test:unit`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+  - AgentLoopKit task verification passed and wrote run evidence:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-15-filter-ship-report-artifacts.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+  - Build passed:
+    - `npm run build`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/artifacts.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+  - Strict dogfood passed after generating fresh handoff evidence:
+    - `npm run dogfood:strict`
+- What worked well:
+  - The existing artifact inventory pattern made ship reports a first-class evidence type without adding new command surface.
+  - Strict dogfood confirmed the live repo inventory now includes `shipReports`.
+- Improve:
+  - If users ask for cleanup workflows, keep them read-only by default and require explicit manual action.
+
 ## 2026-06-15: Default Bounded Stale Evidence Preview
 
 - Task contract: `.agentloop/tasks/2026-06-15-bound-stale-preview-markdown-by-default.md`
