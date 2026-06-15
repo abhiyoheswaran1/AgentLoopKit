@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-00-31-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-00-31",
+  "createdAtEpochMs": 1781562676825,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-make-doctor-output-markdown-safe.md",
+    "title": "Make doctor output Markdown-safe",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-00-27-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-00-31-pr-summary.md",
+  "changedFileCount": 31
+}

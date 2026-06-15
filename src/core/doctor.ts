@@ -6,7 +6,12 @@ import { pathExists, readTextIfExists } from './file-system.js';
 import { commandExists, getGitRoot, getGitStatus, isInsideGitRepo } from './git.js';
 import { inlineCode } from './markdown-format.js';
 import { detectPackageManager } from './package-manager.js';
-import { detectMonorepo, detectPackageScripts, detectProjectType } from './project-detection.js';
+import {
+  detectMonorepo,
+  detectPackageScripts,
+  detectProjectName,
+  detectProjectType,
+} from './project-detection.js';
 import { detectRiskFileScan } from './safety.js';
 import { inspectHarnessUpgrade } from './upgrade-harness.js';
 
@@ -185,7 +190,7 @@ function renderNextActions(nextActions: DoctorNextAction[]) {
   if (!nextActions.length) {
     return `## Next Steps
 
-No doctor follow-up required. Create a task with ${inlineCode(
+No doctor follow-up required. Create a task with ${doctorInlineCode(
       'agentloop create-task',
     )} when you are ready to start work.
 `;
@@ -194,9 +199,13 @@ No doctor follow-up required. Create a task with ${inlineCode(
   return `## Next Steps
 
 ${nextActions
-  .map((item) => `- Run ${inlineCode(item.command)}: ${inlineCode(item.reason)}`)
+  .map((item) => `- Run ${doctorInlineCode(item.command)}: ${doctorInlineCode(item.reason)}`)
   .join('\n')}
 `;
+}
+
+function doctorInlineCode(value: string) {
+  return inlineCode(value.replace(/\r/g, '\\r').replace(/\n/g, '\\n'));
 }
 
 function determineOverallStatus(input: {
@@ -383,9 +392,11 @@ export async function runDoctor(options: {
   }
 
   const packageManager = await detectPackageManager(cwd);
+  const projectName = await detectProjectName(cwd);
   const projectType = await detectProjectType(cwd);
   const monorepo = await detectMonorepo(cwd);
   const commands = await detectPackageScripts(cwd, packageManager);
+  checks.push(check('Package name', 'pass', projectName));
   checks.push(check('Package manager', 'pass', packageManager));
   checks.push(check('Project type', 'pass', projectType));
   checks.push(
@@ -454,7 +465,9 @@ export async function runDoctor(options: {
 
 ${outputChecks
   .map((item) => {
-    return `- [${inlineCode(item.status)}] ${inlineCode(item.name)}: ${inlineCode(item.message)}`;
+    return `- [${doctorInlineCode(item.status)}] ${doctorInlineCode(
+      item.name,
+    )}: ${doctorInlineCode(item.message)}`;
   })
   .join('\n')}
 

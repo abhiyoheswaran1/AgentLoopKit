@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added a `Package name` doctor check and made human-readable doctor output render dynamic values as single-line inline code while preserving raw JSON values.
 - Added shell completion values for artifact types, badge sources, `summarize` and `handoff` formats, and the `task archive --status done` value.
 - Added shell completion values for `agentloop release-proof --only` channels.
 - Added `agentloop release-proof --only <channel>` for targeted npm, GitHub Release, GHCR, or MCP Registry proof checks.

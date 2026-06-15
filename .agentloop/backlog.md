@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 116 Decisions
+
+| item                        | source persona   | problem                                                                                         | proposed solution                                                                                          | priority | effort | adoption impact | risk | decision | notes                                                                                                    |
+| --------------------------- | ---------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| Markdown-safe doctor output | Samir, Nora, Tom | Doctor output is often pasted into Markdown, but unusual dynamic values could break list shape. | Render human doctor dynamic values as single-line inline code and add package-name context; keep JSON raw. | P1       | S      | medium          | low  | do now   | Safety/trust polish only. No exit-code, risk-scan, release, registry, or global Markdown-helper changes. |
+
 ## Current Research Cycle 115 Decisions
 
 | item                                    | source persona  | problem                                                                 | proposed solution                                                                                                   | priority | effort | adoption impact | risk | decision | notes                                                                                         |

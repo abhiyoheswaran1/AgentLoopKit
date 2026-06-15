@@ -1,0 +1,7 @@
+ .agentloop/backlog.md   |  6 +++++
+ CHANGELOG.md            |  1 +
+ docs/cli-reference.md   |  3 ++-
+ docs/getting-started.md |  3 ++-
+ src/core/doctor.ts      | 21 ++++++++++++++----
+ tests/doctor.test.ts    | 58 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 86 insertions(+), 6 deletions(-)

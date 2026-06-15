@@ -2,6 +2,47 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Doctor Output
+
+- Task contract: `.agentloop/tasks/archive/2026-06-16-make-doctor-output-markdown-safe.md`
+- Trigger:
+  - `agentloop doctor` is often pasted into Markdown issues, PRs, and handoffs.
+  - Dogfooding showed that dynamic values were already wrapped in inline code, but line breaks in unusual local values could still break Markdown list shape.
+- Implementation:
+  - Added a `Package name` doctor check from existing project-name detection.
+  - Kept doctor JSON values raw for scripts and machine consumers.
+  - Rendered human-readable doctor check values and next-step values as single-line inline code by turning CR/LF into visible `\r` and `\n` text before Markdown rendering.
+  - Updated getting-started, CLI reference, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized safe copy/paste behavior for public logs.
+  - Nora wanted clearer doctor context without adding a new command.
+  - Tom wanted deterministic rendering rather than vague safety language.
+  - Maya kept the change local to doctor instead of changing global Markdown helpers.
+- Verification:
+  - Red TDD run failed before package-name output and single-line dynamic rendering existed:
+    - `npm test -- tests/doctor.test.ts`
+  - Focused task verification passed and wrote AgentLoop evidence:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-doctor-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+  - Focused adjacent tests passed:
+    - `npm test -- tests/doctor.test.ts tests/init.test.ts tests/cli-docs-drift.test.ts`
+  - Static and docs checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full Vitest passed:
+    - `npm test`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/doctor.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The red test reproduced Markdown list injection with a package name and risk path containing line breaks.
+  - Keeping the fix in doctor avoided changing rendering semantics for unrelated commands.
+- Improve:
+  - Continue the Markdown-safe output pass command by command instead of introducing a broad sanitizer without tests.
+
 ## 2026-06-16: Fixed Option Shell Completions
 
 - Task contract: `.agentloop/tasks/archive/2026-06-15-complete-fixed-option-completions.md`

@@ -1,0 +1,8 @@
+ .agentloop/backlog.md     |  6 +++++
+ .agentloop/dogfood-log.md | 41 +++++++++++++++++++++++++++++++++
+ CHANGELOG.md              |  1 +
+ docs/cli-reference.md     |  3 ++-
+ docs/getting-started.md   |  3 ++-
+ src/core/doctor.ts        | 21 +++++++++++++----
+ tests/doctor.test.ts      | 58 +++++++++++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 127 insertions(+), 6 deletions(-)

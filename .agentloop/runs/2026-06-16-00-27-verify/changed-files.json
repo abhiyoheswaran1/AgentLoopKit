@@ -1,0 +1,34 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/getting-started.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/doctor.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/doctor.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-16-00-27-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-16-make-doctor-output-markdown-safe.md"
+  }
+]

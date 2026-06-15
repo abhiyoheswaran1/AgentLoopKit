@@ -357,6 +357,65 @@ describe('doctor', () => {
     );
   });
 
+  test('doctor human output renders dynamic values as single-line inline code', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await mkdir(path.join(dir, 'src'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'src', 'auth\n- [x] injected.ts'),
+      'export const auth = true;\n',
+    );
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify(
+        {
+          name: 'demo*pkg\n- [x] injected',
+          version: '1.0.0',
+          scripts: {
+            test: 'echo test',
+            lint: 'echo lint',
+            typecheck: 'echo typecheck',
+            build: 'echo build',
+          },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const humanResult = await execa(tsxPath, [cliPath, 'doctor'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'doctor', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain('- [`pass`] `Package name`: `demo*pkg\\n- [x] injected`');
+    expect(humanResult.stdout).toContain(
+      '- [`warn`] `Risk files: auth`: `1 detected: src/auth\\n- [x] injected.ts`',
+    );
+    expect(humanResult.stdout).not.toContain('\n- [x] injected`:');
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'Package name',
+          status: 'pass',
+          message: 'demo*pkg\n- [x] injected',
+        }),
+        expect.objectContaining({
+          name: 'Risk files: auth',
+          status: 'warn',
+          message: '1 detected: src/auth\n- [x] injected.ts',
+        }),
+      ]),
+    );
+  });
+
   test('warns when template manifest is stale, invalid, or newer than the CLI', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
