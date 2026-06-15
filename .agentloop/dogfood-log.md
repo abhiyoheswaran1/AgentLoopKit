@@ -10318,3 +10318,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The strict dogfood gate again forced fresh reviewer handoff evidence before the work could be considered ready.
 - Improve:
   - Consider adding a lighter release-smoke grouping later if full CLI smoke runtime becomes too slow for everyday development.
+
+## 2026-06-15: Release Proof Missing-MCP Hardening
+
+- Task contract: `.agentloop/tasks/2026-06-15-add-local-release-proof-helper.md`
+- AgentFlight session: `af-20260615-203342-add-local-release-proof-helper`
+- Trigger:
+  - `agentloop release-proof` already existed, but dogfood review found a real product gap: a repo without MCP server metadata caused the command to crash before npm, GitHub Release, and GHCR proof could be reported.
+  - Product-panel read: Elias and Nora wanted the maintainer command to remain useful in normal npm/GitHub release flows; Samir wanted missing MCP proof to stay explicit rather than silently pass.
+- Implementation:
+  - Added core and CLI regression coverage for repositories without `package.json` `mcpName` or `server.json` `name`.
+  - Changed missing MCP metadata from a command-level exception into a `mcp-registry` channel warning.
+  - Preserved strict mode behavior through the existing warning-to-fail path.
+  - Updated `docs/release-proof.md` to explain non-MCP repositories and the MCP metadata lookup.
+- Verification:
+  - Red-green focused test:
+    - `npm test -- tests/release-proof.test.ts` failed on `RELEASE_PROOF_MCP_NAME_MISSING`.
+    - After the core change, `npm test -- tests/release-proof.test.ts` passed with 7 tests.
+  - Task-linked AgentLoop verification initially failed on typecheck, then passed after fixing TypeScript narrowing:
+    - `.agentloop/reports/2026-06-15-22-37-verification-report.md`
+    - `.agentloop/runs/2026-06-15-22-37-verify-2`
+  - Fresh handoff evidence was generated:
+    - `.agentloop/handoffs/2026-06-15-22-38-pr-summary.md`
+    - `.agentloop/runs/2026-06-15-22-38-handoff`
+  - `npx --yes agentflight verify -- npm test -- tests/release-proof.test.ts` passed:
+    - `.agentflight/evidence/af-20260615-203342-add-local-release-proof-helper/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260615-203342-add-local-release-proof-helper/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+  - `npm run dogfood:strict` initially failed because the dirty files had no fresh handoff.
+  - After `agentloop handoff --write-run --redact-paths`, `npm run dogfood:strict` passed.
+- What worked well:
+  - The product audit avoided duplicating an existing command and found a sharper hardening task.
+  - The command now works for both MCP and non-MCP release channels while preserving explicit warnings.
+- Improve:
+  - Consider adding `release-proof --only <channel>` later if maintainers want targeted checks without running live metadata requests for every channel.

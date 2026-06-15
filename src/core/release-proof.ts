@@ -1,7 +1,6 @@
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { execa } from 'execa';
-import { AgentLoopError } from './errors.js';
 import { pathExists } from './file-system.js';
 import { inlineCode } from './markdown-format.js';
 import { checkNpmStatus } from './npm-status.js';
@@ -459,13 +458,6 @@ export async function checkReleaseProof(options: {
   const repo = githubRepoFromUrl(packageMetadata.repositoryUrl);
   const mcpName = packageMetadata.mcpName ?? (await readServerMcpName(options.cwd));
 
-  if (!mcpName) {
-    throw new AgentLoopError(
-      'Release proof requires package.json mcpName or server.json name for MCP Registry proof.',
-      'RELEASE_PROOF_MCP_NAME_MISSING',
-    );
-  }
-
   const npmStatus = await checkNpmStatus({
     cwd: options.cwd,
     packageName: packageMetadata.name,
@@ -520,22 +512,39 @@ export async function checkReleaseProof(options: {
         message: `GHCR proof could not be read: ${ghcrResult.source.error ?? 'unknown error'}.`,
       };
 
-  const mcpUrl = `https://registry.modelcontextprotocol.io/v0.1/servers/${encodeURIComponent(
-    mcpName,
-  )}/versions/latest`;
-  const mcpResult = options.mcpRegistryJson
-    ? parseCapturedJson(options.mcpRegistryJson, 'captured MCP Registry JSON')
-    : await fetchJson(mcpUrl, timeoutMs);
-  const mcp = mcpResult.value
-    ? mcpRegistryProof(mcpResult.value, {
-        version,
-        packageName: packageMetadata.name,
-        mcpName,
-      })
-    : {
-        status: 'warn' as const,
-        message: `MCP Registry proof could not be read: ${mcpResult.source.error ?? 'unknown error'}.`,
-      };
+  const mcpResult =
+    !mcpName
+      ? {
+          source: sourceFromError(
+            'MCP Registry proof',
+            'package.json mcpName or server.json name is not configured',
+          ),
+        }
+      : options.mcpRegistryJson
+        ? parseCapturedJson(options.mcpRegistryJson, 'captured MCP Registry JSON')
+        : await fetchJson(
+            `https://registry.modelcontextprotocol.io/v0.1/servers/${encodeURIComponent(
+              mcpName,
+            )}/versions/latest`,
+            timeoutMs,
+          );
+  const mcp =
+    !mcpName
+      ? {
+          status: 'warn' as const,
+          message:
+            'MCP Registry proof is not configured because package.json mcpName or server.json name is missing.',
+        }
+      : mcpResult.value
+        ? mcpRegistryProof(mcpResult.value, {
+            version,
+            packageName: packageMetadata.name,
+            mcpName,
+          })
+        : {
+            status: 'warn' as const,
+            message: `MCP Registry proof could not be read: ${mcpResult.source.error ?? 'unknown error'}.`,
+          };
 
   const channels = [
     npmChannel,

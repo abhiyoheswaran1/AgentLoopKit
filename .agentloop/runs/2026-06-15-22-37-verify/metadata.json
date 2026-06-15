@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-22-37-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-22-37",
+  "createdAtEpochMs": 1781555820110,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-add-local-release-proof-helper.md",
+    "title": "Add local release proof helper",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-22-36-verification-report.md",
+  "overallStatus": "fail",
+  "changedFileCount": 5
+}

@@ -14,8 +14,9 @@ async function git(cwd: string, args: string[]) {
   return execa('git', args, { cwd });
 }
 
-async function createReleaseProofRepo(version = '1.2.3') {
+async function createReleaseProofRepo(version = '1.2.3', options: { mcpServer?: boolean } = {}) {
   const dir = await makeTempDir();
+  const writeMcpServer = options.mcpServer ?? true;
   tempDirs.push(dir);
   await git(dir, ['init', '-q']);
   await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
@@ -28,18 +29,20 @@ async function createReleaseProofRepo(version = '1.2.3') {
       url: 'git+https://github.com/abhiyoheswaran1/AgentLoopKit.git',
     },
   });
-  await writeJson(path.join(dir, 'server.json'), {
-    name: 'io.github.abhiyoheswaran1/agentloopkit',
-    version,
-    packages: [
-      {
-        registryType: 'npm',
-        identifier: 'agentloopkit',
-        version,
-        transport: { type: 'stdio' },
-      },
-    ],
-  });
+  if (writeMcpServer) {
+    await writeJson(path.join(dir, 'server.json'), {
+      name: 'io.github.abhiyoheswaran1/agentloopkit',
+      version,
+      packages: [
+        {
+          registryType: 'npm',
+          identifier: 'agentloopkit',
+          version,
+          transport: { type: 'stdio' },
+        },
+      ],
+    });
+  }
   await writeFile(path.join(dir, 'README.md'), '# Release proof fixture\n');
   await git(dir, ['add', '.']);
   await git(dir, ['commit', '-m', 'Prepare release proof fixture']);
@@ -165,6 +168,36 @@ describe('release proof', () => {
     expect(result.nextAction.command).toBe('verify release tag');
   });
 
+  test('warns instead of crashing when MCP Registry metadata is not configured', async () => {
+    const dir = await createReleaseProofRepo('1.2.3', { mcpServer: false });
+    const fixtures = proofFixtures();
+
+    const result = await checkReleaseProof({
+      cwd: dir,
+      npmRegistryJson: fixtures.npmRegistryJson,
+      githubReleaseJson: fixtures.githubReleaseJson,
+      ghcrTagsJson: fixtures.ghcrTagsJson,
+    });
+
+    expect(result.overallStatus).toBe('warn');
+    expect(result.channels).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'npm', status: 'pass' }),
+        expect.objectContaining({ id: 'github-release', status: 'pass' }),
+        expect.objectContaining({ id: 'ghcr', status: 'pass' }),
+        expect.objectContaining({
+          id: 'mcp-registry',
+          status: 'warn',
+          message: expect.stringContaining('MCP Registry proof is not configured'),
+        }),
+      ]),
+    );
+    expect(result.sources.mcpRegistry).toMatchObject({
+      command: 'MCP Registry proof',
+      exitCode: 1,
+    });
+  });
+
   test('CLI prints JSON release proof from captured fixture files', async () => {
     const dir = await createReleaseProofRepo();
     const paths = await writeFixtureFiles(dir);
@@ -197,6 +230,44 @@ describe('release proof', () => {
     expect(output.sources.githubRelease.command).toContain('captured GitHub release JSON');
     expect(output.sources.ghcr.command).toContain('captured GHCR tag JSON');
     expect(output.sources.mcpRegistry.command).toContain('captured MCP Registry JSON');
+  });
+
+  test('CLI prints JSON warning instead of crashing when MCP metadata is absent', async () => {
+    const dir = await createReleaseProofRepo('1.2.3', { mcpServer: false });
+    const paths = await writeFixtureFiles(dir);
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'release-proof',
+        '--json',
+        '--npm-registry-json',
+        paths.npmRegistryJsonPath,
+        '--github-release-json',
+        paths.githubReleaseJsonPath,
+        '--ghcr-tags-json',
+        paths.ghcrTagsJsonPath,
+      ],
+      { cwd: dir },
+    );
+
+    expect(result.stderr).toBe('');
+    const output = JSON.parse(result.stdout);
+    expect(output.overallStatus).toBe('warn');
+    expect(output.channels).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'mcp-registry',
+          status: 'warn',
+          message: expect.stringContaining('MCP Registry proof is not configured'),
+        }),
+      ]),
+    );
+    expect(output.sources.mcpRegistry).toMatchObject({
+      command: 'MCP Registry proof',
+      exitCode: 1,
+    });
   });
 
   test('CLI rejects captured proof files that look like env files without printing contents', async () => {

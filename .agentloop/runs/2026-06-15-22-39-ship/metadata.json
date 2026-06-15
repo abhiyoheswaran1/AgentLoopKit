@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-22-39-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-22-39",
+  "createdAtEpochMs": 1781555996474,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-add-local-release-proof-helper.md",
+    "title": "Add local release proof helper",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-22-39-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-22-39-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-22-39-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 27
+}

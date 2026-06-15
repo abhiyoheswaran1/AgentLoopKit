@@ -1,0 +1,4 @@
+ docs/release-proof.md       |  4 ++
+ src/core/release-proof.ts   | 57 +++++++++++++++-----------
+ tests/release-proof.test.ts | 97 +++++++++++++++++++++++++++++++++++++++------
+ 3 files changed, 121 insertions(+), 37 deletions(-)

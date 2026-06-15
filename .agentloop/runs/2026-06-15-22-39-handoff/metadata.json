@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-22-39-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-15-22-39",
+  "createdAtEpochMs": 1781555976063,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-15-add-local-release-proof-helper.md",
+    "title": "Add local release proof helper",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-22-39-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-22-39-pr-summary.md",
+  "changedFileCount": 22
+}

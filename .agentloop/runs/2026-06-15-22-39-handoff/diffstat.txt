@@ -1,0 +1,5 @@
+ .agentloop/dogfood-log.md   | 34 ++++++++++++++++
+ docs/release-proof.md       |  4 ++
+ src/core/release-proof.ts   | 57 +++++++++++++++-----------
+ tests/release-proof.test.ts | 97 +++++++++++++++++++++++++++++++++++++++------
+ 4 files changed, 155 insertions(+), 37 deletions(-)

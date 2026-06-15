@@ -18,6 +18,8 @@ agentloop release-proof --redact-paths
 
 The command compares each channel with the local `package.json` version. It also checks whether the local git tag `v<version>` exists.
 
+If a repository does not publish an MCP server, `release-proof` still checks npm, GitHub Releases, and GHCR. The MCP Registry channel reports a warning instead of stopping the command. Use `--strict` when that warning should fail a release gate.
+
 ## Captured Proof
 
 Use captured JSON when you want deterministic output in a release handoff or CI job:
@@ -82,6 +84,8 @@ Human output includes:
 - safety notes
 
 JSON output includes the same fields plus source metadata for each proof channel.
+
+For MCP Registry proof, AgentLoopKit looks for `package.json` `mcpName` or `server.json` `name`. Repositories without either field get an MCP warning while the other channels continue to report normally.
 
 ## Exit Codes
 
