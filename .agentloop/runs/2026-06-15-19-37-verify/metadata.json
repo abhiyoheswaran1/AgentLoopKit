@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-15-19-37-verify",
+  "command": "verify",
+  "createdAt": "2026-06-15-19-37",
+  "createdAtEpochMs": 1781545078250,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-guard-self-dogfood-instruction-drift.md",
+    "title": "Guard self-dogfood instruction drift",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-19-37-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 41
+}

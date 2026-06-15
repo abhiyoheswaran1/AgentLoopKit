@@ -64,6 +64,14 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     expect(dogfoodGuide).toContain('--dry-run');
   });
 
+  test('documents that dogfood start uses the source CLI before a build exists', async () => {
+    const dogfoodGuide = await readFile('.agentloop/harness/autonomous-dogfooding.md', 'utf8');
+
+    expect(dogfoodGuide).toContain('source CLI');
+    expect(dogfoodGuide).toContain('npx --no-install tsx src/cli/index.ts');
+    expect(dogfoodGuide).toContain('before `dist/` exists');
+  });
+
   test('keeps near-term maintenance duties tied to explicit guardrails', async () => {
     const roadmap = await readFile('ROADMAP.md', 'utf8');
     const distribution = await readFile('docs/distribution-channels.md', 'utf8');

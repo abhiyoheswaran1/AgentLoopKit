@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-15-19-38-ship",
+  "command": "ship",
+  "createdAt": "2026-06-15-19-38",
+  "createdAtEpochMs": 1781545101845,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-15-guard-self-dogfood-instruction-drift.md",
+    "title": "Guard self-dogfood instruction drift",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-15-19-37-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-15-19-38-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-15-19-38-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 49
+}

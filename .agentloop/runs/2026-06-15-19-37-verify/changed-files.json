@@ -1,0 +1,166 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/harness/autonomous-dogfooding.md"
+  },
+  {
+    "status": "M",
+    "path": "tests/autonomous-dogfood.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-15-19-27-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-15-19-31-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-15-19-34-pr-summary-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-15-19-34-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-15-19-24-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-15-19-26-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-15-19-30-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-15-19-34-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-15-19-37-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-25-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-25-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-25-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-27-handoff/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-27-handoff/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-27-handoff/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-27-handoff/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-27-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-27-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-27-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-30-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-30-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-30-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-31-handoff/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-31-handoff/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-31-handoff/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-31-handoff/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-34-handoff/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-34-handoff/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-34-handoff/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-34-handoff/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-34-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-34-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-34-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-34-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-34-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-15-19-34-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-15-guard-self-dogfood-instruction-drift.md"
+  }
+]

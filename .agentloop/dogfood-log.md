@@ -2,6 +2,36 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-15: Self-Dogfood Instruction Drift Guard
+
+- Task contract: `.agentloop/tasks/archive/2026-06-15-guard-self-dogfood-instruction-drift.md`
+- Trigger:
+  - The maintainer asked AgentLoopKit development to use AgentLoopKit, AgentFlight, and ProjScan like real users would.
+  - Dogfooding exposed a documentation gap after `npm run dogfood:start` was fixed to use the source CLI instead of `dist/`.
+- Implementation:
+  - Added a focused regression test that fails if the autonomous dogfood guide stops documenting the source-first AgentLoopKit CLI path.
+  - Updated `.agentloop/harness/autonomous-dogfooding.md` to explain that `npm run dogfood:start` runs `npx --no-install tsx src/cli/index.ts` so it works before `dist/` exists.
+- Product-panel decision:
+  - Lina wanted future autonomous sessions to start from the same helper humans use.
+  - Maya kept the change to one test and one internal harness sentence.
+  - Samir kept public docs untouched and avoided release or registry side effects.
+  - Tom wanted deterministic drift coverage instead of relying on agents remembering the helper behavior.
+- Verification:
+  - Red run failed on the missing source-first guide text:
+    - `npm test -- tests/autonomous-dogfood.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/autonomous-dogfood.test.ts`
+  - AgentLoop task verification passed and wrote `.agentloop/reports/2026-06-15-19-30-verification-report.md`.
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/autonomous-dogfood.test.ts`
+  - Strict dogfood passed, including public-doc hygiene, dependency audit, AgentFlight doctor, and ProjScan doctor:
+    - `npm run dogfood:strict`
+- What worked well:
+  - AgentFlight caught that its own session still needed verification proof even though AgentLoopKit already had a report.
+  - `agentloop status` correctly asked for a handoff before strict dogfood.
+- Improve:
+  - Consider adding a future `dogfood:finish` helper if the repeated post-verification sequence stays stable.
+
 ## 2026-06-15: Autonomous Dogfood Harness And Maintenance Guard
 
 - Task contract: `.agentloop/tasks/2026-06-15-harden-agentloopkit-autonomous-dogfood-harness.md`

@@ -24,6 +24,8 @@ Start the flight recorder first, wait for it to finish, then create or update th
 npm run dogfood:start -- --title "Describe the change" --type feature --problem "Why this task matters" --outcome "What should be true when it is done"
 ```
 
+The helper runs AgentLoopKit through the source CLI (`npx --no-install tsx src/cli/index.ts`) so dogfooding works before `dist/` exists in a fresh contributor checkout.
+
 Use `--dry-run` first when you want to inspect the exact local commands without writing AgentFlight, AgentLoopKit, or ProjScan state.
 
 If a task already exists, read it first:
