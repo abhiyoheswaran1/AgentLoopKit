@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-03-28-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-03-28",
+  "createdAtEpochMs": 1781573287526,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-task-lifecycle-output-markdown-safe.md",
+    "title": "Make task lifecycle output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-03-25-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

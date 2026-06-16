@@ -3,7 +3,7 @@ import { lstat, mkdir, readFile, stat, symlink, utimes, writeFile } from 'node:f
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
-import { inlineCode } from '../src/core/markdown-format.js';
+import { inlineCode, singleLineInlineCode } from '../src/core/markdown-format.js';
 import {
   archiveTask,
   clearActiveTask,
@@ -401,6 +401,34 @@ describe('task command', () => {
     );
   });
 
+  test('prints task lifecycle paths with line breaks on one markdown line', async () => {
+    const { dir } = await createTaskStateFixture();
+    const taskPath = '.agentloop/tasks/2026-06-09-active\ntask.md';
+    await writeFile(path.join(dir, taskPath), '# Active task\n\n- Status: review\n');
+
+    const setResult = await execa(tsxPath, [cliPath, 'task', 'set', taskPath], { cwd: dir });
+    expect(setResult.stdout).toContain(singleLineInlineCode(taskPath));
+    expect(setResult.stdout).not.toContain('.agentloop/tasks/2026-06-09-active\ntask.md');
+
+    const listResult = await execa(tsxPath, [cliPath, 'task', 'list'], { cwd: dir });
+    expect(listResult.stdout).toContain(`  ${singleLineInlineCode(taskPath)}`);
+    expect(listResult.stdout).not.toContain('.agentloop/tasks/2026-06-09-active\ntask.md');
+
+    const doneResult = await execa(tsxPath, [cliPath, 'task', 'done', taskPath], { cwd: dir });
+    expect(doneResult.stdout).toContain(singleLineInlineCode(taskPath));
+    expect(doneResult.stdout).not.toContain('.agentloop/tasks/2026-06-09-active\ntask.md');
+
+    const archiveResult = await execa(tsxPath, [cliPath, 'task', 'archive', taskPath], {
+      cwd: dir,
+    });
+    expect(archiveResult.stdout).toContain(
+      `${singleLineInlineCode(taskPath)} -> ${singleLineInlineCode(
+        '.agentloop/tasks/archive/2026-06-09-active\ntask.md',
+      )}`,
+    );
+    expect(archiveResult.stdout).not.toContain('.agentloop/tasks/archive/2026-06-09-active\ntask.md');
+  });
+
   test('reports task folder hygiene diagnostics from the CLI without writing state', async () => {
     const { dir } = await createTaskStateFixture();
     await writeFile(
@@ -694,6 +722,30 @@ describe('task command', () => {
         path: legacyTaskPath,
         status: 'review`ready',
         message: 'Task contract uses unsupported status "review`ready".',
+      }),
+    );
+  });
+
+  test('prints task doctor diagnostics with line-break paths on one markdown line', async () => {
+    const { dir } = await createTaskStateFixture();
+    const legacyTaskPath = '.agentloop/tasks/2026-06-09-legacy\ntask.md';
+    await writeFile(path.join(dir, legacyTaskPath), '# Legacy task\n\n- Status: review`ready\n');
+
+    const markdownResult = await execa(tsxPath, [cliPath, 'task', 'doctor'], { cwd: dir });
+
+    expect(markdownResult.stdout).toContain(`  Path: ${singleLineInlineCode(legacyTaskPath)}`);
+    expect(markdownResult.stdout).toContain(
+      `  Recommendation: ${singleLineInlineCode(
+        `Run \`agentloop task status ${legacyTaskPath} proposed\` or another supported status.`,
+      )}`,
+    );
+    expect(markdownResult.stdout).not.toContain('.agentloop/tasks/2026-06-09-legacy\ntask.md');
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'task', 'doctor', '--json'], { cwd: dir });
+    expect(JSON.parse(jsonResult.stdout).taskDoctor.diagnostics).toContainEqual(
+      expect.objectContaining({
+        path: legacyTaskPath,
+        status: 'review`ready',
       }),
     );
   });

@@ -23,7 +23,7 @@ import type {
   TaskContract,
   TaskDoctorResult,
 } from '../../core/task-state.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 const TASK_DONE_NEXT_STEP = 'Next step: run `agentloop handoff --write-run`, then archive the task.';

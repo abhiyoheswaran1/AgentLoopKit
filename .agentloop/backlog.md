@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 127 Decisions
+
+| item                                | source persona    | problem                                                                                                      | proposed solution                                                                                                 | priority | effort | adoption impact | risk | decision | notes                                                                                            |
+| ----------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ------------------------------------------------------------------------------------------------ |
+| Markdown-safe task lifecycle output | Samir, Nora, Lina | Agents paste task lifecycle output into handoffs, but task paths, titles, diagnostics, or archive messages can split Markdown. | Render human task lifecycle dynamic values and diagnostics on one Markdown line; keep JSON and state changes raw. | P1       | S      | medium          | low  | do now   | No task parsing, status semantics, archive behavior, active-task selection, exit-code, or JSON-shape changes. |
+
 ## Current Research Cycle 126 Decisions
 
 | item                                  | source persona     | problem                                                                                                        | proposed solution                                                                                                  | priority | effort | adoption impact | risk | decision | notes                                                                                           |

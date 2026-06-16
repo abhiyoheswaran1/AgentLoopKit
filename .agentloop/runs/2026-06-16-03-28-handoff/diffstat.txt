@@ -1,0 +1,6 @@
+ .agentloop/backlog.md    |  6 ++++++
+ CHANGELOG.md             |  1 +
+ docs/cli-reference.md    |  2 ++
+ src/cli/commands/task.ts |  2 +-
+ tests/task-state.test.ts | 54 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 63 insertions(+), 2 deletions(-)

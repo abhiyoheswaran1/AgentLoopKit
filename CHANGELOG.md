@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Made human-readable task lifecycle output render dynamic task values and diagnostics on one Markdown line while preserving raw JSON values.
 - Made human-readable `maintainer-check` output render dynamic check values and evidence paths on one Markdown line while preserving raw JSON values.
 - Made `agentloop prepare-pr` PR bodies, GitHub comments, and write confirmations render dynamic values on one Markdown line while preserving raw JSON values.
 - Made human-readable `ship` output render dynamic values as single-line inline code or prose while preserving raw JSON values.

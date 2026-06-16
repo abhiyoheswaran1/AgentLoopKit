@@ -134,6 +134,8 @@ Archive task contracts after verification and handoff, not as a substitute for e
 
 `task doctor` is read-only. It warns about missing, legacy, unsupported, and terminal statuses, likely post-verification gates listed under `Verification Commands`, and open task contracts that still contain AgentLoopKit placeholder text in review-critical sections. Replace placeholder sections before asking an agent to implement the task. `deferred` tasks are treated as parked backlog and do not trigger placeholder warnings.
 
+Human-readable task lifecycle output keeps dynamic task titles, statuses, paths, diagnostics, and archive confirmations on one Markdown line. JSON output keeps raw values for scripts.
+
 ## Status And Next
 
 ```bash
