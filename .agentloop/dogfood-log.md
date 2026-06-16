@@ -11325,3 +11325,53 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The core import path and JSON behavior stayed unchanged; the fix sits at the CLI display boundary.
 - Improve:
   - Continue the same audit for remaining command-level write confirmations that still import the multi-line formatter.
+
+## 2026-06-16: Install-Agent Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-install-agent-output-markdown-safe.md`
+- AgentFlight session: `af-20260616-030632-make-install-agent-output-markdown-safe`
+- Trigger:
+  - `agentloop install-agent` writes local setup guidance that agents often paste into handoffs.
+  - Human output used normal inline-code formatting for the generated agent-instruction path, so a repo path containing a line break could split the confirmation line.
+  - Product-panel read: Samir wanted setup evidence to stay paste-safe; Nora wanted output to remain readable; Lina wanted multi-agent setup evidence to be reliable in long sessions.
+- Implementation:
+  - Added a red regression using a real temp repo path containing a line break.
+  - Routed human `install-agent` path confirmation output through the shared single-line formatter.
+  - Left JSON output unchanged so scripts still receive raw path values.
+  - Documented the human-vs-JSON output boundary in the CLI reference and changelog.
+- Verification:
+  - Red-focused test:
+    - `npm test -- tests/agent-installation.test.ts` failed because the generated agent path split the human Markdown line.
+  - Green-focused test:
+    - `npm test -- tests/agent-installation.test.ts` passed with 10 tests.
+  - Focused docs drift check:
+    - `npm test -- tests/agent-installation.test.ts tests/cli-docs-drift.test.ts` passed with 11 tests.
+  - Public docs hygiene:
+    - `npm run check:public-docs` passed.
+  - Broad local checks:
+    - `npm run typecheck` passed.
+    - `npm run lint` passed.
+    - `npm run build` passed.
+    - `npm test` passed with 62 files and 620 tests.
+    - `npm run check:links` passed with 2334 Markdown files checked.
+  - AgentFlight focused verification passed:
+    - `.agentflight/evidence/af-20260616-030632-make-install-agent-output-markdown-safe/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260616-030632-make-install-agent-output-markdown-safe/verification-1.stderr.txt`
+  - First AgentLoop verification wrote `.agentloop/reports/2026-06-16-05-11-verification-report.md` with overall status `fail` because `npm run dogfood:strict` was incorrectly recorded under `Verification Commands`.
+  - Root cause fix:
+    - Moved `npm run dogfood:strict` to `Post-Verification Gates`.
+    - Replaced placeholder task sections for likely files and rollback notes.
+    - `agentloop task doctor` then passed.
+  - Corrected AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-16-05-13-verification-report.md`
+    - `.agentloop/runs/2026-06-16-05-15-verify`
+  - Handoff evidence was written:
+    - `.agentloop/handoffs/2026-06-16-05-15-pr-summary.md`
+    - `.agentloop/runs/2026-06-16-05-15-handoff`
+  - `npm run dogfood:strict` passed after the fresh handoff.
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+- What worked well:
+  - The product caught its own task-contract mistake: post-verification gates must not run inside `agentloop verify` before the verification report exists.
+- Improve:
+  - Continue the command-boundary output audit for `summarize`, `verify`, `badge`, `report`, and `schemastore`.
+  - Consider making `dogfood:start` easier to use correctly by forwarding post-verification gate fields explicitly in examples.

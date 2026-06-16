@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Made human-readable `install-agent` output render generated agent-instruction paths on one Markdown line while preserving raw JSON values.
 - Made human-readable `github import` output render dynamic imported metadata values on one Markdown line while preserving raw JSON values.
 - Made human-readable `upgrade-harness` output render dynamic harness audit values on one Markdown line while preserving raw JSON values.
 - Made human-readable `policy` output render dynamic policy and policy-pack values on one Markdown line while preserving raw JSON values.

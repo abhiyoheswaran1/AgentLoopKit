@@ -1,0 +1,6 @@
+ .agentloop/backlog.md             |  6 ++++++
+ CHANGELOG.md                      |  1 +
+ docs/cli-reference.md             |  2 ++
+ src/cli/commands/install-agent.ts |  2 +-
+ tests/agent-installation.test.ts  | 21 ++++++++++++++++++++-
+ 5 files changed, 30 insertions(+), 2 deletions(-)

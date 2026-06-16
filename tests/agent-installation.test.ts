@@ -3,7 +3,7 @@ import { mkdir, readdir, readFile, realpath, stat, symlink, writeFile } from 'no
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { SUPPORTED_AGENTS } from '../src/core/constants.js';
-import { inlineCode } from '../src/core/markdown-format.js';
+import { inlineCode, singleLineInlineCode } from '../src/core/markdown-format.js';
 import { CLI_PROCESS_TIMEOUT_MS, makeTempDir, removeTempDir } from './helpers.js';
 import {
   installAgentInstructions,
@@ -88,6 +88,25 @@ describe('agent installation', () => {
 
     expect(result.stdout).toContain(`Agent instructions written: ${inlineCode(agentFilePath)}`);
     expect(result.stdout).toContain('AGENTS.md now references the agent instructions.');
+  });
+
+  test('keeps installed agent paths on one line in human output while preserving JSON values', async () => {
+    const dir = await makeTempDir('agentloopkit-\nwith-break-');
+    tempDirs.push(dir);
+    await writeFile(path.join(dir, 'AGENTS.md'), '# Existing\n\nKeep this.');
+    const resolvedDir = await realpath(dir);
+    const agentFilePath = path.join(resolvedDir, '.agentloop/agents/codex.md');
+
+    const humanResult = await execa(tsxPath, [cliPath, 'install-agent', 'codex'], { cwd: dir });
+    const jsonResult = await execa(tsxPath, [cliPath, 'install-agent', 'codex', '--json'], {
+      cwd: dir,
+    });
+
+    expect(humanResult.stdout).toContain(
+      `Agent instructions written: ${singleLineInlineCode(agentFilePath)}`,
+    );
+    expect(humanResult.stdout).not.toContain(`Agent instructions written: ${inlineCode(agentFilePath)}`);
+    expect(JSON.parse(jsonResult.stdout).agent.agentFilePath).toBe(agentFilePath);
   });
 
   test('prints all installed agent paths as JSON when requested', async () => {

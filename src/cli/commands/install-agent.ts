@@ -7,7 +7,7 @@ import {
 } from '../../core/agent-installation.js';
 import { resolveAgentLoopWorkspaceCwd } from '../../core/config.js';
 import { SUPPORTED_AGENTS } from '../../core/constants.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { printOutputPathJsonError } from '../json-errors.js';
 
 export function installAgentCommand() {

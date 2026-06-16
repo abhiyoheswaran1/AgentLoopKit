@@ -1,0 +1,7 @@
+ .agentloop/backlog.md             |  6 +++++
+ .agentloop/dogfood-log.md         | 50 +++++++++++++++++++++++++++++++++++++++
+ CHANGELOG.md                      |  1 +
+ docs/cli-reference.md             |  2 ++
+ src/cli/commands/install-agent.ts |  2 +-
+ tests/agent-installation.test.ts  | 21 +++++++++++++++-
+ 6 files changed, 80 insertions(+), 2 deletions(-)

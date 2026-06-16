@@ -557,6 +557,8 @@ agentloop install-agent all --json
 
 `install-agent` writes agent-specific Markdown instructions under `.agentloop/agents/` and updates `AGENTS.md` with safe references. Unsupported agent names return supported names with no file writes.
 
+Human-readable `install-agent` output keeps generated agent-instruction paths on one Markdown line. JSON output keeps raw path values for scripts.
+
 ## Templates And Completions
 
 ```bash

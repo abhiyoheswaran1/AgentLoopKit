@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-05-13-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-05-13",
+  "createdAtEpochMs": 1781579586915,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-install-agent-output-markdown-safe.md",
+    "title": "Make install-agent output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-05-11-verification-report.md",
+  "overallStatus": "fail",
+  "changedFileCount": 7
+}

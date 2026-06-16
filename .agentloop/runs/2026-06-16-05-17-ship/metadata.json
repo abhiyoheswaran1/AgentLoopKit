@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-05-17-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-05-17",
+  "createdAtEpochMs": 1781579828652,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-make-install-agent-output-markdown-safe.md",
+    "title": "Make install-agent output Markdown-safe",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-05-13-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-05-17-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-05-17-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 25
+}
