@@ -5,7 +5,7 @@ import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import { TASK_TYPES } from '../src/core/constants.js';
 import { initializeAgentLoop } from '../src/core/init.js';
-import { inlineCode } from '../src/core/markdown-format.js';
+import { inlineCode, singleLineInlineCode } from '../src/core/markdown-format.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { CLI_PROCESS_TIMEOUT_MS, makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -257,6 +257,41 @@ describe('create-task command', () => {
     expect(result.stdout).toContain(`Active task set: ${inlineCode(taskPath)}`);
   });
 
+  test('prints created task paths containing line breaks on one Markdown line', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+    const resolvedDir = await realpath(dir);
+    const taskPath = '.agentloop/tasks/manual\ntask.md';
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Manual output path',
+        '--type',
+        'docs',
+        '--out',
+        taskPath,
+      ],
+      { cwd: dir },
+    );
+
+    expect(result.stdout).toContain(
+      `Task contract created: ${singleLineInlineCode(path.join(resolvedDir, taskPath))}`,
+    );
+    expect(result.stdout).toContain(`Active task set: ${singleLineInlineCode(taskPath)}`);
+    expect(result.stdout).not.toContain(
+      `Task contract created: ${inlineCode(path.join(resolvedDir, taskPath))}`,
+    );
+    expect(result.stdout).not.toContain(`Active task set: ${inlineCode(taskPath)}`);
+  });
+
   test('accepts repeated risk note flags in non-interactive mode', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -471,10 +506,7 @@ describe('create-task command', () => {
         code: 'POST_VERIFICATION_GATE_IN_VERIFICATION_COMMANDS',
         message:
           'Some verification commands look like post-verification gates. Move them to --post-verification if they need a fresh AgentLoop report.',
-        commands: [
-          'agentloop ship',
-          'npx --no-install agentloop prepare-pr --github-comment',
-        ],
+        commands: ['agentloop ship', 'npx --no-install agentloop prepare-pr --github-comment'],
         suggestion:
           'Use --post-verification for each listed command that needs a fresh AgentLoop report.',
       },
@@ -488,9 +520,7 @@ describe('create-task command', () => {
         '- npx --no-install agentloop prepare-pr --github-comment',
       ].join('\n'),
     );
-    expect(markdown).toContain(
-      '## Post-Verification Gates\n- No post-verification gate recorded.',
-    );
+    expect(markdown).toContain('## Post-Verification Gates\n- No post-verification gate recorded.');
   });
 
   test('warns in human output when verification commands look like post-verification gates', async () => {
@@ -531,9 +561,68 @@ describe('create-task command', () => {
     expect(markdown).toContain(
       '## Verification Commands\n- node dist/cli/index.js release-check --strict',
     );
-    expect(markdown).toContain(
-      '## Post-Verification Gates\n- No post-verification gate recorded.',
+    expect(markdown).toContain('## Post-Verification Gates\n- No post-verification gate recorded.');
+  });
+
+  test('prints post-verification warnings containing line breaks on one Markdown line', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const flaggedCommand = 'node dist/cli/index.js\nrelease-check --strict';
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({
+        name: 'demo',
+        type: 'generic',
+        packageManager: 'npm',
+        commands: {
+          test: flaggedCommand,
+          lint: '',
+          typecheck: '',
+          build: '',
+        },
+      }),
     );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Human multiline misplaced gate',
+        '--type',
+        'release',
+        '--out',
+        '.agentloop/tasks/human-multiline-misplaced-gate.md',
+        '--include-config-commands',
+      ],
+      { cwd: dir },
+    );
+
+    expect(result.stdout).toContain(
+      `Move to --post-verification: ${singleLineInlineCode(flaggedCommand)}`,
+    );
+    expect(result.stdout).not.toContain(
+      `Move to --post-verification: ${inlineCode(flaggedCommand)}`,
+    );
+
+    const jsonResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'JSON multiline misplaced gate',
+        '--type',
+        'release',
+        '--out',
+        '.agentloop/tasks/json-multiline-misplaced-gate.md',
+        '--include-config-commands',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    expect(JSON.parse(jsonResult.stdout).warnings[0].commands).toEqual([flaggedCommand]);
   });
 
   test('sets the newly created task as active even when another task was pinned', async () => {

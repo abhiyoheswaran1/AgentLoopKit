@@ -3,7 +3,7 @@ import prompts from 'prompts';
 import { AgentLoopConfig } from '../../core/config.js';
 import { TASK_TYPES } from '../../core/constants.js';
 import { AgentLoopError } from '../../core/errors.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { findLikelyPostVerificationGates } from '../../core/post-verification-gates.js';
 import { createTaskContractFile, TaskOutputPathError, TaskType } from '../../core/task-contract.js';
 import { setActiveTask } from '../../core/task-state.js';

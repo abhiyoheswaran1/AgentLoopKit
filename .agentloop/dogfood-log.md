@@ -2,6 +2,50 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Create-Task Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-create-task-output-markdown-safe.md`
+- Trigger:
+  - Agents paste `agentloop create-task` output into handoffs, CI logs, issues, and PR comments.
+  - Generated task paths and post-verification warning command values could split Markdown when they contained line breaks.
+- Implementation:
+  - Switched `create-task` human rendering to `singleLineInlineCode`.
+  - Kept JSON output, generated task content, active-task state, warning detection, exit codes, and file writes unchanged.
+  - Added regression tests for newline-containing generated task paths and newline-containing warning commands.
+  - Updated create-task CLI docs, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized paste-safe evidence in public logs and reviews.
+  - Nora wanted first-run task creation output to stay readable when agents copy it into handoffs.
+  - Lina prioritized reliable task setup output during long autonomous sessions.
+  - Maya accepted a formatter-boundary change with no task-generation or JSON changes.
+- Verification:
+  - Red TDD run failed before create-task output used single-line formatting:
+    - `npm test -- tests/create-task.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/create-task.test.ts`
+    - `npm test -- tests/create-task.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, links, and build checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `615` tests.
+  - AgentLoopKit verification, ship, and handoff evidence passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-create-task-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/create-task.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The red tests reproduced the exact Markdown line-splitting failure before the formatter change.
+- Improve:
+  - Continue auditing command families that still import the multi-line `inlineCode` helper for human output.
+
 ## 2026-06-16: Markdown-Safe Run Ledger Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-run-ledger-output-markdown-safe.md`

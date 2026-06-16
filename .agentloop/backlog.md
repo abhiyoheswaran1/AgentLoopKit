@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 129 Decisions
+
+| item                             | source persona    | problem                                                                                                          | proposed solution                                                                                        | priority | effort | adoption impact | risk | decision | notes                                                                                              |
+| -------------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | -------------------------------------------------------------------------------------------------- |
+| Markdown-safe create-task output | Samir, Nora, Lina | Agents paste create-task output into handoffs, but generated paths or warning command values can split Markdown. | Render human create-task generated paths and warning command values on one Markdown line; keep JSON raw. | P1       | S      | medium          | low  | do now   | No task generation, warning detection, active state, exit-code, file-write, or JSON-shape changes. |
+
 ## Current Research Cycle 128 Decisions
 
 | item                            | source persona    | problem                                                                                                      | proposed solution                                                                                           | priority | effort | adoption impact | risk | decision | notes                                                                                        |
