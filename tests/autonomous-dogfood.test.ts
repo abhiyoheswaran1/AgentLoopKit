@@ -111,6 +111,7 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     expect(maintenanceCommandText).toContain(
       'npx --no-install tsx src/cli/index.ts github import --help',
     );
+    expect(maintenanceCommandText).toContain('npm test -- tests/github-metadata.test.ts');
     expect(maintenanceCommandText).toContain('npx --yes agentflight@latest --version');
     expect(maintenanceCommandText).toContain('npx --yes projscan --format json doctor');
     expect(maintenanceCommandText).toContain('npm run dogfood');

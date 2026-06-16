@@ -1,0 +1,10 @@
+ .agentloop/backlog.md                  |  6 +++++
+ .agentloop/dogfood-log.md              | 40 ++++++++++++++++++++++++++++++++++
+ CHANGELOG.md                           |  1 +
+ DECISIONS.md                           |  6 +++++
+ README.md                              |  2 +-
+ docs/maintenance-guards.md             |  2 +-
+ scripts/maintenance-check.mjs          |  8 ++++++-
+ tests/autonomous-dogfood.test.ts       |  1 +
+ tests/maintenance-check-script.test.ts | 12 +++++++---
+ 9 files changed, 72 insertions(+), 6 deletions(-)

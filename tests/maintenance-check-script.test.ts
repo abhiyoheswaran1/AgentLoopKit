@@ -14,6 +14,7 @@ describe('maintenance check script helpers', () => {
       'schemastore entry',
       'policy pack inventory',
       'github metadata import surface',
+      'github metadata safety tests',
       'agentflight version',
       'projscan project health',
       'dogfood self-check',
@@ -57,9 +58,14 @@ describe('maintenance check script helpers', () => {
       'import',
       '--help',
     ]);
-    expect(steps[7].args).toEqual(['--yes', 'agentflight@latest', '--version']);
-    expect(steps[8].args).toEqual(['--yes', 'projscan', '--format', 'json', 'doctor']);
-    expect(steps[9].args).toEqual(['run', 'dogfood']);
+    expect(steps[7]).toMatchObject({
+      command: 'npm',
+      args: ['test', '--', 'tests/github-metadata.test.ts'],
+      allowFailure: false,
+    });
+    expect(steps[8].args).toEqual(['--yes', 'agentflight@latest', '--version']);
+    expect(steps[9].args).toEqual(['--yes', 'projscan', '--format', 'json', 'doctor']);
+    expect(steps[10].args).toEqual(['run', 'dogfood']);
   });
 
   test('does not include release mutation or credential-reading commands', () => {

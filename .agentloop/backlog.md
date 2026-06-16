@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 147 Decisions
+
+| item                                | source persona      | problem                                                                                                                       | proposed solution                                                                                         | priority | effort | adoption impact | risk | decision | notes                                                                                   |
+| ----------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | --------------------------------------------------------------------------------------- |
+| GitHub metadata maintenance coverage | Samir, Maya, Rachel | The near-term gate checked `github import --help`, but not the optional/read-only GitHub metadata safety contract directly. | Add focused `tests/github-metadata.test.ts` coverage to `maintenance:check` and update public guard docs. | P1       | S      | medium          | low  | do now   | No API calls, `gh`, token reads, posting, required metadata, release, or publish action. |
+
 ## Current Research Cycle 146 Decisions
 
 | item                           | source persona      | problem                                                                                                                   | proposed solution                                                                                                           | priority | effort | adoption impact | risk | decision | notes                                                                                            |

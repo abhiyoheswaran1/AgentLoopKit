@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-06-16: Maintenance Gate Tests GitHub Metadata Safety Directly
+
+The near-term roadmap says imported GitHub metadata must stay optional, local, read-only, token-free, and non-blocking when absent. `npm run maintenance:check` should verify that contract with focused `tests/github-metadata.test.ts` coverage, not only by checking that `agentloop github import --help` exists.
+
+The gate remains local and non-mutating. It does not call GitHub APIs, run `gh`, read tokens, read `.env` files, post comments, publish packages, or make GitHub metadata mandatory.
+
 ## 2026-06-16: Release Proof Distinguishes Channel Proof From HEAD State
 
 `agentloop release-proof` checks whether public release channels match the local package version. It should also report the version tag commit, current commit, and whether `HEAD` matches the version tag.

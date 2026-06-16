@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-14-16-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-14-16",
+  "createdAtEpochMs": 1781612178854,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-strengthen-github-metadata-maintenance-gate.md",
+    "title": "Strengthen GitHub metadata maintenance gate",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-14-04-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-14-16-pr-summary.md",
+  "changedFileCount": 38
+}

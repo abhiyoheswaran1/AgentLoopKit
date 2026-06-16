@@ -12208,3 +12208,45 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The fix stays narrow: git metadata and next-action guidance only.
 - Improve:
   - Keep release-proof focused on channel proof and use release-check for unreleased-commit release decisions.
+
+## 2026-06-16: GitHub Metadata Maintenance Gate Coverage
+
+- Task contract: `.agentloop/tasks/2026-06-16-strengthen-github-metadata-maintenance-gate.md`
+- Trigger:
+  - The near-term roadmap says GitHub metadata must stay optional, read-only, token-free, and local.
+  - `npm run maintenance:check` checked `agentloop github import --help`, but did not name focused behavior coverage in the gate.
+- Product decision:
+  - Keep the existing help-surface check.
+  - Add focused `tests/github-metadata.test.ts` coverage to the maintenance gate.
+  - Keep the command local and non-mutating: no GitHub API calls, `gh`, token reads, `.env` reads, posting, publishing, or required GitHub metadata.
+- AgentLoopKit usage:
+  - Created a task contract with `agentloop create-task`.
+  - Marked the task `in-progress`.
+  - Used `agentloop verify --task ... --task-commands --write-run --redact-paths` to write verification evidence.
+- TDD:
+  - Added failing expectations in `tests/maintenance-check-script.test.ts` and `tests/autonomous-dogfood.test.ts` for the new `github metadata safety tests` step.
+  - The red run failed because the maintenance plan did not include `npm test -- tests/github-metadata.test.ts`.
+  - Added the focused maintenance step and updated public maintenance wording.
+- Verification so far:
+  - Red run: `npm test -- tests/maintenance-check-script.test.ts tests/autonomous-dogfood.test.ts` failed on the missing step.
+  - Green run: `npm test -- tests/maintenance-check-script.test.ts tests/autonomous-dogfood.test.ts` passed with 8 tests.
+  - Focused task run passed:
+    - `npm test -- tests/maintenance-check-script.test.ts tests/autonomous-dogfood.test.ts tests/github-metadata.test.ts`
+    - `npm run check:public-docs`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run build`
+  - `agentloop verify --task .agentloop/tasks/2026-06-16-strengthen-github-metadata-maintenance-gate.md --task-commands --write-run --redact-paths --timeout-ms 600000` passed.
+  - Verification report: `.agentloop/reports/2026-06-16-14-04-verification-report.md`.
+  - Run ledger entry: `.agentloop/runs/2026-06-16-14-08-verify`.
+  - The AgentLoop verification report includes full `pnpm test` with 63 files and 650 tests, lint, typecheck, build, and the focused GitHub metadata maintenance test set.
+  - `agentloop handoff --redact-paths --write-run` wrote `.agentloop/handoffs/2026-06-16-14-09-pr-summary.md`.
+  - `npm run dogfood:strict` passed after the fresh handoff, including AgentFlight doctor and ProjScan health score A.
+  - `npm run maintenance:check -- --json` passed and included the new `github metadata safety tests` step: `npm test -- tests/github-metadata.test.ts`.
+  - `agentloop ship --redact-paths` passed with a 96/100 review-readiness score and wrote `.agentloop/reports/2026-06-16-14-12-ship-report.md`.
+  - Final `npm run dogfood:strict` passed after task archival, ship evidence, and final handoff.
+  - Final `npm run maintenance:check -- --json` passed with `github metadata safety tests`, AgentFlight, ProjScan, and the non-mutating safety summary.
+- What worked well:
+  - The change strengthens the roadmap guard without touching GitHub metadata import semantics.
+- Improve:
+  - Keep maintenance gate step names specific enough that future maintainers know what safety contract is being checked.

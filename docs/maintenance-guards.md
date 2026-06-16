@@ -128,7 +128,7 @@ Use the maintenance gate during ongoing development when release proof, public d
 npm run maintenance:check
 ```
 
-That gate runs unit tests, public-doc hygiene, link checks, live release proof, SchemaStore output, policy-pack inventory, the read-only GitHub metadata import surface, AgentFlight version, ProjScan health, and the non-strict dogfood self-check.
+That gate runs unit tests, public-doc hygiene, link checks, live release proof, SchemaStore output, policy-pack inventory, the read-only GitHub metadata import surface, focused GitHub metadata safety tests, AgentFlight version, ProjScan health, and the non-strict dogfood self-check.
 
 Run `npm run dogfood:strict` after fresh verification when review gates should block the final handoff.
 
