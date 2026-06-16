@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-13-48-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-13-48",
+  "createdAtEpochMs": 1781610531581,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-clarify-release-proof-when-head-is-after-tag.md",
+    "title": "Clarify release proof when HEAD is after tag",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-13-37-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-13-48-pr-summary.md",
+  "changedFileCount": 19
+}

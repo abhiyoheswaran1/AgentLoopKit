@@ -85,6 +85,8 @@ Human output includes:
 - overall status
 - package version
 - local git tag status
+- tag commit and current commit
+- whether `HEAD` matches the version tag
 - channel checks
 - next action
 - safety notes
@@ -92,6 +94,8 @@ Human output includes:
 JSON output includes the same fields plus source metadata for each proof channel.
 
 Human Markdown keeps package metadata, channel messages, tags, commits, URLs, and next-action commands on one line. JSON keeps raw values for scripts.
+
+`release-proof` checks public channel proof for the local package version. If `HEAD` differs from the version tag, the command reports that state and recommends `agentloop release-check`. That commit mismatch does not make channel proof fail by itself; it means the current checkout may contain unreleased work.
 
 For MCP Registry proof, AgentLoopKit looks for `package.json` `mcpName` or `server.json` `name`. Repositories without either field get an MCP warning while the other channels continue to report normally.
 

@@ -134,6 +134,33 @@ describe('release proof', () => {
     expect(result.markdown).toContain('GHCR image tag found');
   });
 
+  test('reports when current HEAD differs from the local version tag', async () => {
+    const dir = await createReleaseProofRepo();
+    await writeFile(path.join(dir, 'unreleased.md'), '# Unreleased change\n');
+    await git(dir, ['add', 'unreleased.md']);
+    await git(dir, ['commit', '-m', 'Add unreleased change']);
+    const headCommit = (await git(dir, ['rev-parse', '--short', 'HEAD'])).stdout.trim();
+    const tagCommit = (await git(dir, ['rev-parse', '--short', 'v1.2.3^{commit}'])).stdout.trim();
+
+    const result = await checkReleaseProof({
+      cwd: dir,
+      ...proofFixtures(),
+    });
+
+    expect(result.overallStatus).toBe('pass');
+    expect(result.git.commit).toBe(headCommit);
+    expect(result.git.tagCommit).toBe(tagCommit);
+    expect(result.git.headMatchesTag).toBe(false);
+    expect(result.nextAction).toEqual({
+      command: 'agentloop release-check',
+      reason:
+        'Release channels match the local package version, but current HEAD differs from the version tag. Use release-check to decide whether unreleased commits need another release.',
+    });
+    expect(result.markdown).toContain(`- Tag commit: ${singleLineInlineCode(tagCommit)}`);
+    expect(result.markdown).toContain(`- Current commit: ${singleLineInlineCode(headCommit)}`);
+    expect(result.markdown).toContain('- HEAD matches tag: `no`');
+  });
+
   test('warns when a post-release channel is missing matching evidence', async () => {
     const dir = await createReleaseProofRepo();
     const fixtures = proofFixtures('1.2.2');
@@ -260,9 +287,7 @@ describe('release proof', () => {
     expect(result.channels[0]?.message).toBe(
       'MCP Registry metadata points at agentloopkit\n- [x] injected@1.2.3.',
     );
-    expect(result.markdown).toContain(
-      `- Package: ${singleLineInlineCode(`${packageName}@1.2.3`)}`,
-    );
+    expect(result.markdown).toContain(`- Package: ${singleLineInlineCode(`${packageName}@1.2.3`)}`);
     expect(result.markdown).toContain(
       singleLineInlineCode('MCP Registry metadata points at agentloopkit\n- [x] injected@1.2.3.'),
     );

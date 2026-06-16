@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 146 Decisions
+
+| item                           | source persona      | problem                                                                                                                   | proposed solution                                                                                                           | priority | effort | adoption impact | risk | decision | notes                                                                                            |
+| ------------------------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ------------------------------------------------------------------------------------------------ |
+| Release-proof HEAD/tag clarity | Dogfood, Samir, Tom | Release proof can pass for the package version while current `HEAD` is newer than the version tag, confusing release use. | Report tag commit, current commit, HEAD/tag match state, and recommend `release-check` when unreleased commits are present. | P1       | S      | medium          | low  | do now   | No version bump, release, publishing, channel mutation, token read, or maintenance-gate failure. |
+
 ## Current Research Cycle 118 Decisions
 
 | item                                | source persona       | problem                                                                                                                          | proposed solution                                                                                                                  | priority | effort | adoption impact | risk | decision | notes                                                                                        |

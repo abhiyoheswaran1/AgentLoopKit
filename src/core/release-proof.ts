@@ -35,6 +35,8 @@ export type ReleaseProofResult = {
     tag: string;
     tagExists: boolean;
     commit: string;
+    tagCommit: string;
+    headMatchesTag: boolean;
   };
   checkedChannels: ReleaseProofChannelId[];
   channels: ReleaseProofChannel[];
@@ -133,6 +135,14 @@ async function gitTagExists(cwd: string, version: string) {
     reject: false,
   });
   return result.exitCode === 0;
+}
+
+async function gitTagCommit(cwd: string, version: string) {
+  const result = await execa('git', ['rev-parse', '--short', `v${version}^{commit}`], {
+    cwd,
+    reject: false,
+  });
+  return result.exitCode === 0 ? result.stdout.trim() : '';
 }
 
 async function gitCommit(cwd: string) {
@@ -397,6 +407,7 @@ function overallStatus(
 
 function chooseNextAction(result: {
   gitTagExists: boolean;
+  headMatchesTag: boolean;
   channels: ReleaseProofChannel[];
   status: ReleaseProofStatus;
 }) {
@@ -411,6 +422,13 @@ function chooseNextAction(result: {
     return {
       command: 'fix release channel proof',
       reason: `Missing or mismatched proof: ${missing.map((item) => item.name).join(', ')}.`,
+    };
+  }
+  if (!result.headMatchesTag) {
+    return {
+      command: 'agentloop release-check',
+      reason:
+        'Release channels match the local package version, but current HEAD differs from the version tag. Use release-check to decide whether unreleased commits need another release.',
     };
   }
   return {
@@ -433,7 +451,9 @@ function renderMarkdown(result: Omit<ReleaseProofResult, 'markdown'>) {
 - Overall status: ${inlineCode(result.overallStatus)}
 - Package: ${inlineCode(`${result.package.name}@${result.package.version}`)}
 - Git tag: ${inlineCode(result.git.tag)} (${result.git.tagExists ? 'found' : 'missing'})
-- Commit: ${inlineCode(result.git.commit || 'unknown')}
+- Tag commit: ${inlineCode(result.git.tagCommit || 'unknown')}
+- Current commit: ${inlineCode(result.git.commit || 'unknown')}
+- HEAD matches tag: ${inlineCode(result.git.headMatchesTag ? 'yes' : 'no')}
 - Checked channels: ${result.checkedChannels.map((item) => inlineCode(item)).join(', ')}
 
 ## Channels
@@ -470,6 +490,8 @@ export async function checkReleaseProof(options: {
   const gitTag = `v${version}`;
   const gitTagFound = await gitTagExists(options.cwd, version);
   const commit = await gitCommit(options.cwd);
+  const tagCommit = gitTagFound ? await gitTagCommit(options.cwd, version) : '';
+  const headMatchesTag = Boolean(commit && tagCommit && commit === tagCommit);
   const checkedChannels = options.only ? [options.only] : [...releaseProofChannelIds];
   const shouldCheck = (channelId: ReleaseProofChannelId) => checkedChannels.includes(channelId);
   const repo = githubRepoFromUrl(packageMetadata.repositoryUrl);
@@ -610,6 +632,8 @@ export async function checkReleaseProof(options: {
       tag: gitTag,
       tagExists: gitTagFound,
       commit,
+      tagCommit,
+      headMatchesTag,
     },
     checkedChannels,
     channels,
@@ -619,7 +643,7 @@ export async function checkReleaseProof(options: {
       ghcr: ghcrResult.source,
       mcpRegistry: mcpResult.source,
     },
-    nextAction: chooseNextAction({ gitTagExists: gitTagFound, channels, status }),
+    nextAction: chooseNextAction({ gitTagExists: gitTagFound, headMatchesTag, channels, status }),
     safety: {
       does: [
         'reads local package metadata',

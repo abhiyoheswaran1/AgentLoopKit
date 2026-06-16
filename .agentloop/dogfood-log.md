@@ -12171,3 +12171,40 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The regression covers both inventory output and latest-report status output.
 - Improve:
   - Keep maintenance and dogfood gates using source CLI evidence selection so this class of bug is visible before publishing.
+
+## 2026-06-16: Release-Proof HEAD/Tag Clarity
+
+- Task contract: `.agentloop/tasks/2026-06-16-clarify-release-proof-when-head-is-after-tag.md`
+- Trigger:
+  - Running `agentloop release-proof --json --redact-paths` from `main` after unreleased commits showed public proof for `0.34.1` and recommended `record release proof`.
+  - The output included the current commit but did not say whether that commit matched `v0.34.1`.
+- Product decision:
+  - `release-proof` checks public channel proof for the package version.
+  - It should also report the version tag commit, current commit, and HEAD/tag match state.
+  - When channel proof passes but `HEAD` differs from the tag, the next action should point to `agentloop release-check`.
+  - The recurring maintenance gate should still pass during normal unreleased development when public proof for the package version is healthy.
+- AgentLoopKit usage:
+  - Created a task contract with `agentloop create-task`.
+  - Marked the task `in-progress`.
+  - Used `release-proof --json --redact-paths` to inspect the current public proof and git-state ambiguity.
+- TDD:
+  - Added a failing `release-proof` regression where a fixture repo tags `v1.2.3`, then creates an unreleased commit.
+  - The red test failed because `git.tagCommit` and `git.headMatchesTag` were missing.
+- Verification so far:
+  - `npm test -- tests/release-proof.test.ts` failed before the implementation on missing `git.tagCommit`.
+  - `npm test -- tests/release-proof.test.ts` passed after implementation with 13 tests.
+  - `npm test -- tests/release-proof.test.ts tests/autonomous-dogfood.test.ts && npm run typecheck && npm run lint && npm run build` passed.
+  - `agentloop verify --task .agentloop/tasks/2026-06-16-clarify-release-proof-when-head-is-after-tag.md --task-commands --write-run --redact-paths --timeout-ms 600000` passed.
+  - Verification report: `.agentloop/reports/2026-06-16-13-37-verification-report.md`.
+  - Run ledger entry: `.agentloop/runs/2026-06-16-13-42-verify`.
+  - The AgentLoop verification report includes full `pnpm test` with 63 files and 650 tests, lint, typecheck, build, and the focused release-proof/autonomous-dogfood regression pair.
+  - `agentloop handoff --redact-paths --write-run` wrote `.agentloop/handoffs/2026-06-16-13-45-pr-summary.md`.
+  - `npm run dogfood:strict` passed after the fresh handoff, including AgentFlight doctor and ProjScan health score A.
+  - `npm run maintenance:check -- --json` passed across unit tests, public docs hygiene, markdown links, release proof, SchemaStore, policy packs, GitHub metadata import help, AgentFlight, ProjScan, and non-strict dogfood.
+  - `agentloop ship --redact-paths` passed with a 96/100 review-readiness score and wrote `.agentloop/reports/2026-06-16-13-49-ship-report.md`.
+  - Final `npm run dogfood:strict` passed after task archival and ship evidence generation.
+  - Final `npm run maintenance:check -- --json` passed after the final ship artifacts, including release proof, SchemaStore, policy packs, GitHub metadata import help, AgentFlight, ProjScan, and dogfood.
+- What worked well:
+  - The fix stays narrow: git metadata and next-action guidance only.
+- Improve:
+  - Keep release-proof focused on channel proof and use release-check for unreleased-commit release decisions.

@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-06-16: Release Proof Distinguishes Channel Proof From HEAD State
+
+`agentloop release-proof` checks whether public release channels match the local package version. It should also report the version tag commit, current commit, and whether `HEAD` matches the version tag.
+
+When public channels match but `HEAD` differs from the version tag, release-proof keeps channel proof passing and points maintainers to `agentloop release-check`. This keeps the recurring maintenance gate useful during unreleased development while avoiding the false impression that the current checkout has already shipped.
+
 ## 2026-06-16: Generated Evidence Order Comes From Filenames
 
 Generated AgentLoopKit evidence files use timestamped names as their canonical order. `status`, `artifacts`, and shared evidence lookup should select generated verification reports, handoffs, ship reports, CI summaries, and release notes by filename timestamp and collision suffix, not filesystem mtime.

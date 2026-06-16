@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-13-49-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-13-49",
+  "createdAtEpochMs": 1781610550999,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-clarify-release-proof-when-head-is-after-tag.md",
+    "title": "Clarify release proof when HEAD is after tag",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-13-37-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-13-49-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-13-49-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 24
+}
