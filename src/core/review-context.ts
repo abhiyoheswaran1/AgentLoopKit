@@ -5,7 +5,7 @@ import {
   type ArtifactInventory,
 } from './artifacts.js';
 import { checkGates } from './check-gates.js';
-import { inlineCode } from './markdown-format.js';
+import { singleLineInlineCode as inlineCode } from './markdown-format.js';
 import { readGithubMetadataContext, type GithubMetadataContext } from './github-metadata.js';
 import { getPolicyStatus } from './policy.js';
 import { listRuns } from './runs.js';

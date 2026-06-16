@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-07-10-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-16-07-10",
+  "createdAtEpochMs": 1781586648396,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-review-context-markdown-output-line-safe.md",
+    "title": "Make review-context Markdown output line-safe",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-07-09-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-07-10-pr-summary-3.md",
+  "changedFileCount": 41
+}

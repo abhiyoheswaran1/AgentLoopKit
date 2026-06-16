@@ -6,6 +6,7 @@ import { initializeAgentLoop } from '../src/core/init.js';
 import { createTaskContractFile } from '../src/core/task-contract.js';
 import { loadAgentLoopConfig } from '../src/core/config.js';
 import { setActiveTask } from '../src/core/task-state.js';
+import { getReviewContext, renderReviewContextMarkdown } from '../src/core/review-context.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -195,6 +196,94 @@ describe('review-context command', () => {
     expect(result.stdout).toContain('Run `agentloop handoff`.');
     expect(result.stdout).not.toContain(dir);
     expect(result.stdout).not.toContain('Review handoff.');
+  });
+
+  test('renders human Markdown with line-safe inline values', () => {
+    const context = {
+      status: {
+        project: { name: 'demo', type: 'generic', packageManager: 'npm' },
+        workingTree: { dirty: true, changedFileCount: 2, changedFiles: [] },
+        activeTask: {
+          path: '.agentloop/tasks/fix\nlogin.md',
+          title: 'Fix\nlogin redirect',
+          status: 'review\nready',
+        },
+        latestTask: null,
+        latestVerification: {
+          path: '.agentloop/reports/verification\nreport.md',
+          title: 'Verification Report',
+          overallStatus: 'pass\nwith-note',
+        },
+        latestRun: undefined,
+        nextAction: {
+          command: 'agentloop\nhandoff',
+          reason: 'Create a reviewer handoff.',
+        },
+      },
+      gates: {
+        strict: false,
+        overallStatus: 'warn',
+        gates: [],
+        nextAction: {
+          command: 'agentloop check-gates',
+          reason: 'Review warnings.',
+        },
+      },
+      policies: {
+        policies: [],
+        summary: { current: 1, modified: 2, missing: 3, extra: 4 },
+      },
+      artifacts: {
+        tasks: { count: 1, byStatus: {}, latest: null },
+        verificationReports: { count: 1, latest: null },
+        handoffs: { count: 0, latest: null },
+        shipReports: { count: 0, latest: null },
+        htmlReports: { count: 0, latest: null },
+        badges: { count: 0, latest: null },
+        ciSummaries: { count: 0, latest: null },
+        releaseNotes: { count: 0, latest: null },
+        runs: { count: 1, latest: null },
+      },
+      recentRuns: [
+        {
+          id: '2026-06-16\nship',
+          command: 'ship',
+          createdAt: '2026-06-16',
+          task: null,
+          score: 96,
+          changedFileCount: 2,
+        },
+      ],
+      latestShip: {
+        id: '2026-06-16\nship',
+        score: 96,
+        shipReportPath: '.agentloop/reports/ship\nreport.md',
+      },
+      githubMetadata: {
+        status: 'invalid',
+        path: '.agentloop/github/context\nbad.json',
+        message: 'Unexpected\nJSON token',
+      },
+      safety: {
+        readOnly: true,
+        includesMarkdownContent: false,
+        commandsRun: [],
+      },
+    } as Awaited<ReturnType<typeof getReviewContext>>;
+
+    const markdown = renderReviewContextMarkdown(context);
+
+    expect(markdown).toContain('`Fix\\nlogin redirect`');
+    expect(markdown).toContain('`review\\nready`');
+    expect(markdown).toContain('`.agentloop/reports/verification\\nreport.md`');
+    expect(markdown).toContain('- Gates: `warn`');
+    expect(markdown).toContain('- `ship` `96`/100');
+    expect(markdown).toContain('`2026-06-16\\nship`');
+    expect(markdown).toContain('`.agentloop/github/context\\nbad.json`');
+    expect(markdown).toContain('`Unexpected\\nJSON token`');
+    expect(markdown).toContain('Run `agentloop\\nhandoff`.');
+    expect(markdown).not.toContain('`Fix\nlogin redirect`');
+    expect(markdown).not.toContain('Run `agentloop\nhandoff`.');
   });
 
   test('accepts redacted output mode for human and JSON output', async () => {

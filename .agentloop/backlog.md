@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 139 Decisions
+
+| item                                    | source persona    | problem                                                                                                                         | proposed solution                                                                                                     | priority | effort | adoption impact | risk | decision | notes                                                                                               |
+| --------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | --------------------------------------------------------------------------------------------------- |
+| Markdown-safe review-context output     | Samir, Nora, Lina | Agents paste `review-context` snapshots into handoffs and PRs, but dynamic snapshot values can split Markdown with unusual data. | Render human review-context snapshot values on one Markdown line; keep JSON snapshot values raw for scripts and tools. | P1       | S      | medium          | low  | do now   | No MCP behavior, artifact inventory, GitHub metadata import, JSON-shape, release, or publish.        |
+
 ## Current Research Cycle 138 Decisions
 
 | item                                   | source persona    | problem                                                                                                                           | proposed solution                                                                                                    | priority | effort | adoption impact | risk | decision | notes                                                                                   |

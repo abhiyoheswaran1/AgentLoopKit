@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-07-10-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-07-10",
+  "createdAtEpochMs": 1781586621589,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-review-context-markdown-output-line-safe.md",
+    "title": "Make review-context Markdown output line-safe",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-07-09-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-07-10-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-07-10-pr-summary-2.md",
+  "score": 87,
+  "changedFileCount": 28
+}

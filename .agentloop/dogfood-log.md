@@ -2,6 +2,57 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Review Context Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-review-context-markdown-output-line-safe.md`
+- Trigger:
+  - Agents paste `agentloop review-context` output into handoffs, PRs, and maintainer notes.
+  - Task titles, report paths, run IDs, local GitHub metadata paths, or next-action commands with line breaks could split Markdown bullets.
+- Implementation:
+  - Switched review-context Markdown rendering to `singleLineInlineCode`.
+  - Kept review-context data gathering, MCP read-only context, JSON output, local GitHub metadata import, artifact inventory, and next-action logic unchanged.
+  - Added a regression test with newline-containing task, report, run, GitHub metadata, and next-action values.
+  - Updated review-context CLI docs, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized paste-safe review context for public PRs and CI logs.
+  - Nora wanted the one-shot snapshot to stay readable when agents copy it into handoffs.
+  - Lina prioritized reliable context snapshots during long autonomous sessions.
+  - Maya accepted a renderer-only formatter change with no JSON-shape or data-collection change.
+- Verification:
+  - Red TDD run failed before review-context used single-line formatting:
+    - `npm test -- tests/review-context.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/review-context.test.ts`
+    - `npm test -- tests/review-context.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, links, and build checks passed:
+    - `npm run check:public-docs`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run build`
+    - `npm run check:links`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `627` tests.
+  - AgentLoopKit verification evidence passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-review-context-markdown-output-line-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - Verification report: `.agentloop/reports/2026-06-16-07-09-verification-report.md`
+    - Run: `.agentloop/runs/2026-06-16-07-09-verify`
+  - AgentLoopKit handoff and ship evidence passed:
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - Ship score: `96`/100.
+    - Ship report: `.agentloop/reports/2026-06-16-07-05-ship-report.md`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/review-context.test.ts`
+    - Session: `.agentflight/evidence/af-20260616-050722-make-review-context-markdown-output-line-safe`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- Dogfood finding:
+  - Starting an AgentFlight session with the same title rewrote the active AgentLoopKit task contract. The task was restored and reverified.
+  - Follow-up: fix duplicate task creation so same-day, same-title task contracts do not overwrite existing task files.
+- Improve:
+  - Continue auditing core Markdown artifacts that still import the multi-line inline-code formatter for line-oriented values.
+
 ## 2026-06-16: Markdown-Safe Ship Confirmation Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-ship-confirmation-output-markdown-safe.md`

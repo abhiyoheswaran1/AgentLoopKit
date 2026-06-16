@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-07-09-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-07-09",
+  "createdAtEpochMs": 1781586598472,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-review-context-markdown-output-line-safe.md",
+    "title": "Make review-context Markdown output line-safe",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-07-09-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 25
+}

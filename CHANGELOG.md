@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Made human-readable `review-context` output render dynamic snapshot values on one Markdown line while preserving raw JSON values.
 - Made human-readable `ship` write-confirmation output render written report paths on one Markdown line while preserving raw JSON values.
 - Made human-readable `schemastore` output render catalog names, file matches, and schema URLs on one Markdown line while preserving raw JSON values.
 - Made human-readable `report` output render written report paths, task titles, verification statuses, and changed-file counts on one Markdown line while preserving raw JSON values.

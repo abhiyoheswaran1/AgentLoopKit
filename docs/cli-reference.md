@@ -172,6 +172,7 @@ agentloop review-context --redact-paths
 `review-context` prints one read-only local snapshot for agents and scripts that do not use MCP. It combines active task state, latest verification, review gates, policy status, artifact inventory, recent run ledger entries, latest ship score, optional imported GitHub issue or PR metadata, working-tree state, safety notes, and the next recommended action.
 
 The command does not run verification, write files, include full Markdown artifact bodies, read `.env` contents, call external APIs, or post to GitHub.
+Human-readable `review-context` output keeps dynamic values inside single-line inline code. Task titles, report paths, run IDs, imported GitHub metadata paths, and next-action commands with unusual characters stay on one Markdown line. JSON output keeps raw values for scripts.
 
 ## Verification
 
