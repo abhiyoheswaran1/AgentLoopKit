@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-06-05-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-06-05",
+  "createdAtEpochMs": 1781582731069,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-badge-output-markdown-safe.md",
+    "title": "Make badge output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-06-03-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

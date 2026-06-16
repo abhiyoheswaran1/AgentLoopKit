@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
 import { BADGE_SOURCES, writeEvidenceBadge } from '../../core/badge.js';
 import { AgentLoopError } from '../../core/errors.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function printJsonError(error: AgentLoopError, details: Record<string, unknown> = {}) {

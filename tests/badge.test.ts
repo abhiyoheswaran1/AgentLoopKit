@@ -113,6 +113,32 @@ describe('badge generation', () => {
     expect(result.stdout).toContain(`Message: ${inlineCode('pass')}`);
   });
 
+  test('CLI keeps badge confirmation path on one line while preserving JSON values', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-10-12-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    const outPath = path.join(dir, '.agentloop/reports/badge\nwith-break.svg');
+
+    const humanResult = await execa(tsxPath, [cliPath, 'badge', '--out', outPath], {
+      cwd: dir,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'badge', '--out', outPath, '--json'], {
+      cwd: dir,
+    });
+    const jsonOutput = JSON.parse(jsonResult.stdout);
+
+    expect(humanResult.stdout).toContain('Badge written: ');
+    expect(humanResult.stdout).toContain('/.agentloop/reports/badge\\nwith-break.svg`');
+    expect(humanResult.stdout).not.toContain('/.agentloop/reports/badge\nwith-break.svg`');
+    expect(jsonOutput.outPath).toBe(outPath);
+  });
+
   test('CLI prints invalid config errors as JSON without writing a badge', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

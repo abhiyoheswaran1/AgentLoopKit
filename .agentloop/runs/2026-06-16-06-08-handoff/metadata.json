@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-06-08-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-06-08",
+  "createdAtEpochMs": 1781582908359,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-make-badge-output-markdown-safe.md",
+    "title": "Make badge output Markdown-safe",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-06-03-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-06-08-pr-summary.md",
+  "changedFileCount": 34
+}

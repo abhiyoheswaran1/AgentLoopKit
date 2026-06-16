@@ -11465,3 +11465,49 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The fix stayed at the CLI display boundary, so command execution, report writing, and JSON output kept their existing behavior.
 - Improve:
   - Continue the command-boundary output audit for `badge`, `report`, `ship`, and `schemastore`.
+
+## 2026-06-16: Badge Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-badge-output-markdown-safe.md`
+- AgentFlight session: `af-20260616-035958-make-badge-output-markdown-safe`
+- Trigger:
+  - `agentloop badge` writes release and evidence artifacts that maintainers paste into handoffs.
+  - Human output used normal inline-code formatting for the written SVG path, so a badge path containing a line break could split pasted evidence.
+  - Product-panel read: Samir wanted artifact confirmations to stay paste-safe; Nora wanted terminal output to stay compact; Elias wanted release evidence to remain clean.
+- Implementation:
+  - Added a red regression using a badge output path containing a line break.
+  - Routed human `badge` write-confirmation values through the shared single-line formatter.
+  - Left JSON output unchanged so scripts still receive raw path and badge metadata values.
+  - Documented the human-vs-JSON output boundary in the CLI reference and changelog.
+- Verification:
+  - Red-focused test:
+    - `npm test -- tests/badge.test.ts` failed because the written badge path split the human Markdown line.
+  - Green-focused test:
+    - `npm test -- tests/badge.test.ts` passed with 11 tests.
+  - Focused docs drift check:
+    - `npm test -- tests/badge.test.ts tests/cli-docs-drift.test.ts` passed with 12 tests.
+  - Public docs hygiene:
+    - `npm run check:public-docs` passed.
+  - Broad local checks:
+    - `npm run typecheck` passed.
+    - `npm run lint` passed.
+    - `npm run build` passed.
+    - `npm test` passed with 62 files and 623 tests.
+    - `npm run check:links` passed with 2385 Markdown files checked.
+  - AgentFlight focused verification passed:
+    - `.agentflight/evidence/af-20260616-035958-make-badge-output-markdown-safe/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260616-035958-make-badge-output-markdown-safe/verification-1.stderr.txt`
+  - AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-16-06-03-verification-report.md`
+    - `.agentloop/runs/2026-06-16-06-05-verify`
+  - The task was marked done and archived at `.agentloop/tasks/archive/2026-06-16-make-badge-output-markdown-safe.md`.
+  - Fresh handoff evidence was written:
+    - `.agentloop/handoffs/2026-06-16-06-06-pr-summary-3.md`
+    - `.agentloop/runs/2026-06-16-06-06-handoff-2`
+  - `agentloop ship --redact-paths` wrote `.agentloop/reports/2026-06-16-06-06-ship-report.md` with review-readiness score `96`/100 and passing gates.
+  - `npm run dogfood:strict` passed after the fresh archived-task handoff.
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+- What worked well:
+  - The fix stayed at the CLI display boundary, so SVG generation, badge source selection, and JSON output kept their existing behavior.
+- Improve:
+  - Continue the command-boundary output audit for `report`, `ship`, and `schemastore`.

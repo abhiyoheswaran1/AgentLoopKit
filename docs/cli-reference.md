@@ -379,6 +379,8 @@ Human-readable `artifacts` output keeps dynamic artifact values inside single-li
 
 `badge` writes a local SVG badge from existing verification or gate evidence.
 
+Human-readable `badge` output keeps written badge paths, sources, statuses, and messages on one Markdown line. JSON output keeps raw values for scripts.
+
 These commands do not run tests, fetch remote assets, read `.env` contents, upload files, or call an LLM.
 
 See [html-reports.md](html-reports.md) and [badges.md](badges.md).

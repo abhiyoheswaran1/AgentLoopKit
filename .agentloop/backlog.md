@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 135 Decisions
+
+| item                       | source persona     | problem                                                                                                                | proposed solution                                                                                              | priority | effort | adoption impact | risk | decision | notes                                                                                  |
+| -------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | -------------------------------------------------------------------------------------- |
+| Markdown-safe badge output | Samir, Nora, Elias | Maintainers paste `badge` evidence into release notes and handoffs, but written SVG paths can split Markdown output.   | Render human badge write-confirmation values on one Markdown line; keep JSON badge values raw for scripts.      | P1       | S      | medium          | low  | do now   | No badge generation, SVG contents, source selection, gate semantics, JSON-shape, release, or publish. |
+
 ## Current Research Cycle 134 Decisions
 
 | item                         | source persona     | problem                                                                                                                      | proposed solution                                                                                                            | priority | effort | adoption impact | risk | decision | notes                                                                                                  |
