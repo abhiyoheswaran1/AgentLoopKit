@@ -76,20 +76,28 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.34.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.34.0>
-- Release asset: `agentloopkit-0.34.0.tgz`
-- Release asset SHA-256: `773d544a9165751d012eab2a6f98056cc1fa0e131fd9e61bd34ff02bb34c6894`
-- Release tag: `v0.34.0` at commit `1407b92551652298341af0d831f7eb9205f4b267`
-- CI run: `27600457996`, success
-- CLI Smoke run: `27600458025`, success
-- Publish workflow run: `27600706290`, success
-- Docker workflow run: `27600706317`, success
-- MCP Registry workflow run: `27601007699`, success
-- Post-publish npm proof: npm latest is `0.34.0`
-- Published-package smoke: `npm run smoke:published -- --version 0.34.0`, passed
-- GHCR proof: `agentloop release-proof --strict` found image tag `0.34.0`
-- MCP Registry proof: `agentloop release-proof --strict` found MCP Registry metadata for `agentloopkit@0.34.0`
+- Prepared npm release: `agentloopkit@0.34.1` pending post-release proof
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.34.1>
+- Release asset: `agentloopkit-0.34.1.tgz`
+- Release asset SHA-256: pending post-release proof
+- Release tag: `v0.34.1` at the release commit after tagging
+- CI run: pending release commit CI
+- CLI Smoke run: pending release commit smoke
+- Publish workflow run: pending GitHub release
+- Docker workflow run: pending GitHub release
+- MCP Registry workflow run: pending GitHub release
+- Post-publish npm proof: pending post-release proof
+- Published-package smoke: `npm run smoke:published -- --version 0.34.1`, pending post-release proof
+- GHCR proof: pending post-release proof
+- MCP Registry proof: pending post-release proof
+
+## 0.34.1 release summary
+
+Included:
+
+- `agentloop release-check` now reports whether commits after the current version tag affect package release contents or only repo-local evidence/docs.
+- JSON release-check output includes `releaseDelta` fields for agents and CI automation.
+- The release workflow stays conservative: existing tags, pending changelog entries, and package-impacting deltas still require explicit version preparation.
 
 ## 0.34.0 release summary
 
@@ -1255,10 +1263,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.34.0` is public.
-- npm latest is `agentloopkit@0.34.0`.
-- GHCR tags include `latest`, `0.34`, and `0.34.0`.
-- MCP Registry lists `0.34.0` as latest.
+- GitHub release `v0.34.1` is public.
+- npm latest is `agentloopkit@0.34.1`.
+- GHCR tags include `latest`, `0.34`, and `0.34.1`.
+- MCP Registry lists `0.34.1` as latest.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

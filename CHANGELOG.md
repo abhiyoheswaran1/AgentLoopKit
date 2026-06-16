@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.34.1
+
 - Added release-delta diagnostics to `agentloop release-check` so maintainers can see whether commits after the current version tag affect package release contents or only repo-local evidence/docs.
 
 ## 0.34.0

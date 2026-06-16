@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-10-25-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-10-25",
+  "createdAtEpochMs": 1781598345292,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-release-0-34-1.md",
+    "title": "Release 0.34.1",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-10-25-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 11
+}
