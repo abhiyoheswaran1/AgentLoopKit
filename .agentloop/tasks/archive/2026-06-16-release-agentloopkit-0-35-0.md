@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-16
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 AgentLoopKit has completed committed maintenance, release-proof, artifact-ordering, and verification-flow work after v0.34.1. We need a fresh bug pass, release metadata, full release gate, and public release through the configured channels.

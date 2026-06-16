@@ -79,13 +79,13 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Current npm release: `agentloopkit@0.35.0`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.35.0>
 - Release asset: `agentloopkit-0.35.0.tgz`
-- Release asset SHA-256: to be recorded after the GitHub release asset is created
-- Release tag: `v0.35.0` at the published release commit
-- CI run: to be recorded after release verification
-- CLI Smoke run: to be recorded after release verification
-- Publish workflow run: to be recorded after release verification
-- Docker workflow run: to be recorded after release verification
-- MCP Registry workflow run: to be recorded after release verification
+- Release asset SHA-256: `f77eff9bded5f78e9058892d19510ac516e156cac42e31566ee4803475b3fe3b`
+- Release tag: `v0.35.0` at commit `bf7acf42140466e4e409599d4795e0f26fb8e01f`
+- CI run: `27620154901`, success
+- CLI Smoke run: `27620155646`, success
+- Publish workflow run: `27620557648`, success
+- Docker workflow run: `27620558047`, success
+- MCP Registry workflow run: `27620932598`, success
 - Post-publish npm proof: npm latest is `0.35.0`
 - Published-package smoke: `npm run smoke:published -- --version 0.35.0`, passed
 - GHCR proof: `agentloop release-proof --strict` found image tag `0.35.0`

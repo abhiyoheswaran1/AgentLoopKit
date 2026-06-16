@@ -12290,3 +12290,42 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The maintenance contract now states and proves the policy-pack safety behavior directly.
 - Improve:
   - Keep policy-pack safety focused on local/no-overwrite behavior unless real usage shows a need for richer team policy examples.
+
+## 2026-06-16: AgentLoopKit 0.35.0 Release
+
+- Task contract: `.agentloop/tasks/2026-06-16-release-agentloopkit-0-35-0.md`
+- Trigger:
+  - The release batch after `v0.34.1` included `verify --post-verification-gates`, generated-artifact ordering, release-proof HEAD/tag clarity, and stronger maintenance gates.
+- Product decision:
+  - Cut a minor release because the batch includes a user-facing CLI capability.
+  - Use the configured GitHub Release -> npm trusted publishing -> GHCR -> MCP Registry path.
+  - Keep release docs user-facing and record proof after public workflows finish.
+- AgentLoopKit usage:
+  - Created a release task with `agentloop create-task`.
+  - Ran `agentloop verify --task ... --task-commands --write-run --redact-paths`.
+  - Generated release notes with `agentloop release-notes --release-version 0.35.0 --from v0.34.1 --to HEAD --write`.
+  - Generated a reviewer handoff with `agentloop handoff --redact-paths --write-run`.
+  - Used `agentloop release-check --strict --redact-paths`, `agentloop npm-status --agentloopkit`, and `agentloop release-proof --strict --redact-paths` for release gates and post-release proof.
+- Bug pass and verification:
+  - Pre-bump `npm run maintenance:check -- --json` passed, including unit tests, public docs, markdown links, release proof, SchemaStore, policy packs, GitHub metadata tests, AgentFlight, ProjScan, and dogfood.
+  - The first release verification failed because the task incorrectly listed `maintenance:check` after the version bump; live release proof correctly failed before `0.35.0` was public.
+  - The task contract was corrected so maintenance runs before the version bump and post-publish proof runs after release.
+  - Passing release verification: `.agentloop/reports/2026-06-16-15-00-verification-report.md`.
+  - `npm run release-flow` passed from clean commit `bf7acf4`.
+  - Push CI passed: `27620154901`.
+  - Push CLI Smoke passed: `27620155646`.
+- Release proof:
+  - GitHub release: `v0.35.0`.
+  - Release asset SHA-256: `f77eff9bded5f78e9058892d19510ac516e156cac42e31566ee4803475b3fe3b`.
+  - npm trusted publishing workflow passed: `27620557648`.
+  - Docker/GHCR workflow passed: `27620558047`.
+  - MCP Registry workflow passed: `27620932598`.
+  - `npm view agentloopkit version versions --json` reported latest `0.35.0`.
+  - `npm run smoke:published -- --version 0.35.0` passed.
+  - Clean-temp npx proof reported `0.35.0` for `agentloopkit`, `agentloop`, and `agentloopkit` bin forms.
+  - `agentloop release-proof --strict --redact-paths` passed for npm, GitHub Release, GHCR, and MCP Registry.
+- What worked well:
+  - The release flow caught a real sequencing mistake in the release task before publish.
+  - Trusted publishing, GHCR, and MCP Registry all completed without local tokens or manual npm publish.
+- Improve:
+  - Consider teaching release task templates to separate pre-bump maintenance checks from post-publish release proof so future release contracts avoid this sequencing mistake.
