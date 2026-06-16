@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 122 Decisions
+
+| item                              | source persona     | problem                                                                                                    | proposed solution                                                                               | priority | effort | adoption impact | risk | decision | notes                                                                                          |
+| --------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ---------------------------------------------------------------------------------------------- |
+| Markdown-safe release-notes output | Samir, Nora, Elias | Maintainers paste `release-notes` into release pages and PRs, but dynamic metadata or paths can split Markdown. | Render human release-notes dynamic values as single-line inline code; keep JSON and changelog prose raw. | P1       | S      | medium          | low  | do now   | No publishing, tag creation, GitHub API call, changelog rewrite, release workflow, or JSON-shape changes. |
+
 ## Current Research Cycle 121 Decisions
 
 | item                            | source persona    | problem                                                                                               | proposed solution                                                                        | priority | effort | adoption impact | risk | decision | notes                                                                                 |

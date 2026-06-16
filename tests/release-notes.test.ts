@@ -4,7 +4,7 @@ import { mkdir, readdir, readFile, rm, symlink, writeFile } from 'node:fs/promis
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
-import { inlineCode } from '../src/core/markdown-format.js';
+import { inlineCode, singleLineInlineCode } from '../src/core/markdown-format.js';
 import { generateReleaseNotes } from '../src/core/release-notes.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -238,6 +238,42 @@ describe('release-notes command', () => {
     );
   });
 
+  test('renders release-note metadata and evidence paths on one markdown line when values contain line breaks', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: false });
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    const taskFileName = 'release\n-task.md';
+    const taskPath = `.agentloop/tasks/${taskFileName}`;
+
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'demo\n- [x] injected',
+      version: '1.2.3\nbeta',
+      scripts: { test: 'echo ok' },
+    });
+    await writeFile(path.join(dir, taskPath), '# Release path task\n\n- Status: review\n');
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: taskPath,
+    });
+
+    const output = await generateReleaseNotes({
+      cwd: dir,
+      config,
+      to: 'HEAD',
+      timestamp: '2026-06-11-16-30',
+    });
+
+    expect(output.packageName).toBe('demo\n- [x] injected');
+    expect(output.version).toBe('1.2.3\nbeta');
+    expect(output.evidence.task?.path).toBe(taskPath);
+    expect(output.markdown).toContain('- Package: `demo\\n- [x] injected`');
+    expect(output.markdown).toContain('- Version: `1.2.3\\nbeta`');
+    expect(output.markdown).toContain(
+      '- Task: `Release path task` (`review`) - `.agentloop/tasks/release\\n-task.md`',
+    );
+    expect(output.markdown).not.toContain('\n- [x] injected`');
+    expect(output.markdown).not.toContain('release\n-task.md`');
+  });
+
   test('handles missing previous tags honestly in markdown output', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: false });
 
@@ -408,7 +444,7 @@ describe('release-notes command', () => {
 
   test('prints written release note paths with Markdown-safe inline values', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: true });
-    const outPath = path.join(dir, '.agentloop/handoffs/release`notes.md');
+    const outPath = path.join(dir, '.agentloop/handoffs/release`notes\nmanual.md');
 
     const result = await execa(
       tsxPath,
@@ -417,7 +453,7 @@ describe('release-notes command', () => {
     );
 
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain(`Release notes written: ${inlineCode(outPath)}`);
+    expect(result.stdout).toContain(`Release notes written: ${singleLineInlineCode(outPath)}`);
   });
 
   test('ignores verification and CI summary evidence from symlinked report roots outside the repo', async () => {

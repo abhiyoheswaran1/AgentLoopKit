@@ -34,6 +34,8 @@ If you do not pass `--from`, AgentLoopKit looks for the newest local version tag
 
 Human output is Markdown. JSON output includes the same evidence paths and release metadata for scripts.
 
+Human Markdown keeps dynamic metadata, refs, paths, and evidence values on one line. JSON keeps raw values. AgentLoopKit does not rewrite the changelog prose that appears under `## What changed` or `## Changelog`.
+
 Use `--public` when you need concise Markdown for a GitHub release page or announcement. Public mode keeps the version, changelog items, verification status, selected git range, and install command, but leaves out the changed-file inventory, working-tree path list, and local AgentLoop evidence paths. The default output remains the detailed local evidence format.
 
 `--write` creates:
@@ -63,7 +65,7 @@ Run `agentloop verify` first when you need fresh verification evidence. `release
 
 If the working tree is dirty, commit or stash those changes before publishing. The command lists uncommitted paths so a release draft cannot silently omit local work.
 
-Changed-file and working-tree paths use Markdown inline-code delimiters long enough to contain paths that include backticks. A repository path cannot close its own path label by including ` in the filename.
+Changed-file and working-tree paths use Markdown inline-code delimiters long enough to contain paths that include backticks. Dynamic path labels also render line breaks as `\n`, so copied release notes keep list items intact.
 
 ## npm Status
 

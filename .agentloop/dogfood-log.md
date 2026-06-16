@@ -2,6 +2,52 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Release-Notes Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-release-notes-output-markdown-safe.md`
+- Trigger:
+  - `agentloop release-notes` drafts Markdown that maintainers paste into release pages, PRs, and review handoffs.
+  - Dynamic metadata and local evidence paths could split Markdown list items when they contained line breaks.
+- Implementation:
+  - Switched `src/core/release-notes.ts` human inline rendering to `singleLineInlineCode`.
+  - Switched the `src/cli/commands/release-notes.ts` written-path message to `singleLineInlineCode`.
+  - Kept git ref validation, release-note generation, changelog prose, write behavior, and JSON output unchanged.
+  - Added regression tests for line breaks in package metadata, task evidence paths, and custom written output paths.
+  - Updated the release-notes docs, CLI reference, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized safe public release-page copy.
+  - Nora wanted release notes to stay pasteable in PR comments.
+  - Elias wanted docs to explain the behavior without release-history chatter.
+  - Maya accepted the narrow helper swap because the existing tests protect release-note content and JSON shape.
+- Verification:
+  - Red TDD run failed before single-line release-notes rendering existed:
+    - `npm test -- tests/release-notes.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/release-notes.test.ts`
+    - `npm test -- tests/release-notes.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, and build checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+  - AgentLoopKit task verification, ship, handoff, and strict dogfood gates passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-release-notes-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+    - `npm run dogfood:strict`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/release-notes.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The failing test showed the exact package metadata and task-path list split.
+  - Existing release-note tests already protected Git ref safety and authored changelog prose.
+- Improve:
+  - Keep auditing paste-heavy commands with command-specific regression tests.
+
 ## 2026-06-16: Markdown-Safe CI Summary Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-ci-summary-output-markdown-safe.md`

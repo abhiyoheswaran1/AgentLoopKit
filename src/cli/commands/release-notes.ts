@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { generateReleaseNotes } from '../../core/release-notes.js';
 import {
   loadWorkspaceForJsonCommand,

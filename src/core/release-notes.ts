@@ -12,7 +12,7 @@ import {
 import { formatTimestamp } from './dates.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import { getGitBranch, getGitCommit } from './git.js';
-import { inlineCode } from './markdown-format.js';
+import { singleLineInlineCode as inlineCode } from './markdown-format.js';
 import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 
 export type ReleaseNotesFormat = 'detailed' | 'public';
