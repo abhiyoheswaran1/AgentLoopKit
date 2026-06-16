@@ -55,7 +55,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
 - Release tag `v0.34.0` points at the published release commit.
-- Published release commit: `pending`.
+- Published release commit: `1407b92551652298341af0d831f7eb9205f4b267`.
 
 ## Near Term
 

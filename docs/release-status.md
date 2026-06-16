@@ -1,34 +1,34 @@
 # Release Status
 
-Last checked: June 15, 2026.
+Last checked: June 16, 2026.
 
 ## Current State
 
-- Current public release: `v0.33.0`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.33.0>
-- Release asset: `agentloopkit-0.33.0.tgz`
-- Release asset SHA-256: `63d5486600cd212a2b521d34639358726e4e91225f0f099abf3387e8891baee7`
-- Release tag `v0.33.0` points at commit `bc39e81085186f64fe0cf0a92a6c2da4dcf0cc70`
-- npm latest: `0.33.0`
-- CI run: `27526213991`, success
-- CLI Smoke run: `27526213989`, success
-- Publish workflow run: `27526226093`, success
-- Docker workflow run: `27526226088`, success
-- MCP Registry workflow run: `27526361078`, success
+- Current public release: `v0.34.0`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.34.0>
+- Release asset: `agentloopkit-0.34.0.tgz`
+- Release asset SHA-256: `773d544a9165751d012eab2a6f98056cc1fa0e131fd9e61bd34ff02bb34c6894`
+- Release tag `v0.34.0` points at commit `1407b92551652298341af0d831f7eb9205f4b267`
+- npm latest: `0.34.0`
+- CI run: `27600457996`, success
+- CLI Smoke run: `27600458025`, success
+- Publish workflow run: `27600706290`, success
+- Docker workflow run: `27600706317`, success
+- MCP Registry workflow run: `27601007699`, success
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
-GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`. The public registry tag list includes `latest`, `0.33`, and `0.33.0`.
+GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`. The public registry tag list includes `latest`, `0.34`, and `0.34.0`.
 
-The MCP Registry public API lists `io.github.abhiyoheswaran1/agentloopkit` version `0.33.0` as latest, with npm package `agentloopkit@0.33.0`.
+The MCP Registry public API lists `io.github.abhiyoheswaran1/agentloopkit` version `0.34.0` as latest, with npm package `agentloopkit@0.34.0`.
 
 ## Latest Release Highlights
 
-Released in `0.33.0`:
+Released in `0.34.0`:
 
-- `agentloop release-proof` checks npm, GitHub Release, GHCR, and MCP Registry evidence for the local package version.
-- Local GitHub metadata summaries appear in `review-context`, `prepare-pr`, and `maintainer-check`.
-- Public-doc hygiene now blocks fake adoption language, premature Pro/SaaS upgrade copy, and internal planning copy.
-- Organization policy-pack workflow examples document repo-local team review rules.
+- `agentloop install-agent` preserves existing `.agentloop/agents/<agent>.md` instructions instead of overwriting local edits.
+- Same-minute generated evidence artifacts now get collision-safe suffixes instead of replacing prior reports.
+- `agentloop release-proof --only <channel>` can check one public channel at a time for npm, GitHub Release, GHCR, or MCP Registry.
+- Public Markdown output and local artifact handling were hardened for safer review logs.
 
 ## Use The Current CLI
 
@@ -36,7 +36,7 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.33.0 version
+npx --yes agentloopkit@0.34.0 version
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -60,7 +60,7 @@ After each publish:
 
 ## Verification Evidence
 
-Local release gate for `0.33.0`:
+Local release gate for `0.34.0`:
 
 - `node scripts/prepublish-check.mjs`
 - `npm run lint`
@@ -77,19 +77,20 @@ Local release gate for `0.33.0`:
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: latest `0.33.0`
+- `npm view agentloopkit version versions --json`: latest `0.34.0`
 - `node dist/cli/index.js npm-status --agentloopkit --expect-current`: latest matches local package version
-- `npm run smoke:published -- --version 0.33.0`: passed
-- `npx --yes agentloopkit@0.33.0 version`: `0.33.0`
-- GitHub release asset digest: `63d5486600cd212a2b521d34639358726e4e91225f0f099abf3387e8891baee7`
-- GHCR tag list includes `latest`, `0.33`, and `0.33.0`
-- MCP Registry search marks `0.33.0` as latest
+- `npm run smoke:published -- --version 0.34.0`: passed
+- `npx --yes agentloopkit@0.34.0 version`: `0.34.0`
+- GitHub release asset digest: `773d544a9165751d012eab2a6f98056cc1fa0e131fd9e61bd34ff02bb34c6894`
+- `node dist/cli/index.js release-proof --strict --redact-paths`: npm, GitHub Release, GHCR, and MCP Registry passed
+- GHCR tag list includes `latest`, `0.34`, and `0.34.0`
+- MCP Registry search marks `0.34.0` as latest
 
 Latest release-status documentation checks:
 
 - `npm run dogfood:strict`
-- `npm run check:links`: 1833 Markdown files checked
+- `npm run check:links`
 - `node scripts/prepublish-check.mjs`
 - `git diff --check`
 - `npx --yes pnpm@10.12.1 audit --audit-level high`
-- `npx --yes projscan doctor --format markdown`: A 100/100
+- `npx --yes projscan doctor --format markdown`

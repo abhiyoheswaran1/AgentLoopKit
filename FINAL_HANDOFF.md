@@ -79,17 +79,27 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Current npm release: `agentloopkit@0.34.0`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.34.0>
 - Release asset: `agentloopkit-0.34.0.tgz`
-- Release asset SHA-256: pending
-- Release tag: `v0.34.0` at commit `pending`
-- CI run: pending
-- CLI Smoke run: pending
-- Publish workflow run: pending
-- Docker workflow run: pending
-- MCP Registry workflow run: pending
-- Post-publish npm proof: pending after release workflows finish
-- Published-package smoke: pending after npm publish
-- GHCR proof: pending after Docker workflow
-- MCP Registry proof: pending after MCP Registry workflow
+- Release asset SHA-256: `773d544a9165751d012eab2a6f98056cc1fa0e131fd9e61bd34ff02bb34c6894`
+- Release tag: `v0.34.0` at commit `1407b92551652298341af0d831f7eb9205f4b267`
+- CI run: `27600457996`, success
+- CLI Smoke run: `27600458025`, success
+- Publish workflow run: `27600706290`, success
+- Docker workflow run: `27600706317`, success
+- MCP Registry workflow run: `27601007699`, success
+- Post-publish npm proof: npm latest is `0.34.0`
+- Published-package smoke: `npm run smoke:published -- --version 0.34.0`, passed
+- GHCR proof: `agentloop release-proof --strict` found image tag `0.34.0`
+- MCP Registry proof: `agentloop release-proof --strict` found MCP Registry metadata for `agentloopkit@0.34.0`
+
+## 0.34.0 release summary
+
+Included:
+
+- safe preservation of existing agent-specific instruction files during `install-agent`
+- collision-safe same-minute evidence artifacts for generated reports, run records, and PR output
+- targeted `agentloop release-proof --only <channel>` checks for npm, GitHub Release, GHCR, and MCP Registry
+- safer Markdown output for public review logs and release evidence
+- tightened local maintenance checks with AgentLoopKit, AgentFlight, and ProjScan dogfooding
 
 ## 0.33.0 release summary
 

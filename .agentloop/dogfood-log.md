@@ -11960,3 +11960,29 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The fix stayed at the CLI display boundary, so SVG generation, badge source selection, and JSON output kept their existing behavior.
 - Improve:
   - Continue the command-boundary output audit for `report`, `ship`, and `schemastore`.
+
+## 2026-06-16: 0.34.0 Release Proof
+
+- Task contract: release-prep and post-release proof for `agentloopkit@0.34.0`
+- Trigger:
+  - The release contained user-facing CLI hardening, same-minute evidence collision fixes, `install-agent` preservation behavior, and targeted release-proof checks.
+  - The maintainer allowed the release decision to be made once release gates passed.
+- AgentLoopKit usage:
+  - `npm run release-flow` passed before the release.
+  - `node dist/cli/index.js release-proof --strict --redact-paths` passed after GitHub Release, npm trusted publishing, GHCR, and MCP Registry workflows completed.
+  - `node dist/cli/index.js npm-status --agentloopkit --expect-current` confirmed npm latest matched the local package version.
+  - `npm run smoke:published -- --version 0.34.0` verified the public package from clean temporary directories.
+- External release proof:
+  - GitHub release: `v0.34.0`
+  - Release commit: `1407b92551652298341af0d831f7eb9205f4b267`
+  - Release asset SHA-256: `773d544a9165751d012eab2a6f98056cc1fa0e131fd9e61bd34ff02bb34c6894`
+  - CI run: `27600457996`, success
+  - CLI Smoke run: `27600458025`, success
+  - Publish workflow run: `27600706290`, success
+  - Docker workflow run: `27600706317`, success
+  - MCP Registry workflow run: `27601007699`, success
+- What worked well:
+  - `release-proof --strict` caught the local missing-tag state before final docs were updated.
+  - The published-package smoke gave stronger evidence than local `npx` checks inside this package checkout, where npm can resolve through workspace context.
+- Improve:
+  - Consider documenting that direct `npx agentloopkit@<version>` verification should be run from a clean directory or via the published-package smoke script.
