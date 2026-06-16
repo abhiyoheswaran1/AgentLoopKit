@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 137 Decisions
+
+| item                             | source persona     | problem                                                                                                                  | proposed solution                                                                                               | priority | effort | adoption impact | risk | decision | notes                                                                                 |
+| -------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ------------------------------------------------------------------------------------- |
+| Markdown-safe SchemaStore output | Samir, Nora, Elias | Maintainers paste `schemastore` catalog output into docs and contribution notes, but catalog values can split Markdown.   | Render human SchemaStore catalog values on one Markdown line; keep JSON catalog values raw for scripts.          | P1       | S      | medium          | low  | do now   | No catalog helper, committed schema entry, schema URL, JSON-shape, release, or publish. |
+
 ## Current Research Cycle 136 Decisions
 
 | item                        | source persona     | problem                                                                                                                | proposed solution                                                                                              | priority | effort | adoption impact | risk | decision | notes                                                                                  |

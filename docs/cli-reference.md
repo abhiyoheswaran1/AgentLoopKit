@@ -488,6 +488,8 @@ agentloop schemastore --json
 
 `schemastore` prints the catalog entry for `agentloop.config.json`. Maintainers can use the JSON output when preparing a SchemaStore contribution.
 
+Human-readable `schemastore` output keeps catalog names, file matches, and schema URLs on one Markdown line. JSON output keeps raw values for scripts.
+
 It does not write files, open a pull request, call SchemaStore, call GitHub APIs, read tokens, or modify package metadata.
 
 See [schemastore.md](schemastore.md).

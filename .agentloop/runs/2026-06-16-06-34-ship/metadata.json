@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-06-34-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-06-34",
+  "createdAtEpochMs": 1781584481972,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-make-schemastore-output-markdown-safe.md",
+    "title": "Make schemastore output Markdown-safe",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-06-34-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-06-34-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-06-34-pr-summary-3.md",
+  "score": 96,
+  "changedFileCount": 21
+}

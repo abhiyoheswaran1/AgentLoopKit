@@ -2,6 +2,55 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe SchemaStore Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-schemastore-output-markdown-safe.md`
+- Trigger:
+  - Maintainers paste `agentloop schemastore` output into docs and SchemaStore contribution notes.
+  - Catalog names, file matches, or schema URLs with line breaks could split Markdown output while JSON kept raw values.
+- Implementation:
+  - Switched `schemastore` command human rendering to `singleLineInlineCode`.
+  - Kept the catalog helper, committed SchemaStore entry, schema URL, JSON output, and safety metadata unchanged.
+  - Added an in-process command regression test with mocked newline-containing catalog values.
+  - Updated SchemaStore CLI docs, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized paste-safe contribution evidence without changing schema metadata.
+  - Nora wanted the command output to stay copyable in docs and release notes.
+  - Elias wanted public docs to explain human vs JSON output without internal planning details.
+  - Maya accepted a formatter-boundary change with no catalog or file-write changes.
+- Verification:
+  - Red TDD run failed before SchemaStore output used single-line formatting:
+    - `npm test -- tests/schemastore.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/schemastore.test.ts`
+    - `npm test -- tests/schemastore.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, links, and build checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `625` tests.
+  - AgentLoopKit verification evidence passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-schemastore-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - Verification report: `.agentloop/reports/2026-06-16-06-34-verification-report.md`
+    - Run: `.agentloop/runs/2026-06-16-06-34-verify`
+  - AgentLoopKit handoff and ship evidence passed:
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - Ship score: `96`/100.
+    - Ship report: `.agentloop/reports/2026-06-16-06-34-ship-report.md`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/schemastore.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The in-process command test injected newline-containing catalog data while proving JSON output stayed raw.
+- Improve:
+  - Audit the remaining `ship` command write confirmation and core Markdown artifacts that still use the multi-line inline-code formatter.
+
 ## 2026-06-16: Markdown-Safe Report Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-report-output-markdown-safe.md`

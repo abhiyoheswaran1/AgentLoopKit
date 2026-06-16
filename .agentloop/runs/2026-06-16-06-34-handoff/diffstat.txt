@@ -1,0 +1,7 @@
+ .agentloop/backlog.md           |  6 ++++++
+ .agentloop/dogfood-log.md       | 44 +++++++++++++++++++++++++++++++++++++++++
+ CHANGELOG.md                    |  1 +
+ docs/cli-reference.md           |  2 ++
+ src/cli/commands/schemastore.ts |  2 +-
+ tests/schemastore.test.ts       | 38 ++++++++++++++++++++++++++++++++++-
+ 6 files changed, 91 insertions(+), 2 deletions(-)

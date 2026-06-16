@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { buildSchemaStoreCatalogEntry } from '../../core/schemastore.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 
 export function schemastoreCommand() {
   return new Command('schemastore')

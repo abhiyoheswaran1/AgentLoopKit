@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-06-34-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-06-34",
+  "createdAtEpochMs": 1781584478688,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-schemastore-output-markdown-safe.md",
+    "title": "Make schemastore output Markdown-safe",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-06-34-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-06-34-pr-summary.md",
+  "changedFileCount": 11
+}
