@@ -3,6 +3,7 @@ import { mkdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { inlineCode, singleLineInlineCode } from '../src/core/markdown-format.js';
 import {
   applyPolicyPack,
   listPolicyPacks,
@@ -46,6 +47,56 @@ async function createPolicyPackFixture() {
     '# Release Policy\n\nRelease only after the release gate passes.\n',
   );
   return { dir, config };
+}
+
+async function createPolicyPackFixtureWithLineBreaks() {
+  const dir = await makeTempDir();
+  tempDirs.push(dir);
+  const config = {
+    ...createDefaultConfig({
+      name: 'policy-pack-demo',
+      type: 'generic',
+      packageManager: 'npm',
+    }),
+    policies: {
+      packs: [{ name: 'org-review', path: '.agentloop/policy-packs/org-review' }],
+    },
+  };
+  const packName = 'org\nreview';
+  const packTitle = 'Org\nReview Pack';
+  const packDescription = 'Local\norganization review rules.';
+  const createdPolicyFile = 'release\npolicy.md';
+  const skippedPolicyFile = 'review\nevidence-policy.md';
+  await writeJson(path.join(dir, 'agentloop.config.json'), config);
+  await mkdir(path.join(dir, '.agentloop/policy-packs/org-review/policies'), { recursive: true });
+  await writeJson(path.join(dir, '.agentloop/policy-packs/org-review/manifest.json'), {
+    name: packName,
+    title: packTitle,
+    description: packDescription,
+    policies: [createdPolicyFile, skippedPolicyFile],
+  });
+  await writeFile(
+    path.join(dir, '.agentloop/policy-packs/org-review/policies', createdPolicyFile),
+    '# Release Policy\n\nRelease only after the release gate passes.\n',
+  );
+  await writeFile(
+    path.join(dir, '.agentloop/policy-packs/org-review/policies', skippedPolicyFile),
+    '# Review Evidence Policy\n\nRequire task, verification, and handoff evidence.\n',
+  );
+  await mkdir(path.join(dir, '.agentloop/policies'), { recursive: true });
+  await writeFile(
+    path.join(dir, '.agentloop/policies', skippedPolicyFile),
+    '# Review Evidence Policy\n\nLocal customized rule.\n',
+  );
+  return {
+    dir,
+    config,
+    packName,
+    packTitle,
+    packDescription,
+    createdPolicyFile,
+    skippedPolicyFile,
+  };
 }
 
 describe('policy packs', () => {
@@ -205,6 +256,54 @@ describe('policy packs', () => {
         '.agentloop/policies/release-policy.md',
         '.agentloop/policies/review-evidence-policy.md',
       ],
+    });
+  });
+
+  test('prints policy pack human output values containing line breaks on one Markdown line', async () => {
+    const { dir, packName, packTitle, packDescription, createdPolicyFile, skippedPolicyFile } =
+      await createPolicyPackFixtureWithLineBreaks();
+    const createdPolicyPath = `.agentloop/policies/${createdPolicyFile}`;
+    const skippedPolicyPath = `.agentloop/policies/${skippedPolicyFile}`;
+
+    const list = await execa(tsxPath, [cliPath, 'policy', 'packs'], { cwd: dir });
+    const show = await execa(tsxPath, [cliPath, 'policy', 'pack', 'show', packName], {
+      cwd: dir,
+    });
+    const apply = await execa(
+      tsxPath,
+      [cliPath, 'policy', 'pack', 'apply', packName, '--dry-run'],
+      { cwd: dir },
+    );
+    const applyJson = await execa(
+      tsxPath,
+      [cliPath, 'policy', 'pack', 'apply', packName, '--dry-run', '--json'],
+      { cwd: dir },
+    );
+
+    expect(list.stdout).toContain(
+      `- ${singleLineInlineCode(packName)} (${singleLineInlineCode('local')})`,
+    );
+    expect(list.stdout).toContain(`  ${singleLineInlineCode(packTitle)} - 2 policy file(s)`);
+    expect(list.stdout).not.toContain(`- ${inlineCode(packName)} (${inlineCode('local')})`);
+
+    expect(show.stdout).toContain('# Org\\nReview Pack');
+    expect(show.stdout).toContain('Local\\norganization review rules.');
+    expect(show.stdout).toContain(`- Name: ${singleLineInlineCode(packName)}`);
+    expect(show.stdout).toContain(`- ${singleLineInlineCode(createdPolicyFile)}`);
+    expect(show.stdout).toContain(`- ${singleLineInlineCode(skippedPolicyFile)}`);
+    expect(show.stdout).not.toContain(`- Name: ${inlineCode(packName)}`);
+    expect(show.stdout).not.toContain(`- ${inlineCode(createdPolicyFile)}`);
+
+    expect(apply.stdout).toContain(`- Pack: ${singleLineInlineCode(packName)}`);
+    expect(apply.stdout).toContain(`- ${singleLineInlineCode(createdPolicyPath)}`);
+    expect(apply.stdout).toContain(`- ${singleLineInlineCode(skippedPolicyPath)}`);
+    expect(apply.stdout).not.toContain(`- Pack: ${inlineCode(packName)}`);
+    expect(apply.stdout).not.toContain(`- ${inlineCode(createdPolicyPath)}`);
+
+    expect(JSON.parse(applyJson.stdout)).toMatchObject({
+      pack: { name: packName, title: packTitle, description: packDescription },
+      created: [createdPolicyPath],
+      skipped: [skippedPolicyPath],
     });
   });
 });

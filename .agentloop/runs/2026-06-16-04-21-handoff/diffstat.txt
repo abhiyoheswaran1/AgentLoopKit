@@ -1,0 +1,9 @@
+ .agentloop/backlog.md      | 40 +++++++++++--------
+ .agentloop/dogfood-log.md  | 39 ++++++++++++++++++
+ CHANGELOG.md               |  1 +
+ docs/cli-reference.md      |  2 +
+ docs/policies.md           |  2 +
+ src/cli/commands/policy.ts | 13 ++++--
+ tests/policy-packs.test.ts | 99 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/policy.test.ts       | 26 ++++++++++--
+ 8 files changed, 198 insertions(+), 24 deletions(-)

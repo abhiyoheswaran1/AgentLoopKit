@@ -532,6 +532,8 @@ agentloop policy pack apply agentloop-baseline
 
 `policy packs` lists bundled packs and local organization packs configured in `agentloop.config.json`. `policy pack apply` copies missing policy files and skips existing files. It does not overwrite local policy edits.
 
+Human-readable policy output keeps dynamic policy titles, pack metadata, paths, created files, and skipped files on one Markdown line. JSON output keeps raw values for scripts.
+
 It does not enforce compliance, scan source code, fetch remote policy packs, read `.env` files, or call a service.
 
 See [policies.md](policies.md).

@@ -2,6 +2,55 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Policy Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-policy-output-markdown-safe.md`
+- Trigger:
+  - Agents and maintainers paste `agentloop policy` output into handoffs and review comments.
+  - Repo-local policy pack metadata and policy filenames could split Markdown when values contained line breaks.
+- Implementation:
+  - Switched policy command human inline rendering to `singleLineInlineCode`.
+  - Rendered policy-pack title and description prose on one escaped Markdown line.
+  - Kept JSON output, policy discovery, status calculation, pack reading, symlink safety, apply skip/create behavior, and exit codes unchanged.
+  - Added regression tests for newline-containing policy paths, policy-pack metadata, and apply created/skipped paths.
+  - Updated policy CLI docs, policy docs, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized safe local policy evidence without changing policy-pack trust boundaries.
+  - Nora wanted policy output that stays readable when pasted into review handoffs.
+  - Elias wanted docs to explain paste-safe human output without internal release notes.
+  - Maya accepted a formatter-boundary change with no policy behavior changes.
+- Verification:
+  - Red TDD run failed before policy output used single-line formatting:
+    - `npm test -- tests/policy.test.ts tests/policy-packs.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/policy.test.ts tests/policy-packs.test.ts`
+    - `npm test -- tests/policy.test.ts tests/policy-packs.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, links, and build checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `617` tests.
+  - AgentLoopKit verification evidence passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-policy-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+  - AgentLoopKit handoff and ship evidence passed:
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - Ship score: `96`/100.
+  - Strict dogfood gate passed:
+    - `npm run dogfood:strict`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/policy.test.ts tests/policy-packs.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The red tests reproduced Markdown line splitting in both local policies and repo-local policy packs.
+- Improve:
+  - Continue auditing command families that still import the multi-line `inlineCode` helper for human output.
+
 ## 2026-06-16: Markdown-Safe Create-Task Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-create-task-output-markdown-safe.md`

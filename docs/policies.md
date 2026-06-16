@@ -22,6 +22,8 @@ agentloop policy pack apply agentloop-baseline --dry-run
 When `.agentloop/policies/` is missing, policy commands with `--json` return a setup error with `code`, `message`, `policiesDir`, and `nextCommand`. When `policy show --json` cannot find a policy, it returns a JSON error with `requestedPolicy` and `availablePolicies`.
 When `agentloop.config.json` is invalid, policy commands with `--json` return a `CONFIG_ERROR` object before reading local policy files.
 
+Human-readable policy output keeps dynamic policy titles, pack metadata, paths, created files, and skipped files on one Markdown line. JSON output keeps raw values for scripts.
+
 `policy status` compares the local Markdown files with AgentLoopKit's bundled policy templates. It reports:
 
 - `current`: local file matches the bundled template

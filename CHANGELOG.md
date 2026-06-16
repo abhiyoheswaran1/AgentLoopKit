@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Made human-readable `policy` output render dynamic policy and policy-pack values on one Markdown line while preserving raw JSON values.
 - Made human-readable `create-task` output render generated paths and warning command values on one Markdown line while preserving raw JSON values.
 - Made human-readable run-ledger output render dynamic run and file-intent values on one Markdown line while preserving raw JSON values.
 - Made human-readable task lifecycle output render dynamic task values and diagnostics on one Markdown line while preserving raw JSON values.

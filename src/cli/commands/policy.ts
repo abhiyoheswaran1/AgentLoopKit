@@ -12,7 +12,10 @@ import {
   listPolicyPacks,
   readPolicyPack,
 } from '../../core/policy-packs.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import {
+  escapeMarkdownProse,
+  singleLineInlineCode as inlineCode,
+} from '../../core/markdown-format.js';
 import type { ListedPolicy, PolicyDocument, PolicyStatusReport } from '../../core/policy.js';
 import type {
   PolicyPack,
@@ -36,6 +39,10 @@ function printJsonError(error: Error & { code?: string }, details: Record<string
     ),
   );
   process.exitCode = 1;
+}
+
+function singleLineProse(value: string) {
+  return escapeMarkdownProse(value).replace(/\r/g, '\\r').replace(/\n/g, '\\n');
 }
 
 function printMissingPolicyDirectoryError(error: unknown, options: { json?: boolean }) {
@@ -121,9 +128,9 @@ function printPolicyPack(pack: PolicyPack, options: { json?: boolean }) {
     return;
   }
 
-  console.log(`# ${pack.title}`);
+  console.log(`# ${singleLineProse(pack.title)}`);
   console.log('');
-  console.log(pack.description);
+  console.log(singleLineProse(pack.description));
   console.log('');
   console.log(`- Name: ${inlineCode(pack.name)}`);
   console.log(`- Source: ${inlineCode(pack.source)}`);

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-04-21-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-04-21",
+  "createdAtEpochMs": 1781576510857,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-make-policy-output-markdown-safe.md",
+    "title": "Make policy output Markdown-safe",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-04-20-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-04-21-pr-summary.md",
+  "changedFileCount": 17
+}

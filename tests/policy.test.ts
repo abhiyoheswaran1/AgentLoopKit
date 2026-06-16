@@ -3,7 +3,7 @@ import { mkdir, rm, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
-import { inlineCode } from '../src/core/markdown-format.js';
+import { inlineCode, singleLineInlineCode } from '../src/core/markdown-format.js';
 import { listPolicies, readPolicy, getPolicyStatus } from '../src/core/policy.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -257,9 +257,7 @@ describe('policy command', () => {
     });
 
     expect(listResult.stdout).toContain(`- ${inlineCode('Custom `Policy`')}`);
-    expect(listResult.stdout).toContain(
-      `  ${inlineCode('.agentloop/policies/custom`policy.md')}`,
-    );
+    expect(listResult.stdout).toContain(`  ${inlineCode('.agentloop/policies/custom`policy.md')}`);
     expect(statusResult.stdout).toContain(
       `- ${inlineCode('extra')}: ${inlineCode('Custom `Policy`')}`,
     );
@@ -267,6 +265,26 @@ describe('policy command', () => {
       `  ${inlineCode('.agentloop/policies/custom`policy.md')}`,
     );
     expect(showResult.stdout).toBe('# Custom `Policy`\n\nRepo guidance.');
+  });
+
+  test('prints policy list and status paths containing line breaks on one Markdown line', async () => {
+    const { dir } = await createPolicyFixture();
+    const policyPath = '.agentloop/policies/custom\npolicy.md';
+    await writeFile(path.join(dir, policyPath), '# Custom Policy\n\nRepo guidance.\n');
+
+    const listResult = await execa(tsxPath, [cliPath, 'policy', 'list'], { cwd: dir });
+    const statusResult = await execa(tsxPath, [cliPath, 'policy', 'status'], { cwd: dir });
+    const jsonResult = await execa(tsxPath, [cliPath, 'policy', 'list', '--json'], { cwd: dir });
+
+    expect(listResult.stdout).toContain(`  ${singleLineInlineCode(policyPath)}`);
+    expect(statusResult.stdout).toContain(`  ${singleLineInlineCode(policyPath)}`);
+    expect(listResult.stdout).not.toContain(`  ${inlineCode(policyPath)}`);
+    expect(statusResult.stdout).not.toContain(`  ${inlineCode(policyPath)}`);
+    expect(JSON.parse(jsonResult.stdout).policies).toContainEqual({
+      name: 'custom\npolicy',
+      title: 'Custom Policy',
+      path: policyPath,
+    });
   });
 
   test('prints missing policy errors as JSON when requested', async () => {
