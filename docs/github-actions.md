@@ -10,6 +10,8 @@ For non-GitHub CI, see [GitLab CI](../examples/gitlab-ci/README.md) and [Buildki
 
 AgentLoopKit includes a composite GitHub Action for teams that want a short CI step instead of writing the npm install command by hand.
 
+Marketplace listing: <https://github.com/marketplace/actions/agentloopkit>
+
 Use it for static, trusted commands such as `check-gates --strict`, `ship --github-comment`, `prepare-pr --github-comment`, or `maintainer-check --redact-paths`. Keep the `command`, `agentloopkit-version`, and `install-mode` values under maintainer control. Do not build those inputs from pull request titles, issue text, branch names, comments, or other user-controlled strings.
 
 The Action installs AgentLoopKit from npm by default, then runs the command through a Node wrapper that uses argument arrays instead of shell interpolation. The wrapper rejects shell metacharacters and only accepts `latest` or exact semver package versions.

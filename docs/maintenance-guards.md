@@ -7,7 +7,7 @@ AgentLoopKit's near-term work is maintenance discipline, adoption polish, and tr
 The supported release path is:
 
 ```text
-GitHub Release -> npm trusted publishing -> GHCR -> MCP Registry
+GitHub Release -> GitHub Marketplace -> npm trusted publishing -> GHCR -> MCP Registry
 ```
 
 Keep these checks healthy:
@@ -59,7 +59,7 @@ After release workflows finish, run:
 agentloop release-proof
 ```
 
-This checks npm, GitHub Releases, GHCR, and MCP Registry evidence. It does not publish, create tags, upload files, post comments, read tokens, or read `.env` contents.
+This checks npm, GitHub Releases, GitHub Marketplace, GHCR, and MCP Registry evidence. It does not publish, create tags, upload files, post comments, read tokens, or read `.env` contents.
 
 ## SchemaStore
 

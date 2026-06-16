@@ -69,6 +69,10 @@ function proofFixtures(version = '1.2.3') {
         },
       ],
     }),
+    githubMarketplaceJson: JSON.stringify({
+      status: 200,
+      url: 'https://github.com/marketplace/actions/agentloopkit',
+    }),
     ghcrTagsJson: JSON.stringify({
       name: 'abhiyoheswaran1/agentloopkit',
       tags: ['latest', '1.2', version],
@@ -92,11 +96,13 @@ async function writeFixtureFiles(dir: string, fixtures = proofFixtures()) {
   const paths = {
     npmRegistryJsonPath: path.join(dir, 'npm-view.json'),
     githubReleaseJsonPath: path.join(dir, 'github-release.json'),
+    githubMarketplaceJsonPath: path.join(dir, 'github-marketplace.json'),
     ghcrTagsJsonPath: path.join(dir, 'ghcr-tags.json'),
     mcpRegistryJsonPath: path.join(dir, 'mcp-registry.json'),
   };
   await writeFile(paths.npmRegistryJsonPath, fixtures.npmRegistryJson);
   await writeFile(paths.githubReleaseJsonPath, fixtures.githubReleaseJson);
+  await writeFile(paths.githubMarketplaceJsonPath, fixtures.githubMarketplaceJson);
   await writeFile(paths.ghcrTagsJsonPath, fixtures.ghcrTagsJson);
   await writeFile(paths.mcpRegistryJsonPath, fixtures.mcpRegistryJson);
   return paths;
@@ -124,6 +130,7 @@ describe('release proof', () => {
       expect.arrayContaining([
         expect.objectContaining({ id: 'npm', status: 'pass' }),
         expect.objectContaining({ id: 'github-release', status: 'pass' }),
+        expect.objectContaining({ id: 'github-marketplace', status: 'pass' }),
         expect.objectContaining({ id: 'ghcr', status: 'pass' }),
         expect.objectContaining({ id: 'mcp-registry', status: 'pass' }),
       ]),
@@ -196,6 +203,34 @@ describe('release proof', () => {
     expect(result.nextAction.command).toBe('verify release tag');
   });
 
+  test('warns when the GitHub Marketplace listing is not published', async () => {
+    const dir = await createReleaseProofRepo();
+
+    const result = await checkReleaseProof({
+      cwd: dir,
+      only: 'github-marketplace',
+      githubMarketplaceJson: JSON.stringify({
+        status: 404,
+        url: 'https://github.com/marketplace/actions/agentloopkit',
+      }),
+    });
+
+    expect(result.overallStatus).toBe('warn');
+    expect(result.channels).toEqual([
+      expect.objectContaining({
+        id: 'github-marketplace',
+        status: 'warn',
+        message:
+          'GitHub Marketplace listing is not published at https://github.com/marketplace/actions/agentloopkit.',
+        url: 'https://github.com/marketplace/actions/agentloopkit',
+      }),
+    ]);
+    expect(result.nextAction).toEqual({
+      command: 'fix release channel proof',
+      reason: 'Missing or mismatched proof: GitHub Marketplace.',
+    });
+  });
+
   test('warns instead of crashing when MCP Registry metadata is not configured', async () => {
     const dir = await createReleaseProofRepo('1.2.3', { mcpServer: false });
     const fixtures = proofFixtures();
@@ -204,6 +239,7 @@ describe('release proof', () => {
       cwd: dir,
       npmRegistryJson: fixtures.npmRegistryJson,
       githubReleaseJson: fixtures.githubReleaseJson,
+      githubMarketplaceJson: fixtures.githubMarketplaceJson,
       ghcrTagsJson: fixtures.ghcrTagsJson,
     });
 
@@ -241,6 +277,10 @@ describe('release proof', () => {
     expect(result.sources.npm.command).toContain('npm view');
     expect(result.sources.githubRelease).toMatchObject({
       command: 'skipped release-proof channel: github-release',
+      exitCode: 0,
+    });
+    expect(result.sources.githubMarketplace).toMatchObject({
+      command: 'skipped release-proof channel: github-marketplace',
       exitCode: 0,
     });
     expect(result.sources.ghcr).toMatchObject({
@@ -330,6 +370,8 @@ describe('release proof', () => {
         paths.npmRegistryJsonPath,
         '--github-release-json',
         paths.githubReleaseJsonPath,
+        '--github-marketplace-json',
+        paths.githubMarketplaceJsonPath,
         '--ghcr-tags-json',
         paths.ghcrTagsJsonPath,
         '--mcp-registry-json',
@@ -346,6 +388,7 @@ describe('release proof', () => {
     const output = JSON.parse(result.stdout);
     expect(output.overallStatus).toBe('pass');
     expect(output.sources.githubRelease.command).toContain('captured GitHub release JSON');
+    expect(output.sources.githubMarketplace.command).toContain('captured GitHub Marketplace JSON');
     expect(output.sources.ghcr.command).toContain('captured GHCR tag JSON');
     expect(output.sources.mcpRegistry.command).toContain('captured MCP Registry JSON');
   });
@@ -375,6 +418,9 @@ describe('release proof', () => {
     expect(output.sources.githubRelease.command).toBe(
       'skipped release-proof channel: github-release',
     );
+    expect(output.sources.githubMarketplace.command).toBe(
+      'skipped release-proof channel: github-marketplace',
+    );
     expect(output.sources.ghcr.command).toBe('skipped release-proof channel: ghcr');
     expect(output.sources.mcpRegistry.command).toBe('skipped release-proof channel: mcp-registry');
   });
@@ -403,9 +449,10 @@ describe('release proof', () => {
     expect(JSON.parse(result.stdout)).toEqual({
       error: {
         code: 'RELEASE_PROOF_ONLY_INVALID',
-        message: 'Release proof --only must be one of: npm, github-release, ghcr, mcp-registry.',
+        message:
+          'Release proof --only must be one of: npm, github-release, github-marketplace, ghcr, mcp-registry.',
         requestedOnly: 'homebrew',
-        allowed: ['npm', 'github-release', 'ghcr', 'mcp-registry'],
+        allowed: ['npm', 'github-release', 'github-marketplace', 'ghcr', 'mcp-registry'],
       },
     });
   });
@@ -424,6 +471,8 @@ describe('release proof', () => {
         paths.npmRegistryJsonPath,
         '--github-release-json',
         paths.githubReleaseJsonPath,
+        '--github-marketplace-json',
+        paths.githubMarketplaceJsonPath,
         '--ghcr-tags-json',
         paths.ghcrTagsJsonPath,
       ],

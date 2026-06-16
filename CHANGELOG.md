@@ -4,6 +4,12 @@
 
 - No unreleased changes yet.
 
+## 0.35.1
+
+- Added GitHub Marketplace proof to `agentloop release-proof`, including `--only github-marketplace` and captured `--github-marketplace-json` support.
+- Added Marketplace-facing metadata to the root composite GitHub Action so the published Action has a badge, clearer description, and explicit trusted-input copy.
+- Updated release docs and checklists so maintainers must publish the Action through the GitHub release UI Marketplace checkbox and verify the Marketplace listing before claiming cross-channel release proof.
+
 ## 0.35.0
 
 - Added `agentloop verify --post-verification-gates` so reviewed task post-verification gates can run after the verification report exists while default `verify` behavior stays unchanged.

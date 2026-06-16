@@ -206,6 +206,7 @@ describe('release smoke script helpers', () => {
       '- GitHub release `v0.28.3` is public.',
       '- npm latest is `agentloopkit@0.28.3`.',
       '- GHCR and MCP Registry are live for `0.28.3`.',
+      '- GitHub Marketplace listing is live for the composite Action.',
       '- Release tag `v0.28.3` points at the published release commit. Current `main` may include post-release bookkeeping.',
       '',
       '## Later',
@@ -229,6 +230,7 @@ describe('release smoke script helpers', () => {
       '- GitHub release `v0.28.1` is public.',
       '- npm latest is `agentloopkit@0.28.1`.',
       '- GHCR and MCP Registry are live for `0.28.1`.',
+      '- GitHub Marketplace listing is live for the composite Action.',
       '- Release tag `v0.28.1` points at the published release commit. Current `main` may include post-release bookkeeping.',
       '',
       '## Later',
@@ -300,6 +302,7 @@ describe('release smoke script helpers', () => {
         '- GitHub release `v9.8.7` is public.',
         '- npm latest is `agentloopkit@9.8.7`.',
         '- GHCR and MCP Registry are live for `9.8.7`.',
+        '- GitHub Marketplace listing is live for the composite Action.',
         '- Release tag `v9.8.7` points at the published release commit.',
       ].join('\n'),
     );
@@ -340,6 +343,7 @@ describe('release smoke script helpers', () => {
         '- GitHub release `v9.8.7` is public.',
         '- npm latest is `agentloopkit@9.8.7`.',
         '- GHCR and MCP Registry are live for `9.8.7`.',
+        '- GitHub Marketplace listing is live for the composite Action.',
         '- Release tag `v9.8.7` points at the published release commit.',
       ].join('\n'),
     );

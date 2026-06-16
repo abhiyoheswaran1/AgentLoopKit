@@ -8,7 +8,12 @@ import {
 } from '../../core/release-proof.js';
 import { resolveAgentLoopWorkspaceCwd } from '../../core/config.js';
 
-type ReleaseProofCapture = 'npm-registry' | 'github-release' | 'ghcr' | 'mcp-registry';
+type ReleaseProofCapture =
+  | 'npm-registry'
+  | 'github-release'
+  | 'github-marketplace'
+  | 'ghcr'
+  | 'mcp-registry';
 type ReleaseProofCaptureErrorReason = 'missing' | 'unreadable' | 'invalid-json' | 'env-file';
 type ReleaseProofTimeoutErrorReason = 'not-positive-integer';
 
@@ -67,6 +72,7 @@ function parseOnly(value: unknown): ReleaseProofChannelId | undefined {
 function captureMatchesOnly(proof: ReleaseProofCapture, only: ReleaseProofChannelId | undefined) {
   if (!only) return true;
   if (proof === 'npm-registry') return only === 'npm';
+  if (proof === 'github-marketplace') return only === 'github-marketplace';
   return proof === only;
 }
 
@@ -76,6 +82,8 @@ function captureLabel(proof: ReleaseProofCapture) {
       return 'npm registry';
     case 'github-release':
       return 'GitHub release';
+    case 'github-marketplace':
+      return 'GitHub Marketplace';
     case 'ghcr':
       return 'GHCR tag';
     case 'mcp-registry':
@@ -198,6 +206,7 @@ export function releaseProofCommand() {
       'read captured `npm view <package> version versions --json` output instead of running npm',
     )
     .option('--github-release-json <path>', 'read captured GitHub release JSON')
+    .option('--github-marketplace-json <path>', 'read captured GitHub Marketplace JSON')
     .option('--ghcr-tags-json <path>', 'read captured GHCR tag-list JSON')
     .option('--mcp-registry-json <path>', 'read captured MCP Registry server JSON')
     .action(
@@ -209,12 +218,14 @@ export function releaseProofCommand() {
         timeoutMs: string;
         npmRegistryJson?: string;
         githubReleaseJson?: string;
+        githubMarketplaceJson?: string;
         ghcrTagsJson?: string;
         mcpRegistryJson?: string;
       }) => {
         let timeoutMs: number;
         let npmRegistryJson: string | undefined;
         let githubReleaseJson: string | undefined;
+        let githubMarketplaceJson: string | undefined;
         let ghcrTagsJson: string | undefined;
         let mcpRegistryJson: string | undefined;
         let only: ReleaseProofChannelId | undefined;
@@ -229,6 +240,10 @@ export function releaseProofCommand() {
           githubReleaseJson =
             options.githubReleaseJson && captureMatchesOnly('github-release', only)
               ? await readCaptureJsonFile('github-release', options.githubReleaseJson)
+              : undefined;
+          githubMarketplaceJson =
+            options.githubMarketplaceJson && captureMatchesOnly('github-marketplace', only)
+              ? await readCaptureJsonFile('github-marketplace', options.githubMarketplaceJson)
               : undefined;
           ghcrTagsJson =
             options.ghcrTagsJson && captureMatchesOnly('ghcr', only)
@@ -261,6 +276,7 @@ export function releaseProofCommand() {
           timeoutMs,
           npmRegistryJson,
           githubReleaseJson,
+          githubMarketplaceJson,
           ghcrTagsJson,
           mcpRegistryJson,
         });

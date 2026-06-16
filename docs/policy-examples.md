@@ -197,7 +197,7 @@ Suggested `release-evidence-policy.md`:
 
 - Release changes must include `agentloop release-check --strict` output.
 - Public docs must not mention unsupported release channels.
-- Record npm, GitHub release, container, and MCP Registry proof only after each channel reports the new version.
+- Record npm, GitHub release, GitHub Marketplace, container, and MCP Registry proof only after each channel reports the new version.
 ```
 
 Good workflow:

@@ -9,6 +9,7 @@ This page is for maintainers planning releases. Keep the README focused on user 
 | npm / npx       | Primary channel       | `npx agentloopkit init`                                                                      |
 | GitHub Releases | Public release assets | Download `agentloopkit-<version>.tgz` from GitHub                                            |
 | GitHub Action   | Live repo action      | `uses: abhiyoheswaran1/AgentLoopKit@v<version>`                                              |
+| GitHub Marketplace | Live Action listing | <https://github.com/marketplace/actions/agentloopkit>                                        |
 | Docker / GHCR   | Live image            | `docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:<version> doctor` |
 | MCP Registry    | Published metadata    | `npx --yes agentloopkit@latest mcp-server`                                                   |
 
@@ -22,7 +23,7 @@ For each release:
 2. Run the full local verification set.
 3. Build and pack the package.
 4. Push the release commit and tag.
-5. Publish the GitHub release with the packed tarball.
+5. Publish the GitHub release with the packed tarball and select **Publish this Action to the GitHub Marketplace** in the GitHub release UI.
 6. Let `.github/workflows/publish.yml` publish to npm through trusted publishing.
 7. Let `.github/workflows/docker.yml` publish the GHCR image from the GitHub release.
 8. Let `.github/workflows/publish-mcp.yml` submit MCP Registry metadata after npm publishes.
@@ -48,6 +49,8 @@ Keep `command` and `agentloopkit-version` static and trusted. Do not build eithe
 
 The action does not upload artifacts or comment on pull requests. Workflow authors decide which command to run and whether to upload generated AgentLoopKit files.
 
+GitHub Marketplace publication is a release UI step, not a `gh release` or REST API flag. Before claiming the Marketplace channel is live for a release, open the GitHub release editor, ensure **Publish this Action to the GitHub Marketplace** is selected, choose the Developer Tools category, publish the release, and verify the Marketplace URL with `agentloop release-proof --only github-marketplace --strict`.
+
 ## Docker / GHCR
 
 The Docker image installs the packed npm tarball globally and runs `agentloop`.
@@ -67,7 +70,7 @@ docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:<versi
 
 The image does not bundle project dependencies. Users still install their own repo dependencies before running verification commands that require them.
 
-After release workflows finish, run `agentloop release-proof` from the release commit to check npm, GitHub Releases, GHCR, and MCP Registry evidence against the local package version.
+After release workflows finish, run `agentloop release-proof` from the release commit to check npm, GitHub Releases, GitHub Marketplace, GHCR, and MCP Registry evidence against the local package version.
 
 ## MCP Registry
 
@@ -90,7 +93,8 @@ See [mcp.md](mcp.md).
 
 ## Channel Rules
 
-- Keep npm and GitHub Releases as the source of truth for public versions.
+- Keep npm and GitHub Releases as the version source of truth for public versions.
+- Keep the GitHub Marketplace listing live for the composite Action before claiming cross-channel proof.
 - Mark a channel supported only after a clean release verifies it.
 - Use the same npm package or release tarball across channels.
 - Keep install commands copy-pasteable.

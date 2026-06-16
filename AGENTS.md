@@ -58,7 +58,7 @@ Use these roles as routing hints when a coding-agent session needs focused exper
 - Template and Harness Engineer: Use for `init`, generated files, `.agentloop/` structure, task templates, policies, gates, and agent instructions. Owns `src/templates/`, template tests, and migration notes.
 - Verification Engineer: Use for Vitest coverage, smoke scripts, CI workflows, release gates, and reproducible evidence. Owns `tests/`, `scripts/`, `.github/workflows/`, and verification reports.
 - Security Reviewer: Use for file writes, command execution, env-file handling, dependency changes, publishing, and registry metadata. Blocks unsafe defaults and requires transparent user-facing behavior.
-- Release Engineer: Use for npm, GitHub Releases, GHCR, MCP Registry, changelog entries, version bumps, tarballs, checksums, and post-release proof.
+- Release Engineer: Use for npm, GitHub Releases, GitHub Marketplace, GHCR, MCP Registry, changelog entries, version bumps, tarballs, checksums, and post-release proof.
 - Docs and DX Writer: Use for README, getting-started docs, examples, CLI copy, error messages, and install instructions. Keeps public docs user-facing and removes maintainer-only notes.
 - Agent Compatibility Engineer: Use for Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and generic-agent guidance. Keeps instructions tool-agnostic unless behavior is implemented.
 - MCP and Automation Engineer: Use for read-only MCP server behavior, GitHub Action usage, CI summaries, and automation docs. Keeps automation local-first and reviewable.

@@ -52,14 +52,20 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     expect(agents).toContain('.agentloop/research/');
     expect(agentloop).toContain('.agentloop/harness/autonomous-dogfooding.md');
     expect(repoMap).toContain('.agentloop/product-panel.md');
-    expect(dogfoodGuide).toContain('Build -> Test -> Review -> Simulated user feedback -> Product panel debate -> Decision -> Backlog update -> Iterate -> Verify -> Document');
-    expect(dogfoodGuide).toContain('Synthetic feedback is internal decision support, not public evidence.');
+    expect(dogfoodGuide).toContain(
+      'Build -> Test -> Review -> Simulated user feedback -> Product panel debate -> Decision -> Backlog update -> Iterate -> Verify -> Document',
+    );
+    expect(dogfoodGuide).toContain(
+      'Synthetic feedback is internal decision support, not public evidence.',
+    );
   });
 
   test('keeps AgentFlight and AgentLoop task setup sequential to avoid generic task races', async () => {
     const dogfoodGuide = await readFile('.agentloop/harness/autonomous-dogfooding.md', 'utf8');
 
-    expect(dogfoodGuide).toContain('Do not start AgentFlight and `agentloop create-task` in parallel.');
+    expect(dogfoodGuide).toContain(
+      'Do not start AgentFlight and `agentloop create-task` in parallel.',
+    );
     expect(dogfoodGuide).toContain('npm run dogfood:start');
     expect(dogfoodGuide).toContain('--dry-run');
   });
@@ -90,7 +96,9 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     expect(roadmap).toContain('Keep the GitHub release to npm trusted-publishing flow healthy');
     expect(roadmap).toContain('Keep bundled policy packs small, safe, and useful');
     expect(distribution).toContain('agentloop release-proof');
-    expect(maintenance).toContain('GitHub Release -> npm trusted publishing -> GHCR -> MCP Registry');
+    expect(maintenance).toContain(
+      'GitHub Release -> GitHub Marketplace -> npm trusted publishing -> GHCR -> MCP Registry',
+    );
     expect(maintenance).toContain('README/public docs');
     expect(maintenance).toContain('SchemaStore');
     expect(maintenance).toContain('policy packs');

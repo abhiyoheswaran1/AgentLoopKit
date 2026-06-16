@@ -31,6 +31,7 @@ async function makeFixture(readme: string) {
       '- GitHub release `v1.2.3` is public.',
       '- npm latest is `agentloopkit@1.2.3`.',
       '- GHCR and MCP Registry are live for `1.2.3`.',
+      '- GitHub Marketplace listing is live for the composite Action.',
       '- Release tag `v1.2.3` points at the published release commit.',
       '',
     ].join('\n'),

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-16-48-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-16-48",
+  "createdAtEpochMs": 1781621323427,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-publish-github-marketplace-action.md",
+    "title": "Publish GitHub Marketplace Action",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-16-43-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-16-48-pr-summary.md",
+  "changedFileCount": 35
+}

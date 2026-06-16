@@ -30,7 +30,7 @@ agentloop create-task --type release --title "Prepare AgentLoopKit release" \
   --acceptance "package.json and CHANGELOG.md agree on the intended version" \
   --acceptance "The full local release gate passes" \
   --acceptance "Post-publish npm proof is recorded before claiming availability" \
-  --acceptance "Post-publish release proof matches npm, GitHub Releases, GHCR, and MCP Registry" \
+  --acceptance "Post-publish release proof matches npm, GitHub Releases, GitHub Marketplace, GHCR, and MCP Registry" \
   --verification "agentloop npm-status --agentloopkit --expect-current" \
   --verification "npm run smoke:release" \
   --verification "npx pnpm@10.12.1 check:links" \

@@ -39,7 +39,7 @@ Rules:
 - Use `agentloop release-notes --write` before a release when reviewers need local release-note evidence.
 - Use `agentloop npm-status` after release attempts to check whether npm latest matches local package metadata.
 - Use `agentloop npm-status --agentloopkit --expect-current` as an AgentLoopKit post-publish smoke check from any directory. It never publishes or reads credentials.
-- Use `agentloop release-proof` after public release workflows finish to check npm, GitHub Releases, GHCR, and MCP Registry proof against local package metadata.
+- Use `agentloop release-proof` after public release workflows finish to check npm, GitHub Releases, GitHub Marketplace, GHCR, and MCP Registry proof against local package metadata.
 - Run targeted checks while developing.
 - Run configured verification before claiming completion.
 - Dogfood dependency audit, AgentFlight, and ProjScan during implementation work in this repository.
@@ -58,6 +58,6 @@ Use `agentloop release-notes --write` after verification when a release workflow
 
 Use `agentloop npm-status` when release docs mention npm availability. Use `--agentloopkit` when checking AgentLoopKit itself from a temp release-smoke folder or CI workspace. The command runs `npm view` only when invoked, or reads captured registry JSON with `--registry-json`. It does not publish packages, read tokens, read `.env` files, or change package metadata.
 
-Use `agentloop release-proof` after release workflows finish when maintainers need one post-release evidence report. It checks npm, GitHub Releases, GHCR, and MCP Registry proof. It does not publish, tag, upload, post comments, or read tokens.
+Use `agentloop release-proof` after release workflows finish when maintainers need one post-release evidence report. It checks npm, GitHub Releases, GitHub Marketplace, GHCR, and MCP Registry proof. It does not publish, tag, upload, post comments, or read tokens.
 
 Use `agentloop verify --task <path> --task-commands` only for reviewed commands listed under `Verification Commands`. Commands under `Post-Verification Gates` are not run by `verify`; run them after the verification report exists.

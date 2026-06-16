@@ -7,7 +7,13 @@ import { checkNpmStatus } from './npm-status.js';
 
 export type ReleaseProofStatus = 'pass' | 'warn' | 'fail';
 
-export const releaseProofChannelIds = ['npm', 'github-release', 'ghcr', 'mcp-registry'] as const;
+export const releaseProofChannelIds = [
+  'npm',
+  'github-release',
+  'github-marketplace',
+  'ghcr',
+  'mcp-registry',
+] as const;
 
 export type ReleaseProofChannelId = (typeof releaseProofChannelIds)[number];
 
@@ -43,6 +49,7 @@ export type ReleaseProofResult = {
   sources: {
     npm: ReleaseProofSource;
     githubRelease: ReleaseProofSource;
+    githubMarketplace: ReleaseProofSource;
     ghcr: ReleaseProofSource;
     mcpRegistry: ReleaseProofSource;
   };
@@ -117,6 +124,22 @@ async function readServerMcpName(cwd: string) {
   if (!(await pathExists(serverPath))) return undefined;
   const parsed = JSON.parse(await readFile(serverPath, 'utf8')) as { name?: unknown };
   return valueAsString(parsed.name);
+}
+
+async function readActionName(cwd: string) {
+  const actionPath = path.join(cwd, 'action.yml');
+  if (!(await pathExists(actionPath))) return undefined;
+  const content = await readFile(actionPath, 'utf8');
+  const match = content.match(/^name:\s*['"]?([^'"\n#]+?)['"]?\s*(?:#.*)?$/m);
+  return valueAsString(match?.[1]);
+}
+
+function marketplaceSlugFromActionName(actionName: string) {
+  return actionName
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 function githubRepoFromUrl(repositoryUrl: string | undefined) {
@@ -203,6 +226,29 @@ async function fetchJson(url: string, timeoutMs: number): Promise<HttpJsonResult
   } catch (error) {
     return {
       source: sourceFromError(`GET ${url}`, error instanceof Error ? error.message : String(error)),
+    };
+  }
+}
+
+async function fetchHttpStatus(url: string, timeoutMs: number): Promise<HttpJsonResult> {
+  try {
+    const response = await fetch(url, {
+      method: 'HEAD',
+      headers: {
+        'user-agent': 'agentloopkit-release-proof',
+      },
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    return {
+      source: { command: `HEAD ${url}`, exitCode: 0 },
+      value: { status: response.status, url },
+    };
+  } catch (error) {
+    return {
+      source: sourceFromError(
+        `HEAD ${url}`,
+        error instanceof Error ? error.message : String(error),
+      ),
     };
   }
 }
@@ -326,6 +372,27 @@ function githubReleaseProof(value: unknown, version: string) {
         : `GitHub release proof is missing v${version}, ${expectedAsset}, or public release state.`,
     url: htmlUrl,
     prerelease,
+  };
+}
+
+function githubMarketplaceProof(value: unknown, fallbackUrl?: string) {
+  const record = valueAsRecord(value);
+  const rawStatus = record?.status;
+  const status =
+    typeof rawStatus === 'number'
+      ? rawStatus
+      : typeof rawStatus === 'string'
+        ? Number(rawStatus)
+        : undefined;
+  const url = valueAsString(record?.url) ?? fallbackUrl ?? 'unknown';
+  const published = typeof status === 'number' && status >= 200 && status < 300;
+
+  return {
+    status: published ? ('pass' as const) : ('warn' as const),
+    message: published
+      ? `GitHub Marketplace listing is published at ${url}.`
+      : `GitHub Marketplace listing is not published at ${url}.`,
+    url,
   };
 }
 
@@ -479,6 +546,7 @@ export async function checkReleaseProof(options: {
   strict?: boolean;
   npmRegistryJson?: string;
   githubReleaseJson?: string;
+  githubMarketplaceJson?: string;
   ghcrTagsJson?: string;
   mcpRegistryJson?: string;
   only?: ReleaseProofChannelId;
@@ -495,6 +563,12 @@ export async function checkReleaseProof(options: {
   const checkedChannels = options.only ? [options.only] : [...releaseProofChannelIds];
   const shouldCheck = (channelId: ReleaseProofChannelId) => checkedChannels.includes(channelId);
   const repo = githubRepoFromUrl(packageMetadata.repositoryUrl);
+  const actionName = shouldCheck('github-marketplace')
+    ? await readActionName(options.cwd)
+    : undefined;
+  const marketplaceUrl = actionName
+    ? `https://github.com/marketplace/actions/${marketplaceSlugFromActionName(actionName)}`
+    : undefined;
   const mcpName = shouldCheck('mcp-registry')
     ? (packageMetadata.mcpName ?? (await readServerMcpName(options.cwd)))
     : undefined;
@@ -544,6 +618,28 @@ export async function checkReleaseProof(options: {
           status: 'warn' as const,
           message: `GitHub release proof could not be read: ${githubResult.source.error ?? 'unknown error'}.`,
           url: undefined,
+        }
+    : undefined;
+
+  const githubMarketplaceResult = shouldCheck('github-marketplace')
+    ? options.githubMarketplaceJson
+      ? parseCapturedJson(options.githubMarketplaceJson, 'captured GitHub Marketplace JSON')
+      : marketplaceUrl
+        ? await fetchHttpStatus(marketplaceUrl, timeoutMs)
+        : {
+            source: sourceFromError(
+              'GitHub Marketplace proof',
+              'root action.yml name is not configured',
+            ),
+          }
+    : { source: sourceFromSkipped('github-marketplace') };
+  const githubMarketplace = shouldCheck('github-marketplace')
+    ? githubMarketplaceResult.value
+      ? githubMarketplaceProof(githubMarketplaceResult.value, marketplaceUrl)
+      : {
+          status: 'warn' as const,
+          message: `GitHub Marketplace proof could not be read: ${githubMarketplaceResult.source.error ?? 'unknown error'}.`,
+          url: marketplaceUrl,
         }
     : undefined;
 
@@ -618,6 +714,15 @@ export async function checkReleaseProof(options: {
           githubProof.url,
         )
       : undefined,
+    githubMarketplace
+      ? channel(
+          'github-marketplace',
+          'GitHub Marketplace',
+          githubMarketplace.status,
+          githubMarketplace.message,
+          githubMarketplace.url,
+        )
+      : undefined,
     ghcr ? channel('ghcr', 'GHCR', ghcr.status, ghcr.message) : undefined,
     mcp ? channel('mcp-registry', 'MCP Registry', mcp.status, mcp.message) : undefined,
   ].filter((item): item is ReleaseProofChannel => Boolean(item));
@@ -640,6 +745,7 @@ export async function checkReleaseProof(options: {
     sources: {
       npm: npmStatus.source,
       githubRelease: githubResult.source,
+      githubMarketplace: githubMarketplaceResult.source,
       ghcr: ghcrResult.source,
       mcpRegistry: mcpResult.source,
     },
@@ -648,7 +754,7 @@ export async function checkReleaseProof(options: {
       does: [
         'reads local package metadata',
         'checks local git tag state',
-        'queries public release metadata when captured JSON is not provided',
+        'queries public release and Marketplace metadata when captured JSON is not provided',
         'requests an anonymous GHCR bearer token when public tag listing requires it',
         'reads only explicit captured JSON files when fixture flags are provided',
       ],

@@ -463,10 +463,12 @@ agentloop release-proof --strict
 agentloop release-proof --redact-paths
 agentloop release-proof --only npm
 agentloop release-proof --only github-release
+agentloop release-proof --only github-marketplace
 agentloop release-proof --only ghcr
 agentloop release-proof --only mcp-registry
 agentloop release-proof --npm-registry-json npm-view.json
 agentloop release-proof --github-release-json github-release.json
+agentloop release-proof --github-marketplace-json github-marketplace.json
 agentloop release-proof --ghcr-tags-json ghcr-tags.json
 agentloop release-proof --mcp-registry-json mcp-registry.json
 
@@ -488,7 +490,7 @@ Human-readable `release-notes` output keeps dynamic metadata, refs, paths, and e
 Use `--redact-paths` before pasting release-check output into a public issue, PR, or CI log. Default JSON keeps the absolute Git root for scripts that need it.
 Human-readable `release-check` output keeps package metadata, release-delta messages, check messages, paths, refs, and commands on one Markdown line. JSON output keeps raw values for scripts, including `releaseDelta.changedFiles`, `releaseDelta.packageImpactingChangedFiles`, and `releaseDelta.recommendation`.
 
-`release-proof` checks post-release evidence across public release channels. It reports whether npm, GitHub Releases, GHCR, and MCP Registry proof match the local package version. It also reports the version tag commit, current commit, and whether `HEAD` matches the version tag. If public channels match but `HEAD` differs from the tag, use `agentloop release-check` to decide whether unreleased commits need another release. Use `--only <channel>` to re-check one channel after a delayed workflow. Use captured JSON flags when you want deterministic CI or release notes without live registry calls. Use `--strict` when missing proof should fail the command.
+`release-proof` checks post-release evidence across public release channels. It reports whether npm, GitHub Releases, GitHub Marketplace, GHCR, and MCP Registry proof match the local package version. It also reports the version tag commit, current commit, and whether `HEAD` matches the version tag. If public channels match but `HEAD` differs from the tag, use `agentloop release-check` to decide whether unreleased commits need another release. Use `--only <channel>` to re-check one channel after a delayed workflow. Use captured JSON flags when you want deterministic CI or release notes without live registry calls. Use `--strict` when missing proof should fail the command.
 
 Human-readable `release-proof` output keeps package metadata, channel messages, tags, commits, URLs, and next-action commands on one Markdown line. JSON output keeps raw values for scripts.
 

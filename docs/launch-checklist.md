@@ -8,7 +8,7 @@ For a read-only registry check, see [npm-status.md](npm-status.md).
 
 ## Current Release Policy
 
-- Current public package line: `0.35.0`.
+- Current public package line: `0.35.1`.
 - Active release candidate: none.
 - Do not bump versions, create tags, publish npm, publish GitHub Releases, publish GHCR, or publish MCP Registry entries during active implementation.
 - Cut the next version only when the maintainer asks for release prep.
@@ -66,6 +66,8 @@ For a read-only registry check, see [npm-status.md](npm-status.md).
 - [ ] Packed tarball is attached to the GitHub release.
 - [ ] Release notes include verification summary and user-facing changes.
 - [ ] Release notes do not mention maintainer-only auth state unless the release is blocked.
+- [ ] Release Action has **Publish this Action to the GitHub Marketplace** selected.
+- [ ] GitHub Marketplace primary category is set to Developer Tools.
 
 ## Automated Publishing
 
@@ -80,9 +82,11 @@ For a read-only registry check, see [npm-status.md](npm-status.md).
 - [ ] `npm view agentloopkit versions --json`
 - [ ] `agentloop npm-status --agentloopkit --expect-current`
 - [ ] `agentloop release-proof`
+- [ ] `agentloop release-proof --only github-marketplace --strict`
 - [ ] `npx --yes agentloopkit@<version> version`
 - [ ] `npm run smoke:published -- --version <version>`
 - [ ] GitHub release asset digest matches the local tarball SHA-256.
+- [ ] GitHub Marketplace URL returns success: <https://github.com/marketplace/actions/agentloopkit>.
 - [ ] GHCR image can run `agentloop version`.
 - [ ] MCP server can run with `npx --yes agentloopkit@<version> mcp-server`.
 

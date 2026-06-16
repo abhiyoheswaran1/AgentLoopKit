@@ -41,7 +41,8 @@ const UNSUPPORTED_ADOPTION_CLAIMS = [
   { label: 'unsupported trust claim', pattern: /\btrusted by\b/i },
   {
     label: 'unsupported production-team claim',
-    pattern: /\bused by\s+(?:thousands|millions|production teams|enterprise teams|real teams|customers)\b/i,
+    pattern:
+      /\bused by\s+(?:thousands|millions|production teams|enterprise teams|real teams|customers)\b/i,
   },
   {
     label: 'unsupported case-study claim',
@@ -65,12 +66,12 @@ const UNSUPPORTED_CHANNEL_CLAIMS = [
   },
   {
     label: 'VS Code Marketplace install claim',
-    pattern: /\b(?:install|download)\s+(?:it\s+)?(?:from|via|with)\s+(?:the\s+)?VS Code Marketplace\b/i,
+    pattern:
+      /\b(?:install|download)\s+(?:it\s+)?(?:from|via|with)\s+(?:the\s+)?VS Code Marketplace\b/i,
   },
   {
     label: 'Open VSX availability claim',
-    pattern:
-      /\b(?:available|published|live|released)\s+(?:on|in|from)\s+(?:the\s+)?Open VSX\b/i,
+    pattern: /\b(?:available|published|live|released)\s+(?:on|in|from)\s+(?:the\s+)?Open VSX\b/i,
   },
   {
     label: 'Open VSX install claim',
@@ -353,6 +354,12 @@ export function assertRoadmapCurrentReleaseState({ filePath, content, version })
     `- GHCR and MCP Registry are live for \`${version}\`.`,
     filePath,
     `GHCR and MCP Registry version ${version}`,
+  );
+  assertRoadmapLine(
+    section,
+    '- GitHub Marketplace listing is live for the composite Action.',
+    filePath,
+    'GitHub Marketplace listing',
   );
 
   if (

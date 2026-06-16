@@ -41,10 +41,10 @@ Before a new public release:
 3. Bump `package.json` to the intended version.
 4. Run the full local release gate.
 5. Push the release commit and tag.
-6. Publish the GitHub release with the packed tarball.
+6. Publish the GitHub release with the packed tarball and select **Publish this Action to the GitHub Marketplace** in the GitHub release UI.
 7. Let `.github/workflows/publish.yml` publish to npm through OIDC.
 8. Let Docker, MCP Registry, and related release workflows run from the GitHub release.
-9. Verify npm again.
+9. Verify npm and the GitHub Marketplace listing again.
 10. Run the published-package smoke from clean temporary directories:
 
    ```bash
@@ -146,7 +146,7 @@ After each publish:
 - update [release-status.md](release-status.md) with the new npm proof;
 - update `CHANGELOG.md`, `docs/launch-checklist.md`, and `FINAL_HANDOFF.md` as needed;
 - verify the GitHub release asset and npm package install;
-- run `agentloop release-proof` after GitHub Release, GHCR, and MCP Registry workflows finish;
+- run `agentloop release-proof` after GitHub Release, GitHub Marketplace, GHCR, and MCP Registry workflows finish;
 - keep README install commands focused on normal npm/npx usage.
 
 ## Package Contents

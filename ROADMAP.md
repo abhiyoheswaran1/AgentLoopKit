@@ -48,20 +48,21 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 
 ## Current State
 
-- GitHub release `v0.35.0` is public.
-- npm latest is `agentloopkit@0.35.0`.
-- GHCR and MCP Registry are live for `0.35.0`.
+- GitHub release `v0.35.1` is public.
+- npm latest is `agentloopkit@0.35.1`.
+- GHCR and MCP Registry are live for `0.35.1`.
+- GitHub Marketplace listing is live for the composite Action.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
-- Release tag `v0.35.0` points at the published release commit.
-- Published release commit: `bf7acf42140466e4e409599d4795e0f26fb8e01f`.
+- Release tag `v0.35.1` points at the published release commit.
+- Published release commit: pending post-publish proof.
 
 ## Near Term
 
 - Keep the GitHub release to npm trusted-publishing flow healthy with each release.
 - Keep the README focused on user install and usage, not release operations.
-- Keep GHCR and MCP Registry release proof current after each release.
+- Keep GitHub Marketplace, GHCR, and MCP Registry release proof current after each release.
 - Keep the SchemaStore catalog entry current if the config schema URL changes.
 - Keep bundled policy packs small, safe, and useful for real maintainers.
 - Keep local GitHub metadata consumption read-only and optional while teams try it in real repos.
