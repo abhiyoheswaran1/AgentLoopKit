@@ -2,6 +2,50 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Run Ledger Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-run-ledger-output-markdown-safe.md`
+- Trigger:
+  - Agents paste `agentloop runs`, `agentloop show-run`, and `agentloop intent <file>` output into handoffs and review comments.
+  - File paths, command labels, and intent reasons could split Markdown when dynamic values contained line breaks.
+- Implementation:
+  - Switched run-ledger CLI human rendering to `singleLineInlineCode`.
+  - Kept JSON output, run discovery, run reading, run metadata, file intent matching, exit codes, and write-run behavior unchanged.
+  - Added regression tests for newline-containing run command labels, file intent paths, and intent reason text.
+  - Updated run-ledger docs, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized safe local evidence that agents paste into reviews.
+  - Nora wanted run history and file intent output to stay readable in Markdown handoffs.
+  - Lina prioritized reliable intent lookup for long autonomous sessions.
+  - Maya accepted a renderer-only change with no run schema or matching changes.
+- Verification:
+  - Red TDD run failed before run-ledger output used single-line formatting:
+    - `npm test -- tests/runs.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/runs.test.ts`
+    - `npm test -- tests/runs.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, links, and build checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `613` tests.
+  - AgentLoopKit verification, ship, and handoff evidence passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-run-ledger-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/runs.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The red test caught newline splitting in `runs --latest`, `show-run`, and `intent` human output while proving JSON stayed raw.
+- Improve:
+  - Continue auditing small command families that still print human output through the multi-line inline-code formatter.
+
 ## 2026-06-16: Markdown-Safe Task Lifecycle Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-task-lifecycle-output-markdown-safe.md`

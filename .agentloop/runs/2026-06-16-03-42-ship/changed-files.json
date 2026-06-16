@@ -1,0 +1,42 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/commands/runs.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/runs.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-16-03-40-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-16-03-42-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-16-03-42-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-16-03-42-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-16-make-run-ledger-output-markdown-safe.md"
+  }
+]

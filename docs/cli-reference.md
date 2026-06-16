@@ -262,6 +262,8 @@ Use `runs --latest` for the newest entry, or `runs --limit <count>` for a bounde
 
 Run ledger JSON and Markdown use display-safe paths. AgentLoopKit artifacts render as `.agentloop/...`; repo files render as repo-relative paths; older absolute paths outside the repo collapse to the filename.
 
+Human-readable run-ledger output keeps dynamic run ids, commands, file paths, and intent reasons on one Markdown line. JSON output keeps raw values for scripts.
+
 `intent <file>` reads the local run ledger and shows which previous AgentLoopKit runs changed that file. It uses local ledger metadata only.
 
 ## Maintainer Check

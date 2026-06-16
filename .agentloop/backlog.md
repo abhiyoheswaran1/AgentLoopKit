@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 128 Decisions
+
+| item                            | source persona    | problem                                                                                                      | proposed solution                                                                                           | priority | effort | adoption impact | risk | decision | notes                                                                                        |
+| ------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | -------------------------------------------------------------------------------------------- |
+| Markdown-safe run-ledger output | Samir, Nora, Lina | Agents paste run-ledger and file-intent output into handoffs, but file paths, commands, or intent reasons can split Markdown. | Render human runs, show-run, and intent dynamic values on one Markdown line; keep JSON and ledger behavior raw. | P1       | S      | medium          | low  | do now   | No run schema, run IDs, intent matching, write-run behavior, exit-code, or JSON-shape changes. |
+
 ## Current Research Cycle 127 Decisions
 
 | item                                | source persona    | problem                                                                                                      | proposed solution                                                                                                 | priority | effort | adoption impact | risk | decision | notes                                                                                            |

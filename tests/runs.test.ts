@@ -4,6 +4,7 @@ import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import { toSafeDisplayPath } from '../src/core/display-path.js';
+import { singleLineInlineCode } from '../src/core/markdown-format.js';
 import { findFileIntent, listRuns, readRun, writeVerificationRun } from '../src/core/runs.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
@@ -395,6 +396,82 @@ describe('run ledger commands', () => {
     expect(latest.stdout).toContain('2026-06-12-00-00-c-ship');
     expect(latest.stdout).not.toContain('2026-06-12-00-00-b-handoff');
     expect(latest.stdout).not.toContain('2026-06-12-00-00-a-verify');
+  });
+
+  test('prints run ledger human output values on one markdown line', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'typescript-package',
+      packageManager: 'npm',
+    });
+    await writeJson(path.join(dir, 'agentloop.config.json'), config);
+    const runsDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-ship');
+    const changedFilePath = 'src/auth/callback\nfile.ts';
+    await mkdir(runsDir, { recursive: true });
+    await writeFile(
+      path.join(runsDir, 'metadata.json'),
+      JSON.stringify(
+        {
+          id: '2026-06-12-00-00-ship',
+          command: 'ship\nstep',
+          createdAt: '2026-06-12-00-00',
+          createdAtEpochMs: 1_000,
+          task: {
+            path: '.agentloop/tasks/2026-06-12-fix-login.md',
+            title: 'Fix login\nredirect bug',
+            status: 'done',
+          },
+          score: 99,
+          changedFileCount: 1,
+        },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(runsDir, 'changed-files.json'),
+      JSON.stringify([{ path: changedFilePath, status: 'M' }], null, 2),
+    );
+
+    const runs = await execa(tsxPath, [cliPath, 'runs', '--latest'], { cwd: dir });
+    const shown = await execa(tsxPath, [cliPath, 'show-run', '2026-06-12-00-00-ship'], {
+      cwd: dir,
+    });
+    const intent = await execa(tsxPath, [cliPath, 'intent', changedFilePath], { cwd: dir });
+
+    expect(runs.stdout).toContain(
+      `- ${singleLineInlineCode('2026-06-12-00-00-ship')} ${singleLineInlineCode(
+        'ship\nstep',
+      )} score ${singleLineInlineCode('99')}/100`,
+    );
+    expect(shown.stdout).toContain(`- Command: ${singleLineInlineCode('ship\nstep')}`);
+    expect(intent.stdout).toContain(`AgentLoopKit intent for ${singleLineInlineCode(changedFilePath)}:`);
+    expect(intent.stdout).toContain(
+      `- ${singleLineInlineCode('2026-06-12-00-00-ship')}: ${singleLineInlineCode(
+        'Changed in ship run for task "Fix login\nredirect bug".',
+      )}`,
+    );
+    expect(`${runs.stdout}\n${shown.stdout}\n${intent.stdout}`).not.toContain('ship\nstep');
+    expect(`${runs.stdout}\n${shown.stdout}\n${intent.stdout}`).not.toContain(changedFilePath);
+
+    const runsJson = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'runs', '--latest', '--json'], { cwd: dir })).stdout,
+    );
+    const shownJson = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'show-run', '2026-06-12-00-00-ship', '--json'], {
+        cwd: dir,
+      })).stdout,
+    );
+    const intentJson = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'intent', changedFilePath, '--json'], { cwd: dir })).stdout,
+    );
+
+    expect(runsJson.runs[0].command).toBe('ship\nstep');
+    expect(shownJson.run.metadata.command).toBe('ship\nstep');
+    expect(intentJson.file).toBe(changedFilePath);
+    expect(intentJson.runs[0].why).toBe('Changed in ship run for task "Fix login\nredirect bug".');
   });
 
   test('rejects invalid run ledger limits before loading the workspace', async () => {

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-03-42-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-03-42",
+  "createdAtEpochMs": 1781574145140,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-run-ledger-output-markdown-safe.md",
+    "title": "Make run ledger output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-03-40-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-03-42-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-03-42-pr-summary.md",
+  "score": 100,
+  "changedFileCount": 10
+}

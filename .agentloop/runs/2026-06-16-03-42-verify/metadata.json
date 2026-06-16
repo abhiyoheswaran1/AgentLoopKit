@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-03-42-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-03-42",
+  "createdAtEpochMs": 1781574132906,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-run-ledger-output-markdown-safe.md",
+    "title": "Make run ledger output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-03-40-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

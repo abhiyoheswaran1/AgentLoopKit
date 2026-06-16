@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-03-42-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-03-42",
+  "createdAtEpochMs": 1781574166116,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-run-ledger-output-markdown-safe.md",
+    "title": "Make run ledger output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-03-40-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-03-42-pr-summary-2.md",
+  "changedFileCount": 18
+}

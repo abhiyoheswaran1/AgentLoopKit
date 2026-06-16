@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { AgentLoopError } from '../../core/errors.js';
 import { findFileIntent, listRuns, readRun } from '../../core/runs.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import {
   CliOptionError,
   loadWorkspaceForJsonCommand,
