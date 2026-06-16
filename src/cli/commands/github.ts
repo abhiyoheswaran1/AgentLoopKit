@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { importGithubMetadata } from '../../core/github-metadata.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { loadWorkspaceForJsonCommand } from '../json-errors.js';
 
 function printImport(

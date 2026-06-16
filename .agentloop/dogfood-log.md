@@ -11283,3 +11283,45 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The command already had one formatting boundary, so a small change covered every human inline value without changing report generation.
 - Improve:
   - Continue checking human command output that agents commonly paste into reviewer evidence.
+
+## 2026-06-16: GitHub Import Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-github-import-output-markdown-safe.md`
+- AgentFlight session: `af-20260616-024903-make-github-import-output-markdown-safe`
+- Trigger:
+  - `agentloop github import` reads explicit local JSON, but issue and PR titles can still contain line breaks.
+  - Human output prints imported titles and the output path, so pasted import evidence could split Markdown lists.
+  - Product-panel read: Samir wanted untrusted local JSON to stay bounded at render time; Nora wanted copy-pasted command output to remain readable; Elias wanted the docs to keep the no-token, no-network boundary clear.
+- Implementation:
+  - Added a red regression for newline issue titles, PR titles, and output paths.
+  - Routed human `github import` inline-code output through the shared single-line formatter.
+  - Documented the human-vs-JSON output boundary in the CLI reference and GitHub metadata guide.
+- Verification:
+  - Red-focused test:
+    - `npm test -- tests/github-metadata.test.ts` failed because the output path split the human Markdown line.
+  - Green-focused test:
+    - `npm test -- tests/github-metadata.test.ts` passed with 9 tests.
+  - Task verification passed:
+    - `npm test -- tests/github-metadata.test.ts`
+    - `npm test -- tests/github-metadata.test.ts tests/cli-docs-drift.test.ts`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+    - `npm test`
+    - `.agentloop/reports/2026-06-16-04-53-verification-report.md`
+    - `.agentloop/runs/2026-06-16-04-55-verify`
+  - `npx --yes agentflight verify -- npm test -- tests/github-metadata.test.ts` passed:
+    - `.agentflight/evidence/af-20260616-024903-make-github-import-output-markdown-safe/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260616-024903-make-github-import-output-markdown-safe/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+  - `agentloop ship --redact-paths` wrote `.agentloop/reports/2026-06-16-04-56-ship-report.md` with review-readiness score `96`/100.
+  - `npm run dogfood:strict` passed with the task in progress.
+  - The task was marked done and archived at `.agentloop/tasks/archive/2026-06-16-make-github-import-output-markdown-safe.md`.
+  - Archived-task handoffs were written under `.agentloop/handoffs/`.
+  - Final `agentloop ship --redact-paths` wrote a ship report under `.agentloop/reports/` with review-readiness score `92`/100.
+- What worked well:
+  - The core import path and JSON behavior stayed unchanged; the fix sits at the CLI display boundary.
+- Improve:
+  - Continue the same audit for remaining command-level write confirmations that still import the multi-line formatter.

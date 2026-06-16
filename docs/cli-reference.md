@@ -498,6 +498,8 @@ agentloop github import --issue-json issue.json --json
 
 `review-context`, `prepare-pr`, and `maintainer-check` read that local context file when it exists. Missing metadata does not block review evidence. PR-facing output escapes issue and PR prose before rendering it.
 
+Human `github import` output keeps imported titles and output paths on one Markdown line. JSON output keeps raw values for scripts.
+
 It does not run `gh`, call GitHub APIs, read GitHub tokens, read `.env` files, post comments, upload files, or execute commands from issue or pull request text.
 
 See [github-metadata.md](github-metadata.md).

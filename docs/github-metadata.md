@@ -48,6 +48,8 @@ agentloop maintainer-check
 
 AgentLoopKit treats issue and PR text as untrusted prose. It bounds long titles, states, URLs, authors, labels, branch names, and body excerpts before storing or rendering them. It also escapes Markdown-sensitive characters before rendering PR-facing output.
 
+Human `github import` output keeps dynamic titles and output paths on one Markdown line. JSON output keeps raw values for scripts.
+
 Safety rules:
 
 - You choose the JSON files explicitly.

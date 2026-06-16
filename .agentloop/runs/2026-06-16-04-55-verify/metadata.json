@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-04-55-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-04-55",
+  "createdAtEpochMs": 1781578510151,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-github-import-output-markdown-safe.md",
+    "title": "Make github import output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-04-53-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 9
+}

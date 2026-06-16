@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-04-57-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-16-04-57",
+  "createdAtEpochMs": 1781578663245,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-make-github-import-output-markdown-safe.md",
+    "title": "Make github import output Markdown-safe",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-04-53-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-04-57-ship-report-2.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-04-57-pr-summary-5.md",
+  "score": 92,
+  "changedFileCount": 48
+}

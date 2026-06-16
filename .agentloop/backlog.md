@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 131 Decisions
+
+| item                               | source persona     | problem                                                                                                                | proposed solution                                                                                               | priority | effort | adoption impact | risk | decision | notes                                                                                         |
+| ---------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | --------------------------------------------------------------------------------------------- |
+| Markdown-safe GitHub import output | Samir, Nora, Elias | Agents paste `github import` evidence into handoffs, but local JSON titles or output paths can split Markdown.         | Render human import status, paths, issue titles, and PR titles on one Markdown line; keep JSON and imports raw. | P1       | S      | medium          | low  | do now   | No GitHub API, tokens, posting, network calls, metadata schema change, normalization change, release, or publish. |
+
 ## Current Research Cycle 130 Decisions
 
 | item                        | source persona     | problem                                                                                                   | proposed solution                                                                                           | priority | effort | adoption impact | risk | decision | notes                                                                                            |

@@ -285,4 +285,71 @@ describe('GitHub metadata import', () => {
       safety: { callsGithubApi: false, readsTokens: false },
     });
   });
+
+  test('keeps imported titles and output paths on one line in human output while preserving JSON values', async () => {
+    const { dir } = await createGithubFixture();
+    await writeJson(path.join(dir, 'issue-newline.json'), {
+      number: 50,
+      title: 'Login\nredirect drops target',
+      state: 'OPEN',
+    });
+    await writeJson(path.join(dir, 'pr-newline.json'), {
+      number: 88,
+      title: 'Fix\nlogin redirect',
+      state: 'OPEN',
+      isDraft: false,
+    });
+    const outputPath = '.agentloop/github/context\nwith-break.json';
+
+    const humanResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'github',
+        'import',
+        '--issue-json',
+        'issue-newline.json',
+        '--pr-json',
+        'pr-newline.json',
+        '--output',
+        outputPath,
+        '--dry-run',
+      ],
+      { cwd: dir },
+    );
+    const jsonResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'github',
+        'import',
+        '--issue-json',
+        'issue-newline.json',
+        '--pr-json',
+        'pr-newline.json',
+        '--output',
+        outputPath,
+        '--dry-run',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+
+    const outputLine = humanResult.stdout
+      .split('\n')
+      .find((line) => line.startsWith('- Output:'));
+    const issueLine = humanResult.stdout.split('\n').find((line) => line.startsWith('- Issue:'));
+    const pullRequestLine = humanResult.stdout
+      .split('\n')
+      .find((line) => line.startsWith('- Pull request:'));
+
+    expect(outputLine).toContain('context\\nwith-break.json');
+    expect(issueLine).toContain('Login\\nredirect drops target');
+    expect(pullRequestLine).toContain('Fix\\nlogin redirect');
+
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.outputPath).toBe(outputPath);
+    expect(output.issue.title).toBe('Login\nredirect drops target');
+    expect(output.pullRequest.title).toBe('Fix\nlogin redirect');
+  });
 });
