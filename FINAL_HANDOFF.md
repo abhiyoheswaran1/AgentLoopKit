@@ -76,20 +76,20 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Prepared npm release: `agentloopkit@0.34.1` pending post-release proof
+- Current npm release: `agentloopkit@0.34.1`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.34.1>
 - Release asset: `agentloopkit-0.34.1.tgz`
-- Release asset SHA-256: pending post-release proof
-- Release tag: `v0.34.1` at the release commit after tagging
-- CI run: pending release commit CI
-- CLI Smoke run: pending release commit smoke
-- Publish workflow run: pending GitHub release
-- Docker workflow run: pending GitHub release
-- MCP Registry workflow run: pending GitHub release
-- Post-publish npm proof: pending post-release proof
-- Published-package smoke: `npm run smoke:published -- --version 0.34.1`, pending post-release proof
-- GHCR proof: pending post-release proof
-- MCP Registry proof: pending post-release proof
+- Release asset SHA-256: `11daa22364e8aea2672fb831c8698d79cc665ee64db85f0e8ccf6bab90c3954f`
+- Release tag: `v0.34.1` at commit `c2f1ea76b77d12a2a865b01c98ecc248eac22afa`
+- CI run: `27604875208`, success
+- CLI Smoke run: `27604875139`, success
+- Publish workflow run: `27605153012`, success
+- Docker workflow run: `27605153434`, success
+- MCP Registry workflow run: `27605495676`, success
+- Post-publish npm proof: npm latest is `0.34.1`
+- Published-package smoke: `npm run smoke:published -- --version 0.34.1`, passed
+- GHCR proof: `agentloop release-proof --strict` found image tag `0.34.1`
+- MCP Registry proof: `agentloop release-proof --strict` found MCP Registry metadata for `agentloopkit@0.34.1`
 
 ## 0.34.1 release summary
 

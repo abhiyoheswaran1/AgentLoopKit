@@ -12025,3 +12025,32 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Dogfooding exposed a real maintainer ambiguity: release-check needed to explain release impact, not only tag state.
 - Improve:
   - After committing this batch, run the clean-tree dogfood gate so AgentFlight, ProjScan, and AgentLoopKit all evaluate the committed state.
+
+## 2026-06-16: 0.34.1 Release Proof
+
+- Task contract: `.agentloop/tasks/2026-06-16-release-0-34-1.md`
+- Trigger:
+  - `agentloop release-check` gained release-delta diagnostics after `v0.34.0`.
+  - The maintainer approved a patch release after the release gate passed.
+- AgentLoopKit usage:
+  - `agentloop release-notes --write --from v0.34.0 --to HEAD --release-version 0.34.1 --public` generated release notes.
+  - `agentloop verify --task .agentloop/tasks/2026-06-16-release-0-34-1.md --write-run --redact-paths` wrote pre-release verification evidence.
+  - `agentloop handoff --redact-paths --write-run` and `agentloop ship --redact-paths` wrote reviewer evidence before the release commit.
+  - `npm run release-flow` passed before tagging.
+  - `agentloop release-proof --strict --redact-paths` passed after GitHub Release, npm trusted publishing, GHCR, and MCP Registry workflows completed.
+  - `agentloop npm-status --agentloopkit --expect-current` confirmed npm latest matched the local package version.
+  - `npm run smoke:published -- --version 0.34.1` verified the public package from clean temporary directories.
+- External release proof:
+  - GitHub release: `v0.34.1`
+  - Release commit: `c2f1ea76b77d12a2a865b01c98ecc248eac22afa`
+  - Release asset SHA-256: `11daa22364e8aea2672fb831c8698d79cc665ee64db85f0e8ccf6bab90c3954f`
+  - CI run: `27604875208`, success
+  - CLI Smoke run: `27604875139`, success
+  - Publish workflow run: `27605153012`, success
+  - Docker workflow run: `27605153434`, success
+  - MCP Registry workflow run: `27605495676`, success
+- What worked well:
+  - The release-delta improvement made `release-check` explain why `0.34.1` was needed after `v0.34.0`.
+  - Trusted publishing, GHCR, MCP Registry, and published-package smoke all completed from the GitHub release path.
+- Improve:
+  - The GitHub CLI watcher intermittently returned a 401 while polling annotations, even though direct `gh run view` confirmed success. Prefer direct run views when watchers fail mid-poll.
