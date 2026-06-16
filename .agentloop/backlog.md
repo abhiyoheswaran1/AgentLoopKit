@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 141 Decisions
+
+| item                                         | source persona      | problem                                                                                                                              | proposed solution                                                                                                                        | priority | effort | adoption impact | risk | decision | notes                                                                                                    |
+| -------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| Same-minute generated evidence preservation  | Dogfood, Samir, Lina | Default generated `verify`, `ci-summary --write`, and `release-notes --write` paths can reuse a minute-based filename and replace evidence. | Use the existing collision-safe artifact allocator for generated default paths while preserving exact explicit `--out` behavior.          | P0       | S      | high            | low  | do now   | No retention policy, badge overwrite change, JSON-shape change, release, publish, API call, or token use. |
+
 ## Current Research Cycle 140 Decisions
 
 | item                                  | source persona     | problem                                                                                                             | proposed solution                                                                                                     | priority | effort | adoption impact | risk | decision | notes                                                                                         |

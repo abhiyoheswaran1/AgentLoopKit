@@ -12,6 +12,8 @@ AgentLoopKit loads `agentloop.config.json`, runs configured commands, and writes
 .agentloop/reports/YYYY-MM-DD-HH-mm-verification-report.md
 ```
 
+If you run `verify` more than once in the same minute, AgentLoopKit keeps the existing report and writes the next one with a numeric suffix, such as `YYYY-MM-DD-HH-mm-verification-report-2.md`.
+
 When run from a nested folder, `verify` searches upward for the nearest `agentloop.config.json` and writes the report under that initialized root.
 
 Supported checks:

@@ -1,0 +1,70 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/ci-summary.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/release-notes.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/verification-reports.md"
+  },
+  {
+    "status": "M",
+    "path": "src/core/ci-summary.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/release-notes.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/verification.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/ci-summary.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/release-notes.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/verification.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-16-07-47-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/research/interview-cycle-113.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-16-prevent-same-minute-evidence-artifact-overwrites-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-16-prevent-same-minute-evidence-artifact-overwrites.md"
+  }
+]

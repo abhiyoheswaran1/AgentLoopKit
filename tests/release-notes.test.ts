@@ -101,6 +101,36 @@ describe('release-notes command', () => {
     expect(written).toBe(output.markdown);
   });
 
+  test('keeps same-minute written release notes instead of overwriting them', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const first = await generateReleaseNotes({
+      cwd: dir,
+      config,
+      from: 'v1.2.2',
+      to: 'HEAD',
+      timestamp: '2026-06-10-12-00',
+      write: true,
+    });
+    await writeFile(first.writtenPath ?? '', 'first-release-notes-marker\n');
+    const second = await generateReleaseNotes({
+      cwd: dir,
+      config,
+      from: 'v1.2.2',
+      to: 'HEAD',
+      timestamp: '2026-06-10-12-00',
+      write: true,
+    });
+
+    expect(second.writtenPath).not.toBe(first.writtenPath);
+    expect(second.writtenPath).toMatch(/-release-notes-2\.md$/);
+    await expect(readFile(first.writtenPath ?? '', 'utf8')).resolves.toContain(
+      'first-release-notes-marker',
+    );
+    await expect(readFile(second.writtenPath ?? '', 'utf8')).resolves.toContain('# Release Notes');
+  });
+
   test('prints concise public release notes without local evidence inventory', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: true });
 

@@ -2,7 +2,7 @@ import path from 'node:path';
 import { readFile, realpath } from 'node:fs/promises';
 import { execa } from 'execa';
 import { AgentLoopConfig } from './config.js';
-import { resolveOutputArtifactPath } from './artifacts.js';
+import { resolveUniqueOutputArtifactPath } from './artifacts.js';
 import { formatTimestamp } from './dates.js';
 import { getGitBranch, getGitCommit, getGitStatus } from './git.js';
 import { isInsidePath, normalizeExistingAncestor, writeTextFile } from './file-system.js';
@@ -499,7 +499,7 @@ ${lines.join('\n')}
 
 export async function runVerification(options: VerificationOptions): Promise<VerificationResult> {
   const timestamp = options.reportTimestamp ?? formatTimestamp();
-  const reportPath = resolveOutputArtifactPath({
+  const reportPath = await resolveUniqueOutputArtifactPath({
     cwd: options.cwd,
     artifactType: 'report',
     requestedPath: path.join(

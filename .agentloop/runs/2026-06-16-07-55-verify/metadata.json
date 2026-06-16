@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-07-55-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-07-55",
+  "createdAtEpochMs": 1781589314020,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-prevent-same-minute-evidence-artifact-overwrites-2.md",
+    "title": "Prevent same-minute evidence artifact overwrites",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-07-54-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 39
+}

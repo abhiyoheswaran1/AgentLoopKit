@@ -44,6 +44,8 @@ Use `--public` when you need concise Markdown for a GitHub release page or annou
 .agentloop/handoffs/YYYY-MM-DD-HH-mm-release-notes.md
 ```
 
+If release notes already exist for the same generated minute, AgentLoopKit keeps them and writes the next default draft with a numeric suffix, such as `YYYY-MM-DD-HH-mm-release-notes-2.md`.
+
 Without `--write`, the command prints the draft and does not create a file.
 Use `--out` only with `--write`. If `--out` is passed without `--write`, AgentLoopKit exits before reading config or writing a file. With `--json`, it returns `OUT_REQUIRES_WRITE`.
 When `--write` is used, output paths must stay inside `.agentloop/handoffs/`, end in `.md`, and resolve inside the current repo. With `--json`, invalid output paths return `OUTPUT_PATH_INVALID` with `requestedPath`, `expectedDir`, `expectedExtension`, and `reason`.

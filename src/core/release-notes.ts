@@ -7,6 +7,7 @@ import {
   ciSummaryPattern,
   latestMarkdownFile,
   resolveOutputArtifactPath,
+  resolveUniqueOutputArtifactPath,
   verificationReportPattern,
 } from './artifacts.js';
 import { formatTimestamp } from './dates.js';
@@ -368,22 +369,21 @@ export async function generateReleaseNotes(options: {
   const markdown =
     format === 'public' ? renderPublicMarkdown(withoutMarkdown) : renderMarkdown(withoutMarkdown);
   const writtenPath = options.write
-    ? ((options.outPath
-        ? resolveOutputArtifactPath({
-            cwd: options.cwd,
-            artifactType: 'release-notes',
-            requestedPath: options.outPath,
-            expectedDir: options.config.paths.handoffsDir,
-            expectedExtension: '.md',
-          })
-        : undefined) ??
-      resolveOutputArtifactPath({
-        cwd: options.cwd,
-        artifactType: 'release-notes',
-        requestedPath: path.join(options.config.paths.handoffsDir, `${timestamp}-release-notes.md`),
-        expectedDir: options.config.paths.handoffsDir,
-        expectedExtension: '.md',
-      }))
+    ? options.outPath
+      ? resolveOutputArtifactPath({
+          cwd: options.cwd,
+          artifactType: 'release-notes',
+          requestedPath: options.outPath,
+          expectedDir: options.config.paths.handoffsDir,
+          expectedExtension: '.md',
+        })
+      : await resolveUniqueOutputArtifactPath({
+          cwd: options.cwd,
+          artifactType: 'release-notes',
+          requestedPath: path.join(options.config.paths.handoffsDir, `${timestamp}-release-notes.md`),
+          expectedDir: options.config.paths.handoffsDir,
+          expectedExtension: '.md',
+        })
     : undefined;
   if (writtenPath) await writeTextFile(writtenPath, markdown);
 

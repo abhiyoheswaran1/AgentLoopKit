@@ -2,6 +2,60 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Same-Minute Evidence Artifact Preservation
+
+- Task contract: `.agentloop/tasks/2026-06-16-prevent-same-minute-evidence-artifact-overwrites-2.md`
+- Trigger:
+  - Product audit found that same-minute collision protection covered handoffs, ship reports, and run directories, but not generated verification reports, CI summaries, or release notes.
+  - Rerunning evidence commands quickly can happen during autonomous agent work.
+  - Replacing the previous artifact weakens AgentLoopKit's audit trail.
+- Implementation:
+  - Default generated `verify` report paths now use the shared collision-safe artifact allocator.
+  - Default generated `ci-summary --write` paths now use the same allocator.
+  - Default generated `release-notes --write` paths now use the same allocator.
+  - Explicit output paths still use the exact requested path and existing safety checks.
+  - AgentFlight started a generic same-title task first; local AgentLoopKit created the active task with a `-2` suffix instead of overwriting it.
+- Product-panel decision:
+  - Samir treated silent evidence replacement as a trust bug.
+  - Lina prioritized long autonomous sessions where agents rerun checks quickly.
+  - Nora wanted the suffix behavior to appear only when a collision happens.
+  - Maya kept the fix on the existing artifact allocator.
+- Verification so far:
+  - Red TDD run failed because generated same-minute artifacts reused the first path:
+    - `npm test -- tests/verification.test.ts tests/ci-summary.test.ts tests/release-notes.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/verification.test.ts tests/ci-summary.test.ts tests/release-notes.test.ts`
+  - Artifact, run-ledger, and CLI-doc focused tests passed:
+    - `npm test -- tests/artifacts.test.ts tests/runs.test.ts tests/cli-docs-drift.test.ts`
+  - Public docs, static checks, and build passed:
+    - `npm run check:public-docs`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `631` tests.
+  - Markdown link checks passed:
+    - `npm run check:links`
+    - `2459` files checked.
+  - AgentLoopKit task verification passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-prevent-same-minute-evidence-artifact-overwrites-2.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - Verification report: `.agentloop/reports/2026-06-16-07-54-verification-report.md`
+    - Run: `.agentloop/runs/2026-06-16-07-55-verify`
+  - Strict dogfood passed after a fresh handoff:
+    - `npm run dogfood:strict`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/verification.test.ts tests/ci-summary.test.ts tests/release-notes.test.ts`
+    - Session: `.agentflight/evidence/af-20260616-053632-prevent-same-minute-evidence-artifact-overwrites`
+  - ProjScan passed with health score A through the strict dogfood gate:
+    - `npx --yes projscan doctor --format markdown`
+  - AgentLoopKit ship evidence passed:
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - Ship score: `92`/100.
+    - Ship report: `.agentloop/reports/2026-06-16-07-55-ship-report.md`
+- Improve:
+  - Keep watching for other default generated artifacts that still use exact timestamp paths.
+
 ## 2026-06-16: Duplicate Task Contract Overwrite Fix
 
 - Task contract: `.agentloop/tasks/2026-06-16-prevent-duplicate-task-contract-overwrites.md`

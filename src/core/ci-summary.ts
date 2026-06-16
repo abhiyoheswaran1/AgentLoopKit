@@ -7,6 +7,7 @@ import {
   latestMarkdownFile,
   prSummaryPattern,
   resolveOutputArtifactPath,
+  resolveUniqueOutputArtifactPath,
   verificationReportPattern,
 } from './artifacts.js';
 import { checkGates, CheckGatesResult } from './check-gates.js';
@@ -239,22 +240,21 @@ export async function getCiSummary(options: {
   };
   const markdown = renderMarkdown(withoutMarkdown);
   const writtenPath = options.write
-    ? ((options.outPath
-        ? resolveOutputArtifactPath({
-            cwd: options.cwd,
-            artifactType: 'ci-summary',
-            requestedPath: options.outPath,
-            expectedDir: options.config.paths.reportsDir,
-            expectedExtension: '.md',
-          })
-        : undefined) ??
-      resolveOutputArtifactPath({
-        cwd: options.cwd,
-        artifactType: 'ci-summary',
-        requestedPath: path.join(options.config.paths.reportsDir, `${timestamp}-ci-summary.md`),
-        expectedDir: options.config.paths.reportsDir,
-        expectedExtension: '.md',
-      }))
+    ? options.outPath
+      ? resolveOutputArtifactPath({
+          cwd: options.cwd,
+          artifactType: 'ci-summary',
+          requestedPath: options.outPath,
+          expectedDir: options.config.paths.reportsDir,
+          expectedExtension: '.md',
+        })
+      : await resolveUniqueOutputArtifactPath({
+          cwd: options.cwd,
+          artifactType: 'ci-summary',
+          requestedPath: path.join(options.config.paths.reportsDir, `${timestamp}-ci-summary.md`),
+          expectedDir: options.config.paths.reportsDir,
+          expectedExtension: '.md',
+        })
     : undefined;
 
   if (writtenPath) await writeTextFile(writtenPath, markdown);

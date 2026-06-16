@@ -1,0 +1,14 @@
+ .agentloop/backlog.md        |  6 ++++++
+ .agentloop/dogfood-log.md    | 26 ++++++++++++++++++++++
+ CHANGELOG.md                 |  1 +
+ docs/ci-summary.md           |  2 ++
+ docs/cli-reference.md        |  6 ++++++
+ docs/release-notes.md        |  2 ++
+ docs/verification-reports.md |  2 ++
+ src/core/ci-summary.ts       |  5 +++--
+ src/core/release-notes.ts    |  5 +++--
+ src/core/verification.ts     |  4 ++--
+ tests/ci-summary.test.ts     | 43 +++++++++++++++++++++++++++++++++++++
+ tests/release-notes.test.ts  | 30 ++++++++++++++++++++++++++
+ tests/verification.test.ts   | 51 ++++++++++++++++++++++++++++++++++++++++++++
+ 13 files changed, 177 insertions(+), 6 deletions(-)

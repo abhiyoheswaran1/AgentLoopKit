@@ -3,6 +3,8 @@ import { mkdir, readdir, readFile, rm, symlink, writeFile } from 'node:fs/promis
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
+import { createDefaultConfig } from '../src/core/config.js';
+import { getCiSummary } from '../src/core/ci-summary.js';
 import { singleLineInlineCode } from '../src/core/markdown-format.js';
 import { makeTempDir, removeTempDir } from './helpers.js';
 
@@ -85,6 +87,47 @@ describe('ci-summary command', () => {
       '- Verification: `pass` - `.agentloop/reports/2026-06-10-11-00-verification-report.md`',
     );
     expect(markdown).not.toContain('TOKEN');
+  });
+
+  test('keeps same-minute written CI summaries instead of overwriting them', async () => {
+    const dir = await createRepoWithEvidence();
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const first = await getCiSummary({
+      cwd: dir,
+      config,
+      timestamp: '2026-06-10-12-00',
+      nowIso: '2026-06-10T12:00:00.000Z',
+      write: true,
+      env: {
+        GITHUB_ACTIONS: 'true',
+        GITHUB_SERVER_URL: 'https://github.com',
+        GITHUB_REPOSITORY: 'owner/repo',
+        GITHUB_RUN_ID: '11111',
+        GITHUB_WORKFLOW: 'First CI summary',
+      },
+    });
+    const second = await getCiSummary({
+      cwd: dir,
+      config,
+      timestamp: '2026-06-10-12-00',
+      nowIso: '2026-06-10T12:00:30.000Z',
+      write: true,
+      env: {
+        GITHUB_ACTIONS: 'true',
+        GITHUB_SERVER_URL: 'https://github.com',
+        GITHUB_REPOSITORY: 'owner/repo',
+        GITHUB_RUN_ID: '22222',
+        GITHUB_WORKFLOW: 'Second CI summary',
+      },
+    });
+
+    expect(second.writtenPath).not.toBe(first.writtenPath);
+    expect(second.writtenPath).toMatch(/-ci-summary-2\.md$/);
+    await expect(readFile(first.writtenPath ?? '', 'utf8')).resolves.toContain('First CI summary');
+    await expect(readFile(second.writtenPath ?? '', 'utf8')).resolves.toContain(
+      'Second CI summary',
+    );
   });
 
   test('prints written CI summary paths with Markdown-safe inline values', async () => {

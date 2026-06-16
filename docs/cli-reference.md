@@ -193,6 +193,8 @@ agentloop verify --redact-paths
 
 `verify` reads `agentloop.config.json`, runs configured commands, captures output excerpts, and writes a Markdown report under `.agentloop/reports/`.
 
+Default verification report paths avoid same-minute collisions by adding a numeric suffix, for example `2026-06-16-07-40-verification-report.md` and `2026-06-16-07-40-verification-report-2.md`.
+
 Use `--task` to include task context in the report. Use `--task-commands` when you also want to run commands listed under the task contract's `Verification Commands` section. `--task-commands` uses the explicit `--task` path first, then the active task set by `create-task` or `task set`; without either, it exits before running commands. Add `--only-task-commands` when a reviewed task contract should run by itself without the configured repo commands.
 
 Verification runs each exact command string once. If a command appears in both `agentloop.config.json` and the task contract, AgentLoopKit keeps the first configured slot and skips the duplicate task entry.
@@ -400,6 +402,8 @@ agentloop ci-summary --write
 
 `ci-summary` reads allowlisted CI provenance fields and existing AgentLoop artifacts. It reports provider, workflow or pipeline, event, ref, commit, and run URL when supported environment variables are present.
 
+Default written CI summary paths avoid same-minute collisions by adding a numeric suffix. Explicit `--out` paths stay exact and keep the existing output-path safety checks.
+
 Human-readable `ci-summary` output keeps CI evidence paths, gate details, and written output paths on one Markdown line. JSON output keeps raw values for scripts.
 
 It does not call CI provider APIs, read secrets, upload files, run tests, or dump arbitrary environment variables.
@@ -464,6 +468,8 @@ agentloop npm-status --registry-json npm-view.json
 ```
 
 `release-notes` drafts local release notes from package metadata, changelog entries, Git history, changed files, working tree status, the active task, the current verification report, and the latest CI summary when those artifacts exist. Use `--public` for concise release-page copy that keeps changed-file inventory and local AgentLoop evidence out of the rendered Markdown. User-provided Git refs must be ordinary refs such as `v1.2.3` or `HEAD`; option-shaped refs are rejected.
+
+Default written release-note paths avoid same-minute collisions by adding a numeric suffix. Explicit `--out` paths stay exact and keep the existing output-path safety checks.
 
 Human-readable `release-notes` output keeps dynamic metadata, refs, paths, and evidence values on one Markdown line. JSON output keeps raw values for scripts.
 

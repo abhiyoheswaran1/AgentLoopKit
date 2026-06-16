@@ -68,6 +68,57 @@ describe('verification', () => {
     expect(result.markdown).toContain('ok');
   });
 
+  test('keeps same-minute verification reports instead of overwriting them', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const firstConfig = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"first-verification\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+    const secondConfig = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"second-verification\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const first = await runVerification({
+      cwd: dir,
+      config: firstConfig,
+      reportTimestamp: '2026-06-09-12-30',
+      nowIso: '2026-06-09T12:30:00.000Z',
+    });
+    const second = await runVerification({
+      cwd: dir,
+      config: secondConfig,
+      reportTimestamp: '2026-06-09-12-30',
+      nowIso: '2026-06-09T12:30:30.000Z',
+    });
+
+    expect(first.reportPath).toBe(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+    );
+    expect(second.reportPath).toBe(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report-2.md'),
+    );
+    await expect(readFile(first.reportPath, 'utf8')).resolves.toContain('first-verification');
+    await expect(readFile(second.reportPath, 'utf8')).resolves.toContain('second-verification');
+  });
+
   test('redacts local root paths from markdown reports when requested', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

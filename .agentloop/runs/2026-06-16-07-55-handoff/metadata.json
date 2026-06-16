@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-07-55-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-07-55",
+  "createdAtEpochMs": 1781589326557,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-prevent-same-minute-evidence-artifact-overwrites-2.md",
+    "title": "Prevent same-minute evidence artifact overwrites",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-07-54-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-07-55-pr-summary-2.md",
+  "changedFileCount": 50
+}
