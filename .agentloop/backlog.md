@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 126 Decisions
+
+| item                                  | source persona     | problem                                                                                                        | proposed solution                                                                                                  | priority | effort | adoption impact | risk | decision | notes                                                                                           |
+| ------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------- | ------ | --------------- | ---- | -------- | ----------------------------------------------------------------------------------------------- |
+| Markdown-safe maintainer-check output | Samir, Nora, Elias | Maintainers paste `maintainer-check` into reviews and CI logs, but dynamic check values or evidence paths can split Markdown. | Render human check values, evidence paths, checklist items, and contributor requests on one Markdown line; keep JSON raw. | P1       | S      | high            | low  | do now   | No risk detection, redaction, exit-code, posting, GitHub API, command execution, or JSON-shape changes. |
+
 ## Current Research Cycle 125 Decisions
 
 | item                            | source persona    | problem                                                                                              | proposed solution                                                                                                      | priority | effort | adoption impact | risk | decision | notes                                                                                              |

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-03-12-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-03-12",
+  "createdAtEpochMs": 1781572366699,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-maintainer-check-output-markdown-safe.md",
+    "title": "Make maintainer-check output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-03-11-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-03-12-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-03-12-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 11
+}

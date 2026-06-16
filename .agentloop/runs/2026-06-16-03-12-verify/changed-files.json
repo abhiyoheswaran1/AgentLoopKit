@@ -1,0 +1,34 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/commands/maintainer-check.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/maintainer-check.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/maintainer-check.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-16-03-11-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-16-make-maintainer-check-output-markdown-safe.md"
+  }
+]

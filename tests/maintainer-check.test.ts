@@ -3,6 +3,7 @@ import { mkdir, realpath, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { renderMaintainerCheckMarkdown } from '../src/core/maintainer-check.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -251,6 +252,76 @@ describe('maintainer-check command', () => {
     expect(humanResult.stdout).not.toContain(root);
     expect(JSON.parse(jsonResult.stdout).status).toBe('pass');
     expect(humanResult.stdout).toContain('# AgentLoopKit Maintainer Check');
+  });
+
+  test('renders human maintainer-check values on one markdown line', () => {
+    const markdown = renderMaintainerCheckMarkdown({
+      status: 'warn',
+      checks: [
+        {
+          id: 'task\ncontract',
+          status: 'warn',
+          message: 'Task title has line one\nline two',
+          path: '.agentloop/tasks/task\ncontract.md',
+        },
+      ],
+      maintainerChecklist: ['Review line one\nline two'],
+      suggestedContributorRequest: 'Please explain line one\nline two.',
+    });
+
+    expect(markdown).toContain(
+      '- [`warn`] `task\\ncontract`: `Task title has line one\\nline two` (`.agentloop/tasks/task\\ncontract.md`)',
+    );
+    expect(markdown).toContain('- [ ] Review line one\\nline two');
+    expect(markdown).toContain('Please explain line one\\nline two.');
+    expect(markdown).not.toContain('task\ncontract');
+    expect(markdown).not.toContain('line one\nline two');
+  });
+
+  test('prints maintainer-check evidence paths with markdown-safe inline values', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await git(dir, ['init', '-q']);
+    await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
+    await git(dir, ['config', 'user.name', 'AgentLoopKit Test']);
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'typescript-package',
+      packageManager: 'npm',
+    });
+    config.paths.tasksDir = '.agentloop/tasks\ncontracts';
+    config.paths.reportsDir = '.agentloop/reports\nproof';
+    config.paths.handoffsDir = '.agentloop/handoffs\nreview';
+    await writeJson(path.join(dir, 'agentloop.config.json'), config);
+    await mkdir(path.join(dir, config.paths.tasksDir), { recursive: true });
+    await mkdir(path.join(dir, config.paths.reportsDir), { recursive: true });
+    await mkdir(path.join(dir, config.paths.handoffsDir), { recursive: true });
+    const taskPath = path.join(dir, config.paths.tasksDir, '2026-06-12-demo.md');
+    await writeFile(taskPath, '# Demo task\n\n- Status: in-progress\n');
+    await setActiveTask({ cwd: dir, config, taskPath });
+    await writeFile(
+      path.join(dir, config.paths.reportsDir, '2026-06-12-13-30-verification-report.md'),
+      '# Verification Report\n\n- Overall status: pass\n',
+    );
+    await writeFile(
+      path.join(dir, config.paths.handoffsDir, '2026-06-12-13-34-pr-summary.md'),
+      '# PR Summary\n\n- Verification status: Overall status: pass\n',
+    );
+    await git(dir, ['add', '.']);
+    await git(dir, ['commit', '-m', 'Initial state']);
+
+    const result = await execa(tsxPath, [cliPath, 'maintainer-check'], { cwd: dir });
+
+    expect(result.stdout).toContain('`.agentloop/tasks\\ncontracts/2026-06-12-demo.md`');
+    expect(result.stdout).toContain(
+      '`.agentloop/reports\\nproof/2026-06-12-13-30-verification-report.md`',
+    );
+    expect(result.stdout).toContain(
+      '`.agentloop/handoffs\\nreview/2026-06-12-13-34-pr-summary.md`',
+    );
+    expect(result.stdout).not.toContain('.agentloop/tasks\ncontracts');
+    expect(result.stdout).not.toContain('.agentloop/reports\nproof');
+    expect(result.stdout).not.toContain('.agentloop/handoffs\nreview');
   });
 
   test('accepts latest run task evidence when the task contract was archived', async () => {

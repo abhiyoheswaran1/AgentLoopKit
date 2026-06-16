@@ -6,6 +6,7 @@ import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js
 import { getGitStatus, parseGitStatus } from './git.js';
 import { readGithubMetadataContext } from './github-metadata.js';
 import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
+import { escapeMarkdownProse, singleLineInlineCode as inlineCode } from './markdown-format.js';
 import { listRuns } from './runs.js';
 import { readTaskContract } from './task-state.js';
 
@@ -84,6 +85,37 @@ function contributorRequest(checks: MaintainerCheck[]) {
     return 'Please address the AgentLoopKit maintainer warnings or explain why they are acceptable.';
   }
   return 'No extra contributor request needed from AgentLoopKit evidence.';
+}
+
+function escapeSingleLineMarkdownProse(value: string) {
+  return escapeMarkdownProse(value).replace(/\r/g, '\\r').replace(/\n/g, '\\n');
+}
+
+export function renderMaintainerCheckMarkdown(result: MaintainerCheckResult) {
+  const checkLines = result.checks
+    .map((item) => {
+      const pathSuffix = item.path ? ` (${inlineCode(item.path)})` : '';
+      return `- [${inlineCode(item.status)}] ${inlineCode(item.id)}: ${inlineCode(item.message)}${pathSuffix}`;
+    })
+    .join('\n');
+  const checklistLines = result.maintainerChecklist
+    .map((item) => `- [ ] ${escapeSingleLineMarkdownProse(item)}`)
+    .join('\n');
+
+  return `# AgentLoopKit Maintainer Check
+
+Status: ${inlineCode(result.status)}
+
+${checkLines}
+
+## Maintainer Checklist
+
+${checklistLines}
+
+## Suggested Contributor Request
+
+${escapeSingleLineMarkdownProse(result.suggestedContributorRequest)}
+`;
 }
 
 export async function runMaintainerCheck(options: {

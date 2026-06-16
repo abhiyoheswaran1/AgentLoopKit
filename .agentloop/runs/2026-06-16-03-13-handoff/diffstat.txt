@@ -1,0 +1,8 @@
+ .agentloop/backlog.md                |  6 +++
+ .agentloop/dogfood-log.md            | 44 ++++++++++++++++++++++
+ CHANGELOG.md                         |  1 +
+ docs/cli-reference.md                |  2 +
+ src/cli/commands/maintainer-check.ts | 16 +++-----
+ src/core/maintainer-check.ts         | 32 ++++++++++++++++
+ tests/maintainer-check.test.ts       | 71 ++++++++++++++++++++++++++++++++++++
+ 7 files changed, 161 insertions(+), 11 deletions(-)

@@ -1,0 +1,7 @@
+ .agentloop/backlog.md                |  6 +++
+ CHANGELOG.md                         |  1 +
+ docs/cli-reference.md                |  2 +
+ src/cli/commands/maintainer-check.ts | 16 +++-----
+ src/core/maintainer-check.ts         | 32 ++++++++++++++++
+ tests/maintainer-check.test.ts       | 71 ++++++++++++++++++++++++++++++++++++
+ 6 files changed, 117 insertions(+), 11 deletions(-)

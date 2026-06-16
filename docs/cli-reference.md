@@ -280,6 +280,8 @@ Missing imported GitHub metadata is neutral. Invalid local metadata is a warning
 
 Use `--redact-paths` before pasting maintainer-check output into a public issue, PR, or CI log. Default JSON keeps existing repo-relative paths unchanged for scripts.
 
+Human-readable output keeps dynamic check values and evidence paths on one Markdown line. JSON output keeps raw values for scripts.
+
 It is read-only. It does not write reports, run verification commands, call GitHub APIs, read tokens, or upload files.
 
 ## Gate Checks

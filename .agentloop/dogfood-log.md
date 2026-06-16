@@ -2,6 +2,50 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Maintainer-Check Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-maintainer-check-output-markdown-safe.md`
+- Trigger:
+  - `agentloop maintainer-check` is copied into maintainer reviews, issues, and CI logs.
+  - Dynamic task titles, check messages, evidence paths, checklist items, and contributor requests could split Markdown when values contained line breaks.
+- Implementation:
+  - Added a shared `renderMaintainerCheckMarkdown` renderer for human output.
+  - Rendered check status, check id, check message, and evidence path values as single-line inline code.
+  - Rendered checklist items and contributor requests as escaped single-line prose.
+  - Kept JSON output, check semantics, redaction, exit codes, command execution behavior, and GitHub behavior unchanged.
+  - Added regression tests for newline-containing maintainer-check values and evidence paths.
+  - Updated maintainer-check docs, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized paste-safe maintainer evidence without changing trust checks.
+  - Nora wanted human output that stays readable in GitHub comments and CI logs.
+  - Elias wanted the CLI reference to explain the behavior without internal release chatter.
+  - Maya accepted a renderer-only fix with no JSON or scoring changes.
+- Verification:
+  - Focused green runs passed:
+    - `npm test -- tests/maintainer-check.test.ts`
+    - `npm test -- tests/maintainer-check.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, links, and build checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `610` tests.
+  - AgentLoopKit verification, ship, and handoff evidence passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-maintainer-check-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/maintainer-check.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The red test caught that human CLI output did not include evidence paths in a paste-safe form.
+- Improve:
+  - Continue auditing commands whose human output is meant for PR reviews, public issues, CI logs, or release handoffs.
+
 ## 2026-06-16: Markdown-Safe Prepare-PR Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-prepare-pr-output-markdown-safe.md`
