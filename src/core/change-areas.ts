@@ -1,5 +1,5 @@
 import { GitFileStatus } from './git.js';
-import { inlineCode } from './markdown-format.js';
+import { singleLineInlineCode as inlineCode } from './markdown-format.js';
 
 export type ChangeArea = {
   key: string;

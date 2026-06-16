@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 125 Decisions
+
+| item                            | source persona    | problem                                                                                              | proposed solution                                                                                                      | priority | effort | adoption impact | risk | decision | notes                                                                                              |
+| ------------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | -------------------------------------------------------------------------------------------------- |
+| Markdown-safe prepare-pr output | Samir, Nora, Lina | `prepare-pr` PR bodies and GitHub comments are pasted into review surfaces, but dynamic values can split Markdown lists. | Render human PR body, GitHub-comment, changed-file, metadata, and written-path values on one Markdown line; keep JSON raw. | P1       | S      | high            | low  | do now   | No GitHub API calls, posting, score, ship-run reuse, run-ledger, changed-file grouping, or JSON-shape changes. |
+
 ## Current Research Cycle 124 Decisions
 
 | item                      | source persona     | problem                                                                                         | proposed solution                                                                                           | priority | effort | adoption impact | risk | decision | notes                                                                            |

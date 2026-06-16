@@ -2,6 +2,53 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Prepare-PR Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-prepare-pr-output-markdown-safe.md`
+- Trigger:
+  - `agentloop prepare-pr` produces PR bodies, optional GitHub-comment Markdown, and written-path confirmations.
+  - Dynamic task prose, readiness claims, artifact paths, changed files, and imported GitHub metadata could split Markdown list items when values contained line breaks.
+- Implementation:
+  - Switched `src/core/prepare-pr.ts` human inline rendering to `singleLineInlineCode`.
+  - Added prepare-pr single-line escaped prose for PR summaries, readiness claims, list values, and rollback notes.
+  - Switched `src/core/change-areas.ts` and `src/cli/commands/prepare-pr.ts` to single-line inline code for changed-file and write-confirmation output.
+  - Kept JSON output, ship evidence reuse, review-readiness scoring, run-ledger semantics, and changed-file grouping unchanged.
+  - Added regression tests for newline-containing ship artifacts, readiness prose, GitHub metadata fields, changed-file paths, and written output paths.
+  - Updated prepare-pr docs, CLI reference, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized safe PR text that users paste into GitHub.
+  - Nora wanted `prepare-pr --github-comment` to stay copyable in CI-managed comments.
+  - Lina prioritized long autonomous sessions where agents leave review evidence without manual cleanup.
+  - Maya accepted a renderer-only fix with no ship evidence, scoring, or run-ledger changes.
+- Verification:
+  - Red TDD run failed before single-line prepare-pr rendering existed:
+    - `npm test -- tests/prepare-pr.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/prepare-pr.test.ts`
+    - `npm test -- tests/prepare-pr.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, links, and build checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+  - AgentLoopKit verification, ship, handoff, archive, and strict dogfood evidence passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-prepare-pr-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts task archive .agentloop/tasks/2026-06-16-make-prepare-pr-output-markdown-safe.md`
+    - `npm run dogfood:strict`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/prepare-pr.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The failing tests showed raw newline splits in PR body lists, GitHub metadata inline values, GitHub-comment readiness lists, and the CLI write confirmation.
+- Improve:
+  - Continue the PR-facing Markdown audit where commands print copy for GitHub comments, release notes, or reviewer handoffs.
+
 ## 2026-06-16: Markdown-Safe Ship Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-ship-output-markdown-safe.md`

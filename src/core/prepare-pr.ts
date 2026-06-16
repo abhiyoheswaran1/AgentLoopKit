@@ -5,7 +5,10 @@ import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js
 import { pathExists, writeTextFile } from './file-system.js';
 import { getGitStatus, GitFileStatus, parseGitStatus } from './git.js';
 import { readGithubMetadataContext, type GithubMetadataContext } from './github-metadata.js';
-import { escapeMarkdownProse, inlineCode } from './markdown-format.js';
+import {
+  escapeMarkdownProse,
+  singleLineInlineCode as inlineCode,
+} from './markdown-format.js';
 import { resolveOutputArtifactPath } from './artifacts.js';
 import { createShipReport, ShipResult } from './ship.js';
 import { listRuns, readRun } from './runs.js';
@@ -68,8 +71,8 @@ function listItems(section: string) {
 
 function renderMarkdownList(values: string[], fallback: string) {
   return values.length
-    ? values.map((value) => `- ${escapeMarkdownProse(value)}`).join('\n')
-    : `- ${escapeMarkdownProse(fallback)}`;
+    ? values.map((value) => `- ${escapeSingleLineMarkdownProse(value)}`).join('\n')
+    : `- ${escapeSingleLineMarkdownProse(fallback)}`;
 }
 
 function relativePath(cwd: string, filePath: string) {
@@ -115,13 +118,17 @@ function sameMeaningfulChanges(left: GitFileStatus[], right: GitFileStatus[]) {
 
 function verificationLine(ship: PreparePrShipEvidence, cwd: string) {
   const report = ship.verificationReportPath
-    ? ` (${relativePath(cwd, ship.verificationReportPath)})`
+    ? ` (${inlineCode(relativePath(cwd, ship.verificationReportPath))})`
     : '';
   return `Overall status: ${ship.verification.status}${report}`;
 }
 
 function escapedInlineProse(value: string) {
   return escapeMarkdownProse(value.replace(/\s+/g, ' ').trim());
+}
+
+function escapeSingleLineMarkdownProse(value: string) {
+  return escapeMarkdownProse(value).replace(/\r/g, '\\r').replace(/\n/g, '\\n');
 }
 
 function githubItemLine(
@@ -142,7 +149,7 @@ function renderGithubMetadataSection(metadata: GithubMetadataContext) {
 
 - Metadata file: ${inlineCode(metadata.path)}
 - Status: invalid
-- Reason: ${escapeMarkdownProse(metadata.message)}
+- Reason: ${escapeSingleLineMarkdownProse(metadata.message)}
 `;
   }
 
@@ -193,11 +200,13 @@ function buildPrBody(input: {
   const risks = listItems(sectionContent(taskContent, 'Risk Notes'));
   const rollback = sectionContent(taskContent, 'Rollback Notes');
 
-  return `# ${title}
+  return `# ${escapeSingleLineMarkdownProse(title)}
 
 ## Summary
 
-${desiredOutcome || problem || 'Review the changed files and AgentLoopKit evidence before merge.'}
+${escapeSingleLineMarkdownProse(
+  desiredOutcome || problem || 'Review the changed files and AgentLoopKit evidence before merge.',
+)}
 
 ## Changed Files
 
@@ -206,7 +215,7 @@ ${renderChangeAreas(input.ship.changedFiles)}
 ## Review Readiness
 
 - Score: ${input.ship.readiness.totalScore}/100
-${input.ship.readiness.claims.map((claim) => `- ${claim}`).join('\n')}
+${input.ship.readiness.claims.map((claim) => `- ${escapeSingleLineMarkdownProse(claim)}`).join('\n')}
 - Ship report: ${inlineCode(relativePath(input.cwd, input.ship.shipReportPath))}
 
 ## Acceptance Criteria
@@ -232,7 +241,7 @@ ${renderMarkdownList(risks, 'No risk notes were recorded.')}
 
 ## Rollback Notes
 
-${rollback || 'No rollback notes were recorded.'}
+${escapeSingleLineMarkdownProse(rollback || 'No rollback notes were recorded.')}
 
 ## What Was Not Verified
 
@@ -246,7 +255,7 @@ function buildGithubComment(ship: PreparePrShipEvidence, cwd: string) {
 - Score: ${ship.readiness.totalScore}/100
 - Ship report: ${inlineCode(relativePath(cwd, ship.shipReportPath))}
 - Handoff: ${ship.handoffPath ? inlineCode(relativePath(cwd, ship.handoffPath)) : 'not generated'}
-- ${ship.readiness.claims[0]}
+- ${escapeSingleLineMarkdownProse(ship.readiness.claims[0] ?? 'No score boundary claim recorded.')}
 
 ### Blockers
 

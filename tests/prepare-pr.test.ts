@@ -1,8 +1,9 @@
 import path from 'node:path';
-import { mkdir, realpath, rename, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, realpath, rename, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { parseGitStatus } from '../src/core/git.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -386,6 +387,123 @@ describe('prepare-pr command', () => {
           expect.objectContaining({ path: '.agentloop/reports/2026-06-12-extra.md' }),
         ]),
       );
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
+
+  test(
+    'renders dynamic PR body and GitHub comment values on one markdown line',
+    async () => {
+      const dir = await createPreparePrFixture();
+      await writeJson(path.join(dir, '.agentloop/github/context.json'), {
+        issue: {
+          number: 42,
+          title: 'Fix login redirect',
+          state: 'OPEN\nTRIAGE',
+          url: 'https://github.com/example/app/issues/42\nutm=agentloop',
+          author: 'octocat',
+          labels: ['bug\ntriage'],
+          bodyExcerpt: 'User loses redirect target.',
+        },
+        pullRequest: {
+          number: 77,
+          title: 'Agent fix for login redirect',
+          state: 'OPEN',
+          url: 'https://github.com/example/app/pull/77',
+          author: 'contributor',
+          labels: [],
+          isDraft: false,
+          baseRefName: 'main',
+          headRefName: 'fix/login\nredirect',
+          changedFiles: 3,
+          additions: 42,
+          deletions: 9,
+          bodyExcerpt: 'Implements the fix.',
+        },
+      });
+      const ship = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir })).stdout,
+      );
+      const runDir = path.join(dir, '.agentloop/runs', ship.run.id);
+      const scorePath = path.join(runDir, 'score.json');
+      const metadataPath = path.join(runDir, 'metadata.json');
+      const score = JSON.parse(await readFile(scorePath, 'utf8'));
+      const metadata = JSON.parse(await readFile(metadataPath, 'utf8'));
+
+      score.claims = ['This is a review-readiness score.\nDo not split this list item.'];
+      score.blockers = ['Blocker line one\nBlocker line two'];
+      score.warnings = ['Warning line one\nWarning line two'];
+      score.recommendedNextActions = ['Next action line one\nNext action line two'];
+      await writeJson(scorePath, score);
+
+      metadata.shipReportPath = '.agentloop/reports/ship\nreport.md';
+      metadata.handoffPath = '.agentloop/handoffs/review\nhandoff.md';
+      await writeJson(metadataPath, metadata);
+      await writeFile(path.join(dir, '.agentloop/reports/ship\nreport.md'), '# Ship Report\n');
+      await writeFile(path.join(dir, '.agentloop/handoffs/review\nhandoff.md'), '# Handoff\n');
+      await writeJson(
+        path.join(runDir, 'changed-files.json'),
+        await parseGitStatus(
+          (await git(dir, ['status', '--short', '--untracked-files=all'])).stdout,
+        ),
+      );
+
+      const output = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'prepare-pr', '--json', '--github-comment'], { cwd: dir }))
+          .stdout,
+      );
+
+      expect(output.shipEvidence).toEqual({
+        source: 'reused',
+        runId: ship.run.id,
+      });
+      expect(output.body).toContain(
+        '- This is a review-readiness score.\\nDo not split this list item.',
+      );
+      expect(output.body).toContain('- Ship report: `.agentloop/reports/ship\\nreport.md`');
+      expect(output.body).toContain('- Issue labels: `bug\\ntriage`');
+      expect(output.body).toContain('`OPEN\\nTRIAGE`');
+      expect(output.body).toContain('`fix/login\\nredirect` -> `main`');
+      expect(output.body).toContain(
+        '`https://github.com/example/app/issues/42\\nutm=agentloop`',
+      );
+      expect(output.githubComment).toContain('- Ship report: `.agentloop/reports/ship\\nreport.md`');
+      expect(output.githubComment).toContain('- Handoff: `.agentloop/handoffs/review\\nhandoff.md`');
+      expect(output.githubComment).toContain(
+        '- This is a review-readiness score.\\nDo not split this list item.',
+      );
+      expect(output.githubComment).toContain('- Blocker line one\\nBlocker line two');
+      expect(output.githubComment).toContain('- Warning line one\\nWarning line two');
+      expect(output.githubComment).toContain('- Next action line one\\nNext action line two');
+
+      expect(output.body).not.toContain('ship\nreport.md`');
+      expect(output.body).not.toContain('bug\ntriage`');
+      expect(output.body).not.toContain('OPEN\nTRIAGE`');
+      expect(output.githubComment).not.toContain('review\nhandoff.md`');
+      expect(output.githubComment).not.toContain('Blocker line one\nBlocker line two');
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
+
+  test(
+    'renders written path confirmation on one markdown line',
+    async () => {
+      const dir = await createPreparePrFixture();
+      const config = createDefaultConfig({
+        name: 'demo',
+        type: 'typescript-package',
+        packageManager: 'npm',
+      });
+      config.paths.handoffsDir = '.agentloop/handoffs\nreview';
+      await writeJson(path.join(dir, 'agentloop.config.json'), config);
+      await mkdir(path.join(dir, config.paths.handoffsDir), { recursive: true });
+
+      const result = await execa(tsxPath, [cliPath, 'prepare-pr', '--write'], { cwd: dir });
+
+      expect(result.stdout).toContain(
+        'PR description written: `.agentloop/handoffs\\nreview/',
+      );
+      expect(result.stdout).not.toContain('PR description written: `.agentloop/handoffs\nreview/');
     },
     CLI_PREPARE_PR_TEST_TIMEOUT_MS,
   );
