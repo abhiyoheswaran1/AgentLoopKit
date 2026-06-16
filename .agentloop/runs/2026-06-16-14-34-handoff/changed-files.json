@@ -1,0 +1,62 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/dogfood-log.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "DECISIONS.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/maintenance-guards.md"
+  },
+  {
+    "status": "M",
+    "path": "scripts/maintenance-check.mjs"
+  },
+  {
+    "status": "M",
+    "path": "tests/autonomous-dogfood.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/maintenance-check-script.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-16-14-27-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/research/interview-cycle-121.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-16-14-31-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-16-14-31-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-16-14-31-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-16-strengthen-policy-pack-maintenance-gate.md"
+  }
+]

@@ -51,6 +51,12 @@ export function createMaintenanceCheckSteps() {
     sourceCliStep('release proof', ['release-proof', '--strict', '--redact-paths']),
     sourceCliStep('schemastore entry', ['schemastore', '--json']),
     sourceCliStep('policy pack inventory', ['policy', 'packs', '--json']),
+    {
+      name: 'policy pack safety tests',
+      command: 'npm',
+      args: ['test', '--', 'tests/policy-packs.test.ts'],
+      allowFailure: false,
+    },
     sourceCliStep('github metadata import surface', ['github', 'import', '--help']),
     {
       name: 'github metadata safety tests',
@@ -111,7 +117,7 @@ Usage:
   npm run maintenance:check
   node scripts/maintenance-check.mjs --json
 
-Runs the near-term roadmap health gate: unit tests, public docs hygiene, link checking, release proof, SchemaStore output, policy-pack inventory, read-only GitHub metadata import help and safety tests, AgentFlight version, ProjScan health, and the dogfood self-check.
+Runs the near-term roadmap health gate: unit tests, public docs hygiene, link checking, release proof, SchemaStore output, policy-pack inventory and safety tests, read-only GitHub metadata import help and safety tests, AgentFlight version, ProjScan health, and the dogfood self-check.
 
 This script does not publish packages, create tags, create GitHub releases, upload files, post comments, read .env contents, or pass token-like environment variables to child processes.`);
 }

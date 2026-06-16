@@ -4,6 +4,7 @@
 
 - Added `agentloop verify --post-verification-gates` so reviewed task post-verification gates can run after the verification report exists while default `verify` behavior stays unchanged.
 - Added focused GitHub metadata safety tests to `npm run maintenance:check` so the optional/read-only metadata contract is checked directly.
+- Added focused policy-pack safety tests to `npm run maintenance:check` so local/no-overwrite policy-pack behavior is checked directly.
 - Added release-proof HEAD/tag clarity so maintainers can see when public channels match the package version but the current checkout contains unreleased commits.
 - Fixed generated artifact ordering so timestamped verification, handoff, and ship evidence stays ordered by filename even when Git operations rewrite filesystem mtimes.
 - Added a dedicated `scripts/maintenance-check.mjs` gate behind `npm run maintenance:check` that exercises near-term roadmap health checks for release proof, public docs, SchemaStore, policy packs, read-only GitHub metadata, AgentFlight, ProjScan, and non-strict dogfood.

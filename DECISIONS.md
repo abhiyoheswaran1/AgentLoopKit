@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-06-16: Maintenance Gate Tests Policy-Pack Safety Directly
+
+The near-term roadmap says bundled policy packs should stay small, local, safe, and useful. `npm run maintenance:check` should verify that contract with focused `tests/policy-packs.test.ts` coverage, not only by listing policy-pack inventory.
+
+The gate remains local and non-mutating beyond the tested CLI behavior. It does not add remote policy packs, enforcement engines, overwrite behavior, API calls, token reads, `.env` reads, releases, or publishing.
+
 ## 2026-06-16: Maintenance Gate Tests GitHub Metadata Safety Directly
 
 The near-term roadmap says imported GitHub metadata must stay optional, local, read-only, token-free, and non-blocking when absent. `npm run maintenance:check` should verify that contract with focused `tests/github-metadata.test.ts` coverage, not only by checking that `agentloop github import --help` exists.

@@ -178,7 +178,7 @@ Use the maintenance gate when release proof, public docs, SchemaStore, policy pa
 npm run maintenance:check
 ```
 
-`maintenance:check` covers public docs, links, release proof, SchemaStore output, policy-pack inventory, GitHub metadata safety tests, AgentFlight, ProjScan, and the non-strict dogfood self-check. Use `npm run dogfood:strict` after verification when review gates should block the handoff.
+`maintenance:check` covers public docs, links, release proof, SchemaStore output, policy-pack inventory and safety tests, GitHub metadata safety tests, AgentFlight, ProjScan, and the non-strict dogfood self-check. Use `npm run dogfood:strict` after verification when review gates should block the handoff.
 
 ## Commands
 

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-14-37-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-14-37",
+  "createdAtEpochMs": 1781613474357,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-strengthen-policy-pack-maintenance-gate.md",
+    "title": "Strengthen policy pack maintenance gate",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-14-27-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-14-37-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-14-37-pr-summary-3.md",
+  "score": 92,
+  "changedFileCount": 30
+}

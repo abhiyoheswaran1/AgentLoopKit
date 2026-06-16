@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-14-37-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-14-37",
+  "createdAtEpochMs": 1781613438458,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-strengthen-policy-pack-maintenance-gate.md",
+    "title": "Strengthen policy pack maintenance gate",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-14-27-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-14-37-pr-summary.md",
+  "changedFileCount": 20
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-14-31-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-14-31",
+  "createdAtEpochMs": 1781613116211,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-strengthen-policy-pack-maintenance-gate.md",
+    "title": "Strengthen policy pack maintenance gate",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-14-27-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 11
+}

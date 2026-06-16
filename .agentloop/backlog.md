@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 148 Decisions
+
+| item                          | source persona      | problem                                                                                                         | proposed solution                                                                                   | priority | effort | adoption impact | risk | decision | notes                                                                                      |
+| ----------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ------------------------------------------------------------------------------------------ |
+| Policy-pack maintenance coverage | Samir, Maya, Rachel | The near-term gate checked policy-pack inventory, but not the local/no-overwrite policy-pack safety contract directly. | Add focused `tests/policy-packs.test.ts` coverage to `maintenance:check` and update public guard docs. | P1       | S      | medium          | low  | do now   | No remote packs, enforcement engine, overwrite behavior, API calls, tokens, release, or publish. |
+
 ## Current Research Cycle 147 Decisions
 
 | item                                | source persona      | problem                                                                                                                       | proposed solution                                                                                         | priority | effort | adoption impact | risk | decision | notes                                                                                   |
