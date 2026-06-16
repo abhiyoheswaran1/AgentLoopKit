@@ -2,6 +2,56 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Same-Minute HTML Report Artifact Preservation
+
+- Task contract: `.agentloop/tasks/2026-06-16-preserve-same-minute-html-report-artifacts-2.md`
+- Trigger:
+  - Product audit found that generated Markdown evidence paths had collision protection, but `agentloop report` still used an exact generated minute-based HTML path.
+  - Static HTML reports are browser-readable local evidence and should not disappear after a quick rerun.
+  - Explicit `--out` paths still need to stay exact for scripts.
+- Implementation:
+  - Default generated `agentloop report` paths now use the shared collision-safe artifact allocator.
+  - Same-minute reruns preserve the first HTML report and write the next one with a numeric suffix.
+  - Explicit `agentloop report --out <path>` keeps exact requested path behavior and existing safety checks.
+- Product-panel decision:
+  - Samir treated silent evidence replacement as a trust bug.
+  - Lina prioritized repeatable autonomous loops where agents rerun `agentloop report`.
+  - Nora wanted docs to explain the suffix only where users will notice it.
+  - Maya kept the fix on the existing artifact allocator and avoided a retention policy.
+- Verification:
+  - Red TDD run failed because the second same-minute generated HTML report reused the first path:
+    - `npm test -- tests/html-report.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/html-report.test.ts`
+    - `14` tests passed.
+  - Adjacent artifact and CLI-doc tests passed:
+    - `npm test -- tests/html-report.test.ts tests/artifacts.test.ts tests/cli-docs-drift.test.ts`
+    - `3` files, `43` tests passed.
+  - Public docs, static checks, and build passed:
+    - `npm run check:public-docs`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `634` tests.
+  - Markdown link checks passed:
+    - `npm run check:links`
+    - `2493` files checked.
+  - AgentLoopKit task verification passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-preserve-same-minute-html-report-artifacts-2.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - Verification report: `.agentloop/reports/2026-06-16-08-28-verification-report.md`
+    - Run: `.agentloop/runs/2026-06-16-08-29-verify`
+  - Strict dogfood passed after a fresh handoff:
+    - `npm run dogfood:strict`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/html-report.test.ts`
+    - Session: `.agentflight/evidence/af-20260616-062232-preserve-same-minute-html-report-artifacts`
+  - ProjScan passed with health score A through the strict dogfood gate:
+    - `npx --yes projscan doctor --format markdown`
+- Improve:
+  - Badge files are intentionally stable status assets; do not change them unless users need historical badge snapshots.
+
 ## 2026-06-16: Same-Minute Prepare PR Artifact Preservation
 
 - Task contract: `.agentloop/tasks/2026-06-16-preserve-same-minute-prepare-pr-artifacts-2.md`

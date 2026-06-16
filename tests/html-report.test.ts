@@ -87,6 +87,67 @@ describe('HTML report generation', () => {
     expect(html).toContain('Review source changes.');
   });
 
+  test('keeps same-minute generated HTML reports instead of overwriting them', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-cli-task.md'),
+      '# CLI task\n\n- Status: in-progress\n',
+    );
+
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    const first = await writeHtmlReport({
+      cwd: dir,
+      config,
+      timestamp: '2026-06-10-12-30',
+      nowIso: '2026-06-10T12:30:00.000Z',
+    });
+    await writeFile(first.outPath, 'first-html-report-marker\n');
+    const second = await writeHtmlReport({
+      cwd: dir,
+      config,
+      timestamp: '2026-06-10-12-30',
+      nowIso: '2026-06-10T12:30:30.000Z',
+    });
+
+    expect(second.outPath).not.toBe(first.outPath);
+    expect(path.basename(second.outPath)).toBe('2026-06-10-12-30-agentloop-report-2.html');
+    await expect(readFile(first.outPath, 'utf8')).resolves.toContain('first-html-report-marker');
+    await expect(readFile(second.outPath, 'utf8')).resolves.toContain(
+      '<title>AgentLoopKit Report - demo</title>',
+    );
+  });
+
+  test('keeps explicit HTML report output paths exact', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-cli-task.md'),
+      '# CLI task\n\n- Status: in-progress\n',
+    );
+
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    const outPath = path.join(dir, '.agentloop/reports/custom-report.html');
+    await writeFile(outPath, 'existing explicit report\n');
+    const result = await writeHtmlReport({
+      cwd: dir,
+      config,
+      timestamp: '2026-06-10-12-30',
+      nowIso: '2026-06-10T12:30:00.000Z',
+      outPath,
+    });
+
+    expect(result.outPath).toBe(outPath);
+    expect(await readFile(outPath, 'utf8')).toContain('<title>AgentLoopKit Report - demo</title>');
+    await expect(
+      readFile(path.join(dir, '.agentloop/reports/custom-report-2.html'), 'utf8'),
+    ).rejects.toThrow();
+  });
+
   test('CLI report command supports JSON output and custom output path', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

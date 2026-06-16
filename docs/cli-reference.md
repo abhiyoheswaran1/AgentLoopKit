@@ -384,6 +384,8 @@ Human-readable `artifacts` output keeps dynamic artifact values inside single-li
 
 `report` writes a local static HTML evidence report from the current task, latest verification report, latest handoff, Git status, diff stats, and deterministic summary.
 
+Generated default `report` filenames preserve same-minute reruns with a numeric suffix such as `-2.html`. Explicit `--out` paths stay exact.
+
 Human-readable `report` output keeps written report paths, task titles, verification statuses, and changed-file counts on one Markdown line. JSON output keeps raw values for scripts.
 
 `badge` writes a local SVG badge from existing verification or gate evidence.

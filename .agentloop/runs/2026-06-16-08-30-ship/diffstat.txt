@@ -1,0 +1,9 @@
+ .agentloop/backlog.md     |  6 +++++
+ .agentloop/dogfood-log.md | 50 ++++++++++++++++++++++++++++++++++++++
+ CHANGELOG.md              |  1 +
+ DECISIONS.md              |  2 +-
+ docs/cli-reference.md     |  2 ++
+ docs/html-reports.md      |  2 ++
+ src/core/html-report.ts   |  5 ++--
+ tests/html-report.test.ts | 61 +++++++++++++++++++++++++++++++++++++++++++++++
+ 8 files changed, 126 insertions(+), 3 deletions(-)

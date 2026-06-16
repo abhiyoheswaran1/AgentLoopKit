@@ -25,6 +25,8 @@ It writes:
 .agentloop/reports/YYYY-MM-DD-HH-mm-agentloop-report.html
 ```
 
+If that generated minute-based path already exists, AgentLoopKit preserves the existing HTML report and writes the next one with a numeric suffix such as `-2.html`. Explicit `--out` paths stay exact.
+
 Use JSON output in scripts:
 
 ```bash

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed default generated `agentloop report` HTML report paths to preserve same-minute reruns by adding a numeric suffix.
 - Changed default generated `prepare-pr --write` PR description paths to preserve same-minute reruns by adding a numeric suffix.
 - Changed default generated `verify`, `ci-summary --write`, and `release-notes --write` artifact paths to preserve same-minute reruns by adding a numeric suffix.
 - Changed default `create-task` path allocation to preserve existing same-day, same-title task contracts by adding a numeric suffix.

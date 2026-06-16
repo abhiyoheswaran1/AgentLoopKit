@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-08-29-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-08-29",
+  "createdAtEpochMs": 1781591369342,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-preserve-same-minute-html-report-artifacts-2.md",
+    "title": "Preserve same-minute HTML report artifacts",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-08-28-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-08-29-pr-summary.md",
+  "changedFileCount": 15
+}

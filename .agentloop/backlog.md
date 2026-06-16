@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 143 Decisions
+
+| item                                      | source persona      | problem                                                                                                                          | proposed solution                                                                                                             | priority | effort | adoption impact | risk | decision | notes                                                                                            |
+| ----------------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ------------------------------------------------------------------------------------------------ |
+| Same-minute HTML report preservation      | Dogfood, Samir, Lina | Default generated `agentloop report` HTML paths can reuse a minute-based filename and replace a browser-readable evidence report. | Use the existing collision-safe artifact allocator for generated default HTML report paths while preserving explicit `--out`. | P0       | S      | medium          | low  | do now   | No badge behavior change, report-content change, retention policy, release, publish, API call, or token use. |
+
 ## Current Research Cycle 142 Decisions
 
 | item                                             | source persona      | problem                                                                                                                      | proposed solution                                                                                                                | priority | effort | adoption impact | risk | decision | notes                                                                                              |

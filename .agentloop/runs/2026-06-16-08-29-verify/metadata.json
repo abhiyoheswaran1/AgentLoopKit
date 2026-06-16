@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-08-29-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-08-29",
+  "createdAtEpochMs": 1781591358450,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-preserve-same-minute-html-report-artifacts-2.md",
+    "title": "Preserve same-minute HTML report artifacts",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-08-28-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 12
+}

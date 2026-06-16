@@ -5,6 +5,7 @@ import {
   prSummaryPattern,
   resolveExplicitArtifactPath,
   resolveOutputArtifactPath,
+  resolveUniqueOutputArtifactPath,
   verificationReportPattern,
 } from './artifacts.js';
 import { AgentLoopConfig } from './config.js';
@@ -320,7 +321,7 @@ export async function writeHtmlReport(options: WriteHtmlReportOptions): Promise<
           expectedExtension: '.html',
         })
       : undefined) ??
-    resolveOutputArtifactPath({
+    (await resolveUniqueOutputArtifactPath({
       cwd,
       artifactType: 'report',
       requestedPath: path.join(
@@ -329,7 +330,7 @@ export async function writeHtmlReport(options: WriteHtmlReportOptions): Promise<
       ),
       expectedDir: options.config.paths.reportsDir,
       expectedExtension: '.html',
-    });
+    }));
 
   await writeTextFile(outPath, report.html);
 
