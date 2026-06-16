@@ -16,6 +16,7 @@ describe('package scripts', () => {
     expect(packageJson.scripts['test:unit']).toContain('tests/release-proof.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/public-docs-hygiene.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/dogfood-start-script.test.ts');
+    expect(packageJson.scripts['test:unit']).toContain('tests/maintenance-check-script.test.ts');
     expect(packageJson.scripts['test:unit']).not.toContain('tests/doctor.test.ts');
     expect(packageJson.scripts['test:unit']).not.toContain('tests/upgrade-harness.test.ts');
     expect(packageJson.scripts['test:integration']).toContain('tests/doctor.test.ts');
@@ -52,5 +53,17 @@ describe('package scripts', () => {
     expect(dogfoodStart).toBe('node scripts/dogfood-start.mjs');
     expect(dogfoodStart).not.toMatch(/\bnpm\s+publish\b/);
     expect(dogfoodStart).not.toMatch(/\bgh\s+release\b/);
+  });
+
+  test('defines a near-term maintenance gate without release mutation', async () => {
+    const packageJson = JSON.parse(await readFile('package.json', 'utf8')) as {
+      scripts: Record<string, string>;
+    };
+    const maintenanceCheck = packageJson.scripts['maintenance:check'];
+
+    expect(maintenanceCheck).toBe('node scripts/maintenance-check.mjs');
+    expect(maintenanceCheck).not.toMatch(/\bnpm\s+publish\b/);
+    expect(maintenanceCheck).not.toMatch(/\bgh\s+release\b/);
+    expect(maintenanceCheck).not.toMatch(/\bgit\s+tag\b/);
   });
 });

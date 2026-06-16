@@ -171,6 +171,14 @@ Use the stricter gate before a release or final handoff:
 npm run dogfood:strict
 ```
 
+Use the maintenance gate when release proof, public docs, SchemaStore, policy packs, GitHub metadata, AgentFlight, or ProjScan behavior changes:
+
+```bash
+npm run maintenance:check
+```
+
+`maintenance:check` runs the non-strict dogfood self-check. Use `npm run dogfood:strict` after verification when review gates should block the handoff.
+
 ## Commands
 
 The package exposes two binaries:

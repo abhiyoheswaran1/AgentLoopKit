@@ -70,7 +70,7 @@ export function createDogfoodSteps({ strict = false } = {}) {
     {
       name: 'projscan project health',
       command: 'npx',
-      args: ['--yes', 'projscan', 'doctor', '--format', 'markdown'],
+      args: ['--yes', 'projscan', '--format', 'markdown', 'doctor'],
       allowFailure: false,
     },
   ];

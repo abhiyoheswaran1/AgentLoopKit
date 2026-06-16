@@ -1,0 +1,10 @@
+ .agentloop/dogfood-log.md        | 28 ++++++++++++++++++++++++++++
+ CHANGELOG.md                     |  3 ++-
+ README.md                        |  8 ++++++++
+ docs/maintenance-guards.md       |  6 +++++-
+ package.json                     |  4 ++--
+ scripts/dogfood.mjs              |  2 +-
+ tests/autonomous-dogfood.test.ts | 33 +++++++++++++++++++++++++++++----
+ tests/dogfood-script.test.ts     |  4 ++--
+ tests/package-scripts.test.ts    | 13 +++++++++++++
+ 9 files changed, 90 insertions(+), 11 deletions(-)

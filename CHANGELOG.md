@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Added a dedicated `scripts/maintenance-check.mjs` gate behind `npm run maintenance:check` that exercises near-term roadmap health checks for release proof, public docs, SchemaStore, policy packs, read-only GitHub metadata, AgentFlight, ProjScan, and non-strict dogfood.
+- Changed the dogfood ProjScan command to use the documented global `--format` flag position.
 
 ## 0.34.1
 

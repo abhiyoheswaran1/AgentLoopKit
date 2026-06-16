@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-11-51-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-11-51",
+  "createdAtEpochMs": 1781603516335,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-maintain-near-term-roadmap-health.md",
+    "title": "Maintain near-term roadmap health",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-11-51-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 55
+}

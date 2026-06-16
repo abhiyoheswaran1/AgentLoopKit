@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-11-52-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-16-11-52",
+  "createdAtEpochMs": 1781603530096,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-maintain-near-term-roadmap-health.md",
+    "title": "Maintain near-term roadmap health",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-11-51-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-11-52-ship-report-2.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-11-52-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 67
+}

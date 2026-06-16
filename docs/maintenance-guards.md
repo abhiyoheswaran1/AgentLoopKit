@@ -122,11 +122,15 @@ agentloop maintainer-check --redact-paths
 
 ## Regular Maintenance Check
 
-Use the lighter maintenance gate during ongoing development:
+Use the maintenance gate during ongoing development when release proof, public docs, SchemaStore, policy packs, GitHub metadata, AgentFlight, or ProjScan behavior changes:
 
 ```bash
 npm run maintenance:check
 ```
+
+That gate runs unit tests, public-doc hygiene, link checks, live release proof, SchemaStore output, policy-pack inventory, the read-only GitHub metadata import surface, AgentFlight version, ProjScan health, and the non-strict dogfood self-check.
+
+Run `npm run dogfood:strict` after fresh verification when review gates should block the final handoff.
 
 Use the full release gate only for approved releases:
 

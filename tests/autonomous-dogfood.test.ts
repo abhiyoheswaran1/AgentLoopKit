@@ -76,6 +76,15 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     const roadmap = await readFile('ROADMAP.md', 'utf8');
     const distribution = await readFile('docs/distribution-channels.md', 'utf8');
     const maintenance = await readFile('docs/maintenance-guards.md', 'utf8');
+    // @ts-expect-error TS7016: script helper has no declaration file.
+    const maintenanceModule = await import('../scripts/maintenance-check.mjs');
+    const maintenanceSteps = maintenanceModule.createMaintenanceCheckSteps() as Array<{
+      command: string;
+      args: string[];
+    }>;
+    const maintenanceCommandText = maintenanceSteps
+      .map((step) => [step.command, ...step.args].join(' '))
+      .join('\n');
     const packageJson = await readJson<{ scripts: Record<string, string> }>('package.json');
 
     expect(roadmap).toContain('Keep the GitHub release to npm trusted-publishing flow healthy');
@@ -86,9 +95,25 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     expect(maintenance).toContain('SchemaStore');
     expect(maintenance).toContain('policy packs');
     expect(maintenance).toContain('GitHub metadata');
-    expect(packageJson.scripts['maintenance:check']).toContain('npm run test:unit');
-    expect(packageJson.scripts['maintenance:check']).toContain('npm run check:public-docs');
-    expect(packageJson.scripts['maintenance:check']).toContain('npm run check:links');
-    expect(packageJson.scripts['maintenance:check']).toContain('npm run dogfood:strict');
+    expect(packageJson.scripts['maintenance:check']).toBe('node scripts/maintenance-check.mjs');
+    expect(maintenanceCommandText).toContain('npm run test:unit');
+    expect(maintenanceCommandText).toContain('npm run check:public-docs');
+    expect(maintenanceCommandText).toContain('npm run check:links');
+    expect(maintenanceCommandText).toContain(
+      'npx --no-install tsx src/cli/index.ts release-proof --strict --redact-paths',
+    );
+    expect(maintenanceCommandText).toContain(
+      'npx --no-install tsx src/cli/index.ts schemastore --json',
+    );
+    expect(maintenanceCommandText).toContain(
+      'npx --no-install tsx src/cli/index.ts policy packs --json',
+    );
+    expect(maintenanceCommandText).toContain(
+      'npx --no-install tsx src/cli/index.ts github import --help',
+    );
+    expect(maintenanceCommandText).toContain('npx --yes agentflight@latest --version');
+    expect(maintenanceCommandText).toContain('npx --yes projscan --format json doctor');
+    expect(maintenanceCommandText).toContain('npm run dogfood');
+    expect(maintenance).toContain('Run `npm run dogfood:strict` after fresh verification');
   });
 });

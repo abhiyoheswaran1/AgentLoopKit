@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-11-55-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-11-55",
+  "createdAtEpochMs": 1781603756345,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-maintain-near-term-roadmap-health.md",
+    "title": "Maintain near-term roadmap health",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-11-51-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-11-55-pr-summary.md",
+  "changedFileCount": 25
+}

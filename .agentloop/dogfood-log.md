@@ -12054,3 +12054,31 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Trusted publishing, GHCR, MCP Registry, and published-package smoke all completed from the GitHub release path.
 - Improve:
   - The GitHub CLI watcher intermittently returned a 401 while polling annotations, even though direct `gh run view` confirmed success. Prefer direct run views when watchers fail mid-poll.
+
+## 2026-06-16: Near-Term Roadmap Maintenance Gate
+
+- Task contract: `.agentloop/tasks/2026-06-16-maintain-near-term-roadmap-health.md`
+- Trigger:
+  - The near-term roadmap called for recurring checks around release publishing, public docs, GHCR/MCP proof, SchemaStore, policy packs, and read-only GitHub metadata.
+  - The repo had individual checks, but no single maintenance gate that exercised those duties together.
+- Implementation:
+  - Added `scripts/maintenance-check.mjs`.
+  - Changed `npm run maintenance:check` to run that script.
+  - The gate checks unit tests, public-doc hygiene, Markdown links, live release proof, SchemaStore output, policy-pack inventory, the GitHub metadata import surface, AgentFlight version, ProjScan health, and non-strict dogfood.
+  - Normalized the dogfood ProjScan command to the documented `projscan --format markdown doctor` argument order.
+- Dogfood finding:
+  - The first maintenance gate used `dogfood:strict`.
+  - That made the gate circular for active work because strict dogfood expects fresh verification and handoff evidence before it passes.
+  - The fix was to keep `maintenance:check` useful during implementation with non-strict dogfood, then run `dogfood:strict` after verification and handoff.
+- Verification:
+  - `npm run maintenance:check -- --json` passed.
+  - `agentloop verify --task .agentloop/tasks/2026-06-16-maintain-near-term-roadmap-health.md --task-commands --only-task-commands --write-run --redact-paths --timeout-ms 600000` passed.
+  - `npm run lint` passed.
+  - `npm run typecheck` passed.
+  - `npm run build` passed.
+  - `npm test` passed with 63 files and 644 tests.
+  - `npm run dogfood:strict` passed after fresh verification, ship, and handoff evidence existed.
+- What worked well:
+  - The product caught its own process bug: a gate that should support implementation cannot require the evidence that it is meant to help produce.
+- Improve:
+  - Consider a future `agentloop verify --post-gates` flow that can run post-verification commands after the report exists without users manually sequencing `verify`, `ship`, `prepare-pr`, and strict dogfood.
