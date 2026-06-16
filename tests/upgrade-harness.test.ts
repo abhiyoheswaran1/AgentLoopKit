@@ -157,4 +157,25 @@ describe('upgrade-harness command', () => {
     expect(output.targetDirectory).toBe('[agentloop-root]');
     expect(result.stdout).not.toContain(dir);
   });
+
+  test('keeps unusual target paths on one line in human output while preserving JSON values', async () => {
+    const baseDir = await makeTempDir();
+    tempDirs.push(baseDir);
+    const dir = path.join(baseDir, 'repo\nwith-break');
+    await mkdir(dir, { recursive: true });
+    await writeOldHarness(dir);
+    const resolvedDir = await realpath(dir);
+
+    const humanResult = await execa(tsxPath, [cliPath, 'upgrade-harness'], { cwd: dir });
+    const jsonResult = await execa(tsxPath, [cliPath, 'upgrade-harness', '--json'], { cwd: dir });
+
+    const targetLine = humanResult.stdout
+      .split('\n')
+      .find((line) => line.startsWith('- Target:'));
+    expect(targetLine).toContain('repo\\nwith-break');
+    expect(humanResult.stdout).not.toContain(resolvedDir);
+
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.targetDirectory).toBe(resolvedDir);
+  });
 });

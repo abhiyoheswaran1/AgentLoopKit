@@ -46,6 +46,8 @@ Use `--details` or `--suggestions` when you want copyable Markdown guidance for 
 
 The command is read-only. It does not overwrite guidance, merge templates, create tasks, run verification commands, read `.env` contents, call external APIs, or upload files. Use `init --dry-run` after `upgrade-harness` when you also want to see missing generated files.
 
+Human-readable output escapes line breaks inside dynamic inline-code values so unusual local paths cannot split Markdown lists. JSON output keeps raw values for scripts.
+
 Use `--redact-paths` before pasting output into a public issue, PR, or CI log. It replaces the absolute AgentLoop root with `[agentloop-root]`.
 
 Existing repos can use the latest CLI before refreshing old guidance:

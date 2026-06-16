@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-04-41-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-04-41",
+  "createdAtEpochMs": 1781577709563,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-make-upgrade-harness-output-markdown-safe.md",
+    "title": "Make upgrade-harness output Markdown-safe",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-04-36-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-04-41-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-04-41-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 49
+}

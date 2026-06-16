@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-04-40-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-04-40",
+  "createdAtEpochMs": 1781577637262,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-upgrade-harness-output-markdown-safe.md",
+    "title": "Make upgrade-harness output Markdown-safe",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-04-36-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-04-40-pr-summary.md",
+  "changedFileCount": 26
+}

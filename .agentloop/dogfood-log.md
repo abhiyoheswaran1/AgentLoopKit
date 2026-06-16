@@ -11242,3 +11242,44 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The dogfood gate forced current handoff evidence instead of accepting a PR description alone.
 - Improve:
   - Consider deeper option-value completions later for other fixed flags, but avoid turning completions into a large dynamic subsystem.
+
+## 2026-06-16: Upgrade-Harness Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-upgrade-harness-output-markdown-safe.md`
+- Trigger:
+  - `upgrade-harness` is meant for older repos and often gets pasted into PRs, issues, or agent handoffs.
+  - Human output used normal inline-code formatting for the target path, so a repo path containing a line break could split a Markdown list item.
+  - Product-panel read: Samir wanted pasted audit output to stay safe; Lina wanted upgrade guidance to remain reliable inside long agent sessions; Tom wanted JSON values left raw for deterministic scripts.
+- Implementation:
+  - Added a red regression using a real temp repo path containing a line break.
+  - Routed human `upgrade-harness` inline-code output through the shared single-line formatter.
+  - Documented the human-vs-JSON output boundary in the CLI and upgrade docs.
+- Verification:
+  - Red-focused test:
+    - `npm test -- tests/upgrade-harness.test.ts` failed because the target path split the human Markdown line.
+  - Green-focused test:
+    - `npm test -- tests/upgrade-harness.test.ts` passed with 6 tests.
+  - Task verification passed:
+    - `npm test -- tests/upgrade-harness.test.ts`
+    - `npm test -- tests/upgrade-harness.test.ts tests/cli-docs-drift.test.ts`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+    - `npm test`
+    - `.agentloop/reports/2026-06-16-04-36-verification-report.md`
+    - `.agentloop/runs/2026-06-16-04-38-verify`
+  - `npx --yes agentflight verify -- npm test -- tests/upgrade-harness.test.ts` passed:
+    - `.agentflight/evidence/af-20260616-022925-make-upgrade-harness-output-markdown-safe/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260616-022925-make-upgrade-harness-output-markdown-safe/verification-1.stderr.txt`
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+  - `agentloop ship --redact-paths` wrote `.agentloop/reports/2026-06-16-04-38-ship-report.md` with review-readiness score `96`/100.
+  - The task was marked done and archived at `.agentloop/tasks/archive/2026-06-16-make-upgrade-harness-output-markdown-safe.md`.
+  - Final archived-task handoff wrote `.agentloop/handoffs/2026-06-16-04-40-pr-summary-3.md`.
+  - Final `agentloop ship --redact-paths` wrote `.agentloop/reports/2026-06-16-04-40-ship-report.md` with review-readiness score `92`/100.
+  - Final `npm run dogfood:strict` passed after archival.
+- What worked well:
+  - The command already had one formatting boundary, so a small change covered every human inline value without changing report generation.
+- Improve:
+  - Continue checking human command output that agents commonly paste into reviewer evidence.

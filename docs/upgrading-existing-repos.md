@@ -22,6 +22,8 @@ Read the output before changing files.
 - `upgrade-harness --details` prints copyable guidance for current-loop topics missing from local generated files.
 - `init --dry-run` shows missing generated files without writing.
 
+Human `upgrade-harness` output keeps dynamic paths on one Markdown line. JSON output keeps raw values for scripts.
+
 ## Apply The Latest CLI
 
 If the repo uses `npx`, you already get the latest CLI when you run:

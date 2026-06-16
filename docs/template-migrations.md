@@ -32,6 +32,8 @@ npx --yes agentloopkit@latest init --dry-run
 
 The command writes nothing. Use `--details` for copyable guidance, then manually copy the relevant sections into `AGENTS.md`, `AGENTLOOP.md`, or `.agentloop/harness/*`.
 
+Human output keeps dynamic paths on one Markdown line. JSON output keeps raw values for automation.
+
 `init --dry-run` shows missing generated files. A non-dry `init` creates missing files and skips existing ones. It does not merge templates into files that already exist.
 
 You can use the current CLI loop before refreshing old generated guidance:

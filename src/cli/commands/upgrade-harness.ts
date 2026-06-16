@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { inspectHarnessUpgrade } from '../../core/upgrade-harness.js';
 import type { HarnessUpgradeReport } from '../../core/upgrade-harness.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { loadWorkspaceForJsonCommand } from '../json-errors.js';
 
 function formatTopics(topics: string[]) {

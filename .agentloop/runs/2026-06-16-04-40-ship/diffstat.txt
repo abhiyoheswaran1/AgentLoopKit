@@ -1,0 +1,9 @@
+ .agentloop/backlog.md               |  1 +
+ .agentloop/dogfood-log.md           | 37 +++++++++++++++++++++++++++++++++++++
+ CHANGELOG.md                        |  1 +
+ docs/cli-reference.md               |  2 ++
+ docs/template-migrations.md         |  2 ++
+ docs/upgrading-existing-repos.md    |  2 ++
+ src/cli/commands/upgrade-harness.ts |  2 +-
+ tests/upgrade-harness.test.ts       | 21 +++++++++++++++++++++
+ 8 files changed, 67 insertions(+), 1 deletion(-)

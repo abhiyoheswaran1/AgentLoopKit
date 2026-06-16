@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-04-38-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-04-38",
+  "createdAtEpochMs": 1781577491377,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-upgrade-harness-output-markdown-safe.md",
+    "title": "Make upgrade-harness output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-04-36-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 10
+}
