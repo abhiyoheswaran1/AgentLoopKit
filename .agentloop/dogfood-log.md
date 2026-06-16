@@ -11986,3 +11986,42 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The published-package smoke gave stronger evidence than local `npx` checks inside this package checkout, where npm can resolve through workspace context.
 - Improve:
   - Consider documenting that direct `npx agentloopkit@<version>` verification should be run from a clean directory or via the published-package smoke script.
+
+## 2026-06-16: Release Delta Readiness
+
+- Task contract: `.agentloop/tasks/2026-06-16-explain-release-delta-readiness.md`
+- Trigger:
+  - After `v0.34.0`, release proof commits existed after the tag but did not affect npm package contents.
+  - `agentloop release-check` warned that the current version tag already existed without explaining whether a new package release was actually needed.
+  - Product-panel read: Maya wanted release automation to stay conservative; Nora wanted a clearer next action; Samir wanted read-only diagnostics with no publishing side effects.
+- Implementation:
+  - Added release-delta diagnostics to `agentloop release-check`.
+  - Classified committed files since `v<package.version>` as package-impacting or repo-local using `package.json.files` plus release-critical defaults.
+  - Added JSON fields for agents and CI: changed files, package-impacting files, commit count, and recommendation.
+  - Kept strict release safety intact: existing tags and pending changelog entries still block release-flow.
+- Verification:
+  - Red-focused test:
+    - `npm test -- tests/release-check.test.ts` failed before implementation because `releaseDelta` was missing.
+  - Green-focused checks:
+    - `npm test -- tests/release-check.test.ts` passed.
+    - `npm test -- tests/release-check.test.ts tests/cli-docs-drift.test.ts` passed with 14 tests.
+  - Broad local checks:
+    - `npm run typecheck` passed.
+    - `npm run lint` passed.
+    - `npm run build` passed.
+    - `npm run check:public-docs` passed.
+    - `npm run check:links` passed with 2525 Markdown files checked.
+    - `npm test` passed with 62 files and 640 tests.
+    - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+  - AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-16-09-57-verification-report.md`
+    - `.agentloop/runs/2026-06-16-09-59-verify`
+  - The task was marked done and archived at `.agentloop/tasks/archive/2026-06-16-explain-release-delta-readiness.md`.
+  - Fresh handoff and ship evidence were written:
+    - `.agentloop/handoffs/2026-06-16-10-04-pr-summary.md`
+    - `.agentloop/reports/2026-06-16-10-03-ship-report.md`
+    - `.agentloop/runs/2026-06-16-10-03-ship`
+- What worked well:
+  - Dogfooding exposed a real maintainer ambiguity: release-check needed to explain release impact, not only tag state.
+- Improve:
+  - After committing this batch, run the clean-tree dogfood gate so AgentFlight, ProjScan, and AgentLoopKit all evaluate the committed state.

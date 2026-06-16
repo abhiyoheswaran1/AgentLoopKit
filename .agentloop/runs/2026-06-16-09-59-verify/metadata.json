@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-09-59-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-09-59",
+  "createdAtEpochMs": 1781596765305,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-explain-release-delta-readiness.md",
+    "title": "Explain release delta readiness",
+    "status": "proposed"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-09-57-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 6
+}

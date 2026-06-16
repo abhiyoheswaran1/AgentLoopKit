@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdir, readdir, realpath, utimes, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, realpath, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
@@ -455,4 +455,117 @@ describe('release-check command', () => {
     },
     CLI_RELEASE_CHECK_TEST_TIMEOUT_MS,
   );
+
+  test('explains when commits after the current version tag do not affect package release contents', async () => {
+    const dir = await createReleaseRepo();
+    await git(dir, ['tag', 'v1.2.3']);
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    await writeFile(path.join(dir, 'docs', 'release-status.md'), '# Release proof\n');
+    await git(dir, ['add', 'docs/release-status.md']);
+    await git(dir, ['commit', '-m', 'docs: record release proof']);
+
+    const result = await execa(tsxPath, [cliPath, 'release-check', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const humanResult = await execa(tsxPath, [cliPath, 'release-check'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.releaseDelta).toMatchObject({
+      tag: 'v1.2.3',
+      commitCount: 1,
+      packageImpactingChangedFileCount: 0,
+      recommendation: 'no-release-needed',
+    });
+    expect(output.releaseDelta.changedFiles).toEqual(['docs/release-status.md']);
+    expect(output.releaseDelta.packageImpactingChangedFiles).toEqual([]);
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'release-delta',
+          status: 'pass',
+          message: '1 commit since v1.2.3, but no package-impacting files changed.',
+        }),
+        expect.objectContaining({
+          id: 'release-tag',
+          status: 'warn',
+        }),
+      ]),
+    );
+    expect(output.nextAction).toEqual({
+      command: 'do not cut a release yet',
+      reason: 'The current version is already tagged and commits since that tag do not affect package release contents.',
+    });
+    expect(humanResult.stdout).toContain(
+      '- [`pass`] `Release delta`: `1 commit since v1.2.3, but no package-impacting files changed.`',
+    );
+    expect(humanResult.stdout).toContain('Run `do not cut a release yet`.');
+  });
+
+  test('explains when commits after the current version tag require a new version choice', async () => {
+    const dir = await createReleaseRepo();
+    await git(dir, ['tag', 'v1.2.3']);
+    await writeFile(path.join(dir, 'README.md'), '# Updated package README\n');
+    await git(dir, ['add', 'README.md']);
+    await git(dir, ['commit', '-m', 'docs: update package readme']);
+
+    const result = await execa(tsxPath, [cliPath, 'release-check', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.releaseDelta).toMatchObject({
+      tag: 'v1.2.3',
+      commitCount: 1,
+      packageImpactingChangedFileCount: 1,
+      recommendation: 'choose-next-version',
+    });
+    expect(output.releaseDelta.packageImpactingChangedFiles).toEqual(['README.md']);
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'release-delta',
+          status: 'warn',
+          message:
+            '1 package-impacting file changed since v1.2.3; choose the next package version before release.',
+        }),
+      ]),
+    );
+    expect(output.nextAction.command).toBe('choose the intended release version');
+    expect(output.nextAction.reason).toBe(
+      'Package-impacting changes exist after the current version tag.',
+    );
+  });
+
+  test('treats package files globs as release-impacting delta paths', async () => {
+    const dir = await createReleaseRepo();
+    const packageJson = JSON.parse(await readFile(path.join(dir, 'package.json'), 'utf8'));
+    packageJson.files = ['public/**/*.json'];
+    await writeFile(path.join(dir, 'package.json'), JSON.stringify(packageJson, null, 2));
+    await git(dir, ['add', 'package.json']);
+    await git(dir, ['commit', '-m', 'Add package files list']);
+    await git(dir, ['tag', 'v1.2.3']);
+    await mkdir(path.join(dir, 'public', 'metadata'), { recursive: true });
+    await writeFile(path.join(dir, 'public', 'metadata', 'manifest.json'), '{"name":"demo"}\n');
+    await git(dir, ['add', 'public/metadata/manifest.json']);
+    await git(dir, ['commit', '-m', 'Add package manifest']);
+
+    const result = await execa(tsxPath, [cliPath, 'release-check', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.releaseDelta.packageImpactingChangedFiles).toEqual([
+      'public/metadata/manifest.json',
+    ]);
+    expect(output.releaseDelta.recommendation).toBe('choose-next-version');
+  });
 });

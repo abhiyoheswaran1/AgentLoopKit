@@ -1,0 +1,5 @@
+ CHANGELOG.md                |   2 +-
+ docs/cli-reference.md       |   4 +-
+ src/core/release-check.ts   | 203 +++++++++++++++++++++++++++++++++++++++++++-
+ tests/release-check.test.ts | 115 ++++++++++++++++++++++++-
+ 4 files changed, 317 insertions(+), 7 deletions(-)

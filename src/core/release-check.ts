@@ -40,6 +40,7 @@ export type ReleaseCheckResult = {
     targetIsRoot: boolean;
     changedFileCount: number;
   };
+  releaseDelta: ReleaseDelta;
   checks: ReleaseReadinessCheck[];
   nextAction: {
     command: string;
@@ -56,6 +57,24 @@ type PackageMetadata = {
   name: string;
   version: string;
   scripts: Record<string, string>;
+  files: string[];
+};
+
+type ReleaseDeltaRecommendation =
+  | 'ready-to-release'
+  | 'no-release-needed'
+  | 'choose-next-version'
+  | 'unknown';
+
+export type ReleaseDelta = {
+  tag: string;
+  tagExists: boolean;
+  commitCount: number;
+  changedFiles: string[];
+  changedFileCount: number;
+  packageImpactingChangedFiles: string[];
+  packageImpactingChangedFileCount: number;
+  recommendation: ReleaseDeltaRecommendation;
 };
 
 const requiredScripts = ['test', 'typecheck', 'build'] as const;
@@ -108,12 +127,13 @@ async function resolveComparablePath(filePath: string) {
 async function readPackageMetadata(cwd: string): Promise<PackageMetadata> {
   const packagePath = path.join(cwd, 'package.json');
   if (!(await pathExists(packagePath))) {
-    return { name: path.basename(cwd), version: '0.0.0', scripts: {} };
+    return { name: path.basename(cwd), version: '0.0.0', scripts: {}, files: [] };
   }
   const parsed = JSON.parse(await readFile(packagePath, 'utf8')) as {
     name?: unknown;
     version?: unknown;
     scripts?: unknown;
+    files?: unknown;
   };
   const scripts =
     parsed.scripts && typeof parsed.scripts === 'object' && !Array.isArray(parsed.scripts)
@@ -132,6 +152,9 @@ async function readPackageMetadata(cwd: string): Promise<PackageMetadata> {
     version:
       typeof parsed.version === 'string' && parsed.version.trim() ? parsed.version.trim() : '0.0.0',
     scripts,
+    files: Array.isArray(parsed.files)
+      ? parsed.files.filter((entry): entry is string => typeof entry === 'string' && !!entry.trim())
+      : [],
   };
 }
 
@@ -225,6 +248,144 @@ async function gitTagExists(cwd: string, version: string) {
   return result.exitCode === 0;
 }
 
+async function gitCommitCountSinceTag(cwd: string, tag: string) {
+  const result = await execa('git', ['rev-list', '--count', `${tag}..HEAD`], {
+    cwd,
+    reject: false,
+  });
+  if (result.exitCode !== 0) return 0;
+  const parsed = Number.parseInt(result.stdout.trim(), 10);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+async function gitChangedFilesSinceTag(cwd: string, tag: string) {
+  const result = await execa('git', ['diff', '--name-only', `${tag}..HEAD`, '--'], {
+    cwd,
+    reject: false,
+  });
+  if (result.exitCode !== 0) return [];
+  return result.stdout
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function normalizePackageFileEntry(entry: string) {
+  return entry.trim().replace(/^\.\/+/, '').replace(/^\/+/, '').replace(/\/+$/, '');
+}
+
+function packageFileEntryMatches(filePath: string, entry: string) {
+  const normalizedEntry = normalizePackageFileEntry(entry);
+  if (!normalizedEntry) return false;
+  if (!normalizedEntry.includes('*')) {
+    return filePath === normalizedEntry || filePath.startsWith(`${normalizedEntry}/`);
+  }
+
+  let pattern = '';
+  for (let index = 0; index < normalizedEntry.length; index += 1) {
+    const char = normalizedEntry[index];
+    const nextChar = normalizedEntry[index + 1];
+    if (char === '*' && nextChar === '*') {
+      pattern += '.*';
+      index += 1;
+      continue;
+    }
+    if (char === '*') {
+      pattern += '[^/]*';
+      continue;
+    }
+    pattern += char.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+  }
+  return new RegExp(`^${pattern}$`).test(filePath);
+}
+
+function isPackageImpactingFile(filePath: string, packageMetadata: PackageMetadata) {
+  const normalized = filePath.split(path.sep).join('/').replace(/^\/+/, '');
+  const packageFileEntries = packageMetadata.files.map(normalizePackageFileEntry).filter(Boolean);
+  if (packageFileEntries.some((entry) => packageFileEntryMatches(normalized, entry))) return true;
+
+  const releaseImpactEntries = [
+    'package.json',
+    'package-lock.json',
+    'npm-shrinkwrap.json',
+    'pnpm-lock.yaml',
+    'yarn.lock',
+    'bun.lockb',
+    'README.md',
+    'LICENSE',
+    'LICENSE.md',
+    'LICENCE',
+    'LICENCE.md',
+    'CHANGELOG.md',
+    'server.json',
+    'src',
+    'dist',
+    'schema',
+    'templates',
+    'scripts/copy-assets.mjs',
+    'tsup.config.ts',
+    'tsconfig.json',
+  ];
+
+  return releaseImpactEntries.some((entry) => packageFileEntryMatches(normalized, entry));
+}
+
+async function buildReleaseDelta(options: {
+  cwd: string;
+  packageMetadata: PackageMetadata;
+  tagExists: boolean;
+}): Promise<ReleaseDelta> {
+  const tag = `v${options.packageMetadata.version}`;
+  if (!options.tagExists) {
+    return {
+      tag,
+      tagExists: false,
+      commitCount: 0,
+      changedFiles: [],
+      changedFileCount: 0,
+      packageImpactingChangedFiles: [],
+      packageImpactingChangedFileCount: 0,
+      recommendation: 'ready-to-release',
+    };
+  }
+
+  const [commitCount, changedFiles] = await Promise.all([
+    gitCommitCountSinceTag(options.cwd, tag),
+    gitChangedFilesSinceTag(options.cwd, tag),
+  ]);
+  const packageImpactingChangedFiles = changedFiles.filter((changedFile) =>
+    isPackageImpactingFile(changedFile, options.packageMetadata),
+  );
+
+  return {
+    tag,
+    tagExists: true,
+    commitCount,
+    changedFiles,
+    changedFileCount: changedFiles.length,
+    packageImpactingChangedFiles,
+    packageImpactingChangedFileCount: packageImpactingChangedFiles.length,
+    recommendation: packageImpactingChangedFiles.length
+      ? 'choose-next-version'
+      : 'no-release-needed',
+  };
+}
+
+function releaseDeltaMessage(delta: ReleaseDelta) {
+  if (!delta.tagExists) {
+    return `Local tag ${delta.tag} is not present yet; release delta starts after version preparation.`;
+  }
+  if (delta.packageImpactingChangedFileCount === 0) {
+    if (delta.commitCount === 0) return `No commits since ${delta.tag}.`;
+    return `${delta.commitCount} commit${delta.commitCount === 1 ? '' : 's'} since ${
+      delta.tag
+    }, but no package-impacting files changed.`;
+  }
+  return `${delta.packageImpactingChangedFileCount} package-impacting file${
+    delta.packageImpactingChangedFileCount === 1 ? '' : 's'
+  } changed since ${delta.tag}; choose the next package version before release.`;
+}
+
 function overallStatus(checks: ReleaseReadinessCheck[], strict: boolean): ReleaseCheckStatus {
   if (checks.some((item) => item.status === 'fail')) return 'fail';
   if (strict && checks.some((item) => item.status === 'warn')) return 'fail';
@@ -232,7 +393,7 @@ function overallStatus(checks: ReleaseReadinessCheck[], strict: boolean): Releas
   return 'pass';
 }
 
-function chooseNextAction(checks: ReleaseReadinessCheck[]) {
+function chooseNextAction(checks: ReleaseReadinessCheck[], releaseDelta: ReleaseDelta) {
   const byId = new Map(checks.map((item) => [item.id, item]));
   if (byId.get('package-metadata')?.status === 'fail') {
     return {
@@ -284,6 +445,19 @@ function chooseNextAction(checks: ReleaseReadinessCheck[]) {
     };
   }
   if (byId.get('release-tag')?.status !== 'pass') {
+    if (releaseDelta.recommendation === 'no-release-needed') {
+      return {
+        command: 'do not cut a release yet',
+        reason:
+          'The current version is already tagged and commits since that tag do not affect package release contents.',
+      };
+    }
+    if (releaseDelta.recommendation === 'choose-next-version') {
+      return {
+        command: 'choose the intended release version',
+        reason: 'Package-impacting changes exist after the current version tag.',
+      };
+    }
     return {
       command: 'choose the intended release version',
       reason: 'The local release tag already exists.',
@@ -521,6 +695,28 @@ export async function checkReleaseReadiness(options: {
   );
 
   const existingTag = inGit ? await gitTagExists(options.cwd, packageMetadata.version) : false;
+  const releaseDelta = inGit
+    ? await buildReleaseDelta({ cwd: options.cwd, packageMetadata, tagExists: existingTag })
+    : {
+        tag: `v${packageMetadata.version}`,
+        tagExists: false,
+        commitCount: 0,
+        changedFiles: [],
+        changedFileCount: 0,
+        packageImpactingChangedFiles: [],
+        packageImpactingChangedFileCount: 0,
+        recommendation: 'unknown' as const,
+      };
+  checks.push(
+    releaseCheck(
+      'release-delta',
+      'Release delta',
+      releaseDelta.tagExists && releaseDelta.packageImpactingChangedFileCount > 0
+        ? 'warn'
+        : 'pass',
+      releaseDeltaMessage(releaseDelta),
+    ),
+  );
   checks.push(
     releaseCheck(
       'release-tag',
@@ -535,7 +731,7 @@ export async function checkReleaseReadiness(options: {
   const outputChecks = checks.map((item) =>
     redactReleaseCheck(item, resolvedGitRoot, options.redactPaths),
   );
-  const rawNextAction = chooseNextAction(checks);
+  const rawNextAction = chooseNextAction(checks, releaseDelta);
   const withoutMarkdown = {
     strict,
     overallStatus: overallStatus(outputChecks, strict),
@@ -552,6 +748,7 @@ export async function checkReleaseReadiness(options: {
       targetIsRoot,
       changedFileCount: changedFiles.length,
     },
+    releaseDelta,
     checks: outputChecks,
     nextAction: {
       command:
