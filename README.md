@@ -257,7 +257,7 @@ agentloop install-agent github-copilot-cli
 agentloop install-agent all
 ```
 
-AgentLoopKit writes repo-local Markdown instructions. When exact third-party config conventions are uncertain, it keeps the output generic instead of pretending to own another tool's setup.
+AgentLoopKit writes repo-local Markdown instructions. Re-running `install-agent` is safe: existing `.agentloop/agents/<agent>.md` files are skipped so local edits are preserved, while `AGENTS.md` is updated with any missing AgentLoopKit references. When exact third-party config conventions are uncertain, it keeps the output generic instead of pretending to own another tool's setup.
 
 ## Safety Model
 

@@ -1,10 +1,12 @@
 import path from 'node:path';
 import { resolveOutputArtifactPath } from './artifacts.js';
 import { SUPPORTED_AGENTS } from './constants.js';
-import { readTextIfExists, writeTextFile } from './file-system.js';
+import { pathExists, readTextIfExists, writeFileIfMissing, writeTextFile } from './file-system.js';
 import { readTemplate } from './template-renderer.js';
 
 export type SupportedAgent = (typeof SUPPORTED_AGENTS)[number];
+export type AgentInstructionFileStatus = 'created' | 'skipped';
+export type AgentsMdStatus = 'created' | 'updated' | 'current';
 
 export function isSupportedAgent(value: string): value is SupportedAgent {
   return (SUPPORTED_AGENTS as readonly string[]).includes(value);
@@ -38,10 +40,12 @@ export async function installAgentInstructions(options: { cwd: string; agent: Su
   const content = await readTemplate(`agents/${options.agent}.md`, {
     agentName: displayNames[options.agent],
   });
-  await writeTextFile(agentFilePath, content);
+  const agentFileCreated = await writeFileIfMissing(agentFilePath, content);
 
+  const agentsFileExisted = await pathExists(agentsPath);
   const existing = await readTextIfExists(agentsPath);
   const marker = `<!-- agentloopkit-agent:${options.agent} -->`;
+  let agentsMdStatus: AgentsMdStatus = 'current';
   if (!existing.includes(marker)) {
     const block = `
 
@@ -57,9 +61,15 @@ ${marker}
       agentsPath,
       existing ? `${existing.trimEnd()}\n${block}` : block.trimStart(),
     );
+    agentsMdStatus = agentsFileExisted ? 'updated' : 'created';
   }
 
-  return { agentFilePath, agentsPath };
+  return {
+    agentFilePath,
+    agentsPath,
+    agentFileStatus: agentFileCreated ? 'created' : 'skipped',
+    agentsMdStatus,
+  };
 }
 
 export async function installAllAgentInstructions(options: { cwd: string }) {

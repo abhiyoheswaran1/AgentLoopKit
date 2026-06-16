@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 144 Decisions
+
+| item                                      | source persona      | problem                                                                                                                  | proposed solution                                                                                                            | priority | effort | adoption impact | risk | decision | notes                                                                                         |
+| ----------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | --------------------------------------------------------------------------------------------- |
+| Preserve edited agent instruction files   | Dogfood, Samir, Lina | Re-running `install-agent` can replace edited `.agentloop/agents/<agent>.md` files and lose local agent-specific guidance. | Skip existing agent instruction files by default, still append missing `AGENTS.md` references, and report created/skipped status. | P0       | S      | high            | low  | do now   | No merge engine, force flag, third-party config writes, release, publish, API call, or token use. |
+
 ## Current Research Cycle 143 Decisions
 
 | item                                      | source persona      | problem                                                                                                                          | proposed solution                                                                                                             | priority | effort | adoption impact | risk | decision | notes                                                                                            |

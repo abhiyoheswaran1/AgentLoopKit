@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Changed `agentloop install-agent` to preserve existing agent instruction files by default and report created/skipped status in human and JSON output.
 - Changed default generated `agentloop report` HTML report paths to preserve same-minute reruns by adding a numeric suffix.
 - Changed default generated `prepare-pr --write` PR description paths to preserve same-minute reruns by adding a numeric suffix.
 - Changed default generated `verify`, `ci-summary --write`, and `release-notes --write` artifact paths to preserve same-minute reruns by adding a numeric suffix.

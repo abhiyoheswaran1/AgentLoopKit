@@ -401,3 +401,11 @@ Release smoke now checks only the `ROADMAP.md` `Current State` block against `pa
 The command can query public metadata with a timeout, or read captured JSON files passed with explicit flags. It refuses `.env` capture paths before reading them. It does not publish packages, create tags, create GitHub releases, upload files, post comments, read npm tokens, read GitHub tokens, or change package metadata.
 
 Public-doc hygiene now skips `docs/superpowers/` because those files are internal implementation plans, not user-facing documentation. The guard still scans README, normal docs, examples, GitHub docs, `ROADMAP.md`, and the root handoff for unsupported public claims.
+
+## 2026-06-16: install-agent Preserves Edited Agent Instructions
+
+Agent-specific files under `.agentloop/agents/` are setup artifacts that maintainers may edit after installation. Re-running `agentloop install-agent` now skips existing agent instruction files instead of replacing them with bundled template text.
+
+`AGENTS.md` remains append-only for missing AgentLoopKit marker blocks, so repos can still gain missing references without losing local agent-specific guidance. Human and JSON output report whether the agent instruction file was `created` or `skipped`, and whether `AGENTS.md` was `created`, `updated`, or already `current`.
+
+This avoids a merge engine, force flag, external agent config discovery, or third-party setup writes. Users who want newer bundled template copy can inspect the package templates and update local files manually.

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-08-47-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-08-47",
+  "createdAtEpochMs": 1781592425614,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-preserve-existing-agent-instruction-files-2.md",
+    "title": "Preserve existing agent instruction files",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-08-46-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-08-47-pr-summary.md",
+  "changedFileCount": 16
+}

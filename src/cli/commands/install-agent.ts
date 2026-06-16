@@ -44,7 +44,13 @@ export function installAgentCommand() {
           );
           return;
         }
-        console.log(`Agent instructions written: ${inlineCode(String(results.length))}`);
+        const createdCount = results.filter((result) => result.agentFileStatus === 'created').length;
+        const skippedCount = results.filter((result) => result.agentFileStatus === 'skipped').length;
+        console.log(
+          `Agent instructions processed: ${inlineCode(String(results.length))} (${inlineCode(
+            `${createdCount} created`,
+          )}, ${inlineCode(`${skippedCount} skipped`)})`,
+        );
         console.log('AGENTS.md now references all bundled agent instructions.');
         return;
       }
@@ -85,7 +91,11 @@ export function installAgentCommand() {
         console.log(JSON.stringify({ agent: { name: requestedAgent, ...result } }, null, 2));
         return;
       }
-      console.log(`Agent instructions written: ${inlineCode(result.agentFilePath)}`);
+      if (result.agentFileStatus === 'created') {
+        console.log(`Agent instructions written: ${inlineCode(result.agentFilePath)}`);
+      } else {
+        console.log(`Agent instructions skipped: ${inlineCode(result.agentFilePath)}`);
+      }
       console.log('AGENTS.md now references the agent instructions.');
     });
 }

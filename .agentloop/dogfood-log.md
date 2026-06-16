@@ -2,6 +2,55 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Existing Agent Instruction File Preservation
+
+- Task contract: `.agentloop/tasks/2026-06-16-preserve-existing-agent-instruction-files-2.md`
+- Trigger:
+  - Product audit found that `agentloop install-agent` could rewrite an existing `.agentloop/agents/<agent>.md` file.
+  - Agent instruction files are likely to become local working agreements for Codex, Claude Code, Cursor, OpenCode, Gemini CLI, and other tools.
+  - Re-running setup should be safe in existing repos.
+- Implementation:
+  - Existing `.agentloop/agents/<agent>.md` files are skipped by default.
+  - Missing agent instruction files are still created from bundled templates.
+  - `AGENTS.md` still gets missing AgentLoopKit marker references without replacing existing content.
+  - Human and JSON output now report created/skipped agent file status and `AGENTS.md` status.
+- Product-panel decision:
+  - Samir treated overwritten local agent guidance as a trust bug.
+  - Lina prioritized repeatable autonomous setup in long-running agent sessions.
+  - Nora wanted the CLI output to say when a file was skipped.
+  - Maya kept the behavior simple and avoided a merge system or force flag.
+- Verification:
+  - Red TDD run failed because existing agent files were not reported as skipped:
+    - `npm test -- tests/agent-installation.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/agent-installation.test.ts`
+    - `13` tests passed.
+  - Adjacent CLI-doc tests passed:
+    - `npm test -- tests/agent-installation.test.ts tests/cli-docs-drift.test.ts`
+    - `2` files, `14` tests passed.
+  - Public docs, static checks, and build passed:
+    - `npm run check:public-docs`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `637` tests.
+  - Markdown link checks passed:
+    - `npm run check:links`
+    - `2506` files checked.
+  - AgentLoopKit task verification passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-preserve-existing-agent-instruction-files-2.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - Verification report: `.agentloop/reports/2026-06-16-08-48-verification-report.md`
+    - Run: `.agentloop/runs/2026-06-16-08-48-verify-2`
+  - Strict dogfood passed after a fresh handoff:
+    - `npm run dogfood:strict`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/agent-installation.test.ts`
+    - Session: `.agentflight/evidence/af-20260616-063818-preserve-existing-agent-instruction-files`
+  - ProjScan passed with health score A through the strict dogfood gate:
+    - `npx --yes projscan doctor --format markdown`
+
 ## 2026-06-16: Same-Minute HTML Report Artifact Preservation
 
 - Task contract: `.agentloop/tasks/2026-06-16-preserve-same-minute-html-report-artifacts-2.md`

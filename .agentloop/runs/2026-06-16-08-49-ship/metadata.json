@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-08-49-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-08-49",
+  "createdAtEpochMs": 1781592562833,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-preserve-existing-agent-instruction-files-2.md",
+    "title": "Preserve existing agent instruction files",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-08-48-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-08-49-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-08-49-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 29
+}
