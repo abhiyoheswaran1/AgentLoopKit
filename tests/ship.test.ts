@@ -4,7 +4,8 @@ import { mkdir, readFile, realpath, rename, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
-import { createShipReport } from '../src/core/ship.js';
+import { singleLineInlineCode } from '../src/core/markdown-format.js';
+import { createShipReport, renderShipGithubComment, type ShipResult } from '../src/core/ship.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -222,6 +223,77 @@ describe('ship command', () => {
     const markdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
     expect(markdown).toContain('Fix login redirect bug');
     expect(markdown).toContain('.agentloop/tasks/archive/2026-06-11-fix-login.md');
+  });
+
+  test('renders ship report task paths on one markdown line', async () => {
+    const dir = await createShipFixture();
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'typescript-package',
+      packageManager: 'npm',
+      commands: { test: 'npm test' },
+    });
+    const taskPath = '.agentloop/tasks/ship\n-task.md';
+    await rename(path.join(dir, '.agentloop/tasks/2026-06-11-fix-login.md'), path.join(dir, taskPath));
+    await setActiveTask({ cwd: dir, config, taskPath });
+
+    const result = await createShipReport({ cwd: dir, config, timestamp: '2026-06-11-12-06' });
+
+    expect(result.task?.path).toBe(taskPath);
+    expect(result.markdown).toContain(
+      `- Task: ${singleLineInlineCode('Fix login redirect bug')} (${singleLineInlineCode(
+        'in-progress',
+      )}) - ${singleLineInlineCode(taskPath)}`,
+    );
+    expect(result.markdown).not.toContain('ship\n-task.md`');
+  });
+
+  test('renders ship GitHub comment dynamic values on one markdown line', () => {
+    const comment = renderShipGithubComment(
+      {
+        readiness: {
+          totalScore: 96,
+          claims: ['This is a review-readiness score, not a code-quality score.'],
+          blockers: [],
+          strengths: [],
+          warnings: ['Risk-sensitive files changed: src/auth/callback\n-extra.ts'],
+          recommendedNextActions: ['Review file src/auth/callback\n-extra.ts before merge.'],
+          dimensions: [],
+        },
+        task: {
+          path: '.agentloop/tasks/comment.md',
+          title: 'Ship\n- [x] injected',
+          status: 'review\n-ready',
+        },
+        verification: { status: 'pass\nmaybe', fresh: true },
+        verificationReportPath: '.agentloop/reports/report\n-path.md',
+        gates: { overallStatus: 'pass\nmaybe', gates: [] },
+        shipReportPath: '.agentloop/reports/ship\n-report.md',
+        changedFiles: [],
+        diffStat: '',
+        timestamp: '2026-06-11-12-06',
+        markdown: '',
+        run: {} as ShipResult['run'],
+      } as unknown as ShipResult,
+    );
+
+    expect(comment).toContain(
+      `- Task: ${singleLineInlineCode('Ship\n- [x] injected')} (${singleLineInlineCode(
+        'review\n-ready',
+      )})`,
+    );
+    expect(comment).toContain(
+      `- Verification: ${singleLineInlineCode('pass\nmaybe')} - ${singleLineInlineCode(
+        '.agentloop/reports/report\n-path.md',
+      )}`,
+    );
+    expect(comment).toContain(`- Gates: ${singleLineInlineCode('pass\nmaybe')}`);
+    expect(comment).toContain(`- Ship report: ${singleLineInlineCode('.agentloop/reports/ship\n-report.md')}`);
+    expect(comment).toContain('- Risk-sensitive files changed: src/auth/callback\\n-extra.ts');
+    expect(comment).toContain('- Review file src/auth/callback\\n-extra.ts before merge.');
+    expect(comment).not.toContain('\n- [x] injected');
+    expect(comment).not.toContain('report\n-path.md');
+    expect(comment).not.toContain('callback\n-extra.ts');
   });
 
   test('includes GitHub comment markdown in JSON output when requested', async () => {

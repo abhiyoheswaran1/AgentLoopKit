@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-02-33-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-02-33",
+  "createdAtEpochMs": 1781570006237,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-ship-output-markdown-safe.md",
+    "title": "Make ship output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-02-33-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 8
+}

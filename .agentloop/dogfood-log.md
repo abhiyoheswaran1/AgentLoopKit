@@ -2,6 +2,52 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Ship Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-ship-output-markdown-safe.md`
+- Trigger:
+  - `agentloop ship` produces the main review-readiness report and optional GitHub-comment Markdown.
+  - Dynamic task paths, task fields, report paths, gate values, and readiness prose could split Markdown list items when values contained line breaks.
+- Implementation:
+  - Switched `src/core/ship.ts` human inline rendering to `singleLineInlineCode`.
+  - Added ship-local single-line escaped prose for readiness warnings, blockers, strengths, and next actions.
+  - Kept review-readiness scoring, gate semantics, task selection, verification execution, run-ledger writes, and JSON output unchanged.
+  - Added regression tests for newline-containing task paths, GitHub-comment task fields, artifact paths, and readiness prose.
+  - Updated ship docs, CLI reference, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized safe PR-comment output.
+  - Nora wanted the one-command review-readiness artifact to remain pasteable.
+  - Lina prioritized long autonomous sessions that depend on clean ship evidence.
+  - Maya accepted a renderer-only fix with no scoring or run-ledger changes.
+- Verification:
+  - Red TDD run failed before single-line ship rendering existed:
+    - `npm test -- tests/ship.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/ship.test.ts`
+    - `npm test -- tests/ship.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, links, and build checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+  - AgentLoopKit verification, ship, handoff, archive, and strict dogfood evidence passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-ship-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts task archive .agentloop/tasks/2026-06-16-make-ship-output-markdown-safe.md`
+    - `npm run dogfood:strict`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/ship.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The failing tests showed both report-path splitting and GitHub-comment prose splitting.
+- Improve:
+  - Continue auditing PR-facing Markdown commands before adding larger features.
+
 ## 2026-06-16: Markdown-Safe Release-Proof Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-release-proof-output-markdown-safe.md`

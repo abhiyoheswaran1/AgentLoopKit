@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Made human-readable `ship` output render dynamic values as single-line inline code or prose while preserving raw JSON values.
 - Made human-readable `release-proof` output render dynamic values as single-line inline code while preserving raw JSON values.
 - Made human-readable `release-notes` output render dynamic values as single-line inline code while preserving raw JSON values and authored changelog prose.
 - Made human-readable `ci-summary` output render dynamic values as single-line inline code while preserving raw JSON values.
