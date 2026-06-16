@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 123 Decisions
+
+| item                               | source persona     | problem                                                                                              | proposed solution                                                                                           | priority | effort | adoption impact | risk | decision | notes                                                                                         |
+| ---------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | --------------------------------------------------------------------------------------------- |
+| Markdown-safe release-proof output | Samir, Nora, Elias | Maintainers paste `release-proof` into release handoffs, but dynamic registry proof values can split Markdown. | Render human release-proof dynamic values and URLs as single-line inline code; keep JSON and channel logic raw. | P1       | S      | medium          | low  | do now   | No publishing, registry mutation, release channel, strict-mode, network, or JSON-shape changes. |
+
 ## Current Research Cycle 122 Decisions
 
 | item                              | source persona     | problem                                                                                                    | proposed solution                                                                               | priority | effort | adoption impact | risk | decision | notes                                                                                          |

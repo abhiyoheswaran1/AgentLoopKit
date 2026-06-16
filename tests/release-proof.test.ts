@@ -3,6 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
+import { singleLineInlineCode } from '../src/core/markdown-format.js';
 import { checkReleaseProof } from '../src/core/release-proof.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -225,6 +226,69 @@ describe('release proof', () => {
     });
     expect(result.markdown).toContain('Checked channels: `npm`');
     expect(result.markdown).not.toContain('GitHub release proof could not be read');
+  });
+
+  test('renders release proof package and channel values on one markdown line', async () => {
+    const dir = await createReleaseProofRepo();
+    const packageName = 'agentloopkit\n- [x] injected';
+    await writeJson(path.join(dir, 'package.json'), {
+      name: packageName,
+      version: '1.2.3',
+      repository: {
+        type: 'git',
+        url: 'git+https://github.com/abhiyoheswaran1/AgentLoopKit.git',
+      },
+    });
+
+    const result = await checkReleaseProof({
+      cwd: dir,
+      only: 'mcp-registry',
+      mcpRegistryJson: JSON.stringify({
+        name: 'io.github.abhiyoheswaran1/agentloopkit',
+        version: '1.2.3',
+        packages: [
+          {
+            registryType: 'npm',
+            identifier: packageName,
+            version: '1.2.3',
+          },
+        ],
+      }),
+    });
+
+    expect(result.package.name).toBe(packageName);
+    expect(result.channels[0]?.message).toBe(
+      'MCP Registry metadata points at agentloopkit\n- [x] injected@1.2.3.',
+    );
+    expect(result.markdown).toContain(
+      `- Package: ${singleLineInlineCode(`${packageName}@1.2.3`)}`,
+    );
+    expect(result.markdown).toContain(
+      singleLineInlineCode('MCP Registry metadata points at agentloopkit\n- [x] injected@1.2.3.'),
+    );
+    expect(result.markdown).not.toContain('\n- [x] injected@1.2.3');
+  });
+
+  test('renders release proof channel URLs on one markdown line', async () => {
+    const dir = await createReleaseProofRepo();
+    const version = '1.2.3';
+    const releaseUrl = 'https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v1.2.3\nnext';
+
+    const result = await checkReleaseProof({
+      cwd: dir,
+      only: 'github-release',
+      githubReleaseJson: JSON.stringify({
+        tag_name: `v${version}`,
+        html_url: releaseUrl,
+        draft: false,
+        prerelease: false,
+        assets: [{ name: `agentloopkit-${version}.tgz` }],
+      }),
+    });
+
+    expect(result.channels[0]?.url).toBe(releaseUrl);
+    expect(result.markdown).toContain(` - ${singleLineInlineCode(releaseUrl)}`);
+    expect(result.markdown).not.toContain('v1.2.3\nnext');
   });
 
   test('CLI prints JSON release proof from captured fixture files', async () => {

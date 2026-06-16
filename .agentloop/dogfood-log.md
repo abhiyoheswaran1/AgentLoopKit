@@ -2,6 +2,53 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Release-Proof Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-release-proof-output-markdown-safe.md`
+- Trigger:
+  - `agentloop release-proof` is copied into release handoffs and post-release evidence notes.
+  - Dynamic package metadata, channel messages, and release URLs could split Markdown list items when values contained line breaks.
+- Implementation:
+  - Switched `src/core/release-proof.ts` human rendering to `singleLineInlineCode`.
+  - Rendered dynamic channel URLs as inline code instead of raw prose.
+  - Kept release channel selection, captured JSON behavior, live metadata checks, strict mode, exit codes, and JSON output unchanged.
+  - Added regression tests for line breaks in package metadata, MCP Registry channel messages, and GitHub release URLs.
+  - Updated release-proof docs, CLI reference, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized safe post-release proof that can be pasted into public handoffs.
+  - Nora wanted one-line release evidence in Markdown comments.
+  - Elias wanted the behavior documented without internal release history.
+  - Maya accepted the narrow formatter swap because the existing tests already protect release channel logic.
+- Verification:
+  - Red TDD run failed before single-line release-proof rendering existed:
+    - `npm test -- tests/release-proof.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/release-proof.test.ts`
+    - `npm test -- tests/release-proof.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, links, and build checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+  - AgentLoopKit verification, ship, handoff, archive, and strict dogfood evidence passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-release-proof-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts task archive .agentloop/tasks/2026-06-16-make-release-proof-output-markdown-safe.md`
+    - `npm run dogfood:strict`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/release-proof.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The failing tests showed both list-item injection and raw URL line splitting.
+  - Captured JSON fixtures kept the release-proof test deterministic.
+- Improve:
+  - Continue the paste-heavy command audit where output is intended for PR comments, release notes, or CI logs.
+
 ## 2026-06-16: Markdown-Safe Release-Notes Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-release-notes-output-markdown-safe.md`

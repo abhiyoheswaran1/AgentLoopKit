@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-02-19-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-02-19",
+  "createdAtEpochMs": 1781569168736,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-release-proof-output-markdown-safe.md",
+    "title": "Make release-proof output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-02-17-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-02-19-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-02-19-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 11
+}

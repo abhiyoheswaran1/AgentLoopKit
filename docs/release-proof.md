@@ -91,6 +91,8 @@ Human output includes:
 
 JSON output includes the same fields plus source metadata for each proof channel.
 
+Human Markdown keeps package metadata, channel messages, tags, commits, URLs, and next-action commands on one line. JSON keeps raw values for scripts.
+
 For MCP Registry proof, AgentLoopKit looks for `package.json` `mcpName` or `server.json` `name`. Repositories without either field get an MCP warning while the other channels continue to report normally.
 
 When you combine `--only` with captured JSON flags, AgentLoopKit reads only the selected channel's capture file. It ignores captured files for unselected channels.

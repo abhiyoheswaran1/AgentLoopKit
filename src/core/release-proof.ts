@@ -2,7 +2,7 @@ import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { pathExists } from './file-system.js';
-import { inlineCode } from './markdown-format.js';
+import { singleLineInlineCode as inlineCode } from './markdown-format.js';
 import { checkNpmStatus } from './npm-status.js';
 
 export type ReleaseProofStatus = 'pass' | 'warn' | 'fail';
@@ -424,7 +424,7 @@ function renderMarkdown(result: Omit<ReleaseProofResult, 'markdown'>) {
     .map(
       (item) =>
         `- [${inlineCode(item.status)}] ${inlineCode(item.name)}: ${inlineCode(item.message)}${
-          item.url ? ` - ${item.url}` : ''
+          item.url ? ` - ${inlineCode(item.url)}` : ''
         }`,
     )
     .join('\n');

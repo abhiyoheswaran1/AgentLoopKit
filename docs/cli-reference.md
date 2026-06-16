@@ -450,6 +450,8 @@ Human-readable `release-check` output keeps package metadata, check messages, pa
 
 `release-proof` checks post-release evidence across public release channels. It reports whether npm, GitHub Releases, GHCR, and MCP Registry proof match the local package version. Use `--only <channel>` to re-check one channel after a delayed workflow. Use captured JSON flags when you want deterministic CI or release notes without live registry calls. Use `--strict` when missing proof should fail the command.
 
+Human-readable `release-proof` output keeps package metadata, channel messages, tags, commits, URLs, and next-action commands on one Markdown line. JSON output keeps raw values for scripts.
+
 `npm-status` checks registry state without publishing. It validates package names before running `npm view --json <package> version versions`, unless you pass captured registry JSON. It refuses `.env` and `.env.*` paths for `--registry-json`.
 
 These commands do not create tags, publish packages, read tokens, read `.env` files, upload files, or change package metadata.
