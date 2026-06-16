@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-16
 - Task type: bugfix
-- Status: review
+- Status: done
 
 ## Problem Statement
 Dogfooding showed that starting another tool with the same task title can rewrite an existing AgentLoopKit task contract for the same date and slug. That destroys acceptance criteria and verification commands.
