@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-07-27-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-07-27",
+  "createdAtEpochMs": 1781587641204,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-prevent-duplicate-task-contract-overwrites.md",
+    "title": "Prevent duplicate task contract overwrites",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-07-25-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-07-27-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-07-27-pr-summary-2.md",
+  "score": 96,
+  "changedFileCount": 22
+}

@@ -101,6 +101,8 @@ Task contracts record the problem statement, desired outcome, constraints, non-g
 
 `create-task` sets the new contract as the active task. With `--json`, output includes both `task` and `activeTask`. Use `task set <path>` when you need to switch back to an older or alternate contract.
 
+Default task paths avoid same-day title collisions by adding a numeric suffix, for example `2026-06-16-fix-login.md` and `2026-06-16-fix-login-2.md`. Explicit `--out` paths stay exact and keep the existing output-path safety checks.
+
 Human-readable `create-task` output keeps generated paths and warning command values on one Markdown line. JSON output keeps raw values for scripts.
 
 Use `--verification` for commands that `agentloop verify --task-commands` may run before the verification report exists. Use `--post-verification` for gates that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, `agentloop maintainer-check`, or reviewer-handoff checks. Post-verification gates are recorded in the task contract but are not executed by `agentloop verify --task-commands`.

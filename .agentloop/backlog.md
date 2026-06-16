@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 140 Decisions
+
+| item                                  | source persona     | problem                                                                                                             | proposed solution                                                                                                     | priority | effort | adoption impact | risk | decision | notes                                                                                         |
+| ------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | --------------------------------------------------------------------------------------------- |
+| Duplicate task contract overwrite fix | Dogfood, Samir, Lina | Same-day, same-title `create-task` calls can overwrite an existing generated task contract and lose task evidence. | Allocate a unique numeric suffix for default generated task paths while preserving exact explicit `--out` path behavior. | P0       | S      | high            | low  | do now   | No database, task ID registry, prompt changes, overwrite flag, release, or publish.            |
+
 ## Current Research Cycle 139 Decisions
 
 | item                                    | source persona    | problem                                                                                                                         | proposed solution                                                                                                     | priority | effort | adoption impact | risk | decision | notes                                                                                               |

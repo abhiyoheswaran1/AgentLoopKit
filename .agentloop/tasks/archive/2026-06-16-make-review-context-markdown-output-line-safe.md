@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-16
 - Task type: bugfix
-- Status: review
+- Status: done
 
 ## Problem Statement
 review-context renders line-oriented Markdown with the raw inline-code formatter, so task titles, GitHub metadata, run IDs, or next-action commands containing line breaks can split bullets and produce misleading pasted review context.

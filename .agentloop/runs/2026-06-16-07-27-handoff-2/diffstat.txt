@@ -1,0 +1,8 @@
+ .agentloop/backlog.md                              |  6 ++
+ .agentloop/dogfood-log.md                          | 45 +++++++++++++++
+ ...ake-review-context-markdown-output-line-safe.md | 64 ----------------------
+ CHANGELOG.md                                       |  1 +
+ docs/cli-reference.md                              |  2 +
+ src/core/task-contract.ts                          | 42 +++++++++++---
+ tests/create-task.test.ts                          | 52 ++++++++++++++++++
+ 7 files changed, 141 insertions(+), 71 deletions(-)

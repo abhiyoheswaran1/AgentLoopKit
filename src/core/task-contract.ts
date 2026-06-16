@@ -2,7 +2,7 @@ import path from 'node:path';
 import { AgentLoopConfig } from './config.js';
 import { formatDate } from './dates.js';
 import { AgentLoopError } from './errors.js';
-import { isInsidePath, normalizeExistingAncestor, writeTextFile } from './file-system.js';
+import { isInsidePath, normalizeExistingAncestor, pathExists, writeTextFile } from './file-system.js';
 import { slugify } from './slug.js';
 
 export type TaskType =
@@ -119,6 +119,26 @@ ${input.rollbackNotes || 'Document how to revert or disable this change.'}
 `;
 }
 
+async function resolveDefaultTaskPath(options: {
+  cwd: string;
+  tasksDir: string;
+  createdDate: string;
+  title: string;
+}) {
+  const slug = slugify(options.title);
+  for (let index = 1; index <= 1000; index += 1) {
+    const suffix = index === 1 ? '' : `-${index}`;
+    const relativePath = path.join(options.tasksDir, `${options.createdDate}-${slug}${suffix}.md`);
+    const absolutePath = path.resolve(options.cwd, relativePath);
+    if (!(await pathExists(absolutePath))) return { relativePath, absolutePath };
+  }
+
+  throw new AgentLoopError(
+    `Could not allocate a unique task contract path for "${options.title}".`,
+    'TASK_OUTPUT_PATH_COLLISION_LIMIT',
+  );
+}
+
 export async function createTaskContractFile(options: {
   cwd: string;
   config: AgentLoopConfig;
@@ -126,12 +146,20 @@ export async function createTaskContractFile(options: {
   out?: string;
 }) {
   const createdDate = options.input.createdDate ?? formatDate();
-  const relativePath =
-    options.out ??
-    path.join(options.config.paths.tasksDir, `${createdDate}-${slugify(options.input.title)}.md`);
-  const absolutePath = path.isAbsolute(relativePath)
-    ? path.resolve(relativePath)
-    : path.resolve(options.cwd, relativePath);
+  const defaultPath = options.out
+    ? null
+    : await resolveDefaultTaskPath({
+        cwd: options.cwd,
+        tasksDir: options.config.paths.tasksDir,
+        createdDate,
+        title: options.input.title,
+      });
+  const relativePath = options.out ?? defaultPath?.relativePath ?? '';
+  const absolutePath =
+    defaultPath?.absolutePath ??
+    (path.isAbsolute(relativePath)
+      ? path.resolve(relativePath)
+      : path.resolve(options.cwd, relativePath));
   const repoRoot = normalizeExistingAncestor(path.resolve(options.cwd));
   const tasksRoot = normalizeExistingAncestor(
     path.resolve(options.cwd, options.config.paths.tasksDir),

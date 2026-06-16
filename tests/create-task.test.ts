@@ -159,6 +159,58 @@ describe('create-task command', () => {
     );
   });
 
+  test('allocates a unique default path instead of overwriting same-title tasks', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const first = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Duplicate task title',
+        '--type',
+        'bugfix',
+        '--problem',
+        'First problem statement',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    const firstOutput = JSON.parse(first.stdout);
+
+    const second = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Duplicate task title',
+        '--type',
+        'bugfix',
+        '--problem',
+        'Second problem statement',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    const secondOutput = JSON.parse(second.stdout);
+
+    expect(secondOutput.task.path).not.toBe(firstOutput.task.path);
+    expect(secondOutput.task.path).toMatch(/duplicate-task-title-2\.md$/);
+    await expect(readFile(firstOutput.task.path, 'utf8')).resolves.toContain(
+      'First problem statement',
+    );
+    await expect(readFile(secondOutput.task.path, 'utf8')).resolves.toContain(
+      'Second problem statement',
+    );
+  });
+
   test('writes task contracts to the parent AgentLoop root when run from a nested directory', async () => {
     const dir = await makeTempDir();
     const nested = path.join(dir, 'src', 'features');

@@ -2,6 +2,51 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Duplicate Task Contract Overwrite Fix
+
+- Task contract: `.agentloop/tasks/2026-06-16-prevent-duplicate-task-contract-overwrites.md`
+- Trigger:
+  - Dogfooding with AgentFlight created another same-title task and rewrote the active AgentLoopKit task contract.
+  - Re-running AgentFlight before this fix is released reproduced the same overwrite because AgentFlight uses the published AgentLoopKit behavior.
+  - Losing a task contract destroys acceptance criteria, verification commands, risk notes, and rollback notes.
+- Implementation:
+  - Default generated task paths now add a numeric suffix when the date-and-slug path already exists.
+  - Explicit `--out` paths keep exact-path behavior and existing safety checks.
+  - Added a regression test that creates two same-title tasks and verifies both files keep their own problem statements.
+  - Updated create-task CLI docs, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir treated silent evidence loss as a trust bug.
+  - Lina prioritized compatibility with external agent tools that may reuse task titles.
+  - Nora wanted the behavior to stay invisible unless a collision happens.
+  - Maya kept the fix in path allocation instead of adding a task registry.
+- Verification:
+  - Red TDD run failed because the second task reused the first path:
+    - `npm test -- tests/create-task.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/create-task.test.ts`
+  - Focused task and docs checks passed:
+    - `npm test -- tests/create-task.test.ts tests/task-contract.test.ts tests/cli-docs-drift.test.ts`
+    - `npm run check:public-docs`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `628` tests.
+  - Link checks passed:
+    - `npm run check:links`
+  - AgentLoopKit verification evidence passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-prevent-duplicate-task-contract-overwrites.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - Verification report: `.agentloop/reports/2026-06-16-07-25-verification-report.md`
+    - Run: `.agentloop/runs/2026-06-16-07-26-verify`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/create-task.test.ts`
+    - Session: `.agentflight/evidence/af-20260616-052222-prevent-duplicate-task-contract-overwrites`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- Improve:
+  - Consider a future `create-task --allow-overwrite` only if users ask for explicit overwrite workflows.
+
 ## 2026-06-16: Markdown-Safe Review Context Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-review-context-markdown-output-line-safe.md`

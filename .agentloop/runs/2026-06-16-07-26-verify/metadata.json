@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-07-26-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-07-26",
+  "createdAtEpochMs": 1781587586688,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-prevent-duplicate-task-contract-overwrites.md",
+    "title": "Prevent duplicate task contract overwrites",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-07-25-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 14
+}
