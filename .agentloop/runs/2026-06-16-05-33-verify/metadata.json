@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-05-33-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-05-33",
+  "createdAtEpochMs": 1781580784237,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-make-summarize-output-markdown-safe.md",
+    "title": "Make summarize output Markdown-safe",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-05-31-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 7
+}

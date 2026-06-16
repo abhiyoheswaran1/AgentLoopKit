@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 133 Decisions
+
+| item                              | source persona     | problem                                                                                                                     | proposed solution                                                                                                     | priority | effort | adoption impact | risk | decision | notes                                                                                      |
+| --------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ------------------------------------------------------------------------------------------ |
+| Markdown-safe summarize output    | Samir, Nora, Lina  | Agents paste `summarize` and `handoff` evidence into reviews, but written summary or run paths can split Markdown output.   | Render human summary and handoff write-confirmation paths on one Markdown line; keep JSON path fields raw for scripts. | P1       | S      | medium          | low  | do now   | No summary generation, redaction, artifact allocation, run-ledger schema, JSON-shape, release, or publish. |
+
 ## Current Research Cycle 132 Decisions
 
 | item                                 | source persona     | problem                                                                                                              | proposed solution                                                                                                  | priority | effort | adoption impact | risk | decision | notes                                                                                          |

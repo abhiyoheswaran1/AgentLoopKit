@@ -154,6 +154,37 @@ describe('handoff command', () => {
     expect(result.stdout).not.toContain(dir);
   });
 
+  test('keeps written summary and run paths on one line in human output while preserving JSON values', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    config.paths.handoffsDir = '.agentloop/handoffs\nwith-break';
+    await writeJson(path.join(dir, 'agentloop.config.json'), config);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'), '# Demo task\n');
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const humanResult = await execa(tsxPath, [cliPath, 'summarize', '--write', '--write-run'], {
+      cwd: dir,
+    });
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'summarize', '--write', '--write-run', '--json'],
+      { cwd: dir },
+    );
+    const jsonOutput = JSON.parse(jsonResult.stdout);
+
+    expect(humanResult.stdout).toContain('Summary written: `.agentloop/handoffs\\nwith-break/');
+    expect(humanResult.stdout).toContain('Run written: `.agentloop/runs/');
+    expect(humanResult.stdout).not.toContain('Summary written: `.agentloop/handoffs\nwith-break/');
+    expect(jsonOutput.outPath).toContain(config.paths.handoffsDir);
+    expect(jsonOutput.run.path).toContain('.agentloop/runs/');
+  });
+
   test('accepts --format json for summarize output', async () => {
     const dir = await createSummaryFixture();
 

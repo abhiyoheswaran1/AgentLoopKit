@@ -340,6 +340,8 @@ If the latest verification report is older than the task, `summarize` and `hando
 
 Use `--redact-paths` before copying summary or handoff output into public issues, PRs, or CI logs. It replaces local absolute roots in the Markdown with `[git-root]` while keeping repo-relative changed-file paths readable.
 
+Human-readable `summarize` and `handoff` output keeps written summary and run paths on one Markdown line. JSON output keeps raw path values for scripts.
+
 See [pr-summaries.md](pr-summaries.md).
 
 ## Local Evidence Reports

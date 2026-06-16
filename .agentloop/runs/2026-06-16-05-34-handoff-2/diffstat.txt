@@ -1,0 +1,7 @@
+ .agentloop/backlog.md         |  6 ++++++
+ .agentloop/dogfood-log.md     | 44 +++++++++++++++++++++++++++++++++++++++++++
+ CHANGELOG.md                  |  1 +
+ docs/cli-reference.md         |  2 ++
+ src/cli/commands/summarize.ts |  2 +-
+ tests/handoff.test.ts         | 31 ++++++++++++++++++++++++++++++
+ 6 files changed, 85 insertions(+), 1 deletion(-)

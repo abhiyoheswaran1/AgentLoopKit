@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { ArtifactPathError, OutputPathError } from '../../core/artifacts.js';
 import { formatTimestamp } from '../../core/dates.js';
 import { AgentLoopError } from '../../core/errors.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { summarizeRepository } from '../../core/pr-summary.js';
 import { writeHandoffRun } from '../../core/runs.js';
 import { readTaskMetadata } from '../../core/task-state.js';

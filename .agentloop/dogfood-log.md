@@ -11375,3 +11375,47 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
 - Improve:
   - Continue the command-boundary output audit for `summarize`, `verify`, `badge`, `report`, and `schemastore`.
   - Consider making `dogfood:start` easier to use correctly by forwarding post-verification gate fields explicitly in examples.
+
+## 2026-06-16: Summarize and Handoff Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-summarize-output-markdown-safe.md`
+- AgentFlight session: `af-20260616-032458-make-summarize-output-markdown-safe`
+- Trigger:
+  - `agentloop summarize --write` and `agentloop handoff` are direct review-evidence commands.
+  - Human output used normal inline-code formatting for written handoff paths and run paths, so a configured handoff directory containing a line break could split pasted reviewer evidence.
+  - Product-panel read: Samir wanted reviewer evidence paths to stay paste-safe; Nora wanted terminal confirmations to stay readable; Lina wanted long agent sessions to trust handoff output without manual cleanup.
+- Implementation:
+  - Added a red regression using a configured handoff directory containing a line break.
+  - Routed human `summarize` and `handoff` write-confirmation paths through the shared single-line formatter.
+  - Left JSON output unchanged so scripts still receive raw path values.
+  - Documented the human-vs-JSON output boundary in the CLI reference and changelog.
+- Verification:
+  - Red-focused test:
+    - `npm test -- tests/handoff.test.ts` failed because the written summary path split the human Markdown line.
+  - Green-focused test:
+    - `npm test -- tests/handoff.test.ts` passed with 18 tests.
+  - Focused docs drift check:
+    - `npm test -- tests/handoff.test.ts tests/cli-docs-drift.test.ts` passed with 19 tests.
+  - Public docs hygiene:
+    - `npm run check:public-docs` passed.
+  - Broad local checks:
+    - `npm run typecheck` passed.
+    - `npm run lint` passed after removing an unused test import.
+    - `npm run build` passed.
+    - `npm test` passed with 62 files and 621 tests.
+    - `npm run check:links` passed with 2351 Markdown files checked.
+  - AgentFlight focused verification passed:
+    - `.agentflight/evidence/af-20260616-032458-make-summarize-output-markdown-safe/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260616-032458-make-summarize-output-markdown-safe/verification-1.stderr.txt`
+  - AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-16-05-31-verification-report.md`
+    - `.agentloop/runs/2026-06-16-05-33-verify`
+  - Fresh handoff evidence was written:
+    - `.agentloop/handoffs/2026-06-16-05-33-pr-summary.md`
+    - `.agentloop/runs/2026-06-16-05-33-handoff`
+  - `npm run dogfood:strict` passed after the fresh handoff.
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+- What worked well:
+  - The shared `summarize` command path meant one command-boundary fix covered both preview and handoff confirmations.
+- Improve:
+  - Continue the command-boundary output audit for `verify`, `badge`, `report`, `ship`, and `schemastore`.
