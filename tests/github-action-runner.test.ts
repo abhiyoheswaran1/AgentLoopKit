@@ -46,11 +46,14 @@ describe('github action runner', () => {
   test('declares GitHub Marketplace metadata with safe input copy', async () => {
     const actionYaml = await readFile('action.yml', 'utf8');
 
-    expect(actionYaml).toContain('name: AgentLoopKit');
-    expect(actionYaml).toContain('description: Run AgentLoopKit review-readiness checks in GitHub Actions.');
+    expect(actionYaml).toContain("name: 'AgentLoopKit'");
+    expect(actionYaml).toContain(
+      "description: 'Run AgentLoopKit review-readiness checks in GitHub Actions.'",
+    );
+    expect(actionYaml).toContain("author: 'Baseframe Labs'");
     expect(actionYaml).toContain('branding:');
-    expect(actionYaml).toContain('icon: check-circle');
-    expect(actionYaml).toContain('color: orange');
+    expect(actionYaml).toContain("icon: 'check-circle'");
+    expect(actionYaml).toContain("color: 'orange'");
     expect(actionYaml).toContain('Do not pass untrusted pull request or user input to command.');
     expect(actionYaml).toContain(
       'Do not pass untrusted pull request or user input to agentloopkit-version.',

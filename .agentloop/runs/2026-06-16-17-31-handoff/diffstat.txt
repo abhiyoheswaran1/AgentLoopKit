@@ -1,0 +1,17 @@
+ CHANGELOG.md                         |  5 ++++
+ FINAL_HANDOFF.md                     | 54 +++++++++++++++++++++++-------------
+ ROADMAP.md                           | 10 +++----
+ action.yml                           | 11 ++++----
+ docs/distribution-channels.md        |  4 +--
+ docs/github-actions.md               |  2 +-
+ docs/launch-checklist.md             |  2 +-
+ docs/npm-publishing.md               |  9 +++---
+ docs/release-status.md               | 50 +++++++++++++++------------------
+ package.json                         |  2 +-
+ scripts/smoke-packed-release.mjs     |  2 +-
+ server.json                          |  4 +--
+ tests/distribution-artifacts.test.ts |  2 +-
+ tests/github-action-runner.test.ts   | 11 +++++---
+ tests/public-docs-hygiene.test.ts    |  2 +-
+ tests/release-smoke.test.ts          |  8 +++---
+ 16 files changed, 99 insertions(+), 79 deletions(-)

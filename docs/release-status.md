@@ -4,31 +4,32 @@ Last checked: June 16, 2026.
 
 ## Current State
 
-- Current public release: `v0.35.0`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.35.0>
-- Release asset: `agentloopkit-0.35.0.tgz`
-- Release asset SHA-256: `f77eff9bded5f78e9058892d19510ac516e156cac42e31566ee4803475b3fe3b`
-- Release tag `v0.35.0` points at commit `bf7acf42140466e4e409599d4795e0f26fb8e01f`
-- npm latest: `0.35.0`
-- CI run: `27620154901`, success
-- CLI Smoke run: `27620155646`, success
-- Publish workflow run: `27620557648`, success
-- Docker workflow run: `27620558047`, success
-- MCP Registry workflow run: `27620932598`, success
+- Current public release: `v0.35.2`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.35.2>
+- Release asset: `agentloopkit-0.35.2.tgz`
+- Release asset SHA-256: pending post-publish proof
+- Release tag `v0.35.2` points at commit `pending post-publish proof`
+- npm latest: pending post-publish proof
+- CI run: pending
+- CLI Smoke run: pending
+- Publish workflow run: pending
+- Docker workflow run: pending
+- MCP Registry workflow run: pending
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
-GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`. The public registry tag list includes `latest`, `0.35`, and `0.35.0`.
+GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`. The public registry tag list should include `latest`, `0.35`, and `0.35.2` after post-publish proof.
 
-The MCP Registry public API lists `io.github.abhiyoheswaran1/agentloopkit` version `0.35.0` as latest, with npm package `agentloopkit@0.35.0`.
+The MCP Registry public API should list `io.github.abhiyoheswaran1/agentloopkit` version `0.35.2` as latest, with npm package `agentloopkit@0.35.2`, after post-publish proof.
+
+GitHub Marketplace publication is the purpose of the `0.35.2` patch release. The public listing URL <https://github.com/marketplace/actions/agentloopkit> must load before claiming the listing is live.
 
 ## Latest Release Highlights
 
-Released in `0.35.0`:
+Prepared in `0.35.2`:
 
-- `agentloop verify --post-verification-gates` can run reviewed post-verification gates after the verification report exists.
-- Generated artifact discovery now orders timestamped verification, handoff, and ship evidence by filename timestamp instead of filesystem mtime.
-- `agentloop release-proof` now reports whether the current checkout matches the version tag.
-- `npm run maintenance:check` directly covers release proof, public docs, SchemaStore, policy packs, read-only GitHub metadata, AgentFlight, ProjScan, and dogfood checks.
+- The root composite GitHub Action now includes explicit `author` metadata.
+- Action metadata formatting is aligned with the Marketplace-published ProjScan Action.
+- The release exists to make GitHub re-evaluate the Action metadata for Marketplace publication.
 
 ## Use The Current CLI
 
@@ -36,7 +37,7 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.35.0 version
+npx --yes agentloopkit@0.35.2 version
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -60,7 +61,7 @@ After each publish:
 
 ## Verification Evidence
 
-Local release gate for `0.35.0`:
+Local release gate for `0.35.2`:
 
 - `node scripts/prepublish-check.mjs`
 - `npm run lint`
@@ -77,14 +78,7 @@ Local release gate for `0.35.0`:
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: latest `0.35.0`
-- `node dist/cli/index.js npm-status --agentloopkit --expect-current`: latest matches local package version
-- `npm run smoke:published -- --version 0.35.0`: passed
-- `npx --yes agentloopkit@0.35.0 version`: `0.35.0`
-- GitHub release asset digest: `f77eff9bded5f78e9058892d19510ac516e156cac42e31566ee4803475b3fe3b`
-- `node dist/cli/index.js release-proof --strict --redact-paths`: npm, GitHub Release, GHCR, and MCP Registry passed
-- GHCR tag list includes `latest`, `0.35`, and `0.35.0`
-- MCP Registry search marks `0.35.0` as latest
+- Pending after the `0.35.2` release workflows finish.
 
 Latest release-status documentation checks:
 

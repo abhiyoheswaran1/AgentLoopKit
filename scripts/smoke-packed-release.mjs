@@ -357,7 +357,7 @@ export function assertRoadmapCurrentReleaseState({ filePath, content, version })
   );
   assertRoadmapLine(
     section,
-    '- GitHub Marketplace listing is live for the composite Action.',
+    '- GitHub Marketplace listing is pending owner UI publication for the composite Action.',
     filePath,
     'GitHub Marketplace listing',
   );

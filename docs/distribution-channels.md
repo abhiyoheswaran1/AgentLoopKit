@@ -9,7 +9,7 @@ This page is for maintainers planning releases. Keep the README focused on user 
 | npm / npx       | Primary channel       | `npx agentloopkit init`                                                                      |
 | GitHub Releases | Public release assets | Download `agentloopkit-<version>.tgz` from GitHub                                            |
 | GitHub Action   | Live repo action      | `uses: abhiyoheswaran1/AgentLoopKit@v<version>`                                              |
-| GitHub Marketplace | Live Action listing | <https://github.com/marketplace/actions/agentloopkit>                                        |
+| GitHub Marketplace | Pending owner UI publication | <https://github.com/marketplace/actions/agentloopkit>                              |
 | Docker / GHCR   | Live image            | `docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:<version> doctor` |
 | MCP Registry    | Published metadata    | `npx --yes agentloopkit@latest mcp-server`                                                   |
 
@@ -94,7 +94,7 @@ See [mcp.md](mcp.md).
 ## Channel Rules
 
 - Keep npm and GitHub Releases as the version source of truth for public versions.
-- Keep the GitHub Marketplace listing live for the composite Action before claiming cross-channel proof.
+- Keep the GitHub Marketplace listing state explicit, and claim it is live only after `agentloop release-proof --only github-marketplace --strict` passes.
 - Mark a channel supported only after a clean release verifies it.
 - Use the same npm package or release tarball across channels.
 - Keep install commands copy-pasteable.

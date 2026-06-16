@@ -39,7 +39,7 @@ describe('distribution artifacts', () => {
     const action = await readFile('action.yml', 'utf8');
     const runner = await readFile('scripts/github-action-runner.mjs', 'utf8');
 
-    expect(action).toContain('using: composite');
+    expect(action).toContain("using: 'composite'");
     expect(action).toContain('agentloopkit-version');
     expect(action).toContain('install-mode');
     expect(action).toContain("default: 'latest'");

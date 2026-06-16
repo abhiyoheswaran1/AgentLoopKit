@@ -1,9 +1,10 @@
-name: AgentLoopKit
-description: Run AgentLoopKit review-readiness checks in GitHub Actions.
+name: 'AgentLoopKit'
+description: 'Run AgentLoopKit review-readiness checks in GitHub Actions.'
+author: 'Baseframe Labs'
 
 branding:
-  icon: check-circle
-  color: orange
+  icon: 'check-circle'
+  color: 'orange'
 
 inputs:
   command:
@@ -23,7 +24,7 @@ inputs:
     default: '.'
 
 runs:
-  using: composite
+  using: 'composite'
   steps:
     - name: Run AgentLoopKit
       shell: bash

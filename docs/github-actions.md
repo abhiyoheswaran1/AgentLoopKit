@@ -10,7 +10,7 @@ For non-GitHub CI, see [GitLab CI](../examples/gitlab-ci/README.md) and [Buildki
 
 AgentLoopKit includes a composite GitHub Action for teams that want a short CI step instead of writing the npm install command by hand.
 
-Marketplace listing: <https://github.com/marketplace/actions/agentloopkit>
+Marketplace listing publication is pending the GitHub release UI checkbox and category step. The intended listing URL is <https://github.com/marketplace/actions/agentloopkit>.
 
 Use it for static, trusted commands such as `check-gates --strict`, `ship --github-comment`, `prepare-pr --github-comment`, or `maintainer-check --redact-paths`. Keep the `command`, `agentloopkit-version`, and `install-mode` values under maintainer control. Do not build those inputs from pull request titles, issue text, branch names, comments, or other user-controlled strings.
 

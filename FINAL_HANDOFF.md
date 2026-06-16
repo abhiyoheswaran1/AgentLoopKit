@@ -76,20 +76,36 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.35.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.35.0>
-- Release asset: `agentloopkit-0.35.0.tgz`
-- Release asset SHA-256: `f77eff9bded5f78e9058892d19510ac516e156cac42e31566ee4803475b3fe3b`
-- Release tag: `v0.35.0` at commit `bf7acf42140466e4e409599d4795e0f26fb8e01f`
-- CI run: `27620154901`, success
-- CLI Smoke run: `27620155646`, success
-- Publish workflow run: `27620557648`, success
-- Docker workflow run: `27620558047`, success
-- MCP Registry workflow run: `27620932598`, success
-- Post-publish npm proof: npm latest is `0.35.0`
-- Published-package smoke: `npm run smoke:published -- --version 0.35.0`, passed
-- GHCR proof: `agentloop release-proof --strict` found image tag `0.35.0`
-- MCP Registry proof: `agentloop release-proof --strict` found MCP Registry metadata for `agentloopkit@0.35.0`
+- Current npm release: `agentloopkit@0.35.2` pending post-publish proof
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.35.2>
+- Release asset: `agentloopkit-0.35.2.tgz`
+- Release asset SHA-256: pending post-publish proof
+- Release tag: `v0.35.2` at commit pending post-publish proof
+- CI run: pending
+- CLI Smoke run: pending
+- Publish workflow run: pending
+- Docker workflow run: pending
+- MCP Registry workflow run: pending
+- Post-publish npm proof: pending
+- GHCR proof: pending
+- MCP Registry proof: pending
+- GitHub Marketplace proof: pending; <https://github.com/marketplace/actions/agentloopkit> must load before claiming Marketplace availability
+
+## 0.35.2 release summary
+
+Included:
+
+- explicit `author` metadata in the root composite GitHub Action.
+- Action metadata formatting aligned with the Marketplace-published ProjScan Action.
+- a Marketplace-focused patch release so GitHub re-evaluates the released Action metadata.
+
+## 0.35.1 release summary
+
+Included:
+
+- GitHub Marketplace proof in `agentloop release-proof`, including `--only github-marketplace`.
+- captured `--github-marketplace-json` support for deterministic release-proof fixtures.
+- release docs and checklists that require the GitHub release UI Marketplace checkbox and category before claiming Marketplace availability.
 
 ## 0.35.0 release summary
 
@@ -1272,11 +1288,11 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.35.1` is public.
-- npm latest is `agentloopkit@0.35.1`.
-- GHCR tags include `latest`, `0.35`, and `0.35.1`.
-- MCP Registry lists `0.35.1` as latest.
-- GitHub Marketplace listing is live at <https://github.com/marketplace/actions/agentloopkit>.
+- GitHub release `v0.35.2` is public.
+- npm latest is `agentloopkit@0.35.2`.
+- GHCR tags should include `latest`, `0.35`, and `0.35.2` after post-publish proof.
+- MCP Registry should list `0.35.2` as latest after post-publish proof.
+- GitHub Marketplace listing is pending post-release proof; <https://github.com/marketplace/actions/agentloopkit> must load before claiming Marketplace availability.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

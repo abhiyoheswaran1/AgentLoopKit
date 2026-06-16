@@ -4,6 +4,11 @@
 
 - No unreleased changes yet.
 
+## 0.35.2
+
+- Added explicit `author` metadata to the root composite GitHub Action and aligned the Action metadata quoting with the Marketplace-published ProjScan Action.
+- Prepared a Marketplace-focused patch release so GitHub evaluates the released Action metadata again.
+
 ## 0.35.1
 
 - Added GitHub Marketplace proof to `agentloop release-proof`, including `--only github-marketplace` and captured `--github-marketplace-json` support.
