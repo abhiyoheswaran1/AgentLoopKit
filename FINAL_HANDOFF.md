@@ -76,20 +76,20 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.33.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.33.0>
-- Release asset: `agentloopkit-0.33.0.tgz`
-- Release asset SHA-256: `63d5486600cd212a2b521d34639358726e4e91225f0f099abf3387e8891baee7`
-- Release tag: `v0.33.0` at commit `bc39e81085186f64fe0cf0a92a6c2da4dcf0cc70`
-- CI run: `27526213991`, success
-- CLI Smoke run: `27526213989`, success
-- Publish workflow run: `27526226093`, success
-- Docker workflow run: `27526226088`, success
-- MCP Registry workflow run: `27526361078`, success
-- Post-publish npm proof: `npm view agentloopkit version versions --json` reports latest `0.33.0`
-- Published-package smoke: `npm run smoke:published -- --version 0.33.0` passed
-- GHCR proof: registry tags include `latest`, `0.33`, and `0.33.0`
-- MCP Registry proof: public registry search marks `0.33.0` as latest for `io.github.abhiyoheswaran1/agentloopkit`
+- Current npm release: `agentloopkit@0.34.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.34.0>
+- Release asset: `agentloopkit-0.34.0.tgz`
+- Release asset SHA-256: pending
+- Release tag: `v0.34.0` at commit `pending`
+- CI run: pending
+- CLI Smoke run: pending
+- Publish workflow run: pending
+- Docker workflow run: pending
+- MCP Registry workflow run: pending
+- Post-publish npm proof: pending after release workflows finish
+- Published-package smoke: pending after npm publish
+- GHCR proof: pending after Docker workflow
+- MCP Registry proof: pending after MCP Registry workflow
 
 ## 0.33.0 release summary
 
@@ -1245,10 +1245,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.33.0` is public.
-- npm latest is `agentloopkit@0.33.0`.
-- GHCR tags include `latest`, `0.33`, and `0.33.0`.
-- MCP Registry lists `0.33.0` as latest.
+- GitHub release `v0.34.0` is public.
+- npm latest is `agentloopkit@0.34.0`.
+- GHCR tags include `latest`, `0.34`, and `0.34.0`.
+- MCP Registry lists `0.34.0` as latest.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.
