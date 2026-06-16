@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 134 Decisions
+
+| item                         | source persona     | problem                                                                                                                      | proposed solution                                                                                                            | priority | effort | adoption impact | risk | decision | notes                                                                                                  |
+| ---------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | ------------------------------------------------------------------------------------------------------ |
+| Markdown-safe verify output  | Samir, Nora, Lina  | Agents paste `verify` evidence into handoffs and PRs, but progress commands or written report paths can split Markdown output. | Render human verify progress commands and write-confirmation paths on one Markdown line; keep JSON command and path fields raw. | P1       | S      | medium          | low  | do now   | No verification execution, task resolution, report format, timeout, JSON-shape, release, or publish. |
+
 ## Current Research Cycle 133 Decisions
 
 | item                              | source persona     | problem                                                                                                                     | proposed solution                                                                                                     | priority | effort | adoption impact | risk | decision | notes                                                                                      |

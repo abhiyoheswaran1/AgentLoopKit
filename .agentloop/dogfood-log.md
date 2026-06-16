@@ -11419,3 +11419,49 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The shared `summarize` command path meant one command-boundary fix covered both preview and handoff confirmations.
 - Improve:
   - Continue the command-boundary output audit for `verify`, `badge`, `report`, `ship`, and `schemastore`.
+
+## 2026-06-16: Verify Markdown Safety
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-verify-output-markdown-safe.md`
+- AgentFlight session: `af-20260616-034338-make-verify-output-markdown-safe`
+- Trigger:
+  - `agentloop verify` is the main evidence command before `ship`, `prepare-pr`, and maintainer review.
+  - Human output used normal inline-code formatting for progress commands and written report paths, so a command or configured report directory containing a line break could split pasted reviewer evidence.
+  - Product-panel read: Samir wanted verification evidence to stay paste-safe; Nora wanted progress output to stay readable; Lina wanted long verification runs to produce reliable handoff text.
+- Implementation:
+  - Added a red regression using a newline-containing custom command and a configured reports directory containing a line break.
+  - Routed human `verify` progress commands and write-confirmation values through the shared single-line formatter.
+  - Left JSON output unchanged so scripts still receive raw command and path values.
+  - Documented the human-vs-JSON output boundary in the CLI reference and changelog.
+- Verification:
+  - Red-focused test:
+    - `npm test -- tests/verification.test.ts` failed because the progress command and report path split the human Markdown lines.
+  - Green-focused test:
+    - `npm test -- tests/verification.test.ts` passed with 48 tests.
+  - Focused docs drift check:
+    - `npm test -- tests/verification.test.ts tests/cli-docs-drift.test.ts` passed with 49 tests.
+  - Public docs hygiene:
+    - `npm run check:public-docs` passed.
+  - Broad local checks:
+    - `npm run typecheck` passed.
+    - `npm run lint` passed.
+    - `npm run build` passed.
+    - `npm test` passed with 62 files and 622 tests.
+    - `npm run check:links` passed with 2368 Markdown files checked.
+  - AgentFlight focused verification passed:
+    - `.agentflight/evidence/af-20260616-034338-make-verify-output-markdown-safe/verification-1.stdout.txt`
+    - `.agentflight/evidence/af-20260616-034338-make-verify-output-markdown-safe/verification-1.stderr.txt`
+  - AgentLoop verification passed:
+    - `.agentloop/reports/2026-06-16-05-49-verification-report.md`
+    - `.agentloop/runs/2026-06-16-05-51-verify`
+  - The task was marked done and archived at `.agentloop/tasks/archive/2026-06-16-make-verify-output-markdown-safe.md`.
+  - Fresh handoff evidence was written:
+    - `.agentloop/handoffs/2026-06-16-05-52-pr-summary-4.md`
+    - `.agentloop/runs/2026-06-16-05-52-handoff-2`
+  - `agentloop ship --redact-paths` wrote `.agentloop/reports/2026-06-16-05-52-ship-report-2.md` with review-readiness score `92`/100 and passing gates.
+  - `npm run dogfood:strict` passed after the archived-task handoff and ship evidence.
+  - `npx --yes projscan doctor --format markdown` passed with A `100/100`.
+- What worked well:
+  - The fix stayed at the CLI display boundary, so command execution, report writing, and JSON output kept their existing behavior.
+- Improve:
+  - Continue the command-boundary output audit for `badge`, `report`, `ship`, and `schemastore`.

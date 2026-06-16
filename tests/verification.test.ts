@@ -1250,6 +1250,62 @@ describe('verification', () => {
     expect(result.stdout).toContain(`Overall status: ${inlineCode('pass')}`);
   });
 
+  test('CLI verify keeps progress commands and report paths on one line while preserving JSON values', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const command = 'node -e "console.log(\\"verify-ok\\")"\n# command-note';
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    config.paths.reportsDir = '.agentloop/reports\nwith-break';
+    await writeFile(path.join(dir, 'agentloop.config.json'), JSON.stringify(config, null, 2));
+
+    const humanResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'verify',
+        '--progress',
+        '--no-test',
+        '--no-lint',
+        '--no-typecheck',
+        '--no-build',
+        '--command',
+        command,
+      ],
+      { cwd: dir },
+    );
+    const jsonResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'verify',
+        '--json',
+        '--no-test',
+        '--no-lint',
+        '--no-typecheck',
+        '--no-build',
+        '--command',
+        command,
+      ],
+      { cwd: dir },
+    );
+    const jsonOutput = JSON.parse(jsonResult.stdout);
+
+    expect(humanResult.stdout).toContain(
+      '[1/1] custom started: `node -e "console.log(\\"verify-ok\\")"\\n# command-note`',
+    );
+    expect(humanResult.stdout).toContain(
+      'Verification report written: `.agentloop/reports\\nwith-break/',
+    );
+    expect(humanResult.stdout).not.toContain(
+      '[1/1] custom started: `node -e "console.log(\\"verify-ok\\")"\n# command-note`',
+    );
+    expect(humanResult.stdout).not.toContain(
+      'Verification report written: `.agentloop/reports\nwith-break/',
+    );
+    expect(jsonOutput.commands[0].command).toBe(command);
+    expect(jsonOutput.reportPath).toContain(config.paths.reportsDir);
+  });
+
   test('CLI verify --progress prints bounded command progress without raw command output', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

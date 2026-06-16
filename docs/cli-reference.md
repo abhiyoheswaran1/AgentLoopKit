@@ -204,6 +204,8 @@ Use `--progress` for long local checks. It prints bounded start/finish lines for
 
 Failed reports include a short failure summary with each failed command, exit code, timeout state, and useful final output lines. If no commands are configured, AgentLoopKit writes a report saying nothing was verified.
 
+Human-readable `verify` output keeps progress commands, written report paths, run paths, and status values on one Markdown line. JSON output keeps raw command and path values for scripts.
+
 See [verification-reports.md](verification-reports.md).
 
 ## Ship And Prepare PR

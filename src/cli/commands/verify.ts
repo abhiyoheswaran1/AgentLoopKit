@@ -9,7 +9,7 @@ import { AgentLoopConfig } from '../../core/config.js';
 import { formatTimestamp } from '../../core/dates.js';
 import { getCurrentTaskPath } from '../../core/evidence.js';
 import { getGitStatus, parseGitStatus } from '../../core/git.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { writeVerificationRun } from '../../core/runs.js';
 import { getActiveTaskPath, readTaskMetadata } from '../../core/task-state.js';
 import { runVerification, VerificationProgressEvent } from '../../core/verification.js';

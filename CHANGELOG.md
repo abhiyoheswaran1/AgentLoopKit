@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Made human-readable `verify` output render progress commands, written report paths, run paths, and status values on one Markdown line while preserving raw JSON values.
 - Made human-readable `summarize` and `handoff` output render written summary and run paths on one Markdown line while preserving raw JSON values.
 - Made human-readable `install-agent` output render generated agent-instruction paths on one Markdown line while preserving raw JSON values.
 - Made human-readable `github import` output render dynamic imported metadata values on one Markdown line while preserving raw JSON values.
