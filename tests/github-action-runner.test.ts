@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { describe, expect, test } from 'vitest';
 // @ts-expect-error The GitHub Action runner is a plain checked-in ESM script.
 // prettier-ignore
@@ -40,5 +41,20 @@ describe('github action runner', () => {
       packageSpec: 'agentloopkit@0.27.0',
       commandArgs: ['status', '--brief'],
     });
+  });
+
+  test('declares GitHub Marketplace metadata with safe input copy', async () => {
+    const actionYaml = await readFile('action.yml', 'utf8');
+
+    expect(actionYaml).toContain('name: AgentLoopKit');
+    expect(actionYaml).toContain('description: Run AgentLoopKit review-readiness checks in GitHub Actions.');
+    expect(actionYaml).toContain('branding:');
+    expect(actionYaml).toContain('icon: check-circle');
+    expect(actionYaml).toContain('color: orange');
+    expect(actionYaml).toContain('Do not pass untrusted pull request or user input to command.');
+    expect(actionYaml).toContain(
+      'Do not pass untrusted pull request or user input to agentloopkit-version.',
+    );
+    expect(actionYaml).toContain('Do not pass untrusted pull request or user input to install-mode.');
   });
 });

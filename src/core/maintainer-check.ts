@@ -166,18 +166,20 @@ export async function runMaintainerCheck(options: {
     cwd: options.cwd,
     config: options.config,
   });
-  const latestRun = (await listRuns(options.cwd))[0];
-  const latestHandoffRunCoversDirtyFiles = await dirtyCoveredByLatestHandoffRun(
-    options.cwd,
-    changedFileStatuses,
-    latestRun,
-  );
   const handoff = await latestMarkdownFile(
     path.join(options.cwd, options.config.paths.handoffsDir),
     {
       pattern: prSummaryPattern,
       rootDir: options.cwd,
     },
+  );
+  const latestRun = (await listRuns(options.cwd))[0];
+  const latestHandoffRunCoversDirtyFiles = await dirtyCoveredByLatestHandoffRun(
+    options.cwd,
+    changedFileStatuses,
+    latestRun,
+    undefined,
+    handoff ?? undefined,
   );
   if (handoff) {
     const staleHandoffForDirtyFiles =

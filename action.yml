@@ -1,5 +1,9 @@
 name: AgentLoopKit
-description: Run AgentLoopKit commands in GitHub Actions.
+description: Run AgentLoopKit review-readiness checks in GitHub Actions.
+
+branding:
+  icon: check-circle
+  color: orange
 
 inputs:
   command:

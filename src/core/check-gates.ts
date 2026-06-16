@@ -280,6 +280,7 @@ export async function checkGates(options: {
     changedFiles,
     latestRun,
     options.projectedReviewEvidenceRun?.changedFiles,
+    handoffPath ?? undefined,
   );
 
   if (handoffPath) {

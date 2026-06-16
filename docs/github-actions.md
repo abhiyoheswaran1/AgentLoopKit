@@ -6,6 +6,16 @@ AgentLoopKit does not install workflows into user repositories. Copy a recipe in
 
 For non-GitHub CI, see [GitLab CI](../examples/gitlab-ci/README.md) and [Buildkite](../examples/buildkite/README.md). Those examples run the same AgentLoopKit commands and report provider-specific provenance from allowlisted environment variables.
 
+## GitHub Marketplace Action
+
+AgentLoopKit includes a composite GitHub Action for teams that want a short CI step instead of writing the npm install command by hand.
+
+Use it for static, trusted commands such as `check-gates --strict`, `ship --github-comment`, `prepare-pr --github-comment`, or `maintainer-check --redact-paths`. Keep the `command`, `agentloopkit-version`, and `install-mode` values under maintainer control. Do not build those inputs from pull request titles, issue text, branch names, comments, or other user-controlled strings.
+
+The Action installs AgentLoopKit from npm by default, then runs the command through a Node wrapper that uses argument arrays instead of shell interpolation. The wrapper rejects shell metacharacters and only accepts `latest` or exact semver package versions.
+
+AgentLoopKit does not post comments, read GitHub tokens, upload artifacts, publish packages, or change repository settings. If a workflow needs to post the Markdown from `ship --github-comment` or `prepare-pr --github-comment`, use a separate GitHub Actions step with explicit `pull-requests: write` permission.
+
 ## npm Install
 
 Use `@latest` while evaluating the workflow. Pin a vetted version in team CI when you need reproducible evidence checks.
@@ -182,7 +192,7 @@ This recipe uses `pull-requests: write` only for the comment step. AgentLoopKit 
 
 ## Recipe 4: Composite Action Wrapper
 
-Use the repo action when you want a shorter workflow step around the same npm package:
+Use the Marketplace Action when you want a shorter workflow step around the same npm package:
 
 The action defaults to npm `latest`. Set `agentloopkit-version` when you want CI to use a reviewed package version.
 

@@ -1,0 +1,14 @@
+ .agentloop/dogfood-log.md          | 34 +++++++++++++++++++++++++
+ DECISIONS.md                       |  6 +++++
+ README.md                          |  2 +-
+ action.yml                         |  6 ++++-
+ docs/github-actions.md             | 12 ++++++++-
+ package.json                       |  2 +-
+ src/core/check-gates.ts            |  1 +
+ src/core/handoff-coverage.ts       | 45 +++++++++++++++++++++++++++------
+ src/core/maintainer-check.ts       | 14 ++++++-----
+ src/core/status.ts                 | 11 +++++++-
+ tests/check-gates.test.ts          | 51 ++++++++++++++++++++++++++++++++++++++
+ tests/github-action-runner.test.ts | 16 ++++++++++++
+ tests/package-scripts.test.ts      |  1 +
+ 13 files changed, 182 insertions(+), 19 deletions(-)

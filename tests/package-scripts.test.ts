@@ -13,6 +13,7 @@ describe('package scripts', () => {
     expect(packageJson.scripts['test:unit']).toContain('tests/schemastore.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/policy-packs.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/github-metadata.test.ts');
+    expect(packageJson.scripts['test:unit']).toContain('tests/github-action-runner.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/release-proof.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/public-docs-hygiene.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/dogfood-start-script.test.ts');

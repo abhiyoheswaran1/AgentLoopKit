@@ -317,7 +317,7 @@ Shell completions include fixed values for task types and status transitions, th
 - [Release proof](docs/release-proof.md)
 - [MCP server](docs/mcp.md)
 - [Template and harness upgrades](docs/template-migrations.md)
-- [CI examples](docs/github-actions.md)
+- [GitHub Actions and Marketplace Action](docs/github-actions.md)
 - [Distribution channels](docs/distribution-channels.md)
 - [Comparison](docs/comparison.md)
 

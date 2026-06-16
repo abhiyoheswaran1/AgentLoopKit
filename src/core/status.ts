@@ -12,7 +12,7 @@ import {
   GitFileStatus,
 } from './git.js';
 import { latestMarkdownFile } from './artifacts.js';
-import { verificationReportPattern } from './artifacts.js';
+import { prSummaryPattern, verificationReportPattern } from './artifacts.js';
 import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
 import { singleLineInlineCode } from './markdown-format.js';
 import { listRuns, RunSummary } from './runs.js';
@@ -405,11 +405,20 @@ export async function getAgentLoopStatus(options: {
       status: task.status,
     }));
   const latestReport = stripReportTimestamp(currentReport);
+  const latestHandoffPath = await latestMarkdownFile(
+    path.join(options.cwd, options.config.paths.handoffsDir),
+    {
+      pattern: prSummaryPattern,
+      rootDir: options.cwd,
+    },
+  );
   const latestRun = (await listRuns(options.cwd))[0];
   const latestHandoffRunCoversDirtyFiles = await dirtyCoveredByLatestHandoffRun(
     options.cwd,
     changedFiles,
     latestRun,
+    undefined,
+    latestHandoffPath ?? undefined,
   );
   const configured = DEFAULT_COMMAND_KEYS.filter((key) => options.config.commands[key]);
   const missing = DEFAULT_COMMAND_KEYS.filter((key) => !options.config.commands[key]);

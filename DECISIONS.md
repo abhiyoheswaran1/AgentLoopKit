@@ -435,3 +435,9 @@ Agent-specific files under `.agentloop/agents/` are setup artifacts that maintai
 `AGENTS.md` remains append-only for missing AgentLoopKit marker blocks, so repos can still gain missing references without losing local agent-specific guidance. Human and JSON output report whether the agent instruction file was `created` or `skipped`, and whether `AGENTS.md` was `created`, `updated`, or already `current`.
 
 This avoids a merge engine, force flag, external agent config discovery, or third-party setup writes. Users who want newer bundled template copy can inspect the package templates and update local files manually.
+
+## 2026-06-16: Handoff Markdown Can Prove Bounded Dirty-File Coverage
+
+`check-gates`, `status`, and `maintainer-check` use run-ledger metadata when it exists. During dogfooding, a plain `agentloop handoff` produced a reviewer summary but no run ledger entry, so strict gates kept asking for another handoff even though the latest handoff listed the changed files.
+
+AgentLoopKit now treats the latest handoff Markdown as bounded local evidence when it lists the dirty files. The coverage check reads only that latest handoff file, adds the handoff artifact path itself, and does not scan arbitrary repo prose. Run-ledger evidence remains the stronger source when available.

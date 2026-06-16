@@ -12329,3 +12329,37 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - Trusted publishing, GHCR, and MCP Registry all completed without local tokens or manual npm publish.
 - Improve:
   - Consider teaching release task templates to separate pre-bump maintenance checks from post-publish release proof so future release contracts avoid this sequencing mistake.
+
+## 2026-06-16: GitHub Action Marketplace Prep And Handoff Coverage Bug
+
+- Task contracts:
+  - `.agentloop/tasks/2026-06-16-prepare-github-action-marketplace-listing.md`
+  - `.agentloop/tasks/2026-06-16-prevent-stale-agentloop-task-state.md`
+- Trigger:
+  - The GitHub Action existed but lacked Marketplace branding and clear safe-input docs.
+  - A separate AgentLoopKit dogfood session in another repo showed stale task state can survive while real release work lives in devlogs and reports.
+- Product decision:
+  - Park the stale task-state problem as deferred future work with concrete acceptance criteria instead of fixing it in this slice.
+  - Add Action Marketplace metadata and docs now because CI adoption is a useful release channel.
+  - Fix the strict-gate handoff coverage bug discovered during dogfooding so plain `agentloop handoff` output can satisfy gates when it lists the dirty files.
+- TDD:
+  - Added a failing Action metadata test in `tests/github-action-runner.test.ts`; it failed because `action.yml` had no Marketplace description or branding.
+  - Added a failing `check-gates` regression for handoff Markdown coverage without a run entry; it failed because strict gates required run-ledger coverage.
+  - Implemented bounded handoff Markdown parsing in `src/core/handoff-coverage.ts` and wired it into `check-gates`, `status`, and `maintainer-check`.
+- Verification:
+  - `npm test -- tests/github-action-runner.test.ts tests/package-scripts.test.ts`: passed.
+  - `npm run check:public-docs`: passed.
+  - `npm run typecheck`: passed.
+  - `npm run test:unit`: passed.
+  - `npm test -- tests/check-gates.test.ts`: passed after the regression fix.
+  - `npm test -- tests/status.test.ts tests/maintainer-check.test.ts tests/next.test.ts`: passed.
+  - `agentloop verify`: passed and wrote `.agentloop/reports/2026-06-16-15-58-verification-report.md`.
+  - `agentloop handoff`: wrote `.agentloop/handoffs/2026-06-16-16-00-pr-summary.md`.
+  - `agentloop check-gates --strict --redact-paths`: passed with a plain handoff and no new run ledger entry.
+  - `npm run dogfood:strict`: passed, including AgentFlight doctor and ProjScan doctor.
+  - `npm run maintenance:check -- --json`: passed, including AgentFlight and ProjScan checks.
+- What worked well:
+  - Dogfooding caught a real evidence-ordering flaw before this became CI guidance for users.
+  - The fix stays token-conscious by reading one latest handoff file instead of scanning repo history.
+- Improve:
+  - Implement the deferred stale task-state detector later so installed repos can recover when `.agentloop/state.json` points at old work.
