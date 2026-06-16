@@ -274,7 +274,9 @@ describe('verification', () => {
     expect(output.reportPath).toMatch(/\.agentloop\/reports\/.+-verification-report\.md$/);
     expect(output.reportPath).not.toContain(dir);
     expect(output.reportPath).not.toContain(nested);
-    await expect(readFile(path.join(dir, output.reportPath), 'utf8')).resolves.toContain('nested-ok');
+    await expect(readFile(path.join(dir, output.reportPath), 'utf8')).resolves.toContain(
+      'nested-ok',
+    );
   });
 
   test('reports no verification when no commands are configured', async () => {
@@ -870,7 +872,7 @@ describe('verification', () => {
         '- Status: in-progress',
         '',
         '## Verification Commands',
-        '- `node -e "require(\'fs\').writeFileSync(\'inline-task-command-ran.txt\', \'yes\'); console.log(\'inline-task-check\')"`',
+        "- `node -e \"require('fs').writeFileSync('inline-task-command-ran.txt', 'yes'); console.log('inline-task-check')\"`",
         '',
       ].join('\n'),
     );
@@ -1018,6 +1020,122 @@ describe('verification', () => {
     });
     await expect(readFile(path.join(dir, 'task-command-ran.txt'), 'utf8')).resolves.toBe('yes');
     await expect(access(path.join(dir, 'post-verification-ran.txt'))).rejects.toThrow();
+  });
+
+  test('runs post-verification gates explicitly after writing the verification report', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'post-gate.mjs'),
+      [
+        "import { existsSync, readFileSync, writeFileSync } from 'node:fs';",
+        "const reportPath = '.agentloop/reports/2026-06-10-12-07-verification-report.md';",
+        'if (!existsSync(reportPath)) process.exit(3);',
+        "const report = readFileSync(reportPath, 'utf8');",
+        "if (!report.includes('Overall status: pass')) process.exit(4);",
+        "writeFileSync('post-verification-ran.txt', 'saw-report');",
+        "console.log('post-gate-saw-report');",
+        '',
+      ].join('\n'),
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/task-commands.md'),
+      [
+        '# Task command opt-in',
+        '',
+        '- Task type: docs',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        "- node -e \"require('fs').writeFileSync('task-command-ran.txt', 'yes')\"",
+        '',
+        '## Post-Verification Gates',
+        '- node post-gate.mjs',
+        '',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: '.agentloop/tasks/task-commands.md',
+      taskCommands: true,
+      postVerificationGates: true,
+      reportTimestamp: '2026-06-10-12-07',
+      nowIso: '2026-06-10T12:07:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('pass');
+    expect(result.postVerificationGates).toEqual({
+      requested: true,
+      foundCount: 1,
+      commands: ['node post-gate.mjs'],
+      results: [
+        expect.objectContaining({
+          key: 'post-verification',
+          command: 'node post-gate.mjs',
+          exitCode: 0,
+          passed: true,
+          output: expect.stringContaining('post-gate-saw-report'),
+        }),
+      ],
+    });
+    await expect(readFile(path.join(dir, 'task-command-ran.txt'), 'utf8')).resolves.toBe('yes');
+    await expect(readFile(path.join(dir, 'post-verification-ran.txt'), 'utf8')).resolves.toBe(
+      'saw-report',
+    );
+    const report = await readFile(result.reportPath, 'utf8');
+    expect(report).toContain('## Post-Verification Gates');
+    expect(report).toContain('### post-verification: `node post-gate.mjs`');
+  });
+
+  test('fails verification when an explicit post-verification gate fails', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/task-commands.md'),
+      [
+        '# Failing post gate',
+        '',
+        '- Task type: docs',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        '- node -e "console.log(\'task command passed\')"',
+        '',
+        '## Post-Verification Gates',
+        '- node -e "console.error(\'post gate failed\'); process.exit(7)"',
+        '',
+      ].join('\n'),
+    );
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      taskPath: '.agentloop/tasks/task-commands.md',
+      taskCommands: true,
+      postVerificationGates: true,
+      reportTimestamp: '2026-06-10-12-09',
+      nowIso: '2026-06-10T12:09:00.000Z',
+    });
+
+    expect(result.overallStatus).toBe('fail');
+    expect(result.postVerificationGates.results).toEqual([
+      expect.objectContaining({
+        key: 'post-verification',
+        exitCode: 7,
+        passed: false,
+        output: expect.stringContaining('post gate failed'),
+      }),
+    ]);
+    expect(result.markdown).toContain('## Failure Summary');
+    expect(result.markdown).toContain('### post-verification:');
+    const report = await readFile(result.reportPath, 'utf8');
+    expect(report).toContain('Overall status: fail');
   });
 
   test('reports when task verification commands are requested but absent', async () => {
@@ -1699,6 +1817,78 @@ describe('verification', () => {
     ]);
   });
 
+  test('CLI verify runs post-verification gates with the explicit flag', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'agentloop.config.json'),
+      JSON.stringify(
+        createDefaultConfig({
+          name: 'demo',
+          type: 'generic',
+          packageManager: 'npm',
+          commands: {
+            test: '',
+            lint: '',
+            typecheck: '',
+            build: '',
+            format: '',
+          },
+        }),
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/demo-task.md'),
+      [
+        '# CLI post gates',
+        '',
+        '- Task type: docs',
+        '- Status: in-progress',
+        '',
+        '## Verification Commands',
+        '- node -e "console.log(\'cli-task-check\')"',
+        '',
+        '## Post-Verification Gates',
+        "- node -e \"require('fs').writeFileSync('cli-post-gate-ran.txt', 'yes'); console.log('cli-post-gate')\"",
+        '',
+      ].join('\n'),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'verify',
+        '--task',
+        '.agentloop/tasks/demo-task.md',
+        '--task-commands',
+        '--post-verification-gates',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    const output = JSON.parse(result.stdout);
+    expect(output.overallStatus).toBe('pass');
+    expect(output.postVerificationGates).toMatchObject({
+      requested: true,
+      foundCount: 1,
+      commands: [
+        "node -e \"require('fs').writeFileSync('cli-post-gate-ran.txt', 'yes'); console.log('cli-post-gate')\"",
+      ],
+    });
+    expect(output.postVerificationGates.results).toEqual([
+      expect.objectContaining({
+        key: 'post-verification',
+        passed: true,
+        output: expect.stringContaining('cli-post-gate'),
+      }),
+    ]);
+    await expect(readFile(path.join(dir, 'cli-post-gate-ran.txt'), 'utf8')).resolves.toBe('yes');
+  });
+
   test('CLI verify uses the active task when --task-commands is passed without --task', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -1724,11 +1914,7 @@ describe('verification', () => {
     );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
-      JSON.stringify(
-        { version: 1, activeTaskPath: '.agentloop/tasks/active-task.md' },
-        null,
-        2,
-      ),
+      JSON.stringify({ version: 1, activeTaskPath: '.agentloop/tasks/active-task.md' }, null, 2),
     );
     await writeFile(
       path.join(dir, '.agentloop/tasks/active-task.md'),
@@ -1838,7 +2024,7 @@ describe('verification', () => {
         '- Status: in-progress',
         '',
         '## Verification Commands',
-        '- node -e "require(\'fs\').writeFileSync(\'task-command-ran.txt\', \'yes\'); console.log(\'task-only-check\')"',
+        "- node -e \"require('fs').writeFileSync('task-command-ran.txt', 'yes'); console.log('task-only-check')\"",
         '',
       ].join('\n'),
     );
@@ -1863,7 +2049,7 @@ describe('verification', () => {
       expect.objectContaining({
         key: 'task',
         command:
-          'node -e "require(\'fs\').writeFileSync(\'task-command-ran.txt\', \'yes\'); console.log(\'task-only-check\')"',
+          "node -e \"require('fs').writeFileSync('task-command-ran.txt', 'yes'); console.log('task-only-check')\"",
         passed: true,
       }),
     ]);
@@ -1899,11 +2085,7 @@ describe('verification', () => {
     );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
-      JSON.stringify(
-        { version: 1, activeTaskPath: '.agentloop/tasks/active-task.md' },
-        null,
-        2,
-      ),
+      JSON.stringify({ version: 1, activeTaskPath: '.agentloop/tasks/active-task.md' }, null, 2),
     );
     await writeFile(
       path.join(dir, '.agentloop/tasks/active-task.md'),
@@ -1914,7 +2096,7 @@ describe('verification', () => {
         '- Status: in-progress',
         '',
         '## Verification Commands',
-        '- node -e "require(\'fs\').writeFileSync(\'active-task-command-ran.txt\', \'yes\')"',
+        "- node -e \"require('fs').writeFileSync('active-task-command-ran.txt', 'yes')\"",
         '',
       ].join('\n'),
     );
@@ -1931,8 +2113,7 @@ describe('verification', () => {
     expect(output.commands).toEqual([
       expect.objectContaining({
         key: 'task',
-        command:
-          'node -e "require(\'fs\').writeFileSync(\'active-task-command-ran.txt\', \'yes\')"',
+        command: "node -e \"require('fs').writeFileSync('active-task-command-ran.txt', 'yes')\"",
         passed: true,
       }),
     ]);
@@ -1974,14 +2155,21 @@ describe('verification', () => {
         '- Status: in-progress',
         '',
         '## Verification Commands',
-        '- node -e "require(\'fs\').writeFileSync(\'task-command-ran.txt\', \'yes\')"',
+        "- node -e \"require('fs').writeFileSync('task-command-ran.txt', 'yes')\"",
         '',
       ].join('\n'),
     );
 
     const result = await execa(
       tsxPath,
-      [cliPath, 'verify', '--task', '.agentloop/tasks/demo-task.md', '--only-task-commands', '--json'],
+      [
+        cliPath,
+        'verify',
+        '--task',
+        '.agentloop/tasks/demo-task.md',
+        '--only-task-commands',
+        '--json',
+      ],
       { cwd: dir, reject: false },
     );
     const output = JSON.parse(result.stdout);

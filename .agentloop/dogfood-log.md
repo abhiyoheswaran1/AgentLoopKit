@@ -2,6 +2,62 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Explicit Post-Verification Gates From Verify
+
+- Task contract: `.agentloop/tasks/archive/2026-06-16-run-post-verification-gates-explicitly-from-verify.md`
+- Trigger:
+  - Task contracts already separated `Verification Commands` from `Post-Verification Gates`.
+  - Dogfooding showed that agents still had to remember the manual sequence after `verify` wrote fresh evidence.
+  - The product needed an explicit path that runs report-dependent gates without changing default verification behavior.
+- Implementation:
+  - Added `agentloop verify --post-verification-gates`.
+  - `verify` now writes the normal verification report first, then runs task `Post-Verification Gates`, then updates the report with gate evidence.
+  - Normal `agentloop verify` and `agentloop verify --task-commands` still do not run post-verification gates.
+  - JSON output includes `postVerificationGates.requested`, `foundCount`, `commands`, and `results`.
+  - Human output reports post-verification gate pass counts when the flag is used.
+- Product-panel decision:
+  - Samir required the default behavior to stay unchanged.
+  - Lina prioritized reducing manual sequencing in long autonomous sessions.
+  - Nora wanted terminal and JSON output to show whether gates ran.
+  - Maya kept the change to one explicit flag instead of a workflow engine.
+- Verification:
+  - Red TDD run failed because `postVerificationGates` did not exist and failing gates did not affect `overallStatus`:
+    - `npm test -- tests/verification.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/verification.test.ts`
+    - `npm test -- tests/verification.test.ts tests/cli-docs-drift.test.ts`
+  - Static checks and docs checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `63` test files, `647` tests.
+  - AgentLoopKit task verification passed:
+    - `node dist/cli/index.js verify --task .agentloop/tasks/2026-06-16-run-post-verification-gates-explicitly-from-verify.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - Verification report: `.agentloop/reports/2026-06-16-12-24-verification-report.md`
+    - Run: `.agentloop/runs/2026-06-16-12-24-verify`
+  - AgentLoopKit ship evidence passed:
+    - `node dist/cli/index.js ship --redact-paths`
+    - Ship score: `92`/100.
+    - Ship report: `.agentloop/reports/2026-06-16-12-24-ship-report.md`
+  - Strict dogfood passed after writing a handoff run:
+    - `node dist/cli/index.js handoff --write-run --redact-paths`
+    - `npm run dogfood:strict`
+  - Final archived-task dogfood passed:
+    - `node dist/cli/index.js task done --json`
+    - `node dist/cli/index.js task archive .agentloop/tasks/2026-06-16-run-post-verification-gates-explicitly-from-verify.md --json`
+    - `node dist/cli/index.js handoff --write-run --redact-paths`
+    - `npm run dogfood:strict`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/verification.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan --format markdown doctor`
+- Improve:
+  - `handoff` without `--write-run` created a reviewer summary but did not make it the latest review-evidence run. For strict dogfood, use `handoff --write-run` after generated evidence changes.
+
 ## 2026-06-16: Existing Agent Instruction File Preservation
 
 - Task contract: `.agentloop/tasks/2026-06-16-preserve-existing-agent-instruction-files-2.md`

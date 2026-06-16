@@ -18,7 +18,7 @@ agentloop create-task --type feature --title "Add settings page" \
 
 Task contracts turn fuzzy requests into scoped engineering work. A good contract names the desired outcome, constraints, non-goals, likely files, files not to touch, acceptance criteria, verification commands, post-verification gates, and rollback notes.
 
-Use verification commands for checks that `agentloop verify --task-commands` can run before a report exists. Use post-verification gates for checks that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, `agentloop maintainer-check`, or reviewer handoff checks.
+Use verification commands for checks that `agentloop verify --task-commands` can run before a report exists. Use post-verification gates for checks that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, `agentloop maintainer-check`, or reviewer handoff checks. Those gates run only when `agentloop verify --post-verification-gates` is passed.
 
 Verification command list items may be written as plain list text or Markdown inline code, for example `- npm test` or ``- `npm test` ``. AgentLoopKit unwraps one balanced inline-code wrapper before execution.
 

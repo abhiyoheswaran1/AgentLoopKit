@@ -114,20 +114,27 @@ async function resolveEffectiveTaskPathForVerify(options: {
   config: AgentLoopConfig;
   taskPath?: string;
   taskCommands?: boolean;
+  postVerificationGates?: boolean;
   json?: boolean;
 }): Promise<{ ok: true; taskPath?: string } | { ok: false }> {
-  if (options.taskPath || !options.taskCommands) return { ok: true, taskPath: options.taskPath };
+  if (options.taskPath || (!options.taskCommands && !options.postVerificationGates)) {
+    return { ok: true, taskPath: options.taskPath };
+  }
 
   const activeTaskPath = await getActiveTaskPath({ cwd: options.cwd, config: options.config });
   if (activeTaskPath) {
     return { ok: true, taskPath: repoRelativePath(options.cwd, activeTaskPath) };
   }
 
+  const optionName = options.taskCommands ? '--task-commands' : '--post-verification-gates';
+  const code = options.taskCommands
+    ? 'TASK_COMMANDS_REQUIRES_TASK'
+    : 'POST_VERIFICATION_GATES_REQUIRES_TASK';
   const error = new CliOptionError(
-    '--task-commands requires --task or an active task. Run `agentloop task set <path>` or pass --task.',
-    'TASK_COMMANDS_REQUIRES_TASK',
+    `${optionName} requires --task or an active task. Run \`agentloop task set <path>\` or pass --task.`,
+    code,
     {
-      option: 'task-commands',
+      option: optionName.replace(/^--/, ''),
       requiredOption: 'task',
       alternative: 'active-task',
     },
@@ -168,6 +175,10 @@ export function verifyCommand() {
     .description('Run configured verification commands and write a report')
     .option('--task <path>', 'task contract path for humans to cross-reference')
     .option('--task-commands', 'also run verification commands listed in the task contract')
+    .option(
+      '--post-verification-gates',
+      'run task Post-Verification Gates after writing the verification report',
+    )
     .option(
       '--only-task-commands',
       'run only task contract verification commands; requires --task and --task-commands',
@@ -216,6 +227,7 @@ export function verifyCommand() {
         config: workspace.config,
         taskPath,
         taskCommands: options.taskCommands === true,
+        postVerificationGates: options.postVerificationGates === true,
         json: options.json === true,
       });
       if (!effectiveTask.ok) return;
@@ -226,6 +238,7 @@ export function verifyCommand() {
           config: workspace.config,
           taskPath: effectiveTask.taskPath,
           taskCommands: options.taskCommands === true,
+          postVerificationGates: options.postVerificationGates === true,
           skip: {
             build: options.onlyTaskCommands === true || options.build === false,
             test: options.onlyTaskCommands === true || options.test === false,
@@ -236,7 +249,9 @@ export function verifyCommand() {
           timeoutMs: parseTimeoutMs(options.timeoutMs),
           redactPaths: options.redactPaths === true,
           onProgress:
-            options.progress === true && options.json !== true ? printVerificationProgress : undefined,
+            options.progress === true && options.json !== true
+              ? printVerificationProgress
+              : undefined,
         });
       } catch (error) {
         if (options.json && error instanceof OutputPathError) {
@@ -281,6 +296,16 @@ export function verifyCommand() {
             publicResult.reportPath,
           )}\nOverall status: ${inlineCode(result.overallStatus)}`,
         );
+        if (result.postVerificationGates.requested) {
+          const passedCount = result.postVerificationGates.results.filter(
+            (gate) => gate.passed,
+          ).length;
+          console.log(
+            `Post-verification gates: ${inlineCode(
+              `${passedCount}/${result.postVerificationGates.foundCount} passed`,
+            )}`,
+          );
+        }
         if (publicRun) console.log(`Run written: ${inlineCode(publicRun.path)}`);
       }
       if (result.overallStatus === 'fail') process.exitCode = 1;

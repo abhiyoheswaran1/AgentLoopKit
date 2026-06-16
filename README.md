@@ -123,6 +123,7 @@ agentloop prepare-pr
 
 `create-task` sets the new contract as the active task. Use `agentloop task set <path>` only when you need to switch to another contract.
 Add `--include-config-commands` when you want the task contract to copy non-empty `test`, `lint`, `typecheck`, and `build` commands from `agentloop.config.json`. Task creation records those commands; it does not run them. Use `verify --task-commands --only-task-commands` when the active contract already includes the full check list.
+Use `verify --post-verification-gates` only for reviewed task gates that need the verification report to exist first.
 After verification and `ship`, use `agentloop prepare-pr` for reviewer copy and `agentloop task done` to close the active task before starting unrelated work.
 
 Use `agentloop status` or `agentloop next` when an agent needs the next local action without reading every file:

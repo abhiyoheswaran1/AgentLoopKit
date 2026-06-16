@@ -105,7 +105,7 @@ Default task paths avoid same-day title collisions by adding a numeric suffix, f
 
 Human-readable `create-task` output keeps generated paths and warning command values on one Markdown line. JSON output keeps raw values for scripts.
 
-Use `--verification` for commands that `agentloop verify --task-commands` may run before the verification report exists. Use `--post-verification` for gates that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, `agentloop maintainer-check`, or reviewer-handoff checks. Post-verification gates are recorded in the task contract but are not executed by `agentloop verify --task-commands`.
+Use `--verification` for commands that `agentloop verify --task-commands` may run before the verification report exists. Use `--post-verification` for gates that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, `agentloop maintainer-check`, or reviewer-handoff checks. Post-verification gates are recorded in the task contract. They run only when you pass `agentloop verify --post-verification-gates`.
 
 Task verification command list items may be written as plain Markdown list text or as inline code, for example `- npm test` or ``- `npm test` ``. AgentLoopKit unwraps one balanced inline-code wrapper before execution.
 
@@ -185,6 +185,7 @@ agentloop verify --task-commands
 agentloop verify --task .agentloop/tasks/<task-file>.md
 agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands
 agentloop verify --task .agentloop/tasks/<task-file>.md --task-commands --only-task-commands
+agentloop verify --task .agentloop/tasks/<task-file>.md --post-verification-gates
 agentloop verify --timeout-ms 120000
 agentloop verify --progress
 agentloop verify --write-run
@@ -199,7 +200,9 @@ Use `--task` to include task context in the report. Use `--task-commands` when y
 
 Verification runs each exact command string once. If a command appears in both `agentloop.config.json` and the task contract, AgentLoopKit keeps the first configured slot and skips the duplicate task entry.
 
-`verify --task-commands` does not run `Post-Verification Gates`. Run those after the verification report exists.
+`verify --task-commands` does not run `Post-Verification Gates`. Use `--post-verification-gates` only after reviewing those commands and deciding they should run after the report exists. The flag requires `--task` or an active task, writes the normal verification report first, then runs commands listed under `Post-Verification Gates`.
+
+If a post-verification gate fails, `verify` exits non-zero and writes the gate output into the final report. JSON output includes `postVerificationGates.requested`, `foundCount`, `commands`, and `results`.
 
 Use `--write-run` when you want verification to also create a local run ledger entry under `.agentloop/runs/`. The run records the verification report path, task reference when available, current changed files, and overall verification status.
 
@@ -209,7 +212,7 @@ Use `--progress` for long local checks. It prints bounded start/finish lines for
 
 Failed reports include a short failure summary with each failed command, exit code, timeout state, and useful final output lines. If no commands are configured, AgentLoopKit writes a report saying nothing was verified.
 
-Human-readable `verify` output keeps progress commands, written report paths, run paths, and status values on one Markdown line. JSON output keeps raw command and path values for scripts.
+Human-readable `verify` output keeps progress commands, written report paths, post-verification gate summaries, run paths, and status values on one Markdown line. JSON output keeps raw command and path values for scripts.
 
 See [verification-reports.md](verification-reports.md).
 

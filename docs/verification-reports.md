@@ -24,6 +24,7 @@ Supported checks:
 - build
 - custom commands through `--command`
 - task contract commands through `--task-commands`
+- task post-verification gates through `--post-verification-gates`
 
 Flags:
 
@@ -33,6 +34,7 @@ agentloop verify --task-commands
 agentloop verify --task .agentloop/tasks/add-settings-page.md
 agentloop verify --task .agentloop/tasks/add-settings-page.md --task-commands
 agentloop verify --task .agentloop/tasks/add-settings-page.md --task-commands --only-task-commands
+agentloop verify --task .agentloop/tasks/add-settings-page.md --post-verification-gates
 agentloop verify --command "node smoke-test.js"
 agentloop verify --timeout-ms 120000
 agentloop verify --progress
@@ -46,7 +48,11 @@ Reports generated with `--task` include a `Task Context` section with the task p
 
 `--task` is metadata-only by default. Use `--task-commands` to also run commands listed under the task contract's `Verification Commands` section. `--task-commands` uses the explicit `--task` path first, then the active task set by `create-task` or `task set`; without either, it exits before running commands. This keeps task Markdown from executing unexpectedly when a maintainer only wants the task context in the report. Add `--only-task-commands` when you want the task contract commands to run without `test`, `lint`, `typecheck`, or `build` from `agentloop.config.json`.
 
-`verify --task-commands` does not run commands under `Post-Verification Gates`. Put commands there when they need the report produced by `agentloop verify`, for example `npm run dogfood:strict`, `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, `agentloop maintainer-check`, or a handoff check. Run those after the verification report exists.
+`verify --task-commands` does not run commands under `Post-Verification Gates`. Put commands there when they need the report produced by `agentloop verify`, for example `npm run dogfood:strict`, `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, `agentloop maintainer-check`, or a handoff check.
+
+Use `--post-verification-gates` when you want `verify` to write the report first and then run commands listed under `Post-Verification Gates`. The flag requires `--task` or an active task. It stays opt-in, so task Markdown does not start running post-report gates during a normal `verify` or `verify --task-commands` run.
+
+If a post-verification gate fails, `verify` exits non-zero and the final report includes the gate output under `Post-Verification Gates`. JSON output includes `postVerificationGates.requested`, `foundCount`, `commands`, and `results`.
 
 If `--task-commands` is requested but no runnable task commands are found, the report includes a `Task Commands` note. JSON output includes `taskCommands.requested`, `taskCommands.foundCount`, and `taskCommands.commands` for CI consumers.
 

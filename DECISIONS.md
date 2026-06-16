@@ -32,6 +32,8 @@ Task contracts can record `Post-Verification Gates` for commands that need a fre
 
 `agentloop verify --task-commands` still runs only reviewed commands under `Verification Commands`. It does not execute post-verification gates, because those commands depend on evidence that `verify` writes after subprocesses finish. This keeps command execution explicit and avoids report-dependent checks failing for the wrong reason.
 
+`agentloop verify --post-verification-gates` is the explicit opt-in for running those gates. The command writes the normal verification report first, then runs commands from `Post-Verification Gates`, then updates the report with gate evidence. A failing gate fails the `verify` command. Normal `verify` and `verify --task-commands` behavior remains unchanged.
+
 ## 2026-06-12: Task-Only Verification Still Requires Explicit Task Commands
 
 `agentloop verify --only-task-commands` is a convenience flag, not a new execution permission. It only works with both `--task <path>` and `--task-commands`, so task Markdown never becomes executable because a user asked for a report with task context.

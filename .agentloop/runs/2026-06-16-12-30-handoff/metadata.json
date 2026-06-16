@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-12-30-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-12-30",
+  "createdAtEpochMs": 1781605843963,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-run-post-verification-gates-explicitly-from-verify.md",
+    "title": "Run post-verification gates explicitly from verify",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-12-24-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-12-30-pr-summary.md",
+  "changedFileCount": 46
+}

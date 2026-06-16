@@ -61,7 +61,7 @@ Use `agentloop check-gates --strict` in CI after task, verification, and handoff
 
 When `agentloop verify` runs in GitHub Actions, the verification report records allowlisted CI provenance fields such as workflow, event, ref, commit, run URL, and run attempt. It does not dump arbitrary environment variables.
 
-`agentloop verify --task <path>` adds task context to the report without executing commands from the task file. Use `agentloop verify --task <path> --task-commands` only when the task contract's `Verification Commands` list has been reviewed and should run. `Post-Verification Gates` are not run by `verify`; run them after the verification report exists.
+`agentloop verify --task <path>` adds task context to the report without executing commands from the task file. Use `agentloop verify --task <path> --task-commands` only when the task contract's `Verification Commands` list has been reviewed and should run. `Post-Verification Gates` run only when `agentloop verify --post-verification-gates` is passed, after the verification report exists.
 
 Use `agentloop ci-summary --write` after verification and handoff when CI should upload one compact Markdown summary of CI provenance, AgentLoop evidence, and gate status. It does not run checks or replace the verification report.
 

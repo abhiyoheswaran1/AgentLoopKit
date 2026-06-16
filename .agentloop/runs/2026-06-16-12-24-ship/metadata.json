@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-12-24-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-12-24",
+  "createdAtEpochMs": 1781605475618,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-run-post-verification-gates-explicitly-from-verify.md",
+    "title": "Run post-verification gates explicitly from verify",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-12-24-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-12-24-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-12-24-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 44
+}

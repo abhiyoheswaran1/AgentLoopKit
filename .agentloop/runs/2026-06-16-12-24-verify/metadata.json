@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-12-24-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-12-24",
+  "createdAtEpochMs": 1781605467800,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-run-post-verification-gates-explicitly-from-verify.md",
+    "title": "Run post-verification gates explicitly from verify",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-12-24-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 41
+}

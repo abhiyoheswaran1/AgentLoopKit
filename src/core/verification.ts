@@ -9,7 +9,14 @@ import { isInsidePath, normalizeExistingAncestor, writeTextFile } from './file-s
 import { fencedCodeBlock, inlineCode } from './markdown-format.js';
 import { redactLocalRoots } from './redaction.js';
 
-export type VerificationCommandKey = 'test' | 'lint' | 'typecheck' | 'build' | 'custom' | 'task';
+export type VerificationCommandKey =
+  | 'test'
+  | 'lint'
+  | 'typecheck'
+  | 'build'
+  | 'custom'
+  | 'task'
+  | 'post-verification';
 
 export type VerificationCommandResult = {
   key: VerificationCommandKey;
@@ -65,6 +72,7 @@ export type VerificationOptions = {
   env?: NodeJS.ProcessEnv;
   taskPath?: string;
   taskCommands?: boolean;
+  postVerificationGates?: boolean;
   skip?: Partial<Record<'test' | 'lint' | 'typecheck' | 'build', boolean>>;
   customCommands?: string[];
   timeoutMs?: number;
@@ -80,6 +88,12 @@ export type VerificationResult = {
     requested: boolean;
     foundCount: number;
     commands: string[];
+  };
+  postVerificationGates: {
+    requested: boolean;
+    foundCount: number;
+    commands: string[];
+    results: VerificationCommandResult[];
   };
   skippedDuplicateCommands: SkippedDuplicateCommand[];
   ciContext?: VerificationCiContext;
@@ -183,13 +197,13 @@ async function runVerificationCommand(options: {
   }
 }
 
-function parseTaskVerificationCommands(markdown: string) {
+function parseTaskSectionCommands(markdown: string, sectionName: string, emptyMessage: string) {
   const lines = markdown.split(/\r?\n/);
   const commands: string[] = [];
   let inSection = false;
 
   for (const line of lines) {
-    if (/^##\s+Verification Commands\s*$/.test(line.trim())) {
+    if (line.trim().replace(/\s+/g, ' ') === `## ${sectionName}`) {
       inSection = true;
       continue;
     }
@@ -198,11 +212,27 @@ function parseTaskVerificationCommands(markdown: string) {
 
     const match = line.match(/^\s*-\s+(.+?)\s*$/);
     const command = normalizeTaskVerificationCommand(match?.[1]);
-    if (!command || command === 'No verification command recorded.') continue;
+    if (!command || command === emptyMessage) continue;
     commands.push(command);
   }
 
   return commands;
+}
+
+function parseTaskVerificationCommands(markdown: string) {
+  return parseTaskSectionCommands(
+    markdown,
+    'Verification Commands',
+    'No verification command recorded.',
+  );
+}
+
+function parseTaskPostVerificationGates(markdown: string) {
+  return parseTaskSectionCommands(
+    markdown,
+    'Post-Verification Gates',
+    'No post-verification gate recorded.',
+  );
 }
 
 function normalizeTaskVerificationCommand(raw: string | undefined) {
@@ -431,6 +461,36 @@ ${selection.skippedDuplicateCommands
 `;
 }
 
+function renderCommandEvidence(result: VerificationCommandResult) {
+  return `### ${result.key}: ${inlineCode(result.command)}
+
+- Exit code: ${result.exitCode}
+- Status: ${result.passed ? 'pass' : 'fail'}
+${result.timedOut ? '- Timed out: yes\n' : ''}
+
+${fencedCodeBlock('text', excerpt(result.output || '(no output)'))}`;
+}
+
+function renderPostVerificationGatesContext(options: {
+  requested: boolean;
+  foundCount: number;
+  results: VerificationCommandResult[];
+}) {
+  if (!options.requested) return '';
+
+  if (options.foundCount === 0) {
+    return `## Post-Verification Gates
+- Post-verification gates were requested, but none were found in the task contract.
+
+`;
+  }
+
+  return `## Post-Verification Gates
+${options.results.map(renderCommandEvidence).join('\n\n')}
+
+`;
+}
+
 function parseTaskMetadata(markdown: string) {
   const lines = markdown.split(/\r?\n/);
   return {
@@ -559,59 +619,130 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
     output: redactValue(result.output),
   }));
 
-  const overallStatus =
-    results.length === 0 ? 'not-run' : results.every((result) => result.passed) ? 'pass' : 'fail';
+  const statusForResults = (selectedResults: VerificationCommandResult[]) =>
+    selectedResults.length === 0
+      ? 'not-run'
+      : selectedResults.every((result) => result.passed)
+        ? 'pass'
+        : 'fail';
+  const baseOverallStatus = statusForResults(results);
   const branch = await getGitBranch(options.cwd);
   const commit = await getGitCommit(options.cwd);
   const status = await getGitStatus(options.cwd);
   const taskContext = await renderTaskContext(options.cwd, options.config, options.taskPath);
   const workingTreeStatus = status.trim() ? 'dirty' : 'clean or unavailable';
-
-  const markdown = `# Verification Report
+  const renderMarkdown = (renderOptions: {
+    overallStatus: 'pass' | 'fail' | 'not-run';
+    allResults: VerificationCommandResult[];
+    postVerificationGates: {
+      requested: boolean;
+      foundCount: number;
+      results: VerificationCommandResult[];
+    };
+  }) => `# Verification Report
 
 - Timestamp: ${inlineCode(nowIso)}
 - Repo: ${inlineCode(path.basename(options.cwd))}
 - Git branch: ${inlineCode(branch || 'not available')}
 - Git commit: ${inlineCode(commit || 'not available')}
 - Working tree: ${inlineCode(workingTreeStatus)}
-- Overall status: ${overallStatus}
+- Overall status: ${renderOptions.overallStatus}
 
 ${renderCiContext(ciContext)}
 ${taskContext}
 ${renderTaskCommandContext(commandSelection)}
 ${renderDuplicateCommandContext(commandSelection)}
-${renderFailureSummary(reportResults)}
+${renderFailureSummary(renderOptions.allResults)}
 ## Commands Run
 ${
   reportResults.length === 0
     ? 'No verification commands were configured or selected.'
-    : reportResults
-        .map(
-          (result) => `### ${result.key}: ${inlineCode(result.command)}
-
-- Exit code: ${result.exitCode}
-- Status: ${result.passed ? 'pass' : 'fail'}
-${result.timedOut ? '- Timed out: yes\n' : ''}
-
-${fencedCodeBlock('text', excerpt(result.output || '(no output)'))}`,
-        )
-        .join('\n\n')
+    : reportResults.map(renderCommandEvidence).join('\n\n')
 }
 
+${renderPostVerificationGatesContext(renderOptions.postVerificationGates)}
 ## Not Run
 ${notRun.length ? notRun.map((item) => `- ${item}`).join('\n') : '- Nothing skipped.'}
 
 ## Recommended Next Actions
 ${
-  overallStatus === 'pass'
+  renderOptions.overallStatus === 'pass'
     ? '- Review the diff and prepare a handoff summary.'
-    : overallStatus === 'fail'
+    : renderOptions.overallStatus === 'fail'
       ? '- Fix failing commands before claiming completion.'
       : '- Add test, lint, typecheck, or build commands to agentloop.config.json.'
 }
 `;
 
-  await writeTextFile(reportPath, markdown);
+  const initialPostVerificationGates = {
+    requested: options.postVerificationGates === true,
+    foundCount: 0,
+    results: [],
+  };
+  const initialMarkdown = renderMarkdown({
+    overallStatus: baseOverallStatus,
+    allResults: reportResults,
+    postVerificationGates: initialPostVerificationGates,
+  });
+  await writeTextFile(reportPath, initialMarkdown);
+
+  const postVerificationGateCommands = options.postVerificationGates
+    ? parseTaskPostVerificationGates(
+        (await readSafeTaskMarkdown(options.cwd, options.config, options.taskPath)) ?? '',
+      )
+    : [];
+  const postVerificationGateResults: VerificationCommandResult[] = [];
+  for (const [gateIndex, command] of postVerificationGateCommands.entries()) {
+    const index = gateIndex + 1;
+    options.onProgress?.({
+      event: 'start',
+      index,
+      total: postVerificationGateCommands.length,
+      key: 'post-verification',
+      command,
+    });
+    const startedAt = Date.now();
+    const result = await runVerificationCommand({
+      key: 'post-verification',
+      command,
+      cwd: options.cwd,
+      env,
+      timeoutMs: options.timeoutMs,
+    });
+    const durationMs = Math.max(0, Date.now() - startedAt);
+    options.onProgress?.({
+      event: 'finish',
+      index,
+      total: postVerificationGateCommands.length,
+      key: 'post-verification',
+      command,
+      status: result.timedOut ? 'timeout' : result.passed ? 'pass' : 'fail',
+      exitCode: result.exitCode,
+      durationMs,
+      ...(result.timedOut ? { timedOut: true } : {}),
+    });
+    postVerificationGateResults.push(result);
+  }
+  const redactedPostVerificationGateResults = postVerificationGateResults.map((result) => ({
+    ...result,
+    output: redactValue(result.output),
+  }));
+  const allReportResults = [...reportResults, ...redactedPostVerificationGateResults];
+  const overallStatus = statusForResults(allReportResults);
+  const postVerificationGates = {
+    requested: options.postVerificationGates === true,
+    foundCount: postVerificationGateCommands.length,
+    commands: postVerificationGateCommands,
+    results: redactedPostVerificationGateResults,
+  };
+  const markdown = renderMarkdown({
+    overallStatus,
+    allResults: allReportResults,
+    postVerificationGates,
+  });
+
+  if (options.postVerificationGates === true) await writeTextFile(reportPath, markdown);
+
   return {
     overallStatus,
     commands: reportResults,
@@ -621,6 +752,7 @@ ${
       foundCount: commandSelection.taskCommandsFound,
       commands: commandSelection.taskCommands,
     },
+    postVerificationGates,
     skippedDuplicateCommands: commandSelection.skippedDuplicateCommands,
     ciContext,
     markdown,
