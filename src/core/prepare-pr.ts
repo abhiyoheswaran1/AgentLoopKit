@@ -9,7 +9,7 @@ import {
   escapeMarkdownProse,
   singleLineInlineCode as inlineCode,
 } from './markdown-format.js';
-import { resolveOutputArtifactPath } from './artifacts.js';
+import { resolveUniqueOutputArtifactPath } from './artifacts.js';
 import { createShipReport, ShipResult } from './ship.js';
 import { listRuns, readRun } from './runs.js';
 import { readTaskContract, TaskContract } from './task-state.js';
@@ -375,7 +375,7 @@ export async function preparePullRequest(options: {
 
   if (options.write) {
     const timestamp = options.timestamp ?? preparedShip.timestamp;
-    writtenPath = resolveOutputArtifactPath({
+    writtenPath = await resolveUniqueOutputArtifactPath({
       cwd: options.cwd,
       artifactType: 'handoff',
       requestedPath: path.join(options.config.paths.handoffsDir, `${timestamp}-pr-description.md`),

@@ -245,6 +245,8 @@ Human-readable `ship` output keeps dynamic task, artifact, written report, gate,
 
 `prepare-pr` generates a PR title and body from the active task, changed files, verification evidence, ship report, gates, risk notes, rollback notes, and optional imported GitHub issue or PR metadata. It groups changed files by review area so reviewers can scan risk-sensitive paths, source, tests, AgentLoop evidence, docs, CI, config, and other files. `--github-comment` includes Markdown suitable for a PR comment. The CLI does not read GitHub tokens or post comments by itself.
 
+`prepare-pr --write` writes the generated PR description under `.agentloop/handoffs/`. If the default minute-based filename already exists, AgentLoopKit preserves the existing draft and writes the next one with a numeric suffix such as `-2.md`.
+
 PR-facing Markdown uses repo-relative AgentLoop artifact paths. `prepare-pr` escapes Markdown control characters in task-derived list prose and imported issue or PR excerpts, so acceptance criteria, risk notes, and GitHub metadata do not turn into unintended checkboxes, headings, or links.
 
 Human-readable output keeps dynamic task, readiness, artifact, file, and metadata values on one Markdown line. JSON output keeps path fields unchanged for scripts.

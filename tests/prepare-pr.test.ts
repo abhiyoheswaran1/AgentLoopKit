@@ -4,6 +4,7 @@ import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import { parseGitStatus } from '../src/core/git.js';
+import { preparePullRequest } from '../src/core/prepare-pr.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -268,6 +269,43 @@ describe('prepare-pr command', () => {
     expect(output.shipEvidence.source).toBe('refreshed');
     expect(output.shipReportPath).toMatch(/\.agentloop\/reports\/.+-ship-report\.md$/);
   });
+
+  test(
+    'keeps same-minute written PR descriptions instead of overwriting them',
+    async () => {
+      const dir = await createPreparePrFixture();
+      const config = createDefaultConfig({
+        name: 'demo',
+        type: 'typescript-package',
+        packageManager: 'npm',
+      });
+
+      const first = await preparePullRequest({
+        cwd: dir,
+        config,
+        timestamp: '2026-06-11-12-30',
+        write: true,
+      });
+      await writeFile(path.join(dir, first.writtenPath ?? ''), 'first-pr-description-marker\n');
+      const second = await preparePullRequest({
+        cwd: dir,
+        config,
+        timestamp: '2026-06-11-12-30',
+        write: true,
+      });
+
+      expect(second.writtenPath).not.toBe(first.writtenPath);
+      expect(second.writtenPath).toMatch(/-pr-description-2\.md$/);
+      await expect(readFile(path.join(dir, first.writtenPath ?? ''), 'utf8')).resolves.toContain(
+        'first-pr-description-marker',
+      );
+      await expect(readFile(path.join(dir, second.writtenPath ?? ''), 'utf8')).resolves.toContain(
+        '# Fix login redirect bug',
+      );
+      expect(second.shipEvidence.source).toBe('reused');
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
 
   test(
     'reuses a fresh ship run instead of writing duplicate run ledger entries',

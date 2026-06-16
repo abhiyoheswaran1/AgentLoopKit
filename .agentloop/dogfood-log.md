@@ -2,6 +2,56 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Same-Minute Prepare PR Artifact Preservation
+
+- Task contract: `.agentloop/tasks/2026-06-16-preserve-same-minute-prepare-pr-artifacts-2.md`
+- Trigger:
+  - Product audit found that `prepare-pr --write` still used an exact generated minute-based PR description path.
+  - Rerunning PR prep quickly during autonomous review work could replace the prior draft.
+  - Replacing a reviewer-facing draft weakens the audit trail and makes repeated agent runs harder to inspect.
+- Implementation:
+  - Default generated `prepare-pr --write` paths now use the shared collision-safe artifact allocator.
+  - Same-minute reruns preserve the first PR description and write the next draft with a numeric suffix.
+  - Ship evidence reuse, generated PR body content, GitHub-comment Markdown, and JSON shape stay unchanged except for safer `writtenPath` values when a collision exists.
+- Product-panel decision:
+  - Samir treated silent reviewer-evidence replacement as a trust bug.
+  - Lina prioritized long autonomous sessions where agents rerun `prepare-pr --write`.
+  - Nora wanted the suffix behavior to appear only on collision.
+  - Maya kept the fix on the existing artifact allocator.
+- Verification:
+  - Red TDD run failed because the second same-minute `prepare-pr --write` reused the first path:
+    - `npm test -- tests/prepare-pr.test.ts`
+  - Focused green run passed:
+    - `npm test -- tests/prepare-pr.test.ts`
+    - `10` tests passed.
+  - Artifact, run-ledger, and CLI-doc focused tests passed:
+    - `npm test -- tests/prepare-pr.test.ts tests/artifacts.test.ts tests/runs.test.ts tests/cli-docs-drift.test.ts`
+    - `4` files, `51` tests passed.
+  - Public docs, static checks, and build passed:
+    - `npm run check:public-docs`
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `632` tests.
+  - Markdown link checks passed:
+    - `npm run check:links`
+    - `2480` files checked.
+  - AgentLoopKit task verification passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-preserve-same-minute-prepare-pr-artifacts-2.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - Verification report: `.agentloop/reports/2026-06-16-08-12-verification-report.md`
+    - Run: `.agentloop/runs/2026-06-16-08-12-verify`
+  - Strict dogfood passed after a fresh handoff:
+    - `npm run dogfood:strict`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/prepare-pr.test.ts`
+    - Session: `.agentflight/evidence/af-20260616-060340-preserve-same-minute-prepare-pr-artifacts`
+  - ProjScan passed with health score A through the strict dogfood gate:
+    - `npx --yes projscan doctor --format markdown`
+- Improve:
+  - Keep scanning default generated artifacts for exact timestamp paths that should preserve existing evidence.
+
 ## 2026-06-16: Same-Minute Evidence Artifact Preservation
 
 - Task contract: `.agentloop/tasks/2026-06-16-prevent-same-minute-evidence-artifact-overwrites-2.md`

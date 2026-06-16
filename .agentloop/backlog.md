@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 142 Decisions
+
+| item                                             | source persona      | problem                                                                                                                      | proposed solution                                                                                                                | priority | effort | adoption impact | risk | decision | notes                                                                                              |
+| ------------------------------------------------ | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | -------------------------------------------------------------------------------------------------- |
+| Same-minute `prepare-pr --write` preservation    | Dogfood, Samir, Lina | Default generated PR description paths can reuse a minute-based filename and replace a reviewer-facing draft during reruns. | Use the existing collision-safe artifact allocator for generated `prepare-pr --write` paths while preserving ship evidence reuse. | P0       | S      | high            | low  | do now   | No `--out` flag, PR body format change, ship scoring change, release, publish, API call, or token use. |
+
 ## Current Research Cycle 141 Decisions
 
 | item                                         | source persona      | problem                                                                                                                              | proposed solution                                                                                                                        | priority | effort | adoption impact | risk | decision | notes                                                                                                    |

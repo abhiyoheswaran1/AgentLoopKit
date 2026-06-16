@@ -1,0 +1,8 @@
+ .agentloop/backlog.md     |  6 ++++++
+ .agentloop/dogfood-log.md | 28 ++++++++++++++++++++++++++++
+ CHANGELOG.md              |  1 +
+ DECISIONS.md              |  6 ++++++
+ docs/cli-reference.md     |  2 ++
+ src/core/prepare-pr.ts    |  4 ++--
+ tests/prepare-pr.test.ts  | 38 ++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 83 insertions(+), 2 deletions(-)

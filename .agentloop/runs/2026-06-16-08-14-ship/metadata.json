@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-08-14-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-08-14",
+  "createdAtEpochMs": 1781590484097,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-preserve-same-minute-prepare-pr-artifacts-2.md",
+    "title": "Preserve same-minute prepare-pr artifacts",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-08-12-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-08-14-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-08-14-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 19
+}

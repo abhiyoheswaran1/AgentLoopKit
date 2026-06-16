@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-06-16: Generated Evidence Paths Preserve Existing Files
+
+Default generated AgentLoopKit evidence paths should not replace existing files when a command is rerun in the same minute. Generated task contracts, verification reports, ship reports, PR summaries, PR descriptions, CI summaries, release notes, and run evidence use collision-safe numeric suffixes when the first timestamped path already exists.
+
+Explicit user-requested output paths remain exact and keep the existing safety checks. AgentLoopKit does not add global state, a database, cleanup automation, network calls, publishing behavior, or hidden overwrite flags for this convention.
+
 ## 2026-06-14: Imported GitHub Metadata Feeds Review Evidence Only
 
 `agentloop github import` remains the only path for GitHub issue and PR context. It reads explicit local JSON files and writes normalized context under `.agentloop/github/context.json`.
