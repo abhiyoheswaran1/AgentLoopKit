@@ -4,30 +4,31 @@ Last checked: June 16, 2026.
 
 ## Current State
 
-- Current public release: `v0.34.1`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.34.1>
-- Release asset: `agentloopkit-0.34.1.tgz`
-- Release asset SHA-256: `11daa22364e8aea2672fb831c8698d79cc665ee64db85f0e8ccf6bab90c3954f`
-- Release tag `v0.34.1` points at commit `c2f1ea76b77d12a2a865b01c98ecc248eac22afa`
-- npm latest: `0.34.1`
-- CI run: `27604875208`, success
-- CLI Smoke run: `27604875139`, success
-- Publish workflow run: `27605153012`, success
-- Docker workflow run: `27605153434`, success
-- MCP Registry workflow run: `27605495676`, success
+- Current public release: `v0.35.0`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.35.0>
+- Release asset: `agentloopkit-0.35.0.tgz`
+- Release asset SHA-256: to be recorded after the GitHub release asset is created
+- Release tag `v0.35.0` points at the published release commit
+- npm latest: `0.35.0`
+- CI run: to be recorded after release verification
+- CLI Smoke run: to be recorded after release verification
+- Publish workflow run: to be recorded after release verification
+- Docker workflow run: to be recorded after release verification
+- MCP Registry workflow run: to be recorded after release verification
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
-GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`. The public registry tag list includes `latest`, `0.34`, and `0.34.1`.
+GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`. The public registry tag list includes `latest`, `0.35`, and `0.35.0`.
 
-The MCP Registry public API lists `io.github.abhiyoheswaran1/agentloopkit` version `0.34.1` as latest, with npm package `agentloopkit@0.34.1`.
+The MCP Registry public API lists `io.github.abhiyoheswaran1/agentloopkit` version `0.35.0` as latest, with npm package `agentloopkit@0.35.0`.
 
 ## Latest Release Highlights
 
-Released in `0.34.1`:
+Released in `0.35.0`:
 
-- `agentloop release-check` explains whether commits after the current version tag affect package release contents or only repo-local evidence/docs.
-- JSON release-check output includes `releaseDelta` fields for agents and CI.
-- Strict release-flow behavior remains conservative: release metadata still has to be prepared before publishing.
+- `agentloop verify --post-verification-gates` can run reviewed post-verification gates after the verification report exists.
+- Generated artifact discovery now orders timestamped verification, handoff, and ship evidence by filename timestamp instead of filesystem mtime.
+- `agentloop release-proof` now reports whether the current checkout matches the version tag.
+- `npm run maintenance:check` directly covers release proof, public docs, SchemaStore, policy packs, read-only GitHub metadata, AgentFlight, ProjScan, and dogfood checks.
 
 ## Use The Current CLI
 
@@ -35,7 +36,7 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.34.1 version
+npx --yes agentloopkit@0.35.0 version
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -59,7 +60,7 @@ After each publish:
 
 ## Verification Evidence
 
-Local release gate for `0.34.1`:
+Local release gate for `0.35.0`:
 
 - `node scripts/prepublish-check.mjs`
 - `npm run lint`
@@ -76,14 +77,14 @@ Local release gate for `0.34.1`:
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: latest `0.34.1`
+- `npm view agentloopkit version versions --json`: latest `0.35.0`
 - `node dist/cli/index.js npm-status --agentloopkit --expect-current`: latest matches local package version
-- `npm run smoke:published -- --version 0.34.1`: passed
-- `npx --yes agentloopkit@0.34.1 version`: `0.34.1`
-- GitHub release asset digest: `11daa22364e8aea2672fb831c8698d79cc665ee64db85f0e8ccf6bab90c3954f`
+- `npm run smoke:published -- --version 0.35.0`: passed
+- `npx --yes agentloopkit@0.35.0 version`: `0.35.0`
+- GitHub release asset digest: to be recorded after the GitHub release asset is created
 - `node dist/cli/index.js release-proof --strict --redact-paths`: npm, GitHub Release, GHCR, and MCP Registry passed
-- GHCR tag list includes `latest`, `0.34`, and `0.34.1`
-- MCP Registry search marks `0.34.1` as latest
+- GHCR tag list includes `latest`, `0.35`, and `0.35.0`
+- MCP Registry search marks `0.35.0` as latest
 
 Latest release-status documentation checks:
 

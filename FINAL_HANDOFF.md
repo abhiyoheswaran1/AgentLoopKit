@@ -76,20 +76,29 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.34.1`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.34.1>
-- Release asset: `agentloopkit-0.34.1.tgz`
-- Release asset SHA-256: `11daa22364e8aea2672fb831c8698d79cc665ee64db85f0e8ccf6bab90c3954f`
-- Release tag: `v0.34.1` at commit `c2f1ea76b77d12a2a865b01c98ecc248eac22afa`
-- CI run: `27604875208`, success
-- CLI Smoke run: `27604875139`, success
-- Publish workflow run: `27605153012`, success
-- Docker workflow run: `27605153434`, success
-- MCP Registry workflow run: `27605495676`, success
-- Post-publish npm proof: npm latest is `0.34.1`
-- Published-package smoke: `npm run smoke:published -- --version 0.34.1`, passed
-- GHCR proof: `agentloop release-proof --strict` found image tag `0.34.1`
-- MCP Registry proof: `agentloop release-proof --strict` found MCP Registry metadata for `agentloopkit@0.34.1`
+- Current npm release: `agentloopkit@0.35.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.35.0>
+- Release asset: `agentloopkit-0.35.0.tgz`
+- Release asset SHA-256: to be recorded after the GitHub release asset is created
+- Release tag: `v0.35.0` at the published release commit
+- CI run: to be recorded after release verification
+- CLI Smoke run: to be recorded after release verification
+- Publish workflow run: to be recorded after release verification
+- Docker workflow run: to be recorded after release verification
+- MCP Registry workflow run: to be recorded after release verification
+- Post-publish npm proof: npm latest is `0.35.0`
+- Published-package smoke: `npm run smoke:published -- --version 0.35.0`, passed
+- GHCR proof: `agentloop release-proof --strict` found image tag `0.35.0`
+- MCP Registry proof: `agentloop release-proof --strict` found MCP Registry metadata for `agentloopkit@0.35.0`
+
+## 0.35.0 release summary
+
+Included:
+
+- `agentloop verify --post-verification-gates` for reviewed post-verification gates that should run after report generation.
+- timestamp-based ordering for generated verification, handoff, and ship evidence so Git operations cannot make old artifacts look newer.
+- clearer `release-proof` HEAD/tag reporting for post-release channel checks.
+- stronger recurring maintenance gates for release proof, public docs, SchemaStore, policy packs, read-only GitHub metadata, AgentFlight, ProjScan, and dogfood.
 
 ## 0.34.1 release summary
 
@@ -1263,10 +1272,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.34.1` is public.
-- npm latest is `agentloopkit@0.34.1`.
-- GHCR tags include `latest`, `0.34`, and `0.34.1`.
-- MCP Registry lists `0.34.1` as latest.
+- GitHub release `v0.35.0` is public.
+- npm latest is `agentloopkit@0.35.0`.
+- GHCR tags include `latest`, `0.35`, and `0.35.0`.
+- MCP Registry lists `0.35.0` as latest.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
 - Do not publish stale intermediate versions from current `main`. Use matching release commits or release tarballs if an old line must be reproduced.

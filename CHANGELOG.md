@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.35.0
+
 - Added `agentloop verify --post-verification-gates` so reviewed task post-verification gates can run after the verification report exists while default `verify` behavior stays unchanged.
 - Added focused GitHub metadata safety tests to `npm run maintenance:check` so the optional/read-only metadata contract is checked directly.
 - Added focused policy-pack safety tests to `npm run maintenance:check` so local/no-overwrite policy-pack behavior is checked directly.
