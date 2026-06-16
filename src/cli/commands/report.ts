@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { ArtifactPathError, OutputPathError } from '../../core/artifacts.js';
 import { writeHtmlReport } from '../../core/html-report.js';
-import { inlineCode } from '../../core/markdown-format.js';
+import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function printArtifactPathJsonError(error: ArtifactPathError) {

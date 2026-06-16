@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 136 Decisions
+
+| item                        | source persona     | problem                                                                                                                | proposed solution                                                                                              | priority | effort | adoption impact | risk | decision | notes                                                                                  |
+| --------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | -------------------------------------------------------------------------------------- |
+| Markdown-safe report output | Samir, Nora, Elias | Maintainers paste `report` evidence into PRs and CI logs, but written HTML report paths can split Markdown output.      | Render human report write-confirmation values on one Markdown line; keep JSON report values raw for scripts.   | P1       | S      | medium          | low  | do now   | No HTML generation, artifact resolution, metadata, JSON-shape, release, or publish. |
+
 ## Current Research Cycle 135 Decisions
 
 | item                       | source persona     | problem                                                                                                                | proposed solution                                                                                              | priority | effort | adoption impact | risk | decision | notes                                                                                  |

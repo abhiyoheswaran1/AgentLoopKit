@@ -2,6 +2,58 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Report Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-report-output-markdown-safe.md`
+- Trigger:
+  - Maintainers paste `agentloop report` confirmations into PRs, CI logs, and handoffs.
+  - A written HTML report path with a line break could split Markdown output even though JSON kept the raw path.
+- Implementation:
+  - Switched `report` command human confirmation rendering to `singleLineInlineCode`.
+  - Kept HTML generation, artifact path validation, report metadata, JSON output, and output file contents unchanged.
+  - Added a regression test for newline-containing report output paths.
+  - Updated report CLI docs, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized paste-safe evidence for PR comments and CI logs.
+  - Nora wanted report confirmations to stay readable after copy-paste.
+  - Elias wanted the public CLI reference to explain the behavior without internal release notes.
+  - Maya accepted a formatter-boundary change with no report-generation changes.
+- Verification:
+  - Red TDD run failed before report output used single-line formatting:
+    - `npm test -- tests/html-report.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/html-report.test.ts`
+    - `npm test -- tests/html-report.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, links, and build checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `624` tests.
+  - AgentLoopKit verification evidence passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-report-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - Verification report: `.agentloop/reports/2026-06-16-06-21-verification-report.md`
+    - Run: `.agentloop/runs/2026-06-16-06-21-verify`
+  - AgentLoopKit handoff and ship evidence passed:
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - Initial ship score: `96`/100.
+    - Refreshed ship score after dogfood-log evidence update: `92`/100.
+    - Latest ship report: `.agentloop/reports/2026-06-16-06-22-ship-report.md`
+  - Strict dogfood gate passed:
+    - `npm run dogfood:strict`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/html-report.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The red test reproduced the exact Markdown line-splitting failure while proving JSON output stayed raw.
+- Improve:
+  - Continue auditing remaining human command output that still imports the multi-line inline-code formatter.
+
 ## 2026-06-16: Markdown-Safe Policy Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-policy-output-markdown-safe.md`

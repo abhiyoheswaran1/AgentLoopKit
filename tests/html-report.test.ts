@@ -5,7 +5,7 @@ import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import { initializeAgentLoop } from '../src/core/init.js';
-import { inlineCode } from '../src/core/markdown-format.js';
+import { inlineCode, singleLineInlineCode } from '../src/core/markdown-format.js';
 import { generateHtmlReport, writeHtmlReport } from '../src/core/html-report.js';
 import { makeTempDir, removeTempDir } from './helpers.js';
 
@@ -132,6 +132,32 @@ describe('HTML report generation', () => {
     expect(result.stdout).toContain(`Report written: ${inlineCode(outPath)}`);
     expect(result.stdout).toContain(`Task: ${inlineCode('CLI `task`')}`);
     expect(result.stdout).toContain('Verification: `not available`');
+  });
+
+  test('CLI report command keeps human confirmation paths on one line while preserving JSON values', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-cli-task.md'),
+      '# CLI task\n\n- Status: in-progress\n',
+    );
+
+    const outPath = path.join(dir, '.agentloop/reports/report\nwith-break.html');
+    const humanResult = await execa(tsxPath, [cliPath, 'report', '--out', outPath], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'report', '--out', outPath, '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain(`Report written: ${singleLineInlineCode(outPath)}`);
+    expect(humanResult.stdout).not.toContain(`Report written: ${inlineCode(outPath)}`);
+    expect(JSON.parse(jsonResult.stdout).outPath).toBe(outPath);
   });
 
   test('CLI report command prints invalid config errors as JSON without writing', async () => {
