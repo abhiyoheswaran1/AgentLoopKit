@@ -12138,3 +12138,36 @@ Internal log of AgentLoopKit used on AgentLoopKit itself.
   - The product caught its own process bug: a gate that should support implementation cannot require the evidence that it is meant to help produce.
 - Improve:
   - Consider a future `agentloop verify --post-gates` flow that can run post-verification commands after the report exists without users manually sequencing `verify`, `ship`, `prepare-pr`, and strict dogfood.
+
+## 2026-06-16: Stale Generated Artifact Ordering
+
+- Task contract: `.agentloop/tasks/2026-06-16-fix-stale-generated-artifact-ordering.md`
+- Trigger:
+  - Dogfooding after cleanup showed `status` and `artifacts` selecting `.agentloop/reports/2026-06-16-11-51-verification-report.md` instead of the newer `.agentloop/reports/2026-06-16-12-24-verification-report.md`.
+  - Git operations had rewritten filesystem mtimes, so mtime sorting made older generated evidence look newer.
+- Product decision:
+  - Generated timestamped evidence should sort by filename timestamp and collision suffix.
+  - Manual files that do not match AgentLoopKit's generated timestamp shape keep the mtime and filename fallback.
+- AgentLoopKit usage:
+  - Created a task contract with `agentloop create-task`.
+  - Marked the task `in-progress`.
+  - Used `agentloop status --json --redact-paths` and `agentloop artifacts --json --latest` to confirm the source CLI now selects the `12:24` evidence.
+- TDD:
+  - Added a failing `artifacts --json` regression for stale mtimes across verification, handoff, and ship reports.
+  - Added a failing `status --json` regression for stale verification report mtimes.
+  - Implemented the shared comparator after both failures reproduced the stale-selection bug.
+- Verification:
+  - `npm test -- tests/artifacts.test.ts` failed before the fix on the expected stale report path.
+  - `npm test -- tests/status.test.ts` failed before the fix on the expected stale report path.
+  - `npm test -- tests/artifacts.test.ts tests/status.test.ts` passed after the fix with 58 tests.
+  - `agentloop verify --task .agentloop/tasks/2026-06-16-fix-stale-generated-artifact-ordering.md --task-commands --write-run --redact-paths --timeout-ms 600000` passed and wrote `.agentloop/reports/2026-06-16-13-03-verification-report.md`.
+  - The AgentLoop verification report includes full `pnpm test` with 63 files and 649 tests, lint, typecheck, build, and the focused regression pair.
+  - `agentloop ship --redact-paths` wrote `.agentloop/reports/2026-06-16-13-10-ship-report.md` with a 96/100 review-readiness score.
+  - `agentloop handoff --redact-paths --write-run` wrote `.agentloop/handoffs/2026-06-16-13-10-pr-summary-2.md`.
+  - `npm run dogfood:strict` passed, including AgentFlight doctor and ProjScan A.
+  - `npm run maintenance:check -- --json` passed across unit tests, public docs hygiene, link checks, release proof, SchemaStore, policy packs, GitHub metadata import help, AgentFlight, ProjScan, and non-strict dogfood.
+- What worked well:
+  - AgentLoopKit caught a bug in its own evidence model before the next release.
+  - The regression covers both inventory output and latest-report status output.
+- Improve:
+  - Keep maintenance and dogfood gates using source CLI evidence selection so this class of bug is visible before publishing.

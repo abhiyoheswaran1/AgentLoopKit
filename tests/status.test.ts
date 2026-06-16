@@ -58,6 +58,46 @@ describe('status command', () => {
     );
   });
 
+  test('selects latest timestamped verification report by filename when mtimes are stale', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    const olderReport = path.join(
+      dir,
+      '.agentloop/reports/2026-06-16-11-51-verification-report.md',
+    );
+    const newerReport = path.join(
+      dir,
+      '.agentloop/reports/2026-06-16-12-24-verification-report.md',
+    );
+    await writeFile(olderReport, '# Older Verification\n\nOverall status: fail\n');
+    await writeFile(newerReport, '# Newer Verification\n\nOverall status: pass\n');
+    await utimes(
+      newerReport,
+      new Date('2026-06-16T12:24:00.000Z'),
+      new Date('2026-06-16T12:24:00.000Z'),
+    );
+    await utimes(
+      olderReport,
+      new Date('2026-06-16T12:48:00.000Z'),
+      new Date('2026-06-16T12:48:00.000Z'),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const status = JSON.parse(result.stdout);
+    expect(status.latestReport.path).toBe(
+      '.agentloop/reports/2026-06-16-12-24-verification-report.md',
+    );
+    expect(status.latestReport.overallStatus).toBe('pass');
+  });
+
   test('redacts local git root paths when requested', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-13-10-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-13-10",
+  "createdAtEpochMs": 1781608250256,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-fix-stale-generated-artifact-ordering.md",
+    "title": "Fix stale generated artifact ordering",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-13-03-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-13-10-pr-summary-2.md",
+  "changedFileCount": 22
+}

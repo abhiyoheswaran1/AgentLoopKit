@@ -158,6 +158,8 @@ agentloop next --redact-paths
 
 Use `--brief` when an agent or script needs one compact human-readable line plus the reason. Brief output includes the latest run evidence when `.agentloop/runs/` exists. `next` uses the same decision rules but prints only the next action. These commands do not run verification commands, call an LLM, read `.env` contents, or write task state.
 
+For generated timestamped evidence such as verification reports, `status` treats the timestamp in the filename as the artifact order. This keeps the newest AgentLoopKit report selected even when Git operations rewrite filesystem mtimes. Manual, non-generated Markdown files still use the filesystem mtime fallback.
+
 Use `status --redact-paths` or `next --redact-paths` before pasting output into public logs. It replaces the absolute Git root with `[git-root]` and keeps repo-relative AgentLoop artifact paths. Default JSON keeps the absolute Git root for scripts that need it.
 Human-readable `status` and `next` output keep dynamic values inside single-line inline code. Task titles, task paths, branch names, and report paths with unusual characters stay on one Markdown line. JSON output keeps raw values for scripts.
 
@@ -381,6 +383,7 @@ agentloop badge --json
 ```
 
 `artifacts` inventories existing local AgentLoop evidence without writing files. It reports task counts, task statuses, latest verification report, latest handoff, latest ship report, HTML reports, badges, CI summaries, release notes, and run ledger entries. Use `--type` to filter to `task`, `verification`, `handoff`, `ship-report`, `html-report`, `badge`, `ci-summary`, `release-notes`, or `run`. Use `--latest` to print only the latest matching artifact entries. Use `--stale` to preview older verification, handoff, ship report, and run-ledger evidence candidates while keeping the latest evidence protected. Markdown stale previews show the first 50 candidates by default. Use `--type ship-report` with `--stale` to inspect only ship report candidates. Use `--limit <count>` with `--stale` to change the cap while still reporting total and hidden counts. JSON output uses repo-relative paths, returns all stale candidates unless you pass `--limit`, and does not include artifact file contents.
+Generated timestamped verification, handoff, ship, CI-summary, and release-note files are ordered by their filename timestamp and collision suffix. Manual files fall back to filesystem mtime and filename ordering.
 Human-readable `artifacts` output keeps dynamic artifact values inside single-line inline code. JSON output keeps raw values for scripts.
 
 `artifacts --stale` is a read-only cleanup preview. It does not delete files, write files, read `.env` contents, follow symlinked artifact roots outside the repo, or run verification commands.

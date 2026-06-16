@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 118 Decisions
+
+| item                                | source persona       | problem                                                                                                                          | proposed solution                                                                                                                  | priority | effort | adoption impact | risk | decision | notes                                                                                        |
+| ----------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | -------------------------------------------------------------------------------------------- |
+| Generated artifact ordering by name | Dogfood, Samir, Lina | Git operations can rewrite artifact mtimes, causing status, artifacts, gates, or handoff flows to pick older generated evidence. | Sort generated timestamped evidence by filename timestamp and collision suffix, while keeping manual file mtime fallback behavior. | P0       | S      | high            | low  | do now   | No release, version bump, cleanup automation, database, network calls, or hidden overwrites. |
+
 ## Current Research Cycle 145 Decisions
 
 | item                                      | source persona      | problem                                                                                                                    | proposed solution                                                                                                                 | priority | effort | adoption impact | risk   | decision | notes                                                                                                                    |

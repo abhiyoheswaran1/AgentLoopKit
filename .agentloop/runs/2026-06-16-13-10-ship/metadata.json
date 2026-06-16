@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-13-10-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-13-10",
+  "createdAtEpochMs": 1781608247725,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-fix-stale-generated-artifact-ordering.md",
+    "title": "Fix stale generated artifact ordering",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-13-03-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-13-10-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-13-10-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 14
+}

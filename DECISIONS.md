@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-06-16: Generated Evidence Order Comes From Filenames
+
+Generated AgentLoopKit evidence files use timestamped names as their canonical order. `status`, `artifacts`, and shared evidence lookup should select generated verification reports, handoffs, ship reports, CI summaries, and release notes by filename timestamp and collision suffix, not filesystem mtime.
+
+Git operations can rewrite mtimes and make an older generated report look newer. Manual, non-generated files keep the existing mtime and filename fallback because they do not carry AgentLoopKit's generated timestamp contract.
+
 ## 2026-06-16: Generated Evidence Paths Preserve Existing Files
 
 Default generated AgentLoopKit evidence paths should not replace existing files when a command is rerun in the same minute. Generated task contracts, verification reports, ship reports, PR summaries, PR descriptions, static HTML reports, CI summaries, release notes, and run evidence use collision-safe numeric suffixes when the first timestamped path already exists.

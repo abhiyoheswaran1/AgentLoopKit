@@ -160,6 +160,11 @@ type InventoryFile = {
   mtimeMs: number;
 };
 
+type GeneratedArtifactSortKey = {
+  timestamp: string;
+  sequence: number;
+};
+
 type ArtifactInventoryJsonKey = keyof ArtifactInventory;
 
 export class ArtifactPathError extends AgentLoopError {
@@ -385,10 +390,7 @@ export async function latestMarkdownFile(
         return { filePath, name: entry.name, mtimeMs: fileStat.mtimeMs };
       }),
   );
-  entries.sort((left, right) => {
-    if (left.mtimeMs !== right.mtimeMs) return left.mtimeMs - right.mtimeMs;
-    return left.name.localeCompare(right.name);
-  });
+  entries.sort(compareInventoryFiles);
   return entries.at(-1)?.filePath;
 }
 
@@ -408,11 +410,33 @@ function extractOverallStatus(markdown: string) {
   return markdown.match(/Overall status:\s*([a-z-]+)/i)?.[1]?.trim() || 'unknown';
 }
 
+function extractGeneratedArtifactSortKey(fileName: string): GeneratedArtifactSortKey | undefined {
+  const parsed = path.parse(fileName);
+  const match = parsed.name.match(/^(\d{4}-\d{2}-\d{2}-\d{2}-\d{2})-(.+)$/);
+  if (!match) return undefined;
+  const numericSuffix = match[2].match(/^(.*)-(\d+)$/);
+  return {
+    timestamp: match[1],
+    sequence: numericSuffix ? Number(numericSuffix[2]) : 1,
+  };
+}
+
+function compareInventoryFiles(left: InventoryFile, right: InventoryFile) {
+  const leftKey = extractGeneratedArtifactSortKey(left.name);
+  const rightKey = extractGeneratedArtifactSortKey(right.name);
+
+  if (leftKey && rightKey) {
+    const timestampOrder = leftKey.timestamp.localeCompare(rightKey.timestamp);
+    if (timestampOrder !== 0) return timestampOrder;
+    if (leftKey.sequence !== rightKey.sequence) return leftKey.sequence - rightKey.sequence;
+  }
+
+  if (left.mtimeMs !== right.mtimeMs) return left.mtimeMs - right.mtimeMs;
+  return left.name.localeCompare(right.name);
+}
+
 function sortInventoryFiles(files: InventoryFile[]) {
-  return files.sort((left, right) => {
-    if (left.mtimeMs !== right.mtimeMs) return left.mtimeMs - right.mtimeMs;
-    return left.name.localeCompare(right.name);
-  });
+  return files.sort(compareInventoryFiles);
 }
 
 async function listInventoryFiles(options: {

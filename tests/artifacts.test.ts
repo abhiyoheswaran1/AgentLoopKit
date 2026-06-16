@@ -490,6 +490,65 @@ describe('artifacts command', () => {
     });
   });
 
+  test('orders timestamped generated artifacts by filename instead of filesystem mtime', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/reports/2026-06-16-11-51-verification-report.md',
+      '# Older Verification\n\nOverall status: fail\n',
+      '2026-06-16T12:48:00.000Z',
+    );
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/reports/2026-06-16-12-24-verification-report.md',
+      '# Newer Verification\n\nOverall status: pass\n',
+      '2026-06-16T12:32:00.000Z',
+    );
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/handoffs/2026-06-16-11-51-pr-summary.md',
+      '# Older Handoff\n',
+      '2026-06-16T12:48:00.000Z',
+    );
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/handoffs/2026-06-16-12-24-pr-summary.md',
+      '# Newer Handoff\n',
+      '2026-06-16T12:32:00.000Z',
+    );
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/reports/2026-06-16-11-51-ship-report.md',
+      '# Older Ship\n',
+      '2026-06-16T12:48:00.000Z',
+    );
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/reports/2026-06-16-12-24-ship-report.md',
+      '# Newer Ship\n',
+      '2026-06-16T12:32:00.000Z',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'artifacts', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const inventory = JSON.parse(result.stdout);
+    expect(inventory.verificationReports.latest.path).toBe(
+      '.agentloop/reports/2026-06-16-12-24-verification-report.md',
+    );
+    expect(inventory.handoffs.latest.path).toBe(
+      '.agentloop/handoffs/2026-06-16-12-24-pr-summary.md',
+    );
+    expect(inventory.shipReports.latest.path).toBe(
+      '.agentloop/reports/2026-06-16-12-24-ship-report.md',
+    );
+  });
+
   test('prints a concise markdown evidence inventory', async () => {
     const dir = await createRepoWithArtifacts();
 
