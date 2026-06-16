@@ -2,6 +2,55 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
+## 2026-06-16: Markdown-Safe Ship Confirmation Output
+
+- Task contract: `.agentloop/tasks/2026-06-16-make-ship-confirmation-output-markdown-safe.md`
+- Trigger:
+  - Agents paste `agentloop ship` output into PRs, CI logs, and handoffs.
+  - The final written ship-report path could split Markdown when a configured reports directory contained a line break.
+- Implementation:
+  - Switched the `ship` command write-confirmation path rendering to `singleLineInlineCode`.
+  - Kept ship scoring, gate checks, report generation, run ledger schema, JSON output, and GitHub-comment output unchanged.
+  - Added a CLI regression test with a newline-containing configured reports directory.
+  - Updated ship CLI docs, changelog, task contract, and backlog notes.
+- Product-panel decision:
+  - Samir prioritized paste-safe review-readiness evidence in CI and PR surfaces.
+  - Nora wanted the final action line from `ship` to remain copyable.
+  - Lina prioritized reliable output during long autonomous sessions where agents paste `ship` results into handoffs.
+  - Maya accepted a command-wrapper formatter change with no scoring or report-generation changes.
+- Verification:
+  - Red TDD run failed before the `ship` confirmation path used single-line formatting:
+    - `npm test -- tests/ship.test.ts`
+  - Focused green runs passed:
+    - `npm test -- tests/ship.test.ts`
+    - `npm test -- tests/ship.test.ts tests/cli-docs-drift.test.ts`
+  - Static, docs, links, and build checks passed:
+    - `npm run typecheck`
+    - `npm run lint`
+    - `npm run check:public-docs`
+    - `npm run check:links`
+    - `npm run build`
+  - Full test suite passed:
+    - `npm test`
+    - `62` test files, `626` tests.
+  - AgentLoopKit verification evidence passed:
+    - `npx --no-install tsx src/cli/index.ts verify --task .agentloop/tasks/2026-06-16-make-ship-confirmation-output-markdown-safe.md --task-commands --only-task-commands --write-run --redact-paths --progress`
+    - Verification report: `.agentloop/reports/2026-06-16-06-48-verification-report.md`
+    - Run: `.agentloop/runs/2026-06-16-06-48-verify`
+  - AgentLoopKit handoff and ship evidence passed:
+    - `npx --no-install tsx src/cli/index.ts handoff --write-run --redact-paths`
+    - `npx --no-install tsx src/cli/index.ts ship --redact-paths`
+    - Ship score: `96`/100.
+    - Ship report: `.agentloop/reports/2026-06-16-06-49-ship-report.md`
+  - AgentFlight verification passed:
+    - `npx --yes agentflight verify -- npm test -- tests/ship.test.ts`
+  - ProjScan passed with health score A:
+    - `npx --yes projscan doctor --format markdown`
+- What worked well:
+  - The regression used real CLI execution and a legal repo-relative reports directory with a line break.
+- Improve:
+  - Continue auditing core Markdown artifacts that still use `inlineCode` for values that can originate from task contracts, Git metadata, or local config.
+
 ## 2026-06-16: Markdown-Safe SchemaStore Output
 
 - Task contract: `.agentloop/tasks/2026-06-16-make-schemastore-output-markdown-safe.md`

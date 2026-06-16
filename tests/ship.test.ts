@@ -390,6 +390,46 @@ describe('ship command', () => {
     expect(result.stdout).not.toContain(dir);
   });
 
+  test(
+    'prints ship report confirmation path on one Markdown line while preserving JSON path values',
+    async () => {
+      const dir = await createShipFixture();
+      const config = createDefaultConfig({
+        name: 'demo',
+        type: 'typescript-package',
+        packageManager: 'npm',
+        commands: { test: 'npm test' },
+      });
+      config.paths.reportsDir = '.agentloop/reports\nwith-break';
+      await writeJson(path.join(dir, 'agentloop.config.json'), config);
+      await mkdir(path.join(dir, config.paths.reportsDir), { recursive: true });
+      await writeFile(
+        path.join(dir, config.paths.reportsDir, '2026-06-11-12-01-verification-report.md'),
+        '# Verification Report\n\n- Overall status: pass\n',
+      );
+
+      const humanResult = await execa(tsxPath, [cliPath, 'ship'], {
+        cwd: dir,
+        reject: false,
+      });
+      const jsonResult = await execa(tsxPath, [cliPath, 'ship', '--json'], {
+        cwd: dir,
+        reject: false,
+      });
+
+      const confirmationLine = humanResult.stdout
+        .split('\n')
+        .find((line) => line.startsWith('Ship report written:'));
+
+      expect(humanResult.exitCode).toBe(0);
+      expect(confirmationLine).toContain('.agentloop/reports\\nwith-break/');
+      expect(JSON.parse(jsonResult.stdout).shipReportPath).toContain(
+        '.agentloop/reports\nwith-break/',
+      );
+    },
+    CLI_SHIP_TEST_TIMEOUT_MS,
+  );
+
   test('accepts redacted GitHub comment output', async () => {
     const dir = await createShipFixture();
     const realRoot = await realpath(dir);

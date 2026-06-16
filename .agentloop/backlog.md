@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 138 Decisions
+
+| item                                   | source persona    | problem                                                                                                                           | proposed solution                                                                                                    | priority | effort | adoption impact | risk | decision | notes                                                                                   |
+| -------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | -------- | --------------------------------------------------------------------------------------- |
+| Markdown-safe ship confirmation output | Samir, Nora, Lina | Agents paste `ship` output into PRs and CI logs, but the final written ship-report path can split Markdown with unusual path config. | Render the human ship write-confirmation path on one Markdown line; keep JSON ship paths raw for scripts.             | P1       | S      | medium          | low  | do now   | No ship scoring, gate checks, report generation, run ledger schema, JSON-shape, release, or publish. |
+
 ## Current Research Cycle 137 Decisions
 
 | item                             | source persona     | problem                                                                                                                  | proposed solution                                                                                               | priority | effort | adoption impact | risk | decision | notes                                                                                 |
