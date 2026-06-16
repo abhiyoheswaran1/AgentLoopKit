@@ -19,10 +19,10 @@ As of June 16, 2026:
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - GitHub releases publish npm through trusted publishing.
 - GHCR and MCP Registry publishing run from GitHub release workflows after npm succeeds.
-- Release tag `v0.35.2` points at commit `pending post-publish proof`.
+- Release tag `v0.35.2` points at commit `f3eb09b56dc6ed4a85889e96de8080674f4a2588`.
 - GitHub Marketplace publication is pending the owner-only GitHub release UI checkbox and category step.
 
-The `0.35.2` release is the Marketplace metadata patch. It aligns the root Action metadata with ProjScan by adding explicit `author` metadata before re-running the public release channels. The GitHub Marketplace URL still requires post-release proof before this page can claim the listing is live.
+The `0.35.2` release completed through GitHub release automation, npm trusted publishing, Docker/GHCR, and MCP Registry. The GitHub Marketplace URL still returned 404 during post-release proof.
 
 ## Release Rule
 

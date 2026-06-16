@@ -7,29 +7,29 @@ Last checked: June 16, 2026.
 - Current public release: `v0.35.2`
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.35.2>
 - Release asset: `agentloopkit-0.35.2.tgz`
-- Release asset SHA-256: pending post-publish proof
-- Release tag `v0.35.2` points at commit `pending post-publish proof`
-- npm latest: pending post-publish proof
-- CI run: pending
-- CLI Smoke run: pending
-- Publish workflow run: pending
-- Docker workflow run: pending
-- MCP Registry workflow run: pending
+- Release asset SHA-256: `18552068caa3943c15383b3c567a33c4dbd46e638adcbb6c171c6ee18ed0fb96`
+- Release tag `v0.35.2` points at commit `f3eb09b56dc6ed4a85889e96de8080674f4a2588`
+- npm latest: `0.35.2`
+- CI run: `27629033574`, success
+- CLI Smoke run: `27629032937`, success
+- Publish workflow run: `27629043182`, success
+- Docker workflow run: `27629043556`, success
+- MCP Registry workflow run: `27629355535`, success
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
-GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`. The public registry tag list should include `latest`, `0.35`, and `0.35.2` after post-publish proof.
+GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`. The public registry tag list includes `latest`, `0.35`, and `0.35.2`.
 
-The MCP Registry public API should list `io.github.abhiyoheswaran1/agentloopkit` version `0.35.2` as latest, with npm package `agentloopkit@0.35.2`, after post-publish proof.
+The MCP Registry public API lists `io.github.abhiyoheswaran1/agentloopkit` version `0.35.2` as latest, with npm package `agentloopkit@0.35.2`.
 
-GitHub Marketplace publication is the purpose of the `0.35.2` patch release. The public listing URL <https://github.com/marketplace/actions/agentloopkit> must load before claiming the listing is live.
+GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 16, 2026.
 
 ## Latest Release Highlights
 
-Prepared in `0.35.2`:
+Released in `0.35.2`:
 
 - The root composite GitHub Action now includes explicit `author` metadata.
 - Action metadata formatting is aligned with the Marketplace-published ProjScan Action.
-- The release exists to make GitHub re-evaluate the Action metadata for Marketplace publication.
+- Release-proof still reports GitHub Marketplace as missing because the public Marketplace URL returns 404.
 
 ## Use The Current CLI
 
@@ -78,7 +78,15 @@ Local release gate for `0.35.2`:
 
 Post-publish checks:
 
-- Pending after the `0.35.2` release workflows finish.
+- `npm view agentloopkit version versions --json`: latest `0.35.2`
+- `node dist/cli/index.js npm-status --agentloopkit --expect-current`: latest matches local package version
+- `npm run smoke:published -- --version 0.35.2`: passed
+- `npx --yes agentloopkit@0.35.2 version`: `0.35.2`
+- GitHub release asset digest: `18552068caa3943c15383b3c567a33c4dbd46e638adcbb6c171c6ee18ed0fb96`
+- `node dist/cli/index.js release-proof --redact-paths`: npm, GitHub Release, GHCR, and MCP Registry passed; GitHub Marketplace warned
+- `node dist/cli/index.js release-proof --strict --only github-marketplace --redact-paths`: failed because the Marketplace URL returned 404
+- GHCR tag list includes `latest`, `0.35`, and `0.35.2`
+- MCP Registry search marks `0.35.2` as latest
 
 Latest release-status documentation checks:
 
