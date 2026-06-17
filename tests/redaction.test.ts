@@ -34,4 +34,18 @@ describe('redaction', () => {
     expect(redacted).not.toContain('D:\\a\\AgentLoopKit\\repo');
     expect(redacted).not.toContain('/tmp/agentloopkit/repo');
   });
+
+  test('infers local roots from labeled absolute paths', () => {
+    const text = [
+      'Smoke repo root: D:\\a\\AgentLoopKit\\repo',
+      'Smoke real git root: /tmp/agentloopkit/repo',
+    ].join('\n');
+
+    const redacted = redactLocalRoots(text, []);
+
+    expect(redacted).toContain('Smoke repo root: [git-root]');
+    expect(redacted).toContain('Smoke real git root: [git-root]');
+    expect(redacted).not.toContain('D:\\a\\AgentLoopKit\\repo');
+    expect(redacted).not.toContain('/tmp/agentloopkit/repo');
+  });
 });

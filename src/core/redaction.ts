@@ -27,12 +27,21 @@ function inferredAgentLoopRoots(value: string) {
   const roots = new Set<string>();
   const windowsPattern = /[A-Za-z]:[\\/][^\r\n`]*?(?=[\\/]\.agentloop(?:[\\/]|$))/g;
   const posixPattern = /\/[^\r\n`]*?(?=\/\.agentloop(?:\/|$))/g;
+  const labeledWindowsPattern = /:\s*([A-Za-z]:[^\r\n`]+)/g;
+  const labeledPosixPattern = /:\s*(\/[^\r\n`]+)/g;
+  const clean = (root: string) => root.trim().replace(/[.,;]+$/, '');
 
   for (const match of value.matchAll(windowsPattern)) {
-    roots.add(match[0]);
+    roots.add(clean(match[0]));
   }
   for (const match of value.matchAll(posixPattern)) {
-    roots.add(match[0]);
+    roots.add(clean(match[0]));
+  }
+  for (const match of value.matchAll(labeledWindowsPattern)) {
+    roots.add(clean(match[1]));
+  }
+  for (const match of value.matchAll(labeledPosixPattern)) {
+    roots.add(clean(match[1]));
   }
 
   return [...roots];
