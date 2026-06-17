@@ -164,7 +164,7 @@ async function readReport(
   const markdown = await readFile(filePath, 'utf8');
   const fileStat = await stat(filePath);
   return {
-    path: path.relative(cwd, filePath),
+    path: path.relative(cwd, filePath).split(path.sep).join('/'),
     title: extractHeading(markdown, path.basename(filePath, '.md')),
     overallStatus: extractOverallStatus(markdown),
     modifiedAtMs: fileStat.mtimeMs,
