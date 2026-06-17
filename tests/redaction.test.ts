@@ -20,4 +20,18 @@ describe('redaction', () => {
     expect(redacted).not.toContain('d:\\a\\AgentLoopKit\\repo');
     expect(redacted).not.toContain('d:/a/AgentLoopKit/repo');
   });
+
+  test('infers local roots from absolute AgentLoop artifact paths', () => {
+    const text = [
+      'Report: D:\\a\\AgentLoopKit\\repo\\.agentloop\\reports\\local-report.md',
+      'Handoff: /tmp/agentloopkit/repo/.agentloop/handoffs/local-handoff.md',
+    ].join('\n');
+
+    const redacted = redactLocalRoots(text, []);
+
+    expect(redacted).toContain('[git-root]\\.agentloop\\reports\\local-report.md');
+    expect(redacted).toContain('[git-root]/.agentloop/handoffs/local-handoff.md');
+    expect(redacted).not.toContain('D:\\a\\AgentLoopKit\\repo');
+    expect(redacted).not.toContain('/tmp/agentloopkit/repo');
+  });
 });

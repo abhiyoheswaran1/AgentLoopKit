@@ -23,9 +23,24 @@ function pathVariants(root: string) {
   return [...variants].filter(Boolean);
 }
 
+function inferredAgentLoopRoots(value: string) {
+  const roots = new Set<string>();
+  const windowsPattern = /[A-Za-z]:[\\/][^\r\n`]*?(?=[\\/]\.agentloop(?:[\\/]|$))/g;
+  const posixPattern = /\/[^\r\n`]*?(?=\/\.agentloop(?:\/|$))/g;
+
+  for (const match of value.matchAll(windowsPattern)) {
+    roots.add(match[0]);
+  }
+  for (const match of value.matchAll(posixPattern)) {
+    roots.add(match[0]);
+  }
+
+  return [...roots];
+}
+
 export function redactLocalRoots(value: string, roots: string[], replacement = '[git-root]') {
   let redacted = value;
-  const variants = new Set(roots.flatMap(pathVariants));
+  const variants = new Set([...roots, ...inferredAgentLoopRoots(value)].flatMap(pathVariants));
 
   for (const root of variants) {
     redacted = redacted.split(root).join(replacement);
