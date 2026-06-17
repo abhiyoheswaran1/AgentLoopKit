@@ -2119,17 +2119,34 @@ describe('task command', () => {
   });
 
   test('exposes AgentFlight placeholder groups in JSON task list output', async () => {
-    const { dir } = await createTaskStateFixture();
+    const { dir, taskPath } = await createTaskStateFixture();
+    const realTaskPath = path.join(dir, '.agentloop/tasks/2026-06-16-real-deferred.md');
+    const placeholderTaskPath = path.join(
+      dir,
+      '.agentloop/tasks/2026-06-17-expose-agentflight-placeholder-groups-in-task-list-json.md',
+    );
     await writeFile(
-      path.join(dir, '.agentloop/tasks/2026-06-16-real-deferred.md'),
+      realTaskPath,
       '# Real deferred\n\n- Status: deferred\n',
     );
     await writeFile(
-      path.join(
-        dir,
-        '.agentloop/tasks/2026-06-17-expose-agentflight-placeholder-groups-in-task-list-json.md',
-      ),
+      placeholderTaskPath,
       agentFlightPlaceholderMarkdown('Expose AgentFlight placeholder groups in task list JSON'),
+    );
+    await utimes(
+      taskPath,
+      new Date('2026-06-16T10:00:00.000Z'),
+      new Date('2026-06-16T10:00:00.000Z'),
+    );
+    await utimes(
+      realTaskPath,
+      new Date('2026-06-16T11:00:00.000Z'),
+      new Date('2026-06-16T11:00:00.000Z'),
+    );
+    await utimes(
+      placeholderTaskPath,
+      new Date('2026-06-16T12:00:00.000Z'),
+      new Date('2026-06-16T12:00:00.000Z'),
     );
 
     const result = await execa(tsxPath, [cliPath, 'task', 'list', '--json'], {
