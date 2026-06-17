@@ -78,6 +78,15 @@ describe('release smoke script helpers', () => {
     expect(env).not.toHaveProperty('GITHUB_TOKEN');
   });
 
+  test('packed home-directory guard forces both Unix and Windows home variables', async () => {
+    const smokeScript = await readFile('scripts/smoke-packed-release.mjs', 'utf8');
+
+    expect(smokeScript).toContain('env: homeDirectoryEnv(fakeHome)');
+    expect(smokeScript).toContain(
+      'return { HOME: homeDirectory, USERPROFILE: homeDirectory };',
+    );
+  });
+
   test('accepts README pins for the packed package version', () => {
     const readme = [
       'npx --yes agentloopkit@0.24.4 version',

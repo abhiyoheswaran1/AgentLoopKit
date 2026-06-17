@@ -34,6 +34,10 @@ function childEnv(overrides = {}) {
   return { ...env, ...overrides };
 }
 
+function homeDirectoryEnv(homeDirectory) {
+  return { HOME: homeDirectory, USERPROFILE: homeDirectory };
+}
+
 function formatCommand(command, args) {
   return [command, ...args].join(' ');
 }
@@ -954,7 +958,7 @@ async function smokeCli({ keep = false } = {}) {
       'Warning: Target directory is your home directory. AgentLoopKit can write repository harness files there when --force is used.';
     const forcedHomeDryRun = await runAgentLoop(['init', '--dry-run', '--force'], {
       cwd: forcedHome,
-      env: { HOME: forcedHome },
+      env: homeDirectoryEnv(forcedHome),
     });
     assert(
       forcedHomeDryRun.stdout.includes(forcedHomeWarning),

@@ -13,6 +13,10 @@ const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
 const originalPath = process.env.PATH;
 
+function homeDirectoryEnv(homeDirectory: string) {
+  return { HOME: homeDirectory, USERPROFILE: homeDirectory };
+}
+
 async function initGitRepository(dir: string) {
   await execFileAsync('git', ['init'], { cwd: dir });
 }
@@ -410,7 +414,7 @@ describe('init', () => {
 
     const result = await execa(tsxPath, [cliPath, 'init', '--dry-run', '--force'], {
       cwd: dir,
-      env: { HOME: dir },
+      env: homeDirectoryEnv(dir),
       reject: false,
     });
 
@@ -428,7 +432,7 @@ describe('init', () => {
 
     const result = await execa(tsxPath, [cliPath, 'init', '--dry-run', '--force', '--json'], {
       cwd: dir,
-      env: { HOME: dir },
+      env: homeDirectoryEnv(dir),
       reject: false,
     });
 

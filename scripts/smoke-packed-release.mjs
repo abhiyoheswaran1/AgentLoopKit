@@ -184,6 +184,10 @@ export function buildChildEnv(sourceEnv = process.env, explicitEnv = {}) {
   return { ...env, ...explicitEnv };
 }
 
+function homeDirectoryEnv(homeDirectory) {
+  return { HOME: homeDirectory, USERPROFILE: homeDirectory };
+}
+
 function toPosixPath(filePath) {
   return filePath.split(path.sep).join('/');
 }
@@ -846,7 +850,7 @@ async function assertHomeDryRunGuard({ tarballPath, tempRoot }) {
   const fakeHome = await makeTempDir(tempRoot, 'fake-home');
   const result = await runPackedAgentLoop(tarballPath, ['init', '--dry-run'], {
     cwd: fakeHome,
-    env: { HOME: fakeHome },
+    env: homeDirectoryEnv(fakeHome),
   });
   if (result.exitCode === 0) {
     throw new Error('packed init dry-run unexpectedly allowed the home directory.');

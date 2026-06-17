@@ -452,7 +452,10 @@ describe('distribution artifacts', () => {
     const smokeScript = await readFile('scripts/smoke-cli.mjs', 'utf8');
 
     expect(smokeScript).toContain("'init', '--dry-run', '--force'");
-    expect(smokeScript).toContain('env: { HOME: forcedHome }');
+    expect(smokeScript).toContain('env: homeDirectoryEnv(forcedHome)');
+    expect(smokeScript).toContain(
+      'return { HOME: homeDirectory, USERPROFILE: homeDirectory };',
+    );
     expect(smokeScript).toContain(
       'Warning: Target directory is your home directory. AgentLoopKit can write repository harness files there when --force is used.',
     );
