@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-17
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 AgentLoopKit v0.36.0 is public, but `main` contains verified post-release fixes and documentation/template improvements that are not in that release. The maintainer explicitly approved a patch release for v0.36.1.
