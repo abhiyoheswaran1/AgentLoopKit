@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-17
 - Task type: release
-- Status: review
+- Status: done
 
 ## Problem Statement
 The repository has verified AgentLoopKit CLI improvements since 0.35.2 and the maintainer approved one release for today.
