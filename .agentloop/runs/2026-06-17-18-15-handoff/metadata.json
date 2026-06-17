@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-18-15-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-18-15",
+  "createdAtEpochMs": 1781712902421,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-clarify-status-brief-json-help-copy.md",
+    "title": "Clarify status brief JSON help copy",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-18-14-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-18-15-pr-summary.md",
+  "changedFileCount": 7
+}

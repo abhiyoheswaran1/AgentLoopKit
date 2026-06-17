@@ -49,6 +49,18 @@ describe('status command', () => {
     tempDirs = [];
   });
 
+  test('documents status brief JSON help copy', async () => {
+    const result = await execa(tsxPath, [cliPath, 'status', '--help'], {
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('--brief');
+    expect(result.stdout.replace(/\s+/g, ' ')).toContain(
+      'compact human output; with --json, compact machine-readable output',
+    );
+  });
+
   test('prints machine-readable repo status with latest unpinned task and report', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

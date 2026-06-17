@@ -8,7 +8,7 @@ export function statusCommand() {
   return new Command('status')
     .description('Show active task, latest verification, dirty files, and next action')
     .option('--json', 'print machine-readable output')
-    .option('--brief', 'print compact human-readable output')
+    .option('--brief', 'print compact human output; with --json, compact machine-readable output')
     .option('--redact-paths', 'redact local absolute paths in public output')
     .action(async (options: { json?: boolean; brief?: boolean; redactPaths?: boolean }) => {
       let workspace: Awaited<ReturnType<typeof loadAgentLoopWorkspace>>;
