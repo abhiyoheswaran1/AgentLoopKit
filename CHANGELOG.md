@@ -4,6 +4,13 @@
 
 - No unreleased changes yet.
 
+## 0.36.1
+
+- Fixed Windows smoke fixtures and release-status report path normalization so cross-platform release checks compare stable, relative evidence paths.
+- Fixed `doctor --redact-paths` coverage for Windows drive variants, current-directory variants, inferred AgentLoop artifact roots, and labeled local path roots.
+- Clarified `agentloop status --brief --json` help copy so compact JSON output is described as machine-readable.
+- Mirrored raw AgentFlight recovery guidance into generated agent instruction templates so direct AgentFlight sessions can re-pin detailed AgentLoop task contracts.
+
 ## 0.36.0
 
 - Added stale task-state recovery across `agentloop status`, `agentloop next`, and `agentloop task doctor` so missing or stale `.agentloop/state.json` pointers are reported with bounded recovery guidance instead of broad scans or mutation.

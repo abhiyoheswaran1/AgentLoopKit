@@ -76,21 +76,29 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.36.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.36.0>
-- Release asset: `agentloopkit-0.36.0.tgz`
-- Release asset SHA-256: `aed9e11a648fb8facf6ddc37c6cc2c3ef8d1b8ac342909fc061c9f7f169d6376`
-- Release tag: `v0.36.0` at commit `7e45b7f50c59b2e0e933a921c2dff62c0b389305`
-- Current `main`: `ac75bfa7de8c14d65b0bb0409a9a056713b36b42`, with unreleased post-release CI portability and redaction fixes
+- Current npm release: `agentloopkit@0.36.1`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.36.1>
+- Release asset: `agentloopkit-0.36.1.tgz`
+- Release asset SHA-256: pending public release asset verification
+- Release tag: `v0.36.1` at the published release commit
 - CI run: `27702176995`, success
 - CLI Smoke run: `27702177015`, success
 - Publish workflow run: `27700012706`, success
 - Docker workflow run: `27700012558`, success
 - MCP Registry workflow run: `27700534371`, success
-- Post-publish npm proof: npm latest is `0.36.0`
-- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.36.0`
-- MCP Registry proof: metadata points at `agentloopkit@0.36.0`
+- Post-publish npm proof: npm latest is `0.36.1`
+- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.36.1`
+- MCP Registry proof: metadata points at `agentloopkit@0.36.1`
 - GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof
+
+## 0.36.1 release summary
+
+Included:
+
+- Windows smoke fixture and release-status report path normalization fixes.
+- broader `doctor --redact-paths` local-root redaction for Windows, current-directory, inferred artifact-root, and labeled-root path variants.
+- clearer `agentloop status --brief --json` help copy.
+- raw AgentFlight recovery guidance mirrored into generated agent instruction templates.
 
 ## 0.36.0 release summary
 
@@ -1297,10 +1305,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.36.0` is public.
-- npm latest is `agentloopkit@0.36.0`.
-- GHCR tags include `latest`, `0.36`, and `0.36.0`.
-- MCP Registry lists `0.36.0` as latest.
+- GitHub release `v0.36.1` is public.
+- npm latest is `agentloopkit@0.36.1`.
+- GHCR tags include `latest`, `0.36`, and `0.36.1`.
+- MCP Registry lists `0.36.1` as latest.
 - GitHub Marketplace listing is not live; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
