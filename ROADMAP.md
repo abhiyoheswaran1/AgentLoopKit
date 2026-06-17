@@ -55,8 +55,9 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
-- Release tag `v0.36.0` points at the published release commit.
-- Published release commit: to be recorded after release publication.
+- Release tag `v0.36.0` points at the published release commit. Commit: `7e45b7f50c59b2e0e933a921c2dff62c0b389305`.
+- Current `main` commit `ac75bfa7de8c14d65b0bb0409a9a056713b36b42` contains unreleased post-release CI portability and redaction fixes.
+- No second release should be cut on June 17, 2026.
 
 ## Near Term
 
