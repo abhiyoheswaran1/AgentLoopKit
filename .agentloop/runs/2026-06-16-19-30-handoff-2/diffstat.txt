@@ -1,0 +1,24 @@
+ .agentloop/harness/autonomous-dogfooding.md        |   2 +
+ ...026-06-16-prevent-stale-agentloop-task-state.md |  78 ----
+ ...2026-06-16-publish-github-marketplace-action.md |   2 +-
+ AGENTLOOP.md                                       |   2 +
+ README.md                                          |   4 +-
+ docs/cli-reference.md                              |   4 +-
+ docs/maintenance-guards.md                         |   6 +-
+ docs/status.md                                     |  16 +-
+ docs/upgrading-existing-repos.md                   |  15 +
+ scripts/dogfood-start.mjs                          |  89 ++++-
+ scripts/maintenance-check.mjs                      |   6 +-
+ src/cli/commands/next.ts                           |  26 +-
+ src/cli/commands/task.ts                           |   9 +-
+ src/core/check-gates.ts                            |  19 +-
+ src/core/status.ts                                 |  98 ++++-
+ src/core/task-state.ts                             | 264 ++++++++++++-
+ src/templates/root/AGENTLOOP.md                    |   2 +
+ tests/autonomous-dogfood.test.ts                   |   8 +-
+ tests/dogfood-start-script.test.ts                 | 124 +++++-
+ tests/maintenance-check-script.test.ts             |   6 +-
+ tests/next.test.ts                                 | 121 ++++++
+ tests/status.test.ts                               | 138 +++++++
+ tests/task-state.test.ts                           | 416 +++++++++++++++++++++
+ 23 files changed, 1332 insertions(+), 123 deletions(-)

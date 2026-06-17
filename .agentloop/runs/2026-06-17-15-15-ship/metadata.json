@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-15-15-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-15-15",
+  "createdAtEpochMs": 1781702157347,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-close-stale-completed-backlog-decisions-3.md",
+    "title": "Close stale completed backlog decisions",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-15-13-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-15-15-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-15-15-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 3030
+}

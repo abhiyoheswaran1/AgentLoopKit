@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-00-56-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-00-56",
+  "createdAtEpochMs": 1781650593237,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-compact-agentloop-evidence-churn-in-ship-reports-2.md",
+    "title": "Compact AgentLoop evidence churn in ship reports",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-00-55-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-00-56-pr-summary.md",
+  "changedFileCount": 1110
+}

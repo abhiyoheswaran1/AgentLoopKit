@@ -18,6 +18,7 @@ export function releaseNotesCommand() {
     .option('--write', 'write notes to .agentloop/handoffs')
     .option('--out <path>', 'output Markdown path when using --write')
     .option('--json', 'print machine-readable output')
+    .option('--redact-paths', 'redact local absolute paths in public output and written notes')
     .action(
       async (options: {
         from?: string;
@@ -27,6 +28,7 @@ export function releaseNotesCommand() {
         write?: boolean;
         out?: string;
         json?: boolean;
+        redactPaths?: boolean;
       }) => {
         if (!validateOutRequiresWrite(options)) return;
         const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
@@ -42,6 +44,7 @@ export function releaseNotesCommand() {
             format: options.public ? 'public' : 'detailed',
             write: options.write,
             outPath: options.out,
+            redactPaths: options.redactPaths === true,
           });
         } catch (error) {
           if (options.json && error instanceof OutputPathError) {

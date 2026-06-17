@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-02-42-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-17-02-42",
+  "createdAtEpochMs": 1781656931319,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-guard-readme-against-release-incident-chatter.md",
+    "title": "Guard README against release incident chatter",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-39-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-42-pr-summary-2.md",
+  "changedFileCount": 1621
+}

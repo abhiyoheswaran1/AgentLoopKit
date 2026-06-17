@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-23-00-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-23-00",
+  "createdAtEpochMs": 1781643645654,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-bound-agentflight-placeholder-task-list-output.md",
+    "title": "Bound AgentFlight placeholder task list output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-22-57-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 650
+}

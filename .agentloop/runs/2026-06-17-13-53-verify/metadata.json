@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-13-53-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-13-53",
+  "createdAtEpochMs": 1781697236926,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-clarify-task-archive-next-step-after-existing-evidence-2.md",
+    "title": "Clarify task archive next step after existing evidence",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-13-48-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2914
+}

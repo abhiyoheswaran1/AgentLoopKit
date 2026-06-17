@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-19-19-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-19-19",
+  "createdAtEpochMs": 1781630394464,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-prevent-dogfood-start-placeholder-task-clutter-2.md",
+    "title": "Prevent dogfood start placeholder task clutter",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-19-18-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-19-19-pr-summary.md",
+  "changedFileCount": 80
+}

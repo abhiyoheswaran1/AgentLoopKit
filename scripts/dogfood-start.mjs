@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* global console, process */
 import { spawn } from 'node:child_process';
+import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -36,6 +37,24 @@ const FORWARDED_CREATE_TASK_FLAGS = new Set([
 ]);
 
 const AGENTLOOP_SOURCE_CLI = ['--no-install', 'tsx', 'src/cli/index.ts'];
+const TASKS_DIR = path.join('.agentloop', 'tasks');
+const TASK_TYPES = [
+  'feature',
+  'bugfix',
+  'refactor',
+  'tests',
+  'test-generation',
+  'docs',
+  'release',
+  'security-review',
+  'dependency-upgrade',
+  'migration',
+];
+const TASK_TYPE_ALIASES = new Map([['test', 'tests']]);
+
+function supportedTaskTypesText() {
+  return TASK_TYPES.join(', ');
+}
 
 function formatCommand(step) {
   return [step.command, ...step.args].join(' ');
@@ -48,6 +67,18 @@ function readValue(argv, index, errors, flag) {
     return { value: '', nextIndex: index };
   }
   return { value, nextIndex: index + 1 };
+}
+
+export function normalizeTaskType(type = 'feature') {
+  const requestedType = type || 'feature';
+  const normalizedType = TASK_TYPE_ALIASES.get(requestedType) ?? requestedType;
+  if (TASK_TYPES.includes(normalizedType)) {
+    return { type: normalizedType };
+  }
+  return {
+    type: normalizedType,
+    error: `Unsupported task type "${requestedType}". Supported task types: ${supportedTaskTypesText()}.`,
+  };
 }
 
 export function parseArgs(argv) {
@@ -82,7 +113,11 @@ export function parseArgs(argv) {
 
     if (arg === '--type') {
       const result = readValue(argv, index, options.errors, arg);
-      options.type = result.value || options.type;
+      if (result.value) {
+        const normalized = normalizeTaskType(result.value);
+        options.type = normalized.type;
+        if (normalized.error) options.errors.push(normalized.error);
+      }
       index = result.nextIndex;
       continue;
     }
@@ -106,7 +141,9 @@ export function parseArgs(argv) {
 
 export function createDogfoodStartSteps(options) {
   const title = options.title;
-  const type = options.type || 'feature';
+  const normalized = normalizeTaskType(options.type);
+  if (normalized.error) throw new Error(normalized.error);
+  const type = normalized.type;
   const taskFields = options.taskFields ?? [];
 
   return [
@@ -139,6 +176,55 @@ export function createDogfoodStartSteps(options) {
       args: ['--yes', 'projscan', 'start'],
     },
   ];
+}
+
+function toPosixPath(filePath) {
+  return filePath.split(path.sep).join('/');
+}
+
+function isAgentFlightPlaceholderTask(markdown) {
+  const normalized = markdown.replace(/\r\n/g, '\n');
+  const title = normalized.match(/^# (.+)\n/)?.[1];
+  if (!title) return false;
+  return (
+    normalized.startsWith(`# ${title}\n`) &&
+    normalized.includes('\n- Status: proposed\n') &&
+    normalized.includes(`\n## Problem Statement\nAgentFlight session task: ${title}\n`) &&
+    normalized.includes(
+      '\n## Desired Outcome\nTask is implemented with local verification evidence.\n',
+    )
+  );
+}
+
+export async function findAgentFlightPlaceholderTaskPaths(options) {
+  const root = path.resolve(options.cwd ?? process.cwd());
+  const tasksDir = path.resolve(root, TASKS_DIR);
+  let entries;
+  try {
+    entries = await readdir(tasksDir, { withFileTypes: true });
+  } catch (error) {
+    if (error?.code === 'ENOENT') return [];
+    throw error;
+  }
+
+  const matches = [];
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
+    const absolutePath = path.join(tasksDir, entry.name);
+    const markdown = await readFile(absolutePath, 'utf8');
+    if (!isAgentFlightPlaceholderTask(markdown)) continue;
+    matches.push(toPosixPath(path.relative(root, absolutePath)));
+  }
+
+  return matches.sort();
+}
+
+function createParkPlaceholderStep(relativePath) {
+  return {
+    name: 'agentloop park AgentFlight placeholder task',
+    command: 'npx',
+    args: [...AGENTLOOP_SOURCE_CLI, 'task', 'status', relativePath, 'deferred'],
+  };
 }
 
 export function buildDogfoodStartEnv(sourceEnv = process.env) {
@@ -237,21 +323,43 @@ async function runStep(step, env, options) {
   };
 }
 
+async function parkAgentFlightPlaceholderTasks(options) {
+  if (options.dryRun) return [];
+  const placeholders = await findAgentFlightPlaceholderTaskPaths({
+    cwd: options.cwd,
+  });
+  const results = [];
+
+  for (const placeholderPath of placeholders) {
+    const result = await runStep(createParkPlaceholderStep(placeholderPath), options.env, {
+      dryRun: options.dryRun,
+      logger: options.logger,
+      runProcess: options.runProcess,
+    });
+    results.push(result);
+    if (result.status === 'fail') break;
+  }
+
+  return results;
+}
+
 export async function runDogfoodStart(options = {}) {
-  const {
-    cwd = process.cwd(),
-    dryRun = false,
-    logger = console,
-    runProcess = spawnStep,
-  } = options;
+  const { cwd = process.cwd(), dryRun = false, logger = console, runProcess = spawnStep } = options;
 
   if (!options.title) {
     throw new Error('Missing required --title value.');
   }
 
-  process.chdir(path.resolve(cwd));
+  const normalized = normalizeTaskType(options.type);
+  if (normalized.error) {
+    throw new Error(normalized.error);
+  }
+  const runOptions = { ...options, type: normalized.type };
+
+  const root = path.resolve(cwd);
+  process.chdir(root);
   const env = buildDogfoodStartEnv();
-  const steps = createDogfoodStartSteps(options);
+  const steps = createDogfoodStartSteps(runOptions);
 
   if (dryRun) {
     logger.log('# AgentLoopKit Dogfood Start Plan');
@@ -264,6 +372,20 @@ export async function runDogfoodStart(options = {}) {
     const result = await runStep(step, env, { dryRun, logger, runProcess });
     results.push(result);
     if (result.status === 'fail') break;
+    if (step.name === 'agentloop task contract') {
+      const placeholderResults = await parkAgentFlightPlaceholderTasks({
+        cwd: root,
+        title: runOptions.title,
+        env,
+        dryRun,
+        logger,
+        runProcess,
+      });
+      results.push(...placeholderResults);
+      if (placeholderResults.some((placeholderResult) => placeholderResult.status === 'fail')) {
+        break;
+      }
+    }
   }
 
   const failedStep = results.find((step) => step.status === 'fail');
@@ -287,6 +409,9 @@ Starts this repo's local dogfood companions in sequence:
 2. AgentLoopKit task contract
 3. AgentLoopKit status
 4. ProjScan project scan
+
+Supported task types:
+  ${TASK_TYPES.join('\n  ')}
 
 This script does not publish packages, create tags, create GitHub releases, post comments, read token files, read .env contents, or run verification commands.`);
 }

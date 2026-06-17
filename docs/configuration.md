@@ -76,3 +76,5 @@ The optional `policies.packs` array lets a team point AgentLoopKit at repo-local
 ```
 
 Pack paths must be repo-relative and cannot use parent traversal, absolute paths, or Windows drive-qualified paths. AgentLoopKit reads these packs only when you run policy-pack commands.
+
+Each configured local pack needs a `manifest.json` under that path. The manifest must include non-empty `name`, `title`, and `description` fields, and `manifest.name` must match the configured `policies.packs[].name` value case-insensitively. This keeps `agentloop policy pack show <name>` and `agentloop policy pack apply <name>` tied to the same user-facing pack identifier.

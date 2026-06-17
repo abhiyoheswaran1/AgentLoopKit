@@ -2,21 +2,24 @@
 
 Internal log of AgentLoopKit used on AgentLoopKit itself.
 
-## 2026-06-16: Parked Stale Task-State Recovery Design
+## 2026-06-16: Stale Task-State Recovery Design And Implementation
 
-- Task contract: `.agentloop/tasks/2026-06-16-prevent-stale-agentloop-task-state.md`
+- Task contract: `.agentloop/tasks/archive/2026-06-16-prevent-stale-agentloop-task-state.md`
 - Plan: `docs/superpowers/plans/2026-06-16-stale-task-state-recovery.md`
 - Trigger:
   - Dogfooding in another repo showed real shipped work captured in local devlogs and reports while `.agentloop/state.json` still pointed at older task context.
   - The product should help agents notice stale task state without requiring full repo scans or long pasted history.
 - Product decision:
-  - Keep this as deferred implementation work until explicitly approved.
-  - Plan v1 around bounded `.agentloop/` evidence only: state pointer, current task files, archived task filenames, recent run metadata, and recent report filenames.
-  - Do not scan arbitrary repo prose, changelogs, devlogs, `.env` files, dependency folders, home directories, or network services.
-- Planned outcome:
+  - Implementation status: completed after maintainer approval.
+  - Keep the detector bounded to `.agentloop/` evidence only: state pointer, current task files, archived task filenames, recent run metadata, and recent report filenames.
+  - Do not scan arbitrary repo prose, changelogs, devlogs, `.env` files, dependency folders, home directories, network services, or LLM services.
+  - No release, version bump, or publishing behavior changed.
+- Implemented outcome:
   - `agentloop task doctor`, `status`, and `next` warn when task state is stale or missing.
   - Recovery guidance suggests existing explicit commands such as `agentloop task clear`, `agentloop task set <path>`, and `agentloop create-task`.
   - Output stays compact and token-conscious by showing file references instead of copying report bodies.
+- Historical note:
+  - This section was originally recorded as a parked design; after maintainer approval, the implementation was completed and archived as task evidence.
 
 ## 2026-06-16: Explicit Post-Verification Gates From Verify
 

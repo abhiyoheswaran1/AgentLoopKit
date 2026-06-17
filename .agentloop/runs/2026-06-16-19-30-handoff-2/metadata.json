@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-19-30-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-16-19-30",
+  "createdAtEpochMs": 1781631049067,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-separate-agentflight-placeholders-from-roadmap-task-counts-2.md",
+    "title": "Separate AgentFlight placeholders from roadmap task counts",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-19-29-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-19-30-pr-summary-2.md",
+  "changedFileCount": 116
+}

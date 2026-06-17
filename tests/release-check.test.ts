@@ -314,6 +314,50 @@ describe('release-check command', () => {
     await expect(readdir(path.join(dir, '.agentloop/handoffs'))).resolves.toEqual(beforeHandoffs);
   });
 
+  test('separates AgentLoop evidence churn from ordinary changed files', async () => {
+    const dir = await createReleaseRepo();
+    await writeFile(path.join(dir, 'src-dirty.ts'), 'export const dirty = true;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-11-10-20-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'release-check', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const humanResult = await execa(tsxPath, [cliPath, 'release-check'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.git).toMatchObject({
+      changedFileCount: 2,
+      nonEvidenceChangedFileCount: 1,
+      agentLoopEvidenceChangedFileCount: 1,
+    });
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'working-tree',
+          status: 'warn',
+          message:
+            '2 changed file(s) detected (1 non-evidence file(s), 1 AgentLoop evidence file(s)).',
+        }),
+      ]),
+    );
+    expect(output.nextAction.command).toBe('git status --short');
+
+    expect(humanResult.stdout).toContain(
+      '- Changed files: `2` (`1` non-evidence, `1` AgentLoop evidence)',
+    );
+    expect(humanResult.stdout).toContain(
+      '- [`warn`] `Working tree`: `2 changed file(s) detected (1 non-evidence file(s), 1 AgentLoop evidence file(s)).`',
+    );
+  });
+
   test(
     'renders markdown check values with safe inline code when release data contains backticks',
     async () => {
@@ -368,6 +412,7 @@ describe('release-check command', () => {
       expect(humanResult.stdout).toContain('- Package: ``demo`pkg@1.2.3`rc``');
       expect(humanResult.stdout).toContain('- Git: ``release`branch`` @ `');
       expect(humanResult.stdout).toContain('- Changed files: `0`');
+      expect(humanResult.stdout).not.toContain('`0` non-evidence');
       expect(humanResult.stdout).toContain(
         '- [`pass`] `Package metadata`: ``package.json declares demo`pkg@1.2.3`rc`` - `package.json`',
       );
@@ -498,7 +543,8 @@ describe('release-check command', () => {
     );
     expect(output.nextAction).toEqual({
       command: 'do not cut a release yet',
-      reason: 'The current version is already tagged and commits since that tag do not affect package release contents.',
+      reason:
+        'The current version is already tagged and commits since that tag do not affect package release contents.',
     });
     expect(humanResult.stdout).toContain(
       '- [`pass`] `Release delta`: `1 commit since v1.2.3, but no package-impacting files changed.`',

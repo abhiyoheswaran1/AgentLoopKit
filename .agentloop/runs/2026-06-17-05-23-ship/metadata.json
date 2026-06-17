@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-05-23-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-05-23",
+  "createdAtEpochMs": 1781666634180,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-fix-fish-task-archive-status-completion-2.md",
+    "title": "Fix fish task archive status completion",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-05-18-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-05-23-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-05-23-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 2079
+}

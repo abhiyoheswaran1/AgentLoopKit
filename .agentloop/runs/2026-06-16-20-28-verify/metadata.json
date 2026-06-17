@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-20-28-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-20-28",
+  "createdAtEpochMs": 1781634515444,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-group-agentflight-placeholders-in-task-list.md",
+    "title": "Group AgentFlight placeholders in task list",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-20-25-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 242
+}

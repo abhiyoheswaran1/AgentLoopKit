@@ -287,6 +287,40 @@ describe('policy command', () => {
     });
   });
 
+  test('accepts redact-paths on policy inspection commands without changing JSON output', async () => {
+    const { dir } = await createPolicyFixture();
+
+    const listHuman = await execa(tsxPath, [cliPath, 'policy', 'list', '--redact-paths'], {
+      cwd: dir,
+    });
+    const statusHuman = await execa(tsxPath, [cliPath, 'policy', 'status', '--redact-paths'], {
+      cwd: dir,
+    });
+    const showHuman = await execa(
+      tsxPath,
+      [cliPath, 'policy', 'show', 'security', '--redact-paths'],
+      { cwd: dir },
+    );
+    const listJson = await execa(tsxPath, [cliPath, 'policy', 'list', '--json'], { cwd: dir });
+    const redactedListJson = await execa(
+      tsxPath,
+      [cliPath, 'policy', 'list', '--json', '--redact-paths'],
+      { cwd: dir },
+    );
+    const statusJson = await execa(tsxPath, [cliPath, 'policy', 'status', '--json'], { cwd: dir });
+    const redactedStatusJson = await execa(
+      tsxPath,
+      [cliPath, 'policy', 'status', '--json', '--redact-paths'],
+      { cwd: dir },
+    );
+
+    expect(listHuman.stdout).toContain('AgentLoopKit policies:');
+    expect(statusHuman.stdout).toContain('AgentLoopKit policy status:');
+    expect(showHuman.stdout).toBe('# Security Policy\n\nDo not expose secrets.');
+    expect(JSON.parse(redactedListJson.stdout)).toEqual(JSON.parse(listJson.stdout));
+    expect(JSON.parse(redactedStatusJson.stdout)).toEqual(JSON.parse(statusJson.stdout));
+  });
+
   test('prints missing policy errors as JSON when requested', async () => {
     const { dir } = await createPolicyFixture();
 

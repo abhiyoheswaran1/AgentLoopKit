@@ -44,6 +44,26 @@ describe('SchemaStore support', () => {
     });
   });
 
+  test('accepts redact-paths without changing SchemaStore output', async () => {
+    const helpResult = await execa(tsxPath, [cliPath, 'schemastore', '--help']);
+    const humanResult = await execa(tsxPath, [cliPath, 'schemastore']);
+    const redactedHumanResult = await execa(tsxPath, [cliPath, 'schemastore', '--redact-paths'], {
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'schemastore', '--json']);
+    const redactedJsonResult = await execa(
+      tsxPath,
+      [cliPath, 'schemastore', '--json', '--redact-paths'],
+      { reject: false },
+    );
+
+    expect(helpResult.stdout).toContain('--redact-paths');
+    expect(redactedHumanResult.exitCode).toBe(0);
+    expect(redactedHumanResult.stdout).toEqual(humanResult.stdout);
+    expect(redactedJsonResult.exitCode).toBe(0);
+    expect(JSON.parse(redactedJsonResult.stdout)).toEqual(JSON.parse(jsonResult.stdout));
+  });
+
   test('prints human SchemaStore catalog values on one Markdown line while preserving JSON values', async () => {
     const entry = {
       name: 'AgentLoopKit\nConfiguration',

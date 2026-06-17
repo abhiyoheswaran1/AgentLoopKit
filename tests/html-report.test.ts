@@ -47,6 +47,38 @@ describe('HTML report generation', () => {
     expect(report.html).not.toContain('<img src=x');
   });
 
+  test('compacts AgentLoop evidence churn in changed files', () => {
+    const report = generateHtmlReport({
+      timestamp: '2026-06-10-12-30',
+      repoName: 'demo',
+      branch: 'main',
+      commit: 'abc123',
+      workingTreeStatus: 'dirty',
+      changedFiles: [
+        { status: 'M', path: 'src/status.ts' },
+        { status: '??', path: '.agentloop/reports/2026-06-10-12-00-verification-report.md' },
+        { status: '??', path: '.agentloop/reports/2026-06-10-12-01-ship-report.md' },
+        { status: '??', path: '.agentloop/handoffs/2026-06-10-12-02-pr-summary.md' },
+        { status: '??', path: '.agentflight/reports/session-proof.md' },
+      ],
+    });
+
+    expect(report.metadata.changedFileCount).toBe(5);
+    expect(report.html).toContain('<code>M</code></td><td><code>src/status.ts</code>');
+    expect(report.html).toContain('<code>AgentLoop evidence</code>');
+    expect(report.html).toContain('<code>.agentloop/reports/</code>');
+    expect(report.html).toContain('2 file(s) grouped under');
+    expect(report.html).toContain('<code>.agentloop/handoffs/</code>');
+    expect(report.html).toContain('<code>.agentflight/reports/</code>');
+    expect(report.html).toContain(
+      'Full paths remain available from Git status and AgentLoop JSON or run-ledger evidence.',
+    );
+    expect(report.html).not.toContain('2026-06-10-12-00-verification-report.md');
+    expect(report.html).not.toContain('2026-06-10-12-01-ship-report.md');
+    expect(report.html).not.toContain('2026-06-10-12-02-pr-summary.md');
+    expect(report.html).not.toContain('session-proof.md');
+  });
+
   test('writes a local static report from repo artifacts', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -171,6 +203,47 @@ describe('HTML report generation', () => {
     expect(payload.sourcePaths.handoff).toBeUndefined();
     expect(payload.html).toBeUndefined();
     expect(await readFile(outPath, 'utf8')).toContain('CLI task');
+  });
+
+  test('CLI report command accepts redact-paths for public output without changing write paths', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-cli-task.md'),
+      '# CLI task\n\n- Status: in-progress\n',
+    );
+
+    const humanOutPath = path.join(dir, '.agentloop/reports/redacted-human-report.html');
+    const jsonOutPath = path.join(dir, '.agentloop/reports/redacted-json-report.html');
+    const help = await execa(tsxPath, [cliPath, 'report', '--help'], { cwd: dir });
+    const human = await execa(
+      tsxPath,
+      [cliPath, 'report', '--out', humanOutPath, '--redact-paths'],
+      { cwd: dir },
+    );
+    const json = await execa(
+      tsxPath,
+      [cliPath, 'report', '--out', jsonOutPath, '--json', '--redact-paths'],
+      { cwd: dir },
+    );
+    const rawJson = await execa(tsxPath, [cliPath, 'report', '--out', jsonOutPath, '--json'], {
+      cwd: dir,
+    });
+
+    expect(help.stdout).toContain('--redact-paths');
+    expect(human.stdout).toContain(
+      'Report written: `[git-root]/.agentloop/reports/redacted-human-report.html`',
+    );
+    expect(human.stdout).not.toContain(dir);
+
+    const redactedPayload = JSON.parse(json.stdout);
+    expect(redactedPayload.outPath).toBe('[git-root]/.agentloop/reports/redacted-json-report.html');
+    expect(JSON.stringify(redactedPayload)).not.toContain(dir);
+    expect(JSON.parse(rawJson.stdout).outPath).toBe(jsonOutPath);
+    expect(await readFile(humanOutPath, 'utf8')).toContain('CLI task');
+    expect(await readFile(jsonOutPath, 'utf8')).toContain('CLI task');
   });
 
   test('CLI report command prints human confirmation values with Markdown-safe inline values', async () => {
@@ -404,7 +477,15 @@ describe('HTML report generation', () => {
     const outPath = path.join(dir, '.agentloop/reports/custom-report.html');
     const result = await execa(
       tsxPath,
-      [cliPath, 'report', '--handoff', '.agentloop/handoffs/missing.md', '--out', outPath, '--json'],
+      [
+        cliPath,
+        'report',
+        '--handoff',
+        '.agentloop/handoffs/missing.md',
+        '--out',
+        outPath,
+        '--json',
+      ],
       { cwd: dir, reject: false },
     );
 

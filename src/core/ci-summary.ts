@@ -12,6 +12,7 @@ import {
 } from './artifacts.js';
 import { checkGates, CheckGatesResult } from './check-gates.js';
 import { singleLineInlineCode as inlineCode } from './markdown-format.js';
+import { redactLocalRoots } from './redaction.js';
 import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 import { detectCiContext, VerificationCiContext } from './verification.js';
 
@@ -162,6 +163,84 @@ function renderGateLine(gate: CheckGatesResult['gates'][number]) {
   )}${suffix}`;
 }
 
+function redactText(value: string, cwd: string, redactPaths: boolean | undefined) {
+  return redactPaths ? redactLocalRoots(value, [cwd]) : value;
+}
+
+function redactOptionalText(
+  value: string | undefined,
+  cwd: string,
+  redactPaths: boolean | undefined,
+) {
+  return value === undefined ? undefined : redactText(value, cwd, redactPaths);
+}
+
+function redactRecordStrings<T extends Record<string, unknown>>(
+  value: T,
+  cwd: string,
+  redactPaths: boolean | undefined,
+): T {
+  if (!redactPaths) return value;
+  return Object.fromEntries(
+    Object.entries(value).map(([key, item]) => [
+      key,
+      typeof item === 'string' ? redactText(item, cwd, redactPaths) : item,
+    ]),
+  ) as T;
+}
+
+function redactArtifact<T extends CiSummaryArtifact | undefined>(
+  artifact: T,
+  cwd: string,
+  redactPaths: boolean | undefined,
+): T {
+  if (!artifact || !redactPaths) return artifact;
+  return {
+    ...artifact,
+    path: redactText(artifact.path, cwd, redactPaths),
+    title: redactText(artifact.title, cwd, redactPaths),
+  };
+}
+
+function redactGate(
+  gate: CheckGatesResult['gates'][number],
+  cwd: string,
+  redactPaths: boolean | undefined,
+) {
+  if (!redactPaths) return gate;
+  return {
+    ...gate,
+    name: redactText(gate.name, cwd, redactPaths),
+    message: redactText(gate.message, cwd, redactPaths),
+    path: redactOptionalText(gate.path, cwd, redactPaths),
+  };
+}
+
+function redactCiSummaryPayload(
+  result: Omit<CiSummaryResult, 'markdown' | 'writtenPath'>,
+  cwd: string,
+  redactPaths: boolean | undefined,
+): Omit<CiSummaryResult, 'markdown' | 'writtenPath'> {
+  if (!redactPaths) return result;
+  return {
+    timestamp: redactText(result.timestamp, cwd, redactPaths),
+    ci: redactRecordStrings(result.ci, cwd, redactPaths),
+    evidence: {
+      task: redactArtifact(result.evidence.task, cwd, redactPaths),
+      verification: redactArtifact(result.evidence.verification, cwd, redactPaths),
+      handoff: redactArtifact(result.evidence.handoff, cwd, redactPaths),
+    },
+    gates: {
+      overallStatus: result.gates.overallStatus,
+      gates: result.gates.gates.map((gate) => redactGate(gate, cwd, redactPaths)),
+    },
+    nextAction: {
+      command: redactText(result.nextAction.command, cwd, redactPaths),
+      reason: redactText(result.nextAction.reason, cwd, redactPaths),
+    },
+  };
+}
+
 function renderMarkdown(result: Omit<CiSummaryResult, 'markdown' | 'writtenPath'>) {
   return `# AgentLoopKit CI Summary
 
@@ -200,6 +279,7 @@ export async function getCiSummary(options: {
   nowIso?: string;
   write?: boolean;
   outPath?: string;
+  redactPaths?: boolean;
 }): Promise<CiSummaryResult> {
   const timestamp = options.timestamp ?? formatTimestamp();
   const nowIso = options.nowIso ?? new Date().toISOString();
@@ -218,7 +298,7 @@ export async function getCiSummary(options: {
     readTask(options.cwd, taskPath),
     readVerification(options.cwd, verificationPath),
     readHandoff(options.cwd, handoffPath),
-    checkGates({ cwd: options.cwd, config: options.config }),
+    checkGates({ cwd: options.cwd, config: options.config, redactPaths: options.redactPaths }),
   ]);
   const ci: CiSummaryCiContext = detectCiContext(options.env ?? process.env) ?? {
     provider: 'none',
@@ -238,7 +318,8 @@ export async function getCiSummary(options: {
     },
     nextAction: chooseNextAction({ verification, gates }),
   };
-  const markdown = renderMarkdown(withoutMarkdown);
+  const publicPayload = redactCiSummaryPayload(withoutMarkdown, options.cwd, options.redactPaths);
+  const markdown = renderMarkdown(publicPayload);
   const writtenPath = options.write
     ? options.outPath
       ? resolveOutputArtifactPath({
@@ -260,8 +341,8 @@ export async function getCiSummary(options: {
   if (writtenPath) await writeTextFile(writtenPath, markdown);
 
   return {
-    ...withoutMarkdown,
+    ...publicPayload,
     markdown,
-    writtenPath,
+    writtenPath: redactOptionalText(writtenPath, options.cwd, options.redactPaths),
   };
 }

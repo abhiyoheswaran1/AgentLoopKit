@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-01-10-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-01-10",
+  "createdAtEpochMs": 1781651453742,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-separate-agentloop-evidence-churn-in-run-ledger-output-2.md",
+    "title": "Separate AgentLoop evidence churn in run ledger output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-01-10-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 1189
+}

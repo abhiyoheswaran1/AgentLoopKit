@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-02-09-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-02-09",
+  "createdAtEpochMs": 1781654968102,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-install-agent-preservation.md",
+    "title": "Add built CLI smoke coverage for install-agent preservation",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-08-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-02-09-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-09-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1451
+}

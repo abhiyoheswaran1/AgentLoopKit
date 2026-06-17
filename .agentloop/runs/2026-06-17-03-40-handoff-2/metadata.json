@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-03-40-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-17-03-40",
+  "createdAtEpochMs": 1781660446260,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-accept-redacted-run-ledger-output-flag.md",
+    "title": "Accept redacted run ledger output flag",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-03-36-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-03-40-pr-summary-2.md",
+  "changedFileCount": 1841
+}

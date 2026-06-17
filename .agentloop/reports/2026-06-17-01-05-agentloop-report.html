@@ -1,0 +1,1088 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgentLoopKit Report - agentloopkit</title>
+  <style>
+    :root { color-scheme: light; --ink: oklch(22% 0.026 245); --muted: oklch(48% 0.023 245); --line: oklch(84% 0.018 245); --panel: oklch(97% 0.009 245); --paper: oklch(99% 0.006 245); --accent: oklch(49% 0.09 183); --warn-ink: oklch(42% 0.12 52); --warn-bg: oklch(96% 0.035 72); --terminal: oklch(19% 0.024 245); --terminal-ink: oklch(91% 0.014 245); }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: var(--paper); line-height: 1.55; }
+    main { max-width: 1040px; margin: 0 auto; padding: 44px 24px 56px; }
+    header { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 28px; }
+    .eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; letter-spacing: 0; text-transform: uppercase; }
+    h1 { margin: 8px 0 12px; font-size: clamp(32px, 5vw, 54px); line-height: 1.03; letter-spacing: 0; }
+    h2 { margin: 0 0 12px; font-size: 21px; letter-spacing: 0; }
+    section { border-top: 1px solid var(--line); padding: 24px 0; }
+    .summary { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-top: 18px; }
+    .metric { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+    .metric span { display: block; color: var(--muted); font-size: 13px; }
+    .metric strong { display: block; margin-top: 5px; font-size: 16px; overflow-wrap: anywhere; }
+    ul.sources { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+    ul.sources li { display: grid; gap: 4px; }
+    .muted { color: var(--muted); }
+    .safety { border: 1px solid oklch(78% 0.08 62); color: var(--warn-ink); background: var(--warn-bg); padding: 14px 16px; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+    th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 10px 12px; vertical-align: top; }
+    th { background: var(--panel); font-size: 13px; color: var(--muted); }
+    tr:last-child td { border-bottom: 0; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 0.92em; overflow-wrap: anywhere; }
+    pre { margin: 0; padding: 16px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--terminal); color: var(--terminal-ink); font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="eyebrow">AgentLoopKit local evidence report</div>
+      <h1>Compact AgentLoop evidence churn in HTML reports</h1>
+      <p class="muted">Generated 2026-06-16T23:05:48.884Z from local repository artifacts. No LLM, network call, telemetry, or command execution is required to render this report.</p>
+      <div class="summary">
+        <div class="metric"><span>Repository</span><strong>agentloopkit</strong></div>
+        <div class="metric"><span>Branch</span><strong>main</strong></div>
+        <div class="metric"><span>Commit</span><strong>370a9fe</strong></div>
+        <div class="metric"><span>Working tree</span><strong>dirty</strong></div>
+        <div class="metric"><span>Verification</span><strong>pass</strong></div>
+        <div class="metric"><span>Changed files</span><strong>1160</strong></div>
+      </div>
+    </header>
+
+    <section>
+      <h2>Source Artifacts</h2>
+      <ul class="sources">
+        <li><span>Task contract</span><code>.agentloop/tasks/2026-06-17-compact-agentloop-evidence-churn-in-html-reports-2.md</code></li>
+        <li><span>Verification report</span><code>.agentloop/reports/2026-06-17-01-01-verification-report.md</code></li>
+        <li><span>Handoff summary</span><code>.agentloop/handoffs/2026-06-17-01-02-pr-summary-3.md</code></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Changed Files</h2>
+      <table>
+  <thead><tr><th>Status</th><th>Path</th></tr></thead>
+  <tbody>
+    <tr><td><code>M</code></td><td><code>.agentflight/config.json</code></td></tr>
+    <tr><td><code>M</code></td><td><code>.agentloop/harness/autonomous-dogfooding.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>AGENTLOOP.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>README.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>docs/check-gates.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>docs/cli-reference.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>docs/configuration.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>docs/getting-started.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>docs/html-reports.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>docs/maintenance-guards.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>docs/policies.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>docs/status.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>docs/upgrading-existing-repos.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>scripts/dogfood-start.mjs</code></td></tr>
+    <tr><td><code>M</code></td><td><code>scripts/dogfood.mjs</code></td></tr>
+    <tr><td><code>M</code></td><td><code>scripts/maintenance-check.mjs</code></td></tr>
+    <tr><td><code>M</code></td><td><code>scripts/smoke-packed-release.mjs</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/cli/commands/artifacts.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/cli/commands/init.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/cli/commands/next.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/cli/commands/task.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/artifacts.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/change-areas.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/check-gates.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/evidence.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/handoff-coverage.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/html-report.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/maintainer-check.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/policy-packs.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/pr-summary.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/prepare-pr.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/readiness-score.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/review-context.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/ship.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/status.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/core/task-state.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>src/templates/root/AGENTLOOP.md</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/artifacts.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/autonomous-dogfood.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/check-gates.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/dogfood-script.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/dogfood-start-script.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/handoff.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/html-report.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/init.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/maintainer-check.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/maintenance-check-script.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/next.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/policy-packs.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/pr-summary.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/prepare-pr.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/readiness-score.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/release-smoke.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/review-context.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/ship.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/status.test.ts</code></td></tr>
+    <tr><td><code>M</code></td><td><code>tests/task-state.test.ts</code></td></tr>
+    <tr><td><code>??</code></td><td><code>.projscanrc.json</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-agentflight-placeholder-roadmap-counts.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-artifact-inventory-agentflight-placeholders.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-artifact-latest-agentflight-placeholder-filter.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-artifacts-redact-paths-flag.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-decouple-maintenance-check-release-proof.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-dogfood-concise-evidence-steps.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-dogfood-concise-hygiene-steps.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-dogfood-concise-review-context.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-dogfood-placeholder-task-clutter.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-handoff-evidence-churn-grouping.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-ignore-active-agentflight-placeholder-tasks.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-maintainer-check-evidence-churn.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-redaction-guidance-smoke-coverage.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-review-context-agentflight-placeholders.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>docs/superpowers/plans/2026-06-16-task-list-agentflight-placeholder-grouping.md</code></td></tr>
+    <tr><td><code>??</code></td><td><code>src/core/agentloop-evidence.ts</code></td></tr>
+    <tr><td><code>AgentLoop evidence</code></td><td>45 file(s) grouped under <code>.agentloop/tasks/</code>.</td></tr>
+    <tr><td><code>AgentLoop evidence</code></td><td>162 file(s) grouped under <code>.agentloop/handoffs/</code>.</td></tr>
+    <tr><td><code>AgentLoop evidence</code></td><td>71 file(s) grouped under <code>.agentloop/reports/</code>.</td></tr>
+    <tr><td><code>AgentLoop evidence</code></td><td>766 file(s) grouped under <code>.agentloop/runs/</code>.</td></tr>
+    <tr><td><code>AgentLoop evidence</code></td><td>42 file(s) grouped under <code>.agentloop/tasks/archive/</code>.</td></tr>
+  </tbody>
+</table>
+<p class="muted">Full paths remain available from Git status and AgentLoop JSON or run-ledger evidence.</p>
+    </section>
+
+    <section>
+  <h2>Task Contract</h2>
+  <pre># Compact AgentLoop evidence churn in HTML reports
+
+- Created date: 2026-06-17
+- Task type: feature
+- Status: in-progress
+
+## Problem Statement
+Long autonomous AgentLoopKit sessions generate many local evidence files under `.agentloop/` and `.agentflight/`.
+Human Markdown surfaces now compact that evidence churn, but `agentloop report` still renders every changed file as a flat HTML table row.
+That makes the browser-readable evidence report noisy and harder for reviewers to scan.
+
+## Desired Outcome
+The HTML report should preserve ordinary changed-file rows while grouping AgentLoop/AgentFlight evidence churn into compact summary rows, matching the reviewability boundary used by ship, handoff, prepare-pr, status, next, and check-gates.
+
+## Constraints
+- Keep the report static, deterministic, local-only, and HTML-escaped.
+- Preserve metadata changed-file counts and source evidence links.
+- Do not hide ordinary non-evidence changed files.
+- Do not delete, archive, or mutate generated evidence files.
+- Do not add dependencies, network calls, telemetry, version bumps, tags, releases, or publishing behavior.
+
+## Non-Goals
+- Do not change JSON output for `agentloop report`.
+- Do not change `ship`, `handoff`, `prepare-pr`, `status`, `next`, or `check-gates`.
+- Do not add cleanup or retention policy.
+- Do not resume deferred Marketplace, Scoop, WinGet, npm, release, or package-channel tasks.
+
+## Assumptions
+- `src/core/agentloop-evidence.ts` is the shared classifier for generated AgentLoop/AgentFlight evidence paths.
+- HTML report users still need to know evidence churn exists, but they do not need hundreds of table rows for generated reports, handoffs, runs, task archives, or AgentFlight proof files.
+- Full file inventory remains available through Git, JSON-capable commands, and run-ledger evidence; this task only changes the human HTML rendering.
+
+## Likely Files or Areas
+- `src/core/html-report.ts`
+- `src/core/agentloop-evidence.ts`
+- `tests/html-report.test.ts`
+- `docs/html-reports.md`
+- `docs/cli-reference.md`
+
+## Files or Areas Not to Touch
+- `package.json` version metadata
+- `CHANGELOG.md`
+- `.github/workflows/` release or publishing workflows
+- dependency lockfiles unless verification unexpectedly changes them
+- Marketplace, Scoop, WinGet, npm, GHCR, MCP registry, and release files
+
+## Acceptance Criteria
+- HTML reports keep ordinary changed-file table rows visible.
+- Generated AgentLoop/AgentFlight evidence paths are grouped by evidence directory with counts instead of one row per file.
+- The HTML output includes a visible note that full paths remain available outside the compact human report.
+- All rendered path/status values remain HTML-escaped.
+- Report metadata still reports the full changed-file count.
+- Docs explain that HTML report changed-file rendering compacts generated AgentLoop evidence churn only.
+
+## Verification Commands
+- `npm test -- tests/html-report.test.ts -t &quot;compacts AgentLoop evidence churn in changed files&quot;`
+- `npm test -- tests/html-report.test.ts`
+- `npm run typecheck`
+- `npm run check:public-docs`
+
+## Post-Verification Gates
+- `npx --yes agentflight status`
+- `npx --yes agentflight doctor`
+- `npx --yes projscan doctor --format markdown`
+
+## Implementation Plan
+- Inspect relevant files before editing.
+- Keep changes focused on this contract.
+- Record any architecture decision in DECISIONS.md.
+
+## Risk Notes
+- Re-check protected areas before changing migrations, auth, secrets, billing, deployment, or public APIs.
+- HTML report rendering must keep escaping behavior intact to avoid turning paths into executable markup.
+- Compaction must not make non-evidence source, test, config, docs, or automation files disappear from the human report.
+
+## Rollback Notes
+Revert the HTML rendering, test, and docs changes for this task. Existing generated HTML reports and evidence files require no cleanup for rollback.
+
+## Handoff Requirements
+- Summarize files changed.
+- Include verification commands and results.
+- State unverified areas honestly.
+- Include risks, rollback notes, and reviewer checklist.</pre>
+</section>
+    <section>
+  <h2>Verification Evidence</h2>
+  <pre># Verification Report
+
+- Timestamp: `2026-06-16T23:01:21.467Z`
+- Repo: `AgentLoopKit`
+- Git branch: `main`
+- Git commit: `370a9fe`
+- Working tree: `dirty`
+- Overall status: pass
+
+
+## Task Context
+- Path: `.agentloop/tasks/2026-06-17-base-ship-scope-control-scoring-on-non-evidence-changes-2.md`
+- Title: `Base ship scope-control scoring on non-evidence changes`
+- Task type: `feature`
+- Status: `in-progress`
+
+
+
+
+
+## Commands Run
+### task: `npm test -- tests/readiness-score.test.ts -t &quot;scores ship scope control from non-evidence changed files&quot;`
+
+- Exit code: 0
+- Status: pass
+
+
+```text
+
+&gt; agentloopkit@0.35.2 test
+&gt; vitest run tests/readiness-score.test.ts -t scores ship scope control from non-evidence changed files
+
+
+ RUN  v4.1.8 [git-root]
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 2 skipped (3)
+   Start at  01:01:22
+   Duration  144ms (transform 22ms, setup 0ms, import 30ms, tests 3ms, environment 0ms)
+
+```
+
+### task: `npm test -- tests/readiness-score.test.ts`
+
+- Exit code: 0
+- Status: pass
+
+
+```text
+
+&gt; agentloopkit@0.35.2 test
+&gt; vitest run tests/readiness-score.test.ts
+
+
+ RUN  v4.1.8 [git-root]
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  01:01:22
+   Duration  141ms (transform 18ms, setup 0ms, import 25ms, tests 4ms, environment 0ms)
+
+```
+
+### task: `npm test -- tests/ship.test.ts`
+
+- Exit code: 0
+- Status: pass
+
+
+```text
+
+&gt; agentloopkit@0.35.2 test
+&gt; vitest run tests/ship.test.ts
+
+
+ RUN  v4.1.8 [git-root]
+
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Start at  01:01:23
+   Duration  8.20s (transform 79ms, setup 0ms, import 143ms, tests 7.95s, environment 0ms)
+
+```
+
+### task: `npm run typecheck`
+
+- Exit code: 0
+- Status: pass
+
+
+```text
+
+&gt; agentloopkit@0.35.2 typecheck
+&gt; tsc --noEmit
+
+```
+
+### task: `npm run check:public-docs`
+
+- Exit code: 0
+- Status: pass
+
+
+```text
+
+&gt; agentloopkit@0.35.2 check:public-docs
+&gt; node scripts/public-docs-hygiene.mjs
+
+# AgentLoopKit Public Docs Hygiene
+Version: 0.35.2
+Public docs checked: 73
+Repo harness files checked: 2
+Public docs hygiene passed.
+```
+
+## Post-Verification Gates
+### post-verification: `npx --yes agentflight status`
+
+- Exit code: 0
+- Status: pass
+
+
+```text
+AgentFlight status
+
+Task:
+Base ship scope-control scoring on non-evidence changes
+
+Session duration:
+2 minutes
+
+Changed files:
+115
+
+Changed areas:
+- agentflight/config: .agentflight/config.json
+- docs: .agentloop/harness/autonomous-dogfooding.md, .agentloop/tasks/2026-06-16-prevent-stale-agentloop-task-state.md, .agentloop/tasks/2026-06-16-publish-github-marketplace-action.md, AGENTLOOP.md, README.md, docs/check-gates.md, docs/cli-reference.md, docs/configuration.md, docs/getting-started.md, docs/maintenance-guards.md, docs/policies.md, docs/status.md, docs/upgrading-existing-repos.md, src/templates/root/AGENTLOOP.md, .agentloop/tasks/2026-06-16-accept-redacted-artifact-inventory-flag.md, .agentloop/tasks/2026-06-16-accept-redacted-task-doctor-flag.md, .agentloop/tasks/2026-06-16-add-init-cli-next-step-guidance-2.md, .agentloop/tasks/2026-06-16-add-maintainer-check-review-area-counts.md, .agentloop/tasks/2026-06-16-add-policy-pack-maintenance-coverage-2.md, .agentloop/tasks/2026-06-16-align-check-gates-active-task-next-action-2.md, .agentloop/tasks/2026-06-16-align-strict-dogfood-guidance-with-handoff-evidence.md, .agentloop/tasks/2026-06-16-compact-agentloop-evidence-in-prepare-pr.md, .agentloop/tasks/2026-06-16-complete-redaction-guidance-smoke-coverage-2.md, .agentloop/tasks/2026-06-16-decouple-maintenance-check-from-strict-release-proof.md, .agentloop/tasks/2026-06-16-document-check-gates-task-done-next-action-2.md, .agentloop/tasks/2026-06-16-exclude-agentflight-placeholders-from-artifact-latest-task-2.md, .agentloop/tasks/2026-06-16-exclude-parked-tasks-from-artifact-latest-task-2.md, .agentloop/tasks/2026-06-16-group-agentflight-placeholders-in-task-list-2.md, .agentloop/tasks/2026-06-16-group-agentloop-evidence-churn-in-handoff-summaries-2.md, .agentloop/tasks/2026-06-16-ignore-active-agentflight-placeholder-tasks-2.md, .agentloop/tasks/2026-06-16-ignore-active-agentflight-placeholders-in-check-gates-2.md, .agentloop/tasks/2026-06-16-ignore-agentloop-evidence-in-agentflight-changed-file-filters.md, .agentloop/tasks/2026-06-16-ignore-generated-evidence-in-projscan-scans.md, .agentloop/tasks/2026-06-16-prevent-dogfood-start-placeholder-task-clutter.md, .agentloop/tasks/2026-06-16-select-next-agentloopkit-dogfood-roadmap-task.md, .agentloop/tasks/2026-06-16-separate-agentflight-placeholders-from-roadmap-task-counts.md, .agentloop/tasks/2026-06-16-separate-agentflight-placeholders-in-artifact-inventory.md, .agentloop/tasks/2026-06-16-separate-agentloop
+
+[output truncated: showing first 2500 and last 2500 characters of 7406 total]
+
+k-evidence-churn.md, docs/superpowers/plans/2026-06-16-redaction-guidance-smoke-coverage.md, docs/superpowers/plans/2026-06-16-review-context-agentflight-placeholders.md, docs/superpowers/plans/2026-06-16-task-list-agentflight-placeholder-grouping.md
+- unknown: scripts/dogfood-start.mjs, scripts/dogfood.mjs, scripts/maintenance-check.mjs, scripts/smoke-packed-release.mjs, src/cli/commands/artifacts.ts, src/cli/commands/init.ts, src/cli/commands/next.ts, src/cli/commands/task.ts, src/core/artifacts.ts, src/core/change-areas.ts, src/core/check-gates.ts, src/core/evidence.ts, src/core/handoff-coverage.ts, src/core/maintainer-check.ts, src/core/policy-packs.ts, src/core/pr-summary.ts, src/core/prepare-pr.ts, src/core/readiness-score.ts, src/core/review-context.ts, src/core/ship.ts, src/core/status.ts, src/core/task-state.ts, .projscanrc.json, src/core/agentloop-evidence.ts
+- tests: tests/artifacts.test.ts, tests/autonomous-dogfood.test.ts, tests/check-gates.test.ts, tests/dogfood-script.test.ts, tests/dogfood-start-script.test.ts, tests/handoff.test.ts, tests/init.test.ts, tests/maintainer-check.test.ts, tests/maintenance-check-script.test.ts, tests/next.test.ts, tests/policy-packs.test.ts, tests/pr-summary.test.ts, tests/prepare-pr.test.ts, tests/readiness-score.test.ts, tests/release-smoke.test.ts, tests/review-context.test.ts, tests/ship.test.ts, tests/status.test.ts, tests/task-state.test.ts
+
+Risk: medium
+- AgentFlight project configuration changed.
+
+Verification Evidence:
+0 passed, 0 failed
+- No verification runs recorded.
+
+Review first:
+1. .projscanrc.json
+   Why: unknown file
+   Focus: Inspect manually because AgentFlight could not classify this file.
+2. scripts/dogfood-start.mjs
+   Why: unknown file
+   Focus: Inspect manually because AgentFlight could not classify this file.
+3. scripts/dogfood.mjs
+   Why: unknown file
+   Focus: Inspect manually because AgentFlight could not classify this file.
+4. scripts/maintenance-check.mjs
+   Why: unknown file
+   Focus: Inspect manually because AgentFlight could not classify this file.
+5. scripts/smoke-packed-release.mjs
+   Why: unknown file
+   Focus: Inspect manually because AgentFlight could not classify this file.
+
+Proof gaps:
+- warning: Test files changed without passing test evidence.
+  Suggested proof: agentflight verify -- npm test
+
+Latest snapshot:
+- No snapshots recorded.
+
+Readiness: Needs verification
+Reason: Test files changed without passing test evidence.
+
+Next action:
+Run agentflight verify -- npm test
+```
+
+### post-verification: `npx --yes agentflight doctor`
+
+- Exit code: 0
+- Status: pass
+
+
+```text
+AgentFlight Doctor
+
+Overall: OK
+
+- OK Node.js version: v26.3.0 satisfies AgentFlight&#39;s Node.js 20+ target.
+- OK npm availability: npm 11.16.0 is available.
+- OK git availability: git is available.
+- OK repository root: [git-root]
+- OK package manager: pnpm
+- OK .agentflight presence: .agentflight exists.
+- OK config validity: .agentflight/config.json is valid.
+- OK .agentflight writable: .agentflight is writable.
+- OK current session: A current session exists.
+- OK ProjScan availability: ProjScan is available.
+- OK AgentLoopKit availability: AgentLoopKit is available.
+- OK test script: npm run test is configured.
+- OK build script: npm run build is configured.
+- OK typecheck script: npm run typecheck is configured.
+- OK lint script: npm run lint is configured.
+```
+
+### post-verification: `npx --yes projscan doctor --format markdown`
+
+- Exit code: 0
+- Status: pass
+
+
+```text
+# Project Health Report
+
+**Health Score: A (100/100)**
+
+[![projscan health](https://img.shields.io/badge/projscan-A-brightgreen)](https://github.com/abhiyoheswaran1/projscan)
+
+No issues detected. Project looks healthy!
+```
+
+
+## Not Run
+- test
+- lint
+- typecheck
+- build
+
+## Recommended Next Actions
+- Review the diff and prepare a handoff summary.</pre>
+</section>
+    <section>
+  <h2>Reviewer Handoff</h2>
+  <pre># PR Summary
+
+- Generated: 2026-06-17-01-02
+- Task context: `Base ship scope-control scoring on non-evidence changes`
+- Verification status: Overall status: pass
+
+## Summary
+This summary was generated deterministically from git status, the latest task contract, and the latest verification report.
+
+## Changed Files
+- M `.agentflight/config.json`
+- M `.agentloop/harness/autonomous-dogfooding.md`
+- M `AGENTLOOP.md`
+- M `README.md`
+- M `docs/check-gates.md`
+- M `docs/cli-reference.md`
+- M `docs/configuration.md`
+- M `docs/getting-started.md`
+- M `docs/maintenance-guards.md`
+- M `docs/policies.md`
+- M `docs/status.md`
+- M `docs/upgrading-existing-repos.md`
+- M `scripts/dogfood-start.mjs`
+- M `scripts/dogfood.mjs`
+- M `scripts/maintenance-check.mjs`
+- M `scripts/smoke-packed-release.mjs`
+- M `src/cli/commands/artifacts.ts`
+- M `src/cli/commands/init.ts`
+- M `src/cli/commands/next.ts`
+- M `src/cli/commands/task.ts`
+- M `src/core/artifacts.ts`
+- M `src/core/change-areas.ts`
+- M `src/core/check-gates.ts`
+- M `src/core/evidence.ts`
+- M `src/core/handoff-coverage.ts`
+- M `src/core/maintainer-check.ts`
+- M `src/core/policy-packs.ts`
+- M `src/core/pr-summary.ts`
+- M `src/core/prepare-pr.ts`
+- M `src/core/readiness-score.ts`
+- M `src/core/review-context.ts`
+- M `src/core/ship.ts`
+- M `src/core/status.ts`
+- M `src/core/task-state.ts`
+- M `src/templates/root/AGENTLOOP.md`
+- M `tests/artifacts.test.ts`
+- M `tests/autonomous-dogfood.test.ts`
+- M `tests/check-gates.test.ts`
+- M `tests/dogfood-script.test.ts`
+- M `tests/dogfood-start-script.test.ts`
+- M `tests/handoff.test.ts`
+- M `tests/init.test.ts`
+- M `tests/maintainer-check.test.ts`
+- M `tests/maintenance-check-script.test.ts`
+- M `tests/next.test.ts`
+- M `tests/policy-packs.test.ts`
+- M `tests/pr-summary.test.ts`
+- M `tests/prepare-pr.test.ts`
+- M `tests/readiness-score.test.ts`
+- M `tests/release-smoke.test.ts`
+- M `tests/review-context.test.ts`
+- M `tests/ship.test.ts`
+- M `tests/status.test.ts`
+- M `tests/task-state.test.ts`
+- ?? `.projscanrc.json`
+- ?? `docs/superpowers/plans/2026-06-16-agentflight-placeholder-roadmap-counts.md`
+- ?? `docs/superpowers/plans/2026-06-16-artifact-inventory-agentflight-placeholders.md`
+- ?? `docs/superpowers/plans/2026-06-16-artifact-latest-agentflight-placeholder-filter.md`
+- ?? `docs/superpowers/plans/2026-06-16-artifacts-redact-paths-flag.md`
+- ?? `docs/superpowers/plans/2026-06-16-decouple-maintenance-check-release-proof.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-concise-evidence-steps.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-concise-hygiene-steps.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-concise-review-context.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-placeholder-task-clutter.md`
+- ?? `docs/superpowers/plans/2026-06-16-handoff-evidence-churn-grouping.md`
+- ?? `docs/superpowers/plans/2026-06-16-ignore-active-agentflight-placeholder-tasks.md`
+- ?? `docs/superpowers/plans/2026-06-16-maintainer-check-evidence-churn.md`
+- ?? `docs/superpowers/plans/2026-06-16-redaction-guidance-smoke-coverage.md`
+- ?? `docs/superpowers/plans/2026-06-16-review-context-agentflight-placeholders.md`
+- ?? `docs/superpowers/plans/2026-06-16-task-list-agentflight-placeholder-grouping.md`
+- ?? `src/core/agentloop-evidence.ts`
+- AgentLoop evidence: `1079` file(s) grouped under `.agentloop/handoffs/`, `.agentloop/reports/`, `.agentloop/runs/`, `.agentloop/tasks/`, `.agentloop/tasks/archive/`.
+- Full paths remain in JSON output and run-ledger evidence.
+
+## Change Areas
+### Source
+- M `src/cli/commands/artifacts.ts`
+- M `src/cli/commands/init.ts`
+- M `src/cli/commands/next.ts`
+- M `src/cli/commands/task.ts`
+- M `src/core/artifacts.ts`
+- M `src/core/change-areas.ts`
+- M `src/core/check-gates.ts`
+- M `src/core/evidence.ts`
+- M `src/core/handoff-coverage.ts`
+- M `src/core/maintainer-check.ts`
+- M `src/core/policy-packs.ts`
+- M `src/core/pr-summary.ts`
+- M `src/core/prepare-pr.ts`
+- M `src/core/readiness-score.ts`
+- M `src/core/review-context.ts`
+- M `src/core/ship.ts`
+- M `src/core/status.ts`
+- M `src/core/task-state.ts`
+- M `src/templates/root/AGENTLOOP.md`
+- ?? `src/core/agentloop-evidence.ts`
+
+### Tests
+- M `tests/artifacts.test.ts`
+- M `tests/autonomous-dogfood.test.ts`
+- M `tests/check-gates.test.ts`
+- M `tests/dogfood-script.test.ts`
+- M `tests/dogfood-start-script.test.ts`
+- M `tests/handoff.test.ts`
+- M `tests/init.test.ts`
+- M `tests/maintainer-check.test.ts`
+- M `tests/maintenance-check-script.test.ts`
+- M `tests/next.test.ts`
+- M `tests/policy-packs.test.ts`
+- M `tests/pr-summary.test.ts`
+- M `tests/prepare-pr.test.ts`
+- M `tests/readiness-score.test.ts`
+- M `tests/release-smoke.test.ts`
+- M `tests/review-context.test.ts`
+- M `tests/ship.test.ts`
+- M `tests/status.test.ts`
+- M `tests/task-state.test.ts`
+
+### AgentLoop
+- M `.agentloop/harness/autonomous-dogfooding.md`
+- M `AGENTLOOP.md`
+
+### Documentation
+- M `README.md`
+- M `docs/check-gates.md`
+- M `docs/cli-reference.md`
+- M `docs/configuration.md`
+- M `docs/getting-started.md`
+- M `docs/maintenance-guards.md`
+- M `docs/policies.md`
+- M `docs/status.md`
+- M `docs/upgrading-existing-repos.md`
+- ?? `docs/superpowers/plans/2026-06-16-agentflight-placeholder-roadmap-counts.md`
+- ?? `docs/superpowers/plans/2026-06-16-artifact-inventory-agentflight-placeholders.md`
+- ?? `docs/superpowers/plans/2026-06-16-artifact-latest-agentflight-placeholder-filter.md`
+- ?? `docs/superpowers/plans/2026-06-16-artifacts-redact-paths-flag.md`
+- ?? `docs/superpowers/plans/2026-06-16-decouple-maintenance-check-release-proof.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-concise-evidence-steps.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-concise-hygiene-steps.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-concise-review-context.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-placeholder-task-clutter.md`
+- ?? `docs/superpowers/plans/2026-06-16-handoff-evidence-churn-grouping.md`
+- ?? `docs/superpowers/plans/2026-06-16-ignore-active-agentflight-placeholder-tasks.md`
+- ?? `docs/superpowers/plans/2026-06-16-maintainer-check-evidence-churn.md`
+- ?? `docs/superpowers/plans/2026-06-16-redaction-guidance-smoke-coverage.md`
+- ?? `docs/superpowers/plans/2026-06-16-review-context-agentflight-placeholders.md`
+- ?? `docs/superpowers/plans/2026-06-16-task-list-agentflight-placeholder-grouping.md`
+
+### CI / Automation
+- M `scripts/dogfood-start.mjs`
+- M `scripts/dogfood.mjs`
+- M `scripts/maintenance-check.mjs`
+- M `scripts/smoke-packed-release.mjs`
+
+### Other
+- M `.agentflight/config.json`
+- ?? `.projscanrc.json`
+
+### AgentLoop Evidence
+- AgentLoop evidence: `1079` file(s) grouped under `.agentloop/handoffs/`, `.agentloop/reports/`, `.agentloop/runs/`, `.agentloop/tasks/`, `.agentloop/tasks/archive/`.
+- Full paths remain in JSON output and run-ledger evidence.
+
+## Diff Stats
+```text
+.agentflight/config.json                           |   6 +-
+ .agentloop/harness/autonomous-dogfooding.md        |  12 +-
+ ...026-06-16-prevent-stale-agentloop-task-state.md |  78 --
+ ...2026-06-16-publish-github-marketplace-action.md |   2 +-
+ AGENTLOOP.md                                       |   2 +
+ README.md                                          |   6 +-
+ docs/check-gates.md                                |   2 +
+ docs/cli-reference.md                              |  30 +-
+ docs/configuration.md                              |   2 +
+ docs/getting-started.md                            |   2 +-
+ docs/maintenance-guards.md                         |   8 +-
+ docs/policies.md                                   |   2 +
+ docs/status.md                                     |  20 +-
+ docs/upgrading-existing-repos.md                   |  15 +
+ scripts/dogfood-start.mjs                          |  88 ++-
+ scripts/dogfood.mjs                                |   8 +-
+ scripts/maintenance-check.mjs                      |   6 +-
+ scripts/smoke-packed-release.mjs                   |   4 +
+ src/cli/commands/artifacts.ts                      |   5 +
+ src/cli/commands/init.ts                           |   2 +
+ src/cli/commands/next.ts                           |  42 +-
+ src/cli/commands/task.ts                           |  62 +-
+ src/core/artifacts.ts                              |  84 ++-
+ src/core/change-areas.ts                           |  46 ++
+ src/core/check-gates.ts                            |  83 ++-
+ src/core/evidence.ts                               |   9 +-
+ src/core/handoff-coverage.ts                       |  24 +
+ src/core/maintainer-check.ts                       |  42 +-
+ src/core/policy-packs.ts                           |  29 +-
+ src/core/pr-summary.ts                             |  14 +-
+ src/core/prepare-pr.ts                             |   4 +-
+ src/core/readiness-score.ts                        |  41 +-
+ src/core/review-context.ts                         |  29 +-
+ src/core/ship.ts                                   |   9 +-
+ src/core/status.ts                                 | 133 +++-
+ src/core/task-state.ts                             | 312 +++++++-
+ src/templates/root/AGENTLOOP.md                    |   2 +
+ tests/artifacts.test.ts                            | 283 ++++++++
+ tests/autonomous-dogfood.test.ts                   | 141 +++-
+ tests/check-gates.test.ts                          | 155 +++-
+ tests/dogfood-script.test.ts                       |  10 +-
+ tests/dogfood-start-script.test.ts                 | 143 +++-
+ tests/handoff.test.ts                              | 113 ++-
+ tests/init.test.ts                                 |  41 ++
+ tests/maintainer-check.test.ts                     | 149 +++-
+ tests/maintenance-check-script.test.ts             |   6 +-
+ tests/next.test.ts                                 | 231 ++++++
+ tests/policy-packs.test.ts                         |  50 +-
+ tests/pr-summary.test.ts                           |   7 +-
+ tests/prepare-pr.test.ts                           |  30 +-
+ tests/readiness-score.test.ts                      |  47 ++
+ tests/release-smoke.test.ts                        |  45 +-
+ tests/review-context.test.ts                       |  42 +-
+ tests/ship.test.ts                                 |  30 +
+ tests/status.test.ts                               | 250 +++++++
+ tests/task-state.test.ts                           | 804 ++++++++++++++++++++-
+ 56 files changed, 3586 insertions(+), 256 deletions(-)
+```
+
+## Behaviour Changed
+- Review changed files and task contract to confirm intended behavior.
+
+## Review Focus
+- Review source changes for behavior and public API impact.
+- Check tests cover the changed behavior.
+- Check docs match the implemented command behavior.
+- Review CI or automation changes for permissions and secret handling.
+- Review AgentLoop artifacts for accurate task, verification, and handoff evidence.
+- Review uncategorized files for ownership and scope.
+
+## Verification Performed
+- Overall status: pass
+
+## Verification Not Performed
+- Check the verification report for skipped commands.
+
+## Risks
+- Re-check protected files such as migrations, secrets, auth, billing, deployment, and public APIs before merge.
+
+## Rollback Notes
+- Revert the changed files or revert the merge commit if this lands as a PR.
+
+## Reviewer Checklist
+- [ ] Acceptance criteria match the task contract.
+- [ ] Verification evidence is adequate for the change.
+- [ ] Risk areas have been reviewed.
+- [ ] Rollback plan is clear.
+
+## Follow-Ups
+- Capture any deferred work in ROADMAP.md or a new task contract.</pre>
+</section>
+    <section>
+  <h2>Current Deterministic Summary</h2>
+  <pre># PR Summary
+
+- Generated: 2026-06-17-01-05
+- Task context: `Compact AgentLoop evidence churn in HTML reports`
+- Verification status: Overall status: pass
+
+## Summary
+This summary was generated deterministically from git status, the latest task contract, and the latest verification report.
+
+## Changed Files
+- M `.agentflight/config.json`
+- M `.agentloop/harness/autonomous-dogfooding.md`
+- M `AGENTLOOP.md`
+- M `README.md`
+- M `docs/check-gates.md`
+- M `docs/cli-reference.md`
+- M `docs/configuration.md`
+- M `docs/getting-started.md`
+- M `docs/html-reports.md`
+- M `docs/maintenance-guards.md`
+- M `docs/policies.md`
+- M `docs/status.md`
+- M `docs/upgrading-existing-repos.md`
+- M `scripts/dogfood-start.mjs`
+- M `scripts/dogfood.mjs`
+- M `scripts/maintenance-check.mjs`
+- M `scripts/smoke-packed-release.mjs`
+- M `src/cli/commands/artifacts.ts`
+- M `src/cli/commands/init.ts`
+- M `src/cli/commands/next.ts`
+- M `src/cli/commands/task.ts`
+- M `src/core/artifacts.ts`
+- M `src/core/change-areas.ts`
+- M `src/core/check-gates.ts`
+- M `src/core/evidence.ts`
+- M `src/core/handoff-coverage.ts`
+- M `src/core/html-report.ts`
+- M `src/core/maintainer-check.ts`
+- M `src/core/policy-packs.ts`
+- M `src/core/pr-summary.ts`
+- M `src/core/prepare-pr.ts`
+- M `src/core/readiness-score.ts`
+- M `src/core/review-context.ts`
+- M `src/core/ship.ts`
+- M `src/core/status.ts`
+- M `src/core/task-state.ts`
+- M `src/templates/root/AGENTLOOP.md`
+- M `tests/artifacts.test.ts`
+- M `tests/autonomous-dogfood.test.ts`
+- M `tests/check-gates.test.ts`
+- M `tests/dogfood-script.test.ts`
+- M `tests/dogfood-start-script.test.ts`
+- M `tests/handoff.test.ts`
+- M `tests/html-report.test.ts`
+- M `tests/init.test.ts`
+- M `tests/maintainer-check.test.ts`
+- M `tests/maintenance-check-script.test.ts`
+- M `tests/next.test.ts`
+- M `tests/policy-packs.test.ts`
+- M `tests/pr-summary.test.ts`
+- M `tests/prepare-pr.test.ts`
+- M `tests/readiness-score.test.ts`
+- M `tests/release-smoke.test.ts`
+- M `tests/review-context.test.ts`
+- M `tests/ship.test.ts`
+- M `tests/status.test.ts`
+- M `tests/task-state.test.ts`
+- ?? `.projscanrc.json`
+- ?? `docs/superpowers/plans/2026-06-16-agentflight-placeholder-roadmap-counts.md`
+- ?? `docs/superpowers/plans/2026-06-16-artifact-inventory-agentflight-placeholders.md`
+- ?? `docs/superpowers/plans/2026-06-16-artifact-latest-agentflight-placeholder-filter.md`
+- ?? `docs/superpowers/plans/2026-06-16-artifacts-redact-paths-flag.md`
+- ?? `docs/superpowers/plans/2026-06-16-decouple-maintenance-check-release-proof.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-concise-evidence-steps.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-concise-hygiene-steps.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-concise-review-context.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-placeholder-task-clutter.md`
+- ?? `docs/superpowers/plans/2026-06-16-handoff-evidence-churn-grouping.md`
+- ?? `docs/superpowers/plans/2026-06-16-ignore-active-agentflight-placeholder-tasks.md`
+- ?? `docs/superpowers/plans/2026-06-16-maintainer-check-evidence-churn.md`
+- ?? `docs/superpowers/plans/2026-06-16-redaction-guidance-smoke-coverage.md`
+- ?? `docs/superpowers/plans/2026-06-16-review-context-agentflight-placeholders.md`
+- ?? `docs/superpowers/plans/2026-06-16-task-list-agentflight-placeholder-grouping.md`
+- ?? `src/core/agentloop-evidence.ts`
+- AgentLoop evidence: `1086` file(s) grouped under `.agentloop/handoffs/`, `.agentloop/reports/`, `.agentloop/runs/`, `.agentloop/tasks/`, `.agentloop/tasks/archive/`.
+- Full paths remain in JSON output and run-ledger evidence.
+
+## Change Areas
+### Source
+- M `src/cli/commands/artifacts.ts`
+- M `src/cli/commands/init.ts`
+- M `src/cli/commands/next.ts`
+- M `src/cli/commands/task.ts`
+- M `src/core/artifacts.ts`
+- M `src/core/change-areas.ts`
+- M `src/core/check-gates.ts`
+- M `src/core/evidence.ts`
+- M `src/core/handoff-coverage.ts`
+- M `src/core/html-report.ts`
+- M `src/core/maintainer-check.ts`
+- M `src/core/policy-packs.ts`
+- M `src/core/pr-summary.ts`
+- M `src/core/prepare-pr.ts`
+- M `src/core/readiness-score.ts`
+- M `src/core/review-context.ts`
+- M `src/core/ship.ts`
+- M `src/core/status.ts`
+- M `src/core/task-state.ts`
+- M `src/templates/root/AGENTLOOP.md`
+- ?? `src/core/agentloop-evidence.ts`
+
+### Tests
+- M `tests/artifacts.test.ts`
+- M `tests/autonomous-dogfood.test.ts`
+- M `tests/check-gates.test.ts`
+- M `tests/dogfood-script.test.ts`
+- M `tests/dogfood-start-script.test.ts`
+- M `tests/handoff.test.ts`
+- M `tests/html-report.test.ts`
+- M `tests/init.test.ts`
+- M `tests/maintainer-check.test.ts`
+- M `tests/maintenance-check-script.test.ts`
+- M `tests/next.test.ts`
+- M `tests/policy-packs.test.ts`
+- M `tests/pr-summary.test.ts`
+- M `tests/prepare-pr.test.ts`
+- M `tests/readiness-score.test.ts`
+- M `tests/release-smoke.test.ts`
+- M `tests/review-context.test.ts`
+- M `tests/ship.test.ts`
+- M `tests/status.test.ts`
+- M `tests/task-state.test.ts`
+
+### AgentLoop
+- M `.agentloop/harness/autonomous-dogfooding.md`
+- M `AGENTLOOP.md`
+
+### Documentation
+- M `README.md`
+- M `docs/check-gates.md`
+- M `docs/cli-reference.md`
+- M `docs/configuration.md`
+- M `docs/getting-started.md`
+- M `docs/html-reports.md`
+- M `docs/maintenance-guards.md`
+- M `docs/policies.md`
+- M `docs/status.md`
+- M `docs/upgrading-existing-repos.md`
+- ?? `docs/superpowers/plans/2026-06-16-agentflight-placeholder-roadmap-counts.md`
+- ?? `docs/superpowers/plans/2026-06-16-artifact-inventory-agentflight-placeholders.md`
+- ?? `docs/superpowers/plans/2026-06-16-artifact-latest-agentflight-placeholder-filter.md`
+- ?? `docs/superpowers/plans/2026-06-16-artifacts-redact-paths-flag.md`
+- ?? `docs/superpowers/plans/2026-06-16-decouple-maintenance-check-release-proof.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-concise-evidence-steps.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-concise-hygiene-steps.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-concise-review-context.md`
+- ?? `docs/superpowers/plans/2026-06-16-dogfood-placeholder-task-clutter.md`
+- ?? `docs/superpowers/plans/2026-06-16-handoff-evidence-churn-grouping.md`
+- ?? `docs/superpowers/plans/2026-06-16-ignore-active-agentflight-placeholder-tasks.md`
+- ?? `docs/superpowers/plans/2026-06-16-maintainer-check-evidence-churn.md`
+- ?? `docs/superpowers/plans/2026-06-16-redaction-guidance-smoke-coverage.md`
+- ?? `docs/superpowers/plans/2026-06-16-review-context-agentflight-placeholders.md`
+- ?? `docs/superpowers/plans/2026-06-16-task-list-agentflight-placeholder-grouping.md`
+
+### CI / Automation
+- M `scripts/dogfood-start.mjs`
+- M `scripts/dogfood.mjs`
+- M `scripts/maintenance-check.mjs`
+- M `scripts/smoke-packed-release.mjs`
+
+### Other
+- M `.agentflight/config.json`
+- ?? `.projscanrc.json`
+
+### AgentLoop Evidence
+- AgentLoop evidence: `1086` file(s) grouped under `.agentloop/handoffs/`, `.agentloop/reports/`, `.agentloop/runs/`, `.agentloop/tasks/`, `.agentloop/tasks/archive/`.
+- Full paths remain in JSON output and run-ledger evidence.
+
+## Diff Stats
+```text
+.agentflight/config.json                           |   6 +-
+ .agentloop/harness/autonomous-dogfooding.md        |  12 +-
+ ...026-06-16-prevent-stale-agentloop-task-state.md |  78 --
+ ...2026-06-16-publish-github-marketplace-action.md |   2 +-
+ AGENTLOOP.md                                       |   2 +
+ README.md                                          |   6 +-
+ docs/check-gates.md                                |   2 +
+ docs/cli-reference.md                              |  32 +-
+ docs/configuration.md                              |   2 +
+ docs/getting-started.md                            |   2 +-
+ docs/html-reports.md                               |   2 +
+ docs/maintenance-guards.md                         |   8 +-
+ docs/policies.md                                   |   2 +
+ docs/status.md                                     |  20 +-
+ docs/upgrading-existing-repos.md                   |  15 +
+ scripts/dogfood-start.mjs                          |  88 ++-
+ scripts/dogfood.mjs                                |   8 +-
+ scripts/maintenance-check.mjs                      |   6 +-
+ scripts/smoke-packed-release.mjs                   |   4 +
+ src/cli/commands/artifacts.ts                      |   5 +
+ src/cli/commands/init.ts                           |   2 +
+ src/cli/commands/next.ts                           |  42 +-
+ src/cli/commands/task.ts                           |  62 +-
+ src/core/artifacts.ts                              |  84 ++-
+ src/core/change-areas.ts                           |  46 ++
+ src/core/check-gates.ts                            |  83 ++-
+ src/core/evidence.ts                               |   9 +-
+ src/core/handoff-coverage.ts                       |  24 +
+ src/core/html-report.ts                            |  46 +-
+ src/core/maintainer-check.ts                       |  42 +-
+ src/core/policy-packs.ts                           |  29 +-
+ src/core/pr-summary.ts                             |  14 +-
+ src/core/prepare-pr.ts                             |   4 +-
+ src/core/readiness-score.ts                        |  41 +-
+ src/core/review-context.ts                         |  29 +-
+ src/core/ship.ts                                   |   9 +-
+ src/core/status.ts                                 | 133 +++-
+ src/core/task-state.ts                             | 312 +++++++-
+ src/templates/root/AGENTLOOP.md                    |   2 +
+ tests/artifacts.test.ts                            | 283 ++++++++
+ tests/autonomous-dogfood.test.ts                   | 141 +++-
+ tests/check-gates.test.ts                          | 155 +++-
+ tests/dogfood-script.test.ts                       |  10 +-
+ tests/dogfood-start-script.test.ts                 | 143 +++-
+ tests/handoff.test.ts                              | 113 ++-
+ tests/html-report.test.ts                          |  30 +
+ tests/init.test.ts                                 |  41 ++
+ tests/maintainer-check.test.ts                     | 149 +++-
+ tests/maintenance-check-script.test.ts             |   6 +-
+ tests/next.test.ts                                 | 231 ++++++
+ tests/policy-packs.test.ts                         |  50 +-
+ tests/pr-summary.test.ts                           |   7 +-
+ tests/prepare-pr.test.ts                           |  30 +-
+ tests/readiness-score.test.ts                      |  47 ++
+ tests/release-smoke.test.ts                        |  45 +-
+ tests/review-context.test.ts                       |  42 +-
+ tests/ship.test.ts                                 |  30 +
+ tests/status.test.ts                               | 250 +++++++
+ tests/task-state.test.ts                           | 804 ++++++++++++++++++++-
+ 59 files changed, 3658 insertions(+), 264 deletions(-)
+```
+
+## Behaviour Changed
+- Review changed files and task contract to confirm intended behavior.
+
+## Review Focus
+- Review source changes for behavior and public API impact.
+- Check tests cover the changed behavior.
+- Check docs match the implemented command behavior.
+- Review CI or automation changes for permissions and secret handling.
+- Review AgentLoop artifacts for accurate task, verification, and handoff evidence.
+- Review uncategorized files for ownership and scope.
+
+## Verification Performed
+- Overall status: pass
+
+## Verification Not Performed
+- Check the verification report for skipped commands.
+
+## Risks
+- Re-check protected files such as migrations, secrets, auth, billing, deployment, and public APIs before merge.
+
+## Rollback Notes
+- Revert the changed files or revert the merge commit if this lands as a PR.
+
+## Reviewer Checklist
+- [ ] Acceptance criteria match the task contract.
+- [ ] Verification evidence is adequate for the change.
+- [ ] Risk areas have been reviewed.
+- [ ] Rollback plan is clear.
+
+## Follow-Ups
+- Capture any deferred work in ROADMAP.md or a new task contract.</pre>
+</section>
+
+    <section>
+      <h2>Diff Stats</h2>
+      <pre>.agentflight/config.json                           |   6 +-
+ .agentloop/harness/autonomous-dogfooding.md        |  12 +-
+ ...026-06-16-prevent-stale-agentloop-task-state.md |  78 --
+ ...2026-06-16-publish-github-marketplace-action.md |   2 +-
+ AGENTLOOP.md                                       |   2 +
+ README.md                                          |   6 +-
+ docs/check-gates.md                                |   2 +
+ docs/cli-reference.md                              |  32 +-
+ docs/configuration.md                              |   2 +
+ docs/getting-started.md                            |   2 +-
+ docs/html-reports.md                               |   2 +
+ docs/maintenance-guards.md                         |   8 +-
+ docs/policies.md                                   |   2 +
+ docs/status.md                                     |  20 +-
+ docs/upgrading-existing-repos.md                   |  15 +
+ scripts/dogfood-start.mjs                          |  88 ++-
+ scripts/dogfood.mjs                                |   8 +-
+ scripts/maintenance-check.mjs                      |   6 +-
+ scripts/smoke-packed-release.mjs                   |   4 +
+ src/cli/commands/artifacts.ts                      |   5 +
+ src/cli/commands/init.ts                           |   2 +
+ src/cli/commands/next.ts                           |  42 +-
+ src/cli/commands/task.ts                           |  62 +-
+ src/core/artifacts.ts                              |  84 ++-
+ src/core/change-areas.ts                           |  46 ++
+ src/core/check-gates.ts                            |  83 ++-
+ src/core/evidence.ts                               |   9 +-
+ src/core/handoff-coverage.ts                       |  24 +
+ src/core/html-report.ts                            |  46 +-
+ src/core/maintainer-check.ts                       |  42 +-
+ src/core/policy-packs.ts                           |  29 +-
+ src/core/pr-summary.ts                             |  14 +-
+ src/core/prepare-pr.ts                             |   4 +-
+ src/core/readiness-score.ts                        |  41 +-
+ src/core/review-context.ts                         |  29 +-
+ src/core/ship.ts                                   |   9 +-
+ src/core/status.ts                                 | 133 +++-
+ src/core/task-state.ts                             | 312 +++++++-
+ src/templates/root/AGENTLOOP.md                    |   2 +
+ tests/artifacts.test.ts                            | 283 ++++++++
+ tests/autonomous-dogfood.test.ts                   | 141 +++-
+ tests/check-gates.test.ts                          | 155 +++-
+ tests/dogfood-script.test.ts                       |  10 +-
+ tests/dogfood-start-script.test.ts                 | 143 +++-
+ tests/handoff.test.ts                              | 113 ++-
+ tests/html-report.test.ts                          |  30 +
+ tests/init.test.ts                                 |  41 ++
+ tests/maintainer-check.test.ts                     | 149 +++-
+ tests/maintenance-check-script.test.ts             |   6 +-
+ tests/next.test.ts                                 | 231 ++++++
+ tests/policy-packs.test.ts                         |  50 +-
+ tests/pr-summary.test.ts                           |   7 +-
+ tests/prepare-pr.test.ts                           |  30 +-
+ tests/readiness-score.test.ts                      |  47 ++
+ tests/release-smoke.test.ts                        |  45 +-
+ tests/review-context.test.ts                       |  42 +-
+ tests/ship.test.ts                                 |  30 +
+ tests/status.test.ts                               | 250 +++++++
+ tests/task-state.test.ts                           | 804 ++++++++++++++++++++-
+ 59 files changed, 3658 insertions(+), 264 deletions(-)</pre>
+    </section>
+
+    <section>
+      <h2>Safety Notes</h2>
+      <div class="safety">This report is a local static artifact. It must not be treated as proof that verification passed unless the verification section says so. Review protected areas such as secrets, auth, billing, deployment, migrations, lockfiles, and public APIs before merge.</div>
+    </section>
+  </main>
+</body>
+</html>

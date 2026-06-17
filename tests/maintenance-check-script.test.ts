@@ -10,12 +10,15 @@ describe('maintenance check script helpers', () => {
       'unit tests',
       'public docs hygiene',
       'markdown links',
-      'release proof',
+      'release proof smoke',
+      'npm status safety tests',
       'schemastore entry',
+      'schemastore consistency tests',
       'policy pack inventory',
       'policy pack safety tests',
       'github metadata import surface',
       'github metadata safety tests',
+      'github metadata ship-score neutrality tests',
       'agentflight version',
       'projscan project health',
       'dogfood self-check',
@@ -33,17 +36,28 @@ describe('maintenance check script helpers', () => {
       'tsx',
       'src/cli/index.ts',
       'release-proof',
-      '--strict',
+      '--only',
+      'npm',
       '--redact-paths',
     ]);
-    expect(steps[4].args).toEqual([
+    expect(steps[4]).toMatchObject({
+      command: 'npm',
+      args: ['test', '--', 'tests/npm-status.test.ts'],
+      allowFailure: false,
+    });
+    expect(steps[5].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
       'schemastore',
       '--json',
     ]);
-    expect(steps[5].args).toEqual([
+    expect(steps[6]).toMatchObject({
+      command: 'npm',
+      args: ['test', '--', 'tests/schemastore.test.ts'],
+      allowFailure: false,
+    });
+    expect(steps[7].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
@@ -51,12 +65,12 @@ describe('maintenance check script helpers', () => {
       'packs',
       '--json',
     ]);
-    expect(steps[6]).toMatchObject({
+    expect(steps[8]).toMatchObject({
       command: 'npm',
       args: ['test', '--', 'tests/policy-packs.test.ts'],
       allowFailure: false,
     });
-    expect(steps[7].args).toEqual([
+    expect(steps[9].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
@@ -64,14 +78,25 @@ describe('maintenance check script helpers', () => {
       'import',
       '--help',
     ]);
-    expect(steps[8]).toMatchObject({
+    expect(steps[10]).toMatchObject({
       command: 'npm',
       args: ['test', '--', 'tests/github-metadata.test.ts'],
       allowFailure: false,
     });
-    expect(steps[9].args).toEqual(['--yes', 'agentflight@latest', '--version']);
-    expect(steps[10].args).toEqual(['--yes', 'projscan', '--format', 'json', 'doctor']);
-    expect(steps[11].args).toEqual(['run', 'dogfood']);
+    expect(steps[11]).toMatchObject({
+      command: 'npm',
+      args: [
+        'test',
+        '--',
+        'tests/ship.test.ts',
+        '-t',
+        'keeps imported GitHub metadata neutral for ship scoring',
+      ],
+      allowFailure: false,
+    });
+    expect(steps[12].args).toEqual(['--yes', 'agentflight@latest', '--version']);
+    expect(steps[13].args).toEqual(['--yes', 'projscan', '--format', 'json', 'doctor']);
+    expect(steps[14].args).toEqual(['run', 'dogfood']);
   });
 
   test('does not include release mutation or credential-reading commands', () => {
@@ -84,8 +109,100 @@ describe('maintenance check script helpers', () => {
     expect(commandText).not.toMatch(/\bgh release create\b/);
     expect(commandText).not.toMatch(/\bgit tag\b/);
     expect(commandText).not.toMatch(/\bmcp-publisher publish\b/);
+    expect(commandText).not.toContain('release-proof --strict');
     expect(commandText).not.toMatch(/\btoken\b/i);
     expect(commandText).not.toMatch(/\.env/);
+  });
+
+  test('maintenance check includes SchemaStore consistency tests', () => {
+    const steps = maintenance.createMaintenanceCheckSteps();
+    const stepNames = steps.map((step: { name: string }) => step.name);
+    const entryIndex = stepNames.indexOf('schemastore entry');
+    const consistencyIndex = stepNames.indexOf('schemastore consistency tests');
+
+    expect(entryIndex).toBeGreaterThanOrEqual(0);
+    expect(consistencyIndex).toBeGreaterThan(entryIndex);
+    expect(steps[consistencyIndex]).toMatchObject({
+      command: 'npm',
+      args: ['test', '--', 'tests/schemastore.test.ts'],
+      allowFailure: false,
+    });
+  });
+
+  test('maintenance check includes npm status safety tests', () => {
+    const steps = maintenance.createMaintenanceCheckSteps();
+    const stepNames = steps.map((step: { name: string }) => step.name);
+    const releaseProofIndex = stepNames.indexOf('release proof smoke');
+    const npmStatusIndex = stepNames.indexOf('npm status safety tests');
+    const schemaStoreIndex = stepNames.indexOf('schemastore entry');
+
+    expect(releaseProofIndex).toBeGreaterThanOrEqual(0);
+    expect(npmStatusIndex).toBe(releaseProofIndex + 1);
+    expect(schemaStoreIndex).toBe(npmStatusIndex + 1);
+    expect(steps[npmStatusIndex]).toMatchObject({
+      command: 'npm',
+      args: ['test', '--', 'tests/npm-status.test.ts'],
+      allowFailure: false,
+    });
+  });
+
+  test('maintenance check includes policy pack safety tests', () => {
+    const steps = maintenance.createMaintenanceCheckSteps();
+    const stepNames = steps.map((step: { name: string }) => step.name);
+    const inventoryIndex = stepNames.indexOf('policy pack inventory');
+    const safetyIndex = stepNames.indexOf('policy pack safety tests');
+
+    expect(inventoryIndex).toBeGreaterThanOrEqual(0);
+    expect(safetyIndex).toBeGreaterThan(inventoryIndex);
+    expect(steps[safetyIndex]).toMatchObject({
+      command: 'npm',
+      args: ['test', '--', 'tests/policy-packs.test.ts'],
+      allowFailure: false,
+    });
+  });
+
+  test('maintenance check includes GitHub metadata safety tests', () => {
+    const steps = maintenance.createMaintenanceCheckSteps();
+    const stepNames = steps.map((step: { name: string }) => step.name);
+    const surfaceIndex = stepNames.indexOf('github metadata import surface');
+    const safetyIndex = stepNames.indexOf('github metadata safety tests');
+
+    expect(surfaceIndex).toBeGreaterThanOrEqual(0);
+    expect(safetyIndex).toBeGreaterThan(surfaceIndex);
+    expect(steps[surfaceIndex].args).toEqual([
+      '--no-install',
+      'tsx',
+      'src/cli/index.ts',
+      'github',
+      'import',
+      '--help',
+    ]);
+    expect(steps[safetyIndex]).toMatchObject({
+      command: 'npm',
+      args: ['test', '--', 'tests/github-metadata.test.ts'],
+      allowFailure: false,
+    });
+  });
+
+  test('maintenance check includes GitHub metadata ship scoring neutrality tests', () => {
+    const steps = maintenance.createMaintenanceCheckSteps();
+    const stepNames = steps.map((step: { name: string }) => step.name);
+    const safetyIndex = stepNames.indexOf('github metadata safety tests');
+    const neutralityIndex = stepNames.indexOf('github metadata ship-score neutrality tests');
+
+    expect(safetyIndex).toBeGreaterThanOrEqual(0);
+    expect(neutralityIndex).toBeGreaterThan(safetyIndex);
+    expect(steps[neutralityIndex]).toMatchObject({
+      command: 'npm',
+      args: [
+        'test',
+        '--',
+        'tests/ship.test.ts',
+        '-t',
+        'keeps imported GitHub metadata neutral for ship scoring',
+      ],
+      allowFailure: false,
+    });
   });
 
   test('builds child process env without inheriting token-like variables', () => {

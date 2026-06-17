@@ -57,7 +57,7 @@ npx agentloopkit init
 
 After setup, non-init commands search upward for the nearest `agentloop.config.json` and use that folder as the AgentLoop root. You can run `agentloop status`, `agentloop verify`, `agentloop ship`, or `agentloop prepare-pr` from a nested source folder and still write tasks, reports, runs, and handoffs to the initialized repo root.
 
-Do not run `init` from your home directory unless you intend to configure your home folder. If you want local agent guidance but do not want to commit the generated files, use local-only mode:
+Do not run `init` from your home directory unless you intend to configure your home folder. AgentLoopKit refuses that by default; `--force` allows it and prints a home-directory target warning. If you want local agent guidance but do not want to commit the generated files, use local-only mode:
 
 ```bash
 npx agentloopkit init --local-only
@@ -172,13 +172,13 @@ Use the stricter gate before a release or final handoff:
 npm run dogfood:strict
 ```
 
-Use the maintenance gate when release proof, public docs, SchemaStore, policy packs, GitHub metadata, AgentFlight, or ProjScan behavior changes:
+Use the maintenance gate when release-proof or npm-status command health, public docs, SchemaStore, policy packs, GitHub metadata, AgentFlight, or ProjScan behavior changes:
 
 ```bash
 npm run maintenance:check
 ```
 
-`maintenance:check` covers public docs, links, release proof, SchemaStore output, policy-pack inventory and safety tests, GitHub metadata safety tests, AgentFlight, ProjScan, and the non-strict dogfood self-check. Use `npm run dogfood:strict` after verification when review gates should block the handoff.
+`maintenance:check` covers public docs, links, non-strict npm release-proof smoke coverage, read-only npm-status safety tests, SchemaStore output and consistency tests, policy-pack inventory and safety tests, GitHub metadata safety and ship-score neutrality tests, AgentFlight, ProjScan, and the non-strict dogfood self-check. Use `npm run dogfood:strict` after fresh handoff or ship evidence exists, when review gates should block the handoff. Strict public release proof remains part of approved release gates.
 
 ## Commands
 
@@ -264,9 +264,10 @@ agentloop install-agent opencode
 agentloop install-agent gemini-cli
 agentloop install-agent github-copilot-cli
 agentloop install-agent all
+agentloop install-agent all --json --redact-paths
 ```
 
-AgentLoopKit writes repo-local Markdown instructions. Re-running `install-agent` is safe: existing `.agentloop/agents/<agent>.md` files are skipped so local edits are preserved, while `AGENTS.md` is updated with any missing AgentLoopKit references. When exact third-party config conventions are uncertain, it keeps the output generic instead of pretending to own another tool's setup.
+AgentLoopKit writes repo-local Markdown instructions. Re-running `install-agent` is safe: existing `.agentloop/agents/<agent>.md` files are skipped so local edits are preserved, while `AGENTS.md` is updated with any missing AgentLoopKit references. Use `--redact-paths` before sharing setup output; it hides local roots in human and JSON output without changing where files are written. When exact third-party config conventions are uncertain, it keeps the output generic instead of pretending to own another tool's setup.
 
 ## Safety Model
 
@@ -291,13 +292,13 @@ For narrower evidence history, `agentloop verify --write-run` and `agentloop han
 
 `agentloop status` includes the newest local run ledger entry when `.agentloop/runs/` exists, so agents can see the latest review-readiness or verification evidence without opening every report.
 Run ledger output uses safe display paths: `.agentloop/...` for AgentLoopKit artifacts, repo-relative paths for repo files, and filenames for older outside absolute paths.
-Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-gates`, `verify`, `summarize`, `handoff`, `ship`, `prepare-pr`, `maintainer-check`, `upgrade-harness`, `release-check`, or `release-proof` before pasting output into a public issue, PR, or CI log. That mode replaces local root paths with a placeholder.
+Use `--redact-paths` with `doctor`, `task list`, `task show`, `status`, `next`, `review-context`, `check-gates`, `artifacts`, `report`, `badge`, `runs`, `show-run`, `intent`, `verify`, `summarize`, `handoff`, `ship`, `prepare-pr`, `maintainer-check`, `upgrade-harness`, `ci-summary`, `release-notes`, `schemastore`, `github import`, `install-agent`, `release-check`, or `release-proof` before pasting output into a public issue, PR, or CI log. That mode replaces local root paths with a placeholder. Default JSON output keeps raw paths for scripts unless the redaction flag is passed. `task show` applies redaction to displayed task contract content. `task list`, `artifacts`, `runs`, `show-run`, `intent`, `schemastore`, and `github import` already use repo-relative paths or catalog metadata, and accept the flag for command consistency.
 `agentloop review-context --json` gives non-MCP agents one read-only local snapshot with status, gates, policies, artifacts, recent runs, latest ship evidence, and the next action.
 `agentloop upgrade-harness` is read-only. It tells existing users which generated guidance files need manual review after a CLI upgrade. It does not merge templates or overwrite local edits.
-`agentloop schemastore --json` prints the catalog entry for `agentloop.config.json`. Use it when preparing a SchemaStore contribution; the CLI does not submit that contribution for you.
-`agentloop github import --issue-json issue.json --pr-json pr.json` imports explicit local GitHub metadata into `.agentloop/github/context.json`. `review-context`, `prepare-pr`, and `maintainer-check` use that local context when it exists. Missing metadata does not block the loop. The CLI does not call GitHub APIs, read tokens, or run `gh`.
+`agentloop schemastore --json` prints the catalog entry for `agentloop.config.json`. Use it when preparing a SchemaStore contribution; the CLI does not submit that contribution for you. `schemastore --redact-paths` is accepted for consistency; catalog values are not local filesystem paths, so output values do not change.
+`agentloop github import --issue-json issue.json --pr-json pr.json` imports explicit local GitHub metadata into `.agentloop/github/context.json`. `review-context`, `prepare-pr`, and `maintainer-check` use that local context when it exists. Missing metadata does not block the loop. `github import --redact-paths` is accepted for consistency; metadata paths are already repo-relative, so output values do not change. The CLI does not call GitHub APIs, read tokens, or run `gh`.
 `agentloop release-proof` checks post-release evidence for npm, GitHub Releases, GitHub Marketplace, GHCR, and MCP Registry. Use `--only <channel>` to re-check one channel. It can query public metadata or read captured JSON files that you pass explicitly. It does not publish, tag, upload, post comments, or read tokens.
-Shell completions include fixed values for task types and status transitions, the `done` archive status, agent names, policy subcommands, completion shells, artifact types, badge sources, `summarize` and `handoff` formats, and `release-proof --only` channels.
+Shell completions include fixed values for task types, task-list status filters, status transitions, the `done` archive status, agent names, policy subcommands, completion shells, artifact types, badge sources, `summarize` and `handoff` formats, and `release-proof --only` channels.
 
 ## More Docs
 

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-02-13-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-02-13",
+  "createdAtEpochMs": 1781655189386,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-task-command-verification-gates.md",
+    "title": "Add built CLI smoke coverage for task-command verification gates",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-12-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-02-13-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-13-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1476
+}

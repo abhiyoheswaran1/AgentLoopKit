@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-02-28-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-17-02-28",
+  "createdAtEpochMs": 1781656107268,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-add-github-metadata-safety-guard-to-maintenance-check.md",
+    "title": "Add GitHub metadata safety guard to maintenance check",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-26-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-28-pr-summary-2.md",
+  "changedFileCount": 1565
+}

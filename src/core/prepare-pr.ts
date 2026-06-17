@@ -13,7 +13,7 @@ import { resolveUniqueOutputArtifactPath } from './artifacts.js';
 import { createShipReport, ShipResult } from './ship.js';
 import { listRuns, readRun } from './runs.js';
 import { readTaskContract, TaskContract } from './task-state.js';
-import { renderChangeAreas } from './change-areas.js';
+import { renderCompactChangeAreas } from './change-areas.js';
 import { toSafeDisplayPath } from './display-path.js';
 
 export type PreparePrResult = {
@@ -210,7 +210,7 @@ ${escapeSingleLineMarkdownProse(
 
 ## Changed Files
 
-${renderChangeAreas(input.ship.changedFiles)}
+${renderCompactChangeAreas(input.ship.changedFiles)}
 
 ## Review Readiness
 

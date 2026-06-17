@@ -177,9 +177,53 @@ describe('release smoke script helpers', () => {
     );
   });
 
-  test('accepts README redaction guidance with every shareable redaction command', () => {
+  test('rejects README redaction guidance without artifacts command', () => {
     const readme = [
       'Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-gates`, `ship`, `prepare-pr`, `maintainer-check`, `upgrade-harness`, `release-check`, or `release-proof` before pasting output into a public issue, PR, or CI log.',
+    ].join('\n');
+
+    expect(() => smoke.assertReadmeRedactionGuidance(readme)).toThrow(
+      'README redaction guidance is missing `artifacts`',
+    );
+  });
+
+  test.each(['verify', 'summarize', 'handoff', 'install-agent'])(
+    'rejects README redaction guidance without %s command',
+    (missingCommand) => {
+      const commands = [
+        'doctor',
+        'status',
+        'next',
+        'review-context',
+        'check-gates',
+        'artifacts',
+        'verify',
+        'summarize',
+        'handoff',
+        'ship',
+        'prepare-pr',
+        'maintainer-check',
+        'upgrade-harness',
+        'install-agent',
+        'release-check',
+        'release-proof',
+      ].filter((command) => command !== missingCommand);
+      const lastCommand = commands.at(-1);
+      if (!lastCommand) throw new Error('expected at least one redaction command');
+      const prefixCommands = commands.slice(0, -1).map((command) => `\`${command}\``);
+      const readme = [
+        `Use \`--redact-paths\` with ${prefixCommands.join(', ')}, or \`${lastCommand}\` before pasting output into a public issue, PR, or CI log.`,
+      ].join('\n');
+
+      expect(() => smoke.assertReadmeRedactionGuidance(readme)).toThrow(
+        `README redaction guidance is missing \`${missingCommand}\``,
+      );
+    },
+  );
+
+  test('accepts README redaction guidance with every shareable redaction command', () => {
+    const readme = [
+      'Use `--redact-paths` with `doctor`, `status`, `next`, `review-context`, `check-gates`, `artifacts`, `verify`, `summarize`, `handoff`, `ship`, `prepare-pr`, `maintainer-check`, `upgrade-harness`, `install-agent`, `release-check`, or `release-proof` before pasting output into a public issue, PR, or CI log.',
     ].join('\n');
 
     expect(() => smoke.assertReadmeRedactionGuidance(readme)).not.toThrow();

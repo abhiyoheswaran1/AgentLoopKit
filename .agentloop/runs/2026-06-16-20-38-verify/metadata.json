@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-20-38-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-20-38",
+  "createdAtEpochMs": 1781635113766,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-exclude-agentflight-placeholders-from-artifact-latest-task.md",
+    "title": "Exclude AgentFlight placeholders from artifact latest task",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-20-35-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 264
+}

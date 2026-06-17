@@ -26,7 +26,6 @@ describe('dogfood script helpers', () => {
       'src/cli/index.ts',
       'task',
       'doctor',
-      '--json',
     ]);
     expect(steps[2].command).toBe('node');
     expect(steps[2].args).toEqual(['scripts/public-docs-hygiene.mjs']);
@@ -45,7 +44,6 @@ describe('dogfood script helpers', () => {
       'tsx',
       'src/cli/index.ts',
       'upgrade-harness',
-      '--json',
       '--redact-paths',
     ]);
     expect(steps[4].allowFailure).toBe(false);
@@ -57,12 +55,17 @@ describe('dogfood script helpers', () => {
       '--redact-paths',
     ]);
     expect(steps[5].allowFailure).toBe(true);
+    expect(steps[6].args).toEqual([
+      '--no-install',
+      'tsx',
+      'src/cli/index.ts',
+      'artifacts',
+    ]);
     expect(steps[7].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
       'maintainer-check',
-      '--json',
       '--redact-paths',
     ]);
     expect(steps[7].allowFailure).toBe(true);
@@ -71,7 +74,6 @@ describe('dogfood script helpers', () => {
       'tsx',
       'src/cli/index.ts',
       'review-context',
-      '--json',
       '--redact-paths',
     ]);
     expect(steps[9].command).toBe('npx');

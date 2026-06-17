@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-03-23-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-03-23",
+  "createdAtEpochMs": 1781659422731,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-accept-redacted-ci-summary-output-flag.md",
+    "title": "Accept redacted CI summary output flag",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-03-23-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-03-23-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-03-23-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1773
+}

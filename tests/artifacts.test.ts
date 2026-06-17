@@ -51,6 +51,34 @@ async function writeRunMetadata(
   await utimes(path.join(runDir, 'metadata.json'), timestamp, timestamp);
 }
 
+async function writeRunChangedFiles(
+  dir: string,
+  runId: string,
+  changedFiles: Array<{ status: string; path: string }>,
+  modifiedAt: string,
+) {
+  const runDir = path.join(dir, '.agentloop/runs', runId);
+  await mkdir(runDir, { recursive: true });
+  await writeFile(path.join(runDir, 'changed-files.json'), JSON.stringify(changedFiles, null, 2));
+  const timestamp = new Date(modifiedAt);
+  await utimes(path.join(runDir, 'changed-files.json'), timestamp, timestamp);
+}
+
+function agentFlightPlaceholderMarkdown(title: string, status = 'deferred') {
+  return `# ${title}
+
+- Created date: 2026-06-16
+- Task type: feature
+- Status: ${status}
+
+## Problem Statement
+AgentFlight session task: ${title}
+
+## Desired Outcome
+Task is implemented with local verification evidence.
+`;
+}
+
 async function createRepoWithArtifacts() {
   const dir = await makeTempDir();
   tempDirs.push(dir);
@@ -490,6 +518,303 @@ describe('artifacts command', () => {
     });
   });
 
+  test('separates AgentFlight placeholder task artifacts from ordinary task counts', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+    const title = 'Separate AgentFlight placeholders in artifact inventory';
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/tasks/2026-06-10-real-task.md',
+      '# Real task\n\n- Status: in-progress\n',
+      '2026-06-10T09:00:00.000Z',
+    );
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/tasks/2026-06-16-separate-agentflight-placeholders-in-artifact-inventory.md',
+      agentFlightPlaceholderMarkdown(title),
+      '2026-06-16T09:00:00.000Z',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'artifacts'], {
+      cwd: dir,
+      reject: false,
+    });
+    const latestTaskResult = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--type', 'task', '--latest'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(markdownResult.exitCode).toBe(0);
+    expect(latestTaskResult.exitCode).toBe(0);
+    const inventory = JSON.parse(jsonResult.stdout);
+    expect(inventory.tasks).toMatchObject({
+      count: 1,
+      byStatus: {
+        'in-progress': 1,
+      },
+      latest: {
+        path: '.agentloop/tasks/2026-06-10-real-task.md',
+        title: 'Real task',
+        status: 'in-progress',
+      },
+      agentFlightPlaceholders: {
+        count: 1,
+        latest: {
+          path: '.agentloop/tasks/2026-06-16-separate-agentflight-placeholders-in-artifact-inventory.md',
+          title,
+          status: 'deferred',
+          source: 'agentflight-placeholder',
+        },
+      },
+    });
+    expect(markdownResult.stdout).toContain('- Tasks: 1 total (`in-progress`: 1)');
+    expect(markdownResult.stdout).toContain('- AgentFlight placeholder tasks: 1 preserved');
+    expect(markdownResult.stdout).toContain(
+      '- Latest task: `Real task` (`in-progress`) - `.agentloop/tasks/2026-06-10-real-task.md`',
+    );
+    expect(latestTaskResult.stdout).toContain(
+      '- Latest task: `Real task` (`in-progress`) - `.agentloop/tasks/2026-06-10-real-task.md`',
+    );
+  });
+
+  test('does not use AgentFlight placeholders as latest task when no ordinary tasks exist', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+    const title = 'Only placeholder task';
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/tasks/2026-06-16-only-placeholder-task.md',
+      agentFlightPlaceholderMarkdown(title),
+      '2026-06-16T09:00:00.000Z',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'artifacts'], {
+      cwd: dir,
+      reject: false,
+    });
+    const latestTaskResult = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--type', 'task', '--latest'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(markdownResult.exitCode).toBe(0);
+    expect(latestTaskResult.exitCode).toBe(0);
+    const inventory = JSON.parse(jsonResult.stdout);
+    expect(inventory.tasks).toMatchObject({
+      count: 0,
+      byStatus: {},
+      latest: null,
+      agentFlightPlaceholders: {
+        count: 1,
+        latest: {
+          path: '.agentloop/tasks/2026-06-16-only-placeholder-task.md',
+          title,
+          status: 'deferred',
+          source: 'agentflight-placeholder',
+        },
+      },
+    });
+    expect(markdownResult.stdout).toContain('- Tasks: 0 total');
+    expect(markdownResult.stdout).toContain('- AgentFlight placeholder tasks: 1 preserved');
+    expect(markdownResult.stdout).toContain('- Latest task: not found');
+    expect(latestTaskResult.stdout).toContain('No task artifacts found.');
+  });
+
+  test('does not use deferred tasks as latest task when no open tasks exist', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/tasks/2026-06-16-parked-marketplace.md',
+      '# Parked marketplace\n\n- Status: deferred\n',
+      '2026-06-16T09:00:00.000Z',
+    );
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/tasks/2026-06-16-placeholder.md',
+      agentFlightPlaceholderMarkdown('Placeholder task'),
+      '2026-06-16T10:00:00.000Z',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'artifacts'], {
+      cwd: dir,
+      reject: false,
+    });
+    const latestTaskResult = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--type', 'task', '--latest'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(markdownResult.exitCode).toBe(0);
+    expect(latestTaskResult.exitCode).toBe(0);
+    const inventory = JSON.parse(jsonResult.stdout);
+    expect(inventory.tasks).toMatchObject({
+      count: 1,
+      byStatus: {
+        deferred: 1,
+      },
+      latest: null,
+      agentFlightPlaceholders: {
+        count: 1,
+      },
+    });
+    expect(markdownResult.stdout).toContain('- Tasks: 1 total (`deferred`: 1)');
+    expect(markdownResult.stdout).toContain('- AgentFlight placeholder tasks: 1 preserved');
+    expect(markdownResult.stdout).toContain('- Latest task: not found');
+    expect(latestTaskResult.stdout).toContain('No task artifacts found.');
+  });
+
+  test('uses latest archived done task as task evidence fallback', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/tasks/2026-06-16-parked-marketplace.md',
+      '# Parked marketplace\n\n- Status: deferred\n',
+      '2026-06-16T09:00:00.000Z',
+    );
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/tasks/2026-06-16-placeholder.md',
+      agentFlightPlaceholderMarkdown('Placeholder task'),
+      '2026-06-16T10:00:00.000Z',
+    );
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/tasks/archive/2026-06-15-older-archived-task.md',
+      '# Older archived task\n\n- Status: done\n',
+      '2026-06-15T09:00:00.000Z',
+    );
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/tasks/archive/2026-06-17-archived-review-task.md',
+      '# Archived review task\n\n- Status: done\n',
+      '2026-06-17T09:00:00.000Z',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'artifacts'], {
+      cwd: dir,
+      reject: false,
+    });
+    const latestTaskResult = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--type', 'task', '--latest'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(markdownResult.exitCode).toBe(0);
+    expect(latestTaskResult.exitCode).toBe(0);
+    const inventory = JSON.parse(jsonResult.stdout);
+    expect(inventory.tasks).toMatchObject({
+      count: 1,
+      byStatus: {
+        deferred: 1,
+      },
+      latest: {
+        path: '.agentloop/tasks/archive/2026-06-17-archived-review-task.md',
+        title: 'Archived review task',
+        status: 'done',
+        archived: true,
+      },
+      agentFlightPlaceholders: {
+        count: 1,
+      },
+    });
+    expect(markdownResult.stdout).toContain('- Tasks: 1 total (`deferred`: 1)');
+    expect(markdownResult.stdout).toContain('- AgentFlight placeholder tasks: 1 preserved');
+    expect(markdownResult.stdout).toContain(
+      '- Latest task: `Archived review task` (`done`, `archived`) - `.agentloop/tasks/archive/2026-06-17-archived-review-task.md`',
+    );
+    expect(latestTaskResult.stdout).toContain(
+      '- Latest task: `Archived review task` (`done`, `archived`) - `.agentloop/tasks/archive/2026-06-17-archived-review-task.md`',
+    );
+  });
+
+  test('uses latest open task instead of a newer deferred task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/tasks/2026-06-15-open-task.md',
+      '# Open task\n\n- Status: in-progress\n',
+      '2026-06-15T09:00:00.000Z',
+    );
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/tasks/2026-06-16-parked-task.md',
+      '# Parked task\n\n- Status: deferred\n',
+      '2026-06-16T09:00:00.000Z',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'artifacts'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(markdownResult.exitCode).toBe(0);
+    const inventory = JSON.parse(jsonResult.stdout);
+    expect(inventory.tasks).toMatchObject({
+      count: 2,
+      byStatus: {
+        deferred: 1,
+        'in-progress': 1,
+      },
+      latest: {
+        path: '.agentloop/tasks/2026-06-15-open-task.md',
+        title: 'Open task',
+        status: 'in-progress',
+      },
+    });
+    expect(markdownResult.stdout).toContain(
+      '- Latest task: `Open task` (`in-progress`) - `.agentloop/tasks/2026-06-15-open-task.md`',
+    );
+  });
+
   test('orders timestamped generated artifacts by filename instead of filesystem mtime', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -592,6 +917,108 @@ describe('artifacts command', () => {
       '- Latest run: `2026-06-10-10-35-ship` `ship` score `96`/100 - `.agentloop/reports/2026-06-10-10-35-ship-report.md`',
     );
     expect(result.stdout).not.toContain('do-not-print-this-fixture');
+  });
+
+  test('separates AgentLoop evidence churn in human run artifact output', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeConfig(dir);
+    await writeEvidenceFile(
+      dir,
+      '.agentloop/reports/2026-06-10-10-35-ship-report.md',
+      '# Latest Ship Report\n',
+      '2026-06-10T10:35:00.000Z',
+    );
+    await writeRunMetadata(
+      dir,
+      '2026-06-10-10-35-ship',
+      {
+        id: '2026-06-10-10-35-ship',
+        command: 'ship',
+        createdAt: '2026-06-10-10-35',
+        score: 96,
+        changedFileCount: 3,
+        shipReportPath: '.agentloop/reports/2026-06-10-10-35-ship-report.md',
+      },
+      '2026-06-10T10:35:00.000Z',
+    );
+    await writeRunChangedFiles(
+      dir,
+      '2026-06-10-10-35-ship',
+      [
+        { status: 'M', path: 'src/index.ts' },
+        { status: 'A', path: '.agentloop/reports/2026-06-10-10-35-ship-report.md' },
+        { status: 'A', path: '.agentflight/reports/session-proof.md' },
+      ],
+      '2026-06-10T10:35:00.000Z',
+    );
+
+    const humanResult = await execa(tsxPath, [cliPath, 'artifacts'], {
+      cwd: dir,
+      reject: false,
+    });
+    const latestRunResult = await execa(tsxPath, [cliPath, 'artifacts', '--type', 'run', '--latest'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--type', 'run', '--latest', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    const expectedLine =
+      '- Latest run: `2026-06-10-10-35-ship` `ship` score `96`/100 - `3` changed file(s) (`1` non-evidence, `2` AgentLoop evidence) - `.agentloop/reports/2026-06-10-10-35-ship-report.md`';
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain(expectedLine);
+    expect(latestRunResult.exitCode).toBe(0);
+    expect(latestRunResult.stdout).toContain(expectedLine);
+    expect(jsonResult.exitCode).toBe(0);
+    expect(JSON.parse(jsonResult.stdout)).toEqual({
+      latest: [
+        {
+          type: 'run',
+          id: '2026-06-10-10-35-ship',
+          command: 'ship',
+          createdAt: '2026-06-10-10-35',
+          score: 96,
+          changedFileCount: 3,
+          shipReportPath: '.agentloop/reports/2026-06-10-10-35-ship-report.md',
+        },
+      ],
+    });
+  });
+
+  test('accepts redact-paths flag for shareable inventory output modes', async () => {
+    const dir = await createRepoWithArtifacts();
+
+    const humanResult = await execa(tsxPath, [cliPath, 'artifacts', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'artifacts', '--json', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+    const latestTaskResult = await execa(
+      tsxPath,
+      [cliPath, 'artifacts', '--type', 'task', '--latest', '--redact-paths'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stderr).toBe('');
+    expect(humanResult.stdout).toContain('# AgentLoopKit Artifacts');
+    expect(jsonResult.exitCode).toBe(0);
+    expect(jsonResult.stderr).toBe('');
+    expect(JSON.parse(jsonResult.stdout).tasks.count).toBe(2);
+    expect(latestTaskResult.exitCode).toBe(0);
+    expect(latestTaskResult.stderr).toBe('');
+    expect(latestTaskResult.stdout).toContain(
+      '- Latest task: `New task` (`in-progress`) - `.agentloop/tasks/2026-06-11-new-task.md`',
+    );
   });
 
   test('renders markdown inventory values with safe inline code when artifact metadata contains backticks', async () => {
@@ -1018,6 +1445,19 @@ describe('artifacts command', () => {
     );
     expect(markdownResult.stdout).toContain('- Showing `4` of `4` candidate(s).');
     expect(await snapshotTree(path.join(dir, '.agentloop'))).toEqual(before);
+  });
+
+  test('accepts redact-paths flag for stale evidence previews', async () => {
+    const dir = await createRepoWithStaleEvidence();
+
+    const result = await execa(tsxPath, [cliPath, 'artifacts', '--stale', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toContain('# AgentLoopKit Stale Evidence Preview');
   });
 
   test('filters stale evidence preview to ship report candidates', async () => {

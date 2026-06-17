@@ -1,5 +1,6 @@
 import { GitFileStatus } from './git.js';
 import { singleLineInlineCode as inlineCode } from './markdown-format.js';
+import { agentLoopEvidenceGroup, isAgentLoopEvidenceFile } from './agentloop-evidence.js';
 
 export type ChangeArea = {
   key: string;
@@ -95,4 +96,49 @@ export function renderChangeAreas(changedFiles: GitFileStatus[]) {
 ${area.files.map(renderChangedFileLine).join('\n')}`;
     })
     .join('\n\n');
+}
+
+function evidenceSummary(changedFiles: GitFileStatus[]) {
+  const evidenceFiles = changedFiles.filter((file) => isAgentLoopEvidenceFile(file.path));
+  if (!evidenceFiles.length) return undefined;
+  const groups = [
+    ...new Set(
+      evidenceFiles.flatMap((file) => {
+        const group = agentLoopEvidenceGroup(file.path);
+        return group ? [group] : [];
+      }),
+    ),
+  ].sort();
+  return {
+    count: evidenceFiles.length,
+    groups,
+    line: `- AgentLoop evidence: ${inlineCode(String(evidenceFiles.length))} file(s) grouped under ${groups
+      .map(inlineCode)
+      .join(', ')}.`,
+  };
+}
+
+export function renderCompactChangedFiles(changedFiles: GitFileStatus[]) {
+  if (!changedFiles.length) return '- No changed files detected.';
+  const visibleFiles = changedFiles.filter((file) => !isAgentLoopEvidenceFile(file.path));
+  const summary = evidenceSummary(changedFiles);
+  const lines = visibleFiles.map(renderChangedFileLine);
+  if (summary) {
+    lines.push(summary.line);
+    lines.push('- Full paths remain in JSON output and run-ledger evidence.');
+  }
+  return lines.join('\n');
+}
+
+export function renderCompactChangeAreas(changedFiles: GitFileStatus[]) {
+  const visibleFiles = changedFiles.filter((file) => !isAgentLoopEvidenceFile(file.path));
+  const summary = evidenceSummary(changedFiles);
+  const visibleAreas = renderChangeAreas(visibleFiles);
+  if (!summary) return visibleAreas;
+
+  const agentLoopArea = `### AgentLoop Evidence
+${summary.line}
+- Full paths remain in JSON output and run-ledger evidence.`;
+
+  return visibleFiles.length ? `${visibleAreas}\n\n${agentLoopArea}` : agentLoopArea;
 }

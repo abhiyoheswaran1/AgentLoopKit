@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-15-18-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-15-18",
+  "createdAtEpochMs": 1781702318979,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-reconcile-verified-non-release-backlog-decisions-2.md",
+    "title": "Reconcile verified non-release backlog decisions",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-15-18-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 3041
+}

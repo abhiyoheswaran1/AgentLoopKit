@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-16-07-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-16-07",
+  "createdAtEpochMs": 1781705274644,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-separate-agentloop-evidence-churn-in-release-check-2.md",
+    "title": "Separate AgentLoop evidence churn in release-check",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-16-03-verification-report.md",
+  "overallStatus": "fail",
+  "changedFileCount": 3109
+}

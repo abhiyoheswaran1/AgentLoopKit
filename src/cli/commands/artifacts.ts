@@ -10,6 +10,8 @@ import {
   renderStaleArtifactPreviewJson,
   renderStaleArtifactPreviewMarkdown,
 } from '../../core/artifacts.js';
+import { readRun } from '../../core/runs.js';
+import type { GitFileStatus } from '../../core/git.js';
 import {
   CliOptionError,
   loadWorkspaceForJsonCommand,
@@ -22,6 +24,7 @@ type ArtifactsCommandOptions = {
   latest?: boolean;
   stale?: boolean;
   limit?: string;
+  redactPaths?: boolean;
 };
 
 function validateArtifactType(options: ArtifactsCommandOptions) {
@@ -90,6 +93,24 @@ function validateArtifactOptions(options: ArtifactsCommandOptions): number | fal
   return parseArtifactLimit(options);
 }
 
+async function readArtifactRunChangedFiles(
+  cwd: string,
+  inventory: Awaited<ReturnType<typeof getArtifactInventory>>,
+) {
+  const changedFiles = new Map<string, GitFileStatus[]>();
+  const latestRun = inventory.runs.latest;
+  if (!latestRun) return changedFiles;
+
+  try {
+    const run = await readRun(cwd, latestRun.id);
+    if (run.changedFiles.length > 0) changedFiles.set(latestRun.id, run.changedFiles);
+  } catch {
+    // Missing or unreadable changed-file evidence keeps the existing human fallback.
+  }
+
+  return changedFiles;
+}
+
 export function artifactsCommand() {
   return new Command('artifacts')
     .description('Show local AgentLoop evidence artifacts without writing files')
@@ -98,6 +119,10 @@ export function artifactsCommand() {
     .option('--stale', 'preview stale evidence candidates without deleting files')
     .option('--limit <count>', 'limit stale preview candidate output')
     .option('--json', 'print machine-readable output')
+    .option(
+      '--redact-paths',
+      'accept common public-output redaction flag; artifact paths are already repo-relative',
+    )
     .action(async (options: ArtifactsCommandOptions) => {
       if (!validateArtifactType(options)) return;
       const limit = validateArtifactOptions(options);
@@ -134,7 +159,12 @@ export function artifactsCommand() {
       if (options.json) {
         console.log(JSON.stringify(renderArtifactInventoryJson(inventory, renderOptions), null, 2));
       } else {
-        console.log(renderArtifactInventoryMarkdown(inventory, renderOptions));
+        console.log(
+          renderArtifactInventoryMarkdown(inventory, {
+            ...renderOptions,
+            runChangedFiles: await readArtifactRunChangedFiles(workspace.cwd, inventory),
+          }),
+        );
       }
     });
 }

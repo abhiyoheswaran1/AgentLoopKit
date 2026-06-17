@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-05-21-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-05-21",
+  "createdAtEpochMs": 1781666461931,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-fix-fish-task-archive-status-completion-2.md",
+    "title": "Fix fish task archive status completion",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-05-18-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2076
+}

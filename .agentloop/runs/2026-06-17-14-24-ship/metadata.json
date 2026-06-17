@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-14-24-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-14-24",
+  "createdAtEpochMs": 1781699060387,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-add-compact-json-status-output-2.md",
+    "title": "Add compact JSON status output",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-14-11-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-14-24-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-14-24-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 2943
+}

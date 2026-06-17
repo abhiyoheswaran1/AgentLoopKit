@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-03-24-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-17-03-24",
+  "createdAtEpochMs": 1781659478982,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-accept-redacted-ci-summary-output-flag.md",
+    "title": "Accept redacted CI summary output flag",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-03-23-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-03-24-pr-summary-2.md",
+  "changedFileCount": 1787
+}

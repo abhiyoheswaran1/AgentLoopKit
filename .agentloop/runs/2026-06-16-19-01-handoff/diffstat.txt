@@ -1,0 +1,15 @@
+ ...026-06-16-prevent-stale-agentloop-task-state.md |  78 -----
+ ...2026-06-16-publish-github-marketplace-action.md |   2 +-
+ AGENTLOOP.md                                       |   2 +
+ docs/status.md                                     |  11 +-
+ docs/upgrading-existing-repos.md                   |  15 +
+ src/cli/commands/next.ts                           |  11 +-
+ src/cli/commands/task.ts                           |   3 +
+ src/core/check-gates.ts                            |  19 +-
+ src/core/status.ts                                 |  58 +++-
+ src/core/task-state.ts                             | 232 +++++++++++++-
+ src/templates/root/AGENTLOOP.md                    |   2 +
+ tests/next.test.ts                                 |  38 +++
+ tests/status.test.ts                               |  38 +++
+ tests/task-state.test.ts                           | 339 +++++++++++++++++++++
+ 14 files changed, 758 insertions(+), 90 deletions(-)

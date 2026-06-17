@@ -102,8 +102,16 @@ async function readJsonFile<T>(filePath: string): Promise<T> {
   return JSON.parse(await readFile(filePath, 'utf8')) as T;
 }
 
-function stringField(value: unknown) {
-  return typeof value === 'string' ? value : '';
+function requiredStringField(
+  record: Record<string, unknown>,
+  field: keyof Pick<PolicyPackManifest, 'name' | 'title' | 'description'>,
+  manifestPath: string,
+) {
+  const value = record[field];
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    throw new PolicyPackManifestError(manifestPath, `${field} must be a non-empty string.`);
+  }
+  return value.trim();
 }
 
 function validatePolicyFileName(fileName: unknown, manifestPath: string) {
@@ -137,9 +145,9 @@ function normalizeManifest(raw: unknown, manifestPath: string): PolicyPackManife
     throw new PolicyPackManifestError(manifestPath, 'policies must be an array.');
   }
   return {
-    name: stringField(record.name),
-    title: stringField(record.title),
-    description: stringField(record.description),
+    name: requiredStringField(record, 'name', manifestPath),
+    title: requiredStringField(record, 'title', manifestPath),
+    description: requiredStringField(record, 'description', manifestPath),
     policies: policies.map((fileName) => validatePolicyFileName(fileName, manifestPath)),
   };
 }
@@ -149,9 +157,19 @@ async function readPackAt(options: {
   packRoot: string;
   displayPath: string;
   source: PolicyPackSource;
+  expectedName?: string;
 }): Promise<PolicyPack> {
   const manifestPath = path.join(options.packRoot, 'manifest.json');
   const manifest = normalizeManifest(await readJsonFile<unknown>(manifestPath), manifestPath);
+  if (
+    options.expectedName !== undefined &&
+    normalizePackName(manifest.name) !== normalizePackName(options.expectedName)
+  ) {
+    throw new PolicyPackManifestError(
+      manifestPath,
+      `manifest name must match configured pack name: ${options.expectedName}`,
+    );
+  }
   const policyDirectory = path.join(options.packRoot, 'policies');
   if (options.source === 'local' && !resolvesInsidePath(options.cwd, policyDirectory)) {
     throw new PolicyPackManifestError(
@@ -227,6 +245,7 @@ async function listLocalPolicyPacks(options: { cwd: string; config: AgentLoopCon
         packRoot: root,
         displayPath: pack.path,
         source: 'local',
+        expectedName: pack.name,
       }),
     );
   }

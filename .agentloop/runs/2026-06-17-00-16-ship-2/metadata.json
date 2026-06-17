@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-00-16-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-17-00-16",
+  "createdAtEpochMs": 1781648187804,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-expose-agentflight-placeholder-groups-in-task-list-json-2.md",
+    "title": "Expose AgentFlight placeholder groups in task list JSON",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-00-15-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-00-16-ship-report-2.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-00-16-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 918
+}

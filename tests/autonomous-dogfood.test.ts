@@ -30,7 +30,50 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     expect(config.changedFileFilters.ignore).toEqual(
       expect.arrayContaining(['.projscan-memory/**', '.projscan-cache/**']),
     );
+    expect(config.changedFileFilters.ignore).toEqual(
+      expect.arrayContaining([
+        '.agentloop/handoffs/**',
+        '.agentloop/reports/**',
+        '.agentloop/runs/**',
+        '.agentloop/tasks/archive/**',
+      ]),
+    );
+    expect(config.changedFileFilters.ignore).not.toContain('.agentloop/**');
+    expect(config.changedFileFilters.ignore).not.toContain('.agentloop/harness/**');
     expect(config.privacy).toEqual({ localOnly: true, telemetry: false });
+  });
+
+  test('keeps ProjScan focused on source while ignoring generated evidence', async () => {
+    const config = await readJson<{ ignore: string[] }>('.projscanrc.json');
+
+    expect(config.ignore).toEqual(
+      expect.arrayContaining([
+        '**/node_modules/**',
+        '**/.git/**',
+        '**/dist/**',
+        '**/build/**',
+        '**/coverage/**',
+        '**/.projscan-cache/**',
+        '**/.projscan-memory/**',
+      ]),
+    );
+    expect(config.ignore).toEqual(
+      expect.arrayContaining([
+        '.agentloop/handoffs/**',
+        '.agentloop/reports/**',
+        '.agentloop/runs/**',
+        '.agentloop/tasks/archive/**',
+        '.agentflight/current/**',
+        '.agentflight/evidence/**',
+        '.agentflight/reports/**',
+        '.agentflight/replays/**',
+        '.agentflight/sessions/**',
+      ]),
+    );
+    expect(config.ignore).not.toContain('.agentloop/**');
+    expect(config.ignore).not.toContain('.agentloop/tasks/**');
+    expect(config.ignore).not.toContain('.agentloop/harness/**');
+    expect(config.ignore).not.toContain('.agentflight/**');
   });
 
   test('tells future Codex sessions to use AgentLoopKit, ProjScan, AgentFlight, personas, and research cycles', async () => {
@@ -58,16 +101,96 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     expect(dogfoodGuide).toContain(
       'Synthetic feedback is internal decision support, not public evidence.',
     );
+    expect(dogfoodGuide).toContain(
+      'AgentFlight changed-file filters ignore generated AgentLoop evidence directories',
+    );
+    expect(dogfoodGuide).toContain(
+      '.agentloop/handoffs/, .agentloop/reports/, .agentloop/runs/, and .agentloop/tasks/archive/',
+    );
+    expect(dogfoodGuide).toContain(
+      'ProjScan ignores generated AgentLoop and AgentFlight evidence directories',
+    );
+    expect(dogfoodGuide).toContain('through `.projscanrc.json`');
+    expect(dogfoodGuide).toContain('current `.agentloop/tasks/` contracts visible to ProjScan');
   });
 
-  test('keeps AgentFlight and AgentLoop task setup sequential to avoid generic task races', async () => {
+  test('tells autonomous sessions to cross-check backlog rows before creating tasks', async () => {
+    const dogfoodGuide = await readFile('.agentloop/harness/autonomous-dogfooding.md', 'utf8');
+
+    expect(dogfoodGuide).toContain('Backlog rows are decision support');
+    expect(dogfoodGuide).toContain('cross-check `.agentloop/tasks/archive/`');
+    expect(dogfoodGuide).toContain('implementation evidence');
+    expect(dogfoodGuide).toContain('do not create a duplicate task contract');
+  });
+
+  test('records stale task-state recovery implementation in dogfood log', async () => {
+    const dogfoodLog = await readFile('.agentloop/dogfood-log.md', 'utf8');
+    const sectionMatch = dogfoodLog.match(
+      /## 2026-06-16: .*Stale Task-State Recovery[\s\S]*?(?=\n## 2026-06-16: Explicit Post-Verification Gates From Verify)/,
+    );
+
+    expect(sectionMatch?.[0]).toBeDefined();
+    const section = sectionMatch?.[0] ?? '';
+
+    expect(section).toContain('Implementation status: completed after maintainer approval');
+    expect(section).toContain(
+      '.agentloop/tasks/archive/2026-06-16-prevent-stale-agentloop-task-state.md',
+    );
+    expect(section).toContain('No release, version bump, or publishing behavior changed.');
+    expect(section).not.toContain(
+      'Keep this as deferred implementation work until explicitly approved.',
+    );
+    expect(section).not.toContain('Planned outcome:');
+  });
+
+  test('documents dogfood-start task setup preflight to avoid generic task races', async () => {
     const dogfoodGuide = await readFile('.agentloop/harness/autonomous-dogfooding.md', 'utf8');
 
     expect(dogfoodGuide).toContain(
       'Do not start AgentFlight and `agentloop create-task` in parallel.',
     );
+    expect(dogfoodGuide).toContain('parks exact AgentFlight placeholder task contracts');
+    expect(dogfoodGuide).toContain('does not touch custom task contracts');
     expect(dogfoodGuide).toContain('npm run dogfood:start');
+    expect(dogfoodGuide).toContain('Supported task types:');
+    expect(dogfoodGuide).toContain('`feature`, `bugfix`, `refactor`, `tests`');
+    expect(dogfoodGuide).toContain('`--type test` is accepted as a local alias for `tests`');
+    expect(dogfoodGuide).toContain('Unsupported task types fail before AgentFlight starts');
     expect(dogfoodGuide).toContain('--dry-run');
+  });
+
+  test('documents raw AgentFlight active-task recovery when the helper is not used', async () => {
+    const agentloop = await readFile('AGENTLOOP.md', 'utf8');
+    const templateAgentloop = await readFile('src/templates/root/AGENTLOOP.md', 'utf8');
+    const agents = await readFile('AGENTS.md', 'utf8');
+    const templateAgents = await readFile('src/templates/root/AGENTS.md', 'utf8');
+    const harnessCommands = await readFile('.agentloop/harness/commands.md', 'utf8');
+    const dogfoodGuide = await readFile('.agentloop/harness/autonomous-dogfooding.md', 'utf8');
+
+    for (const content of [
+      agentloop,
+      templateAgentloop,
+      agents,
+      templateAgents,
+      harnessCommands,
+      dogfoodGuide,
+    ]) {
+      expect(content).toContain('npx --yes agentflight start --task "<task>" --yes');
+      expect(content).toContain('agentloop status --redact-paths');
+      expect(content).toContain('agentloop task set <path>');
+      expect(content).toContain('AgentFlight placeholder');
+    }
+  });
+
+  test('documents strict dogfood after fresh handoff or ship evidence exists', async () => {
+    const dogfoodGuide = await readFile('.agentloop/harness/autonomous-dogfooding.md', 'utf8');
+
+    expect(dogfoodGuide).toContain(
+      'Run `npm run dogfood:strict` after fresh handoff or ship evidence exists',
+    );
+    expect(dogfoodGuide.indexOf('agentloop handoff --write-run')).toBeLessThan(
+      dogfoodGuide.indexOf('npm run dogfood:strict'),
+    );
   });
 
   test('documents that dogfood start uses the source CLI before a build exists', async () => {
@@ -108,8 +231,9 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     expect(maintenanceCommandText).toContain('npm run check:public-docs');
     expect(maintenanceCommandText).toContain('npm run check:links');
     expect(maintenanceCommandText).toContain(
-      'npx --no-install tsx src/cli/index.ts release-proof --strict --redact-paths',
+      'npx --no-install tsx src/cli/index.ts release-proof --only npm --redact-paths',
     );
+    expect(maintenanceCommandText).not.toContain('release-proof --strict');
     expect(maintenanceCommandText).toContain(
       'npx --no-install tsx src/cli/index.ts schemastore --json',
     );
@@ -124,6 +248,59 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     expect(maintenanceCommandText).toContain('npx --yes agentflight@latest --version');
     expect(maintenanceCommandText).toContain('npx --yes projscan --format json doctor');
     expect(maintenanceCommandText).toContain('npm run dogfood');
-    expect(maintenance).toContain('Run `npm run dogfood:strict` after fresh verification');
+    expect(maintenance).toContain(
+      'Run `npm run dogfood:strict` after fresh handoff or ship evidence exists',
+    );
+    expect(maintenance).toContain('Strict public release proof belongs in approved release gates');
+  });
+
+  test('uses concise human local-check output in normal dogfood logs', async () => {
+    // @ts-expect-error TS7016: script helper has no declaration file.
+    const dogfoodModule = await import('../scripts/dogfood.mjs');
+    const steps = dogfoodModule.createDogfoodSteps() as Array<{
+      name: string;
+      args: string[];
+    }>;
+
+    const taskDoctorStep = steps.find((step) => step.name === 'task folder hygiene');
+    const upgradeHarnessStep = steps.find((step) => step.name === 'harness upgrade audit');
+    const artifactStep = steps.find((step) => step.name === 'artifact inventory');
+    const maintainerStep = steps.find((step) => step.name === 'maintainer reviewability check');
+    const reviewContextStep = steps.find((step) => step.name === 'agent review context');
+
+    expect(taskDoctorStep?.args).toEqual([
+      '--no-install',
+      'tsx',
+      'src/cli/index.ts',
+      'task',
+      'doctor',
+    ]);
+    expect(taskDoctorStep?.args).not.toContain('--json');
+    expect(upgradeHarnessStep?.args).toEqual([
+      '--no-install',
+      'tsx',
+      'src/cli/index.ts',
+      'upgrade-harness',
+      '--redact-paths',
+    ]);
+    expect(upgradeHarnessStep?.args).not.toContain('--json');
+    expect(artifactStep?.args).toEqual(['--no-install', 'tsx', 'src/cli/index.ts', 'artifacts']);
+    expect(artifactStep?.args).not.toContain('--json');
+    expect(maintainerStep?.args).toEqual([
+      '--no-install',
+      'tsx',
+      'src/cli/index.ts',
+      'maintainer-check',
+      '--redact-paths',
+    ]);
+    expect(maintainerStep?.args).not.toContain('--json');
+    expect(reviewContextStep?.args).toEqual([
+      '--no-install',
+      'tsx',
+      'src/cli/index.ts',
+      'review-context',
+      '--redact-paths',
+    ]);
+    expect(reviewContextStep?.args).not.toContain('--json');
   });
 });

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-00-27-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-17-00-27",
+  "createdAtEpochMs": 1781648835944,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-park-all-agentflight-placeholders-during-dogfood-start-2.md",
+    "title": "Park all AgentFlight placeholders during dogfood start",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-00-25-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-00-27-pr-summary-2.md",
+  "changedFileCount": 1004
+}

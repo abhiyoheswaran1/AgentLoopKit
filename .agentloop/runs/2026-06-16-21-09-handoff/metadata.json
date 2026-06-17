@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-21-09-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-21-09",
+  "createdAtEpochMs": 1781636962881,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-use-concise-hygiene-steps-in-dogfood-output.md",
+    "title": "Use concise hygiene steps in dogfood output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-21-06-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-21-09-pr-summary.md",
+  "changedFileCount": 335
+}

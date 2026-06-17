@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-23-51-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-23-51",
+  "createdAtEpochMs": 1781646666619,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-ignore-agentloop-evidence-in-agentflight-changed-file-filters-2.md",
+    "title": "Ignore AgentLoop evidence in AgentFlight changed-file filters",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-23-48-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-23-51-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-23-51-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 797
+}

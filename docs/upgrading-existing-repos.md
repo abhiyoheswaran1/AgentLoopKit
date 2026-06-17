@@ -24,6 +24,21 @@ Read the output before changing files.
 
 Human `upgrade-harness` output keeps dynamic paths on one Markdown line. JSON output keeps raw values for scripts.
 
+## Recover Stale Task State
+
+Run `agentloop task doctor` when an upgraded repo appears to have old task context, when `.agentloop/state.json` points at a missing or archived task, or when recent AgentLoop reports exist without a current active task.
+
+The recovery check is bounded and local. It reads `.agentloop/state.json`, a capped set of task contracts, recent run metadata, and recent verification report filenames. It does not scan the whole repository, read `.env` files, call external services, or infer task history from changelogs, devlogs, or arbitrary prose.
+
+If the active pointer is stale, use the printed recovery commands to clear, set, or create the current task contract:
+
+```bash
+agentloop task doctor
+agentloop task clear
+agentloop task set .agentloop/tasks/<current-task>.md
+agentloop create-task --title "Current work"
+```
+
 ## Apply The Latest CLI
 
 If the repo uses `npx`, you already get the latest CLI when you run:

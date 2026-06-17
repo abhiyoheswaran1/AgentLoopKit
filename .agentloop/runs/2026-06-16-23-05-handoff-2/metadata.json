@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-23-05-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-16-23-05",
+  "createdAtEpochMs": 1781643955896,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-bound-agentflight-placeholder-task-list-output.md",
+    "title": "Bound AgentFlight placeholder task list output",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-23-01-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-23-05-pr-summary-2.md",
+  "changedFileCount": 671
+}

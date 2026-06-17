@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-23-47-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-23-47",
+  "createdAtEpochMs": 1781646420438,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-ignore-agentloop-evidence-in-agentflight-changed-file-filters-2.md",
+    "title": "Ignore AgentLoop evidence in AgentFlight changed-file filters",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-23-43-verification-report.md",
+  "overallStatus": "fail",
+  "changedFileCount": 790
+}

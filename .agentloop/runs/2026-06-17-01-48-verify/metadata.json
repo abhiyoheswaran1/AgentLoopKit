@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-01-48-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-01-48",
+  "createdAtEpochMs": 1781653715313,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-record-stale-task-state-implementation-in-dogfood-evidence.md",
+    "title": "Record stale task-state implementation in dogfood evidence",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-01-48-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 1344
+}

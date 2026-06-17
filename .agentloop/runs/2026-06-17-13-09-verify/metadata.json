@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-13-09-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-13-09",
+  "createdAtEpochMs": 1781694568237,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-default-stale-preview-cap-2.md",
+    "title": "Add built CLI smoke coverage for default stale preview cap",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-13-03-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2852
+}

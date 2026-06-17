@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-05-02-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-05-02",
+  "createdAtEpochMs": 1781665328916,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-doctor-redaction-contract.md",
+    "title": "Add built CLI smoke coverage for doctor redaction",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-04-51-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-05-02-pr-summary.md",
+  "changedFileCount": 2046
+}

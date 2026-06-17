@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-05-34-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-05-34",
+  "createdAtEpochMs": 1781667285066,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-stale-task-state-recovery-2.md",
+    "title": "Add built CLI smoke coverage for stale task state recovery",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-05-31-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2096
+}

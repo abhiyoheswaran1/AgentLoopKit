@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-03-09-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-03-09",
+  "createdAtEpochMs": 1781658598031,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-accept-redacted-github-import-flag-2.md",
+    "title": "Accept redacted GitHub import flag",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-03-09-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 1712
+}

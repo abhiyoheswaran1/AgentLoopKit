@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-14-47-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-14-47",
+  "createdAtEpochMs": 1781700474633,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-mark-completed-backlog-decisions-before-next-task-selection-2.md",
+    "title": "Mark completed backlog decisions before next task selection",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-14-47-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2982
+}

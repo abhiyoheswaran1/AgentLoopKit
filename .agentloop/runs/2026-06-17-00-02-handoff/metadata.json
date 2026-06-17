@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-00-02-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-00-02",
+  "createdAtEpochMs": 1781647366282,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-ignore-generated-evidence-in-projscan-scans-2.md",
+    "title": "Ignore generated evidence in ProjScan scans",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-00-01-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-00-02-pr-summary.md",
+  "changedFileCount": 871
+}

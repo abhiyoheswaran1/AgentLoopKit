@@ -24,6 +24,7 @@ export type InitResult = {
   created: string[];
   updated: string[];
   skipped: string[];
+  warnings: InitWarning[];
   dryRun: boolean;
   targetDirectory: string;
   project: AgentLoopConfig['project'];
@@ -40,6 +41,12 @@ export type InitResult = {
     excludePath: string;
     patterns: string[];
   };
+};
+
+export type InitWarning = {
+  id: 'home-directory-target';
+  message: string;
+  targetDirectory: string;
 };
 
 export type InitSetupErrorReason = 'home-directory-refused' | 'git-repository-required';
@@ -69,6 +76,8 @@ const LOCAL_ONLY_NOTICE = `${LOCAL_ONLY_NOTICE_START}
 
 This AgentLoopKit setup is excluded by this clone's \`.git/info/exclude\`. Use these files for local agent work. Do not commit these AgentLoopKit files unless a maintainer intentionally converts the repo to a shared harness.
 ${LOCAL_ONLY_NOTICE_END}`;
+const HOME_DIRECTORY_WARNING =
+  'Target directory is your home directory. AgentLoopKit can write repository harness files there when --force is used.';
 
 function repoPath(...segments: string[]) {
   return segments.join('/');
@@ -292,6 +301,7 @@ export async function initializeAgentLoop(options: {
     created: [],
     updated: [],
     skipped: [],
+    warnings: [],
     dryRun: Boolean(options.dryRun),
     targetDirectory: cwd,
     project: {
@@ -314,13 +324,21 @@ export async function initializeAgentLoop(options: {
     resolveComparablePath(cwd),
     resolveComparablePath(homeDirectory),
   ]);
-  if (!options.force && resolvedCwd === resolvedHomeDirectory) {
+  const targetIsHomeDirectory = resolvedCwd === resolvedHomeDirectory;
+  if (!options.force && targetIsHomeDirectory) {
     throw new InitSetupError(
       'Refusing to initialize your home directory. Run this inside a project repository, or pass --force if you intentionally want AgentLoopKit files in your home directory.',
       'init',
       'home-directory-refused',
       'cd <project-directory>',
     );
+  }
+  if (targetIsHomeDirectory) {
+    result.warnings.push({
+      id: 'home-directory-target',
+      message: HOME_DIRECTORY_WARNING,
+      targetDirectory: cwd,
+    });
   }
   await validateInitOutputTargets(cwd);
   if (options.localOnly) {

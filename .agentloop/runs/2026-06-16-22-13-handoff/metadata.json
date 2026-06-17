@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-22-13-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-22-13",
+  "createdAtEpochMs": 1781640827037,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-ignore-active-agentflight-placeholders-in-check-gates.md",
+    "title": "Ignore active AgentFlight placeholders in check-gates",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-22-11-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-22-13-pr-summary.md",
+  "changedFileCount": 519
+}

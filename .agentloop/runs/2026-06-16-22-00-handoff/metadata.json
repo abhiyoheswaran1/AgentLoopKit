@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-22-00-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-22-00",
+  "createdAtEpochMs": 1781640022173,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-align-check-gates-active-task-next-action.md",
+    "title": "Align check-gates active task next action",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-21-58-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-22-00-pr-summary.md",
+  "changedFileCount": 475
+}

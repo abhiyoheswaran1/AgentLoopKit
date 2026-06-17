@@ -38,6 +38,8 @@ Before changing code:
 - Do not run destructive git or filesystem commands unless the user asks for them.
 - Do not read or print secrets. If env files exist, mention only their paths.
 - Run the configured verification commands before claiming completion.
+- Use AgentFlight for meaningful autonomous sessions: `npx --yes agentflight start --task "<task>" --yes`, `npx --yes agentflight status`, `npx --yes agentflight doctor`, and `npx --yes agentflight report`.
+- After raw `agentflight start`, run `agentloop status --redact-paths`; if an AgentFlight placeholder becomes active, run `agentloop task set <path>` to re-pin the detailed AgentLoop task.
 - Generate review evidence with changed files, tests run, risks, rollback notes, and reviewer checklist.
 
 Agent roster:

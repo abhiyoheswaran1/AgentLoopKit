@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-12-03-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-12-03",
+  "createdAtEpochMs": 1781690631056,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-task-list-status-filter.md",
+    "title": "Add built CLI smoke coverage for task list status filter",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-11-58-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2762
+}

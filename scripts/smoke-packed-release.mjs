@@ -98,6 +98,37 @@ const INTERNAL_CHATTER_CLAIMS = [
   { label: 'npm latest remains wording', pattern: /\bnpm latest remains\b/i },
 ];
 
+const README_RELEASE_RUNBOOK_DETAILS = [
+  {
+    label: 'current release operations section',
+    pattern: /\bcurrent release operations\b/i,
+  },
+  {
+    label: 'npm trusted publishing configuration',
+    pattern: /\bnpm trusted publishing\b/i,
+  },
+  {
+    label: 'trusted-publishing workflow detail',
+    pattern: /\btrusted-publishing workflow\b/i,
+  },
+  {
+    label: 'publish workflow path',
+    pattern: /\.github\/workflows\/publish\.yml/i,
+  },
+  {
+    label: 'local auth failure notes',
+    pattern: /\blocal auth failures?\b/i,
+  },
+  {
+    label: 'token state notes',
+    pattern: /\btoken state\b/i,
+  },
+  {
+    label: 'temporary registry repair notes',
+    pattern: /\btemporary registry repair\b/i,
+  },
+];
+
 const STALE_REPO_HARNESS_RELEASE_CLAIMS = [
   {
     label: 'planned version batch',
@@ -115,10 +146,15 @@ const README_REDACTION_COMMANDS = [
   'next',
   'review-context',
   'check-gates',
+  'artifacts',
+  'verify',
+  'summarize',
+  'handoff',
   'ship',
   'prepare-pr',
   'maintainer-check',
   'upgrade-harness',
+  'install-agent',
   'release-check',
   'release-proof',
 ];
@@ -286,6 +322,16 @@ export function assertReadmeRedactionGuidance(content) {
   }
 }
 
+export function assertReadmeAvoidsReleaseRunbookDetails(content) {
+  const runbookDetail = README_RELEASE_RUNBOOK_DETAILS.find((claim) => claim.pattern.test(content));
+
+  if (runbookDetail) {
+    throw new Error(
+      `README contains maintainer-only release runbook detail: ${runbookDetail.label}. Keep README focused on user install and usage; put release operations in release docs.`,
+    );
+  }
+}
+
 function roadmapCurrentState(content) {
   const lines = content.split(/\r?\n/);
   const start = lines.findIndex((line) => /^##\s+Current State\s*$/.test(line));
@@ -443,6 +489,7 @@ export async function runPublicDocsHygiene({ cwd = process.cwd(), version } = {}
   const readme = publicDocFiles.find((file) => toPosixPath(file.filePath) === 'README.md');
   if (readme) {
     assertReadmeRedactionGuidance(readme.content);
+    assertReadmeAvoidsReleaseRunbookDetails(readme.content);
   }
 
   const repoHarnessFiles = await collectRepoHarnessFiles(cwd);

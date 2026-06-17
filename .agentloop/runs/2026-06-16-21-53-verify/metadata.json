@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-21-53-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-21-53",
+  "createdAtEpochMs": 1781639638196,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-add-init-cli-next-step-guidance.md",
+    "title": "Add init CLI next-step guidance",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-21-52-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 450
+}

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-04-38-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-04-38",
+  "createdAtEpochMs": 1781663885071,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-task-list-json-groups-contract.md",
+    "title": "Add built CLI smoke coverage for task-list JSON groups",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-04-32-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-04-38-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-04-38-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1986
+}

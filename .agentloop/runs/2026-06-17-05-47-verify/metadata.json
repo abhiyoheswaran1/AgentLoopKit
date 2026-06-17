@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-05-47-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-05-47",
+  "createdAtEpochMs": 1781668034540,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-release-proof-head-tag-clarity-2.md",
+    "title": "Add built CLI smoke coverage for release-proof HEAD tag clarity",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-05-44-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2116
+}

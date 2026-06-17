@@ -39,6 +39,24 @@ async function createRepoWithReviewContextEvidence() {
     },
   });
   await setActiveTask({ cwd: dir, config, taskPath: task.path });
+  await writeFile(
+    path.join(
+      dir,
+      '.agentloop/tasks/2026-06-16-surface-agentflight-placeholders-in-review-context.md',
+    ),
+    [
+      '# Surface AgentFlight placeholders in review context',
+      '',
+      '- Status: proposed',
+      '',
+      '## Problem Statement',
+      'AgentFlight session task: Surface AgentFlight placeholders in review context',
+      '',
+      '## Desired Outcome',
+      'Task is implemented with local verification evidence.',
+      '',
+    ].join('\n'),
+  );
   await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
   await writeFile(
     path.join(dir, '.agentloop/reports/2026-06-10-12-30-verification-report.md'),
@@ -147,6 +165,16 @@ describe('review-context command', () => {
       ]),
     );
     expect(payload.policies.summary.current).toBe(8);
+    expect(payload.artifacts.tasks.count).toBe(1);
+    expect(payload.artifacts.tasks.agentFlightPlaceholders).toMatchObject({
+      count: 1,
+      latest: {
+        path: '.agentloop/tasks/2026-06-16-surface-agentflight-placeholders-in-review-context.md',
+        title: 'Surface AgentFlight placeholders in review context',
+        status: 'proposed',
+        source: 'agentflight-placeholder',
+      },
+    });
     expect(payload.artifacts.verificationReports.latest).toMatchObject({
       overallStatus: 'pass',
     });
@@ -191,6 +219,9 @@ describe('review-context command', () => {
     expect(result.stdout).toContain('- Active task: `Fix login redirect bug`');
     expect(result.stdout).toContain('- Latest verification: `pass`');
     expect(result.stdout).toContain('- Gates: `warn`');
+    expect(result.stdout).toContain(
+      '- Artifacts: `1` task(s), `1` AgentFlight placeholder task(s), `1` verification report(s), `1` handoff(s)',
+    );
     expect(result.stdout).toContain('- Latest ship score: `94`/100');
     expect(result.stdout).toContain('- GitHub metadata: issue `#42` `OPEN`, PR `#77` `OPEN`');
     expect(result.stdout).toContain('Run `agentloop handoff`.');
@@ -198,11 +229,62 @@ describe('review-context command', () => {
     expect(result.stdout).not.toContain('Review handoff.');
   });
 
+  test('separates AgentLoop evidence churn in recent runs for human output', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    const runDir = path.join(dir, '.agentloop/runs/2026-06-10-12-32-ship');
+    const changedFiles = [
+      { path: 'src/status.ts', status: 'M' },
+      { path: '.agentloop/reports/2026-06-10-12-30-verification-report.md', status: '??' },
+      { path: '.agentflight/reports/session-proof.md', status: '??' },
+    ];
+    await mkdir(runDir, { recursive: true });
+    await writeFile(
+      path.join(runDir, 'metadata.json'),
+      JSON.stringify(
+        {
+          id: '2026-06-10-12-32-ship',
+          command: 'ship',
+          createdAt: '2026-06-10-12-32',
+          createdAtEpochMs: Date.parse('2026-06-10T12:32:00Z'),
+          task: null,
+          score: 94,
+          changedFileCount: changedFiles.length,
+        },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(runDir, 'changed-files.json'),
+      `${JSON.stringify(changedFiles, null, 2)}\n`,
+    );
+
+    const human = await execa(tsxPath, [cliPath, 'review-context'], { cwd: dir });
+    const json = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'review-context', '--json'], { cwd: dir })).stdout,
+    );
+
+    expect(human.stdout).toContain(
+      '- `ship` `94`/100 - `3` changed file(s) (`1` non-evidence, `2` AgentLoop evidence) - `2026-06-10-12-32-ship`',
+    );
+    expect(json.recentRuns[0]).not.toHaveProperty('nonEvidenceChangedFileCount');
+    expect(json.recentRuns[0]).not.toHaveProperty('agentLoopEvidenceChangedFileCount');
+  });
+
   test('renders human Markdown with line-safe inline values', () => {
     const context = {
       status: {
         project: { name: 'demo', type: 'generic', packageManager: 'npm' },
-        workingTree: { dirty: true, changedFileCount: 2, changedFiles: [] },
+        workingTree: {
+          dirty: true,
+          changedFileCount: 2,
+          nonEvidenceChangedFileCount: 1,
+          agentLoopEvidenceChangedFileCount: 1,
+          changedFiles: [],
+        },
         activeTask: {
           path: '.agentloop/tasks/fix\nlogin.md',
           title: 'Fix\nlogin redirect',
@@ -277,6 +359,9 @@ describe('review-context command', () => {
     expect(markdown).toContain('`review\\nready`');
     expect(markdown).toContain('`.agentloop/reports/verification\\nreport.md`');
     expect(markdown).toContain('- Gates: `warn`');
+    expect(markdown).toContain(
+      '- Working tree: `dirty (2; 1 non-evidence, 1 AgentLoop evidence)`',
+    );
     expect(markdown).toContain('- `ship` `96`/100');
     expect(markdown).toContain('`2026-06-16\\nship`');
     expect(markdown).toContain('`.agentloop/github/context\\nbad.json`');

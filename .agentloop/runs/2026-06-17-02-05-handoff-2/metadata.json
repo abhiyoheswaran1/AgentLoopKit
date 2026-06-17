@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-02-05-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-17-02-05",
+  "createdAtEpochMs": 1781654749917,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-add-built-cli-smoke-coverage-for-github-metadata-import.md",
+    "title": "Add built CLI smoke coverage for GitHub metadata import",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-04-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-05-pr-summary-3.md",
+  "changedFileCount": 1440
+}

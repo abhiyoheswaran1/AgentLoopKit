@@ -17,6 +17,7 @@ Print the SchemaStore catalog entry:
 ```bash
 agentloop schemastore
 agentloop schemastore --json
+agentloop schemastore --json --redact-paths
 ```
 
 The committed entry lives at:
@@ -25,4 +26,4 @@ The committed entry lives at:
 schema/schemastore/agentloopkit.json
 ```
 
-Use that JSON when preparing a SchemaStore contribution. AgentLoopKit does not submit the contribution, call GitHub APIs, write files, read tokens, or change package metadata.
+Use that JSON when preparing a SchemaStore contribution. `--redact-paths` is accepted for command consistency; catalog values are not local filesystem paths, so output values do not change. AgentLoopKit does not submit the contribution, call GitHub APIs, write files, read tokens, or change package metadata.

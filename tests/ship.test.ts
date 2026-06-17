@@ -142,13 +142,105 @@ describe('ship command', () => {
 
     const markdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
     expect(markdown).toContain('# AgentLoopKit Ship Report');
-    expect(markdown).toContain('Make agent-generated code reviewable, verifiable, and merge-ready.');
+    expect(markdown).toContain(
+      'Make agent-generated code reviewable, verifiable, and merge-ready.',
+    );
     expect(markdown).toContain('This is a review-readiness score, not a code-quality score.');
     expect(markdown).toContain('src/auth/callback.ts');
     expect(markdown).toContain('Review risk-sensitive files before merge.');
     expect(markdown).toContain('.agentloop/reports/');
     expect(markdown).not.toContain('Latest handoff does not cover the current dirty files.');
     expect(markdown).not.toContain(dir);
+  });
+
+  test('keeps imported GitHub metadata neutral for ship scoring', async () => {
+    const baselineDir = await createShipFixture();
+    const metadataDir = await createShipFixture();
+    await writeJson(path.join(metadataDir, '.agentloop/github/context.json'), {
+      issue: {
+        number: 42,
+        title: 'High priority customer-impacting auth bug',
+        state: 'open',
+        url: 'https://github.com/example/repo/issues/42',
+        author: { login: 'maintainer' },
+        labels: ['priority/high', 'auth'],
+        body: 'External issue context must not change ship readiness scoring.',
+      },
+      pullRequest: {
+        number: 77,
+        title: 'Fixes important login issue',
+        state: 'open',
+        url: 'https://github.com/example/repo/pull/77',
+        author: { login: 'agent' },
+        labels: ['ready'],
+        body: 'PR context is useful for review, not scoring.',
+        isDraft: false,
+        baseRefName: 'main',
+        headRefName: 'fix-login',
+        changedFiles: 1,
+        additions: 4,
+        deletions: 2,
+      },
+    });
+    await git(metadataDir, ['add', '.agentloop/github/context.json']);
+    await git(metadataDir, ['commit', '-m', 'Add imported GitHub metadata']);
+
+    const baseline = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: baselineDir })).stdout,
+    );
+    const withMetadata = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: metadataDir })).stdout,
+    );
+
+    expect(withMetadata.changedFiles).toEqual([{ status: 'M', path: 'src/auth/callback.ts' }]);
+    expect(withMetadata.readiness.totalScore).toBe(baseline.readiness.totalScore);
+    expect(
+      withMetadata.readiness.dimensions.map((dimension: { id: string; score: number }) => ({
+        id: dimension.id,
+        score: dimension.score,
+      })),
+    ).toEqual(
+      baseline.readiness.dimensions.map((dimension: { id: string; score: number }) => ({
+        id: dimension.id,
+        score: dimension.score,
+      })),
+    );
+
+    const markdown = await readFile(path.join(metadataDir, withMetadata.shipReportPath), 'utf8');
+    expect(JSON.stringify(withMetadata.readiness)).not.toContain(
+      'High priority customer-impacting auth bug',
+    );
+    expect(markdown).not.toContain('High priority customer-impacting auth bug');
+  });
+
+  test('compacts AgentLoop evidence churn in ship report markdown only', async () => {
+    const dir = await createShipFixture();
+    const evidencePath = '.agentloop/reports/2026-06-11-12-01-verification-report.md';
+    await writeFile(
+      path.join(dir, evidencePath),
+      '# Verification Report\n\n- Overall status: pass\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+    const markdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
+    const runChangedFiles = JSON.parse(
+      await readFile(path.join(dir, output.run.path, 'changed-files.json'), 'utf8'),
+    );
+
+    expect(output.changedFiles).toEqual(
+      expect.arrayContaining([
+        { status: 'M', path: 'src/auth/callback.ts' },
+        { status: '??', path: evidencePath },
+      ]),
+    );
+    expect(runChangedFiles).toEqual(output.changedFiles);
+    expect(markdown).toContain('- M `src/auth/callback.ts`');
+    expect(markdown).toContain(
+      '- AgentLoop evidence: `1` file(s) grouped under `.agentloop/reports/`.',
+    );
+    expect(markdown).toContain('- Full paths remain in JSON output and run-ledger evidence.');
+    expect(markdown).not.toContain(`- ?? \`${evidencePath}\``);
   });
 
   test('keeps same-minute ship report and handoff artifacts instead of overwriting them', async () => {
@@ -234,7 +326,10 @@ describe('ship command', () => {
       commands: { test: 'npm test' },
     });
     const taskPath = '.agentloop/tasks/ship\n-task.md';
-    await rename(path.join(dir, '.agentloop/tasks/2026-06-11-fix-login.md'), path.join(dir, taskPath));
+    await rename(
+      path.join(dir, '.agentloop/tasks/2026-06-11-fix-login.md'),
+      path.join(dir, taskPath),
+    );
     await setActiveTask({ cwd: dir, config, taskPath });
 
     const result = await createShipReport({ cwd: dir, config, timestamp: '2026-06-11-12-06' });
@@ -249,33 +344,31 @@ describe('ship command', () => {
   });
 
   test('renders ship GitHub comment dynamic values on one markdown line', () => {
-    const comment = renderShipGithubComment(
-      {
-        readiness: {
-          totalScore: 96,
-          claims: ['This is a review-readiness score, not a code-quality score.'],
-          blockers: [],
-          strengths: [],
-          warnings: ['Risk-sensitive files changed: src/auth/callback\n-extra.ts'],
-          recommendedNextActions: ['Review file src/auth/callback\n-extra.ts before merge.'],
-          dimensions: [],
-        },
-        task: {
-          path: '.agentloop/tasks/comment.md',
-          title: 'Ship\n- [x] injected',
-          status: 'review\n-ready',
-        },
-        verification: { status: 'pass\nmaybe', fresh: true },
-        verificationReportPath: '.agentloop/reports/report\n-path.md',
-        gates: { overallStatus: 'pass\nmaybe', gates: [] },
-        shipReportPath: '.agentloop/reports/ship\n-report.md',
-        changedFiles: [],
-        diffStat: '',
-        timestamp: '2026-06-11-12-06',
-        markdown: '',
-        run: {} as ShipResult['run'],
-      } as unknown as ShipResult,
-    );
+    const comment = renderShipGithubComment({
+      readiness: {
+        totalScore: 96,
+        claims: ['This is a review-readiness score, not a code-quality score.'],
+        blockers: [],
+        strengths: [],
+        warnings: ['Risk-sensitive files changed: src/auth/callback\n-extra.ts'],
+        recommendedNextActions: ['Review file src/auth/callback\n-extra.ts before merge.'],
+        dimensions: [],
+      },
+      task: {
+        path: '.agentloop/tasks/comment.md',
+        title: 'Ship\n- [x] injected',
+        status: 'review\n-ready',
+      },
+      verification: { status: 'pass\nmaybe', fresh: true },
+      verificationReportPath: '.agentloop/reports/report\n-path.md',
+      gates: { overallStatus: 'pass\nmaybe', gates: [] },
+      shipReportPath: '.agentloop/reports/ship\n-report.md',
+      changedFiles: [],
+      diffStat: '',
+      timestamp: '2026-06-11-12-06',
+      markdown: '',
+      run: {} as ShipResult['run'],
+    } as unknown as ShipResult);
 
     expect(comment).toContain(
       `- Task: ${singleLineInlineCode('Ship\n- [x] injected')} (${singleLineInlineCode(
@@ -288,7 +381,9 @@ describe('ship command', () => {
       )}`,
     );
     expect(comment).toContain(`- Gates: ${singleLineInlineCode('pass\nmaybe')}`);
-    expect(comment).toContain(`- Ship report: ${singleLineInlineCode('.agentloop/reports/ship\n-report.md')}`);
+    expect(comment).toContain(
+      `- Ship report: ${singleLineInlineCode('.agentloop/reports/ship\n-report.md')}`,
+    );
     expect(comment).toContain('- Risk-sensitive files changed: src/auth/callback\\n-extra.ts');
     expect(comment).toContain('- Review file src/auth/callback\\n-extra.ts before merge.');
     expect(comment).not.toContain('\n- [x] injected');
@@ -306,7 +401,9 @@ describe('ship command', () => {
 
     expect(output.githubComment).toContain('## AgentLoopKit Review Readiness');
     expect(output.githubComment).toContain(`Score: ${output.readiness.totalScore}/100`);
-    expect(output.githubComment).toContain('This is a review-readiness score, not a code-quality score.');
+    expect(output.githubComment).toContain(
+      'This is a review-readiness score, not a code-quality score.',
+    );
     expect(output.githubComment).toContain('.agentloop/reports/');
     expect(output.githubComment).not.toContain(dir);
     expect(output.shipReportPath).not.toContain(dir);

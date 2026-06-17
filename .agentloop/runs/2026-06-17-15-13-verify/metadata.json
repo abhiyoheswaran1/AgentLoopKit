@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-15-13-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-15-13",
+  "createdAtEpochMs": 1781702022897,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-close-stale-completed-backlog-decisions-3.md",
+    "title": "Close stale completed backlog decisions",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-15-13-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 3022
+}

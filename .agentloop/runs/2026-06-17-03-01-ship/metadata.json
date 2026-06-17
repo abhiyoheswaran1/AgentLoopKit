@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-03-01-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-03-01",
+  "createdAtEpochMs": 1781658066928,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-accept-redacted-policy-output-flag-2.md",
+    "title": "Accept redacted policy output flag",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-03-00-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-03-01-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-03-01-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1684
+}

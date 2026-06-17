@@ -157,6 +157,48 @@ describe('init', () => {
     expect(output.commands.configured).toEqual(['test', 'typecheck']);
     expect(output.commands.missing).toEqual(['lint', 'build', 'format']);
     expect(output.git).toEqual({ isRepository: false, root: '', targetIsRoot: false });
+    expect(output.warnings).toEqual([]);
+    await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
+  });
+
+  test('human init output gives post-setup loop next steps', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'demo-next-steps',
+      scripts: { test: 'vitest' },
+    });
+
+    const result = await execa(tsxPath, [cliPath, 'init'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('Next steps:');
+    expect(result.stdout).toContain('- Run agentloop doctor');
+    expect(result.stdout).toContain('- Create a task with agentloop create-task');
+    expect(result.stdout).toContain('- Verify the task with agentloop verify --task <path> --task-commands');
+    expect(result.stdout).toContain('- Hand off review evidence with agentloop handoff');
+  });
+
+  test('dry-run human init output does not suggest verification before setup is written', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'demo-dry-run-next-steps',
+      scripts: { test: 'vitest' },
+    });
+
+    const result = await execa(tsxPath, [cliPath, 'init', '--dry-run'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('No files written.');
+    expect(result.stdout).not.toContain('agentloop verify');
+    expect(result.stdout).not.toContain('agentloop handoff');
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
   });
 
@@ -352,6 +394,56 @@ describe('init', () => {
     const result = await initializeAgentLoop({ cwd: dir, homeDirectory: dir, force: true });
 
     expect(result.created.some((file) => file.endsWith('AGENTLOOP.md'))).toBe(true);
+    expect(result.warnings).toEqual([
+      {
+        id: 'home-directory-target',
+        message:
+          'Target directory is your home directory. AgentLoopKit can write repository harness files there when --force is used.',
+        targetDirectory: dir,
+      },
+    ]);
+  });
+
+  test('forced home-directory dry-run prints a non-fatal warning without writing files', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'init', '--dry-run', '--force'], {
+      cwd: dir,
+      env: { HOME: dir },
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain(
+      'Warning: Target directory is your home directory. AgentLoopKit can write repository harness files there when --force is used.',
+    );
+    expect(result.stdout).toContain('No files written.');
+    await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
+  });
+
+  test('forced home-directory JSON output includes additive warning metadata', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'init', '--dry-run', '--force', '--json'], {
+      cwd: dir,
+      env: { HOME: dir },
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    const expectedTargetDirectory = await realpath(dir);
+    expect(output.warnings).toEqual([
+      {
+        id: 'home-directory-target',
+        message:
+          'Target directory is your home directory. AgentLoopKit can write repository harness files there when --force is used.',
+        targetDirectory: expectedTargetDirectory,
+      },
+    ]);
+    await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
   });
 
   test('local-only mode excludes generated harness files from local git tracking', async () => {

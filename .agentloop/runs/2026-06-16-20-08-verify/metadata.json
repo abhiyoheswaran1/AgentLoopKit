@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-20-08-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-20-08",
+  "createdAtEpochMs": 1781633280797,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-complete-redaction-guidance-smoke-coverage.md",
+    "title": "Complete redaction guidance smoke coverage",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-20-05-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 198
+}

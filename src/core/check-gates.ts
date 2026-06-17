@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { readFile, realpath } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
+import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
 import { latestMarkdownFile, prSummaryPattern } from './artifacts.js';
 import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
 import { pathExists, resolvesInsidePath } from './file-system.js';
@@ -15,7 +16,8 @@ import {
 import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
 import { inlineCode } from './markdown-format.js';
 import { listRuns, RunSummary } from './runs.js';
-import { inspectTaskDirectory } from './task-state.js';
+import { getActiveTask, inspectTaskDirectory } from './task-state.js';
+import type { ActiveTask } from './task-state.js';
 
 export type GateStatus = 'pass' | 'warn' | 'fail';
 
@@ -38,6 +40,8 @@ export type CheckGatesResult = {
     root: string;
     targetIsRoot: boolean;
     changedFileCount: number;
+    nonEvidenceChangedFileCount: number;
+    agentLoopEvidenceChangedFileCount: number;
   };
   nextAction: {
     command: string;
@@ -62,6 +66,15 @@ const requiredPolicyFiles = [
   '.agentloop/policies/git-policy.md',
   '.agentloop/policies/secrets-policy.md',
 ];
+const taskStateRecoveryDiagnosticIds = new Set([
+  'active-task-agentflight-placeholder',
+  'active-task-missing',
+  'active-task-archived',
+  'active-task-terminal',
+  'active-task-deferred',
+  'active-task-older-than-runs',
+  'recent-evidence-without-active-task',
+]);
 
 function extractHeading(markdown: string, fallback: string) {
   return markdown.match(/^#\s+(.+)$/m)?.[1]?.trim() || fallback;
@@ -105,7 +118,11 @@ function overallStatus(gates: GateCheck[], strict: boolean): GateStatus {
 
 function chooseNextAction(
   gates: GateCheck[],
-  input: { dirty: boolean; dirtyCoveredByLatestHandoffRun: boolean },
+  input: {
+    activeTask?: ActiveTask;
+    dirty: boolean;
+    dirtyCoveredByLatestHandoffRun: boolean;
+  },
 ) {
   const task = gates.find((item) => item.id === 'task-contract');
   const report = gates.find((item) => item.id === 'verification-report');
@@ -142,6 +159,22 @@ function chooseNextAction(
     };
   }
   if (input.dirty && input.dirtyCoveredByLatestHandoffRun) {
+    const activeStatus = input.activeTask?.status.trim().toLowerCase();
+    const activeTaskCanBeClosed =
+      input.activeTask &&
+      !input.activeTask.source &&
+      task?.path === input.activeTask.path &&
+      activeStatus !== 'deferred' &&
+      activeStatus !== 'done' &&
+      activeStatus !== 'completed' &&
+      activeStatus !== 'verified';
+    if (activeTaskCanBeClosed) {
+      return {
+        command: 'agentloop task done',
+        reason:
+          'Task, verification, and handoff evidence cover the current dirty files. Mark the task done when the handoff is ready, or keep it open if work is still in progress.',
+      };
+    }
     return {
       command: 'agentloop create-task',
       reason:
@@ -156,6 +189,24 @@ function chooseNextAction(
 
 function gateInlineCode(value: string) {
   return inlineCode(value.replace(/\r/g, '\\r').replace(/\n/g, '\\n'));
+}
+
+function changedFileSummary(input: {
+  changedFileCount: number;
+  nonEvidenceChangedFileCount: number;
+  agentLoopEvidenceChangedFileCount: number;
+}) {
+  if (input.changedFileCount === 0) return '0';
+  return `${input.changedFileCount}; ${input.nonEvidenceChangedFileCount} non-evidence, ${input.agentLoopEvidenceChangedFileCount} AgentLoop evidence`;
+}
+
+function changedFileGateMessage(input: {
+  changedFileCount: number;
+  nonEvidenceChangedFileCount: number;
+  agentLoopEvidenceChangedFileCount: number;
+}) {
+  if (input.changedFileCount === 0) return 'No changed files detected.';
+  return `${input.changedFileCount} changed file(s) detected (${input.nonEvidenceChangedFileCount} non-evidence, ${input.agentLoopEvidenceChangedFileCount} AgentLoop evidence).`;
 }
 
 function renderMarkdown(result: Omit<CheckGatesResult, 'markdown'>) {
@@ -192,7 +243,7 @@ function renderMarkdown(result: Omit<CheckGatesResult, 'markdown'>) {
 - Overall status: ${gateInlineCode(result.overallStatus)}
 - Strict mode: ${gateInlineCode(result.strict ? 'enabled (warnings fail)' : 'disabled')}
 ${gitLines.join('\n')}
-- Changed files: ${gateInlineCode(String(result.git.changedFileCount))}
+- Changed files: ${gateInlineCode(changedFileSummary(result.git))}
 
 ## Gates
 
@@ -274,6 +325,10 @@ export async function checkGates(options: {
 
   const inGit = await isInsideGitRepo(options.cwd);
   const changedFiles = inGit ? await parseGitStatus(await getGitStatus(options.cwd)) : [];
+  const agentLoopEvidenceChangedFileCount = changedFiles.filter((file) =>
+    isAgentLoopEvidenceFile(file.path),
+  ).length;
+  const nonEvidenceChangedFileCount = changedFiles.length - agentLoopEvidenceChangedFileCount;
   const latestRun = options.projectedReviewEvidenceRun ?? (await listRuns(options.cwd))[0];
   const latestHandoffRunCoversDirtyFiles = await dirtyCoveredByLatestHandoffRun(
     options.cwd,
@@ -301,14 +356,17 @@ export async function checkGates(options: {
   }
 
   const taskDoctor = await inspectTaskDirectory(options);
+  const taskHygieneDiagnostics = taskDoctor.diagnostics.filter(
+    (diagnostic) => !taskStateRecoveryDiagnosticIds.has(diagnostic.id),
+  );
   gates.push(
     gate(
       'task-hygiene',
       'Task hygiene',
-      taskDoctor.overallStatus,
-      taskDoctor.counts.diagnostics
-        ? `Task folder has ${taskDoctor.counts.diagnostics} hygiene diagnostic${
-            taskDoctor.counts.diagnostics === 1 ? '' : 's'
+      taskHygieneDiagnostics.length ? 'warn' : 'pass',
+      taskHygieneDiagnostics.length
+        ? `Task folder has ${taskHygieneDiagnostics.length} hygiene diagnostic${
+            taskHygieneDiagnostics.length === 1 ? '' : 's'
           }. Run \`agentloop task doctor\` for cleanup details.`
         : 'Task folder hygiene checks passed.',
     ),
@@ -353,9 +411,11 @@ export async function checkGates(options: {
       !inGit ? 'warn' : 'pass',
       !inGit
         ? 'Not inside a git repository.'
-        : changedFiles.length === 0
-          ? 'No changed files detected.'
-          : `${changedFiles.length} changed file(s) detected.`,
+        : changedFileGateMessage({
+            changedFileCount: changedFiles.length,
+            nonEvidenceChangedFileCount,
+            agentLoopEvidenceChangedFileCount,
+          }),
     ),
   );
   if (inGit) {
@@ -382,8 +442,11 @@ export async function checkGates(options: {
       root: redactGitRoot(resolvedGitRoot, options.redactPaths),
       targetIsRoot: gitTargetIsRoot,
       changedFileCount: changedFiles.length,
+      nonEvidenceChangedFileCount,
+      agentLoopEvidenceChangedFileCount,
     },
     nextAction: chooseNextAction(gates, {
+      activeTask: await getActiveTask(options),
       dirty: changedFiles.length > 0,
       dirtyCoveredByLatestHandoffRun: latestHandoffRunCoversDirtyFiles,
     }),

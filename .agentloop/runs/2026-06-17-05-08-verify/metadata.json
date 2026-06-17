@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-05-08-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-05-08",
+  "createdAtEpochMs": 1781665718020,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-policy-pack-redaction-contract.md",
+    "title": "Add built CLI smoke coverage for policy pack redaction",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-05-05-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2054
+}

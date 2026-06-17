@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-13-40-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-13-40",
+  "createdAtEpochMs": 1781696405666,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-clarify-release-checklist-proof-phases-2.md",
+    "title": "Clarify release checklist proof phases",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-13-34-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-13-40-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-13-40-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 2902
+}

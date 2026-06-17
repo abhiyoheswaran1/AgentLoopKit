@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-01-07-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-01-07",
+  "createdAtEpochMs": 1781651246481,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-compact-agentloop-evidence-churn-in-html-reports-2.md",
+    "title": "Compact AgentLoop evidence churn in HTML reports",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-01-05-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-01-07-pr-summary.md",
+  "changedFileCount": 1174
+}

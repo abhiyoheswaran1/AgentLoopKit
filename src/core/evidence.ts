@@ -2,7 +2,7 @@ import path from 'node:path';
 import { readFile, stat } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { latestMarkdownFile, verificationReportPattern } from './artifacts.js';
-import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
+import { getActiveTaskPath, getFallbackTaskPath, readTaskMetadata } from './task-state.js';
 import { pathExists, resolvesInsidePath } from './file-system.js';
 import { listRuns } from './runs.js';
 
@@ -37,7 +37,12 @@ function isPostVerificationTaskStatus(status: string) {
 }
 
 export async function getCurrentTaskPath(options: { cwd: string; config: AgentLoopConfig }) {
-  return (await getActiveTaskPath(options)) ?? (await getFallbackTaskPath(options));
+  const activeTaskPath = await getActiveTaskPath(options);
+  if (activeTaskPath) {
+    const activeTask = await readTaskMetadata(options.cwd, activeTaskPath);
+    if (activeTask.source !== 'agentflight-placeholder') return activeTaskPath;
+  }
+  return getFallbackTaskPath(options);
 }
 
 async function resolveLatestRunTaskPath(options: { cwd: string; config: AgentLoopConfig }) {

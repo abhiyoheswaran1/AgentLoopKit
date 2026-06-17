@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-21-48-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-16-21-48",
+  "createdAtEpochMs": 1781639323140,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-skip-agentflight-placeholder-section-warnings.md",
+    "title": "Skip AgentFlight placeholder section warnings",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-21-45-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-21-48-pr-summary-2.md",
+  "changedFileCount": 438
+}

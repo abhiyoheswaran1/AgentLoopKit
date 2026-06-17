@@ -8,8 +8,8 @@ AgentLoopKit does not create tags, create GitHub releases, publish npm packages,
 
 Use this workflow when:
 
-- `package.json` and `CHANGELOG.md` are ready for the intended version;
-- maintainers need proof that npm currently has the previous release;
+- maintainers are about to prepare `package.json` and `CHANGELOG.md` for the intended version;
+- maintainers need proof that npm currently matches local package metadata before a version bump, or an explicit note that metadata has already moved ahead of npm;
 - maintainers need a repeatable local release gate;
 - maintainers need post-publish verification before updating docs.
 
@@ -20,36 +20,49 @@ Do not use current `main` to publish old versions. If you need an older version,
 ```bash
 agentloop create-task --type release --title "Prepare AgentLoopKit release" \
   --problem-statement "Maintainers need package, verification, and registry evidence before publishing" \
-  --desired-outcome "The release has matching metadata, local verification, npm proof, and clear next steps" \
+  --desired-outcome "The release has phased pre-bump evidence, local verification, post-publish proof, and clear next steps" \
   --likely-file CHANGELOG.md \
   --likely-file package.json \
   --likely-file docs/release-status.md \
   --likely-file docs/npm-publishing.md \
   --likely-file FINAL_HANDOFF.md \
   --forbidden-file README.md \
-  --acceptance "package.json and CHANGELOG.md agree on the intended version" \
+  --acceptance "Pre-bump npm proof is recorded before package metadata changes, or the version gap is explained" \
+  --acceptance "package.json and CHANGELOG.md agree on the intended version before release-flow runs" \
   --acceptance "The full local release gate passes" \
-  --acceptance "Post-publish npm proof is recorded before claiming availability" \
-  --acceptance "Post-publish release proof matches npm, GitHub Releases, GitHub Marketplace, GHCR, and MCP Registry" \
-  --verification "agentloop npm-status --agentloopkit --expect-current" \
-  --verification "npm run smoke:release" \
-  --verification "npx pnpm@10.12.1 check:links" \
+  --acceptance "Post-publish npm and release-proof results are recorded before availability claims" \
+  --verification "npm run release-flow" \
   --verification "npx projscan doctor --format markdown" \
   --rollback "Revert release metadata changes before publishing, or publish a corrective patch after a completed release"
 ```
 
-## Evidence To Collect
+## Pre-Bump Evidence
+
+Collect this before package metadata changes when possible:
 
 - current package version in `package.json`;
+- `agentloop npm-status --agentloopkit --expect-current` while local package metadata still matches npm latest;
+- if package metadata has already moved ahead of npm, record that version gap explicitly instead of treating the npm-status failure as a release-flow failure.
+
+## Local Release Verification
+
+Collect this after release metadata is ready and before publishing:
+
 - intended release version;
 - `CHANGELOG.md` section for the intended version;
-- `agentloop npm-status --agentloopkit --expect-current` before the version bump;
-- lint, typecheck, test, build, and packed-release smoke results;
+- `npm run release-flow` result;
+- lint, typecheck, test, build, link-check, strict dogfood, release-check, and packed-release smoke results from the release gate;
 - packed tarball name and SHA-256;
+
+## Post-Publish Proof
+
+Collect this only after the GitHub Release and public channel workflows finish:
+
+- `agentloop npm-status --agentloopkit --expect-current`;
+- `agentloop release-proof`;
 - GitHub release URL after publication;
 - npm version proof after publication;
 - Docker, GHCR, MCP Registry, or other channel workflow URLs when those workflows run.
-- `agentloop release-proof` output after public channel workflows finish.
 
 ## Handoff Checklist
 

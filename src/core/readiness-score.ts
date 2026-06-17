@@ -1,4 +1,5 @@
 import type { GitFileStatus } from './git.js';
+import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
 
 export type ReadinessGateStatus = 'pass' | 'warn' | 'fail';
 
@@ -151,23 +152,47 @@ function riskSensitiveFiles(changedFiles: GitFileStatus[]) {
 }
 
 function scopeControl(input: ReadinessScoreInput, warnings: string[]) {
-  const count = input.changedFiles.length;
+  const totalCount = input.changedFiles.length;
+  const evidenceCount = input.changedFiles.filter((file) => isAgentLoopEvidenceFile(file.path)).length;
+  const count = totalCount - evidenceCount;
   const risky = riskSensitiveFiles(input.changedFiles);
   let score = 100;
-  let reason = `${count} changed file(s).`;
+  let reason =
+    evidenceCount > 0
+      ? `${count} non-evidence changed file(s); ${evidenceCount} AgentLoop evidence file(s) also present (${totalCount} total).`
+      : `${count} changed file(s).`;
 
   if (count === 0) {
     score = 60;
-    reason = 'No changed files detected.';
-    warnings.push('No changed files detected.');
+    if (totalCount === 0) {
+      reason = 'No changed files detected.';
+      warnings.push('No changed files detected.');
+    } else {
+      reason = `No non-evidence changed files detected; ${evidenceCount} AgentLoop evidence file(s) also present (${totalCount} total).`;
+      warnings.push('No non-evidence changed files detected.');
+    }
   } else if (count > 25) {
     score = 45;
-    reason = `${count} changed files is broad for one review.`;
-    warnings.push('Large change set; consider splitting before review.');
+    reason =
+      evidenceCount > 0
+        ? `${count} non-evidence changed files is broad for one review; ${evidenceCount} AgentLoop evidence file(s) also present (${totalCount} total).`
+        : `${count} changed files is broad for one review.`;
+    warnings.push(
+      evidenceCount > 0
+        ? 'Large non-evidence change set; consider splitting before review.'
+        : 'Large change set; consider splitting before review.',
+    );
   } else if (count > 10) {
     score = 75;
-    reason = `${count} changed files is reviewable but not small.`;
-    warnings.push('Medium-sized change set; check scope carefully.');
+    reason =
+      evidenceCount > 0
+        ? `${count} non-evidence changed files is reviewable but not small; ${evidenceCount} AgentLoop evidence file(s) also present (${totalCount} total).`
+        : `${count} changed files is reviewable but not small.`;
+    warnings.push(
+      evidenceCount > 0
+        ? 'Medium-sized non-evidence change set; check scope carefully.'
+        : 'Medium-sized change set; check scope carefully.',
+    );
   }
 
   if (risky.length > 0) score = Math.max(0, score - 15);

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-06-28-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-06-28",
+  "createdAtEpochMs": 1781670534290,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-release-notes-redaction.md",
+    "title": "Add built CLI smoke coverage for release-notes redaction",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-06-20-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-06-28-pr-summary.md",
+  "changedFileCount": 2188
+}

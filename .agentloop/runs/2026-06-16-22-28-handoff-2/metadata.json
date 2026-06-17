@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-22-28-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-16-22-28",
+  "createdAtEpochMs": 1781641713038,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-exclude-parked-tasks-from-artifact-latest-task.md",
+    "title": "Exclude parked tasks from artifact latest task",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-22-25-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-22-28-pr-summary-2.md",
+  "changedFileCount": 566
+}

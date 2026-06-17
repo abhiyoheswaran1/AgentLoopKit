@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-04-38-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-17-04-38",
+  "createdAtEpochMs": 1781663933715,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-add-built-cli-smoke-coverage-for-task-list-json-groups-contract.md",
+    "title": "Add built CLI smoke coverage for task-list JSON groups",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-04-32-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-04-38-pr-summary-3.md",
+  "changedFileCount": 2000
+}

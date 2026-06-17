@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-10-40-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-10-40",
+  "createdAtEpochMs": 1781685656088,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-accept-redacted-task-show-output-flag-2.md",
+    "title": "Accept redacted task show output flag",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-10-36-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-10-40-pr-summary.md",
+  "changedFileCount": 2680
+}

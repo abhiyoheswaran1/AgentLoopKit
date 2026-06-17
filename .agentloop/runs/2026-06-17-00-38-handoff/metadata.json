@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-00-38-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-00-38",
+  "createdAtEpochMs": 1781649489129,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-separate-agentloop-evidence-churn-in-status-output-2.md",
+    "title": "Separate AgentLoop evidence churn in status output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-00-35-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-00-38-pr-summary.md",
+  "changedFileCount": 1028
+}

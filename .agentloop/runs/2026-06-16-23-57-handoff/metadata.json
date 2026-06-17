@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-23-57-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-23-57",
+  "createdAtEpochMs": 1781647064557,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-align-strict-dogfood-guidance-with-handoff-evidence-2.md",
+    "title": "Align strict dogfood guidance with handoff evidence",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-23-57-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-23-57-pr-summary-2.md",
+  "changedFileCount": 835
+}

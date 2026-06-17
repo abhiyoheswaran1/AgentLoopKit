@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-09-43-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-17-09-43",
+  "createdAtEpochMs": 1781682197138,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-add-built-cli-smoke-coverage-for-template-and-completion-commands.md",
+    "title": "Add built CLI smoke coverage for template and completion commands",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-09-37-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-09-43-pr-summary-2.md",
+  "changedFileCount": 2579
+}

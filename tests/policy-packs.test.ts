@@ -52,6 +52,11 @@ async function createPolicyPackFixture() {
 async function createPolicyPackFixtureWithLineBreaks() {
   const dir = await makeTempDir();
   tempDirs.push(dir);
+  const packName = 'org\nreview';
+  const packTitle = 'Org\nReview Pack';
+  const packDescription = 'Local\norganization review rules.';
+  const createdPolicyFile = 'release\npolicy.md';
+  const skippedPolicyFile = 'review\nevidence-policy.md';
   const config = {
     ...createDefaultConfig({
       name: 'policy-pack-demo',
@@ -59,14 +64,9 @@ async function createPolicyPackFixtureWithLineBreaks() {
       packageManager: 'npm',
     }),
     policies: {
-      packs: [{ name: 'org-review', path: '.agentloop/policy-packs/org-review' }],
+      packs: [{ name: packName, path: '.agentloop/policy-packs/org-review' }],
     },
   };
-  const packName = 'org\nreview';
-  const packTitle = 'Org\nReview Pack';
-  const packDescription = 'Local\norganization review rules.';
-  const createdPolicyFile = 'release\npolicy.md';
-  const skippedPolicyFile = 'review\nevidence-policy.md';
   await writeJson(path.join(dir, 'agentloop.config.json'), config);
   await mkdir(path.join(dir, '.agentloop/policy-packs/org-review/policies'), { recursive: true });
   await writeJson(path.join(dir, '.agentloop/policy-packs/org-review/manifest.json'), {
@@ -207,6 +207,44 @@ describe('policy packs', () => {
     );
   });
 
+  test.each([
+    ['name', '   '],
+    ['title', ''],
+    ['description', '\t'],
+  ])('rejects local policy pack manifests with empty %s metadata', async (field, value) => {
+    const { dir, config } = await createPolicyPackFixture();
+    await writeJson(path.join(dir, '.agentloop/policy-packs/org-review/manifest.json'), {
+      name: 'org-review',
+      title: 'Org Review Pack',
+      description: 'Local organization review rules.',
+      policies: ['review-evidence-policy.md'],
+      [field]: value,
+    });
+
+    await expect(listPolicyPacks({ cwd: dir, config })).rejects.toThrow(PolicyPackManifestError);
+    await expect(readPolicyPack({ cwd: dir, config, packName: 'org-review' })).rejects.toThrow(
+      new RegExp(`${field} must be a non-empty string`, 'i'),
+    );
+  });
+
+  test('rejects local policy pack manifests whose name does not match the configured pack name', async () => {
+    const { dir, config } = await createPolicyPackFixture();
+    await writeJson(path.join(dir, '.agentloop/policy-packs/org-review/manifest.json'), {
+      name: 'platform-review',
+      title: 'Org Review Pack',
+      description: 'Local organization review rules.',
+      policies: ['review-evidence-policy.md'],
+    });
+
+    await expect(listPolicyPacks({ cwd: dir, config })).rejects.toThrow(PolicyPackManifestError);
+    await expect(readPolicyPack({ cwd: dir, config, packName: 'org-review' })).rejects.toThrow(
+      /manifest name must match configured pack name/i,
+    );
+    await expect(applyPolicyPack({ cwd: dir, config, packName: 'org-review' })).rejects.toThrow(
+      /manifest name must match configured pack name/i,
+    );
+  });
+
   test('rejects policy files that resolve outside the pack policy directory', async () => {
     const { dir, config } = await createPolicyPackFixture();
     const outsideDir = await makeTempDir('agentloopkit-outside-policy-pack-');
@@ -257,6 +295,47 @@ describe('policy packs', () => {
         '.agentloop/policies/review-evidence-policy.md',
       ],
     });
+  });
+
+  test('accepts redact-paths on policy pack commands without changing JSON output', async () => {
+    const { dir } = await createPolicyPackFixture();
+    await mkdir(path.join(dir, '.agentloop/policies'), { recursive: true });
+
+    const packsHuman = await execa(tsxPath, [cliPath, 'policy', 'packs', '--redact-paths'], {
+      cwd: dir,
+    });
+    const showHuman = await execa(
+      tsxPath,
+      [cliPath, 'policy', 'pack', 'show', 'org-review', '--redact-paths'],
+      { cwd: dir },
+    );
+    const applyHuman = await execa(
+      tsxPath,
+      [cliPath, 'policy', 'pack', 'apply', 'org-review', '--dry-run', '--redact-paths'],
+      { cwd: dir },
+    );
+    const packsJson = await execa(tsxPath, [cliPath, 'policy', 'packs', '--json'], { cwd: dir });
+    const redactedPacksJson = await execa(
+      tsxPath,
+      [cliPath, 'policy', 'packs', '--json', '--redact-paths'],
+      { cwd: dir },
+    );
+    const applyJson = await execa(
+      tsxPath,
+      [cliPath, 'policy', 'pack', 'apply', 'org-review', '--dry-run', '--json'],
+      { cwd: dir },
+    );
+    const redactedApplyJson = await execa(
+      tsxPath,
+      [cliPath, 'policy', 'pack', 'apply', 'org-review', '--dry-run', '--json', '--redact-paths'],
+      { cwd: dir },
+    );
+
+    expect(packsHuman.stdout).toContain('AgentLoopKit policy packs:');
+    expect(showHuman.stdout).toContain('# Org Review Pack');
+    expect(applyHuman.stdout).toContain('# AgentLoopKit Policy Pack Apply');
+    expect(JSON.parse(redactedPacksJson.stdout)).toEqual(JSON.parse(packsJson.stdout));
+    expect(JSON.parse(redactedApplyJson.stdout)).toEqual(JSON.parse(applyJson.stdout));
   });
 
   test('prints policy pack human output values containing line breaks on one Markdown line', async () => {

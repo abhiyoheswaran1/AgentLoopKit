@@ -34,7 +34,7 @@ export function createDogfoodSteps({ strict = false } = {}) {
   if (strict) gateArgs.push('--strict');
 
   const steps = [
-    agentloopStep('task folder hygiene', ['task', 'doctor', '--json']),
+    agentloopStep('task folder hygiene', ['task', 'doctor']),
     agentloopStep('current loop status', ['status', '--brief', '--redact-paths']),
     {
       name: 'public docs hygiene',
@@ -50,17 +50,15 @@ export function createDogfoodSteps({ strict = false } = {}) {
     },
     agentloopStep('harness upgrade audit', [
       'upgrade-harness',
-      '--json',
       '--redact-paths',
     ]),
     agentloopStep('review evidence gates', gateArgs),
-    agentloopStep('artifact inventory', ['artifacts', '--json']),
+    agentloopStep('artifact inventory', ['artifacts']),
     agentloopStep('maintainer reviewability check', [
       'maintainer-check',
-      '--json',
       '--redact-paths',
     ]),
-    agentloopStep('agent review context', ['review-context', '--json', '--redact-paths']),
+    agentloopStep('agent review context', ['review-context', '--redact-paths']),
     {
       name: 'agentflight session health',
       command: 'npx',

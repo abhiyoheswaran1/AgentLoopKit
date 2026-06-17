@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-14-51-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-14-51",
+  "createdAtEpochMs": 1781700677167,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-mark-completed-backlog-decisions-before-next-task-selection-2.md",
+    "title": "Mark completed backlog decisions before next task selection",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-14-47-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-14-51-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-14-51-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 2990
+}

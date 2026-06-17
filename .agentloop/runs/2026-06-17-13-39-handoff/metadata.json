@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-13-39-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-13-39",
+  "createdAtEpochMs": 1781696399375,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-clarify-release-checklist-proof-phases-2.md",
+    "title": "Clarify release checklist proof phases",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-13-34-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-13-39-pr-summary.md",
+  "changedFileCount": 2897
+}

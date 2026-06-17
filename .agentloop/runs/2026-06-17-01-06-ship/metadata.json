@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-01-06-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-01-06",
+  "createdAtEpochMs": 1781651194028,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-compact-agentloop-evidence-churn-in-html-reports-2.md",
+    "title": "Compact AgentLoop evidence churn in HTML reports",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-01-05-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-01-06-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-01-06-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1165
+}

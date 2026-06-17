@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-02-18-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-02-18",
+  "createdAtEpochMs": 1781655488101,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-schemastore-output.md",
+    "title": "Add built CLI smoke coverage for SchemaStore output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-17-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-02-18-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-18-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1501
+}

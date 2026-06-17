@@ -40,7 +40,10 @@ describe('agent installation', () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await mkdir(path.join(dir, '.agentloop/agents'), { recursive: true });
-    await writeFile(path.join(dir, '.agentloop/agents/codex.md'), '# Custom Codex rules\n\nKeep me.\n');
+    await writeFile(
+      path.join(dir, '.agentloop/agents/codex.md'),
+      '# Custom Codex rules\n\nKeep me.\n',
+    );
     await writeFile(path.join(dir, 'AGENTS.md'), '# Existing\n\nKeep this.');
 
     const result = await installAgentInstructions({ cwd: dir, agent: 'codex' });
@@ -60,7 +63,10 @@ describe('agent installation', () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await mkdir(path.join(dir, '.agentloop/agents'), { recursive: true });
-    await writeFile(path.join(dir, '.agentloop/agents/codex.md'), '# Custom Codex rules\n\nKeep me.\n');
+    await writeFile(
+      path.join(dir, '.agentloop/agents/codex.md'),
+      '# Custom Codex rules\n\nKeep me.\n',
+    );
     await writeFile(path.join(dir, 'AGENTS.md'), '# Existing\n\nKeep this.');
 
     const result = await execa(tsxPath, [cliPath, 'install-agent', 'codex', '--json'], {
@@ -82,14 +88,19 @@ describe('agent installation', () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await mkdir(path.join(dir, '.agentloop/agents'), { recursive: true });
-    await writeFile(path.join(dir, '.agentloop/agents/codex.md'), '# Custom Codex rules\n\nKeep me.\n');
+    await writeFile(
+      path.join(dir, '.agentloop/agents/codex.md'),
+      '# Custom Codex rules\n\nKeep me.\n',
+    );
     await writeFile(path.join(dir, 'AGENTS.md'), '# Existing\n\nKeep this.');
     const resolvedDir = await realpath(dir);
     const agentFilePath = path.join(resolvedDir, '.agentloop/agents/codex.md');
 
     const result = await execa(tsxPath, [cliPath, 'install-agent', 'codex'], { cwd: dir });
 
-    expect(result.stdout).toContain(`Agent instructions skipped: ${singleLineInlineCode(agentFilePath)}`);
+    expect(result.stdout).toContain(
+      `Agent instructions skipped: ${singleLineInlineCode(agentFilePath)}`,
+    );
     expect(result.stdout).toContain('AGENTS.md now references the agent instructions.');
   });
 
@@ -136,6 +147,53 @@ describe('agent installation', () => {
     await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toContain('Keep this.');
   });
 
+  test('documents and redacts single installed agent paths when requested', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeFile(path.join(dir, 'AGENTS.md'), '# Existing\n\nKeep this.');
+    const resolvedDir = await realpath(dir);
+    const rawAgentFilePath = path.join(resolvedDir, '.agentloop/agents/codex.md');
+    const rawAgentsPath = path.join(resolvedDir, 'AGENTS.md');
+
+    const helpResult = await execa(tsxPath, [cliPath, 'install-agent', '--help'], { cwd: dir });
+    const humanResult = await execa(
+      tsxPath,
+      [cliPath, 'install-agent', 'codex', '--redact-paths'],
+      {
+        cwd: dir,
+      },
+    );
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'install-agent', 'codex', '--json', '--redact-paths'],
+      { cwd: dir },
+    );
+    const rawJsonResult = await execa(tsxPath, [cliPath, 'install-agent', 'codex', '--json'], {
+      cwd: dir,
+    });
+
+    expect(helpResult.stdout).toContain('--redact-paths');
+    expect(humanResult.stdout).toContain(
+      `Agent instructions written: ${singleLineInlineCode('[git-root]/.agentloop/agents/codex.md')}`,
+    );
+    expect(humanResult.stdout).not.toContain(rawAgentFilePath);
+    expect(JSON.parse(jsonResult.stdout)).toEqual({
+      agent: {
+        name: 'codex',
+        agentFilePath: '[git-root]/.agentloop/agents/codex.md',
+        agentsPath: '[git-root]/AGENTS.md',
+        agentFileStatus: 'skipped',
+        agentsMdStatus: 'current',
+      },
+    });
+    expect(JSON.parse(rawJsonResult.stdout).agent.agentFilePath).toBe(rawAgentFilePath);
+    expect(JSON.parse(rawJsonResult.stdout).agent.agentsPath).toBe(rawAgentsPath);
+    await expect(readFile(path.join(dir, '.agentloop/agents/codex.md'), 'utf8')).resolves.toContain(
+      'Codex',
+    );
+    await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toContain('Keep this.');
+  });
+
   test('prints installed agent paths with Markdown-safe inline values', async () => {
     const dir = await makeTempDir('agent`loop-');
     tempDirs.push(dir);
@@ -164,8 +222,47 @@ describe('agent installation', () => {
     expect(humanResult.stdout).toContain(
       `Agent instructions written: ${singleLineInlineCode(agentFilePath)}`,
     );
-    expect(humanResult.stdout).not.toContain(`Agent instructions written: ${inlineCode(agentFilePath)}`);
+    expect(humanResult.stdout).not.toContain(
+      `Agent instructions written: ${inlineCode(agentFilePath)}`,
+    );
     expect(JSON.parse(jsonResult.stdout).agent.agentFilePath).toBe(agentFilePath);
+  });
+
+  test('redacts all installed agent JSON paths when requested without changing writes', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const resolvedDir = await realpath(dir);
+
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'install-agent', 'all', '--json', '--redact-paths'],
+      { cwd: dir },
+    );
+    const rawJsonResult = await execa(tsxPath, [cliPath, 'install-agent', 'all', '--json'], {
+      cwd: dir,
+    });
+    const payload = JSON.parse(jsonResult.stdout);
+    const rawPayload = JSON.parse(rawJsonResult.stdout);
+
+    expect(payload).toEqual({
+      agents: SUPPORTED_AGENTS.map((agent, index) => ({
+        name: agent,
+        agentFilePath: `[git-root]/.agentloop/agents/${agent}.md`,
+        agentsPath: '[git-root]/AGENTS.md',
+        agentFileStatus: 'created',
+        agentsMdStatus: index === 0 ? 'created' : 'updated',
+      })),
+    });
+    expect(rawPayload.agents[0].agentFilePath).toBe(
+      path.join(resolvedDir, '.agentloop/agents/codex.md'),
+    );
+    expect(rawPayload.agents[0].agentsPath).toBe(path.join(resolvedDir, 'AGENTS.md'));
+    await expect(
+      readFile(path.join(dir, '.agentloop/agents/generic.md'), 'utf8'),
+    ).resolves.toContain('Generic Coding Agent');
+    await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toContain(
+      '.agentloop/agents/github-copilot-cli.md',
+    );
   });
 
   test('prints all installed agent paths as JSON when requested', async () => {

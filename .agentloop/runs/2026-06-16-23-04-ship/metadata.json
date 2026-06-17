@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-23-04-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-23-04",
+  "createdAtEpochMs": 1781643892995,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-bound-agentflight-placeholder-task-list-output.md",
+    "title": "Bound AgentFlight placeholder task list output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-23-01-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-23-04-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-23-04-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 657
+}

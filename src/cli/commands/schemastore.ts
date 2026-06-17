@@ -6,7 +6,11 @@ export function schemastoreCommand() {
   return new Command('schemastore')
     .description('Print the SchemaStore catalog entry for agentloop.config.json')
     .option('--json', 'print machine-readable output')
-    .action((options: { json?: boolean }) => {
+    .option(
+      '--redact-paths',
+      'accept common public-output redaction flag; SchemaStore catalog values are not local paths',
+    )
+    .action((options: { json?: boolean; redactPaths?: boolean }) => {
       const entry = buildSchemaStoreCatalogEntry();
       const result = {
         entry,

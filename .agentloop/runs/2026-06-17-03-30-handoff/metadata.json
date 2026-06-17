@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-03-30-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-03-30",
+  "createdAtEpochMs": 1781659818166,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-accept-redacted-release-notes-output-flag.md",
+    "title": "Accept redacted release-notes output flag",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-03-28-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-03-30-pr-summary.md",
+  "changedFileCount": 1816
+}

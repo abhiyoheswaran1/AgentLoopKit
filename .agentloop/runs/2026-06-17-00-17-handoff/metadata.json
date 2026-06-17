@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-00-17-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-00-17",
+  "createdAtEpochMs": 1781648221807,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-expose-agentflight-placeholder-groups-in-task-list-json-2.md",
+    "title": "Expose AgentFlight placeholder groups in task list JSON",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-00-15-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-00-17-pr-summary.md",
+  "changedFileCount": 944
+}

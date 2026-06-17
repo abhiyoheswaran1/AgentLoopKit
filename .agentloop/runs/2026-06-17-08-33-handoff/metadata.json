@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-08-33-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-08-33",
+  "createdAtEpochMs": 1781678032299,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-upgrade-harness-redaction.md",
+    "title": "Add built CLI smoke coverage for upgrade-harness redaction",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-08-26-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-08-33-pr-summary.md",
+  "changedFileCount": 2399
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-02-23-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-02-23",
+  "createdAtEpochMs": 1781655800596,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-policy-pack-safety-tests-to-maintenance-check.md",
+    "title": "Add policy pack safety tests to maintenance check",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-21-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-23-pr-summary.md",
+  "changedFileCount": 1535
+}

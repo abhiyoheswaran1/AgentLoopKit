@@ -1,6 +1,10 @@
 import path from 'node:path';
 import { mkdir, readdir, readFile, rename, rm, stat } from 'node:fs/promises';
-import { OutputPathError, resolveOutputArtifactPath } from './artifacts.js';
+import {
+  OutputPathError,
+  resolveOutputArtifactPath,
+  verificationReportPattern,
+} from './artifacts.js';
 import { AgentLoopConfig } from './config.js';
 import { AgentLoopError } from './errors.js';
 import {
@@ -17,10 +21,13 @@ type TaskState = {
   activeTaskPath?: string;
 };
 
+export type TaskSource = 'agentflight-placeholder';
+
 export type ActiveTask = {
   path: string;
   title: string;
   status: string;
+  source?: TaskSource;
 };
 
 export type ListedTask = ActiveTask & {
@@ -46,10 +53,17 @@ export type BulkTaskArchiveResult = {
 
 export type TaskDoctorDiagnostic = {
   id:
+    | 'active-task-archived'
+    | 'active-task-agentflight-placeholder'
+    | 'active-task-deferred'
+    | 'active-task-missing'
+    | 'active-task-older-than-runs'
+    | 'active-task-terminal'
     | 'legacy-task-status'
     | 'missing-task-status'
     | 'placeholder-task-section'
     | 'post-verification-gate-in-verification-commands'
+    | 'recent-evidence-without-active-task'
     | 'terminal-task-in-active-folder'
     | 'unsupported-task-status';
   severity: 'warn';
@@ -59,6 +73,7 @@ export type TaskDoctorDiagnostic = {
   message: string;
   recommendation: string;
   commands?: string[];
+  evidence?: string[];
   sections?: string[];
 };
 
@@ -104,6 +119,10 @@ const TERMINAL_TASK_STATUSES = new Set(['done', 'completed', 'verified']);
 const NON_FALLBACK_TASK_STATUSES = new Set(['deferred', ...TERMINAL_TASK_STATUSES]);
 const LEGACY_TASK_STATUSES = new Set(['completed', 'verified']);
 const OPEN_TASK_STATUSES = new Set(['proposed', 'in-progress', 'blocked', 'review']);
+const TASK_DOCTOR_TASK_LIMIT = 25;
+const TASK_DOCTOR_RECENT_RUN_LIMIT = 10;
+const TASK_DOCTOR_RECENT_REPORT_LIMIT = 10;
+const TASK_DOCTOR_MAX_EVIDENCE_FILE_BYTES = 64 * 1024;
 const REVIEW_CRITICAL_PLACEHOLDERS = [
   {
     heading: 'Problem Statement',
@@ -165,6 +184,169 @@ function toStoredPath(cwd: string, absolutePath: string) {
 
 function tasksRoot(cwd: string, config: AgentLoopConfig) {
   return path.resolve(cwd, config.paths.tasksDir);
+}
+
+function taskArchiveRoot(cwd: string, config: AgentLoopConfig) {
+  return path.join(tasksRoot(cwd, config), 'archive');
+}
+
+type RecentTaskEvidence = {
+  path: string;
+  source: 'run' | 'report';
+  modifiedMs: number;
+  taskPath?: string | null;
+};
+
+async function listRecentRunEvidence(cwd: string): Promise<RecentTaskEvidence[]> {
+  const root = path.resolve(cwd, '.agentloop/runs');
+  if (!resolvesInsidePath(cwd, root)) return [];
+  const entries = await readdir(root, { withFileTypes: true }).catch(() => []);
+  const evidence: RecentTaskEvidence[] = [];
+
+  for (const entry of entries
+    .filter((candidate) => candidate.isDirectory())
+    .sort((left, right) => right.name.localeCompare(left.name))
+    .slice(0, TASK_DOCTOR_RECENT_RUN_LIMIT)) {
+    const metadataPath = path.join(root, entry.name, 'metadata.json');
+    const metadataStat = await stat(metadataPath).catch(() => undefined);
+    if (!metadataStat?.isFile()) continue;
+    let taskPath: string | null | undefined;
+    let createdAtEpochMs: number | undefined;
+    if (metadataStat.size <= TASK_DOCTOR_MAX_EVIDENCE_FILE_BYTES) {
+      try {
+        const parsed = JSON.parse(await readFile(metadataPath, 'utf8')) as {
+          createdAtEpochMs?: unknown;
+          task?: { path?: unknown } | null;
+        };
+        createdAtEpochMs =
+          typeof parsed.createdAtEpochMs === 'number' && Number.isFinite(parsed.createdAtEpochMs)
+            ? parsed.createdAtEpochMs
+            : undefined;
+        taskPath =
+          parsed.task && typeof parsed.task.path === 'string'
+            ? parsed.task.path
+            : parsed.task === null
+              ? null
+              : undefined;
+      } catch {
+        taskPath = undefined;
+      }
+    }
+    evidence.push({
+      path: toStoredPath(cwd, metadataPath),
+      source: 'run',
+      modifiedMs: createdAtEpochMs ?? metadataStat.mtimeMs,
+      taskPath,
+    });
+  }
+
+  return evidence;
+}
+
+async function listRecentReportEvidence(
+  cwd: string,
+  config: AgentLoopConfig,
+): Promise<RecentTaskEvidence[]> {
+  const root = path.resolve(cwd, config.paths.reportsDir);
+  if (!resolvesInsidePath(cwd, root)) return [];
+  const entries = await readdir(root, { withFileTypes: true }).catch(() => []);
+  const evidence: RecentTaskEvidence[] = [];
+
+  for (const entry of entries
+    .filter((candidate) => candidate.isFile())
+    .filter((candidate) => verificationReportPattern.test(candidate.name))
+    .sort((left, right) => right.name.localeCompare(left.name))
+    .slice(0, TASK_DOCTOR_RECENT_REPORT_LIMIT)) {
+    const reportPath = path.join(root, entry.name);
+    const reportStat = await stat(reportPath).catch(() => undefined);
+    if (!reportStat?.isFile()) continue;
+    evidence.push({
+      path: toStoredPath(cwd, reportPath),
+      source: 'report',
+      modifiedMs: reportStat.mtimeMs,
+    });
+  }
+
+  return evidence;
+}
+
+async function listRecentTaskEvidence(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+}): Promise<RecentTaskEvidence[]> {
+  const [runs, reports] = await Promise.all([
+    listRecentRunEvidence(options.cwd),
+    listRecentReportEvidence(options.cwd, options.config),
+  ]);
+  return [...runs, ...reports].sort((left, right) => {
+    if (left.modifiedMs !== right.modifiedMs) return right.modifiedMs - left.modifiedMs;
+    return right.path.localeCompare(left.path);
+  });
+}
+
+function hasOpenRealTask(tasks: ListedTask[]) {
+  return tasks.some(
+    (task) => !task.source && OPEN_TASK_STATUSES.has(task.status.trim().toLowerCase()),
+  );
+}
+
+function taskPathBasename(taskPath: string) {
+  return path.basename(taskPath.replace(/\\/g, '/'));
+}
+
+async function resolveArchivedTaskPathForEvidence(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  taskPath: string;
+}) {
+  const absoluteTaskPath = path.isAbsolute(options.taskPath)
+    ? path.resolve(options.taskPath)
+    : path.resolve(options.cwd, options.taskPath);
+  const root = tasksRoot(options.cwd, options.config);
+  const archiveRoot = taskArchiveRoot(options.cwd, options.config);
+
+  if (
+    !absoluteTaskPath.endsWith('.md') ||
+    !isInsidePath(normalizeExistingAncestor(root), normalizeExistingAncestor(absoluteTaskPath)) ||
+    isInsidePath(
+      normalizeExistingAncestor(archiveRoot),
+      normalizeExistingAncestor(absoluteTaskPath),
+    )
+  ) {
+    return undefined;
+  }
+
+  return resolveTaskPath({
+    cwd: options.cwd,
+    config: options.config,
+    taskPath: path.join(archiveRoot, taskPathBasename(options.taskPath)),
+    strict: false,
+  });
+}
+
+async function latestEvidenceResolvesToArchivedTerminalTask(
+  options: { cwd: string; config: AgentLoopConfig },
+  evidence: RecentTaskEvidence | undefined,
+) {
+  if (evidence?.source !== 'run' || !evidence.taskPath) return false;
+  const directTaskPath = await resolveTaskPath({
+    cwd: options.cwd,
+    config: options.config,
+    taskPath: evidence.taskPath,
+    strict: false,
+  });
+  const taskPath =
+    directTaskPath ??
+    (await resolveArchivedTaskPathForEvidence({
+      cwd: options.cwd,
+      config: options.config,
+      taskPath: evidence.taskPath,
+    }));
+  if (!taskPath || !isInsidePath(taskArchiveRoot(options.cwd, options.config), taskPath)) {
+    return false;
+  }
+  const task = await readTaskMetadata(options.cwd, taskPath);
+  return !task.source && TERMINAL_TASK_STATUSES.has(task.status.trim().toLowerCase());
 }
 
 async function readState(cwd: string, config: AgentLoopConfig): Promise<TaskState> {
@@ -265,9 +447,7 @@ function extractMarkdownListSection(markdown: string, heading: string) {
     sectionLines.push(line);
   }
 
-  return sectionLines
-    .map((line) => line.match(/^\s*-\s+(.+)$/)?.[1]?.trim() ?? '')
-    .filter(Boolean);
+  return sectionLines.map((line) => line.match(/^\s*-\s+(.+)$/)?.[1]?.trim() ?? '').filter(Boolean);
 }
 
 function extractMarkdownSectionLines(markdown: string, heading: string) {
@@ -285,7 +465,10 @@ function extractMarkdownSectionLines(markdown: string, heading: string) {
 }
 
 function normalizeTaskSectionLine(line: string) {
-  return line.replace(/^\s*-\s+/, '').replace(/\s+/g, ' ').trim();
+  return line
+    .replace(/^\s*-\s+/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function findPlaceholderTaskSections(markdown: string) {
@@ -318,17 +501,35 @@ function assertBulkArchiveStatus(status: TaskStatus) {
   );
 }
 
-function isFallbackTaskCandidate(status: string) {
-  const clean = status.trim().toLowerCase();
+function detectTaskSource(markdown: string, title: string): TaskSource | undefined {
+  const normalized = markdown.replace(/\r\n/g, '\n');
+  if (
+    normalized.startsWith(`# ${title}\n`) &&
+    normalized.includes(`\n## Problem Statement\nAgentFlight session task: ${title}\n`) &&
+    normalized.includes(
+      '\n## Desired Outcome\nTask is implemented with local verification evidence.\n',
+    )
+  ) {
+    return 'agentflight-placeholder';
+  }
+  return undefined;
+}
+
+function isFallbackTaskCandidate(task: Pick<ActiveTask, 'status' | 'source'>) {
+  if (task.source === 'agentflight-placeholder') return false;
+  const clean = task.status.trim().toLowerCase();
   return clean !== 'unknown' && !NON_FALLBACK_TASK_STATUSES.has(clean);
 }
 
 export async function readTaskMetadata(cwd: string, filePath: string): Promise<ActiveTask> {
   const markdown = await readFile(filePath, 'utf8');
+  const title = extractHeading(markdown, path.basename(filePath, '.md'));
+  const source = detectTaskSource(markdown, title);
   return {
     path: toStoredPath(cwd, filePath),
-    title: extractHeading(markdown, path.basename(filePath, '.md')),
+    title,
     status: extractTaskStatus(markdown),
+    ...(source ? { source } : {}),
   };
 }
 
@@ -493,9 +694,7 @@ export async function getActiveTask(options: { cwd: string; config: AgentLoopCon
 }
 
 export async function getFallbackTaskPath(options: { cwd: string; config: AgentLoopConfig }) {
-  const task = (await listTasks(options)).find((candidate) =>
-    isFallbackTaskCandidate(candidate.status),
-  );
+  const task = (await listTasks(options)).find((candidate) => isFallbackTaskCandidate(candidate));
   return task ? path.resolve(options.cwd, task.path) : undefined;
 }
 
@@ -506,11 +705,13 @@ export async function clearActiveTask(options: { cwd: string; config: AgentLoopC
 export async function listTasks(options: {
   cwd: string;
   config: AgentLoopConfig;
+  status?: string;
 }): Promise<ListedTask[]> {
   const root = tasksRoot(options.cwd, options.config);
   if (!resolvesInsidePath(options.cwd, root)) return [];
   const entries = await readdir(root, { withFileTypes: true }).catch(() => []);
   const activeTaskPath = await getActiveTaskPath(options);
+  const requestedStatus = options.status ? parseTaskStatus(options.status) : undefined;
 
   const tasks = await Promise.all(
     entries
@@ -532,7 +733,14 @@ export async function listTasks(options: {
   );
 
   return tasks
+    .filter(
+      (task) =>
+        requestedStatus === undefined || task.status.trim().toLowerCase() === requestedStatus,
+    )
     .sort((left, right) => {
+      const leftPlaceholder = left.source === 'agentflight-placeholder';
+      const rightPlaceholder = right.source === 'agentflight-placeholder';
+      if (leftPlaceholder !== rightPlaceholder) return leftPlaceholder ? 1 : -1;
       if (left.active !== right.active) return left.active ? -1 : 1;
       if (left.modifiedMs !== right.modifiedMs) return right.modifiedMs - left.modifiedMs;
       return left.path.localeCompare(right.path);
@@ -541,6 +749,7 @@ export async function listTasks(options: {
       path: task.path,
       title: task.title,
       status: task.status,
+      ...(task.source ? { source: task.source } : {}),
       active: task.active,
       modifiedAt: task.modifiedAt,
     }));
@@ -550,8 +759,138 @@ export async function inspectTaskDirectory(options: {
   cwd: string;
   config: AgentLoopConfig;
 }): Promise<TaskDoctorResult> {
-  const tasks = await listTasks(options);
+  const tasks = (await listTasks(options)).slice(0, TASK_DOCTOR_TASK_LIMIT);
+  const recentEvidence = await listRecentTaskEvidence(options);
   const diagnostics: TaskDoctorDiagnostic[] = [];
+  const state = await readState(options.cwd, options.config);
+  const stateStat = await stat(resolveStatePath(options.cwd, options.config)).catch(
+    () => undefined,
+  );
+  if (state.activeTaskPath) {
+    const activeTaskPath = await resolveTaskPath({
+      cwd: options.cwd,
+      config: options.config,
+      taskPath: state.activeTaskPath,
+      strict: false,
+    });
+    if (!activeTaskPath) {
+      diagnostics.push({
+        id: 'active-task-missing',
+        severity: 'warn',
+        path: state.activeTaskPath,
+        title: path.basename(state.activeTaskPath, '.md'),
+        status: 'unknown',
+        message: 'Active task pointer points to a missing task contract.',
+        recommendation: 'Run `agentloop task clear`, then set or create the current task contract.',
+        commands: ['agentloop task clear', 'agentloop task set <path>', 'agentloop create-task'],
+      });
+    } else {
+      const activeTask = await readTaskMetadata(options.cwd, activeTaskPath);
+      const activeStatus = activeTask.status.trim().toLowerCase();
+      const archiveRoot = taskArchiveRoot(options.cwd, options.config);
+      if (activeTask.source === 'agentflight-placeholder') {
+        diagnostics.push({
+          id: 'active-task-agentflight-placeholder',
+          severity: 'warn',
+          path: activeTask.path,
+          title: activeTask.title,
+          status: activeTask.status,
+          message: 'Active task pointer points to an AgentFlight placeholder task.',
+          recommendation:
+            'Run `agentloop task clear`, then set an existing real task or create a current task contract before continuing.',
+          commands: ['agentloop task clear', 'agentloop task set <path>', 'agentloop create-task'],
+        });
+      } else if (isInsidePath(archiveRoot, activeTaskPath)) {
+        diagnostics.push({
+          id: 'active-task-archived',
+          severity: 'warn',
+          path: activeTask.path,
+          title: activeTask.title,
+          status: activeTask.status,
+          message: 'Active task pointer points to an archived task contract.',
+          recommendation:
+            'Run `agentloop task clear`; archived tasks are kept as evidence, not active work.',
+          commands: ['agentloop task clear'],
+        });
+      } else if (TERMINAL_TASK_STATUSES.has(activeStatus)) {
+        diagnostics.push({
+          id: 'active-task-terminal',
+          severity: 'warn',
+          path: activeTask.path,
+          title: activeTask.title,
+          status: activeTask.status,
+          message: 'Active task pointer points to a terminal task contract.',
+          recommendation:
+            'Run `agentloop task archive <path>` after verification and handoff, or `agentloop task clear` if it is already archived elsewhere.',
+          commands: [`agentloop task archive ${activeTask.path}`, 'agentloop task clear'],
+        });
+      } else if (activeStatus === 'deferred') {
+        diagnostics.push({
+          id: 'active-task-deferred',
+          severity: 'warn',
+          path: activeTask.path,
+          title: activeTask.title,
+          status: activeTask.status,
+          message: 'Active task pointer points to a deferred task contract.',
+          recommendation:
+            'Run `agentloop task clear` or `agentloop task set <path>` for the current open task.',
+          commands: ['agentloop task clear', 'agentloop task set <path>'],
+        });
+      }
+      if (activeTask.source !== 'agentflight-placeholder') {
+        const activeTaskStat = await stat(activeTaskPath).catch(() => undefined);
+        const activePointerModifiedMs = stateStat?.mtimeMs ?? activeTaskStat?.mtimeMs;
+        const newerEvidence = activeTaskStat
+          ? recentEvidence.filter(
+              (evidence) =>
+                evidence.source === 'run' &&
+                activePointerModifiedMs !== undefined &&
+                evidence.modifiedMs > activePointerModifiedMs &&
+                evidence.taskPath !== activeTask.path,
+            )
+          : [];
+        const hasNewerOpenTask =
+          activeTaskStat &&
+          tasks.some(
+            (task) =>
+              task.path !== activeTask.path &&
+              OPEN_TASK_STATUSES.has(task.status.trim().toLowerCase()) &&
+              Date.parse(task.modifiedAt) > activeTaskStat.mtimeMs,
+          );
+        if (OPEN_TASK_STATUSES.has(activeStatus) && newerEvidence.length > 0 && !hasNewerOpenTask) {
+          diagnostics.push({
+            id: 'active-task-older-than-runs',
+            severity: 'warn',
+            path: activeTask.path,
+            title: activeTask.title,
+            status: activeTask.status,
+            message: 'Active task pointer is older than recent AgentLoop evidence.',
+            recommendation:
+              'Run `agentloop task doctor`, then clear, set, or create the current task contract before continuing.',
+            commands: ['agentloop task doctor', 'agentloop task clear', 'agentloop create-task'],
+            evidence: newerEvidence.map((evidence) => evidence.path).slice(0, 10),
+          });
+        }
+      }
+    }
+  } else if (
+    recentEvidence.length > 0 &&
+    (hasOpenRealTask(tasks) ||
+      !(await latestEvidenceResolvesToArchivedTerminalTask(options, recentEvidence[0])))
+  ) {
+    diagnostics.push({
+      id: 'recent-evidence-without-active-task',
+      severity: 'warn',
+      path: repoPath(options.config.paths.agentloopDir, 'state.json'),
+      title: 'Active task state',
+      status: 'missing',
+      message: 'Recent AgentLoop evidence exists, but no active task is pinned.',
+      recommendation:
+        'Run `agentloop task doctor`, then set an existing task or create a current task contract.',
+      commands: ['agentloop task doctor', 'agentloop task set <path>', 'agentloop create-task'],
+      evidence: recentEvidence.map((evidence) => evidence.path).slice(0, 10),
+    });
+  }
 
   for (const task of tasks) {
     const status = task.status.trim().toLowerCase();
@@ -627,7 +966,7 @@ export async function inspectTaskDirectory(options: {
       });
     }
 
-    if (OPEN_TASK_STATUSES.has(status)) {
+    if (OPEN_TASK_STATUSES.has(status) && task.source !== 'agentflight-placeholder') {
       const placeholderSections = findPlaceholderTaskSections(taskContent);
       if (placeholderSections.length > 0) {
         diagnostics.push({

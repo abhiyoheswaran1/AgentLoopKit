@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-01-49-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-17-01-49",
+  "createdAtEpochMs": 1781653774799,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-record-stale-task-state-implementation-in-dogfood-evidence.md",
+    "title": "Record stale task-state implementation in dogfood evidence",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-01-48-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-01-49-pr-summary-2.md",
+  "changedFileCount": 1361
+}

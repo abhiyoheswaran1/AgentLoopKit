@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-19-37-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-19-37",
+  "createdAtEpochMs": 1781631471018,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-separate-agentflight-placeholders-in-artifact-inventory-2.md",
+    "title": "Separate AgentFlight placeholders in artifact inventory",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-19-36-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-19-37-pr-summary.md",
+  "changedFileCount": 130
+}

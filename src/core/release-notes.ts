@@ -14,6 +14,7 @@ import { formatTimestamp } from './dates.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import { getGitBranch, getGitCommit } from './git.js';
 import { singleLineInlineCode as inlineCode } from './markdown-format.js';
+import { redactLocalRoots } from './redaction.js';
 import { getActiveTaskPath, getFallbackTaskPath } from './task-state.js';
 
 export type ReleaseNotesFormat = 'detailed' | 'public';
@@ -275,6 +276,71 @@ npm install ${result.packageName}@${result.version}
 `;
 }
 
+function redactText(value: string, cwd: string, redactPaths: boolean | undefined) {
+  return redactPaths ? redactLocalRoots(value, [cwd]) : value;
+}
+
+function redactOptionalText(
+  value: string | undefined,
+  cwd: string,
+  redactPaths: boolean | undefined,
+) {
+  return value === undefined ? undefined : redactText(value, cwd, redactPaths);
+}
+
+function redactReleaseNotesPayload(
+  result: Omit<ReleaseNotesResult, 'markdown' | 'writtenPath'>,
+  cwd: string,
+  redactPaths: boolean | undefined,
+): Omit<ReleaseNotesResult, 'markdown' | 'writtenPath'> {
+  if (!redactPaths) return result;
+  return {
+    format: result.format,
+    timestamp: redactText(result.timestamp, cwd, redactPaths),
+    packageName: redactText(result.packageName, cwd, redactPaths),
+    version: redactText(result.version, cwd, redactPaths),
+    gitRange: {
+      from: redactOptionalText(result.gitRange.from, cwd, redactPaths),
+      to: redactText(result.gitRange.to, cwd, redactPaths),
+      label: redactText(result.gitRange.label, cwd, redactPaths),
+      fallbackReason: redactOptionalText(result.gitRange.fallbackReason, cwd, redactPaths),
+    },
+    branch: redactText(result.branch, cwd, redactPaths),
+    commit: redactText(result.commit, cwd, redactPaths),
+    commits: result.commits.map((commit) => redactText(commit, cwd, redactPaths)),
+    changedFiles: result.changedFiles.map((file) => ({
+      status: redactText(file.status, cwd, redactPaths),
+      path: redactText(file.path, cwd, redactPaths),
+    })),
+    workingTree: {
+      clean: result.workingTree.clean,
+      files: result.workingTree.files.map((file) => redactText(file, cwd, redactPaths)),
+    },
+    changelogSection: redactText(result.changelogSection, cwd, redactPaths),
+    evidence: {
+      task: result.evidence.task
+        ? {
+            path: redactText(result.evidence.task.path, cwd, redactPaths),
+            title: redactText(result.evidence.task.title, cwd, redactPaths),
+            status: redactText(result.evidence.task.status, cwd, redactPaths),
+          }
+        : undefined,
+      verification: result.evidence.verification
+        ? {
+            path: redactText(result.evidence.verification.path, cwd, redactPaths),
+            overallStatus: redactText(result.evidence.verification.overallStatus, cwd, redactPaths),
+          }
+        : undefined,
+      ciSummary: result.evidence.ciSummary
+        ? {
+            path: redactText(result.evidence.ciSummary.path, cwd, redactPaths),
+            title: redactText(result.evidence.ciSummary.title, cwd, redactPaths),
+          }
+        : undefined,
+    },
+  };
+}
+
 export async function generateReleaseNotes(options: {
   cwd: string;
   config: AgentLoopConfig;
@@ -285,6 +351,7 @@ export async function generateReleaseNotes(options: {
   write?: boolean;
   outPath?: string;
   format?: ReleaseNotesFormat;
+  redactPaths?: boolean;
 }): Promise<ReleaseNotesResult> {
   const timestamp = options.timestamp ?? formatTimestamp();
   const format = options.format ?? 'detailed';
@@ -366,8 +433,13 @@ export async function generateReleaseNotes(options: {
       ciSummary,
     },
   };
+  const publicPayload = redactReleaseNotesPayload(
+    withoutMarkdown,
+    options.cwd,
+    options.redactPaths,
+  );
   const markdown =
-    format === 'public' ? renderPublicMarkdown(withoutMarkdown) : renderMarkdown(withoutMarkdown);
+    format === 'public' ? renderPublicMarkdown(publicPayload) : renderMarkdown(publicPayload);
   const writtenPath = options.write
     ? options.outPath
       ? resolveOutputArtifactPath({
@@ -380,7 +452,10 @@ export async function generateReleaseNotes(options: {
       : await resolveUniqueOutputArtifactPath({
           cwd: options.cwd,
           artifactType: 'release-notes',
-          requestedPath: path.join(options.config.paths.handoffsDir, `${timestamp}-release-notes.md`),
+          requestedPath: path.join(
+            options.config.paths.handoffsDir,
+            `${timestamp}-release-notes.md`,
+          ),
           expectedDir: options.config.paths.handoffsDir,
           expectedExtension: '.md',
         })
@@ -388,8 +463,8 @@ export async function generateReleaseNotes(options: {
   if (writtenPath) await writeTextFile(writtenPath, markdown);
 
   return {
-    ...withoutMarkdown,
+    ...publicPayload,
     markdown,
-    writtenPath,
+    writtenPath: redactOptionalText(writtenPath, options.cwd, options.redactPaths),
   };
 }

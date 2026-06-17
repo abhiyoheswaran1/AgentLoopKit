@@ -11,7 +11,11 @@ import {
   resolveCurrentVerificationEvidence,
 } from './evidence.js';
 import { fencedCodeBlock, inlineCode } from './markdown-format.js';
-import { classifyChangedFiles, renderChangeAreas, renderChangedFileLine } from './change-areas.js';
+import {
+  classifyChangedFiles,
+  renderCompactChangeAreas,
+  renderCompactChangedFiles,
+} from './change-areas.js';
 import { redactLocalRoots } from './redaction.js';
 
 export type PrSummaryInput = {
@@ -82,14 +86,10 @@ export function generatePrSummary(input: PrSummaryInput) {
 This summary was generated deterministically from git status, the latest task contract, and the latest verification report.
 
 ## Changed Files
-${
-  input.changedFiles.length
-    ? input.changedFiles.map(renderChangedFileLine).join('\n')
-    : '- No changed files detected.'
-}
+${renderCompactChangedFiles(input.changedFiles)}
 
 ## Change Areas
-${renderChangeAreas(input.changedFiles)}
+${renderCompactChangeAreas(input.changedFiles)}
 
 ## Diff Stats
 ${renderDiffStat(input.diffStat)}

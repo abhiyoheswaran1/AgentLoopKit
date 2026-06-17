@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-23-36-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-23-36",
+  "createdAtEpochMs": 1781645779583,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-compact-agentloop-evidence-in-prepare-pr-2.md",
+    "title": "Compact AgentLoop evidence in prepare-pr",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-23-32-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 759
+}

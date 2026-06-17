@@ -1,0 +1,15 @@
+{
+  "id": "2026-06-16-22-03-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-22-03",
+  "createdAtEpochMs": 1781640220507,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-document-check-gates-task-done-next-action-2.md",
+    "title": "Document check-gates task-done next action",
+    "status": "proposed",
+    "source": "agentflight-placeholder"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-22-02-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-22-03-pr-summary.md",
+  "changedFileCount": 497
+}

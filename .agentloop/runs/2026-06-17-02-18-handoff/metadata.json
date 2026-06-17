@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-02-18-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-02-18",
+  "createdAtEpochMs": 1781655517990,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-schemastore-output.md",
+    "title": "Add built CLI smoke coverage for SchemaStore output",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-17-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-18-pr-summary-2.md",
+  "changedFileCount": 1510
+}

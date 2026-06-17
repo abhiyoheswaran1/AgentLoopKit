@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-15-49-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-15-49",
+  "createdAtEpochMs": 1781704187355,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-clarify-raw-agentflight-active-task-recovery-2.md",
+    "title": "Clarify raw AgentFlight active-task recovery",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-15-49-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-15-49-pr-summary.md",
+  "changedFileCount": 3085
+}

@@ -143,6 +143,73 @@ describe('ci-summary command', () => {
     expect(result.stdout).toContain(`CI summary written: ${singleLineInlineCode(outPath)}`);
   });
 
+  test('accepts redact-paths and redacts local roots in public CI summary output', async () => {
+    const dir = await createRepoWithEvidence();
+    const humanOutPath = path.join(dir, '.agentloop/reports/manual-ci-summary.md');
+    const jsonOutPath = path.join(dir, '.agentloop/reports/manual-ci-summary-json.md');
+    const rawJsonOutPath = path.join(dir, '.agentloop/reports/manual-ci-summary-json-raw.md');
+
+    const helpResult = await execa(tsxPath, [cliPath, 'ci-summary', '--help'], { cwd: dir });
+    const humanResult = await execa(
+      tsxPath,
+      [cliPath, 'ci-summary', '--write', '--out', humanOutPath, '--redact-paths'],
+      {
+        cwd: dir,
+        reject: false,
+        env: {
+          GITHUB_ACTIONS: 'true',
+          GITHUB_WORKFLOW: `CI ${dir}`,
+        },
+      },
+    );
+    const redactedJsonResult = await execa(
+      tsxPath,
+      [cliPath, 'ci-summary', '--write', '--out', jsonOutPath, '--json', '--redact-paths'],
+      {
+        cwd: dir,
+        reject: false,
+        env: {
+          GITHUB_ACTIONS: 'true',
+          GITHUB_WORKFLOW: `CI ${dir}`,
+        },
+      },
+    );
+    const rawJsonResult = await execa(
+      tsxPath,
+      [cliPath, 'ci-summary', '--write', '--out', rawJsonOutPath, '--json'],
+      {
+        cwd: dir,
+        env: {
+          GITHUB_ACTIONS: 'true',
+          GITHUB_WORKFLOW: `CI ${dir}`,
+        },
+      },
+    );
+
+    expect(helpResult.stdout).toContain('--redact-paths');
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain('- Workflow: `CI [git-root]`');
+    expect(humanResult.stdout).toContain(
+      'CI summary written: `[git-root]/.agentloop/reports/manual-ci-summary.md`',
+    );
+    expect(humanResult.stdout).not.toContain(dir);
+    await expect(readFile(humanOutPath, 'utf8')).resolves.toContain('- Workflow: `CI [git-root]`');
+
+    expect(redactedJsonResult.exitCode).toBe(0);
+    const redactedPayload = JSON.parse(redactedJsonResult.stdout);
+    expect(redactedPayload.ci.workflow).toBe('CI [git-root]');
+    expect(redactedPayload.writtenPath).toBe(
+      '[git-root]/.agentloop/reports/manual-ci-summary-json.md',
+    );
+    expect(redactedPayload.markdown).toContain('- Workflow: `CI [git-root]`');
+    expect(JSON.stringify(redactedPayload)).not.toContain(dir);
+    await expect(readFile(jsonOutPath, 'utf8')).resolves.toContain('- Workflow: `CI [git-root]`');
+
+    const rawPayload = JSON.parse(rawJsonResult.stdout);
+    expect(rawPayload.ci.workflow).toBe(`CI ${dir}`);
+    expect(rawPayload.writtenPath).toBe(rawJsonOutPath);
+  });
+
   test('writes markdown-safe CI metadata when values contain backticks', async () => {
     const dir = await createRepoWithEvidence();
     const result = await execa(tsxPath, [cliPath, 'ci-summary', '--json', '--write'], {
@@ -517,54 +584,58 @@ describe('ci-summary command', () => {
     await expect(readFile(outPath, 'utf8')).rejects.toThrow();
   });
 
-  test('status, report, badge, and gates ignore newer CI summary artifacts when locating verification reports', async () => {
-    const dir = await createRepoWithEvidence();
-    await writeFile(
-      path.join(dir, '.agentloop/reports/2026-06-10-12-00-ci-summary.md'),
-      '# AgentLoopKit CI Summary\n\n- Overall status: fail\n- Verification: fail\n',
-    );
+  test(
+    'status, report, badge, and gates ignore newer CI summary artifacts when locating verification reports',
+    async () => {
+      const dir = await createRepoWithEvidence();
+      await writeFile(
+        path.join(dir, '.agentloop/reports/2026-06-10-12-00-ci-summary.md'),
+        '# AgentLoopKit CI Summary\n\n- Overall status: fail\n- Verification: fail\n',
+      );
 
-    const statusResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
-      cwd: dir,
-      reject: false,
-    });
-    const gatesResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
-      cwd: dir,
-      reject: false,
-    });
-    const badgeResult = await execa(tsxPath, [cliPath, 'badge', '--json'], {
-      cwd: dir,
-      reject: false,
-    });
-    const reportResult = await execa(tsxPath, [cliPath, 'report', '--json'], {
-      cwd: dir,
-      reject: false,
-    });
+      const statusResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
+        cwd: dir,
+        reject: false,
+      });
+      const gatesResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+        cwd: dir,
+        reject: false,
+      });
+      const badgeResult = await execa(tsxPath, [cliPath, 'badge', '--json'], {
+        cwd: dir,
+        reject: false,
+      });
+      const reportResult = await execa(tsxPath, [cliPath, 'report', '--json'], {
+        cwd: dir,
+        reject: false,
+      });
 
-    expect(statusResult.exitCode).toBe(0);
-    expect(JSON.parse(statusResult.stdout).latestReport.path).toContain('verification-report.md');
-    expect(JSON.parse(statusResult.stdout).latestReport.overallStatus).toBe('pass');
+      expect(statusResult.exitCode).toBe(0);
+      expect(JSON.parse(statusResult.stdout).latestReport.path).toContain('verification-report.md');
+      expect(JSON.parse(statusResult.stdout).latestReport.overallStatus).toBe('pass');
 
-    expect(gatesResult.exitCode).toBe(0);
-    const gates = JSON.parse(gatesResult.stdout);
-    expect(gates.gates).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: 'verification-report',
-          status: 'pass',
-          path: '.agentloop/reports/2026-06-10-11-00-verification-report.md',
-        }),
-      ]),
-    );
+      expect(gatesResult.exitCode).toBe(0);
+      const gates = JSON.parse(gatesResult.stdout);
+      expect(gates.gates).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'verification-report',
+            status: 'pass',
+            path: '.agentloop/reports/2026-06-10-11-00-verification-report.md',
+          }),
+        ]),
+      );
 
-    expect(badgeResult.exitCode).toBe(0);
-    expect(JSON.parse(badgeResult.stdout).sourcePath).toContain('verification-report.md');
-    expect(JSON.parse(badgeResult.stdout).status).toBe('pass');
+      expect(badgeResult.exitCode).toBe(0);
+      expect(JSON.parse(badgeResult.stdout).sourcePath).toContain('verification-report.md');
+      expect(JSON.parse(badgeResult.stdout).status).toBe('pass');
 
-    expect(reportResult.exitCode).toBe(0);
-    expect(JSON.parse(reportResult.stdout).sourcePaths.verification).toContain(
-      'verification-report.md',
-    );
-    expect(JSON.parse(reportResult.stdout).metadata.verificationStatus).toBe('pass');
-  }, CLI_ARTIFACT_LOOKUP_TEST_TIMEOUT_MS);
+      expect(reportResult.exitCode).toBe(0);
+      expect(JSON.parse(reportResult.stdout).sourcePaths.verification).toContain(
+        'verification-report.md',
+      );
+      expect(JSON.parse(reportResult.stdout).metadata.verificationStatus).toBe('pass');
+    },
+    CLI_ARTIFACT_LOOKUP_TEST_TIMEOUT_MS,
+  );
 });

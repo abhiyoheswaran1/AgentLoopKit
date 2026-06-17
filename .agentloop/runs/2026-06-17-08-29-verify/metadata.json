@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-08-29-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-08-29",
+  "createdAtEpochMs": 1781677773222,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-upgrade-harness-redaction.md",
+    "title": "Add built CLI smoke coverage for upgrade-harness redaction",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-08-26-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2396
+}

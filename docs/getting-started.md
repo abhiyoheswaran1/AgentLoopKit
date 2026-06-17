@@ -8,11 +8,11 @@ npx agentloopkit init --dry-run
 npx agentloopkit init
 ```
 
-`init` writes files into the current directory. The output shows the target folder, detected project type, package manager, Git status, Git root, configured commands, and file counts. When the target is a Git subdirectory, `init` warns that files will be written there instead of the Git root. Use `--dry-run` first when you want to see the same plan without writing files.
+`init` writes files into the current directory. The output shows the target folder, detected project type, package manager, Git status, Git root, configured commands, file counts, and the next commands for doctor, task creation, task-linked verification, and handoff. When the target is a Git subdirectory, `init` warns that files will be written there instead of the Git root. Use `--dry-run` first when you want to see the same plan without writing files.
 
 After setup, repo commands search upward for the nearest `agentloop.config.json`. You can run `status`, `create-task`, `verify`, `ship`, `prepare-pr`, and `handoff` from nested folders, and AgentLoopKit still uses the initialized root.
 
-Do not run non-dry `init` from `~` unless you intentionally want AgentLoopKit files in your home directory. AgentLoopKit refuses that by default; pass `--force` only when you mean it.
+Do not run non-dry `init` from `~` unless you intentionally want AgentLoopKit files in your home directory. AgentLoopKit refuses that by default; pass `--force` only when you mean it. Forced init and forced dry-run output include a home-directory target warning.
 
 Use local-only mode when you want the harness in your clone but do not want to commit it:
 

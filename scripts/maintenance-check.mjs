@@ -48,8 +48,20 @@ export function createMaintenanceCheckSteps() {
       args: ['run', 'check:links'],
       allowFailure: false,
     },
-    sourceCliStep('release proof', ['release-proof', '--strict', '--redact-paths']),
+    sourceCliStep('release proof smoke', ['release-proof', '--only', 'npm', '--redact-paths']),
+    {
+      name: 'npm status safety tests',
+      command: 'npm',
+      args: ['test', '--', 'tests/npm-status.test.ts'],
+      allowFailure: false,
+    },
     sourceCliStep('schemastore entry', ['schemastore', '--json']),
+    {
+      name: 'schemastore consistency tests',
+      command: 'npm',
+      args: ['test', '--', 'tests/schemastore.test.ts'],
+      allowFailure: false,
+    },
     sourceCliStep('policy pack inventory', ['policy', 'packs', '--json']),
     {
       name: 'policy pack safety tests',
@@ -62,6 +74,18 @@ export function createMaintenanceCheckSteps() {
       name: 'github metadata safety tests',
       command: 'npm',
       args: ['test', '--', 'tests/github-metadata.test.ts'],
+      allowFailure: false,
+    },
+    {
+      name: 'github metadata ship-score neutrality tests',
+      command: 'npm',
+      args: [
+        'test',
+        '--',
+        'tests/ship.test.ts',
+        '-t',
+        'keeps imported GitHub metadata neutral for ship scoring',
+      ],
       allowFailure: false,
     },
     {
@@ -117,9 +141,9 @@ Usage:
   npm run maintenance:check
   node scripts/maintenance-check.mjs --json
 
-Runs the near-term roadmap health gate: unit tests, public docs hygiene, link checking, release proof, SchemaStore output, policy-pack inventory and safety tests, read-only GitHub metadata import help and safety tests, AgentFlight version, ProjScan health, and the dogfood self-check.
+Runs the near-term roadmap health gate: unit tests, public docs hygiene, link checking, release-proof smoke coverage, npm-status safety tests, SchemaStore output and consistency tests, policy-pack inventory and safety tests, read-only GitHub metadata import help, GitHub metadata safety tests, ship-score neutrality coverage, AgentFlight version, ProjScan health, and the dogfood self-check.
 
-This script does not publish packages, create tags, create GitHub releases, upload files, post comments, read .env contents, or pass token-like environment variables to child processes.`);
+This script does not publish packages, create tags, create GitHub releases, require strict public release proof, upload files, post comments, read .env contents, or pass token-like environment variables to child processes.`);
 }
 
 function spawnStep(step, env, { quiet = false } = {}) {

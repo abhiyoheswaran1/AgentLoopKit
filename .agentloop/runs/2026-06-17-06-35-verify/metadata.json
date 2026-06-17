@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-06-35-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-06-35",
+  "createdAtEpochMs": 1781670944259,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-run-ledger-redaction.md",
+    "title": "Add built CLI smoke coverage for run ledger redaction",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-06-32-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2196
+}

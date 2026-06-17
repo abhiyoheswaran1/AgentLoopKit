@@ -56,7 +56,9 @@ async function createMaintainerFixture() {
   return dir;
 }
 
-async function createReviewableFixture(options: { freshHandoffRun?: boolean } = {}) {
+async function createReviewableFixture(
+  options: { freshHandoffRun?: boolean; dirtySourceFile?: boolean } = {},
+) {
   const dir = await makeTempDir();
   tempDirs.push(dir);
 
@@ -112,7 +114,9 @@ async function createReviewableFixture(options: { freshHandoffRun?: boolean } = 
   await writeFile(path.join(dir, 'src/index.ts'), 'export const value = "old";\n');
   await git(dir, ['add', '.']);
   await git(dir, ['commit', '-m', 'Initial state']);
-  await writeFile(path.join(dir, 'src/index.ts'), 'export const value = "new";\n');
+  if (options.dirtySourceFile !== false) {
+    await writeFile(path.join(dir, 'src/index.ts'), 'export const value = "new";\n');
+  }
 
   return dir;
 }
@@ -179,6 +183,147 @@ describe('maintainer-check command', () => {
           id: 'handoff-summary',
           status: 'pass',
           message: 'Reviewer handoff found.',
+        }),
+      ]),
+    );
+  });
+
+  test('does not warn about broad changed-file count for AgentLoop evidence churn', async () => {
+    const dir = await createReviewableFixture({
+      dirtySourceFile: false,
+      freshHandoffRun: true,
+    });
+
+    for (let index = 0; index < 30; index += 1) {
+      await writeFile(
+        path.join(
+          dir,
+          `.agentloop/reports/2026-06-12-14-${String(index).padStart(2, '0')}-verification-report.md`,
+        ),
+        '# Verification Report\n\n- Overall status: pass\n',
+      );
+    }
+
+    const result = await execa(tsxPath, [cliPath, 'maintainer-check', '--json'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+    const changedFileCount = output.checks.find(
+      (item: { id: string }) => item.id === 'changed-file-count',
+    );
+
+    expect(changedFileCount).toEqual(
+      expect.objectContaining({
+        status: 'pass',
+        message:
+          '30 changed file(s) detected (0 non-evidence file(s), 30 AgentLoop evidence file(s)).',
+      }),
+    );
+  });
+
+  test('warns about broad changed-file count based on non-evidence files', async () => {
+    const dir = await createReviewableFixture({
+      dirtySourceFile: false,
+      freshHandoffRun: true,
+    });
+
+    for (let index = 0; index < 6; index += 1) {
+      await writeFile(
+        path.join(dir, `src/file-${index}.ts`),
+        `export const value${index} = true;\n`,
+      );
+    }
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    for (let index = 0; index < 20; index += 1) {
+      await writeFile(path.join(dir, `docs/guide-${index}.md`), `# Guide ${index}\n`);
+    }
+    for (let index = 0; index < 2; index += 1) {
+      await writeFile(
+        path.join(
+          dir,
+          `.agentloop/reports/2026-06-12-15-${String(index).padStart(2, '0')}-verification-report.md`,
+        ),
+        '# Verification Report\n\n- Overall status: pass\n',
+      );
+    }
+
+    const result = await execa(tsxPath, [cliPath, 'maintainer-check', '--json'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+    const changedFileCount = output.checks.find(
+      (item: { id: string }) => item.id === 'changed-file-count',
+    );
+
+    expect(changedFileCount).toEqual(
+      expect.objectContaining({
+        status: 'warn',
+        message:
+          '28 changed file(s) detected (26 non-evidence file(s), 2 AgentLoop evidence file(s)). Non-evidence review areas: Documentation 20, Source 6.',
+      }),
+    );
+  });
+
+  test('uses stable title ordering when non-evidence review area counts tie', async () => {
+    const dir = await createReviewableFixture({
+      dirtySourceFile: false,
+      freshHandoffRun: true,
+    });
+
+    for (let index = 0; index < 13; index += 1) {
+      await writeFile(
+        path.join(dir, `src/file-${index}.ts`),
+        `export const value${index} = true;\n`,
+      );
+    }
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    for (let index = 0; index < 13; index += 1) {
+      await writeFile(path.join(dir, `docs/guide-${index}.md`), `# Guide ${index}\n`);
+    }
+
+    const result = await execa(tsxPath, [cliPath, 'maintainer-check', '--json'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+    const changedFileCount = output.checks.find(
+      (item: { id: string }) => item.id === 'changed-file-count',
+    );
+
+    expect(changedFileCount).toEqual(
+      expect.objectContaining({
+        status: 'warn',
+        message:
+          '26 changed file(s) detected. Non-evidence review areas: Documentation 13, Source 13.',
+      }),
+    );
+  });
+
+  test('keeps safety checks on the full changed-file list when evidence is separated', async () => {
+    const dir = await createReviewableFixture({
+      dirtySourceFile: false,
+      freshHandoffRun: true,
+    });
+
+    for (let index = 0; index < 30; index += 1) {
+      await writeFile(
+        path.join(
+          dir,
+          `.agentloop/reports/2026-06-12-16-${String(index).padStart(2, '0')}-verification-report.md`,
+        ),
+        '# Verification Report\n\n- Overall status: pass\n',
+      );
+    }
+    await writeFile(path.join(dir, 'package.json'), '{"scripts":{"test":"vitest"}}\n');
+
+    const result = await execa(tsxPath, [cliPath, 'maintainer-check', '--json'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'changed-file-count',
+          status: 'pass',
+          message:
+            '31 changed file(s) detected (1 non-evidence file(s), 30 AgentLoop evidence file(s)).',
+        }),
+        expect.objectContaining({
+          id: 'dependency-lockfiles',
+          status: 'warn',
+          message: 'Dependency or lockfile changes detected.',
         }),
       ]),
     );

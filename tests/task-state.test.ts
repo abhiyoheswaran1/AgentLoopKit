@@ -8,6 +8,7 @@ import {
   archiveTask,
   clearActiveTask,
   getActiveTaskPath,
+  inspectTaskDirectory,
   listTasks,
   readTaskContract,
   setActiveTask,
@@ -29,6 +30,60 @@ async function createTaskStateFixture() {
   const taskPath = path.join(dir, '.agentloop/tasks/2026-06-09-demo.md');
   await writeFile(taskPath, '# Demo task\n\n- Status: proposed\n');
   return { dir, config, taskPath };
+}
+
+function agentFlightPlaceholderMarkdown(title: string, status = 'deferred') {
+  return `# ${title}
+
+- Created date: 2026-06-16
+- Task type: feature
+- Status: ${status}
+
+## Problem Statement
+AgentFlight session task: ${title}
+
+## Desired Outcome
+Task is implemented with local verification evidence.
+`;
+}
+
+function fullAgentFlightPlaceholderMarkdown(title: string, status = 'proposed') {
+  return `# ${title}
+
+- Created date: 2026-06-16
+- Task type: feature
+- Status: ${status}
+
+## Problem Statement
+AgentFlight session task: ${title}
+
+## Desired Outcome
+Task is implemented with local verification evidence.
+
+## Constraints
+- Keep changes scoped and do not claim completion without proof.
+
+## Non-Goals
+- None recorded yet.
+
+## Assumptions
+- None recorded yet.
+
+## Likely Files or Areas
+- None recorded yet.
+
+## Files or Areas Not to Touch
+- None recorded yet.
+
+## Acceptance Criteria
+- Add acceptance criteria before implementation starts.
+
+## Verification Commands
+- No verification command recorded.
+
+## Rollback Notes
+Document how to revert or disable this change.
+`;
 }
 
 describe('task state', () => {
@@ -89,6 +144,68 @@ describe('task state', () => {
       active: false,
     });
     expect(tasks[0]?.modifiedAt).toMatch(/T/);
+  });
+
+  test('filters task list status in core inventory while preserving active ordering', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const deferredTask = path.join(dir, '.agentloop/tasks/2026-06-09-deferred.md');
+    const doneTask = path.join(dir, '.agentloop/tasks/2026-06-09-done.md');
+    await writeFile(deferredTask, '# Deferred task\n\n- Status: deferred\n');
+    await writeFile(doneTask, '# Done task\n\n- Status: done\n');
+    await setActiveTask({ cwd: dir, config, taskPath: deferredTask });
+
+    const tasks = await listTasks({ cwd: dir, config, status: 'deferred' });
+
+    expect(tasks).toEqual([
+      expect.objectContaining({
+        path: '.agentloop/tasks/2026-06-09-deferred.md',
+        title: 'Deferred task',
+        status: 'deferred',
+        active: true,
+      }),
+    ]);
+    expect(tasks).toEqual(
+      expect.not.arrayContaining([expect.objectContaining({ title: 'Demo task' })]),
+    );
+    expect(tasks).toEqual(
+      expect.not.arrayContaining([expect.objectContaining({ title: 'Done task' })]),
+    );
+  });
+
+  test('classifies exact AgentFlight placeholder task contracts in task inventory', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const title = 'Separate AgentFlight placeholders from roadmap task counts';
+    await writeFile(
+      path.join(
+        dir,
+        '.agentloop/tasks/2026-06-16-separate-agentflight-placeholders-from-roadmap-task-counts.md',
+      ),
+      agentFlightPlaceholderMarkdown(title),
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-16-custom-deferred.md'),
+      '# Custom deferred\n\n- Status: deferred\n\n## Problem Statement\nKeep this as real backlog.\n',
+    );
+
+    const tasks = await listTasks({ cwd: dir, config });
+    const placeholder = tasks.find((task) => task.title === title) as Record<string, unknown>;
+    const customDeferred = tasks.find((task) => task.title === 'Custom deferred') as Record<
+      string,
+      unknown
+    >;
+
+    expect(placeholder).toMatchObject({
+      path: '.agentloop/tasks/2026-06-16-separate-agentflight-placeholders-from-roadmap-task-counts.md',
+      title,
+      status: 'deferred',
+      source: 'agentflight-placeholder',
+    });
+    expect(customDeferred).toMatchObject({
+      path: '.agentloop/tasks/2026-06-16-custom-deferred.md',
+      title: 'Custom deferred',
+      status: 'deferred',
+    });
+    expect(customDeferred).not.toHaveProperty('source');
   });
 
   test('reads task contract content with metadata', async () => {
@@ -239,7 +356,9 @@ describe('task state', () => {
     );
 
     expect(await readFile(outsideTask, 'utf8')).toBe('# Outside task\n\n- Status: proposed\n');
-    await expect(stat(path.join(dir, '.agentloop/tasks/archive/outside-task.md'))).rejects.toThrow();
+    await expect(
+      stat(path.join(dir, '.agentloop/tasks/archive/outside-task.md')),
+    ).rejects.toThrow();
     await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
   });
 
@@ -247,7 +366,10 @@ describe('task state', () => {
     const { dir, config } = await createTaskStateFixture();
     const outsideDir = await makeTempDir();
     tempDirs.push(outsideDir);
-    await writeFile(path.join(outsideDir, 'outside-task.md'), '# Outside task\n\n- Status: proposed\n');
+    await writeFile(
+      path.join(outsideDir, 'outside-task.md'),
+      '# Outside task\n\n- Status: proposed\n',
+    );
     await symlink(outsideDir, path.join(dir, '.agentloop/tasks/outside-link'), 'dir');
     await writeJson(path.join(dir, '.agentloop/state.json'), {
       version: 1,
@@ -285,6 +407,477 @@ describe('task state', () => {
     await symlink(outsideState, path.join(dir, '.agentloop/state.json'), 'file');
 
     expect(await getActiveTaskPath({ cwd: dir, config })).toBeUndefined();
+  });
+
+  test('task doctor warns when active state points to a missing task', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/missing.md',
+    });
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.overallStatus).toBe('warn');
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'active-task-missing',
+          severity: 'warn',
+          path: '.agentloop/tasks/missing.md',
+        }),
+      ]),
+    );
+  });
+
+  test('task doctor warns when active state points to an archived task', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/archive/2026-06-16-old.md'),
+      '# Old Task\n\n- Status: done\n',
+    );
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/archive/2026-06-16-old.md',
+    });
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'active-task-archived',
+          severity: 'warn',
+          path: '.agentloop/tasks/archive/2026-06-16-old.md',
+        }),
+      ]),
+    );
+  });
+
+  test('task doctor warns when active state points to a terminal task', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    await writeFile(path.join(dir, '.agentloop/tasks/done.md'), '# Done\n\n- Status: done\n');
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/done.md',
+    });
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'active-task-terminal',
+          severity: 'warn',
+          path: '.agentloop/tasks/done.md',
+        }),
+      ]),
+    );
+  });
+
+  test('task doctor warns when active state points to a deferred task', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/parked.md'),
+      '# Parked\n\n- Status: deferred\n',
+    );
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/parked.md',
+    });
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'active-task-deferred',
+          severity: 'warn',
+          path: '.agentloop/tasks/parked.md',
+        }),
+      ]),
+    );
+  });
+
+  test('task doctor warns when active task is an AgentFlight placeholder', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const title = 'Ignore active AgentFlight placeholder tasks';
+    const taskPath = path.join(
+      dir,
+      '.agentloop/tasks/2026-06-16-ignore-active-agentflight-placeholder-tasks-2.md',
+    );
+    await writeFile(taskPath, agentFlightPlaceholderMarkdown(title, 'proposed'));
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath:
+        '.agentloop/tasks/2026-06-16-ignore-active-agentflight-placeholder-tasks-2.md',
+    });
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'active-task-agentflight-placeholder',
+          severity: 'warn',
+          path: '.agentloop/tasks/2026-06-16-ignore-active-agentflight-placeholder-tasks-2.md',
+          title,
+          commands: expect.arrayContaining([
+            'agentloop task clear',
+            'agentloop task set <path>',
+            'agentloop create-task',
+          ]),
+        }),
+      ]),
+    );
+  });
+
+  test('task doctor skips placeholder-section warnings for AgentFlight placeholders', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const title = 'Skip AgentFlight placeholder section warnings';
+    await writeFile(
+      path.join(
+        dir,
+        '.agentloop/tasks/2026-06-16-skip-agentflight-placeholder-section-warnings-2.md',
+      ),
+      fullAgentFlightPlaceholderMarkdown(title, 'proposed'),
+    );
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.diagnostics).not.toContainEqual(
+      expect.objectContaining({
+        id: 'placeholder-task-section',
+        path: '.agentloop/tasks/2026-06-16-skip-agentflight-placeholder-section-warnings-2.md',
+      }),
+    );
+  });
+
+  test('task doctor warns when active task is older than recent run evidence', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const taskPath = path.join(dir, '.agentloop/tasks/old.md');
+    const runMetadataPath = path.join(dir, '.agentloop/runs/2026-06-16-20-00-verify/metadata.json');
+    await writeFile(taskPath, '# Old\n\n- Status: in-progress\n');
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/old.md',
+    });
+    await mkdir(path.dirname(runMetadataPath), { recursive: true });
+    await writeJson(runMetadataPath, {
+      id: '2026-06-16-20-00-verify',
+      command: 'verify',
+      createdAt: '2026-06-16-20-00',
+      task: null,
+      changedFileCount: 0,
+    });
+    await utimes(taskPath, new Date('2026-06-16T18:00:00Z'), new Date('2026-06-16T18:00:00Z'));
+    await utimes(
+      path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+      new Date('2026-06-16T17:00:00Z'),
+      new Date('2026-06-16T17:00:00Z'),
+    );
+    await utimes(
+      path.join(dir, '.agentloop/state.json'),
+      new Date('2026-06-16T18:30:00Z'),
+      new Date('2026-06-16T18:30:00Z'),
+    );
+    await utimes(
+      runMetadataPath,
+      new Date('2026-06-16T20:00:00Z'),
+      new Date('2026-06-16T20:00:00Z'),
+    );
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'active-task-older-than-runs',
+          severity: 'warn',
+          path: '.agentloop/tasks/old.md',
+          evidence: expect.arrayContaining([
+            '.agentloop/runs/2026-06-16-20-00-verify/metadata.json',
+          ]),
+        }),
+      ]),
+    );
+  });
+
+  test('task doctor warns when recent evidence exists without an active task', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const reportPath = path.join(dir, '.agentloop/reports/2026-06-16-20-30-verification-report.md');
+    await mkdir(path.dirname(reportPath), { recursive: true });
+    await writeFile(reportPath, '# Verification Report\n\nOverall status: pass\n');
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'recent-evidence-without-active-task',
+          severity: 'warn',
+          path: '.agentloop/state.json',
+          evidence: expect.arrayContaining([
+            '.agentloop/reports/2026-06-16-20-30-verification-report.md',
+          ]),
+        }),
+      ]),
+    );
+  });
+
+  test('task doctor accepts latest run evidence for an archived terminal task when no task is active', async () => {
+    const { dir, config, taskPath } = await createTaskStateFixture();
+    await setActiveTask({ cwd: dir, config, taskPath });
+    await updateTaskStatus({ cwd: dir, config, taskPath, status: 'done' });
+    const archived = await archiveTask({ cwd: dir, config, taskPath });
+    const runMetadataPath = path.join(
+      dir,
+      '.agentloop/runs/2026-06-16-20-45-handoff/metadata.json',
+    );
+    await mkdir(path.dirname(runMetadataPath), { recursive: true });
+    await writeJson(runMetadataPath, {
+      id: '2026-06-16-20-45-handoff',
+      command: 'handoff',
+      createdAt: '2026-06-16-20-45',
+      task: {
+        path: archived.path,
+        title: archived.title,
+        status: archived.status,
+      },
+      changedFileCount: 1,
+    });
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.diagnostics).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'recent-evidence-without-active-task',
+        }),
+      ]),
+    );
+  });
+
+  test('task doctor accepts pre-archive run metadata as archived task evidence', async () => {
+    const { dir, config, taskPath } = await createTaskStateFixture();
+    const task = await setActiveTask({ cwd: dir, config, taskPath });
+    await updateTaskStatus({ cwd: dir, config, taskPath, status: 'done' });
+    const runMetadataPath = path.join(
+      dir,
+      '.agentloop/runs/2026-06-16-20-45-handoff/metadata.json',
+    );
+    await mkdir(path.dirname(runMetadataPath), { recursive: true });
+    await writeJson(runMetadataPath, {
+      id: '2026-06-16-20-45-handoff',
+      command: 'handoff',
+      createdAt: '2026-06-16-20-45',
+      task: {
+        path: task.path,
+        title: task.title,
+        status: 'done',
+      },
+      changedFileCount: 1,
+    });
+    await archiveTask({ cwd: dir, config, taskPath });
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.diagnostics).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'recent-evidence-without-active-task',
+        }),
+      ]),
+    );
+  });
+
+  test('task doctor still warns when an open task exists without an active task', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/archive/2026-06-16-done.md'),
+      '# Done task\n\n- Status: done\n',
+    );
+    const runMetadataPath = path.join(
+      dir,
+      '.agentloop/runs/2026-06-16-20-45-handoff/metadata.json',
+    );
+    await mkdir(path.dirname(runMetadataPath), { recursive: true });
+    await writeJson(runMetadataPath, {
+      id: '2026-06-16-20-45-handoff',
+      command: 'handoff',
+      createdAt: '2026-06-16-20-45',
+      task: {
+        path: '.agentloop/tasks/archive/2026-06-16-done.md',
+        title: 'Done task',
+        status: 'done',
+      },
+      changedFileCount: 1,
+    });
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'recent-evidence-without-active-task',
+          severity: 'warn',
+          path: '.agentloop/state.json',
+          evidence: expect.arrayContaining([
+            '.agentloop/runs/2026-06-16-20-45-handoff/metadata.json',
+          ]),
+        }),
+      ]),
+    );
+  });
+
+  test('task doctor caps stale-state evidence references', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const taskPath = path.join(dir, '.agentloop/tasks/old.md');
+    await writeFile(taskPath, '# Old\n\n- Status: in-progress\n');
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/old.md',
+    });
+    await utimes(
+      path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+      new Date('2026-06-16T09:00:00Z'),
+      new Date('2026-06-16T09:00:00Z'),
+    );
+    await utimes(taskPath, new Date('2026-06-16T10:00:00Z'), new Date('2026-06-16T10:00:00Z'));
+    await utimes(
+      path.join(dir, '.agentloop/state.json'),
+      new Date('2026-06-16T10:30:00Z'),
+      new Date('2026-06-16T10:30:00Z'),
+    );
+    for (let index = 0; index < 12; index += 1) {
+      const hour = String(index + 11).padStart(2, '0');
+      const runMetadataPath = path.join(
+        dir,
+        `.agentloop/runs/2026-06-16-${hour}-00-verify/metadata.json`,
+      );
+      await mkdir(path.dirname(runMetadataPath), { recursive: true });
+      await writeJson(runMetadataPath, {
+        id: `2026-06-16-${hour}-00-verify`,
+        command: 'verify',
+        createdAt: `2026-06-16-${hour}-00`,
+        task: null,
+        changedFileCount: 0,
+      });
+    }
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+    const diagnostic = result.diagnostics.find((item) => item.id === 'active-task-older-than-runs');
+
+    expect(diagnostic?.evidence).toHaveLength(10);
+    expect(diagnostic?.evidence).not.toContain(
+      '.agentloop/runs/2026-06-16-11-00-verify/metadata.json',
+    );
+    expect(diagnostic?.evidence).not.toContain(
+      '.agentloop/runs/2026-06-16-12-00-verify/metadata.json',
+    );
+  });
+
+  test('task doctor does not warn when newer run evidence references the active task', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const taskPath = path.join(dir, '.agentloop/tasks/current.md');
+    const runMetadataPath = path.join(dir, '.agentloop/runs/2026-06-16-20-00-verify/metadata.json');
+    await writeFile(taskPath, '# Current\n\n- Status: in-progress\n');
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/current.md',
+    });
+    await mkdir(path.dirname(runMetadataPath), { recursive: true });
+    await writeJson(runMetadataPath, {
+      id: '2026-06-16-20-00-verify',
+      command: 'verify',
+      createdAt: '2026-06-16-20-00',
+      task: {
+        path: '.agentloop/tasks/current.md',
+        title: 'Current',
+        status: 'in-progress',
+      },
+      changedFileCount: 0,
+    });
+    await utimes(taskPath, new Date('2026-06-16T18:00:00Z'), new Date('2026-06-16T18:00:00Z'));
+    await utimes(
+      path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+      new Date('2026-06-16T17:00:00Z'),
+      new Date('2026-06-16T17:00:00Z'),
+    );
+    await utimes(
+      path.join(dir, '.agentloop/state.json'),
+      new Date('2026-06-16T18:30:00Z'),
+      new Date('2026-06-16T18:30:00Z'),
+    );
+    await utimes(
+      runMetadataPath,
+      new Date('2026-06-16T20:00:00Z'),
+      new Date('2026-06-16T20:00:00Z'),
+    );
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.diagnostics).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'active-task-older-than-runs',
+        }),
+      ]),
+    );
+  });
+
+  test('task doctor does not warn when active pointer is newer than unrelated run evidence', async () => {
+    const { dir, config } = await createTaskStateFixture();
+    const taskPath = path.join(dir, '.agentloop/tasks/current.md');
+    const runMetadataPath = path.join(
+      dir,
+      '.agentloop/runs/2026-06-16-17-31-handoff/metadata.json',
+    );
+    await writeFile(taskPath, '# Current\n\n- Status: in-progress\n');
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/current.md',
+    });
+    await mkdir(path.dirname(runMetadataPath), { recursive: true });
+    await writeJson(runMetadataPath, {
+      id: '2026-06-16-17-31-handoff',
+      command: 'handoff',
+      createdAt: '2026-06-16-17-31',
+      task: {
+        path: '.agentloop/tasks/older.md',
+        title: 'Older task',
+        status: 'done',
+      },
+      changedFileCount: 0,
+    });
+    await utimes(
+      path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+      new Date('2026-06-16T14:00:00Z'),
+      new Date('2026-06-16T14:00:00Z'),
+    );
+    await utimes(taskPath, new Date('2026-06-16T15:00:00Z'), new Date('2026-06-16T15:00:00Z'));
+    await utimes(
+      runMetadataPath,
+      new Date('2026-06-16T17:31:00Z'),
+      new Date('2026-06-16T17:31:00Z'),
+    );
+    await utimes(
+      path.join(dir, '.agentloop/state.json'),
+      new Date('2026-06-16T18:00:00Z'),
+      new Date('2026-06-16T18:00:00Z'),
+    );
+
+    const result = await inspectTaskDirectory({ cwd: dir, config });
+
+    expect(result.diagnostics).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'active-task-older-than-runs',
+        }),
+      ]),
+    );
   });
 });
 
@@ -352,10 +945,7 @@ describe('task command', () => {
   test('prints task lifecycle human output with Markdown-safe inline values', async () => {
     const { dir } = await createTaskStateFixture();
     const taskPath = '.agentloop/tasks/2026-06-09-active`task.md';
-    await writeFile(
-      path.join(dir, taskPath),
-      '# Active `task`\n\n- Status: review`ready\n',
-    );
+    await writeFile(path.join(dir, taskPath), '# Active `task`\n\n- Status: review`ready\n');
 
     const setResult = await execa(tsxPath, [cliPath, 'task', 'set', taskPath], { cwd: dir });
     expect(setResult.stdout).toContain(
@@ -369,11 +959,9 @@ describe('task command', () => {
     );
     expect(listResult.stdout).toContain(`  ${inlineCode(taskPath)}`);
 
-    const statusResult = await execa(
-      tsxPath,
-      [cliPath, 'task', 'status', taskPath, 'review'],
-      { cwd: dir },
-    );
+    const statusResult = await execa(tsxPath, [cliPath, 'task', 'status', taskPath, 'review'], {
+      cwd: dir,
+    });
     expect(statusResult.stdout).toContain(
       `Updated task status: ${inlineCode('Active `task`')} (${inlineCode('review')})`,
     );
@@ -384,7 +972,7 @@ describe('task command', () => {
       `Updated task status: ${inlineCode('Active `task`')} (${inlineCode('done')})`,
     );
     expect(doneResult.stdout).toContain(
-      'Next step: run `agentloop handoff --write-run`, then archive the task.',
+      'Next step: run `agentloop status --redact-paths`; if it asks for handoff, run `agentloop handoff --write-run`, then archive the task.',
     );
 
     const archiveResult = await execa(tsxPath, [cliPath, 'task', 'archive', taskPath], {
@@ -397,7 +985,7 @@ describe('task command', () => {
       `${inlineCode(taskPath)} -> ${inlineCode('.agentloop/tasks/archive/2026-06-09-active`task.md')}`,
     );
     expect(archiveResult.stdout).toContain(
-      'Next step: run `agentloop handoff --write-run` to capture reviewer evidence for the archived task.',
+      'Next step: run `agentloop status --redact-paths`; if it asks for handoff, run `agentloop handoff --write-run`.',
     );
   });
 
@@ -426,7 +1014,9 @@ describe('task command', () => {
         '.agentloop/tasks/archive/2026-06-09-active\ntask.md',
       )}`,
     );
-    expect(archiveResult.stdout).not.toContain('.agentloop/tasks/archive/2026-06-09-active\ntask.md');
+    expect(archiveResult.stdout).not.toContain(
+      '.agentloop/tasks/archive/2026-06-09-active\ntask.md',
+    );
   });
 
   test('reports task folder hygiene diagnostics from the CLI without writing state', async () => {
@@ -511,6 +1101,81 @@ describe('task command', () => {
     );
   });
 
+  test('accepts redact-paths on task doctor without changing diagnostics shape', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-done.md'),
+      '# Done\n\n- Status: done\n',
+    );
+
+    const human = await execa(tsxPath, [cliPath, 'task', 'doctor', '--redact-paths'], {
+      cwd: dir,
+    });
+    const json = await execa(tsxPath, [cliPath, 'task', 'doctor', '--json', '--redact-paths'], {
+      cwd: dir,
+    });
+    const help = await execa(tsxPath, [cliPath, 'task', 'doctor', '--help'], { cwd: dir });
+
+    expect(human.stdout).toContain('# AgentLoopKit Task Doctor');
+    expect(human.stdout).toContain('Status: `warn`');
+    expect(human.stdout).toContain('`terminal-task-in-active-folder`');
+    expect(JSON.parse(json.stdout)).toMatchObject({
+      taskDoctor: {
+        overallStatus: 'warn',
+        diagnostics: [
+          expect.objectContaining({
+            id: 'terminal-task-in-active-folder',
+            path: '.agentloop/tasks/2026-06-09-done.md',
+          }),
+        ],
+      },
+    });
+    expect(help.stdout).toContain('--redact-paths');
+  });
+
+  test('prints task doctor stale-state recovery commands and evidence refs', async () => {
+    const { dir } = await createTaskStateFixture();
+    const taskPath = path.join(dir, '.agentloop/tasks/old.md');
+    const runMetadataPath = path.join(dir, '.agentloop/runs/2026-06-16-20-00-verify/metadata.json');
+    await writeFile(taskPath, '# Old\n\n- Status: in-progress\n');
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/old.md',
+    });
+    await mkdir(path.dirname(runMetadataPath), { recursive: true });
+    await writeJson(runMetadataPath, {
+      id: '2026-06-16-20-00-verify',
+      command: 'verify',
+      createdAt: '2026-06-16-20-00',
+      task: null,
+      changedFileCount: 0,
+    });
+    await utimes(taskPath, new Date('2026-06-16T18:00:00Z'), new Date('2026-06-16T18:00:00Z'));
+    await utimes(
+      path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+      new Date('2026-06-16T17:00:00Z'),
+      new Date('2026-06-16T17:00:00Z'),
+    );
+    await utimes(
+      path.join(dir, '.agentloop/state.json'),
+      new Date('2026-06-16T18:30:00Z'),
+      new Date('2026-06-16T18:30:00Z'),
+    );
+    await utimes(
+      runMetadataPath,
+      new Date('2026-06-16T20:00:00Z'),
+      new Date('2026-06-16T20:00:00Z'),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'doctor'], { cwd: dir });
+
+    expect(result.stdout).toContain(inlineCode('active-task-older-than-runs'));
+    expect(result.stdout).toContain(`  Commands: ${inlineCode('agentloop task doctor')}`);
+    expect(result.stdout).toContain(
+      `  Evidence: ${inlineCode('.agentloop/runs/2026-06-16-20-00-verify/metadata.json')}`,
+    );
+  });
+
   test('reports post-verification gates recorded as verification commands', async () => {
     const { dir } = await createTaskStateFixture();
     const taskPath = '.agentloop/tasks/2026-06-09-gate-mismatch.md';
@@ -568,9 +1233,7 @@ describe('task command', () => {
       inlineCode('post-verification-gate-in-verification-commands'),
     );
     expect(humanResult.stdout).toContain(inlineCode('npm run dogfood:strict'));
-    expect(humanResult.stdout).toContain(
-      inlineCode('node dist/cli/index.js check-gates --strict'),
-    );
+    expect(humanResult.stdout).toContain(inlineCode('node dist/cli/index.js check-gates --strict'));
     expect(humanResult.stdout).toContain(inlineCode('agentloop ship'));
     expect(humanResult.stdout).toContain(
       inlineCode('npx --no-install agentloop prepare-pr --github-comment'),
@@ -692,10 +1355,7 @@ describe('task command', () => {
   test('prints task doctor diagnostics with Markdown-safe inline values', async () => {
     const { dir } = await createTaskStateFixture();
     const legacyTaskPath = '.agentloop/tasks/2026-06-09-legacy`task.md';
-    await writeFile(
-      path.join(dir, legacyTaskPath),
-      '# Legacy `task`\n\n- Status: review`ready\n',
-    );
+    await writeFile(path.join(dir, legacyTaskPath), '# Legacy `task`\n\n- Status: review`ready\n');
 
     const markdownResult = await execa(tsxPath, [cliPath, 'task', 'doctor'], { cwd: dir });
     expect(markdownResult.stdout).toContain(`Status: ${inlineCode('warn')}`);
@@ -861,6 +1521,60 @@ describe('task command', () => {
     await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
   });
 
+  test('redacts local roots from task show output only when requested', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+    const absoluteReportPath = path.join(dir, '.agentloop/reports/local-report.md');
+    await writeFile(
+      taskPath,
+      [
+        '# Demo task',
+        '',
+        '- Status: proposed',
+        '',
+        '## Evidence',
+        `Local report: ${absoluteReportPath}`,
+        '',
+      ].join('\n'),
+    );
+
+    const rawMarkdownResult = await execa(
+      tsxPath,
+      [cliPath, 'task', 'show', '.agentloop/tasks/2026-06-09-demo.md'],
+      { cwd: dir },
+    );
+    expect(rawMarkdownResult.stdout).toContain(absoluteReportPath);
+
+    const rawJsonResult = await execa(
+      tsxPath,
+      [cliPath, 'task', 'show', '.agentloop/tasks/2026-06-09-demo.md', '--json'],
+      { cwd: dir },
+    );
+    expect(JSON.parse(rawJsonResult.stdout).task.content).toContain(absoluteReportPath);
+
+    const redactedMarkdownResult = await execa(
+      tsxPath,
+      [cliPath, 'task', 'show', '.agentloop/tasks/2026-06-09-demo.md', '--redact-paths'],
+      { cwd: dir },
+    );
+    expect(redactedMarkdownResult.stdout).toContain(
+      '[git-root]/.agentloop/reports/local-report.md',
+    );
+    expect(redactedMarkdownResult.stdout).not.toContain(dir);
+
+    const redactedJsonResult = await execa(
+      tsxPath,
+      [cliPath, 'task', 'show', '.agentloop/tasks/2026-06-09-demo.md', '--json', '--redact-paths'],
+      { cwd: dir },
+    );
+    const redactedJson = JSON.parse(redactedJsonResult.stdout);
+    expect(redactedJson.task.content).toContain('[git-root]/.agentloop/reports/local-report.md');
+    expect(JSON.stringify(redactedJson)).not.toContain(dir);
+
+    const helpResult = await execa(tsxPath, [cliPath, 'task', 'show', '--help'], { cwd: dir });
+    expect(helpResult.stdout).toContain('--redact-paths');
+    await expect(stat(path.join(dir, '.agentloop/state.json'))).rejects.toThrow();
+  });
+
   test('prints missing task path errors as JSON when requested', async () => {
     const { dir } = await createTaskStateFixture();
 
@@ -909,7 +1623,10 @@ describe('task command', () => {
     const { dir } = await createTaskStateFixture();
     const outsideDir = await makeTempDir();
     tempDirs.push(outsideDir);
-    await writeFile(path.join(outsideDir, 'outside-task.md'), '# Outside task\n\n- Status: proposed\n');
+    await writeFile(
+      path.join(outsideDir, 'outside-task.md'),
+      '# Outside task\n\n- Status: proposed\n',
+    );
     await symlink(outsideDir, path.join(dir, '.agentloop/tasks/outside-link'), 'dir');
     const requestedTask = '.agentloop/tasks/outside-link/outside-task.md';
 
@@ -1045,15 +1762,16 @@ describe('task command', () => {
   test('keeps missing task path errors human-readable by default', async () => {
     const { dir } = await createTaskStateFixture();
 
-    const result = await execa(
-      tsxPath,
-      [cliPath, 'task', 'show', '.agentloop/tasks/missing.md'],
-      { cwd: dir, reject: false },
-    );
+    const result = await execa(tsxPath, [cliPath, 'task', 'show', '.agentloop/tasks/missing.md'], {
+      cwd: dir,
+      reject: false,
+    });
 
     expect(result.exitCode).toBe(1);
     expect(result.stdout).toBe('');
-    expect(result.stderr).toContain('agentloop: Task contract not found: .agentloop/tasks/missing.md');
+    expect(result.stderr).toContain(
+      'agentloop: Task contract not found: .agentloop/tasks/missing.md',
+    );
   });
 
   test('updates task status from the CLI', async () => {
@@ -1150,6 +1868,443 @@ describe('task command', () => {
     expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: deferred\n');
   });
 
+  test('labels AgentFlight placeholders in task list output', async () => {
+    const { dir } = await createTaskStateFixture();
+    const title = 'Separate AgentFlight placeholders from roadmap task counts';
+    await writeFile(
+      path.join(
+        dir,
+        '.agentloop/tasks/2026-06-16-separate-agentflight-placeholders-from-roadmap-task-counts.md',
+      ),
+      agentFlightPlaceholderMarkdown(title),
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'task', 'list', '--json'], { cwd: dir });
+    const humanResult = await execa(tsxPath, [cliPath, 'task', 'list'], { cwd: dir });
+
+    expect(JSON.parse(jsonResult.stdout).tasks).toContainEqual(
+      expect.objectContaining({
+        title,
+        status: 'deferred',
+        source: 'agentflight-placeholder',
+      }),
+    );
+    expect(humanResult.stdout).toContain(
+      '`Separate AgentFlight placeholders from roadmap task counts` (`deferred`, `AgentFlight placeholder`)',
+    );
+  });
+
+  test('accepts redact-paths on task list without changing output or active state', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-16-real-deferred.md'),
+      '# Real deferred\n\n- Status: deferred\n',
+    );
+
+    const help = await execa(tsxPath, [cliPath, 'task', 'list', '--help'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+    expect(help.stdout).toContain('--redact-paths');
+
+    const human = await execa(tsxPath, [cliPath, 'task', 'list'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+    const redactedHuman = await execa(tsxPath, [cliPath, 'task', 'list', '--redact-paths'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+    const json = JSON.parse(
+      (
+        await execa(tsxPath, [cliPath, 'task', 'list', '--json'], {
+          cwd: dir,
+          timeout: CLI_PROCESS_TIMEOUT_MS,
+        })
+      ).stdout,
+    );
+    const redactedJson = JSON.parse(
+      (
+        await execa(tsxPath, [cliPath, 'task', 'list', '--json', '--redact-paths'], {
+          cwd: dir,
+          timeout: CLI_PROCESS_TIMEOUT_MS,
+        })
+      ).stdout,
+    );
+
+    expect(redactedHuman.stdout).toBe(human.stdout);
+    expect(redactedJson).toEqual(json);
+    await expect(readFile(path.join(dir, '.agentloop/state.json'), 'utf8')).rejects.toThrow();
+  });
+
+  test('filters task list status output from the CLI', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-16-real-deferred.md'),
+      '# Real deferred\n\n- Status: deferred\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-16-review.md'),
+      '# Review task\n\n- Status: review\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-17-agentflight-placeholder.md'),
+      agentFlightPlaceholderMarkdown('Deferred placeholder'),
+    );
+
+    const help = await execa(tsxPath, [cliPath, 'task', 'list', '--help'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+    expect(help.stdout).toContain('--status <status>');
+
+    const human = await execa(tsxPath, [cliPath, 'task', 'list', '--status', 'deferred'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+    expect(human.stdout).toContain('`Real deferred` (`deferred`)');
+    expect(human.stdout).toContain(
+      '`Deferred placeholder` (`deferred`, `AgentFlight placeholder`)',
+    );
+    expect(human.stdout).not.toContain('`Demo task` (`proposed`)');
+    expect(human.stdout).not.toContain('`Review task` (`review`)');
+
+    const json = JSON.parse(
+      (
+        await execa(tsxPath, [cliPath, 'task', 'list', '--json', '--status', 'deferred'], {
+          cwd: dir,
+          timeout: CLI_PROCESS_TIMEOUT_MS,
+        })
+      ).stdout,
+    );
+    expect(json.tasks).toEqual([
+      expect.objectContaining({ title: 'Real deferred', status: 'deferred' }),
+      expect.objectContaining({
+        title: 'Deferred placeholder',
+        status: 'deferred',
+        source: 'agentflight-placeholder',
+      }),
+    ]);
+    expect(json.taskContracts).toEqual([
+      expect.objectContaining({ title: 'Real deferred', status: 'deferred' }),
+    ]);
+    expect(json.agentFlightPlaceholders).toEqual([
+      expect.objectContaining({
+        title: 'Deferred placeholder',
+        status: 'deferred',
+        source: 'agentflight-placeholder',
+      }),
+    ]);
+
+    await expect(readFile(path.join(dir, '.agentloop/state.json'), 'utf8')).rejects.toThrow();
+  });
+
+  test('prints unsupported task list status errors as JSON when requested', async () => {
+    const { dir } = await createTaskStateFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'task', 'list', '--status', 'waiting', '--json'],
+      { cwd: dir, reject: false, timeout: CLI_PROCESS_TIMEOUT_MS },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'UNSUPPORTED_TASK_STATUS',
+        message: 'Unsupported task status "waiting".',
+        requestedStatus: 'waiting',
+        supportedStatuses: ['proposed', 'in-progress', 'blocked', 'deferred', 'review', 'done'],
+      },
+    });
+    await expect(readFile(path.join(dir, '.agentloop/state.json'), 'utf8')).rejects.toThrow();
+  });
+
+  test('keeps unsupported task list status errors human-readable by default', async () => {
+    const { dir } = await createTaskStateFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'list', '--status', 'waiting'], {
+      cwd: dir,
+      reject: false,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('agentloop: Unsupported task status "waiting".');
+    await expect(readFile(path.join(dir, '.agentloop/state.json'), 'utf8')).rejects.toThrow();
+  });
+
+  test('groups AgentFlight placeholders after ordinary task contracts in task list output', async () => {
+    const { dir } = await createTaskStateFixture();
+    const placeholderTitle = 'Group AgentFlight placeholders in task list';
+    await writeFile(
+      path.join(
+        dir,
+        '.agentloop/tasks/2026-06-16-group-agentflight-placeholders-in-task-list-2.md',
+      ),
+      agentFlightPlaceholderMarkdown(placeholderTitle),
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-16-real-deferred.md'),
+      '# Real deferred\n\n- Status: deferred\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'list'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+
+    const realIndex = result.stdout.indexOf('`Real deferred` (`deferred`)');
+    const sectionIndex = result.stdout.indexOf('AgentFlight placeholders:');
+    const placeholderIndex = result.stdout.indexOf(
+      '`Group AgentFlight placeholders in task list` (`deferred`, `AgentFlight placeholder`)',
+    );
+    expect(realIndex).toBeGreaterThan(-1);
+    expect(sectionIndex).toBeGreaterThan(realIndex);
+    expect(placeholderIndex).toBeGreaterThan(sectionIndex);
+    expect(result.stdout).toContain(
+      '  `.agentloop/tasks/2026-06-16-group-agentflight-placeholders-in-task-list-2.md`',
+    );
+  });
+
+  test('orders real task contracts before AgentFlight placeholders in JSON task list output', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+    const realTaskPath = path.join(dir, '.agentloop/tasks/2026-06-16-real-roadmap-task.md');
+    const placeholderTaskPath = path.join(
+      dir,
+      '.agentloop/tasks/2026-06-16-prioritize-real-task-contracts-in-json-task-list.md',
+    );
+    await writeFile(realTaskPath, '# Real roadmap task\n\n- Status: deferred\n');
+    await writeFile(
+      placeholderTaskPath,
+      agentFlightPlaceholderMarkdown('Prioritize real task contracts in JSON task list'),
+    );
+    await utimes(
+      taskPath,
+      new Date('2026-06-16T10:00:00.000Z'),
+      new Date('2026-06-16T10:00:00.000Z'),
+    );
+    await utimes(
+      realTaskPath,
+      new Date('2026-06-16T11:00:00.000Z'),
+      new Date('2026-06-16T11:00:00.000Z'),
+    );
+    await utimes(
+      placeholderTaskPath,
+      new Date('2026-06-16T12:00:00.000Z'),
+      new Date('2026-06-16T12:00:00.000Z'),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'list', '--json'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+    const tasks = JSON.parse(result.stdout).tasks as Array<{ title: string; source?: string }>;
+
+    const firstPlaceholderIndex = tasks.findIndex(
+      (task) => task.source === 'agentflight-placeholder',
+    );
+    const lastRealTaskIndex = tasks.reduce(
+      (latest, task, index) => (task.source === 'agentflight-placeholder' ? latest : index),
+      -1,
+    );
+    expect(firstPlaceholderIndex).toBeGreaterThan(lastRealTaskIndex);
+    expect(tasks.map((task) => task.title)).toEqual([
+      'Real roadmap task',
+      'Demo task',
+      'Prioritize real task contracts in JSON task list',
+    ]);
+  });
+
+  test('exposes AgentFlight placeholder groups in JSON task list output', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-16-real-deferred.md'),
+      '# Real deferred\n\n- Status: deferred\n',
+    );
+    await writeFile(
+      path.join(
+        dir,
+        '.agentloop/tasks/2026-06-17-expose-agentflight-placeholder-groups-in-task-list-json.md',
+      ),
+      agentFlightPlaceholderMarkdown('Expose AgentFlight placeholder groups in task list JSON'),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'task', 'list', '--json'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+    const payload = JSON.parse(result.stdout) as {
+      tasks: Array<{ title: string; source?: string }>;
+      taskContracts: Array<{ title: string; source?: string }>;
+      agentFlightPlaceholders: Array<{ title: string; source?: string }>;
+    };
+
+    expect(payload.tasks.map((task) => task.title)).toEqual([
+      'Real deferred',
+      'Demo task',
+      'Expose AgentFlight placeholder groups in task list JSON',
+    ]);
+    expect(payload.taskContracts).toEqual([
+      expect.objectContaining({ title: 'Real deferred' }),
+      expect.objectContaining({ title: 'Demo task' }),
+    ]);
+    expect(payload.taskContracts).toEqual(
+      expect.not.arrayContaining([expect.objectContaining({ source: 'agentflight-placeholder' })]),
+    );
+    expect(payload.agentFlightPlaceholders).toEqual([
+      expect.objectContaining({
+        title: 'Expose AgentFlight placeholder groups in task list JSON',
+        source: 'agentflight-placeholder',
+      }),
+    ]);
+    expect(payload.tasks).toHaveLength(
+      payload.taskContracts.length + payload.agentFlightPlaceholders.length,
+    );
+  });
+
+  test('bounds AgentFlight placeholders in human task list output while JSON stays complete', async () => {
+    const { dir } = await createTaskStateFixture();
+    const placeholderTitles = Array.from(
+      { length: 7 },
+      (_, index) => `AgentFlight placeholder ${index + 1}`,
+    );
+    for (const [index, title] of placeholderTitles.entries()) {
+      await writeFile(
+        path.join(dir, `.agentloop/tasks/2026-06-16-agentflight-placeholder-${index + 1}.md`),
+        agentFlightPlaceholderMarkdown(title),
+      );
+    }
+
+    const humanResult = await execa(tsxPath, [cliPath, 'task', 'list'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+    const jsonResult = await execa(tsxPath, [cliPath, 'task', 'list', '--json'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+
+    const visiblePlaceholderRows =
+      humanResult.stdout.match(
+        /`AgentFlight placeholder \d+` \(`deferred`, `AgentFlight placeholder`\)/g,
+      ) ?? [];
+    const jsonPlaceholders = JSON.parse(jsonResult.stdout).tasks.filter(
+      (task: { source?: string }) => task.source === 'agentflight-placeholder',
+    );
+
+    expect(visiblePlaceholderRows).toHaveLength(5);
+    expect(humanResult.stdout).toContain('... 2 more AgentFlight placeholder task(s) hidden');
+    expect(humanResult.stdout).toContain(
+      'Run `agentloop task list --json` to inspect all placeholders.',
+    );
+    expect(jsonPlaceholders).toHaveLength(7);
+  });
+
+  test('prints compact task list JSON when brief JSON is requested', async () => {
+    const { dir } = await createTaskStateFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-16-real-deferred.md'),
+      '# Real deferred\n\n- Status: deferred\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-16-review.md'),
+      '# Review task\n\n- Status: review\n',
+    );
+    for (const index of [1, 2, 3, 4]) {
+      await writeFile(
+        path.join(dir, `.agentloop/tasks/2026-06-17-placeholder-${index}.md`),
+        agentFlightPlaceholderMarkdown(`Placeholder ${index}`),
+      );
+    }
+
+    const [fullResult, compactResult, compactDeferredResult, humanResult, briefHumanResult] =
+      await Promise.all([
+        execa(tsxPath, [cliPath, 'task', 'list', '--json'], {
+          cwd: dir,
+          timeout: CLI_PROCESS_TIMEOUT_MS,
+        }),
+        execa(tsxPath, [cliPath, 'task', 'list', '--json', '--brief'], {
+          cwd: dir,
+          timeout: CLI_PROCESS_TIMEOUT_MS,
+        }),
+        execa(tsxPath, [cliPath, 'task', 'list', '--json', '--brief', '--status', 'deferred'], {
+          cwd: dir,
+          timeout: CLI_PROCESS_TIMEOUT_MS,
+        }),
+        execa(tsxPath, [cliPath, 'task', 'list'], {
+          cwd: dir,
+          timeout: CLI_PROCESS_TIMEOUT_MS,
+        }),
+        execa(tsxPath, [cliPath, 'task', 'list', '--brief'], {
+          cwd: dir,
+          timeout: CLI_PROCESS_TIMEOUT_MS,
+        }),
+      ]);
+
+    const full = JSON.parse(fullResult.stdout);
+    const compact = JSON.parse(compactResult.stdout);
+    const compactDeferred = JSON.parse(compactDeferredResult.stdout);
+
+    expect(full.tasks).toHaveLength(7);
+    expect(full.taskContracts).toHaveLength(3);
+    expect(full.agentFlightPlaceholders).toHaveLength(4);
+    expect(compact.tasks).toBeUndefined();
+    expect(compact.totalCount).toBe(7);
+    expect(compact.statusFilter).toBeNull();
+    expect(compact.taskContracts).toEqual({
+      count: 3,
+      hiddenCount: 0,
+      preview: expect.arrayContaining([
+        expect.objectContaining({ title: 'Real deferred', status: 'deferred' }),
+        expect.objectContaining({ title: 'Review task', status: 'review' }),
+        expect.objectContaining({ title: 'Demo task', status: 'proposed' }),
+      ]),
+    });
+    expect(compact.agentFlightPlaceholders).toEqual({
+      count: 4,
+      hiddenCount: 1,
+      preview: expect.arrayContaining([
+        expect.objectContaining({ status: 'deferred', source: 'agentflight-placeholder' }),
+      ]),
+    });
+    expect(compact.agentFlightPlaceholders.preview).toHaveLength(3);
+    expect(
+      compact.agentFlightPlaceholders.preview.every((task: { title: string }) =>
+        task.title.startsWith('Placeholder '),
+      ),
+    ).toBe(true);
+    expect(compact.brief).toBe(
+      'AgentLoopKit tasks: total=7, taskContracts=3, agentFlightPlaceholders=4',
+    );
+
+    expect(compactDeferred.tasks).toBeUndefined();
+    expect(compactDeferred.statusFilter).toBe('deferred');
+    expect(compactDeferred.totalCount).toBe(5);
+    expect(compactDeferred.taskContracts).toEqual({
+      count: 1,
+      hiddenCount: 0,
+      preview: [expect.objectContaining({ title: 'Real deferred', status: 'deferred' })],
+    });
+    expect(compactDeferred.agentFlightPlaceholders).toEqual({
+      count: 4,
+      hiddenCount: 1,
+      preview: expect.arrayContaining([
+        expect.objectContaining({ status: 'deferred', source: 'agentflight-placeholder' }),
+      ]),
+    });
+    expect(compactDeferred.agentFlightPlaceholders.preview).toHaveLength(3);
+    expect(
+      compactDeferred.agentFlightPlaceholders.preview.every((task: { title: string }) =>
+        task.title.startsWith('Placeholder '),
+      ),
+    ).toBe(true);
+    expect(briefHumanResult.stdout).toBe(humanResult.stdout);
+    expect(compactResult.stdout.length).toBeLessThan(fullResult.stdout.length);
+  });
+
   test('prints unsupported task status errors as JSON when requested', async () => {
     const { dir, taskPath } = await createTaskStateFixture();
 
@@ -1184,7 +2339,9 @@ describe('task command', () => {
     expect(result.exitCode).toBe(1);
     expect(result.stdout).toBe('');
     expect(result.stderr).toContain('agentloop: Unsupported task status "waiting".');
-    expect(result.stderr).toContain('Use one of: proposed, in-progress, blocked, deferred, review, done.');
+    expect(result.stderr).toContain(
+      'Use one of: proposed, in-progress, blocked, deferred, review, done.',
+    );
     expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: proposed\n');
   });
 
@@ -1210,14 +2367,18 @@ describe('task command', () => {
     });
     await expect(stat(taskPath)).rejects.toThrow();
     const listResult = await execa(tsxPath, [cliPath, 'task', 'list', '--json'], { cwd: dir });
-    expect(JSON.parse(listResult.stdout)).toEqual({ tasks: [] });
+    expect(JSON.parse(listResult.stdout)).toEqual({
+      tasks: [],
+      taskContracts: [],
+      agentFlightPlaceholders: [],
+    });
     const currentResult = await execa(tsxPath, [cliPath, 'task', 'current', '--json'], {
       cwd: dir,
     });
     expect(JSON.parse(currentResult.stdout)).toEqual({ activeTask: null });
   });
 
-  test('prints a handoff next step after bulk archiving tasks', async () => {
+  test('prints a status-first next step after bulk archiving tasks', async () => {
     const { dir } = await createTaskStateFixture();
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-09-first.md'),
@@ -1236,7 +2397,7 @@ describe('task command', () => {
       'Bulk task archive complete: archived `2` task contract(s) with status `done`.',
     );
     expect(result.stdout).toContain(
-      'Next step: run `agentloop handoff --write-run` to capture reviewer evidence for the archived tasks.',
+      'Next step: run `agentloop status --redact-paths`; if it asks for handoff, run `agentloop handoff --write-run`.',
     );
   });
 

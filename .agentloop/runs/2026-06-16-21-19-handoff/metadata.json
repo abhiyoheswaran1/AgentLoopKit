@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-21-19-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-21-19",
+  "createdAtEpochMs": 1781637552306,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-separate-agentloop-evidence-churn-in-maintainer-check.md",
+    "title": "Separate AgentLoop evidence churn in maintainer check",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-21-16-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-21-19-pr-summary.md",
+  "changedFileCount": 359
+}

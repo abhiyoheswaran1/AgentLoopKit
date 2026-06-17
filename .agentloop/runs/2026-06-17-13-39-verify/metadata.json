@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-13-39-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-13-39",
+  "createdAtEpochMs": 1781696355673,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-clarify-release-checklist-proof-phases-2.md",
+    "title": "Clarify release checklist proof phases",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-13-34-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2894
+}

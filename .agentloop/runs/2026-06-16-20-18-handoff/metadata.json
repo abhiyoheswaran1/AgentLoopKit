@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-20-18-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-20-18",
+  "createdAtEpochMs": 1781633929482,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-ignore-active-agentflight-placeholder-tasks.md",
+    "title": "Ignore active AgentFlight placeholder tasks",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-20-15-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-20-18-pr-summary.md",
+  "changedFileCount": 223
+}

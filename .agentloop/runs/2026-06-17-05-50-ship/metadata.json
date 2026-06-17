@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-05-50-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-05-50",
+  "createdAtEpochMs": 1781668215830,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-release-proof-head-tag-clarity-2.md",
+    "title": "Add built CLI smoke coverage for release-proof HEAD tag clarity",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-05-44-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-05-50-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-05-50-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 2119
+}

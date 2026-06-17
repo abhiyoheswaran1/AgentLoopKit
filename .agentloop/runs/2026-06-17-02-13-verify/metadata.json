@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-02-13-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-02-13",
+  "createdAtEpochMs": 1781655184609,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-task-command-verification-gates.md",
+    "title": "Add built CLI smoke coverage for task-command verification gates",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-12-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 1473
+}

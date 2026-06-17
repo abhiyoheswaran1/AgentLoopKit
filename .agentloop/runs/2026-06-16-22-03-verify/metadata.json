@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-22-03-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-22-03",
+  "createdAtEpochMs": 1781640215343,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-document-check-gates-task-done-next-action.md",
+    "title": "Document check-gates task-done next action",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-22-02-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 494
+}

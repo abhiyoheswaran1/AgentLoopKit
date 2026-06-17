@@ -19,6 +19,8 @@ The report uses local inputs:
 - git diff stats
 - deterministic PR summary output
 
+The changed-file table keeps ordinary source, test, docs, config, and automation paths visible. Generated AgentLoop and AgentFlight evidence paths are compacted into grouped count rows so long local verification sessions do not flood the browser report. Full evidence paths remain available from Git status, JSON-capable AgentLoop commands, and run-ledger artifacts.
+
 It writes:
 
 ```text
@@ -31,11 +33,15 @@ Use JSON output in scripts:
 
 ```bash
 agentloop report --json
+agentloop report --json --redact-paths
 agentloop report --out .agentloop/reports/review.html --json
 agentloop report --verification .agentloop/reports/2026-06-10-12-00-verification-report.md --json
+agentloop badge --json --redact-paths
 ```
 
 JSON output includes the written `outPath`, report metadata, and source paths. It does not embed the full HTML body.
+
+Use `--redact-paths` before copying `report` or `badge` command output into public logs. It redacts local roots in human and JSON output only; the real HTML or SVG write path and artifact contents stay unchanged.
 
 Output paths must stay inside `.agentloop/reports/`, end in `.html`, and resolve inside the current repo. With `--json`, invalid output paths return `OUTPUT_PATH_INVALID` with `requestedPath`, `expectedDir`, `expectedExtension`, and `reason`.
 

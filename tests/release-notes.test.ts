@@ -486,6 +486,93 @@ describe('release-notes command', () => {
     expect(result.stdout).toContain(`Release notes written: ${singleLineInlineCode(outPath)}`);
   });
 
+  test('accepts redact-paths and redacts local roots in public release-note output', async () => {
+    const dir = await createReleaseFixture({ withPreviousTag: true });
+    const packageName = `demo-${dir}`;
+    const humanOutPath = path.join(dir, '.agentloop/handoffs/manual-release-notes.md');
+    const jsonOutPath = path.join(dir, '.agentloop/handoffs/manual-release-notes-json.md');
+    const rawJsonOutPath = path.join(dir, '.agentloop/handoffs/manual-release-notes-json-raw.md');
+    await writeJson(path.join(dir, 'package.json'), {
+      name: packageName,
+      version: '1.2.3',
+      scripts: { test: 'echo ok' },
+    });
+
+    const helpResult = await execa(tsxPath, [cliPath, 'release-notes', '--help'], { cwd: dir });
+    const humanResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'release-notes',
+        '--from',
+        'v1.2.2',
+        '--to',
+        'HEAD',
+        '--write',
+        '--out',
+        humanOutPath,
+        '--redact-paths',
+      ],
+      { cwd: dir, reject: false },
+    );
+    const redactedJsonResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'release-notes',
+        '--from',
+        'v1.2.2',
+        '--to',
+        'HEAD',
+        '--write',
+        '--out',
+        jsonOutPath,
+        '--json',
+        '--redact-paths',
+      ],
+      { cwd: dir, reject: false },
+    );
+    const rawJsonResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'release-notes',
+        '--from',
+        'v1.2.2',
+        '--to',
+        'HEAD',
+        '--write',
+        '--out',
+        rawJsonOutPath,
+        '--json',
+      ],
+      { cwd: dir },
+    );
+
+    expect(helpResult.stdout).toContain('--redact-paths');
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain('- Package: `demo-[git-root]`');
+    expect(humanResult.stdout).toContain(
+      'Release notes written: `[git-root]/.agentloop/handoffs/manual-release-notes.md`',
+    );
+    expect(humanResult.stdout).not.toContain(dir);
+    await expect(readFile(humanOutPath, 'utf8')).resolves.toContain('- Package: `demo-[git-root]`');
+
+    expect(redactedJsonResult.exitCode).toBe(0);
+    const redactedPayload = JSON.parse(redactedJsonResult.stdout);
+    expect(redactedPayload.packageName).toBe('demo-[git-root]');
+    expect(redactedPayload.writtenPath).toBe(
+      '[git-root]/.agentloop/handoffs/manual-release-notes-json.md',
+    );
+    expect(redactedPayload.markdown).toContain('- Package: `demo-[git-root]`');
+    expect(JSON.stringify(redactedPayload)).not.toContain(dir);
+    await expect(readFile(jsonOutPath, 'utf8')).resolves.toContain('- Package: `demo-[git-root]`');
+
+    const rawPayload = JSON.parse(rawJsonResult.stdout);
+    expect(rawPayload.packageName).toBe(packageName);
+    expect(rawPayload.writtenPath).toBe(rawJsonOutPath);
+  });
+
   test('ignores verification and CI summary evidence from symlinked report roots outside the repo', async () => {
     const dir = await createReleaseFixture({ withPreviousTag: true });
     const outsideReports = await makeTempDir();

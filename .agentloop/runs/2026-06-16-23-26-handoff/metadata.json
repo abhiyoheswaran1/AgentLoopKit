@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-23-26-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-23-26",
+  "createdAtEpochMs": 1781645195609,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-sort-maintainer-check-review-area-counts-2.md",
+    "title": "Sort maintainer-check review area counts",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-23-22-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-23-26-pr-summary-3.md",
+  "changedFileCount": 727
+}

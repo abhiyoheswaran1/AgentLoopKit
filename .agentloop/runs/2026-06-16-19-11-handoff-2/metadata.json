@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-19-11-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-16-19-11",
+  "createdAtEpochMs": 1781629915558,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-decouple-maintenance-check-from-strict-release-proof-2.md",
+    "title": "Decouple maintenance check from strict release proof",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-19-07-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-19-11-pr-summary-2.md",
+  "changedFileCount": 65
+}

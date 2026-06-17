@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-20-59-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-20-59",
+  "createdAtEpochMs": 1781636345852,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-use-concise-evidence-steps-in-dogfood-output.md",
+    "title": "Use concise evidence steps in dogfood output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-20-56-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-20-59-pr-summary.md",
+  "changedFileCount": 313
+}

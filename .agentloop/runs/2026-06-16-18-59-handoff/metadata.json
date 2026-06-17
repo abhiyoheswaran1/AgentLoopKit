@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-18-59-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-18-59",
+  "createdAtEpochMs": 1781629198883,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-prevent-stale-agentloop-task-state.md",
+    "title": "Prevent stale AgentLoop task state",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-18-59-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-18-59-pr-summary.md",
+  "changedFileCount": 32
+}

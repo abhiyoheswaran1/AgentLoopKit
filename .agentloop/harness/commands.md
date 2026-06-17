@@ -44,6 +44,7 @@ Rules:
 - Run configured verification before claiming completion.
 - Dogfood dependency audit, AgentFlight, and ProjScan during implementation work in this repository.
 - Use `npx --yes agentflight start --task "<task>" --yes` at the beginning of meaningful autonomous work.
+- After raw `agentflight start`, run `agentloop status --redact-paths`; if an AgentFlight placeholder becomes active, run `agentloop task set <path>` to re-pin the detailed AgentLoop task.
 - Use `npx --yes agentflight status`, `npx --yes agentflight doctor`, and `npx --yes agentflight report` before final handoff when a session record helps review.
 - Use `.agentloop/product-panel.md`, `.agentloop/user-personas.md`, `.agentloop/backlog.md`, and `.agentloop/research/` to guide product decisions. Treat those files as internal decision support, not public evidence.
 - Use `.agentloop/harness/autonomous-dogfooding.md` for the full self-dogfood workflow.

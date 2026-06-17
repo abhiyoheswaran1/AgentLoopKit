@@ -45,6 +45,7 @@ describe('completion scripts', () => {
     expect(script).toContain("_values 'artifact type'");
     expect(script).toContain("_values 'badge source'");
     expect(script).toContain("_values 'output format'");
+    expect(script).toContain("_values 'task list status'");
     expect(script).toContain('_values \'archive status\' "done"');
     for (const type of TASK_TYPES) {
       expect(script).toContain(`"${type}"`);
@@ -79,6 +80,7 @@ describe('completion scripts', () => {
     expect(script).toContain(`compgen -W "${outputFormats}"`);
     expect(script).toContain(`compgen -W "${releaseProofChannels}"`);
     expect(script).toContain(`compgen -W "${taskStatuses}"`);
+    expect(script).toContain('list)\n          if [[ "$previous" == "--status" ]]');
     expect(script).toContain(`compgen -W "${archiveStatuses}"`);
     expect(script).toContain(
       'codex claude-code cursor opencode gemini-cli github-copilot-cli generic all',
@@ -115,7 +117,22 @@ describe('completion scripts', () => {
       `complete -c agentloopkit -n '__fish_seen_subcommand_from handoff' -a '${outputFormats}'`,
     );
     expect(script).toContain(
+      `complete -c agentloop -n '__fish_seen_subcommand_from task; and __fish_seen_subcommand_from list' -l status -a '${taskStatuses}'`,
+    );
+    expect(script).toContain(
+      `complete -c agentloopkit -n '__fish_seen_subcommand_from task; and __fish_seen_subcommand_from list' -l status -a '${taskStatuses}'`,
+    );
+    expect(script).toContain(
+      `complete -c agentloop -n '__fish_seen_subcommand_from task; and __fish_seen_subcommand_from archive' -l status -a '${archiveStatuses}'`,
+    );
+    expect(script).toContain(
+      `complete -c agentloopkit -n '__fish_seen_subcommand_from task; and __fish_seen_subcommand_from archive' -l status -a '${archiveStatuses}'`,
+    );
+    expect(script).not.toContain(
       `complete -c agentloop -n '__fish_seen_subcommand_from archive' -l status -a '${archiveStatuses}'`,
+    );
+    expect(script).not.toContain(
+      `complete -c agentloopkit -n '__fish_seen_subcommand_from archive' -l status -a '${archiveStatuses}'`,
     );
     expect(script).toContain('review');
     expect(script).not.toContain('config.fish');
@@ -145,6 +162,7 @@ describe('completion scripts', () => {
     expect(script).toContain('$AgentLoopBadgeSources');
     expect(script).toContain('$AgentLoopOutputFormats');
     expect(script).toContain('$AgentLoopArchiveStatuses');
+    expect(script).toContain("$words[2] -eq 'list'");
     expect(script).toContain('$AgentLoopReleaseProofChannels');
     for (const type of TASK_TYPES) {
       expect(script).toContain(`'${type}'`);

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-02-22-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-02-22",
+  "createdAtEpochMs": 1781655771556,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-policy-pack-safety-tests-to-maintenance-check.md",
+    "title": "Add policy pack safety tests to maintenance check",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-21-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-02-22-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-22-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1526
+}

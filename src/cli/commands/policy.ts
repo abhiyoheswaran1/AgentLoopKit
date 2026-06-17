@@ -170,6 +170,11 @@ function printPolicyPackApply(result: PolicyPackApplyResult, options: { json?: b
   console.log('Safety: existing policies are skipped, not overwritten.');
 }
 
+const REDACT_PATHS_OPTION = [
+  '--redact-paths',
+  'accept common public-output redaction flag; policy paths are already repo-relative',
+] as const;
+
 export function policyCommand() {
   const command = new Command('policy').description('List or inspect local AgentLoopKit policies');
 
@@ -177,6 +182,7 @@ export function policyCommand() {
     .command('list')
     .description('List local policies under .agentloop/policies')
     .option('--json', 'print machine-readable output')
+    .option(...REDACT_PATHS_OPTION)
     .action(async (options: { json?: boolean }) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
@@ -194,6 +200,7 @@ export function policyCommand() {
     .command('status')
     .description('Show local policy template status')
     .option('--json', 'print machine-readable output')
+    .option(...REDACT_PATHS_OPTION)
     .action(async (options: { json?: boolean }) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
@@ -211,6 +218,7 @@ export function policyCommand() {
     .command('packs')
     .description('List bundled and configured organization policy packs')
     .option('--json', 'print machine-readable output')
+    .option(...REDACT_PATHS_OPTION)
     .action(async (options: { json?: boolean }) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
@@ -225,6 +233,7 @@ export function policyCommand() {
     .argument('<pack>', 'policy pack name')
     .description('Show a bundled or configured policy pack')
     .option('--json', 'print machine-readable output')
+    .option(...REDACT_PATHS_OPTION)
     .action(async (packName: string, options: { json?: boolean }) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
@@ -253,6 +262,7 @@ export function policyCommand() {
     .description('Copy missing policies from a policy pack without overwriting existing policies')
     .option('--dry-run', 'show planned writes without writing files')
     .option('--json', 'print machine-readable output')
+    .option(...REDACT_PATHS_OPTION)
     .action(async (packName: string, options: { dryRun?: boolean; json?: boolean }) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
@@ -281,6 +291,7 @@ export function policyCommand() {
     .argument('<policy>', 'policy name, such as security or security-policy.md')
     .description('Show a local policy')
     .option('--json', 'print machine-readable output')
+    .option(...REDACT_PATHS_OPTION)
     .action(async (policyName: string, options: { json?: boolean }) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;

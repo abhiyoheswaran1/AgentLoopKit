@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, test } from 'vitest';
@@ -81,6 +81,104 @@ describe('public docs hygiene', () => {
     await expect(runHygiene({ cwd: dir, version: '1.2.3' })).rejects.toThrow(
       'unsupported public claim',
     );
+  });
+
+  test('rejects maintainer release runbook details in README', async () => {
+    const dir = await makeFixture(
+      [
+        '# AgentLoopKit',
+        '',
+        'Current release operations:',
+        '- npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.',
+        '- Future releases should publish through GitHub Releases and the trusted-publishing workflow.',
+        '',
+      ].join('\n'),
+    );
+
+    await expect(runHygiene({ cwd: dir, version: '1.2.3' })).rejects.toThrow(
+      'README contains maintainer-only release runbook detail',
+    );
+  });
+
+  test('allows release-specific docs to discuss publishing workflows', async () => {
+    const dir = await makeFixture('# AgentLoopKit\n\nUse `npx agentloopkit init`.\n');
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'docs/npm-publishing.md'),
+      [
+        '# npm Publishing',
+        '',
+        'Release maintainers can inspect npm trusted publishing and `.github/workflows/publish.yml` during approved release prep.',
+        '',
+      ].join('\n'),
+    );
+
+    await expect(runHygiene({ cwd: dir, version: '1.2.3' })).resolves.toMatchObject({
+      version: '1.2.3',
+    });
+  });
+
+  test('rejects release incident chatter in README', async () => {
+    const dir = await makeFixture(
+      [
+        '# AgentLoopKit',
+        '',
+        'Release incident notes:',
+        '- Local auth failures blocked npm publishing.',
+        '- Token state is being checked before temporary registry repair notes are updated.',
+        '',
+      ].join('\n'),
+    );
+
+    await expect(runHygiene({ cwd: dir, version: '1.2.3' })).rejects.toThrow(
+      'README contains maintainer-only release runbook detail',
+    );
+  });
+
+  test('allows release-specific docs to preserve release incident history', async () => {
+    const dir = await makeFixture('# AgentLoopKit\n\nUse `npx agentloopkit init`.\n');
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    await writeFile(
+      path.join(dir, 'docs/release-status.md'),
+      [
+        '# Release Status',
+        '',
+        'Historical local auth failures, token state, and temporary registry repair notes stay in release-status docs.',
+        '',
+      ].join('\n'),
+    );
+
+    await expect(runHygiene({ cwd: dir, version: '1.2.3' })).resolves.toMatchObject({
+      version: '1.2.3',
+    });
+  });
+
+  test('keeps release checklist proof phases separated', async () => {
+    const checklist = await readFile('docs/release-checklist-example.md', 'utf8');
+    const template = await readFile('src/templates/harness/release-checklist.md', 'utf8');
+    const taskContract =
+      checklist.match(/## Task Contract[\s\S]*?```bash\n([\s\S]*?)```/)?.[1] ?? '';
+    const preBumpEvidence = checklist.match(/## Pre-Bump Evidence[\s\S]*?(?=\n## )/)?.[0] ?? '';
+    const postPublishProof = checklist.match(/## Post-Publish Proof[\s\S]*?(?=\n## )/)?.[0] ?? '';
+
+    expect(preBumpEvidence).toContain('agentloop npm-status --agentloopkit --expect-current');
+    expect(postPublishProof).toContain('agentloop npm-status --agentloopkit --expect-current');
+    expect(postPublishProof).toContain('agentloop release-proof');
+    expect(taskContract).toContain(
+      'Pre-bump npm proof is recorded before package metadata changes, or the version gap is explained',
+    );
+    expect(taskContract).toContain(
+      'Post-publish npm and release-proof results are recorded before availability claims',
+    );
+    expect(taskContract).not.toContain(
+      '--verification "agentloop npm-status --agentloopkit --expect-current"',
+    );
+    expect(taskContract).not.toContain('--verification "agentloop release-proof');
+    expect(template).toContain('Pre-bump evidence');
+    expect(template).toContain('Local release verification');
+    expect(template).toContain('Post-publish proof');
+    expect(template).toContain('agentloop npm-status --agentloopkit --expect-current');
+    expect(template).toContain('agentloop release-proof');
   });
 
   test('allows deferred channel design docs to describe future gates', async () => {

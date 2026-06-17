@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-22-48-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-16-22-48",
+  "createdAtEpochMs": 1781642919128,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-accept-redacted-task-doctor-flag-2.md",
+    "title": "Accept redacted task doctor flag",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-22-44-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-22-48-ship-report-2.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-22-48-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 618
+}

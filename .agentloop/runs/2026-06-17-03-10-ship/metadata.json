@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-03-10-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-03-10",
+  "createdAtEpochMs": 1781658603707,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-accept-redacted-github-import-flag-2.md",
+    "title": "Accept redacted GitHub import flag",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-03-09-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-03-10-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-03-10-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1715
+}

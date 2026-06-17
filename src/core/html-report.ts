@@ -8,6 +8,7 @@ import {
   resolveUniqueOutputArtifactPath,
   verificationReportPattern,
 } from './artifacts.js';
+import { agentLoopEvidenceGroup } from './agentloop-evidence.js';
 import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
 import { pathExists, writeTextFile } from './file-system.js';
@@ -110,21 +111,50 @@ function renderSourcePath(label: string, filePath: string | undefined) {
   return `<li><span>${escapeHtml(label)}</span><code>${escapeHtml(filePath ?? 'not found')}</code></li>`;
 }
 
+function compactChangedFiles(changedFiles: GitFileStatus[]) {
+  const ordinaryFiles: GitFileStatus[] = [];
+  const evidenceGroups = new Map<string, number>();
+
+  for (const file of changedFiles) {
+    const group = agentLoopEvidenceGroup(file.path);
+    if (!group) {
+      ordinaryFiles.push(file);
+      continue;
+    }
+    evidenceGroups.set(group, (evidenceGroups.get(group) ?? 0) + 1);
+  }
+
+  return {
+    ordinaryFiles,
+    evidenceGroups: Array.from(evidenceGroups.entries()),
+  };
+}
+
 function renderChangedFiles(changedFiles: GitFileStatus[]) {
   if (!changedFiles.length) return '<p class="muted">No changed files detected.</p>';
-  return `<table>
-  <thead><tr><th>Status</th><th>Path</th></tr></thead>
-  <tbody>
-${changedFiles
-  .map(
+  const { ordinaryFiles, evidenceGroups } = compactChangedFiles(changedFiles);
+  const ordinaryRows = ordinaryFiles.map(
     (file) =>
       `    <tr><td><code>${escapeHtml(file.status)}</code></td><td><code>${escapeHtml(
         file.path,
       )}</code></td></tr>`,
-  )
-  .join('\n')}
+  );
+  const evidenceRows = evidenceGroups.map(
+    ([group, count]) =>
+      `    <tr><td><code>AgentLoop evidence</code></td><td>${count} file(s) grouped under <code>${escapeHtml(
+        group,
+      )}</code>.</td></tr>`,
+  );
+  const note = evidenceGroups.length
+    ? '\n<p class="muted">Full paths remain available from Git status and AgentLoop JSON or run-ledger evidence.</p>'
+    : '';
+
+  return `<table>
+  <thead><tr><th>Status</th><th>Path</th></tr></thead>
+  <tbody>
+${[...ordinaryRows, ...evidenceRows].join('\n')}
   </tbody>
-</table>`;
+</table>${note}`;
 }
 
 function renderMarkdownBlock(label: string, markdown: string | undefined, emptyText: string) {

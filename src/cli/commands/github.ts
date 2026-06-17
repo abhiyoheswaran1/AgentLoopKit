@@ -49,6 +49,10 @@ export function githubCommand() {
     )
     .option('--dry-run', 'read and normalize metadata without writing the context file')
     .option('--json', 'print machine-readable output')
+    .option(
+      '--redact-paths',
+      'accept common public-output redaction flag; GitHub metadata paths are already repo-relative',
+    )
     .action(
       async (options: {
         issueJson?: string;
@@ -56,6 +60,7 @@ export function githubCommand() {
         output?: string;
         dryRun?: boolean;
         json?: boolean;
+        redactPaths?: boolean;
       }) => {
         const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
         if (!workspace) return;

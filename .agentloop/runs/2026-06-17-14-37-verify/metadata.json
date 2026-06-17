@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-14-37-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-14-37",
+  "createdAtEpochMs": 1781699824334,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-compact-json-task-list-output-2.md",
+    "title": "Add compact JSON task list output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-14-30-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2954
+}

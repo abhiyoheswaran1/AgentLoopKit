@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-19-47-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-19-47",
+  "createdAtEpochMs": 1781632055706,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-surface-agentflight-placeholders-in-review-context-2.md",
+    "title": "Surface AgentFlight placeholders in review context",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-19-45-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-19-47-pr-summary.md",
+  "changedFileCount": 154
+}

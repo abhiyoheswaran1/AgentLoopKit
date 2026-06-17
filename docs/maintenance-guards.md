@@ -116,23 +116,24 @@ Run:
 
 ```bash
 npm test -- tests/github-metadata.test.ts
+npm test -- tests/ship.test.ts -t "keeps imported GitHub metadata neutral for ship scoring"
 agentloop review-context --redact-paths
 agentloop maintainer-check --redact-paths
 ```
 
 ## Regular Maintenance Check
 
-Use the maintenance gate during ongoing development when release proof, public docs, SchemaStore, policy packs, GitHub metadata, AgentFlight, or ProjScan behavior changes:
+Use the maintenance gate during ongoing development when release-proof or npm-status command health, public docs, SchemaStore, policy packs, GitHub metadata, AgentFlight, or ProjScan behavior changes:
 
 ```bash
 npm run maintenance:check
 ```
 
-That gate runs unit tests, public-doc hygiene, link checks, live release proof, SchemaStore output, policy-pack inventory, focused policy-pack safety tests, the read-only GitHub metadata import surface, focused GitHub metadata safety tests, AgentFlight version, ProjScan health, and the non-strict dogfood self-check.
+That gate runs unit tests, public-doc hygiene, link checks, a non-strict npm-only release-proof smoke check, focused read-only npm-status safety tests, SchemaStore output and focused consistency tests, policy-pack inventory, focused policy-pack safety tests, the read-only GitHub metadata import surface, focused GitHub metadata safety tests, ship-score neutrality coverage for imported GitHub metadata, AgentFlight version, ProjScan health, and the non-strict dogfood self-check.
 
-Run `npm run dogfood:strict` after fresh verification when review gates should block the final handoff.
+Run `npm run dogfood:strict` after fresh handoff or ship evidence exists, when review gates should block the final handoff.
 
-Use the full release gate only for approved releases:
+Strict public release proof belongs in approved release gates, not the regular development maintenance guard. Use the full release gate only for approved releases:
 
 ```bash
 npm run release-flow

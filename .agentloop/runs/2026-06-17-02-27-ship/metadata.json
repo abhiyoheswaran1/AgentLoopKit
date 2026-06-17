@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-02-27-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-02-27",
+  "createdAtEpochMs": 1781656065183,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-github-metadata-safety-guard-to-maintenance-check.md",
+    "title": "Add GitHub metadata safety guard to maintenance check",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-26-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-02-27-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-27-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1551
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-15-19-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-15-19",
+  "createdAtEpochMs": 1781702359748,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-reconcile-verified-non-release-backlog-decisions-2.md",
+    "title": "Reconcile verified non-release backlog decisions",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-15-18-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-15-19-pr-summary.md",
+  "changedFileCount": 3044
+}

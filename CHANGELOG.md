@@ -4,6 +4,16 @@
 
 - No unreleased changes yet.
 
+## 0.36.0
+
+- Added stale task-state recovery across `agentloop status`, `agentloop next`, and `agentloop task doctor` so missing or stale `.agentloop/state.json` pointers are reported with bounded recovery guidance instead of broad scans or mutation.
+- Added `agentloop artifacts` fallback support for the latest archived terminal task, including JSON metadata and human output that identify archived task evidence when no live task is available.
+- Hardened release and review evidence surfaces by separating AgentLoop-generated evidence churn from source changes across status, next, check-gates, review-context, artifacts, runs, ship, maintainer-check, and release-check output.
+- Improved AgentFlight placeholder handling so placeholder tasks are grouped, parked, and excluded from latest-task evidence where real task contracts should take precedence.
+- Expanded built CLI smoke coverage for release-check evidence splitting, stale task-state recovery, archived task fallback, redaction, generated artifact ordering, policy packs, npm-status, and review surfaces.
+- Added maintenance coverage for npm-status, SchemaStore, GitHub metadata, policy packs, public docs, links, ProjScan, AgentFlight, and strict dogfood checks.
+- Tightened Markdown-safe and redacted CLI output across task, policy, install-agent, verify, handoff, report, badge, ci-summary, release-notes, release-proof, schemastore, run-ledger, status, next, check-gates, ship, prepare-pr, maintainer-check, and artifact commands.
+
 ## 0.35.2
 
 - Added explicit `author` metadata to the root composite GitHub Action and aligned the Action metadata quoting with the Marketplace-published ProjScan Action.

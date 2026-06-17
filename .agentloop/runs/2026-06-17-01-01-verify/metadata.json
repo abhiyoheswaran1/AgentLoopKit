@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-01-01-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-01-01",
+  "createdAtEpochMs": 1781650900699,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-base-ship-scope-control-scoring-on-non-evidence-changes-2.md",
+    "title": "Base ship scope-control scoring on non-evidence changes",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-01-01-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 1133
+}

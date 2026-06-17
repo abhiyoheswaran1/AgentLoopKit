@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-11-53-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-11-53",
+  "createdAtEpochMs": 1781689991531,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-filter-task-list-by-status.md",
+    "title": "Filter task list by status",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-11-47-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2747
+}

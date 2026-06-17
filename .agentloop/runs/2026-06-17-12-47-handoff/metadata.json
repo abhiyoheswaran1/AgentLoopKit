@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-12-47-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-12-47",
+  "createdAtEpochMs": 1781693233954,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-preflight-dogfood-start-task-type-before-agentflight-2.md",
+    "title": "Preflight dogfood-start task type before AgentFlight",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-12-40-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-12-47-pr-summary.md",
+  "changedFileCount": 2815
+}

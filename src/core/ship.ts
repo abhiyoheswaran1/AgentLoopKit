@@ -2,6 +2,7 @@ import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { resolveUniqueOutputArtifactPath } from './artifacts.js';
+import { renderCompactChangedFiles } from './change-areas.js';
 import { checkGates } from './check-gates.js';
 import { formatTimestamp } from './dates.js';
 import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
@@ -74,12 +75,6 @@ function renderList(values: string[], fallback: string) {
   return values.length
     ? values.map((value) => `- ${escapeSingleLineMarkdownProse(value)}`).join('\n')
     : `- ${escapeSingleLineMarkdownProse(fallback)}`;
-}
-
-function renderChangedFiles(changedFiles: ShipRenderInput['changedFiles']) {
-  return changedFiles.length
-    ? changedFiles.map((file) => `- ${file.status} ${inlineCode(file.path)}`).join('\n')
-    : '- No changed files detected.';
 }
 
 export function renderShipGithubComment(input: ShipResult, cwd?: string) {
@@ -161,7 +156,7 @@ ${renderList(input.readiness.recommendedNextActions, 'Review the diff and open t
 
 ## Changed Files
 
-${renderChangedFiles(input.changedFiles)}
+${renderCompactChangedFiles(input.changedFiles)}
 
 ## Diff Stat
 

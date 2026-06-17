@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-05-51-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-05-51",
+  "createdAtEpochMs": 1781668310578,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-release-proof-head-tag-clarity-2.md",
+    "title": "Add built CLI smoke coverage for release-proof HEAD tag clarity",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-05-44-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-05-51-pr-summary.md",
+  "changedFileCount": 2128
+}

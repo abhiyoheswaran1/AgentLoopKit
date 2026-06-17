@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-20-39-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-20-39",
+  "createdAtEpochMs": 1781635159854,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-exclude-agentflight-placeholders-from-artifact-latest-task.md",
+    "title": "Exclude AgentFlight placeholders from artifact latest task",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-20-35-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-20-39-pr-summary.md",
+  "changedFileCount": 272
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-15-43-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-15-43",
+  "createdAtEpochMs": 1781703807875,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-surface-release-approval-boundary-in-next-action.md",
+    "title": "Surface release approval boundary in next action",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-15-40-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-15-43-pr-summary.md",
+  "changedFileCount": 3074
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-02-36-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-02-36",
+  "createdAtEpochMs": 1781656589972,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-guard-readme-against-release-runbook-drift.md",
+    "title": "Guard README against release runbook drift",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-33-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-36-pr-summary.md",
+  "changedFileCount": 1586
+}

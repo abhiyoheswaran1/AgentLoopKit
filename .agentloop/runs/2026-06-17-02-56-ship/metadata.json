@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-02-56-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-02-56",
+  "createdAtEpochMs": 1781657769852,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-guard-ship-scoring-from-github-metadata-2.md",
+    "title": "Guard ship scoring from GitHub metadata",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-55-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-02-56-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-56-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1657
+}

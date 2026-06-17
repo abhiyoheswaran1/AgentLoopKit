@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-15-14-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-15-14",
+  "createdAtEpochMs": 1781702058243,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-close-stale-completed-backlog-decisions-3.md",
+    "title": "Close stale completed backlog decisions",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-15-13-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-15-14-pr-summary.md",
+  "changedFileCount": 3025
+}

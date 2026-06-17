@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { mkdir, readdir, symlink, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -12,6 +12,10 @@ const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 let tempDirs: string[] = [];
+
+async function git(cwd: string, args: string[]) {
+  return execa('git', args, { cwd });
+}
 
 async function createSummaryFixture() {
   const dir = await makeTempDir();
@@ -79,6 +83,44 @@ async function createArchivedRunTaskFixture() {
   return dir;
 }
 
+async function createDirtySummaryGitFixture(options: { sourceChange?: boolean } = {}) {
+  const dir = await createSummaryFixture();
+  await writeFile(
+    path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+    '# Demo task\n\n- Status: in-progress\n\n## Acceptance Criteria\n- Handoff stays readable.\n',
+  );
+  await git(dir, ['init', '-q']);
+  await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
+  await git(dir, ['config', 'user.name', 'AgentLoopKit Test']);
+  await mkdir(path.join(dir, 'src'), { recursive: true });
+  await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+  await mkdir(path.join(dir, '.agentloop/runs'), { recursive: true });
+  await writeFile(path.join(dir, 'src/index.ts'), 'export const value = "old";\n');
+  await writeFile(path.join(dir, '.agentloop/handoffs/.gitkeep'), '');
+  await writeFile(path.join(dir, '.agentloop/runs/.gitkeep'), '');
+  await git(dir, ['add', '.']);
+  await git(dir, ['commit', '-m', 'Initial summary fixture']);
+
+  if (options.sourceChange !== false) {
+    await writeFile(path.join(dir, 'src/index.ts'), 'export const value = "new";\n');
+  }
+  await writeFile(
+    path.join(dir, '.agentloop/reports/2026-06-09-12-01-verification-report.md'),
+    '# Verification Report\n\nOverall status: pass\n',
+  );
+  await writeFile(
+    path.join(dir, '.agentloop/handoffs/2026-06-09-12-01-pr-summary.md'),
+    '# PR Summary\n',
+  );
+  await mkdir(path.join(dir, '.agentloop/runs/2026-06-09-12-01-handoff'), { recursive: true });
+  await writeFile(
+    path.join(dir, '.agentloop/runs/2026-06-09-12-01-handoff/metadata.json'),
+    '{"id":"2026-06-09-12-01-handoff"}\n',
+  );
+
+  return dir;
+}
+
 describe('handoff command', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
@@ -95,6 +137,75 @@ describe('handoff command', () => {
     expect(output.outPath).toContain('.agentloop/handoffs');
     expect(output.outPath).not.toContain(dir);
     expect(existsSync(path.join(dir, output.outPath))).toBe(true);
+  });
+
+  test('groups AgentLoop evidence churn in changed-file Markdown while preserving JSON output', async () => {
+    const dir = await createDirtySummaryGitFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'handoff', '--json', '--write-run'], {
+      cwd: dir,
+    });
+    const output = JSON.parse(result.stdout);
+    const changedPaths = output.changedFiles.map((file: { path: string }) => file.path);
+    const runChangedFiles = JSON.parse(
+      await readFile(path.join(dir, output.run.path, 'changed-files.json'), 'utf8'),
+    );
+    const runChangedPaths = runChangedFiles.map((file: { path: string }) => file.path);
+
+    expect(output.markdown).toContain('- M `src/index.ts`');
+    expect(output.markdown).toContain(
+      '- AgentLoop evidence: `3` file(s) grouped under `.agentloop/handoffs/`, `.agentloop/reports/`, `.agentloop/runs/`.',
+    );
+    expect(output.markdown).toContain('Full paths remain in JSON output and run-ledger evidence.');
+    expect(output.markdown).not.toContain(
+      '.agentloop/reports/2026-06-09-12-01-verification-report.md',
+    );
+    expect(output.markdown).not.toContain('.agentloop/handoffs/2026-06-09-12-01-pr-summary.md');
+    expect(changedPaths).toEqual(
+      expect.arrayContaining([
+        'src/index.ts',
+        '.agentloop/reports/2026-06-09-12-01-verification-report.md',
+        '.agentloop/handoffs/2026-06-09-12-01-pr-summary.md',
+      ]),
+    );
+    expect(runChangedPaths).toEqual(expect.arrayContaining(changedPaths));
+  });
+
+  test('shows an explicit changed-file count when only AgentLoop evidence changed', async () => {
+    const dir = await createDirtySummaryGitFixture({ sourceChange: false });
+
+    const result = await execa(tsxPath, [cliPath, 'summarize', '--json'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+
+    expect(output.markdown).toContain(
+      '- AgentLoop evidence: `3` file(s) grouped under `.agentloop/handoffs/`, `.agentloop/reports/`, `.agentloop/runs/`.',
+    );
+    expect(output.markdown).toContain('Full paths remain in JSON output and run-ledger evidence.');
+    expect(output.markdown).not.toContain('- No changed files detected.');
+    expect(output.markdown).not.toContain(
+      '.agentloop/reports/2026-06-09-12-01-verification-report.md',
+    );
+  });
+
+  test('compact evidence summaries still cover handoff-only gate freshness', async () => {
+    const dir = await createDirtySummaryGitFixture({ sourceChange: false });
+
+    await execa(tsxPath, [cliPath, 'handoff', '--json'], { cwd: dir });
+    const gatesResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const gates = JSON.parse(gatesResult.stdout);
+
+    expect(gates.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'handoff-summary',
+          status: 'pass',
+          message: 'Reviewer handoff found.',
+        }),
+      ]),
+    );
   });
 
   test('keeps same-minute written handoffs instead of overwriting them', async () => {

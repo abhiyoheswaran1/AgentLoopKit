@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-04-12-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-17-04-12",
+  "createdAtEpochMs": 1781662347692,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-accept-redacted-install-agent-output-flag.md",
+    "title": "Accept redacted install-agent output flag",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-04-08-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-04-12-pr-summary-2.md",
+  "changedFileCount": 1925
+}

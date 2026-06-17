@@ -89,6 +89,48 @@ describe('badge generation', () => {
     expect(svg).toContain(payload.status);
   });
 
+  test('CLI accepts redact-paths for public badge output without changing write paths', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-10-12-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const humanOutPath = path.join(dir, '.agentloop/reports/redacted-human-badge.svg');
+    const jsonOutPath = path.join(dir, '.agentloop/reports/redacted-json-badge.svg');
+    const help = await execa(tsxPath, [cliPath, 'badge', '--help'], { cwd: dir });
+    const human = await execa(
+      tsxPath,
+      [cliPath, 'badge', '--out', humanOutPath, '--redact-paths'],
+      { cwd: dir },
+    );
+    const json = await execa(
+      tsxPath,
+      [cliPath, 'badge', '--out', jsonOutPath, '--json', '--redact-paths'],
+      { cwd: dir },
+    );
+    const rawJson = await execa(tsxPath, [cliPath, 'badge', '--out', jsonOutPath, '--json'], {
+      cwd: dir,
+    });
+
+    expect(help.stdout).toContain('--redact-paths');
+    expect(human.stdout).toContain(
+      'Badge written: `[git-root]/.agentloop/reports/redacted-human-badge.svg`',
+    );
+    expect(human.stdout).not.toContain(dir);
+
+    const redactedPayload = JSON.parse(json.stdout);
+    expect(redactedPayload.outPath).toBe('[git-root]/.agentloop/reports/redacted-json-badge.svg');
+    expect(JSON.stringify(redactedPayload)).not.toContain(dir);
+    expect(JSON.parse(rawJson.stdout).outPath).toBe(jsonOutPath);
+    expect(await readFile(humanOutPath, 'utf8')).toContain('verification');
+    expect(await readFile(jsonOutPath, 'utf8')).toContain('verification');
+  });
+
   test('CLI prints badge confirmation values with Markdown-safe inline values', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -247,14 +289,10 @@ describe('badge generation', () => {
     tempDirs.push(dir);
     await initializeAgentLoop({ cwd: dir });
 
-    const result = await execa(
-      tsxPath,
-      [cliPath, 'badge', '--source', 'vibes', '--json'],
-      {
-        cwd: dir,
-        reject: false,
-      },
-    );
+    const result = await execa(tsxPath, [cliPath, 'badge', '--source', 'vibes', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
 
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toBe('');

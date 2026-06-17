@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-01-36-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-01-36",
+  "createdAtEpochMs": 1781652964245,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-warn-on-forced-home-directory-init.md",
+    "title": "Warn on forced home-directory init",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-01-34-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-01-36-pr-summary.md",
+  "changedFileCount": 1310
+}

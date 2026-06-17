@@ -21,6 +21,25 @@ function parseHandoffChangedPaths(markdown: string) {
   return paths;
 }
 
+function parseHandoffEvidenceGroups(markdown: string) {
+  const groups = new Set<string>();
+  for (const line of markdown.split(/\r?\n/)) {
+    if (!line.includes('AgentLoop evidence:') || !line.includes('grouped under')) continue;
+    for (const match of line.matchAll(/`([^`]+\/)`/g)) {
+      groups.add(match[1].replace(/\\/g, '/'));
+    }
+  }
+  return groups;
+}
+
+function isCoveredByEvidenceGroup(filePath: string, evidenceGroups: Set<string>) {
+  const normalizedPath = normalizeGitStatusPath(filePath);
+  return [...evidenceGroups].some((groupPath) => {
+    const normalizedGroup = normalizeGitStatusPath(groupPath);
+    return normalizedPath === normalizedGroup || normalizedPath.startsWith(groupPath);
+  });
+}
+
 function isReviewEvidenceRun(latestRun: RunSummary | undefined): latestRun is RunSummary {
   return (
     latestRun?.command === 'handoff' ||
@@ -73,6 +92,7 @@ export async function dirtyCoveredByLatestHandoffRun(
       normalizeGitStatusPath(changedFile.path),
     ),
   );
+  const coveredEvidenceGroups = new Set<string>();
   if (isReviewEvidenceRun(latestRun)) {
     for (const artifactPath of [
       latestRun.verificationReportPath,
@@ -89,11 +109,15 @@ export async function dirtyCoveredByLatestHandoffRun(
     for (const coveredPath of parseHandoffChangedPaths(handoffMarkdown)) {
       coveredPaths.add(coveredPath);
     }
+    for (const coveredGroup of parseHandoffEvidenceGroups(handoffMarkdown)) {
+      coveredEvidenceGroups.add(coveredGroup);
+    }
   }
 
   return changedFiles.every((changedFile) => {
     if (isLatestReviewEvidenceRunArtifact(changedFile.path, latestRun)) return true;
     if (isCoveredAgentLoopArtifactDirectory(changedFile.path, coveredPaths, latestRun)) return true;
+    if (isCoveredByEvidenceGroup(changedFile.path, coveredEvidenceGroups)) return true;
     return coveredPaths.has(normalizeGitStatusPath(changedFile.path));
   });
 }

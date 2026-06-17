@@ -137,6 +137,12 @@ _agentloop_completion() {
       ;;
     task)
       case "\${COMP_WORDS[2]}" in
+        list)
+          if [[ "$previous" == "--status" ]]; then
+            COMPREPLY=( $(compgen -W "${taskStatuses.join(' ')}" -- "$current") )
+            return 0
+          fi
+          ;;
         status)
           if [[ \${COMP_CWORD} -eq 4 ]]; then
             COMPREPLY=( $(compgen -W "${taskStatuses.join(' ')}" -- "$current") )
@@ -204,7 +210,9 @@ _agentloop() {
     args)
       case "$words[2]" in
         task)
-          if [[ "$words[3]" == "status" && CURRENT -eq 5 ]]; then
+          if [[ "$words[3]" == "list" && "\${words[CURRENT-1]}" == "--status" ]]; then
+            _values 'task list status' ${taskStatuses.map((status) => `"${status}"`).join(' ')}
+          elif [[ "$words[3]" == "status" && CURRENT -eq 5 ]]; then
             _values 'task status' ${taskStatuses.map((status) => `"${status}"`).join(' ')}
           elif [[ "$words[3]" == "archive" && "\${words[CURRENT-1]}" == "--status" ]]; then
             _values 'archive status' ${archiveStatuses.map((status) => `"${status}"`).join(' ')}
@@ -273,6 +281,10 @@ function fishLine(command: string, args: string[], description: string) {
 
 function renderFish() {
   const topCommands = topLevelCommands.map(([name]) => name);
+  const taskArchiveStatusCondition =
+    '__fish_seen_subcommand_from task; and __fish_seen_subcommand_from archive';
+  const taskListStatusCondition =
+    '__fish_seen_subcommand_from task; and __fish_seen_subcommand_from list';
   return `# AgentLoopKit fish completion
 # Save with: agentloop completion fish > ~/.config/fish/completions/agentloop.fish
 
@@ -288,7 +300,8 @@ complete -c agentloop -n '__fish_seen_subcommand_from badge' -a '${badgeSources.
 complete -c agentloop -n '__fish_seen_subcommand_from summarize' -a '${outputFormats.join(' ')}' -d 'Output format'
 complete -c agentloop -n '__fish_seen_subcommand_from handoff' -a '${outputFormats.join(' ')}' -d 'Output format'
 complete -c agentloop -n '__fish_seen_subcommand_from status' -a '${taskStatuses.join(' ')}' -d 'Task status'
-complete -c agentloop -n '__fish_seen_subcommand_from archive' -l status -a '${archiveStatuses.join(' ')}' -d 'Archive status'
+complete -c agentloop -n '${taskListStatusCondition}' -l status -a '${taskStatuses.join(' ')}' -d 'Task list status'
+complete -c agentloop -n '${taskArchiveStatusCondition}' -l status -a '${archiveStatuses.join(' ')}' -d 'Archive status'
 complete -c agentloop -n '__fish_seen_subcommand_from install-agent' -a '${agentNames.join(' ')}' -d 'Agent name'
 complete -c agentloop -n '__fish_seen_subcommand_from completion' -a '${COMPLETION_SHELLS.join(' ')}' -d 'Shell'
 complete -c agentloopkit -n '__fish_use_subcommand' -a '${topCommands.join(' ')}' -d 'AgentLoopKit command'
@@ -301,7 +314,8 @@ complete -c agentloopkit -n '__fish_seen_subcommand_from badge' -a '${badgeSourc
 complete -c agentloopkit -n '__fish_seen_subcommand_from summarize' -a '${outputFormats.join(' ')}' -d 'Output format'
 complete -c agentloopkit -n '__fish_seen_subcommand_from handoff' -a '${outputFormats.join(' ')}' -d 'Output format'
 complete -c agentloopkit -n '__fish_seen_subcommand_from status' -a '${taskStatuses.join(' ')}' -d 'Task status'
-complete -c agentloopkit -n '__fish_seen_subcommand_from archive' -l status -a '${archiveStatuses.join(' ')}' -d 'Archive status'
+complete -c agentloopkit -n '${taskListStatusCondition}' -l status -a '${taskStatuses.join(' ')}' -d 'Task list status'
+complete -c agentloopkit -n '${taskArchiveStatusCondition}' -l status -a '${archiveStatuses.join(' ')}' -d 'Archive status'
 complete -c agentloopkit -n '__fish_seen_subcommand_from install-agent' -a '${agentNames.join(' ')}' -d 'Agent name'
 complete -c agentloopkit -n '__fish_seen_subcommand_from completion' -a '${COMPLETION_SHELLS.join(' ')}' -d 'Shell'
 `;
@@ -340,7 +354,9 @@ Register-ArgumentCompleter -Native -CommandName agentloop, agentloopkit -ScriptB
   if ($words.Count -gt 1) {
     switch ($words[1]) {
       'task' {
-        if ($words.Count -gt 2 -and $words[2] -eq 'status') {
+        if ($words.Count -gt 3 -and $words[2] -eq 'list' -and ($words[-1] -eq '--status' -or $words[-2] -eq '--status')) {
+          $values = $AgentLoopTaskStatuses
+        } elseif ($words.Count -gt 2 -and $words[2] -eq 'status') {
           $values = $AgentLoopTaskStatuses
         } elseif ($words.Count -gt 3 -and $words[2] -eq 'archive' -and ($words[-1] -eq '--status' -or $words[-2] -eq '--status')) {
           $values = $AgentLoopArchiveStatuses

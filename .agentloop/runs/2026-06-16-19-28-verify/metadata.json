@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-19-28-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-19-28",
+  "createdAtEpochMs": 1781630885992,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-separate-agentflight-placeholders-from-roadmap-task-counts-2.md",
+    "title": "Separate AgentFlight placeholders from roadmap task counts",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-19-27-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 103
+}

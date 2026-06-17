@@ -81,8 +81,11 @@ describe('PR summary generation', () => {
     expect(summary.markdown).toContain('- M `.github/workflows/ci.yml`');
     expect(summary.markdown).toContain('### Config / Package');
     expect(summary.markdown).toContain('- M `package.json`');
-    expect(summary.markdown).toContain('### AgentLoop');
-    expect(summary.markdown).toContain('- A `.agentloop/tasks/2026-06-10-demo.md`');
+    expect(summary.markdown).toContain('### AgentLoop Evidence');
+    expect(summary.markdown).toContain(
+      '- AgentLoop evidence: `1` file(s) grouped under `.agentloop/tasks/`.',
+    );
+    expect(summary.markdown).not.toContain('- A `.agentloop/tasks/2026-06-10-demo.md`');
     expect(summary.markdown).toContain('### Risk-Sensitive');
     expect(summary.markdown).toContain('- A `db/migrations/001-create-users.sql`');
     expect(summary.markdown).toContain('## Review Focus');

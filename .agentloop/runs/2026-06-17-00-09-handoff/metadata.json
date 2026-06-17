@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-00-09-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-00-09",
+  "createdAtEpochMs": 1781647784732,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-prioritize-real-task-contracts-in-json-task-list-2.md",
+    "title": "Prioritize real task contracts in JSON task list",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-00-07-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-00-09-pr-summary-2.md",
+  "changedFileCount": 896
+}

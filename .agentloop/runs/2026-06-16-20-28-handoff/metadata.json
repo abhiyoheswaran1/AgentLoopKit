@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-20-28-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-20-28",
+  "createdAtEpochMs": 1781634521249,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-group-agentflight-placeholders-in-task-list.md",
+    "title": "Group AgentFlight placeholders in task list",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-20-25-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-20-28-pr-summary.md",
+  "changedFileCount": 245
+}

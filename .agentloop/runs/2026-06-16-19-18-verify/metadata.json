@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-19-18-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-19-18",
+  "createdAtEpochMs": 1781630320273,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-prevent-dogfood-start-placeholder-task-clutter-2.md",
+    "title": "Prevent dogfood start placeholder task clutter",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-19-18-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 77
+}

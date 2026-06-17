@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-12-36-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-12-36",
+  "createdAtEpochMs": 1781692612021,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-stale-artifact-limits-2.md",
+    "title": "Add built CLI smoke coverage for stale artifact limits",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-12-28-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-12-36-pr-summary.md",
+  "changedFileCount": 2795
+}

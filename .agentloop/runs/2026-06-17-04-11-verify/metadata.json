@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-04-11-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-04-11",
+  "createdAtEpochMs": 1781662275686,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-accept-redacted-install-agent-output-flag.md",
+    "title": "Accept redacted install-agent output flag",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-04-08-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 1908
+}

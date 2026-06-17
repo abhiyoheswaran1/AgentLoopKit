@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-12-58-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-12-58",
+  "createdAtEpochMs": 1781693889780,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-document-dogfood-start-task-type-preflight-2.md",
+    "title": "Document dogfood-start task type preflight",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-12-50-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-12-58-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-12-58-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 2840
+}

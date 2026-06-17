@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-22-39-handoff-3",
+  "command": "handoff",
+  "createdAt": "2026-06-16-22-39",
+  "createdAtEpochMs": 1781642386580,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-validate-local-policy-pack-manifest-names-2.md",
+    "title": "Validate local policy pack manifest names",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-22-35-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-22-39-pr-summary-3.md",
+  "changedFileCount": 605
+}

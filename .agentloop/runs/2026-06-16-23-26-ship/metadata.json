@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-23-26-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-23-26",
+  "createdAtEpochMs": 1781645169378,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-sort-maintainer-check-review-area-counts-2.md",
+    "title": "Sort maintainer-check review area counts",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-23-22-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-23-26-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-23-26-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 717
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-02-13-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-02-13",
+  "createdAtEpochMs": 1781655215914,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-task-command-verification-gates.md",
+    "title": "Add built CLI smoke coverage for task-command verification gates",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-12-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-13-pr-summary-2.md",
+  "changedFileCount": 1485
+}

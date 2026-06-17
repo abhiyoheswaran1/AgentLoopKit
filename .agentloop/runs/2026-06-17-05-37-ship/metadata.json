@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-05-37-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-05-37",
+  "createdAtEpochMs": 1781667472885,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-stale-task-state-recovery-2.md",
+    "title": "Add built CLI smoke coverage for stale task state recovery",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-05-31-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-05-37-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-05-37-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 2099
+}

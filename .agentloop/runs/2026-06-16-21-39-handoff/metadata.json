@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-21-39-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-21-39",
+  "createdAtEpochMs": 1781638758685,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-add-policy-pack-maintenance-coverage.md",
+    "title": "Add policy-pack maintenance coverage",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-21-36-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-21-39-pr-summary.md",
+  "changedFileCount": 407
+}

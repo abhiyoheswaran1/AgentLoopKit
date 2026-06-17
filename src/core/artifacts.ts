@@ -8,8 +8,11 @@ import {
   pathExists,
   resolvesInsidePath,
 } from './file-system.js';
+import { GitFileStatus } from './git.js';
+import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
 import { singleLineInlineCode as inlineCode } from './markdown-format.js';
 import { listRuns, RunSummary } from './runs.js';
+import { readTaskMetadata, TaskSource } from './task-state.js';
 
 export const verificationReportPattern =
   /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report(?:-\d+)?\.md$/;
@@ -19,6 +22,7 @@ export const ciSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ci-summary(?:-\d
 export const releaseNotesPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-release-notes(?:-\d+)?\.md$/;
 export const generatedMarkdownPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-.+\.md$/;
 export const defaultStaleArtifactMarkdownLimit = 50;
+const parkedOrTerminalTaskStatuses = new Set(['deferred', 'done', 'completed', 'verified']);
 
 export const artifactInventoryTypes = [
   'task',
@@ -52,6 +56,8 @@ export type ArtifactInventoryTask = {
   path: string;
   title: string;
   status: string;
+  source?: TaskSource;
+  archived?: boolean;
 };
 
 export type ArtifactInventoryVerification = {
@@ -74,6 +80,10 @@ export type ArtifactInventory = {
     count: number;
     byStatus: Record<string, number>;
     latest: ArtifactInventoryTask | null;
+    agentFlightPlaceholders?: {
+      count: number;
+      latest: ArtifactInventoryTask | null;
+    };
   };
   verificationReports: {
     count: number;
@@ -112,6 +122,7 @@ export type ArtifactInventory = {
 export type ArtifactInventoryRenderOptions = {
   type?: ArtifactInventoryFilterType;
   latest?: boolean;
+  runChangedFiles?: Map<string, GitFileStatus[]>;
 };
 
 export type LatestArtifactInventoryItem =
@@ -402,10 +413,6 @@ function extractHeading(markdown: string, fallback: string) {
   return markdown.match(/^#\s+(.+)$/m)?.[1]?.trim() || fallback;
 }
 
-function extractTaskStatus(markdown: string) {
-  return markdown.match(/^- Status:\s*(.+)$/im)?.[1]?.trim() || 'unknown';
-}
-
 function extractOverallStatus(markdown: string) {
   return markdown.match(/Overall status:\s*([a-z-]+)/i)?.[1]?.trim() || 'unknown';
 }
@@ -467,12 +474,7 @@ async function listInventoryFiles(options: {
 }
 
 async function readTaskInventory(cwd: string, file: InventoryFile): Promise<ArtifactInventoryTask> {
-  const markdown = await readFile(file.filePath, 'utf8');
-  return {
-    path: displayPath(cwd, file.filePath),
-    title: extractHeading(markdown, path.basename(file.name, '.md')),
-    status: extractTaskStatus(markdown),
-  };
+  return readTaskMetadata(cwd, file.filePath);
 }
 
 async function readVerificationInventory(
@@ -514,6 +516,26 @@ function countTaskStatuses(tasks: ArtifactInventoryTask[]) {
   );
 }
 
+function latestActionableTask(tasks: ArtifactInventoryTask[]) {
+  return (
+    tasks.filter((task) => !parkedOrTerminalTaskStatuses.has(task.status.trim().toLowerCase())).at(
+      -1,
+    ) ?? null
+  );
+}
+
+function latestArchivedTask(tasks: ArtifactInventoryTask[]) {
+  return (
+    tasks
+      .filter((task) => {
+        if (task.source === 'agentflight-placeholder') return false;
+        const status = task.status.trim().toLowerCase();
+        return status === 'done' || status === 'completed' || status === 'verified';
+      })
+      .at(-1) ?? null
+  );
+}
+
 async function listRunInventory(cwd: string) {
   try {
     return await listRuns(cwd);
@@ -531,6 +553,7 @@ export async function getArtifactInventory(options: {
   const handoffsDir = options.config.paths.handoffsDir;
   const [
     taskFiles,
+    archivedTaskFiles,
     verificationFiles,
     handoffFiles,
     shipReportFiles,
@@ -543,6 +566,12 @@ export async function getArtifactInventory(options: {
     listInventoryFiles({
       cwd: options.cwd,
       dir: options.config.paths.tasksDir,
+      extension: '.md',
+      ignoreReadme: true,
+    }),
+    listInventoryFiles({
+      cwd: options.cwd,
+      dir: path.join(options.config.paths.tasksDir, 'archive'),
       extension: '.md',
       ignoreReadme: true,
     }),
@@ -588,7 +617,17 @@ export async function getArtifactInventory(options: {
     }),
     listRunInventory(options.cwd),
   ]);
-  const tasks = await Promise.all(taskFiles.map((file) => readTaskInventory(options.cwd, file)));
+  const taskArtifacts = await Promise.all(
+    taskFiles.map((file) => readTaskInventory(options.cwd, file)),
+  );
+  const archivedTaskArtifacts = (
+    await Promise.all(archivedTaskFiles.map((file) => readTaskInventory(options.cwd, file)))
+  ).map((task) => ({ ...task, archived: true }));
+  const agentFlightPlaceholderTasks = taskArtifacts.filter(
+    (task) => task.source === 'agentflight-placeholder',
+  );
+  const tasks = taskArtifacts.filter((task) => task.source !== 'agentflight-placeholder');
+  const latestTask = latestActionableTask(tasks) ?? latestArchivedTask(archivedTaskArtifacts);
   const latestVerification = verificationFiles.at(-1)
     ? await readVerificationInventory(options.cwd, verificationFiles.at(-1) as InventoryFile)
     : null;
@@ -609,7 +648,15 @@ export async function getArtifactInventory(options: {
     tasks: {
       count: tasks.length,
       byStatus: countTaskStatuses(tasks),
-      latest: tasks.at(-1) ?? null,
+      latest: latestTask,
+      ...(agentFlightPlaceholderTasks.length
+        ? {
+            agentFlightPlaceholders: {
+              count: agentFlightPlaceholderTasks.length,
+              latest: agentFlightPlaceholderTasks.at(-1) ?? null,
+            },
+          }
+        : {}),
     },
     verificationReports: {
       count: verificationFiles.length,
@@ -839,6 +886,31 @@ function formatTaskCounts(byStatus: Record<string, number>) {
   return ` (${entries.map(([status, count]) => `${inlineCode(status)}: ${count}`).join(', ')})`;
 }
 
+function formatTaskStatus(task: ArtifactInventoryTask) {
+  const statusParts = [inlineCode(task.status)];
+  if (task.source === 'agentflight-placeholder') {
+    statusParts.push(inlineCode('AgentFlight placeholder'));
+  }
+  if (task.archived) {
+    statusParts.push(inlineCode('archived'));
+  }
+  return statusParts.join(', ');
+}
+
+function formatLatestTaskLine(task: ArtifactInventoryTask | null) {
+  return task
+    ? `- Latest task: ${inlineCode(task.title)} (${formatTaskStatus(task)}) - ${inlineCode(
+        task.path,
+      )}`
+    : '- Latest task: not found';
+}
+
+function formatAgentFlightPlaceholderTaskCount(
+  placeholders: ArtifactInventory['tasks']['agentFlightPlaceholders'],
+) {
+  return placeholders ? `- AgentFlight placeholder tasks: ${placeholders.count} preserved` : '';
+}
+
 function formatNamedArtifact(label: string, artifact: ArtifactInventoryNamedArtifact | null) {
   return artifact
     ? `- ${label}: ${inlineCode(artifact.title)} - ${inlineCode(artifact.path)}`
@@ -853,18 +925,52 @@ function runPrimaryArtifact(run: RunSummary) {
   return run.shipReportPath ?? run.handoffPath ?? run.verificationReportPath;
 }
 
-function formatRunResult(run: RunSummary) {
-  if (typeof run.score === 'number') return `score ${inlineCode(String(run.score))}/100`;
-  if (run.overallStatus) return `status ${inlineCode(run.overallStatus)}`;
-  return `${inlineCode(String(run.changedFileCount))} changed file(s)`;
+function formatRunChangedFileScope(
+  run: RunSummary,
+  runChangedFiles: Map<string, GitFileStatus[]> | undefined,
+) {
+  if (!runChangedFiles?.has(run.id)) return undefined;
+  const changedFiles = runChangedFiles.get(run.id) ?? [];
+  if (changedFiles.length === 0) return undefined;
+
+  const prefix = `${inlineCode(String(changedFiles.length))} changed file(s)`;
+  const agentLoopEvidenceCount = changedFiles.filter((file) =>
+    isAgentLoopEvidenceFile(file.path),
+  ).length;
+  if (agentLoopEvidenceCount === 0) return prefix;
+
+  const nonEvidenceCount = changedFiles.length - agentLoopEvidenceCount;
+  return `${prefix} (${inlineCode(String(nonEvidenceCount))} non-evidence, ${inlineCode(
+    String(agentLoopEvidenceCount),
+  )} AgentLoop evidence)`;
 }
 
-function formatRunArtifact(label: string, run: RunSummary | null) {
+function formatRunResult(run: RunSummary, runChangedFiles?: Map<string, GitFileStatus[]>) {
+  const changedFileScope = formatRunChangedFileScope(run, runChangedFiles);
+  if (typeof run.score === 'number') {
+    return [`score ${inlineCode(String(run.score))}/100`, changedFileScope]
+      .filter(Boolean)
+      .join(' - ');
+  }
+  if (run.overallStatus) {
+    return [`status ${inlineCode(run.overallStatus)}`, changedFileScope]
+      .filter(Boolean)
+      .join(' - ');
+  }
+  return changedFileScope ?? `${inlineCode(String(run.changedFileCount))} changed file(s)`;
+}
+
+function formatRunArtifact(
+  label: string,
+  run: RunSummary | null,
+  runChangedFiles?: Map<string, GitFileStatus[]>,
+) {
   if (!run) return `- ${label}: not found`;
   const artifactPath = runPrimaryArtifact(run);
-  return `- ${label}: ${inlineCode(run.id)} ${inlineCode(run.command)} ${formatRunResult(run)}${
-    artifactPath ? ` - ${inlineCode(artifactPath)}` : ''
-  }`;
+  return `- ${label}: ${inlineCode(run.id)} ${inlineCode(run.command)} ${formatRunResult(
+    run,
+    runChangedFiles,
+  )}${artifactPath ? ` - ${inlineCode(artifactPath)}` : ''}`;
 }
 
 function selectedArtifactTypes(options: ArtifactInventoryRenderOptions) {
@@ -974,6 +1080,9 @@ ${preview.nextSteps.map((step) => `- ${step}`).join('\n')}
 }
 
 function countForType(inventory: ArtifactInventory, type: ArtifactInventoryFilterType) {
+  if (type === 'task') {
+    return inventory.tasks.count + (inventory.tasks.agentFlightPlaceholders?.count ?? 0);
+  }
   return inventory[artifactInventoryJsonKeys[type]].count;
 }
 
@@ -1000,14 +1109,14 @@ function formatTypeCountLine(inventory: ArtifactInventory, type: ArtifactInvento
   }
 }
 
-function formatTypeLatestLine(inventory: ArtifactInventory, type: ArtifactInventoryFilterType) {
+function formatTypeLatestLine(
+  inventory: ArtifactInventory,
+  type: ArtifactInventoryFilterType,
+  options: ArtifactInventoryRenderOptions = {},
+) {
   switch (type) {
     case 'task':
-      return inventory.tasks.latest
-        ? `- Latest task: ${inlineCode(inventory.tasks.latest.title)} (${inlineCode(
-            inventory.tasks.latest.status,
-          )}) - ${inlineCode(inventory.tasks.latest.path)}`
-        : '- Latest task: not found';
+      return formatLatestTaskLine(inventory.tasks.latest);
     case 'verification':
       return inventory.verificationReports.latest
         ? `- Latest verification: ${inlineCode(
@@ -1027,7 +1136,7 @@ function formatTypeLatestLine(inventory: ArtifactInventory, type: ArtifactInvent
     case 'release-notes':
       return formatNamedArtifact('Latest release notes', inventory.releaseNotes.latest);
     case 'run':
-      return formatRunArtifact('Latest run', inventory.runs.latest);
+      return formatRunArtifact('Latest run', inventory.runs.latest, options.runChangedFiles);
   }
 }
 
@@ -1053,7 +1162,7 @@ function renderLatestArtifactInventoryMarkdown(
 ) {
   const lines = selectedArtifactTypes(options)
     .filter((type) => latestArtifactForType(inventory, type))
-    .map((type) => formatTypeLatestLine(inventory, type));
+    .map((type) => formatTypeLatestLine(inventory, type, options));
 
   if (!lines.length) return renderNoArtifactMatch(options.type);
 
@@ -1066,13 +1175,16 @@ ${lines.join('\n')}
 function renderFilteredArtifactInventoryMarkdown(
   inventory: ArtifactInventory,
   type: ArtifactInventoryFilterType,
+  options: ArtifactInventoryRenderOptions = {},
 ) {
-  if (countForType(inventory, type) === 0) return renderNoArtifactMatch(type);
+  if (countForType(inventory, type) === 0 && !latestArtifactForType(inventory, type)) {
+    return renderNoArtifactMatch(type);
+  }
 
   return `# AgentLoopKit Artifacts
 
 ${formatTypeCountLine(inventory, type)}
-${formatTypeLatestLine(inventory, type)}
+${type === 'task' && inventory.tasks.agentFlightPlaceholders ? `${formatAgentFlightPlaceholderTaskCount(inventory.tasks.agentFlightPlaceholders)}\n` : ''}${formatTypeLatestLine(inventory, type, options)}
 `;
 }
 
@@ -1081,18 +1193,12 @@ export function renderArtifactInventoryMarkdown(
   options: ArtifactInventoryRenderOptions = {},
 ) {
   if (options.latest) return renderLatestArtifactInventoryMarkdown(inventory, options);
-  if (options.type) return renderFilteredArtifactInventoryMarkdown(inventory, options.type);
+  if (options.type) return renderFilteredArtifactInventoryMarkdown(inventory, options.type, options);
 
   return `# AgentLoopKit Artifacts
 
 - Tasks: ${inventory.tasks.count} total${formatTaskCounts(inventory.tasks.byStatus)}
-${
-  inventory.tasks.latest
-    ? `- Latest task: ${inlineCode(inventory.tasks.latest.title)} (${inlineCode(
-        inventory.tasks.latest.status,
-      )}) - ${inlineCode(inventory.tasks.latest.path)}`
-    : '- Latest task: not found'
-}
+${inventory.tasks.agentFlightPlaceholders ? `${formatAgentFlightPlaceholderTaskCount(inventory.tasks.agentFlightPlaceholders)}\n` : ''}${formatLatestTaskLine(inventory.tasks.latest)}
 - Verification reports: ${inventory.verificationReports.count}
 ${
   inventory.verificationReports.latest
@@ -1114,6 +1220,6 @@ ${formatNamedArtifact('Latest CI summary', inventory.ciSummaries.latest)}
 - Release notes: ${inventory.releaseNotes.count}
 ${formatNamedArtifact('Latest release notes', inventory.releaseNotes.latest)}
 - Runs: ${inventory.runs.count}
-${formatRunArtifact('Latest run', inventory.runs.latest)}
+${formatRunArtifact('Latest run', inventory.runs.latest, options.runChangedFiles)}
 `;
 }

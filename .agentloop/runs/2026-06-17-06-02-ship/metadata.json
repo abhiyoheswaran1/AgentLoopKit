@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-06-02-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-06-02",
+  "createdAtEpochMs": 1781668951350,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-generated-artifact-filename-ordering-2.md",
+    "title": "Add built CLI smoke coverage for generated artifact filename ordering",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-05-56-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-06-02-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-06-02-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 2139
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-10-11-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-10-11",
+  "createdAtEpochMs": 1781683864073,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-add-npm-status-safety-tests-to-maintenance-check.md",
+    "title": "Add npm-status safety tests to maintenance check",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-10-07-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-10-11-pr-summary.md",
+  "changedFileCount": 2637
+}

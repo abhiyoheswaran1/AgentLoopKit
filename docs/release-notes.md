@@ -8,7 +8,9 @@ agentloop release-notes --from v0.19.0 --to HEAD
 agentloop release-notes --release-version <version>
 agentloop release-notes --public
 agentloop release-notes --json
+agentloop release-notes --json --redact-paths
 agentloop release-notes --write
+agentloop release-notes --write --redact-paths
 agentloop release-notes --write --out .agentloop/handoffs/release.md
 ```
 
@@ -34,7 +36,7 @@ If you do not pass `--from`, AgentLoopKit looks for the newest local version tag
 
 Human output is Markdown. JSON output includes the same evidence paths and release metadata for scripts.
 
-Human Markdown keeps dynamic metadata, refs, paths, and evidence values on one line. JSON keeps raw values. AgentLoopKit does not rewrite the changelog prose that appears under `## What changed` or `## Changelog`.
+Human Markdown keeps dynamic metadata, refs, paths, and evidence values on one line. JSON keeps raw values by default. Use `--redact-paths` before copying local drafts into public logs; it replaces local roots with `[git-root]` in human output, JSON output, and written Markdown without publishing a release or changing where `--write` stores the file. AgentLoopKit does not rewrite the changelog prose that appears under `## What changed` or `## Changelog`, except for local-root redaction when that flag is passed.
 
 Use `--public` when you need concise Markdown for a GitHub release page or announcement. Public mode keeps the version, changelog items, verification status, selected git range, and install command, but leaves out the changed-file inventory, working-tree path list, and local AgentLoop evidence paths. The default output remains the detailed local evidence format.
 

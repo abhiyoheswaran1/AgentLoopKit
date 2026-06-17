@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-03-11-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-03-11",
+  "createdAtEpochMs": 1781658664385,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-accept-redacted-github-import-flag-2.md",
+    "title": "Accept redacted GitHub import flag",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-03-09-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-03-11-pr-summary.md",
+  "changedFileCount": 1729
+}

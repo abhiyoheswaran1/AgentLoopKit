@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-14-48-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-14-48",
+  "createdAtEpochMs": 1781700487319,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-mark-completed-backlog-decisions-before-next-task-selection-2.md",
+    "title": "Mark completed backlog decisions before next task selection",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-14-47-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-14-48-pr-summary.md",
+  "changedFileCount": 2985
+}

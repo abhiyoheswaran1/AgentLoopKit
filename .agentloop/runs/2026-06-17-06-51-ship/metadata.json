@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-06-51-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-06-51",
+  "createdAtEpochMs": 1781671878992,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-release-check-redaction-2.md",
+    "title": "Add built CLI smoke coverage for release-check redaction",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-06-44-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-06-51-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-06-51-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 2219
+}

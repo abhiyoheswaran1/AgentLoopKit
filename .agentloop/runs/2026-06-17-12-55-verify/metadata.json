@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-12-55-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-12-55",
+  "createdAtEpochMs": 1781693753723,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-document-dogfood-start-task-type-preflight-2.md",
+    "title": "Document dogfood-start task type preflight",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-12-50-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2832
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-08-58-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-08-58",
+  "createdAtEpochMs": 1781679516389,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-artifacts-redaction.md",
+    "title": "Add built CLI smoke coverage for artifacts redaction",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-08-55-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2456
+}

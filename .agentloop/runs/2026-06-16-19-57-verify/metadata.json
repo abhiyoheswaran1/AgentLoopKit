@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-19-57-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-19-57",
+  "createdAtEpochMs": 1781632621549,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-accept-redacted-artifact-inventory-flag-2.md",
+    "title": "Accept redacted artifact inventory flag",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-19-54-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 176
+}

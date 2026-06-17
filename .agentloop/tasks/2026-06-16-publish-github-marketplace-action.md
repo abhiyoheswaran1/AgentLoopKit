@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-16
 - Task type: release
-- Status: in-progress
+- Status: deferred
 
 ## Problem Statement
 The GitHub Marketplace URL for AgentLoopKit returns 404 even though prior release guidance implied Marketplace availability.

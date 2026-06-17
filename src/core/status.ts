@@ -11,12 +11,20 @@ import {
   parseGitStatus,
   GitFileStatus,
 } from './git.js';
+import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
 import { latestMarkdownFile } from './artifacts.js';
 import { prSummaryPattern, verificationReportPattern } from './artifacts.js';
 import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
 import { singleLineInlineCode } from './markdown-format.js';
 import { listRuns, RunSummary } from './runs.js';
-import { getActiveTaskPath, getFallbackTaskPath, listTasks } from './task-state.js';
+import {
+  getActiveTaskPath,
+  getFallbackTaskPath,
+  inspectTaskDirectory,
+  listTasks,
+  readTaskMetadata,
+} from './task-state.js';
+import type { TaskDoctorDiagnostic, TaskSource } from './task-state.js';
 
 export type StatusArtifact = {
   path: string;
@@ -25,6 +33,7 @@ export type StatusArtifact = {
 
 export type StatusTask = StatusArtifact & {
   status: string;
+  source?: TaskSource;
 };
 
 export type StatusReport = StatusArtifact & {
@@ -43,11 +52,19 @@ export type AgentLoopStatusResult = {
   workingTree: {
     dirty: boolean;
     changedFileCount: number;
+    nonEvidenceChangedFileCount: number;
+    agentLoopEvidenceChangedFileCount: number;
     changedFiles: GitFileStatus[];
   };
   activeTask: StatusTask | null;
+  staleTaskState?: {
+    id: string;
+    path: string;
+    message: string;
+  };
   latestTask: StatusTask | null;
   deferredTasks: StatusTask[];
+  agentFlightPlaceholderTasks: StatusTask[];
   latestReport?: StatusReport;
   latestRun?: RunSummary;
   commands: {
@@ -66,16 +83,65 @@ type Timestamped<T> = T & {
   modifiedAtMs: number;
 };
 
+export type StatusTaskListSummary = {
+  count: number;
+  preview: StatusTask[];
+  hiddenCount: number;
+};
+
+export type AgentLoopStatusBriefJson = {
+  project: AgentLoopStatusResult['project'];
+  git: AgentLoopStatusResult['git'];
+  workingTree: Omit<AgentLoopStatusResult['workingTree'], 'changedFiles'>;
+  activeTask: AgentLoopStatusResult['activeTask'];
+  staleTaskState?: AgentLoopStatusResult['staleTaskState'];
+  latestTask: AgentLoopStatusResult['latestTask'];
+  deferredTasks: StatusTaskListSummary;
+  agentFlightPlaceholderTasks: StatusTaskListSummary;
+  latestReport?: AgentLoopStatusResult['latestReport'];
+  latestRun?: AgentLoopStatusResult['latestRun'];
+  commands: AgentLoopStatusResult['commands'] & {
+    configuredCount: number;
+    missingCount: number;
+  };
+  nextAction: AgentLoopStatusResult['nextAction'];
+  brief: string;
+};
+
+const STALE_NEXT_ACTION_DIAGNOSTICS = new Set([
+  'active-task-missing',
+  'active-task-archived',
+  'active-task-deferred',
+  'active-task-older-than-runs',
+]);
+
+function pickStaleTaskStateDiagnostic(diagnostics: TaskDoctorDiagnostic[]) {
+  const diagnostic = diagnostics.find((candidate) =>
+    STALE_NEXT_ACTION_DIAGNOSTICS.has(candidate.id),
+  );
+  if (!diagnostic) return undefined;
+  return {
+    id: diagnostic.id,
+    path: diagnostic.path,
+    message: diagnostic.message,
+  };
+}
+
 function extractHeading(markdown: string, fallback: string) {
   return markdown.match(/^#\s+(.+)$/m)?.[1]?.trim() || fallback;
 }
 
-function extractTaskStatus(markdown: string) {
-  return markdown.match(/^- Status:\s*(.+)$/im)?.[1]?.trim() || 'unknown';
-}
-
 function extractOverallStatus(markdown: string) {
   return markdown.match(/Overall status:\s*([a-z-]+)/i)?.[1]?.trim() || 'unknown';
+}
+
+function extractTaskType(markdown: string) {
+  return (
+    markdown
+      .match(/^- Task type:\s*(.+)$/im)?.[1]
+      ?.trim()
+      .toLowerCase() || 'unknown'
+  );
 }
 
 async function readTask(
@@ -83,12 +149,9 @@ async function readTask(
   filePath: string | undefined,
 ): Promise<Timestamped<StatusTask> | undefined> {
   if (!filePath) return undefined;
-  const markdown = await readFile(filePath, 'utf8');
-  const fileStat = await stat(filePath);
+  const [task, fileStat] = await Promise.all([readTaskMetadata(cwd, filePath), stat(filePath)]);
   return {
-    path: path.relative(cwd, filePath),
-    title: extractHeading(markdown, path.basename(filePath, '.md')),
-    status: extractTaskStatus(markdown),
+    ...task,
     modifiedAtMs: fileStat.mtimeMs,
   };
 }
@@ -114,6 +177,7 @@ function stripTaskTimestamp(task: Timestamped<StatusTask> | undefined): StatusTa
     path: task.path,
     title: task.title,
     status: task.status,
+    ...(task.source ? { source: task.source } : {}),
   };
 }
 
@@ -133,15 +197,38 @@ function isPostVerificationTaskState(task: Timestamped<StatusTask> | undefined) 
   return status === 'review' || status === 'done';
 }
 
+async function isReleaseChannelTask(cwd: string, task: StatusTask) {
+  try {
+    const markdown = await readFile(path.resolve(cwd, task.path), 'utf8');
+    return extractTaskType(markdown) === 'release';
+  } catch {
+    return false;
+  }
+}
+
+async function allDeferredTasksAreReleaseChannel(cwd: string, tasks: StatusTask[]) {
+  if (!tasks.length) return false;
+  const taskTypes = await Promise.all(tasks.map((task) => isReleaseChannelTask(cwd, task)));
+  return taskTypes.every(Boolean);
+}
+
 function chooseNextAction(input: {
   activeTask: StatusTask | null;
+  staleTaskState?: AgentLoopStatusResult['staleTaskState'];
   latestTask: StatusTask | null;
   deferredTasks: StatusTask[];
+  deferredTasksAreReleaseChannel: boolean;
   latestReport?: StatusReport;
   latestRun?: RunSummary;
   dirty: boolean;
   dirtyCoveredByLatestHandoffRun: boolean;
 }) {
+  if (input.staleTaskState) {
+    return {
+      command: 'agentloop task doctor',
+      reason: `The active task pointer is stale: ${input.staleTaskState.message}`,
+    };
+  }
   if (!input.activeTask) {
     if (input.latestTask) {
       return {
@@ -165,6 +252,19 @@ function chooseNextAction(input: {
     }
     if (input.deferredTasks.length > 0) {
       const count = input.deferredTasks.length;
+      if (input.deferredTasksAreReleaseChannel) {
+        const noun = `deferred release-channel task contract${count === 1 ? '' : 's'}`;
+        if (!input.dirty) {
+          return {
+            command: 'none',
+            reason: `${count} ${noun} ${count === 1 ? 'is' : 'are'} parked for maintainer approval. No command is required until release work is approved, or create a non-release task only when there is current work.`,
+          };
+        }
+        return {
+          command: 'agentloop create-task',
+          reason: `${count} ${noun} ${count === 1 ? 'is' : 'are'} parked for maintainer approval. Create a non-release task for current work, or move release work back to proposed only after maintainer approval.`,
+        };
+      }
       if (!input.dirty) {
         return {
           command: 'none',
@@ -235,6 +335,14 @@ function formatTaskMarkdown(task: StatusTask | null | undefined) {
   return `${singleLineInlineCode(task.title)} (${singleLineInlineCode(task.status)}) - ${singleLineInlineCode(task.path)}`;
 }
 
+function formatActiveTaskMarkdown(
+  task: StatusTask | null | undefined,
+  staleTaskState: AgentLoopStatusResult['staleTaskState'],
+) {
+  if (staleTaskState) return `stale pointer - ${singleLineInlineCode(staleTaskState.path)}`;
+  return formatTaskMarkdown(task);
+}
+
 function formatReportMarkdown(report: StatusReport | undefined) {
   if (!report) return 'No verification report found.';
   return `${singleLineInlineCode(report.overallStatus)} - ${singleLineInlineCode(report.path)}`;
@@ -265,6 +373,17 @@ function formatDeferredTaskSummaryMarkdown(tasks: StatusTask[]) {
   return `${count} parked - ${titles}${remaining}`;
 }
 
+function formatAgentFlightPlaceholderSummaryMarkdown(tasks: StatusTask[]) {
+  if (!tasks.length) return 'none';
+  const count = tasks.length;
+  const titles = tasks
+    .slice(0, 3)
+    .map((task) => singleLineInlineCode(task.title))
+    .join(', ');
+  const remaining = count > 3 ? `, +${count - 3} more` : '';
+  return `${count} preserved - ${titles}${remaining}`;
+}
+
 async function resolveComparablePath(filePath: string) {
   try {
     return await realpath(filePath);
@@ -284,6 +403,16 @@ function formatBriefValue(value: string) {
   return `"${value.replace(/["\r\n]/g, ' ').trim()}"`;
 }
 
+function formatBriefWorkingTree(workingTree: StatusRenderInput['workingTree']) {
+  if (!workingTree.dirty) return 'clean';
+  return `dirty (${workingTree.changedFileCount}; ${workingTree.nonEvidenceChangedFileCount} non-evidence, ${workingTree.agentLoopEvidenceChangedFileCount} AgentLoop evidence)`;
+}
+
+function formatMarkdownWorkingTree(workingTree: StatusRenderInput['workingTree']) {
+  if (!workingTree.dirty) return 'clean';
+  return `dirty (${workingTree.changedFileCount} changed file(s); ${workingTree.nonEvidenceChangedFileCount} non-evidence, ${workingTree.agentLoopEvidenceChangedFileCount} AgentLoop evidence)`;
+}
+
 function renderBrief(result: StatusRenderInput) {
   const task = result.activeTask ?? result.latestTask;
   const taskTitle = task?.title ?? 'none';
@@ -294,9 +423,7 @@ function renderBrief(result: StatusRenderInput) {
       ? `${result.latestRun.command} ${result.latestRun.overallStatus ?? `${result.latestRun.changedFileCount} files`}`
       : `${result.latestRun.command} ${result.latestRun.score}/100`
     : 'none';
-  const tree = result.workingTree.dirty
-    ? `dirty (${result.workingTree.changedFileCount})`
-    : 'clean';
+  const tree = formatBriefWorkingTree(result.workingTree);
 
   return `AgentLoopKit: task=${formatBriefValue(taskTitle)} status=${formatBriefValue(taskStatus)}; verification=${verification}; run=${formatBriefValue(run)}; tree=${tree}; next=${formatBriefValue(result.nextAction.command)}
 Reason: ${result.nextAction.reason}`;
@@ -322,16 +449,18 @@ function renderMarkdown(result: StatusRenderInput) {
         ]
       : []),
   ];
-  const workingTree = result.workingTree.dirty
-    ? `dirty (${result.workingTree.changedFileCount} changed file(s))`
-    : 'clean';
-  const activeTask = result.activeTask
-    ? formatTaskMarkdown(result.activeTask)
-    : result.latestTask
-      ? 'none pinned.'
-      : result.deferredTasks.length
-        ? `none active; ${result.deferredTasks.length} deferred task${result.deferredTasks.length === 1 ? '' : 's'} parked.`
-        : 'No task contract found.';
+  const workingTree = formatMarkdownWorkingTree(result.workingTree);
+  const activeTask = result.staleTaskState
+    ? formatActiveTaskMarkdown(result.activeTask, result.staleTaskState)
+    : result.activeTask
+      ? formatTaskMarkdown(result.activeTask)
+      : result.latestTask
+        ? 'none pinned.'
+        : result.deferredTasks.length
+          ? `none active; ${result.deferredTasks.length} deferred task${result.deferredTasks.length === 1 ? '' : 's'} parked.`
+          : result.agentFlightPlaceholderTasks.length
+            ? `none active; ${result.agentFlightPlaceholderTasks.length} AgentFlight placeholder task${result.agentFlightPlaceholderTasks.length === 1 ? '' : 's'} preserved.`
+            : 'No task contract found.';
   const latestTask = formatTaskMarkdown(result.latestTask);
   const latestReport = formatReportMarkdown(result.latestReport);
   const latestRun = formatRunSummaryMarkdown(result.latestRun);
@@ -350,6 +479,7 @@ ${gitLines.join('\n')}
 - Active task: ${activeTask}
 - Latest open task: ${latestTask}
 - Deferred tasks: ${formatDeferredTaskSummaryMarkdown(result.deferredTasks)}
+- AgentFlight placeholders: ${formatAgentFlightPlaceholderSummaryMarkdown(result.agentFlightPlaceholderTasks)}
 - Latest verification: ${latestReport}
 - Latest run: ${latestRun}
 - Configured commands: ${formatMarkdownList(result.commands.configured)}
@@ -359,6 +489,42 @@ ${gitLines.join('\n')}
 
 ${nextAction}
 `;
+}
+
+function summarizeStatusTasks(tasks: StatusTask[], limit = 3): StatusTaskListSummary {
+  return {
+    count: tasks.length,
+    preview: tasks.slice(0, limit),
+    hiddenCount: Math.max(0, tasks.length - limit),
+  };
+}
+
+export function toBriefStatusJson(result: AgentLoopStatusResult): AgentLoopStatusBriefJson {
+  return {
+    project: result.project,
+    git: result.git,
+    workingTree: {
+      dirty: result.workingTree.dirty,
+      changedFileCount: result.workingTree.changedFileCount,
+      nonEvidenceChangedFileCount: result.workingTree.nonEvidenceChangedFileCount,
+      agentLoopEvidenceChangedFileCount: result.workingTree.agentLoopEvidenceChangedFileCount,
+    },
+    activeTask: result.activeTask,
+    ...(result.staleTaskState ? { staleTaskState: result.staleTaskState } : {}),
+    latestTask: result.latestTask,
+    deferredTasks: summarizeStatusTasks(result.deferredTasks),
+    agentFlightPlaceholderTasks: summarizeStatusTasks(result.agentFlightPlaceholderTasks),
+    ...(result.latestReport ? { latestReport: result.latestReport } : {}),
+    ...(result.latestRun ? { latestRun: result.latestRun } : {}),
+    commands: {
+      configured: result.commands.configured,
+      missing: result.commands.missing,
+      configuredCount: result.commands.configured.length,
+      missingCount: result.commands.missing.length,
+    },
+    nextAction: result.nextAction,
+    brief: result.brief,
+  };
 }
 
 export async function getAgentLoopStatus(options: {
@@ -374,9 +540,20 @@ export async function getAgentLoopStatus(options: {
     : false;
   const rawStatus = inGit ? await getGitStatus(options.cwd) : '';
   const changedFiles = await parseGitStatus(rawStatus);
+  const agentLoopEvidenceChangedFileCount = changedFiles.filter((file) =>
+    isAgentLoopEvidenceFile(file.path),
+  ).length;
+  const nonEvidenceChangedFileCount = changedFiles.length - agentLoopEvidenceChangedFileCount;
+  const staleTaskState = pickStaleTaskStateDiagnostic(
+    (await inspectTaskDirectory(options)).diagnostics,
+  );
   const activeTaskPath = await getActiveTaskPath(options);
-  const timestampedActiveTask = await readTask(options.cwd, activeTaskPath);
-  const fallbackTaskPath = activeTaskPath ? undefined : await getFallbackTaskPath(options);
+  const timestampedPinnedActiveTask = await readTask(options.cwd, activeTaskPath);
+  const timestampedActiveTask =
+    timestampedPinnedActiveTask?.source === 'agentflight-placeholder'
+      ? undefined
+      : timestampedPinnedActiveTask;
+  const fallbackTaskPath = timestampedActiveTask ? undefined : await getFallbackTaskPath(options);
   const timestampedLatestTask = await readTask(options.cwd, fallbackTaskPath);
   const listedTasks = await listTasks(options);
   const timestampedReport = await readReport(
@@ -398,11 +575,25 @@ export async function getAgentLoopStatus(options: {
   const latestTask = stripTaskTimestamp(timestampedLatestTask) ?? null;
   const deferredTasks = listedTasks
     .filter((task) => task.status.trim().toLowerCase() === 'deferred')
+    .filter((task) => task.source !== 'agentflight-placeholder')
     .filter((task) => task.path !== activeTask?.path)
     .map((task) => ({
       path: task.path,
       title: task.title,
       status: task.status,
+    }));
+  const deferredTasksAreReleaseChannel = await allDeferredTasksAreReleaseChannel(
+    options.cwd,
+    deferredTasks,
+  );
+  const agentFlightPlaceholderTasks = listedTasks
+    .filter((task) => task.source === 'agentflight-placeholder')
+    .filter((task) => task.path !== activeTask?.path)
+    .map((task) => ({
+      path: task.path,
+      title: task.title,
+      status: task.status,
+      source: task.source,
     }));
   const latestReport = stripReportTimestamp(currentReport);
   const latestHandoffPath = await latestMarkdownFile(
@@ -424,8 +615,10 @@ export async function getAgentLoopStatus(options: {
   const missing = DEFAULT_COMMAND_KEYS.filter((key) => !options.config.commands[key]);
   const nextAction = chooseNextAction({
     activeTask,
+    staleTaskState,
     latestTask,
     deferredTasks,
+    deferredTasksAreReleaseChannel,
     latestReport,
     latestRun,
     dirty: changedFiles.length > 0,
@@ -443,11 +636,15 @@ export async function getAgentLoopStatus(options: {
     workingTree: {
       dirty: changedFiles.length > 0,
       changedFileCount: changedFiles.length,
+      nonEvidenceChangedFileCount,
+      agentLoopEvidenceChangedFileCount,
       changedFiles,
     },
     activeTask,
+    ...(staleTaskState ? { staleTaskState } : {}),
     latestTask,
     deferredTasks,
+    agentFlightPlaceholderTasks,
     latestReport,
     latestRun,
     commands: {

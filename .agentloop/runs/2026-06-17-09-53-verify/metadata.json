@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-09-53-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-09-53",
+  "createdAtEpochMs": 1781682828076,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-npm-status-captured-registry-mode.md",
+    "title": "Add built CLI smoke coverage for npm-status captured registry mode",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-09-52-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2591
+}

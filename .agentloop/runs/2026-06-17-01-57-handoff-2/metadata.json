@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-01-57-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-17-01-57",
+  "createdAtEpochMs": 1781654254751,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-add-built-cli-smoke-coverage-for-policy-pack-inventory.md",
+    "title": "Add built CLI smoke coverage for policy pack inventory",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-01-56-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-01-57-pr-summary-2.md",
+  "changedFileCount": 1411
+}

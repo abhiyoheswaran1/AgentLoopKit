@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-23-51-handoff-2",
+  "command": "handoff",
+  "createdAt": "2026-06-16-23-51",
+  "createdAtEpochMs": 1781646711532,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-ignore-agentloop-evidence-in-agentflight-changed-file-filters-2.md",
+    "title": "Ignore AgentLoop evidence in AgentFlight changed-file filters",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-23-48-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-23-51-pr-summary-3.md",
+  "changedFileCount": 811
+}

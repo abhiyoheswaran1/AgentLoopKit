@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-11-24-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-11-24",
+  "createdAtEpochMs": 1781688262588,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-archived-task-doctor-pass-2.md",
+    "title": "Add built CLI smoke coverage for archived task doctor pass",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-11-16-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-11-24-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-11-24-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 2728
+}

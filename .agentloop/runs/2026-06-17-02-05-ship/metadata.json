@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-02-05-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-02-05",
+  "createdAtEpochMs": 1781654704553,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-github-metadata-import.md",
+    "title": "Add built CLI smoke coverage for GitHub metadata import",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-04-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-02-05-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-05-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1426
+}

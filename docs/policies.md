@@ -12,6 +12,7 @@ agentloop policy status
 agentloop policy list --json
 agentloop policy show security --json
 agentloop policy status --json
+agentloop policy status --redact-paths
 agentloop policy packs
 agentloop policy pack show agentloop-baseline
 agentloop policy pack apply agentloop-baseline --dry-run
@@ -22,7 +23,7 @@ agentloop policy pack apply agentloop-baseline --dry-run
 When `.agentloop/policies/` is missing, policy commands with `--json` return a setup error with `code`, `message`, `policiesDir`, and `nextCommand`. When `policy show --json` cannot find a policy, it returns a JSON error with `requestedPolicy` and `availablePolicies`.
 When `agentloop.config.json` is invalid, policy commands with `--json` return a `CONFIG_ERROR` object before reading local policy files.
 
-Human-readable policy output keeps dynamic policy titles, pack metadata, paths, created files, and skipped files on one Markdown line. JSON output keeps raw values for scripts.
+Human-readable policy output keeps dynamic policy titles, pack metadata, paths, created files, and skipped files on one Markdown line. JSON output keeps raw values for scripts. Policy commands accept `--redact-paths` for consistency with other shareable evidence commands; policy paths are already repo-relative, so the flag does not change output values.
 
 `policy status` compares the local Markdown files with AgentLoopKit's bundled policy templates. It reports:
 
@@ -90,6 +91,8 @@ Each local pack needs a manifest:
   "policies": ["review-evidence-policy.md"]
 }
 ```
+
+The manifest `name`, `title`, and `description` fields must be non-empty strings. For configured local packs, `manifest.name` must match the pack `name` in `agentloop.config.json` case-insensitively; AgentLoopKit rejects mismatches before listing, showing, or applying that pack.
 
 Policy files live under the pack's `policies/` directory. AgentLoopKit reads local packs only when you run `policy packs`, `policy pack show`, or `policy pack apply`.
 Local pack paths and policy files must resolve inside the repository and the pack's `policies/` directory. AgentLoopKit rejects symlinked policy files that point outside that boundary before reading their contents.

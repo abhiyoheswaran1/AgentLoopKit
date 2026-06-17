@@ -5,11 +5,13 @@ import {
   type ArtifactInventory,
 } from './artifacts.js';
 import { checkGates } from './check-gates.js';
+import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
 import { singleLineInlineCode as inlineCode } from './markdown-format.js';
 import { readGithubMetadataContext, type GithubMetadataContext } from './github-metadata.js';
 import { getPolicyStatus } from './policy.js';
 import { listRuns } from './runs.js';
 import { getAgentLoopStatus } from './status.js';
+import type { GitFileStatus } from './git.js';
 
 export async function getReviewContext(options: {
   cwd: string;
@@ -91,17 +93,55 @@ function formatLatestShip(ship: Awaited<ReturnType<typeof getReviewContext>>['la
   return `${inlineCode(String(ship.score))}/100${report}`;
 }
 
-function formatRecentRuns(runs: Awaited<ReturnType<typeof getReviewContext>>['recentRuns']) {
+function formatArtifactSummary(
+  artifacts: Awaited<ReturnType<typeof getReviewContext>>['artifacts'],
+) {
+  const placeholderCount = artifacts.tasks.agentFlightPlaceholders?.count ?? 0;
+  const placeholderPart =
+    placeholderCount > 0
+      ? `, ${inlineCode(String(placeholderCount))} AgentFlight placeholder task(s)`
+      : '';
+  return `${inlineCode(String(artifacts.tasks.count))} task(s)${placeholderPart}, ${inlineCode(
+    String(artifacts.verificationReports.count),
+  )} verification report(s), ${inlineCode(String(artifacts.handoffs.count))} handoff(s)`;
+}
+
+function formatChangedFileScope(
+  run: Awaited<ReturnType<typeof getReviewContext>>['recentRuns'][number],
+  recentRunChangedFiles: Map<string, GitFileStatus[]> | undefined,
+) {
+  if (!recentRunChangedFiles?.has(run.id)) return undefined;
+  const changedFiles = recentRunChangedFiles.get(run.id) ?? [];
+  const count = changedFiles.length > 0 ? changedFiles.length : run.changedFileCount;
+  const prefix = `${inlineCode(String(count))} changed file(s)`;
+  if (changedFiles.length === 0) return prefix;
+
+  const agentLoopEvidenceCount = changedFiles.filter((file) =>
+    isAgentLoopEvidenceFile(file.path),
+  ).length;
+  if (agentLoopEvidenceCount === 0) return prefix;
+
+  const nonEvidenceCount = changedFiles.length - agentLoopEvidenceCount;
+  return `${prefix} (${inlineCode(String(nonEvidenceCount))} non-evidence, ${inlineCode(
+    String(agentLoopEvidenceCount),
+  )} AgentLoop evidence)`;
+}
+
+function formatRecentRuns(
+  runs: Awaited<ReturnType<typeof getReviewContext>>['recentRuns'],
+  recentRunChangedFiles?: Map<string, GitFileStatus[]>,
+) {
   if (!runs.length) return 'none';
   return runs
     .slice(0, 3)
     .map((run) => {
+      const changedFileScope = formatChangedFileScope(run, recentRunChangedFiles);
       const result =
         run.score === undefined
           ? run.overallStatus
-            ? inlineCode(run.overallStatus)
-            : `${inlineCode(String(run.changedFileCount))} changed file(s)`
-          : `${inlineCode(String(run.score))}/100`;
+            ? [inlineCode(run.overallStatus), changedFileScope].filter(Boolean).join(' - ')
+            : changedFileScope ?? `${inlineCode(String(run.changedFileCount))} changed file(s)`
+          : [`${inlineCode(String(run.score))}/100`, changedFileScope].filter(Boolean).join(' - ');
       return `- ${inlineCode(run.command)} ${result} - ${inlineCode(run.id)}`;
     })
     .join('\n');
@@ -128,7 +168,16 @@ function formatGithubMetadata(metadata: GithubMetadataContext) {
     : `present - ${inlineCode(metadata.path)}`;
 }
 
-export function renderReviewContextMarkdown(context: Awaited<ReturnType<typeof getReviewContext>>) {
+function formatWorkingTree(context: Awaited<ReturnType<typeof getReviewContext>>['status']) {
+  const workingTree = context.workingTree;
+  if (!workingTree.dirty) return 'clean';
+  return `dirty (${workingTree.changedFileCount}; ${workingTree.nonEvidenceChangedFileCount} non-evidence, ${workingTree.agentLoopEvidenceChangedFileCount} AgentLoop evidence)`;
+}
+
+export function renderReviewContextMarkdown(
+  context: Awaited<ReturnType<typeof getReviewContext>>,
+  options?: { recentRunChangedFiles?: Map<string, GitFileStatus[]> },
+) {
   const policy = context.policies.summary;
   const artifacts = context.artifacts;
 
@@ -142,20 +191,14 @@ export function renderReviewContextMarkdown(context: Awaited<ReturnType<typeof g
   )} modified, ${inlineCode(String(policy.missing))} missing, ${inlineCode(
     String(policy.extra),
   )} extra
-- Artifacts: ${inlineCode(String(artifacts.tasks.count))} task(s), ${inlineCode(
-    String(artifacts.verificationReports.count),
-  )} verification report(s), ${inlineCode(String(artifacts.handoffs.count))} handoff(s)
+- Artifacts: ${formatArtifactSummary(artifacts)}
 - Latest ship score: ${formatLatestShip(context.latestShip)}
 - GitHub metadata: ${formatGithubMetadata(context.githubMetadata)}
-- Working tree: ${inlineCode(
-    context.status.workingTree.dirty
-      ? `dirty (${context.status.workingTree.changedFileCount})`
-      : 'clean',
-  )}
+- Working tree: ${inlineCode(formatWorkingTree(context.status))}
 
 ## Recent Runs
 
-${formatRecentRuns(context.recentRuns)}
+${formatRecentRuns(context.recentRuns, options?.recentRunChangedFiles)}
 
 ## Next Action
 

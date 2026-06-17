@@ -119,4 +119,51 @@ describe('review readiness scoring', () => {
       'Generate a reviewer handoff with agentloop handoff.',
     ]);
   });
+
+  test('scores ship scope control from non-evidence changed files', () => {
+    const evidenceFiles = Array.from({ length: 30 }, (_, index) => ({
+      status: '??' as const,
+      path: `.agentloop/reports/2026-06-11-12-${String(index).padStart(2, '0')}-verification-report.md`,
+    }));
+
+    const result = evaluateReviewReadiness({
+      task: {
+        path: '.agentloop/tasks/add-status-copy.md',
+        title: 'Add status copy',
+        status: 'in-progress',
+        content: clearTask,
+      },
+      changedFiles: [{ status: 'M', path: 'src/status.ts' }, ...evidenceFiles],
+      verification: {
+        status: 'pass',
+        fresh: true,
+        path: '.agentloop/reports/2026-06-11-12-00-verification-report.md',
+      },
+      gates: {
+        overallStatus: 'pass',
+        gates: [
+          { id: 'task-contract', name: 'Task contract', status: 'pass', message: 'Task found.' },
+          {
+            id: 'verification-report',
+            name: 'Verification report',
+            status: 'pass',
+            message: 'Overall status: pass',
+          },
+        ],
+      },
+      handoff: {
+        path: '.agentloop/handoffs/2026-06-11-12-05-pr-summary.md',
+      },
+    });
+
+    const scopeControl = result.dimensions.find((dimension) => dimension.id === 'scope-control');
+
+    expect(scopeControl).toEqual(
+      expect.objectContaining({
+        score: 100,
+        reason: '1 non-evidence changed file(s); 30 AgentLoop evidence file(s) also present (31 total).',
+      }),
+    );
+    expect(result.warnings).not.toContain('Large change set; consider splitting before review.');
+  });
 });

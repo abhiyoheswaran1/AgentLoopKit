@@ -3,6 +3,7 @@ import { OutputPathError } from '../../core/artifacts.js';
 import { BADGE_SOURCES, writeEvidenceBadge } from '../../core/badge.js';
 import { AgentLoopError } from '../../core/errors.js';
 import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
+import { redactLocalRoots } from '../../core/redaction.js';
 import { loadWorkspaceForJsonCommand, printOutputPathJsonError } from '../json-errors.js';
 
 function printJsonError(error: AgentLoopError, details: Record<string, unknown> = {}) {
@@ -22,6 +23,18 @@ function printJsonError(error: AgentLoopError, details: Record<string, unknown> 
   process.exitCode = 1;
 }
 
+function redactText(value: string, cwd: string, redactPaths: boolean | undefined) {
+  return redactPaths ? redactLocalRoots(value, [cwd]) : value;
+}
+
+function redactOptionalText(
+  value: string | undefined,
+  cwd: string,
+  redactPaths: boolean | undefined,
+) {
+  return value === undefined ? undefined : redactText(value, cwd, redactPaths);
+}
+
 export function badgeCommand() {
   return new Command('badge')
     .description('Generate a local SVG evidence badge')
@@ -29,8 +42,15 @@ export function badgeCommand() {
     .option('--out <path>', 'output SVG path')
     .option('--strict', 'use strict gate status when source is gates')
     .option('--json', 'print machine-readable output')
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .action(
-      async (options: { source?: string; out?: string; strict?: boolean; json?: boolean }) => {
+      async (options: {
+        source?: string;
+        out?: string;
+        strict?: boolean;
+        json?: boolean;
+        redactPaths?: boolean;
+      }) => {
         const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
         if (!workspace) return;
         let result: Awaited<ReturnType<typeof writeEvidenceBadge>>;
@@ -66,12 +86,16 @@ export function badgeCommand() {
           console.log(
             JSON.stringify(
               {
-                outPath: result.outPath,
+                outPath: redactText(result.outPath, workspace.cwd, options.redactPaths),
                 source: result.source,
                 status: result.status,
                 label: result.label,
                 message: result.message,
-                sourcePath: result.sourcePath,
+                sourcePath: redactOptionalText(
+                  result.sourcePath,
+                  workspace.cwd,
+                  options.redactPaths,
+                ),
               },
               null,
               2,
@@ -80,10 +104,10 @@ export function badgeCommand() {
         } else {
           console.log(`# AgentLoopKit Badge
 
-Badge written: ${inlineCode(result.outPath)}
-Source: ${inlineCode(result.source)}
-Status: ${inlineCode(result.status)}
-Message: ${inlineCode(result.message)}`);
+Badge written: ${inlineCode(redactText(result.outPath, workspace.cwd, options.redactPaths))}
+Source: ${inlineCode(redactText(result.source, workspace.cwd, options.redactPaths))}
+Status: ${inlineCode(redactText(result.status, workspace.cwd, options.redactPaths))}
+Message: ${inlineCode(redactText(result.message, workspace.cwd, options.redactPaths))}`);
         }
       },
     );

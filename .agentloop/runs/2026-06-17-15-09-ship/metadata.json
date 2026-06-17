@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-15-09-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-15-09",
+  "createdAtEpochMs": 1781701791297,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-guard-backlog-implemented-decisions-2.md",
+    "title": "Guard backlog implemented decisions",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-15-04-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-15-09-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-15-09-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 3010
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-03-39-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-03-39",
+  "createdAtEpochMs": 1781660345288,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-accept-redacted-run-ledger-output-flag.md",
+    "title": "Accept redacted run ledger output flag",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-03-36-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 1824
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-15-05-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-15-05",
+  "createdAtEpochMs": 1781701527823,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-guard-backlog-implemented-decisions-2.md",
+    "title": "Guard backlog implemented decisions",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-15-04-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-15-05-pr-summary.md",
+  "changedFileCount": 3005
+}

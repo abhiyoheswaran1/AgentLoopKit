@@ -28,6 +28,21 @@ async function commitAll(dir: string, message = 'baseline') {
   );
 }
 
+function agentFlightPlaceholderMarkdown(title: string, status = 'proposed') {
+  return `# ${title}
+
+- Created date: 2026-06-16
+- Task type: feature
+- Status: ${status}
+
+## Problem Statement
+AgentFlight session task: ${title}
+
+## Desired Outcome
+Task is implemented with local verification evidence.
+`;
+}
+
 describe('check-gates command', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
@@ -78,6 +93,62 @@ describe('check-gates command', () => {
       ]),
     );
     expect(output.nextAction.command).toBe('none');
+  });
+
+  test('separates AgentLoop evidence churn in Git context output', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-17-gate-context.md'),
+      '# Gate context\n\n- Status: in-progress\n',
+    );
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/2026-06-17-gate-context.md',
+    });
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-17-00-40-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+    await commitAll(dir);
+    await mkdir(path.join(dir, 'src'), { recursive: true });
+    await writeFile(path.join(dir, 'src/index.ts'), 'export const value = 1;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-17-00-40-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const humanResult = await execa(tsxPath, [cliPath, 'check-gates'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(humanResult.exitCode).toBe(0);
+    const output = JSON.parse(jsonResult.stdout);
+    expect(output.git).toMatchObject({
+      changedFileCount: 2,
+      nonEvidenceChangedFileCount: 1,
+      agentLoopEvidenceChangedFileCount: 1,
+    });
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'git-context',
+          status: 'pass',
+          message: '2 changed file(s) detected (1 non-evidence, 1 AgentLoop evidence).',
+        }),
+      ]),
+    );
+    expect(humanResult.stdout).toContain(
+      '- Changed files: `2; 1 non-evidence, 1 AgentLoop evidence`',
+    );
+    expect(humanResult.stdout).toContain(
+      '[`pass`] `Git context`: `2 changed file(s) detected (1 non-evidence, 1 AgentLoop evidence).`',
+    );
   });
 
   test('passes strict gates when latest run references an archived task contract', async () => {
@@ -237,6 +308,10 @@ describe('check-gates command', () => {
       path.join(dir, '.agentloop/tasks/2026-06-13-docs-hygiene.md'),
       '# Docs hygiene\n\n- Status: in-progress\n',
     );
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/2026-06-13-docs-hygiene.md',
+    });
     await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
     await writeFile(
       path.join(dir, '.agentloop/reports/2026-06-13-01-06-verification-report.md'),
@@ -265,6 +340,10 @@ describe('check-gates command', () => {
       cwd: dir,
       reject: false,
     });
+    const humanResult = await execa(tsxPath, [cliPath, 'check-gates', '--strict'], {
+      cwd: dir,
+      reject: false,
+    });
 
     expect(result.exitCode).toBe(0);
     const output = JSON.parse(result.stdout);
@@ -278,7 +357,81 @@ describe('check-gates command', () => {
         }),
       ]),
     );
-    expect(output.nextAction.command).toBe('agentloop create-task');
+    expect(output.nextAction).toEqual({
+      command: 'agentloop task done',
+      reason:
+        'Task, verification, and handoff evidence cover the current dirty files. Mark the task done when the handoff is ready, or keep it open if work is still in progress.',
+    });
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain('Run `agentloop task done`.');
+  });
+
+  test('ignores an active AgentFlight placeholder when checking real task gates', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-13-real-task.md'),
+      '# Real task\n\n- Status: in-progress\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-13-real-task-2.md'),
+      agentFlightPlaceholderMarkdown('Real task', 'proposed'),
+    );
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: '.agentloop/tasks/2026-06-13-real-task-2.md',
+    });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-13-01-06-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/handoffs/.gitkeep'), '');
+    await commitAll(dir, 'init');
+
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 2;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-13-01-11-pr-summary.md'),
+      `# PR Summary
+
+## Changed Files
+- M \`src.ts\`
+
+## Verification Performed
+- Overall status: pass
+`,
+    );
+
+    const doctorResult = await execa(tsxPath, [cliPath, 'task', 'doctor'], {
+      cwd: dir,
+      reject: false,
+    });
+    const gateResult = await execa(tsxPath, [cliPath, 'check-gates', '--strict', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(doctorResult.exitCode).toBe(0);
+    expect(doctorResult.stdout).toContain('active-task-agentflight-placeholder');
+    expect(gateResult.exitCode).toBe(0);
+    const output = JSON.parse(gateResult.stdout);
+    expect(output.overallStatus).toBe('pass');
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'task-contract',
+          status: 'pass',
+          message: 'Real task',
+          path: '.agentloop/tasks/2026-06-13-real-task.md',
+        }),
+        expect.objectContaining({
+          id: 'task-hygiene',
+          status: 'pass',
+          message: 'Task folder hygiene checks passed.',
+        }),
+      ]),
+    );
   });
 
   test('does not request another handoff when latest ship run covers dirty evidence', async () => {

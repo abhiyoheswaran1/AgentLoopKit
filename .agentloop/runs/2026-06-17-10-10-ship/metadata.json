@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-10-10-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-10-10",
+  "createdAtEpochMs": 1781683845004,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-npm-status-safety-tests-to-maintenance-check.md",
+    "title": "Add npm-status safety tests to maintenance check",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-10-07-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-10-10-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-10-10-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 2628
+}

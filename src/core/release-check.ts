@@ -2,6 +2,7 @@ import path from 'node:path';
 import { readFile, realpath } from 'node:fs/promises';
 import { execa } from 'execa';
 import type { AgentLoopConfig } from './config.js';
+import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
 import { latestMarkdownFile, prSummaryPattern, releaseNotesPattern } from './artifacts.js';
 import { resolveCurrentTaskVerificationEvidence } from './evidence.js';
 import { pathExists } from './file-system.js';
@@ -39,6 +40,8 @@ export type ReleaseCheckResult = {
     root: string;
     targetIsRoot: boolean;
     changedFileCount: number;
+    nonEvidenceChangedFileCount: number;
+    agentLoopEvidenceChangedFileCount: number;
   };
   releaseDelta: ReleaseDelta;
   checks: ReleaseReadinessCheck[];
@@ -271,7 +274,11 @@ async function gitChangedFilesSinceTag(cwd: string, tag: string) {
 }
 
 function normalizePackageFileEntry(entry: string) {
-  return entry.trim().replace(/^\.\/+/, '').replace(/^\/+/, '').replace(/\/+$/, '');
+  return entry
+    .trim()
+    .replace(/^\.\/+/, '')
+    .replace(/^\/+/, '')
+    .replace(/\/+$/, '');
 }
 
 function packageFileEntryMatches(filePath: string, entry: string) {
@@ -386,6 +393,28 @@ function releaseDeltaMessage(delta: ReleaseDelta) {
   } changed since ${delta.tag}; choose the next package version before release.`;
 }
 
+function changedFileMessage(totalCount: number, nonEvidenceCount: number, evidenceCount: number) {
+  if (evidenceCount === 0) return `${totalCount} changed file(s) detected.`;
+  return `${totalCount} changed file(s) detected (${nonEvidenceCount} non-evidence file(s), ${evidenceCount} AgentLoop evidence file(s)).`;
+}
+
+function renderChangedFileCount(
+  result: Pick<
+    ReleaseCheckResult['git'],
+    'changedFileCount' | 'nonEvidenceChangedFileCount' | 'agentLoopEvidenceChangedFileCount'
+  >,
+) {
+  if (result.agentLoopEvidenceChangedFileCount === 0) {
+    return inlineCode(String(result.changedFileCount));
+  }
+  return [
+    inlineCode(String(result.changedFileCount)),
+    `(${inlineCode(String(result.nonEvidenceChangedFileCount))} non-evidence, ${inlineCode(
+      String(result.agentLoopEvidenceChangedFileCount),
+    )} AgentLoop evidence)`,
+  ].join(' ');
+}
+
 function overallStatus(checks: ReleaseReadinessCheck[], strict: boolean): ReleaseCheckStatus {
   if (checks.some((item) => item.status === 'fail')) return 'fail';
   if (strict && checks.some((item) => item.status === 'warn')) return 'fail';
@@ -491,7 +520,7 @@ function renderMarkdown(result: Omit<ReleaseCheckResult, 'markdown'>) {
 - Strict mode: ${inlineCode(result.strict ? 'enabled (warnings fail)' : 'disabled')}
 - Package: ${inlineCode(`${result.package.name}@${result.package.version}`)}
 - Git: ${gitLine}
-- Changed files: ${inlineCode(String(result.git.changedFileCount))}
+- Changed files: ${renderChangedFileCount(result.git)}
 
 ## Checks
 
@@ -657,6 +686,10 @@ export async function checkReleaseReadiness(options: {
   const inGit = await isInsideGitRepo(options.cwd);
   const status = inGit ? await getGitStatus(options.cwd) : '';
   const changedFiles = inGit ? await parseGitStatus(status) : [];
+  const agentLoopEvidenceChangedFileCount = changedFiles.filter((file) =>
+    isAgentLoopEvidenceFile(file.path),
+  ).length;
+  const nonEvidenceChangedFileCount = changedFiles.length - agentLoopEvidenceChangedFileCount;
   const gitRoot = inGit ? await getGitRoot(options.cwd) : '';
   const resolvedGitRoot = gitRoot ? await resolveComparablePath(gitRoot) : '';
   const targetIsRoot = resolvedGitRoot
@@ -689,7 +722,11 @@ export async function checkReleaseReadiness(options: {
       'Working tree',
       changedFiles.length ? 'warn' : 'pass',
       changedFiles.length
-        ? `${changedFiles.length} changed file(s) detected.`
+        ? changedFileMessage(
+            changedFiles.length,
+            nonEvidenceChangedFileCount,
+            agentLoopEvidenceChangedFileCount,
+          )
         : 'No uncommitted changes detected.',
     ),
   );
@@ -711,9 +748,7 @@ export async function checkReleaseReadiness(options: {
     releaseCheck(
       'release-delta',
       'Release delta',
-      releaseDelta.tagExists && releaseDelta.packageImpactingChangedFileCount > 0
-        ? 'warn'
-        : 'pass',
+      releaseDelta.tagExists && releaseDelta.packageImpactingChangedFileCount > 0 ? 'warn' : 'pass',
       releaseDeltaMessage(releaseDelta),
     ),
   );
@@ -747,6 +782,8 @@ export async function checkReleaseReadiness(options: {
         redactLocalRoot(resolvedGitRoot, resolvedGitRoot, options.redactPaths) ?? resolvedGitRoot,
       targetIsRoot,
       changedFileCount: changedFiles.length,
+      nonEvidenceChangedFileCount,
+      agentLoopEvidenceChangedFileCount,
     },
     releaseDelta,
     checks: outputChecks,

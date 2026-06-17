@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-15-55-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-15-55",
+  "createdAtEpochMs": 1781704513326,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-mirror-raw-agentflight-recovery-in-agent-instructions-2.md",
+    "title": "Mirror raw AgentFlight recovery in agent instructions",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-15-54-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-15-55-pr-summary.md",
+  "changedFileCount": 3099
+}

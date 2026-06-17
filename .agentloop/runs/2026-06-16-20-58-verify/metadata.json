@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-20-58-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-20-58",
+  "createdAtEpochMs": 1781636327032,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-use-concise-evidence-steps-in-dogfood-output.md",
+    "title": "Use concise evidence steps in dogfood output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-20-56-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 310
+}

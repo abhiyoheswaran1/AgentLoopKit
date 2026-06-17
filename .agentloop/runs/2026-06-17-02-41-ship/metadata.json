@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-02-41-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-02-41",
+  "createdAtEpochMs": 1781656893185,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-guard-readme-against-release-incident-chatter.md",
+    "title": "Guard README against release incident chatter",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-39-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-02-41-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-41-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1607
+}

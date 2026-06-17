@@ -286,6 +286,44 @@ describe('GitHub metadata import', () => {
     });
   });
 
+  test('accepts redact-paths in GitHub import without changing JSON output', async () => {
+    const { dir } = await createGithubFixture();
+
+    const helpResult = await execa(tsxPath, [cliPath, 'github', 'import', '--help'], {
+      cwd: dir,
+    });
+    const humanResult = await execa(
+      tsxPath,
+      [cliPath, 'github', 'import', '--issue-json', 'issue.json', '--dry-run', '--redact-paths'],
+      { cwd: dir, reject: false },
+    );
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'github', 'import', '--issue-json', 'issue.json', '--dry-run', '--json'],
+      { cwd: dir },
+    );
+    const redactedJsonResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'github',
+        'import',
+        '--issue-json',
+        'issue.json',
+        '--dry-run',
+        '--json',
+        '--redact-paths',
+      ],
+      { cwd: dir, reject: false },
+    );
+
+    expect(helpResult.stdout).toContain('--redact-paths');
+    expect(humanResult.exitCode).toBe(0);
+    expect(humanResult.stdout).toContain('- Output: `.agentloop/github/context.json`');
+    expect(redactedJsonResult.exitCode).toBe(0);
+    expect(JSON.parse(redactedJsonResult.stdout)).toEqual(JSON.parse(jsonResult.stdout));
+  });
+
   test('keeps imported titles and output paths on one line in human output while preserving JSON values', async () => {
     const { dir } = await createGithubFixture();
     await writeJson(path.join(dir, 'issue-newline.json'), {
@@ -335,9 +373,7 @@ describe('GitHub metadata import', () => {
       { cwd: dir },
     );
 
-    const outputLine = humanResult.stdout
-      .split('\n')
-      .find((line) => line.startsWith('- Output:'));
+    const outputLine = humanResult.stdout.split('\n').find((line) => line.startsWith('- Output:'));
     const issueLine = humanResult.stdout.split('\n').find((line) => line.startsWith('- Issue:'));
     const pullRequestLine = humanResult.stdout
       .split('\n')

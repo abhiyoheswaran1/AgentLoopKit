@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-12-34-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-12-34",
+  "createdAtEpochMs": 1781692461503,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-stale-artifact-limits-2.md",
+    "title": "Add built CLI smoke coverage for stale artifact limits",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-12-28-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2792
+}

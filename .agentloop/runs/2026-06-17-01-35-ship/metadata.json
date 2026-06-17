@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-01-35-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-01-35",
+  "createdAtEpochMs": 1781652921482,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-warn-on-forced-home-directory-init.md",
+    "title": "Warn on forced home-directory init",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-01-34-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-01-35-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-01-35-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1296
+}

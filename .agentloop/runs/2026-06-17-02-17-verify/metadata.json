@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-02-17-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-02-17",
+  "createdAtEpochMs": 1781655479557,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-schemastore-output.md",
+    "title": "Add built CLI smoke coverage for SchemaStore output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-17-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 1498
+}

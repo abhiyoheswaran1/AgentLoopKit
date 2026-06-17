@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-03-16-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-03-16",
+  "createdAtEpochMs": 1781658983097,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-accept-redacted-schemastore-output-flag.md",
+    "title": "Accept redacted SchemaStore output flag",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-03-16-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-03-16-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-03-16-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1743
+}

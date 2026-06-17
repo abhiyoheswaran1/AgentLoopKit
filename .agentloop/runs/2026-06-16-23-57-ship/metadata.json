@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-23-57-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-23-57",
+  "createdAtEpochMs": 1781647058498,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-align-strict-dogfood-guidance-with-handoff-evidence-2.md",
+    "title": "Align strict dogfood guidance with handoff evidence",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-23-57-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-23-57-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-23-57-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 827
+}

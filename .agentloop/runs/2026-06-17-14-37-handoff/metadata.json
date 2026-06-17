@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-14-37-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-14-37",
+  "createdAtEpochMs": 1781699841067,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-compact-json-task-list-output-2.md",
+    "title": "Add compact JSON task list output",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-14-30-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-14-37-pr-summary.md",
+  "changedFileCount": 2957
+}

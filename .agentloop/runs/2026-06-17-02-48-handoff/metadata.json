@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-02-48-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-02-48",
+  "createdAtEpochMs": 1781657280845,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-schemastore-consistency-tests-to-maintenance-check.md",
+    "title": "Add SchemaStore consistency tests to maintenance check",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-44-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-48-pr-summary.md",
+  "changedFileCount": 1641
+}

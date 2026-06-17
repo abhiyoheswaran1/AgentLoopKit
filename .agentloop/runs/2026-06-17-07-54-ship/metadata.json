@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-07-54-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-07-54",
+  "createdAtEpochMs": 1781675669420,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-handoff-redaction.md",
+    "title": "Add built CLI smoke coverage for handoff redaction",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-07-46-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-07-54-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-07-54-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 2324
+}

@@ -79,6 +79,9 @@ export function initCommand() {
             );
           }
         }
+        for (const warning of result.warnings) {
+          logger.info(`Warning: ${warning.message}`);
+        }
         logger.info(`Configured commands: ${formatList(result.commands.configured)}`);
         logger.info(`Missing commands: ${formatList(result.commands.missing)}`);
         logger.info(`Created: ${result.created.length}`);
@@ -100,6 +103,8 @@ export function initCommand() {
           logger.info('- Review AGENTS.md and AGENTLOOP.md');
           logger.info('- Run agentloop doctor');
           logger.info('- Create a task with agentloop create-task');
+          logger.info('- Verify the task with agentloop verify --task <path> --task-commands');
+          logger.info('- Hand off review evidence with agentloop handoff');
         }
       },
     );

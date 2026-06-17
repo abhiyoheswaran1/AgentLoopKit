@@ -24,7 +24,11 @@
     "ignore": [
       ".projscan-memory/**",
       ".projscan-cache/**",
-      ".agentflight/current/**"
+      ".agentflight/current/**",
+      ".agentloop/handoffs/**",
+      ".agentloop/reports/**",
+      ".agentloop/runs/**",
+      ".agentloop/tasks/archive/**"
     ]
   },
   "privacy": {

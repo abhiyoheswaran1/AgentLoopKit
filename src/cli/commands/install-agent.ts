@@ -8,14 +8,32 @@ import {
 import { resolveAgentLoopWorkspaceCwd } from '../../core/config.js';
 import { SUPPORTED_AGENTS } from '../../core/constants.js';
 import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
+import { redactLocalRoots } from '../../core/redaction.js';
 import { printOutputPathJsonError } from '../json-errors.js';
+
+function redactText(value: string, cwd: string, redactPaths: boolean | undefined) {
+  return redactPaths ? redactLocalRoots(value, [cwd]) : value;
+}
+
+function redactInstallResult<T extends { agentFilePath: string; agentsPath: string }>(
+  result: T,
+  cwd: string,
+  redactPaths: boolean | undefined,
+): T {
+  return {
+    ...result,
+    agentFilePath: redactText(result.agentFilePath, cwd, redactPaths),
+    agentsPath: redactText(result.agentsPath, cwd, redactPaths),
+  };
+}
 
 export function installAgentCommand() {
   return new Command('install-agent')
     .description('Install agent-specific instruction files')
     .argument('<agent>', `one of: ${SUPPORTED_AGENTS.join(', ')}, all`)
     .option('--json', 'print machine-readable output')
-    .action(async (agent: string, options: { json?: boolean }) => {
+    .option('--redact-paths', 'redact local absolute paths in public output')
+    .action(async (agent: string, options: { json?: boolean; redactPaths?: boolean }) => {
       const requestedAgent = agent.trim();
       const cwd = await resolveAgentLoopWorkspaceCwd(process.cwd());
       if (requestedAgent === 'all') {
@@ -35,7 +53,7 @@ export function installAgentCommand() {
               {
                 agents: results.map((result, index) => ({
                   name: SUPPORTED_AGENTS[index],
-                  ...result,
+                  ...redactInstallResult(result, cwd, options.redactPaths),
                 })),
               },
               null,
@@ -44,8 +62,12 @@ export function installAgentCommand() {
           );
           return;
         }
-        const createdCount = results.filter((result) => result.agentFileStatus === 'created').length;
-        const skippedCount = results.filter((result) => result.agentFileStatus === 'skipped').length;
+        const createdCount = results.filter(
+          (result) => result.agentFileStatus === 'created',
+        ).length;
+        const skippedCount = results.filter(
+          (result) => result.agentFileStatus === 'skipped',
+        ).length;
         console.log(
           `Agent instructions processed: ${inlineCode(String(results.length))} (${inlineCode(
             `${createdCount} created`,
@@ -88,13 +110,25 @@ export function installAgentCommand() {
         throw error;
       }
       if (options.json) {
-        console.log(JSON.stringify({ agent: { name: requestedAgent, ...result } }, null, 2));
+        console.log(
+          JSON.stringify(
+            {
+              agent: {
+                name: requestedAgent,
+                ...redactInstallResult(result, cwd, options.redactPaths),
+              },
+            },
+            null,
+            2,
+          ),
+        );
         return;
       }
+      const agentFilePath = redactText(result.agentFilePath, cwd, options.redactPaths);
       if (result.agentFileStatus === 'created') {
-        console.log(`Agent instructions written: ${inlineCode(result.agentFilePath)}`);
+        console.log(`Agent instructions written: ${inlineCode(agentFilePath)}`);
       } else {
-        console.log(`Agent instructions skipped: ${inlineCode(result.agentFilePath)}`);
+        console.log(`Agent instructions skipped: ${inlineCode(agentFilePath)}`);
       }
       console.log('AGENTS.md now references the agent instructions.');
     });

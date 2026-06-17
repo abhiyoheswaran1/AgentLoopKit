@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-02-22-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-02-22",
+  "createdAtEpochMs": 1781655765512,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-policy-pack-safety-tests-to-maintenance-check.md",
+    "title": "Add policy pack safety tests to maintenance check",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-21-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 1523
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-01-22-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-01-22",
+  "createdAtEpochMs": 1781652157000,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-separate-agentloop-evidence-churn-in-artifacts-run-output-2.md",
+    "title": "Separate AgentLoop evidence churn in artifacts run output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-01-21-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 1240
+}

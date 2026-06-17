@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { loadAgentLoopWorkspace } from '../../core/config.js';
 import { ConfigError } from '../../core/errors.js';
-import { getAgentLoopStatus } from '../../core/status.js';
+import { getAgentLoopStatus, toBriefStatusJson } from '../../core/status.js';
 import { printAgentLoopJsonError } from '../json-errors.js';
 
 export function statusCommand() {
@@ -27,7 +27,7 @@ export function statusCommand() {
         redactPaths: options.redactPaths === true,
       });
       if (options.json) {
-        console.log(JSON.stringify(result, null, 2));
+        console.log(JSON.stringify(options.brief ? toBriefStatusJson(result) : result, null, 2));
       } else if (options.brief) {
         console.log(result.brief);
       } else {

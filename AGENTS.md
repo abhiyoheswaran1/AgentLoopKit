@@ -43,6 +43,7 @@ Before changing code:
 - Run `npm run dogfood` during meaningful AgentLoopKit changes to exercise the local self-check path, including dependency audit. Use `npm run dogfood:strict` before final handoff or release prep when warnings should block progress.
 - Run `npm run maintenance:check` for the near-term maintenance guard covering unit checks, public-doc hygiene, link checks, and strict dogfood.
 - Use AgentFlight for meaningful autonomous sessions: `npx --yes agentflight start --task "<task>" --yes`, `npx --yes agentflight status`, `npx --yes agentflight doctor`, and `npx --yes agentflight report`.
+- After raw `agentflight start`, run `agentloop status --redact-paths`; if an AgentFlight placeholder becomes active, run `agentloop task set <path>` to re-pin the detailed AgentLoop task.
 - Use ProjScan during implementation: `npx --yes projscan doctor --format markdown`, `npx --yes projscan start`, or a more specific ProjScan command when repo-risk context is needed.
 - Before making product-direction decisions, review `.agentloop/product-panel.md`, `.agentloop/user-personas.md`, `.agentloop/backlog.md`, and the latest files under `.agentloop/research/`.
 - Treat `.agentloop/research/` and product-panel output as simulated internal decision support. Do not present it as real user feedback, adoption, testimonials, or interviews in public docs.

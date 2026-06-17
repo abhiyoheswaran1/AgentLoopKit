@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-01-29-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-01-29",
+  "createdAtEpochMs": 1781652555356,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-17-add-built-cli-smoke-coverage-for-artifacts-run-evidence-split-2.md",
+    "title": "Add built CLI smoke coverage for artifacts run evidence split",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-01-26-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-01-29-pr-summary.md",
+  "changedFileCount": 1284
+}

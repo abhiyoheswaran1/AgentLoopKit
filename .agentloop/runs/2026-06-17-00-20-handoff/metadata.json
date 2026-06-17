@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-00-20-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-00-20",
+  "createdAtEpochMs": 1781648431817,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-cross-check-backlog-items-before-autonomous-task-selection-2.md",
+    "title": "Cross-check backlog items before autonomous task selection",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-00-19-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-00-20-pr-summary-2.md",
+  "changedFileCount": 964
+}

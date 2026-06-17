@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-20-50-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-20-50",
+  "createdAtEpochMs": 1781635811445,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-use-concise-review-context-in-dogfood-output.md",
+    "title": "Use concise review context in dogfood output",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-20-46-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-20-50-pr-summary.md",
+  "changedFileCount": 296
+}

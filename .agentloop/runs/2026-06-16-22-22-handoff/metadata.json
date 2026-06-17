@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-22-22-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-22-22",
+  "createdAtEpochMs": 1781641323748,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-16-suppress-task-doctor-warning-after-clean-archived-evidence.md",
+    "title": "Suppress task doctor warning after clean archived evidence",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-22-19-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-22-22-pr-summary.md",
+  "changedFileCount": 550
+}

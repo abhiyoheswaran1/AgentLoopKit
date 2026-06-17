@@ -7,7 +7,9 @@ Run:
 ```bash
 agentloop ci-summary
 agentloop ci-summary --json
+agentloop ci-summary --json --redact-paths
 agentloop ci-summary --write
+agentloop ci-summary --write --redact-paths
 agentloop ci-summary --write --out .agentloop/reports/ci-summary.md
 ```
 
@@ -41,7 +43,7 @@ Human output is Markdown:
 - Gates: pass
 ```
 
-JSON output includes the same CI context, evidence paths, gate statuses, next action, and optional `writtenPath`.
+JSON output includes the same CI context, evidence paths, gate statuses, next action, and optional `writtenPath`. Default JSON keeps raw paths for scripts. Use `--redact-paths` before copying CI summary output into public logs; it replaces local roots with `[git-root]` in human output, JSON output, and written Markdown without changing where `--write` stores the file.
 
 ## Written Artifacts
 

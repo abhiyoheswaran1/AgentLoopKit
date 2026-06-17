@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-09-37-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-09-37",
+  "createdAtEpochMs": 1781681847227,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-template-and-completion-commands.md",
+    "title": "Add built CLI smoke coverage for template and completion commands",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-09-33-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2553
+}

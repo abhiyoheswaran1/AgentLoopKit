@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-22-38-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-22-38",
+  "createdAtEpochMs": 1781642334920,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-validate-local-policy-pack-manifest-names-2.md",
+    "title": "Validate local policy pack manifest names",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-22-35-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-22-38-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-22-38-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 586
+}

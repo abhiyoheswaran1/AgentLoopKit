@@ -3,12 +3,14 @@ import { readFile } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { latestMarkdownFile, prSummaryPattern } from './artifacts.js';
 import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
-import { getGitStatus, parseGitStatus } from './git.js';
+import { getGitStatus, GitFileStatus, parseGitStatus } from './git.js';
 import { readGithubMetadataContext } from './github-metadata.js';
 import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
 import { escapeMarkdownProse, singleLineInlineCode as inlineCode } from './markdown-format.js';
 import { listRuns } from './runs.js';
 import { readTaskContract } from './task-state.js';
+import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
+import { classifyChangedFiles } from './change-areas.js';
 
 export type MaintainerCheckStatus = 'pass' | 'warn' | 'fail';
 
@@ -63,6 +65,30 @@ function redactCheck(check: MaintainerCheck, root: string, redactPaths: boolean 
 
 function hasPath(changedFiles: string[], pattern: RegExp) {
   return changedFiles.some((filePath) => pattern.test(filePath));
+}
+
+function changedFileCountMessage(
+  totalCount: number,
+  nonEvidenceCount: number,
+  evidenceCount: number,
+  nonEvidenceFiles: GitFileStatus[] = [],
+) {
+  const areaCounts =
+    nonEvidenceCount > 25 && nonEvidenceFiles.length
+      ? classifyChangedFiles(nonEvidenceFiles)
+          .sort(
+            (left, right) =>
+              right.files.length - left.files.length || left.title.localeCompare(right.title),
+          )
+          .map((area) => `${area.title} ${area.files.length}`)
+          .join(', ')
+      : '';
+  const areaSuffix = areaCounts ? ` Non-evidence review areas: ${areaCounts}.` : '';
+  if (evidenceCount === 0) return `${totalCount} changed file(s) detected.${areaSuffix}`;
+  return [
+    `${totalCount} changed file(s) detected`,
+    `(${nonEvidenceCount} non-evidence file(s), ${evidenceCount} AgentLoop evidence file(s)).${areaSuffix}`,
+  ].join(' ');
 }
 
 function overallStatus(checks: MaintainerCheck[]): MaintainerCheckStatus {
@@ -222,11 +248,21 @@ export async function runMaintainerCheck(options: {
       githubMetadata.status === 'missing' ? undefined : githubMetadata.path,
     ),
   );
+  const nonEvidenceChangedFiles = changedFileStatuses.filter(
+    (file) => !isAgentLoopEvidenceFile(file.path),
+  );
+  const agentLoopEvidenceFileCount = changedFiles.length - nonEvidenceChangedFiles.length;
+  const nonEvidenceChangedFileCount = nonEvidenceChangedFiles.length;
   checks.push(
     check(
       'changed-file-count',
-      changedFiles.length > 25 ? 'warn' : 'pass',
-      `${changedFiles.length} changed file(s) detected.`,
+      nonEvidenceChangedFileCount > 25 ? 'warn' : 'pass',
+      changedFileCountMessage(
+        changedFiles.length,
+        nonEvidenceChangedFileCount,
+        agentLoopEvidenceFileCount,
+        nonEvidenceChangedFiles,
+      ),
     ),
   );
   checks.push(

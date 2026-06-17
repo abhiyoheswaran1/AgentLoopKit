@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-01-35-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-01-35",
+  "createdAtEpochMs": 1781652900682,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-warn-on-forced-home-directory-init.md",
+    "title": "Warn on forced home-directory init",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-01-34-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 1293
+}

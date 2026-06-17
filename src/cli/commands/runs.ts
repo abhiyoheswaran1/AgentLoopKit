@@ -1,26 +1,54 @@
 import { Command } from 'commander';
+import { isAgentLoopEvidenceFile } from '../../core/agentloop-evidence.js';
 import { AgentLoopError } from '../../core/errors.js';
 import { findFileIntent, listRuns, readRun } from '../../core/runs.js';
 import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
+import type { GitFileStatus } from '../../core/git.js';
 import {
   CliOptionError,
   loadWorkspaceForJsonCommand,
   printAgentLoopJsonError,
 } from '../json-errors.js';
 
-function printRuns(runs: Awaited<ReturnType<typeof listRuns>>) {
+function formatChangedFileScope(
+  changedFileCount: number,
+  changedFiles: GitFileStatus[],
+  options: { includeLabel: boolean },
+) {
+  const count = changedFiles.length > 0 ? changedFiles.length : changedFileCount;
+  const prefix = options.includeLabel
+    ? `${inlineCode(String(count))} changed files`
+    : inlineCode(String(count));
+  if (changedFiles.length === 0) return prefix;
+
+  const agentLoopEvidenceCount = changedFiles.filter((file) =>
+    isAgentLoopEvidenceFile(file.path),
+  ).length;
+  if (agentLoopEvidenceCount === 0) return prefix;
+
+  const nonEvidenceCount = changedFiles.length - agentLoopEvidenceCount;
+  return `${prefix} (${inlineCode(String(nonEvidenceCount))} non-evidence, ${inlineCode(
+    String(agentLoopEvidenceCount),
+  )} AgentLoop evidence)`;
+}
+
+async function printRuns(cwd: string, runs: Awaited<ReturnType<typeof listRuns>>) {
   if (!runs.length) {
     console.log('No AgentLoopKit runs found.');
     return;
   }
   console.log('AgentLoopKit runs:');
   for (const run of runs) {
+    const record = await readRun(cwd, run.id);
+    const changedFileScope = formatChangedFileScope(run.changedFileCount, record.changedFiles, {
+      includeLabel: true,
+    });
     const result =
       run.score === undefined
         ? run.overallStatus
-          ? `status ${inlineCode(run.overallStatus)}`
-          : `${inlineCode(String(run.changedFileCount))} changed files`
-        : `score ${inlineCode(String(run.score))}/100`;
+          ? `status ${inlineCode(run.overallStatus)} - ${changedFileScope}`
+          : changedFileScope
+        : `score ${inlineCode(String(run.score))}/100 - ${changedFileScope}`;
     console.log(`- ${inlineCode(run.id)} ${inlineCode(run.command)} ${result}`);
   }
 }
@@ -50,6 +78,10 @@ export function runsCommand() {
     .option('--limit <count>', 'show only the newest count run entries')
     .option('--latest', 'show only the newest run entry')
     .option('--json', 'print machine-readable output')
+    .option(
+      '--redact-paths',
+      'accept common public-output redaction flag; run ledger paths are already display-safe',
+    )
     .action(async (options: { json?: boolean; latest?: boolean; limit?: string }) => {
       let limit: number | undefined;
       try {
@@ -65,7 +97,7 @@ export function runsCommand() {
       if (!workspace) return;
       const runs = limitRuns(await listRuns(workspace.cwd), limit);
       if (options.json) console.log(JSON.stringify({ runs }, null, 2));
-      else printRuns(runs);
+      else await printRuns(workspace.cwd, runs);
     });
 }
 
@@ -74,6 +106,10 @@ export function showRunCommand() {
     .description('Show a local AgentLoopKit run ledger entry')
     .argument('<id>', 'run id')
     .option('--json', 'print machine-readable output')
+    .option(
+      '--redact-paths',
+      'accept common public-output redaction flag; run ledger paths are already display-safe',
+    )
     .action(async (id: string, options: { json?: boolean }) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
@@ -87,7 +123,13 @@ export function showRunCommand() {
             console.log(`- Score: ${inlineCode(String(run.metadata.score))}/100`);
           if (run.metadata.overallStatus)
             console.log(`- Status: ${inlineCode(run.metadata.overallStatus)}`);
-          console.log(`- Changed files: ${inlineCode(String(run.metadata.changedFileCount))}`);
+          console.log(
+            `- Changed files: ${formatChangedFileScope(
+              run.metadata.changedFileCount,
+              run.changedFiles,
+              { includeLabel: false },
+            )}`,
+          );
         }
       } catch (error) {
         if (options.json && error instanceof AgentLoopError) {
@@ -104,6 +146,10 @@ export function intentCommand() {
     .description('Show which local AgentLoopKit runs touched a file')
     .argument('<file>', 'repo-relative file path')
     .option('--json', 'print machine-readable output')
+    .option(
+      '--redact-paths',
+      'accept common public-output redaction flag; run ledger paths are already display-safe',
+    )
     .action(async (file: string, options: { json?: boolean }) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;

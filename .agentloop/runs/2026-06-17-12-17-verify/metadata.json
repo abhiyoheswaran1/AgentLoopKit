@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-12-17-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-12-17",
+  "createdAtEpochMs": 1781691451113,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-github-metadata-review-surfaces-2.md",
+    "title": "Add built CLI smoke coverage for GitHub metadata review surfaces",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-12-12-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 2777
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-16-35-verify",
+  "command": "verify",
+  "createdAt": "2026-06-17-16-35",
+  "createdAtEpochMs": 1781706900355,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-surface-latest-archived-task-in-artifacts-inventory-2.md",
+    "title": "Surface latest archived task in artifacts inventory",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-16-34-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 3135
+}

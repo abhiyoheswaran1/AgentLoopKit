@@ -9,10 +9,15 @@ type NextActionResult = {
   command: string;
   reason: string;
   activeTask: AgentLoopStatusResult['activeTask'] | null;
+  staleTaskState?: AgentLoopStatusResult['staleTaskState'];
   latestTask: AgentLoopStatusResult['latestTask'] | null;
   deferredTasks: AgentLoopStatusResult['deferredTasks'];
+  agentFlightPlaceholderTasks: AgentLoopStatusResult['agentFlightPlaceholderTasks'];
   latestReport: AgentLoopStatusResult['latestReport'] | null;
-  workingTree: Pick<AgentLoopStatusResult['workingTree'], 'dirty' | 'changedFileCount'>;
+  workingTree: Pick<
+    AgentLoopStatusResult['workingTree'],
+    'dirty' | 'changedFileCount' | 'nonEvidenceChangedFileCount' | 'agentLoopEvidenceChangedFileCount'
+  >;
   commands: AgentLoopStatusResult['commands'];
 };
 
@@ -21,6 +26,13 @@ function formatTask(
 ) {
   if (!task) return 'none';
   return `${singleLineInlineCode(task.title)} (${singleLineInlineCode(task.status)}) - ${singleLineInlineCode(task.path)}`;
+}
+
+function formatActiveTask(result: NextActionResult) {
+  if (result.staleTaskState) {
+    return `stale pointer - ${singleLineInlineCode(result.staleTaskState.path)}`;
+  }
+  return formatTask(result.activeTask);
 }
 
 function formatReport(result: NextActionResult) {
@@ -38,26 +50,45 @@ function formatDeferredTasks(tasks: AgentLoopStatusResult['deferredTasks']) {
   return `${tasks.length} parked - ${titles}${remaining}`;
 }
 
+function formatAgentFlightPlaceholderTasks(
+  tasks: AgentLoopStatusResult['agentFlightPlaceholderTasks'],
+) {
+  if (!tasks.length) return 'none';
+  const titles = tasks
+    .slice(0, 3)
+    .map((task) => singleLineInlineCode(task.title))
+    .join(', ');
+  const remaining = tasks.length > 3 ? `, +${tasks.length - 3} more` : '';
+  return `${tasks.length} preserved - ${titles}${remaining}`;
+}
+
 function toNextActionResult(status: AgentLoopStatusResult): NextActionResult {
   return {
     command: status.nextAction.command,
     reason: status.nextAction.reason,
     activeTask: status.activeTask ?? null,
+    ...(status.staleTaskState ? { staleTaskState: status.staleTaskState } : {}),
     latestTask: status.latestTask ?? null,
     deferredTasks: status.deferredTasks,
+    agentFlightPlaceholderTasks: status.agentFlightPlaceholderTasks,
     latestReport: status.latestReport ?? null,
     workingTree: {
       dirty: status.workingTree.dirty,
       changedFileCount: status.workingTree.changedFileCount,
+      nonEvidenceChangedFileCount: status.workingTree.nonEvidenceChangedFileCount,
+      agentLoopEvidenceChangedFileCount: status.workingTree.agentLoopEvidenceChangedFileCount,
     },
     commands: status.commands,
   };
 }
 
+function formatWorkingTree(workingTree: NextActionResult['workingTree']) {
+  if (!workingTree.dirty) return 'clean';
+  return `dirty (${workingTree.changedFileCount}; ${workingTree.nonEvidenceChangedFileCount} non-evidence, ${workingTree.agentLoopEvidenceChangedFileCount} AgentLoop evidence)`;
+}
+
 function renderNextAction(result: NextActionResult) {
-  const workingTree = result.workingTree.dirty
-    ? `dirty (${result.workingTree.changedFileCount} changed file(s))`
-    : 'clean';
+  const workingTree = formatWorkingTree(result.workingTree);
   const nextAction =
     result.command === 'none'
       ? `No command required.\n\n${result.reason}`
@@ -67,9 +98,10 @@ function renderNextAction(result: NextActionResult) {
 
 ${nextAction}
 
-- Active task: ${formatTask(result.activeTask)}
+- Active task: ${formatActiveTask(result)}
 - Latest open task: ${formatTask(result.latestTask)}
 - Deferred tasks: ${formatDeferredTasks(result.deferredTasks)}
+- AgentFlight placeholders: ${formatAgentFlightPlaceholderTasks(result.agentFlightPlaceholderTasks)}
 - Latest verification: ${formatReport(result)}
 - Working tree: ${singleLineInlineCode(workingTree)}
 `;

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-16-23-36-ship",
+  "command": "ship",
+  "createdAt": "2026-06-16-23-36",
+  "createdAtEpochMs": 1781645764162,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-compact-agentloop-evidence-in-prepare-pr-2.md",
+    "title": "Compact AgentLoop evidence in prepare-pr",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-23-32-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-16-23-36-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-23-36-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 751
+}

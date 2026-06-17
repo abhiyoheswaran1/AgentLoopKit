@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-15-30-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-15-30",
+  "createdAtEpochMs": 1781703034225,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-park-release-channel-backlog-while-release-work-is-blocked-2.md",
+    "title": "Park release-channel backlog while release work is blocked",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-15-29-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-15-30-pr-summary.md",
+  "changedFileCount": 3063
+}

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-02-35-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-02-35",
+  "createdAtEpochMs": 1781656559141,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-guard-readme-against-release-runbook-drift.md",
+    "title": "Guard README against release runbook drift",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-02-33-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-02-35-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-02-35-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 1577
+}

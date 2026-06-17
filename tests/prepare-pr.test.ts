@@ -386,6 +386,8 @@ describe('prepare-pr command', () => {
       await mkdir(path.join(dir, 'docs'), { recursive: true });
       await mkdir(path.join(dir, 'src/ui'), { recursive: true });
       await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+      await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+      await mkdir(path.join(dir, '.agentloop/runs/2026-06-12-12-00-verify'), { recursive: true });
       await writeFile(path.join(dir, 'src/ui/button.ts'), 'export const label = "Save";\n');
       await writeFile(path.join(dir, 'tests/ui/button.test.ts'), 'test("button", () => {});\n');
       await writeFile(path.join(dir, 'docs/login`flow.md'), '# Login flow\n');
@@ -393,6 +395,14 @@ describe('prepare-pr command', () => {
         path.join(dir, '.agentloop/reports/2026-06-12-extra.md'),
         '# Extra evidence\n',
       );
+      await writeFile(
+        path.join(dir, '.agentloop/handoffs/2026-06-12-extra-pr-summary.md'),
+        '# Extra handoff\n',
+      );
+      await writeJson(path.join(dir, '.agentloop/runs/2026-06-12-12-00-verify/metadata.json'), {
+        id: '2026-06-12-12-00-verify',
+        command: 'verify',
+      });
       await git(dir, [
         'add',
         '-N',
@@ -412,8 +422,18 @@ describe('prepare-pr command', () => {
       expect(output.body).toContain('- A `src/ui/button.ts`');
       expect(output.body).toContain('### Tests');
       expect(output.body).toContain('- A `tests/ui/button.test.ts`');
-      expect(output.body).toContain('### AgentLoop');
-      expect(output.body).toContain('- ?? `.agentloop/reports/2026-06-12-extra.md`');
+      expect(output.body).toContain('### AgentLoop Evidence');
+      expect(output.body).toContain(
+        '- AgentLoop evidence: `3` file(s) grouped under `.agentloop/handoffs/`, `.agentloop/reports/`, `.agentloop/runs/`.',
+      );
+      expect(output.body).toContain('- Full paths remain in JSON output and run-ledger evidence.');
+      expect(output.body).not.toContain('- ?? `.agentloop/reports/2026-06-12-extra.md`');
+      expect(output.body).not.toContain(
+        '- ?? `.agentloop/handoffs/2026-06-12-extra-pr-summary.md`',
+      );
+      expect(output.body).not.toContain(
+        '- ?? `.agentloop/runs/2026-06-12-12-00-verify/metadata.json`',
+      );
       expect(output.body).toContain('### Documentation');
       expect(output.body).toContain('- A ``docs/login`flow.md``');
       expect(output.changedFiles).toEqual(
@@ -423,6 +443,12 @@ describe('prepare-pr command', () => {
           expect.objectContaining({ path: 'tests/ui/button.test.ts' }),
           expect.objectContaining({ path: 'docs/login`flow.md' }),
           expect.objectContaining({ path: '.agentloop/reports/2026-06-12-extra.md' }),
+          expect.objectContaining({
+            path: '.agentloop/handoffs/2026-06-12-extra-pr-summary.md',
+          }),
+          expect.objectContaining({
+            path: '.agentloop/runs/2026-06-12-12-00-verify/metadata.json',
+          }),
         ]),
       );
     },

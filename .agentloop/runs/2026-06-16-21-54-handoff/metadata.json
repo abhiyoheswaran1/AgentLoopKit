@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-21-54-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-16-21-54",
+  "createdAtEpochMs": 1781639652400,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-add-init-cli-next-step-guidance.md",
+    "title": "Add init CLI next-step guidance",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-21-52-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-16-21-54-pr-summary.md",
+  "changedFileCount": 453
+}

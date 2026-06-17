@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-17-11-11-ship",
+  "command": "ship",
+  "createdAt": "2026-06-17-11-11",
+  "createdAtEpochMs": 1781687501938,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-suppress-task-doctor-warning-after-archived-task-evidence-2.md",
+    "title": "Suppress task-doctor warning after archived task evidence",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-11-02-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-17-11-11-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-11-11-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 2713
+}

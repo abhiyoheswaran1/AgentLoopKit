@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-17-05-39-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-17-05-39",
+  "createdAtEpochMs": 1781667575351,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-17-add-built-cli-smoke-coverage-for-stale-task-state-recovery-2.md",
+    "title": "Add built CLI smoke coverage for stale task state recovery",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-17-05-31-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-17-05-39-pr-summary.md",
+  "changedFileCount": 2108
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-16-23-15-verify",
+  "command": "verify",
+  "createdAt": "2026-06-16-23-15",
+  "createdAtEpochMs": 1781644535202,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-16-add-maintainer-check-review-area-counts-2.md",
+    "title": "Add maintainer-check review area counts",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-16-23-12-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 684
+}
