@@ -13,6 +13,13 @@ function pathVariants(root: string) {
   if (cleanRoot.startsWith('/var/')) variants.add(`/private${cleanRoot}`);
   if (cleanRoot.startsWith('/private/var/')) variants.add(cleanRoot.replace(/^\/private/, ''));
 
+  for (const variant of [...variants]) {
+    if (/^[A-Za-z]:/.test(variant)) {
+      variants.add(variant[0].toUpperCase() + variant.slice(1));
+      variants.add(variant[0].toLowerCase() + variant.slice(1));
+    }
+  }
+
   return [...variants].filter(Boolean);
 }
 

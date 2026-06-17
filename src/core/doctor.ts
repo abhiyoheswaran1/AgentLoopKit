@@ -12,6 +12,7 @@ import {
   detectProjectName,
   detectProjectType,
 } from './project-detection.js';
+import { redactLocalRoots } from './redaction.js';
 import { detectRiskFileScan } from './safety.js';
 import { inspectHarnessUpgrade } from './upgrade-harness.js';
 
@@ -228,14 +229,7 @@ async function resolveComparablePath(filePath: string) {
 
 function redactLocalGitRoot(value: string, gitRoot: string, redactPaths: boolean | undefined) {
   if (!redactPaths || !gitRoot || gitRoot === path.parse(gitRoot).root) return value;
-
-  let redacted = value;
-  const candidates = new Set([gitRoot, gitRoot.replace(/\\/g, '/')]);
-  for (const candidate of candidates) {
-    if (!candidate) continue;
-    redacted = redacted.split(candidate).join('[git-root]');
-  }
-  return redacted;
+  return redactLocalRoots(value, [gitRoot]);
 }
 
 function redactDoctorCheck(check: DoctorCheck, gitRoot: string, redactPaths: boolean | undefined) {
