@@ -166,6 +166,17 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     const templateAgents = await readFile('src/templates/root/AGENTS.md', 'utf8');
     const harnessCommands = await readFile('.agentloop/harness/commands.md', 'utf8');
     const dogfoodGuide = await readFile('.agentloop/harness/autonomous-dogfooding.md', 'utf8');
+    const agentTemplates = await Promise.all(
+      [
+        'claude-code',
+        'codex',
+        'cursor',
+        'gemini-cli',
+        'generic',
+        'github-copilot-cli',
+        'opencode',
+      ].map((agent) => readFile(`src/templates/agents/${agent}.md`, 'utf8')),
+    );
 
     for (const content of [
       agentloop,
@@ -174,6 +185,7 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
       templateAgents,
       harnessCommands,
       dogfoodGuide,
+      ...agentTemplates,
     ]) {
       expect(content).toContain('npx --yes agentflight start --task "<task>" --yes');
       expect(content).toContain('agentloop status --redact-paths');

@@ -1,0 +1,9 @@
+ src/templates/agents/claude-code.md        |  1 +
+ src/templates/agents/codex.md              |  1 +
+ src/templates/agents/cursor.md             |  1 +
+ src/templates/agents/gemini-cli.md         |  1 +
+ src/templates/agents/generic.md            |  1 +
+ src/templates/agents/github-copilot-cli.md |  1 +
+ src/templates/agents/opencode.md           |  1 +
+ tests/autonomous-dogfood.test.ts           | 12 ++++++++++++
+ 8 files changed, 19 insertions(+)

@@ -1,0 +1,58 @@
+[
+  {
+    "status": "M",
+    "path": "src/templates/agents/claude-code.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/codex.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/cursor.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/gemini-cli.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/generic.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/github-copilot-cli.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/opencode.md"
+  },
+  {
+    "status": "M",
+    "path": "tests/autonomous-dogfood.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-17-18-19-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-17-18-19-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-17-18-19-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-17-18-19-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-17-mirror-raw-agentflight-recovery-in-agent-instructions-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-17-mirror-raw-agentflight-recovery-in-agent-instructions-real.md"
+  }
+]
