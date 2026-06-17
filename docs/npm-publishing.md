@@ -19,7 +19,7 @@ As of June 17, 2026:
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - GitHub releases publish npm through trusted publishing.
 - GHCR and MCP Registry publishing run from GitHub release workflows after npm succeeds.
-- Release tag `v0.36.1` points at the published release commit.
+- Release tag `v0.36.1` points at commit `ea012582f5baa0b197472e44823cf4b426298890`.
 - GitHub Marketplace publication remains deferred until maintainer approval for the owner-only listing step.
 
 The `0.36.1` release completed through GitHub release automation, npm trusted publishing, Docker/GHCR, and MCP Registry. The GitHub Marketplace URL still returned 404 during post-release proof.
