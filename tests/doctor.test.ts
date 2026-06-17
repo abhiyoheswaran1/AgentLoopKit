@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { execFile } from 'node:child_process';
-import { mkdir, realpath, rm, writeFile } from 'node:fs/promises';
+import { mkdir, realpath, rm, symlink, writeFile } from 'node:fs/promises';
 import { promisify } from 'node:util';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
@@ -145,6 +145,28 @@ describe('doctor', () => {
     expect(redactedHumanResult.exitCode).toBe(0);
     expect(redactedHumanResult.stdout).toContain('- [`pass`] `Git root`: `[git-root]`');
     expect(redactedHumanResult.stdout).not.toContain(root);
+  });
+
+  test('redacts raw cwd when it differs from the resolved git root', async () => {
+    const dir = await makeTempDir();
+    const linkParent = await makeTempDir();
+    const linkedDir = path.join(linkParent, 'linked-repo');
+    tempDirs.push(dir, linkParent);
+    await initGitRepository(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await symlink(dir, linkedDir, 'dir');
+
+    const result = await runDoctor({ cwd: linkedDir, redactPaths: true });
+    const serialized = JSON.stringify(result);
+
+    expect(result.git.root).toBe('[git-root]');
+    expect(result.checks).toContainEqual({
+      name: 'Current directory',
+      status: 'pass',
+      message: '[git-root]',
+    });
+    expect(serialized).not.toContain(await realpath(dir));
+    expect(serialized).not.toContain(linkedDir);
   });
 
   test('doctor human output warns when target is a git repository subdirectory', async () => {

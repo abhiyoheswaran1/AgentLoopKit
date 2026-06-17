@@ -227,15 +227,23 @@ async function resolveComparablePath(filePath: string) {
   }
 }
 
-function redactLocalGitRoot(value: string, gitRoot: string, redactPaths: boolean | undefined) {
-  if (!redactPaths || !gitRoot || gitRoot === path.parse(gitRoot).root) return value;
-  return redactLocalRoots(value, [gitRoot]);
+function redactLocalDoctorPaths(
+  value: string,
+  roots: string[],
+  redactPaths: boolean | undefined,
+) {
+  if (!redactPaths) return value;
+  return redactLocalRoots(value, roots);
 }
 
-function redactDoctorCheck(check: DoctorCheck, gitRoot: string, redactPaths: boolean | undefined) {
+function redactDoctorCheck(
+  check: DoctorCheck,
+  roots: string[],
+  redactPaths: boolean | undefined,
+) {
   return {
     ...check,
-    message: redactLocalGitRoot(check.message, gitRoot, redactPaths),
+    message: redactLocalDoctorPaths(check.message, roots, redactPaths),
   };
 }
 
@@ -313,9 +321,9 @@ export async function runDoctor(options: {
   );
   const gitRoot = inGit ? await getGitRoot(cwd) : '';
   const resolvedGitRoot = gitRoot ? await resolveComparablePath(gitRoot) : '';
-  const targetIsRoot = resolvedGitRoot
-    ? resolvedGitRoot === (await resolveComparablePath(cwd))
-    : false;
+  const resolvedCwd = await resolveComparablePath(cwd);
+  const targetIsRoot = resolvedGitRoot ? resolvedGitRoot === resolvedCwd : false;
+  const redactionRoots = [resolvedGitRoot, resolvedCwd, cwd].filter(Boolean);
   const git = {
     isRepository: inGit,
     root: resolvedGitRoot,
@@ -446,7 +454,7 @@ export async function runDoctor(options: {
   }
 
   const outputChecks = checks.map((item) =>
-    redactDoctorCheck(item, resolvedGitRoot, options.redactPaths),
+    redactDoctorCheck(item, redactionRoots, options.redactPaths),
   );
   const warnings = outputChecks.filter((item) => item.status === 'warn');
   const serious = outputChecks.filter((item) => item.status === 'fail');
@@ -477,7 +485,7 @@ ${renderNextActions(nextActions)}
     nextActions,
     git: {
       ...git,
-      root: redactLocalGitRoot(git.root, resolvedGitRoot, options.redactPaths),
+      root: redactLocalDoctorPaths(git.root, redactionRoots, options.redactPaths),
     },
     markdown,
   };
