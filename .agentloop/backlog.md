@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 151 Decisions
+
+| item                                  | source persona                     | problem                                                                                                                                       | proposed solution                                                                                             | priority | effort | adoption impact | risk | decision    | notes                                                                                                                                                         |
+| ------------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Active placeholder task next-action   | Tom, Nora, Samir, Dogfood Steward  | Local real-repo trials showed `status` could recommend handoff while the active task still had placeholder acceptance, verification, or rollback sections. | Reuse task-doctor placeholder diagnostics so `status` and `next` route active placeholder contracts to `agentloop task doctor` before handoff. | P1       | S      | high            | low  | implemented | Internal temp-copy trials only; no create-task template change, scoring change, policy-pack expansion, GitHub API call, token read, telemetry, release, or publish. |
+
 ## Current Research Cycle 150 Decisions
 
 | item                                 | source persona       | problem                                                                                                                        | proposed solution                                                                                         | priority | effort | adoption impact | risk | decision    | notes                                                                                                                                             |

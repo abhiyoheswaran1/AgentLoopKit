@@ -257,6 +257,82 @@ describe('next command', () => {
     );
   });
 
+  test('recommends task doctor when the active task still has placeholder sections', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
+    const taskPath = '.agentloop/tasks/2026-06-19-placeholder-task.md';
+    await writeFile(
+      path.join(dir, taskPath),
+      `# Placeholder task
+
+- Created date: 2026-06-19
+- Task type: feature
+- Status: in-progress
+
+## Problem Statement
+Exercise placeholder task routing.
+
+## Desired Outcome
+Next points to task doctor before review evidence is generated.
+
+## Constraints
+- None recorded yet.
+
+## Non-Goals
+- None recorded yet.
+
+## Likely Files or Areas
+- None recorded yet.
+
+## Acceptance Criteria
+- Add acceptance criteria before implementation starts.
+
+## Verification Commands
+- No verification command recorded.
+
+## Rollback Notes
+Document how to revert or disable this change.
+`,
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: taskPath,
+      }),
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-19-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'next', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'next'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(markdownResult.exitCode).toBe(0);
+    const next = JSON.parse(jsonResult.stdout);
+    expect(next.command).toBe('agentloop task doctor');
+    expect(next.reason).toBe(
+      'Active task still has placeholder guidance in review-critical sections. Replace it before verification or handoff evidence.',
+    );
+    expect(next.activeTask.path).toBe(taskPath);
+    expect(markdownResult.stdout).toContain('Run `agentloop task doctor`.');
+    expect(markdownResult.stdout).toContain(
+      'Active task still has placeholder guidance in review-critical sections.',
+    );
+  });
+
   test('renders next markdown values with safe inline code when task data contains backticks', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

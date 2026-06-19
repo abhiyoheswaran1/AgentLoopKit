@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Changed `agentloop status` and `agentloop next` to route active task contracts with review-critical placeholder sections to `agentloop task doctor` before verification or handoff.
 
 ## 0.36.2
 

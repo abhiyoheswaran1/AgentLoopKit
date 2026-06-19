@@ -251,6 +251,79 @@ describe('status command', () => {
     expect(humanResult.stdout).toContain('- Git target: `root directory`');
   });
 
+  test('routes active task placeholder contracts to task doctor before handoff', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
+    const taskPath = '.agentloop/tasks/2026-06-19-placeholder-task.md';
+    await writeFile(
+      path.join(dir, taskPath),
+      `# Placeholder task
+
+- Created date: 2026-06-19
+- Task type: feature
+- Status: in-progress
+
+## Problem Statement
+Exercise placeholder task routing.
+
+## Desired Outcome
+Status points to task doctor before review evidence is generated.
+
+## Constraints
+- None recorded yet.
+
+## Non-Goals
+- None recorded yet.
+
+## Likely Files or Areas
+- None recorded yet.
+
+## Acceptance Criteria
+- Add acceptance criteria before implementation starts.
+
+## Verification Commands
+- No verification command recorded.
+
+## Rollback Notes
+Document how to revert or disable this change.
+`,
+    );
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: taskPath,
+    });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-19-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+    const humanResult = await execa(tsxPath, [cliPath, 'status', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(humanResult.exitCode).toBe(0);
+    const status = JSON.parse(jsonResult.stdout);
+    expect(status.nextAction).toEqual({
+      command: 'agentloop task doctor',
+      reason:
+        'Active task still has placeholder guidance in review-critical sections. Replace it before verification or handoff evidence.',
+    });
+    expect(humanResult.stdout).toContain('Run `agentloop task doctor`.');
+    expect(humanResult.stdout).toContain(
+      'Active task still has placeholder guidance in review-critical sections.',
+    );
+  });
+
   test('discovers parent AgentLoop config when run from a nested directory', async () => {
     const dir = await makeTempDir();
     const nested = path.join(dir, 'src', 'features');

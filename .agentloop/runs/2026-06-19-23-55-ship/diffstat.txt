@@ -1,0 +1,9 @@
+ .agentloop/backlog.md        |  6 ++++
+ CHANGELOG.md                 |  2 +-
+ DECISIONS.md                 |  6 ++++
+ src/core/status.ts           | 28 ++++++++++++++--
+ tests/mcp-tools.test.ts      |  4 +++
+ tests/next.test.ts           | 76 ++++++++++++++++++++++++++++++++++++++++++++
+ tests/review-context.test.ts |  1 +
+ tests/status.test.ts         | 73 ++++++++++++++++++++++++++++++++++++++++++
+ 8 files changed, 192 insertions(+), 4 deletions(-)

@@ -32,6 +32,7 @@ async function createRepoWithReviewContextEvidence() {
       type: 'bugfix',
       problemStatement: 'Login redirects lose the requested URL.',
       desiredOutcome: 'Users return to the originally requested URL after login.',
+      likelyFiles: ['src/auth/redirect.ts'],
       acceptanceCriteria: ['Redirect destination is preserved'],
       verificationCommands: ['npm test'],
       riskNotes: ['Touches auth-adjacent routing'],

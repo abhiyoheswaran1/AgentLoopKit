@@ -245,8 +245,12 @@ async function createInitializedRepo() {
     input: {
       title: 'Add API route',
       type: 'feature',
+      problemStatement: 'The API route is missing.',
+      desiredOutcome: 'The API route returns JSON for callers.',
+      likelyFiles: ['src/routes/api.ts'],
       acceptanceCriteria: ['Route returns JSON'],
       verificationCommands: ['npm test'],
+      rollbackNotes: 'Revert the route implementation.',
     },
   });
   await setActiveTask({ cwd: dir, config, taskPath: task.path });

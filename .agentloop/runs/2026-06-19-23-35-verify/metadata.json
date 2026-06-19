@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-19-23-35-verify",
+  "command": "verify",
+  "createdAt": "2026-06-19-23-35",
+  "createdAtEpochMs": 1781904904907,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-19-run-real-repo-usefulness-trials-2.md",
+    "title": "Run real-repo usefulness trials",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-19-23-25-verification-report.md",
+  "overallStatus": "fail",
+  "changedFileCount": 13
+}

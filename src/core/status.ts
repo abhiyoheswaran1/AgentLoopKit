@@ -127,6 +127,17 @@ function pickStaleTaskStateDiagnostic(diagnostics: TaskDoctorDiagnostic[]) {
   };
 }
 
+function hasActiveTaskPlaceholderDiagnostic(
+  diagnostics: TaskDoctorDiagnostic[],
+  activeTask: StatusTask | null,
+) {
+  if (!activeTask) return false;
+  return diagnostics.some(
+    (diagnostic) =>
+      diagnostic.id === 'placeholder-task-section' && diagnostic.path === activeTask.path,
+  );
+}
+
 function extractHeading(markdown: string, fallback: string) {
   return markdown.match(/^#\s+(.+)$/m)?.[1]?.trim() || fallback;
 }
@@ -222,6 +233,7 @@ function chooseNextAction(input: {
   latestRun?: RunSummary;
   dirty: boolean;
   dirtyCoveredByLatestHandoffRun: boolean;
+  activeTaskHasReviewCriticalPlaceholders: boolean;
 }) {
   if (input.staleTaskState) {
     return {
@@ -286,6 +298,13 @@ function chooseNextAction(input: {
       command: `agentloop task archive ${input.activeTask.path}`,
       reason:
         'The active task is done. Archive it to clear the active pointer before starting the next task.',
+    };
+  }
+  if (input.activeTaskHasReviewCriticalPlaceholders) {
+    return {
+      command: 'agentloop task doctor',
+      reason:
+        'Active task still has placeholder guidance in review-critical sections. Replace it before verification or handoff evidence.',
     };
   }
   if (!input.latestReport) {
@@ -544,9 +563,8 @@ export async function getAgentLoopStatus(options: {
     isAgentLoopEvidenceFile(file.path),
   ).length;
   const nonEvidenceChangedFileCount = changedFiles.length - agentLoopEvidenceChangedFileCount;
-  const staleTaskState = pickStaleTaskStateDiagnostic(
-    (await inspectTaskDirectory(options)).diagnostics,
-  );
+  const taskDoctorDiagnostics = (await inspectTaskDirectory(options)).diagnostics;
+  const staleTaskState = pickStaleTaskStateDiagnostic(taskDoctorDiagnostics);
   const activeTaskPath = await getActiveTaskPath(options);
   const timestampedPinnedActiveTask = await readTask(options.cwd, activeTaskPath);
   const timestampedActiveTask =
@@ -623,6 +641,10 @@ export async function getAgentLoopStatus(options: {
     latestRun,
     dirty: changedFiles.length > 0,
     dirtyCoveredByLatestHandoffRun: latestHandoffRunCoversDirtyFiles,
+    activeTaskHasReviewCriticalPlaceholders: hasActiveTaskPlaceholderDiagnostic(
+      taskDoctorDiagnostics,
+      activeTask,
+    ),
   });
   const withoutMarkdown = {
     project: options.config.project,

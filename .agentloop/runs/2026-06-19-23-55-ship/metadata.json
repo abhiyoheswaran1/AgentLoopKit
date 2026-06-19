@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-19-23-55-ship",
+  "command": "ship",
+  "createdAt": "2026-06-19-23-55",
+  "createdAtEpochMs": 1781906124548,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-19-run-real-repo-usefulness-trials-2.md",
+    "title": "Run real-repo usefulness trials",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-19-23-51-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-19-23-55-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-19-23-55-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 22
+}

@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-06-19: Status Routes Placeholder Task Contracts To Doctor
+
+Local real-repo trials against temporary repository copies showed that active task contracts with placeholder acceptance, verification, rollback, or other review-critical sections could reach `agentloop status` and `agentloop next` with a handoff recommendation after verification passed.
+
+`status` now reuses existing task-doctor diagnostics for the active task. When `placeholder-task-section` applies to the active task, the next action is `agentloop task doctor` before verification or handoff recommendations. The change is read-only and does not mutate task files, change `create-task` templates, change `ship` scoring, call GitHub APIs, read tokens, add telemetry, or affect release channels.
+
 ## 2026-06-19: Public Docs Hygiene Guards Trial Boundaries
 
 Real-repo trial guidance is now the decision gate before adding more bundled policy packs or letting imported GitHub metadata affect `ship` scoring. Public docs hygiene should protect that checklist from drifting into adoption proof, compliance claims, credential-bearing automation, telemetry, remote services, or scoring changes.
