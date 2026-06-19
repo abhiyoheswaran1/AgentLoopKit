@@ -1,0 +1,23 @@
+ .agentloop/backlog.md                              |  16 +++
+ .agentloop/harness/autonomous-dogfooding.md        |   2 +-
+ ...agentflight-recovery-in-agent-instructions-2.md |   2 +-
+ ...-06-17-prepare-agentloopkit-0-36-0-release-2.md |   2 +-
+ CHANGELOG.md                                       |   9 ++
+ DECISIONS.md                                       |  18 ++++
+ FINAL_HANDOFF.md                                   |  46 +++++----
+ README.md                                          |  15 +++
+ ROADMAP.md                                         |   9 +-
+ docs/contributor-playbook.md                       |   2 +
+ docs/getting-started.md                            |  15 +++
+ docs/launch-checklist.md                           |   2 +-
+ docs/npm-publishing.md                             |  12 ++-
+ docs/release-status.md                             |  58 +++++------
+ docs/status.md                                     |   2 +-
+ package.json                                       |   2 +-
+ scripts/smoke-packed-release.mjs                   |  39 ++++++++
+ server.json                                        |   4 +-
+ src/core/artifacts.ts                              | 111 ++++-----------------
+ src/core/task-state.ts                             |   7 +-
+ tests/public-docs-hygiene.test.ts                  |  64 ++++++++++++
+ tests/task-state.test.ts                           |   4 +
+ 22 files changed, 281 insertions(+), 160 deletions(-)

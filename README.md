@@ -107,6 +107,20 @@ npx --yes agentloopkit@latest maintainer-check
 
 ## Core Workflow
 
+First useful loop after `init`:
+
+```bash
+agentloop doctor
+agentloop create-task --type bugfix --title "Fix checkout bug" --include-config-commands
+agentloop status --brief
+agentloop verify --task-commands --progress
+agentloop ship
+agentloop prepare-pr
+agentloop task done
+```
+
+That sequence creates a task contract, checks the repo setup, runs only reviewed verification commands, records review-readiness evidence, drafts PR copy, and closes the active task. It does not post to GitHub, publish packages, call an LLM, or run hidden commands.
+
 ```bash
 npx agentloopkit init
 agentloop create-task --title "Fix login redirect bug" --type bugfix \
@@ -315,6 +329,7 @@ Shell completions include fixed values for task types, task-list status filters,
 - [Policies](docs/policies.md)
 - [SchemaStore support](docs/schemastore.md)
 - [GitHub metadata import](docs/github-metadata.md)
+- [Real-repo trials](docs/real-repo-trials.md)
 - [Release proof](docs/release-proof.md)
 - [MCP server](docs/mcp.md)
 - [Template and harness upgrades](docs/template-migrations.md)

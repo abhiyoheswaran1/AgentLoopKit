@@ -1,5 +1,23 @@
 # Decisions
 
+## 2026-06-19: Public Docs Hygiene Guards Trial Boundaries
+
+Real-repo trial guidance is now the decision gate before adding more bundled policy packs or letting imported GitHub metadata affect `ship` scoring. Public docs hygiene should protect that checklist from drifting into adoption proof, compliance claims, credential-bearing automation, telemetry, remote services, or scoring changes.
+
+The guard checks only `docs/real-repo-trials.md` when the file exists. It does not add a new command, require trial files, change policy-pack behavior, change GitHub metadata import behavior, call GitHub APIs, read tokens, post comments, publish packages, or affect release channels.
+
+## 2026-06-19: Artifact Path Primitives Stay In A Leaf Module
+
+Generated artifact filename patterns and output-path validation are shared infrastructure, not artifact inventory behavior. They live in `src/core/artifact-paths.ts` so `task-state`, `runs`, and `artifacts` can depend on a stable leaf module instead of importing through each other.
+
+`src/core/artifacts.ts` still re-exports the existing internal names for compatibility with current callers. The change breaks the core circular import without adding a database, runtime registry, dependency, public API, release behavior, or artifact format change.
+
+## 2026-06-19: Trial Guidance Comes Before Policy-Pack Or Metadata Expansion
+
+Policy packs stay local Markdown guidance and imported GitHub metadata stays optional local review context. AgentLoopKit should collect maintainer trial notes in real repositories before adding more bundled packs or letting imported GitHub text affect `ship` scoring.
+
+Trial guidance must not present internal simulated research as public evidence. It must not add remote policy packs, enforcement engines, hosted services, telemetry, GitHub API calls, automatic posting, token reads, compliance claims, releases, or publishing behavior.
+
 ## 2026-06-16: Maintenance Gate Tests Policy-Pack Safety Directly
 
 The near-term roadmap says bundled policy packs should stay small, local, safe, and useful. `npm run maintenance:check` should verify that contract with focused `tests/policy-packs.test.ts` coverage, not only by listing policy-pack inventory.

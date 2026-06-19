@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-17
 - Task type: feature
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 AgentFlight session task: Mirror raw AgentFlight recovery in agent instructions

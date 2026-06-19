@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-19-17-48-ship",
+  "command": "ship",
+  "createdAt": "2026-06-19-17-48",
+  "createdAtEpochMs": 1781884106761,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-19-implement-approved-research-improvement-batch.md",
+    "title": "Implement approved research improvement batch",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-19-17-40-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-19-17-48-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-19-17-48-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 23
+}

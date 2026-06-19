@@ -1,0 +1,14 @@
+ .agentloop/backlog.md                       |  10 +++
+ .agentloop/harness/autonomous-dogfooding.md |   2 +-
+ CHANGELOG.md                                |   6 +-
+ DECISIONS.md                                |  12 +++
+ README.md                                   |  15 ++++
+ ROADMAP.md                                  |   1 +
+ docs/contributor-playbook.md                |   2 +
+ docs/getting-started.md                     |  15 ++++
+ docs/npm-publishing.md                      |   2 +
+ docs/status.md                              |   2 +-
+ src/core/artifacts.ts                       | 111 ++++++----------------------
+ src/core/task-state.ts                      |   7 +-
+ tests/task-state.test.ts                    |   4 +
+ 13 files changed, 93 insertions(+), 96 deletions(-)

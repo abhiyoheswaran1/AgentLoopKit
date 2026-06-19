@@ -12,17 +12,17 @@ For a compact current-state summary, see [release-status.md](release-status.md).
 
 ## Current State
 
-As of June 17, 2026:
+As of June 19, 2026:
 
-- npm latest is `agentloopkit@0.36.1`.
-- GitHub release `v0.36.1` is public with attached `agentloopkit-0.36.1.tgz`.
+- npm latest is `agentloopkit@0.36.2`.
+- GitHub release `v0.36.2` is public with attached `agentloopkit-0.36.2.tgz`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - GitHub releases publish npm through trusted publishing.
 - GHCR and MCP Registry publishing run from GitHub release workflows after npm succeeds.
-- Release tag `v0.36.1` points at commit `ea012582f5baa0b197472e44823cf4b426298890`.
+- Release tag `v0.36.2` points at the published release commit.
 - GitHub Marketplace publication remains deferred until maintainer approval for the owner-only listing step.
 
-The `0.36.1` release completed through GitHub release automation, npm trusted publishing, Docker/GHCR, and MCP Registry. The GitHub Marketplace URL still returned 404 during post-release proof.
+The `0.36.2` release completed through GitHub release automation, npm trusted publishing, Docker/GHCR, and MCP Registry. The GitHub Marketplace URL still returned 404 during post-release proof.
 
 ## Release Rule
 
@@ -63,6 +63,8 @@ npm run release-flow
 `release-flow` runs the local metadata guard, lint, typecheck, full tests, build, public-doc hygiene, link checking, strict dogfood gate, packed-package smoke, and strict `agentloop release-check`.
 
 `prepublishOnly` runs the local changelog metadata guard, typecheck, tests, and build.
+
+`prepublishOnly` is intentional release-time defense in depth. npm runs it during `npm publish`, not when users install `agentloopkit`; the package still has no `postinstall`, telemetry, token reads, or hidden install-time command. If ProjScan flags the lifecycle script, treat that as a release-review reminder: inspect `scripts/prepublish-check.mjs`, confirm the command still runs only local metadata checks plus typecheck, tests, and build, and do not silence or normalize any new install lifecycle script without a separate security review.
 
 The packed-package smoke check builds the CLI, packs the package into a temporary directory, runs the packed binary in isolated temp repositories, checks path guards and home-directory refusal, and verifies packaged public docs for stale package pins. It does not publish, create tags, call GitHub APIs, read npm tokens, or read `.env` files.
 

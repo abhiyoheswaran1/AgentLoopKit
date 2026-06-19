@@ -13,14 +13,27 @@ import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
 import { singleLineInlineCode as inlineCode } from './markdown-format.js';
 import { listRuns, RunSummary } from './runs.js';
 import { readTaskMetadata, TaskSource } from './task-state.js';
+import {
+  ciSummaryPattern,
+  prSummaryPattern,
+  releaseNotesPattern,
+  resolveOutputArtifactPath,
+  shipReportPattern,
+  verificationReportPattern,
+} from './artifact-paths.js';
+import type { OutputArtifactType } from './artifact-paths.js';
 
-export const verificationReportPattern =
-  /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-verification-report(?:-\d+)?\.md$/;
-export const shipReportPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ship-report(?:-\d+)?\.md$/;
-export const prSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-pr-summary(?:-\d+)?\.md$/;
-export const ciSummaryPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-ci-summary(?:-\d+)?\.md$/;
-export const releaseNotesPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-release-notes(?:-\d+)?\.md$/;
-export const generatedMarkdownPattern = /^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-.+\.md$/;
+export {
+  ciSummaryPattern,
+  generatedMarkdownPattern,
+  OutputPathError,
+  prSummaryPattern,
+  releaseNotesPattern,
+  resolveOutputArtifactPath,
+  shipReportPattern,
+  verificationReportPattern,
+} from './artifact-paths.js';
+export type { OutputArtifactType, OutputPathErrorReason } from './artifact-paths.js';
 export const defaultStaleArtifactMarkdownLimit = 50;
 const parkedOrTerminalTaskStatuses = new Set(['deferred', 'done', 'completed', 'verified']);
 
@@ -39,19 +52,6 @@ export const artifactInventoryTypes = [
 export type ArtifactType = 'task' | 'verification' | 'handoff';
 export type ArtifactInventoryFilterType = (typeof artifactInventoryTypes)[number];
 export type ArtifactPathErrorReason = 'outside-directory' | 'not-markdown' | 'missing';
-export type OutputArtifactType =
-  | 'report'
-  | 'handoff'
-  | 'badge'
-  | 'ci-summary'
-  | 'release-notes'
-  | 'agent-instructions'
-  | 'agents-md'
-  | 'init-file'
-  | 'task-state'
-  | 'task-archive';
-export type OutputPathErrorReason = 'outside-directory' | 'wrong-extension';
-
 export type ArtifactInventoryTask = {
   path: string;
   title: string;
@@ -197,19 +197,6 @@ const artifactLabels: Record<ArtifactType, string> = {
   handoff: 'Handoff',
 };
 
-const outputArtifactLabels: Record<OutputArtifactType, string> = {
-  report: 'Report',
-  handoff: 'Handoff',
-  badge: 'Badge',
-  'ci-summary': 'CI summary',
-  'release-notes': 'Release notes',
-  'agent-instructions': 'Agent instructions',
-  'agents-md': 'AGENTS.md',
-  'init-file': 'Init file',
-  'task-state': 'Task state',
-  'task-archive': 'Task archive',
-};
-
 const artifactInventoryJsonKeys: Record<ArtifactInventoryFilterType, ArtifactInventoryJsonKey> = {
   task: 'tasks',
   verification: 'verificationReports',
@@ -248,20 +235,6 @@ const artifactInventoryNextSteps: Record<ArtifactInventoryFilterType, string> = 
 
 export function isArtifactInventoryType(value: string): value is ArtifactInventoryFilterType {
   return artifactInventoryTypes.some((type) => type === value);
-}
-
-export class OutputPathError extends AgentLoopError {
-  constructor(
-    message: string,
-    public readonly artifactType: OutputArtifactType,
-    public readonly requestedPath: string,
-    public readonly expectedDir: string,
-    public readonly expectedExtension: string,
-    public readonly reason: OutputPathErrorReason,
-  ) {
-    super(message, 'OUTPUT_PATH_INVALID');
-    this.name = 'OutputPathError';
-  }
 }
 
 export async function resolveExplicitArtifactPath(options: {
@@ -308,48 +281,6 @@ export async function resolveExplicitArtifactPath(options: {
       options.requestedPath,
       options.expectedDir,
       'missing',
-    );
-  }
-
-  return absolutePath;
-}
-
-export function resolveOutputArtifactPath(options: {
-  cwd: string;
-  artifactType: OutputArtifactType;
-  requestedPath: string;
-  expectedDir: string;
-  expectedExtension: string;
-}) {
-  const absolutePath = path.isAbsolute(options.requestedPath)
-    ? path.resolve(options.requestedPath)
-    : path.resolve(options.cwd, options.requestedPath);
-  const repoRoot = normalizeExistingAncestor(path.resolve(options.cwd));
-  const expectedRoot = normalizeExistingAncestor(path.resolve(options.cwd, options.expectedDir));
-  const label = outputArtifactLabels[options.artifactType];
-
-  if (
-    !isInsidePath(repoRoot, expectedRoot) ||
-    !isInsidePath(expectedRoot, normalizeExistingAncestor(absolutePath))
-  ) {
-    throw new OutputPathError(
-      `${label} output path must stay inside ${options.expectedDir}: ${options.requestedPath}`,
-      options.artifactType,
-      options.requestedPath,
-      options.expectedDir,
-      options.expectedExtension,
-      'outside-directory',
-    );
-  }
-
-  if (!absolutePath.endsWith(options.expectedExtension)) {
-    throw new OutputPathError(
-      `${label} output path must use ${options.expectedExtension}: ${options.requestedPath}`,
-      options.artifactType,
-      options.requestedPath,
-      options.expectedDir,
-      options.expectedExtension,
-      'wrong-extension',
     );
   }
 

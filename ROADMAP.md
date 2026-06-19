@@ -48,14 +48,14 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 
 ## Current State
 
-- GitHub release `v0.36.1` is public.
-- npm latest is `agentloopkit@0.36.1`.
-- GHCR and MCP Registry are live for `0.36.1`.
+- GitHub release `v0.36.2` is public.
+- npm latest is `agentloopkit@0.36.2`.
+- GHCR and MCP Registry are live for `0.36.2`.
 - GitHub Marketplace listing is pending owner UI publication for the composite Action.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
-- Release tag `v0.36.1` points at the published release commit. Commit: `ea012582f5baa0b197472e44823cf4b426298890`.
+- Release tag `v0.36.2` points at the published release commit.
 
 ## Near Term
 
@@ -65,6 +65,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Keep the SchemaStore catalog entry current if the config schema URL changes.
 - Keep bundled policy packs small, safe, and useful for real maintainers.
 - Keep local GitHub metadata consumption read-only and optional while teams try it in real repos.
+- Use the [real-repo trial checklist](docs/real-repo-trials.md) before adding more bundled policy packs or changing GitHub metadata scoring.
 
 ## Later
 

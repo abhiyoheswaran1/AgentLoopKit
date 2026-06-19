@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-17
 - Task type: feature
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 AgentFlight session task: Prepare AgentLoopKit 0.36.0 release

@@ -32,7 +32,7 @@ After the detailed AgentLoop task is created, the helper parks exact AgentFlight
 
 Use `--dry-run` first when you want to inspect the exact local commands without writing AgentFlight, AgentLoopKit, or ProjScan state.
 
-If you start AgentFlight directly with `npx --yes agentflight start --task "<task>" --yes`, run `agentloop status --redact-paths` afterward. If status or task doctor shows the AgentFlight placeholder as the active task, use `agentloop task set <path>` to re-pin the detailed AgentLoop task contract before continuing.
+If you start AgentFlight directly with `npx --yes agentflight start --task "<task>" --yes`, run `agentloop status --redact-paths` and `agentloop task doctor --redact-paths` afterward. If the AgentFlight placeholder becomes active, treat that file as preserved session evidence: run `agentloop task clear`, then `agentloop task set <path>` for the detailed task contract or `agentloop create-task` for new scoped work. Do not hand-edit or delete the placeholder as the default recovery.
 
 If a task already exists, read it first:
 

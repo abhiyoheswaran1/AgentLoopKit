@@ -4,6 +4,15 @@
 
 - No unreleased changes yet.
 
+## 0.36.2
+
+- Broke the `artifacts`/`runs`/`task-state` core import cycle by moving generated artifact patterns and output-path validation into a leaf module.
+- Clarified direct AgentFlight placeholder recovery so task doctor tells agents to preserve placeholder files as session evidence while clearing or re-pinning real task state.
+- Added a compact first-use loop to the README and getting-started docs.
+- Documented why the intentional `prepublishOnly` release guard remains acceptable while other lifecycle scripts still require review.
+- Added a real-repo trial checklist for policy packs and imported GitHub metadata before expanding bundled packs or scoring behavior.
+- Added public-doc hygiene coverage that keeps real-repo trial guidance local-first, non-marketing, and scoring-neutral.
+
 ## 0.36.1
 
 - Fixed Windows smoke fixtures and release-status report path normalization so cross-platform release checks compare stable, relative evidence paths.

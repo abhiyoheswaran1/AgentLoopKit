@@ -52,6 +52,21 @@ In monorepos, root checks do not always prove that one package was tested. Add p
 
 AgentLoopKit records and runs the commands you configure. It does not infer package graphs or run workspace commands on its own.
 
+## First Useful Loop
+
+After `init` and `doctor`, the shortest useful loop is:
+
+```bash
+npx agentloopkit create-task --type bugfix --title "Fix checkout bug" --include-config-commands
+npx agentloopkit status --brief
+npx agentloopkit verify --task-commands --progress
+npx agentloopkit ship
+npx agentloopkit prepare-pr
+npx agentloopkit task done
+```
+
+`create-task` sets the new contract as active. `verify --task-commands` runs the reviewed commands copied into the task contract. `ship` records review-readiness evidence, `prepare-pr` drafts reviewer copy, and `task done` closes the focused task. This path does not post to GitHub, publish packages, call an LLM, or run hidden commands.
+
 ## Existing Repos And Harness Upgrades
 
 Use the latest CLI in an existing AgentLoopKit repo before changing local guidance files:

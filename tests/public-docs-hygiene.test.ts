@@ -39,6 +39,11 @@ async function makeFixture(readme: string) {
   return dir;
 }
 
+async function writeRealRepoTrials(dir: string, content: string) {
+  await mkdir(path.join(dir, 'docs'), { recursive: true });
+  await writeFile(path.join(dir, 'docs/real-repo-trials.md'), content);
+}
+
 describe('public docs hygiene', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map((dir) => rm(dir, { recursive: true, force: true })));
@@ -209,6 +214,65 @@ describe('public docs hygiene', () => {
     await expect(runHygiene({ cwd: dir, version: '1.2.3' })).resolves.toMatchObject({
       version: '1.2.3',
     });
+  });
+
+  test('rejects real-repo trial guidance without no-public-proof boundary', async () => {
+    const dir = await makeFixture('# AgentLoopKit\n\nUse `npx agentloopkit init`.\n');
+    await writeRealRepoTrials(
+      dir,
+      [
+        '# Real-Repo Trials',
+        '',
+        'Run local trials with no tokens, no GitHub API calls, no telemetry, and no remote service.',
+        'GitHub metadata is optional local context. Missing metadata is neutral.',
+        'Do not let imported issue or PR text affect `ship` scoring yet.',
+        'No trial outcome should trigger a release-channel change, remote service, telemetry, remote policy service, or automatic GitHub posting.',
+        '',
+      ].join('\n'),
+    );
+
+    await expect(runHygiene({ cwd: dir, version: '1.2.3' })).rejects.toThrow(
+      'docs/real-repo-trials.md is missing real-repo trial guidance: no-public-proof boundary',
+    );
+  });
+
+  test('rejects real-repo trial guidance without local-only safety boundary', async () => {
+    const dir = await makeFixture('# AgentLoopKit\n\nUse `npx agentloopkit init`.\n');
+    await writeRealRepoTrials(
+      dir,
+      [
+        '# Real-Repo Trials',
+        '',
+        'Do not publish trial notes as public proof of usage, interviews, compliance, or commercial traction.',
+        'GitHub metadata is optional local context. Missing metadata is neutral.',
+        'Do not let imported issue or PR text affect `ship` scoring yet.',
+        'No trial outcome should trigger a release-channel change, remote service, telemetry, remote policy service, or automatic GitHub posting.',
+        '',
+      ].join('\n'),
+    );
+
+    await expect(runHygiene({ cwd: dir, version: '1.2.3' })).rejects.toThrow(
+      'docs/real-repo-trials.md is missing real-repo trial guidance: local-only safety boundary',
+    );
+  });
+
+  test('rejects real-repo trial guidance without metadata scoring boundary', async () => {
+    const dir = await makeFixture('# AgentLoopKit\n\nUse `npx agentloopkit init`.\n');
+    await writeRealRepoTrials(
+      dir,
+      [
+        '# Real-Repo Trials',
+        '',
+        'Do not publish trial notes as public proof of usage, interviews, compliance, or commercial traction.',
+        'Run local trials with no tokens, no GitHub API calls, no telemetry, and no remote service.',
+        'No trial outcome should trigger a release-channel change, remote service, telemetry, remote policy service, or automatic GitHub posting.',
+        '',
+      ].join('\n'),
+    );
+
+    await expect(runHygiene({ cwd: dir, version: '1.2.3' })).rejects.toThrow(
+      'docs/real-repo-trials.md is missing real-repo trial guidance: metadata/scoring boundary',
+    );
   });
 
   test('ignores internal planning docs when checking public claims', async () => {

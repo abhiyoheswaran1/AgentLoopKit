@@ -161,6 +161,8 @@ Maintainers should expect a first contribution to include:
 
 For behavior changes, ask for a focused Vitest test. For docs-only work, `check:links` and `projscan` are usually enough.
 
+ProjScan currently reports the package `prepublishOnly` script as a lifecycle-script warning. That warning is expected for release review because `prepublishOnly` guards `npm publish`; it is not an install-time `postinstall` hook. Maintainers should verify that `prepublishOnly` still points at `scripts/prepublish-check.mjs`, typecheck, tests, and build, and should treat any new lifecycle script as a separate package-trust change.
+
 ## Maintainer Triage Notes
 
 Use labels this way:

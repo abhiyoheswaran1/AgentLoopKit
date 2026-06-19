@@ -98,6 +98,28 @@ const INTERNAL_CHATTER_CLAIMS = [
   { label: 'npm latest remains wording', pattern: /\bnpm latest remains\b/i },
 ];
 
+const REAL_REPO_TRIAL_REQUIRED_BOUNDARIES = [
+  {
+    label: 'no-public-proof boundary',
+    patterns: [/do not publish trial notes as public proof/i, /usage/i, /interviews/i],
+  },
+  {
+    label: 'local-only safety boundary',
+    patterns: [/no tokens/i, /no GitHub API calls/i, /no telemetry/i, /no remote service/i],
+  },
+  {
+    label: 'metadata/scoring boundary',
+    patterns: [
+      /missing metadata is neutral/i,
+      /do not let imported issue or PR text affect `ship` scoring yet/i,
+    ],
+  },
+  {
+    label: 'no-release-channel-change boundary',
+    patterns: [/no trial outcome should trigger a release-channel change/i, /automatic GitHub posting/i],
+  },
+];
+
 const README_RELEASE_RUNBOOK_DETAILS = [
   {
     label: 'current release operations section',
@@ -288,6 +310,22 @@ export function assertPublicDocsAvoidUnsupportedClaims(files) {
     if (internalClaim) {
       throw new Error(
         `${filePath} contains maintainer-only release chatter: ${internalClaim.label}. Keep README and normal docs user-facing.`,
+      );
+    }
+  }
+}
+
+export function assertRealRepoTrialGuidance(files) {
+  const trialDoc = files.find(
+    (file) => toPosixPath(file.filePath) === 'docs/real-repo-trials.md',
+  );
+  if (!trialDoc) return;
+
+  for (const boundary of REAL_REPO_TRIAL_REQUIRED_BOUNDARIES) {
+    const hasBoundary = boundary.patterns.every((pattern) => pattern.test(trialDoc.content));
+    if (!hasBoundary) {
+      throw new Error(
+        `docs/real-repo-trials.md is missing real-repo trial guidance: ${boundary.label}. Keep trial docs local-first, non-marketing, and scoring-neutral.`,
       );
     }
   }
@@ -490,6 +528,7 @@ export async function runPublicDocsHygiene({ cwd = process.cwd(), version } = {}
   const publicDocFiles = await collectPublicDocPinFiles(cwd);
   assertPublicDocsDoNotPinVersions(publicDocFiles);
   assertPublicDocsAvoidUnsupportedClaims(publicDocFiles);
+  assertRealRepoTrialGuidance(publicDocFiles);
   const readme = publicDocFiles.find((file) => toPosixPath(file.filePath) === 'README.md');
   if (readme) {
     assertReadmeRedactionGuidance(readme.content);

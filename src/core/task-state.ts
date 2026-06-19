@@ -4,7 +4,7 @@ import {
   OutputPathError,
   resolveOutputArtifactPath,
   verificationReportPattern,
-} from './artifacts.js';
+} from './artifact-paths.js';
 import { AgentLoopConfig } from './config.js';
 import { AgentLoopError } from './errors.js';
 import {
@@ -795,9 +795,10 @@ export async function inspectTaskDirectory(options: {
           path: activeTask.path,
           title: activeTask.title,
           status: activeTask.status,
-          message: 'Active task pointer points to an AgentFlight placeholder task.',
+          message:
+            'Active task pointer points to an AgentFlight placeholder task preserved as session evidence.',
           recommendation:
-            'Run `agentloop task clear`, then set an existing real task or create a current task contract before continuing.',
+            'Run `agentloop task clear`, then set an existing real task or create a current task contract before continuing. Do not edit or delete the AgentFlight placeholder as the default recovery.',
           commands: ['agentloop task clear', 'agentloop task set <path>', 'agentloop create-task'],
         });
       } else if (isInsidePath(archiveRoot, activeTaskPath)) {

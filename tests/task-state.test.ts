@@ -523,6 +523,10 @@ describe('task state', () => {
           severity: 'warn',
           path: '.agentloop/tasks/2026-06-16-ignore-active-agentflight-placeholder-tasks-2.md',
           title,
+          message:
+            'Active task pointer points to an AgentFlight placeholder task preserved as session evidence.',
+          recommendation:
+            'Run `agentloop task clear`, then set an existing real task or create a current task contract before continuing. Do not edit or delete the AgentFlight placeholder as the default recovery.',
           commands: expect.arrayContaining([
             'agentloop task clear',
             'agentloop task set <path>',

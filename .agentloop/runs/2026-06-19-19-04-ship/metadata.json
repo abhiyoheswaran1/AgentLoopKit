@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-19-19-04-ship",
+  "command": "ship",
+  "createdAt": "2026-06-19-19-04",
+  "createdAtEpochMs": 1781888663779,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-19-guard-real-repo-trial-guidance.md",
+    "title": "Guard real-repo trial guidance",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-19-19-03-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-19-19-04-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-19-19-04-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 41
+}
