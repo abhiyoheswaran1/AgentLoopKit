@@ -7,21 +7,21 @@ Last checked: June 19, 2026.
 - Current public release: `v0.36.2`
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.36.2>
 - Release asset: `agentloopkit-0.36.2.tgz`
-- Release asset SHA-256: recorded in the `v0.36.2` GitHub release asset after publication.
-- Release tag `v0.36.2` points at the published release commit.
+- Release asset SHA-256: `c16d640ff99768cce30ee59f40172d64a9ec85eda6df2f794a82263de21c4bdd`
+- Release tag `v0.36.2` points at commit `845a1d53`.
 - npm latest: `0.36.2`
-- CI run: recorded in GitHub Actions for `v0.36.2`
-- CLI Smoke run: recorded in GitHub Actions for `v0.36.2`
-- Publish workflow run: recorded in GitHub Actions for `v0.36.2`
-- Docker workflow run: recorded in GitHub Actions for `v0.36.2`
-- MCP Registry workflow run: recorded in GitHub Actions for `v0.36.2`
+- CI run: `27844140346`
+- CLI Smoke run: `27844140354`
+- Publish workflow run: `27844155386`
+- Docker workflow run: `27844155385`
+- MCP Registry workflow run: `27844453742`
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
 GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirms the `0.36.2` image.
 
 The MCP Registry metadata points at npm package `agentloopkit@0.36.2`.
 
-GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 17, 2026.
+GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 19, 2026.
 
 ## Latest Release Highlights
 
@@ -40,7 +40,8 @@ npm is the primary install path:
 
 ```bash
 npx agentloopkit init
-npx --yes agentloopkit@0.36.2 version
+tmp=$(mktemp -d)
+(cd "$tmp" && npx --yes agentloopkit@0.36.2 version)
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -85,7 +86,7 @@ Post-publish checks:
 - `npx --no-install agentloop npm-status --agentloopkit --expect-current`: latest matches local package version
 - `npm run smoke:published -- --version 0.36.2`: passed
 - `npx --yes agentloopkit@0.36.2 version`: `0.36.2` from a clean temporary directory
-- GitHub release asset digest: recorded in the `v0.36.2` GitHub release asset after publication
+- GitHub release asset digest: `c16d640ff99768cce30ee59f40172d64a9ec85eda6df2f794a82263de21c4bdd`
 - `npx --no-install agentloop release-proof --redact-paths`: npm, GitHub Release, GHCR, and MCP Registry passed; GitHub Marketplace warned
 - `npx --no-install agentloop release-proof --strict --only github-marketplace --redact-paths`: failed because the Marketplace URL returned 404
 - GHCR image tag `0.36.2` is confirmed by release proof

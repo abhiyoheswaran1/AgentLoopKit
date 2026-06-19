@@ -76,6 +76,8 @@ npm run smoke:published -- --version <version>
 
 That check verifies the public npm package with `npm view`, `npx agentloopkit@<version> version`, `npx agentloopkit@<version> init --dry-run --json`, and both installed bin aliases from clean temporary directories. It does not publish, create tags, call GitHub APIs, read npm tokens, or read `.env` files.
 
+Run ad hoc `npx --yes agentloopkit@<version> version` checks from a clean temporary directory. Running that command inside a repo or shell with a globally installed `agentloopkit` can resolve the local or global binary first and print a stale version unrelated to the published package.
+
 Current `main` also includes a prepublish guard:
 
 ```bash
@@ -139,7 +141,8 @@ npm view agentloopkit version
 npm view agentloopkit versions --json
 agentloop npm-status --agentloopkit --expect-current
 agentloop release-proof
-npx --yes agentloopkit@<version> version
+tmp=$(mktemp -d)
+(cd "$tmp" && npx --yes agentloopkit@<version> version)
 ```
 
 The expected successful result is npm latest matching `package.json` and a versions list containing that release.
