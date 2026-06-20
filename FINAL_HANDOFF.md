@@ -13,6 +13,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - binaries: `agentloop` and `agentloopkit`
 - repo init flow with `--dry-run` and JSON output
 - doctor checks with JSON output
+- doctor advisory mode for onboarding and preflight checks that should warn without failing the shell
 - doctor risk-file category warnings with capped path examples
 - task contract generation
 - task contract creation with JSON output for agents and scripts
@@ -35,6 +36,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - read-only local evidence inventory with `agentloop artifacts`
 - read-only local reviewability snapshot with `agentloop review-context`
 - next-action shortcut with `agentloop next`
+- status and next routing for active task contracts that still contain review-critical placeholder sections
 - prepublish metadata guard that blocks npm publish while `CHANGELOG.md` has unreleased entries
 - read-only local policy inspection with `agentloop policy`
 - read-only local policy template status with `agentloop policy status`
@@ -76,20 +78,27 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.36.2`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.36.2>
-- Release asset: `agentloopkit-0.36.2.tgz`
-- Release asset SHA-256: `c16d640ff99768cce30ee59f40172d64a9ec85eda6df2f794a82263de21c4bdd`
-- Release tag: `v0.36.2` at commit `845a1d53`
-- CI run: `27844140346`
-- CLI Smoke run: `27844140354`
-- Publish workflow run: `27844155386`
-- Docker workflow run: `27844155385`
-- MCP Registry workflow run: `27844453742`
-- Post-publish npm proof: npm latest is `0.36.2`
-- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.36.2`
-- MCP Registry proof: metadata points at `agentloopkit@0.36.2`
+- Current npm release: `agentloopkit@0.37.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.37.0>
+- Release asset: `agentloopkit-0.37.0.tgz`
+- Release asset SHA-256: recorded in the `v0.37.0` GitHub release asset after publication
+- Release tag: `v0.37.0` at the published release commit
+- CI run: recorded in GitHub Actions for `v0.37.0`
+- CLI Smoke run: recorded in GitHub Actions for `v0.37.0`
+- Publish workflow run: recorded in GitHub Actions for `v0.37.0`
+- Docker workflow run: recorded in GitHub Actions for `v0.37.0`
+- MCP Registry workflow run: recorded in GitHub Actions for `v0.37.0`
+- Post-publish npm proof: npm latest is `0.37.0`
+- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.37.0`
+- MCP Registry proof: metadata points at `agentloopkit@0.37.0`
 - GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof
+
+## 0.37.0 release summary
+
+Included:
+
+- `agentloop doctor --advisory` for checks that should display failing diagnostics without failing the shell.
+- `agentloop status` and `agentloop next` guidance that sends active placeholder-section task contracts to `agentloop task doctor` before verification or handoff.
 
 ## 0.36.2 release summary
 
@@ -1307,10 +1316,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.36.2` is public.
-- npm latest is `agentloopkit@0.36.2`.
-- GHCR tags include `latest`, `0.36`, and `0.36.2`.
-- MCP Registry lists `0.36.2` as latest.
+- GitHub release `v0.37.0` is public.
+- npm latest is `agentloopkit@0.37.0`.
+- GHCR tags include `latest`, `0.37`, and `0.37.0`.
+- MCP Registry lists `0.37.0` as latest.
 - GitHub Marketplace listing is not live; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
