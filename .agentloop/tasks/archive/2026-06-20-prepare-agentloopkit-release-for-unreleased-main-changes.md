@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-20
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 `main` contains unreleased package-impacting improvements after `v0.36.2`: status/next placeholder-task routing and `agentloop doctor --advisory`. Maintainers approved addressing the release metadata and cutting the next release so users can install those changes.

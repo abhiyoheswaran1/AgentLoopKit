@@ -7,14 +7,14 @@ Last checked: June 20, 2026.
 - Current public release: `v0.37.0`
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.37.0>
 - Release asset: `agentloopkit-0.37.0.tgz`
-- Release asset SHA-256: recorded in the `v0.37.0` GitHub release asset after publication.
-- Release tag `v0.37.0` points at the published release commit.
+- Release asset SHA-256: `ecd8dcfafffee74f470243b0911265cb64d1191007f4bf15459fcd32cac2d61a`
+- Release tag `v0.37.0` points at commit `7efddc80`.
 - npm latest: `0.37.0`
-- CI run: recorded in GitHub Actions for `v0.37.0`
-- CLI Smoke run: recorded in GitHub Actions for `v0.37.0`
-- Publish workflow run: recorded in GitHub Actions for `v0.37.0`
-- Docker workflow run: recorded in GitHub Actions for `v0.37.0`
-- MCP Registry workflow run: recorded in GitHub Actions for `v0.37.0`
+- CI run: `27864617915`
+- CLI Smoke run: `27864617902`
+- Publish workflow run: `27864623264`
+- Docker workflow run: `27864623265`
+- MCP Registry workflow run: `27864800014`
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
 GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirms the `0.37.0` image.
@@ -82,7 +82,7 @@ Post-publish checks:
 - `npx --no-install agentloop npm-status --agentloopkit --expect-current`: latest matches local package version
 - `npm run smoke:published -- --version 0.37.0`: passed
 - `npx --yes agentloopkit@0.37.0 version`: `0.37.0` from a clean temporary directory
-- GitHub release asset digest: recorded in the `v0.37.0` GitHub release asset after publication
+- GitHub release asset digest: `ecd8dcfafffee74f470243b0911265cb64d1191007f4bf15459fcd32cac2d61a`
 - `npx --no-install agentloop release-proof --redact-paths`: npm, GitHub Release, GHCR, and MCP Registry passed; GitHub Marketplace warned
 - `npx --no-install agentloop release-proof --strict --only github-marketplace --redact-paths`: failed because the Marketplace URL returned 404
 - GHCR image tag `0.37.0` is confirmed by release proof
