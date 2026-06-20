@@ -238,6 +238,56 @@ describe('doctor', () => {
     );
   });
 
+  test('advisory mode exits zero while keeping failing JSON diagnostics', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+
+    const defaultResult = await execa(tsxPath, [cliPath, 'doctor', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const advisoryResult = await execa(tsxPath, [cliPath, 'doctor', '--advisory', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(defaultResult.exitCode).toBe(1);
+    const defaultDoctor = JSON.parse(defaultResult.stdout);
+    expect(defaultDoctor.overallStatus).toBe('fail');
+    expect(defaultDoctor.advisory).toBe(false);
+
+    expect(advisoryResult.exitCode).toBe(0);
+    const advisoryDoctor = JSON.parse(advisoryResult.stdout);
+    expect(advisoryDoctor.overallStatus).toBe('fail');
+    expect(advisoryDoctor.advisory).toBe(true);
+    expect(advisoryDoctor.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'agentloop.config.json',
+          status: 'fail',
+        }),
+      ]),
+    );
+  });
+
+  test('advisory mode labels human output and keeps failure details', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'doctor', '--advisory', '--redact-paths'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('- Overall status: `fail`');
+    expect(result.stdout).toContain('- Advisory mode: `enabled`');
+    expect(result.stdout).toContain('- [`fail`] `agentloop.config.json`:');
+    expect(result.stdout).toContain('Run `agentloop init`');
+  });
+
   test('includes actionable next steps for common warnings', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

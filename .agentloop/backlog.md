@@ -17,6 +17,12 @@ Score candidate improvements from 1 to 5:
 
 Prefer high-value, low-complexity improvements. Safety and trust override the score.
 
+## Current Research Cycle 152 Decisions
+
+| item                          | source persona                    | problem                                                                                                                           | proposed solution                                                                                         | priority | effort | adoption impact | risk | decision    | notes                                                                                                                                   |
+| ----------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | -------- | ------ | --------------- | ---- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Advisory doctor preflight     | Nora, Tom, Platform Engineer      | `doctor` is useful before init, but its non-zero missing-config exit can stop copy-paste onboarding or real-repo trial scripts.   | Add explicit `doctor --advisory` that keeps failing diagnostics visible while exiting 0 for onboarding use. | P1       | S      | high            | low  | implemented | Default `doctor` and `doctor --strict` gate semantics stay intact; no init automation, telemetry, token read, release, or publish. |
+
 ## Current Research Cycle 151 Decisions
 
 | item                                  | source persona                     | problem                                                                                                                                       | proposed solution                                                                                             | priority | effort | adoption impact | risk | decision    | notes                                                                                                                                                         |

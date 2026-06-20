@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-06-20: Doctor Advisory Mode Preserves Setup Gates
+
+Real-repo trial notes showed that `agentloop doctor` is useful before initialization but can stop copy-paste onboarding scripts because missing config is a serious failure. The default command should keep that non-zero exit for gates, while trial and onboarding docs need an explicit advisory preflight path.
+
+`agentloop doctor --advisory` keeps the same diagnostics, next actions, and `overallStatus`, but exits `0` so users and agents can continue a first-run script after seeing the setup warnings. Human and JSON output expose advisory mode. This does not auto-run `init`, hide failures, call external services, read tokens, add telemetry, release, or publish.
+
 ## 2026-06-19: Status Routes Placeholder Task Contracts To Doctor
 
 Local real-repo trials against temporary repository copies showed that active task contracts with placeholder acceptance, verification, rollback, or other review-critical sections could reach `agentloop status` and `agentloop next` with a handoff recommendation after verification passed.

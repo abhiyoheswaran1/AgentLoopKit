@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-20-08-53-ship",
+  "command": "ship",
+  "createdAt": "2026-06-20-08-53",
+  "createdAtEpochMs": 1781938421117,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-20-make-doctor-pre-init-safe-for-copy-paste-trials.md",
+    "title": "Make doctor pre-init safe for copy-paste trials",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-20-08-50-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-20-08-53-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-20-08-53-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 30
+}

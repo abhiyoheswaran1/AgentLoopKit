@@ -64,6 +64,7 @@ npx --yes agentloopkit@latest prepare-pr
 agentloop doctor
 agentloop doctor --json
 agentloop doctor --strict
+agentloop doctor --advisory
 agentloop doctor --redact-paths
 ```
 
@@ -73,6 +74,8 @@ Env files are reported by path only. AgentLoopKit does not read `.env` contents.
 Risk-file scanning is bounded; on very large repos, doctor reports when the scan stops early so you can run targeted checks.
 
 Warnings keep exit code `0` by default. Use `--strict` when warnings should fail CI or a team setup gate.
+
+Use `--advisory` for onboarding, first-run preflight, or real-repo trial scripts that should keep printing diagnostics even when setup is missing. Advisory mode keeps the same checks, `overallStatus`, warnings, failures, and next steps, but exits `0` and marks human and JSON output as advisory. Do not use advisory mode for CI gates that should fail on setup errors.
 
 Use `--redact-paths` before pasting doctor output into a public issue, PR, or CI log. It hides the absolute Git root and keeps repo-relative risk-file paths readable. Default JSON keeps the absolute Git root for scripts that need it.
 Human-readable output renders dynamic values as single-line inline code, so unusual package names or file paths cannot break Markdown lists. JSON output keeps raw values for scripts.

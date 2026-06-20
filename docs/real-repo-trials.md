@@ -13,10 +13,12 @@ Do not publish trial notes as public proof of usage, interviews, compliance, or 
 - Record the verification commands that already prove work in that repo.
 
 ```bash
-npx --yes agentloopkit@latest doctor --redact-paths
+npx --yes agentloopkit@latest doctor --advisory --redact-paths
 npx --yes agentloopkit@latest create-task --type bugfix --title "Trial AgentLoopKit review evidence"
 npx --yes agentloopkit@latest status --brief
 ```
+
+The trial preflight uses `--advisory` so missing setup prints guidance without stopping a copy-paste script. Use plain `doctor` or `doctor --strict` when a setup check should fail a gate.
 
 ## Policy-Pack Trial
 

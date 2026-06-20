@@ -1,0 +1,10 @@
+ .agentloop/backlog.md      |  6 ++++++
+ CHANGELOG.md               |  1 +
+ DECISIONS.md               |  6 ++++++
+ README.md                  | 10 +++++++++-
+ docs/cli-reference.md      |  3 +++
+ docs/real-repo-trials.md   |  4 +++-
+ src/cli/commands/doctor.ts | 37 +++++++++++++++++++++-------------
+ src/core/doctor.ts         |  5 +++++
+ tests/doctor.test.ts       | 50 ++++++++++++++++++++++++++++++++++++++++++++++
+ 9 files changed, 106 insertions(+), 16 deletions(-)

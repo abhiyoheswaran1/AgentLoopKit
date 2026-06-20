@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added `agentloop doctor --advisory` for onboarding and real-repo trial preflight checks that should show failing diagnostics without failing the shell.
 - Changed `agentloop status` and `agentloop next` to route active task contracts with review-critical placeholder sections to `agentloop task doctor` before verification or handoff.
 
 ## 0.36.2

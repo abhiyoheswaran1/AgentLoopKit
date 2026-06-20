@@ -35,6 +35,7 @@ export type DoctorResult = {
   warnings: DoctorCheck[];
   serious: DoctorCheck[];
   strict: boolean;
+  advisory: boolean;
   overallStatus: DoctorOverallStatus;
   nextActions: DoctorNextAction[];
   git: {
@@ -294,12 +295,14 @@ async function checkTemplateManifest(cwd: string): Promise<DoctorCheck> {
 export async function runDoctor(options: {
   cwd: string;
   strict?: boolean;
+  advisory?: boolean;
   riskScanMaxDepth?: number;
   riskScanMaxEntries?: number;
   redactPaths?: boolean;
 }): Promise<DoctorResult> {
   const cwd = options.cwd;
   const strict = options.strict ?? false;
+  const advisory = options.advisory ?? false;
   const checks: DoctorCheck[] = [];
 
   checks.push(check('Current directory', 'pass', cwd));
@@ -464,6 +467,7 @@ export async function runDoctor(options: {
 
 - Overall status: ${inlineCode(overallStatus)}
 - Strict mode: ${inlineCode(strict ? 'enabled' : 'disabled')}
+- Advisory mode: ${inlineCode(advisory ? 'enabled' : 'disabled')}
 
 ${outputChecks
   .map((item) => {
@@ -481,6 +485,7 @@ ${renderNextActions(nextActions)}
     warnings,
     serious,
     strict,
+    advisory,
     overallStatus,
     nextActions,
     git: {

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-20-08-46-verify",
+  "command": "verify",
+  "createdAt": "2026-06-20-08-46",
+  "createdAtEpochMs": 1781937978981,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-20-make-doctor-pre-init-safe-for-copy-paste-trials.md",
+    "title": "Make doctor pre-init safe for copy-paste trials",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-20-08-43-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 15
+}

@@ -74,6 +74,14 @@ npx --yes agentloopkit@latest init
 
 For repeatable CI or team setup, replace `@latest` with a vetted version.
 
+Before initialization, exploratory preflight can be advisory:
+
+```bash
+npx --yes agentloopkit@latest doctor --advisory --redact-paths
+```
+
+Advisory mode keeps missing-setup diagnostics visible but exits `0` so first-run scripts can continue. Use plain `doctor` or `doctor --strict` for gates that should fail on setup errors.
+
 Pinned team usage:
 
 ```bash
@@ -206,7 +214,7 @@ agentloopkit init
 | Command                          | Purpose                                                                        |
 | -------------------------------- | ------------------------------------------------------------------------------ |
 | `agentloop init`                 | Generate the repo harness and config                                           |
-| `agentloop doctor`               | Check setup health, commands, git state, and risk files                        |
+| `agentloop doctor`               | Check setup health, commands, git state, and risk files; use `--advisory` for first-run preflight |
 | `agentloop create-task`          | Create a scoped task contract                                                  |
 | `agentloop task ...`             | List, show, pin, update, archive, and inspect task state                       |
 | `agentloop status`               | Show active task, latest report, latest run, dirty files, and next step        |
