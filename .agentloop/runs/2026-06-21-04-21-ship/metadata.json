@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-04-21-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-04-21",
+  "createdAtEpochMs": 1782008516566,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-clarify-maintainer-check-package-manifest-warnings.md",
+    "title": "Clarify maintainer-check package manifest warnings",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-04-07-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-04-21-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-04-21-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 308
+}

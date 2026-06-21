@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-12-55-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-12-55",
+  "createdAtEpochMs": 1782039362779,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-add-local-research-task-workflow.md",
+    "title": "Add local research task workflow",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-12-38-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-12-55-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-12-55-pr-summary.md",
+  "score": 88,
+  "changedFileCount": 715
+}

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-09-38-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-09-38",
+  "createdAtEpochMs": 1782027489805,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-show-dirty-file-examples-in-check-gates-create-task-guidance.md",
+    "title": "Show dirty file examples in check-gates create-task guidance",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-09-33-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-09-38-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-09-38-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 548
+}

@@ -1,0 +1,9 @@
+ .agentloop/backlog.md           |   6 ++
+ CHANGELOG.md                    |   2 +-
+ DECISIONS.md                    |   6 ++
+ docs/task-contracts.md          |   1 +
+ src/cli/commands/create-task.ts |  61 +++++++++++++---
+ src/core/task-contract.ts       |  80 +++++++++++++++++++--
+ src/core/task-state.ts          |  62 +----------------
+ tests/create-task.test.ts       | 151 ++++++++++++++++++++++++++++++++++++++++
+ 8 files changed, 291 insertions(+), 78 deletions(-)

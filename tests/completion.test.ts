@@ -47,6 +47,7 @@ describe('completion scripts', () => {
     expect(script).toContain("_values 'output format'");
     expect(script).toContain("_values 'task list status'");
     expect(script).toContain('_values \'archive status\' "done"');
+    expect(script).toContain('"research"');
     for (const type of TASK_TYPES) {
       expect(script).toContain(`"${type}"`);
     }
@@ -75,6 +76,7 @@ describe('completion scripts', () => {
     expect(script).toContain('list show set status done archive current clear doctor');
     expect(script).toContain('compgen -W "list show status packs pack"');
     expect(script).toContain(`compgen -W "${TASK_TYPES.join(' ')}"`);
+    expect(script).toContain('research');
     expect(script).toContain(`compgen -W "${artifactTypes}"`);
     expect(script).toContain(`compgen -W "${badgeSources}"`);
     expect(script).toContain(`compgen -W "${outputFormats}"`);
@@ -98,6 +100,7 @@ describe('completion scripts', () => {
     );
     expect(script).toContain("complete -c agentloop -n '__fish_seen_subcommand_from create-task'");
     expect(script).toContain(`-a '${TASK_TYPES.join(' ')}'`);
+    expect(script).toContain('research');
     expect(script).toContain(
       `complete -c agentloop -n '__fish_seen_subcommand_from release-proof' -a '${releaseProofChannels}'`,
     );

@@ -25,9 +25,9 @@ Product-minded founder building an open-source developer tool with commercial po
 Perspective:
 
 - Wants a popular open-source devtool with strong GitHub adoption.
-- Wants practical value for Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and other coding-agent users.
+- Wants practical value for Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and other software-agent users.
 - Wants low maintenance and optional future monetisation.
-- Dislikes shallow AI wrappers.
+- Dislikes shallow assistant wrappers.
 - Strongly prefers a lightweight repo-level/npm-based product over a heavy app.
 
 ### Maya, Principal Engineer
@@ -83,7 +83,7 @@ Heavy user of Codex CLI, Claude Code, Cursor, OpenCode, and Gemini CLI.
 
 Perspective:
 
-- Runs long autonomous coding sessions.
+- Runs long autonomous engineering sessions.
 - Wants agents to stay disciplined.
 - Wants task contracts, verification reports, PR summaries, and fewer messy diffs.
 - Values compatibility across tools.
@@ -92,7 +92,7 @@ Perspective:
 
 ### Tom, Skeptical Senior Developer
 
-Experienced developer skeptical of AI hype.
+Experienced developer skeptical of automation hype.
 
 Perspective:
 
@@ -104,7 +104,7 @@ Perspective:
 
 ### Rachel, Startup CTO
 
-CTO of a small engineering team experimenting with coding agents.
+CTO of a small engineering team experimenting with software agents.
 
 Perspective:
 

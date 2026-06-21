@@ -1,7 +1,7 @@
 export const PRODUCT_NAME = 'AgentLoopKit';
 export const PACKAGE_NAME = 'agentloopkit';
 export const CLI_NAME = 'agentloop';
-export const TAGLINE = 'A drop-in engineering loop for coding agents.';
+export const TAGLINE = 'A drop-in engineering loop for software agents.';
 export const CONFIG_FILE = 'agentloop.config.json';
 export const AGENTLOOP_DIR = '.agentloop';
 export const AGENTLOOP_MANIFEST_FILE = '.agentloop/manifest.json';
@@ -45,6 +45,7 @@ export const TASK_TYPES = [
   'refactor',
   'tests',
   'test-generation',
+  'research',
   'docs',
   'release',
   'security-review',

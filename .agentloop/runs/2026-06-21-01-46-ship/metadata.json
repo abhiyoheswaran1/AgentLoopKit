@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-01-46-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-01-46",
+  "createdAtEpochMs": 1781999210316,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-clarify-task-clear-for-ignored-active-pointers.md",
+    "title": "Clarify task clear for ignored active pointers",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-01-38-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-01-46-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-01-46-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 175
+}

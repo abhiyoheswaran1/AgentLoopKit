@@ -1,0 +1,72 @@
+{
+  "totalScore": 88,
+  "dimensions": [
+    {
+      "id": "task-clarity",
+      "label": "Task clarity",
+      "score": 100,
+      "weight": 15,
+      "reason": "100/100 task evidence present."
+    },
+    {
+      "id": "scope-control",
+      "label": "Scope control",
+      "score": 30,
+      "weight": 15,
+      "reason": "140 non-evidence changed files is broad for one review; 552 AgentLoop evidence file(s) also present (692 total). Non-evidence review areas: AgentLoop 50, Source 45, Tests 24, Documentation 16, CI / Automation 3, Config / Package 1, Risk-Sensitive 1."
+    },
+    {
+      "id": "verification-evidence",
+      "label": "Verification evidence",
+      "score": 100,
+      "weight": 25,
+      "reason": "Latest verification report passed."
+    },
+    {
+      "id": "evidence-freshness",
+      "label": "Evidence freshness",
+      "score": 100,
+      "weight": 15,
+      "reason": "Verification evidence matches current task timing."
+    },
+    {
+      "id": "policy-gate-compliance",
+      "label": "Policy and gate compliance",
+      "score": 100,
+      "weight": 15,
+      "reason": "Review gates passed."
+    },
+    {
+      "id": "handoff-readiness",
+      "label": "Handoff readiness",
+      "score": 100,
+      "weight": 10,
+      "reason": "Reviewer handoff evidence exists."
+    },
+    {
+      "id": "risk-flags",
+      "label": "Risk flags",
+      "score": 70,
+      "weight": 5,
+      "reason": "Risk-sensitive files changed and risk notes are present."
+    }
+  ],
+  "strengths": [
+    "Task contract has problem, outcome, acceptance criteria, verification commands, risk notes, and rollback notes.",
+    "Verification evidence is passing.",
+    "Review gates pass.",
+    "Reviewer handoff exists."
+  ],
+  "warnings": [
+    "Large non-evidence change set; consider splitting before review.",
+    "Risk-sensitive files changed: examples/security-review/README.md"
+  ],
+  "blockers": [],
+  "recommendedNextActions": [
+    "Review risk-sensitive files before merge."
+  ],
+  "claims": [
+    "This is a review-readiness score, not a code-quality score.",
+    "The score is deterministic and based only on local AgentLoopKit evidence."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-00-19-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-00-19",
+  "createdAtEpochMs": 1781993973538,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-20-mention-dirty-work-risk-in-next-guidance.md",
+    "title": "Mention dirty-work risk in next guidance",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-00-06-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-00-19-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-00-19-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 92
+}

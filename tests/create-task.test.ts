@@ -14,6 +14,12 @@ const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 let tempDirs: string[] = [];
 
+async function initializeGitFixture(dir: string) {
+  await execa('git', ['init', '-q'], { cwd: dir });
+  await execa('git', ['config', 'user.email', 'agentloopkit@example.com'], { cwd: dir });
+  await execa('git', ['config', 'user.name', 'AgentLoopKit Test'], { cwd: dir });
+}
+
 describe('create-task command', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
@@ -31,6 +37,19 @@ describe('create-task command', () => {
     for (const type of TASK_TYPES) {
       expect(result.stdout).toContain(type);
     }
+  });
+
+  test('uses engineering-session wording in help and root guidance', async () => {
+    const [help, localGuide, templateGuide] = await Promise.all([
+      execa(tsxPath, [cliPath, 'create-task', '--help']),
+      readFile('AGENTLOOP.md', 'utf8'),
+      readFile('src/templates/root/AGENTLOOP.md', 'utf8'),
+    ]);
+    const liveCopy = [help.stdout, localGuide, templateGuide].join('\n');
+    const oldPhrase = ['agentic', 'coding', 'session'].join(' ');
+
+    expect(liveCopy).toContain('agentic engineering session');
+    expect(liveCopy).not.toContain(oldPhrase);
   });
 
   test('accumulates repeated non-interactive list options', async () => {
@@ -416,6 +435,135 @@ describe('create-task command', () => {
     expect(markdown).toContain('- Regression test fails before implementation');
   });
 
+  test('accepts research as a non-interactive task type', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Interview checkout users',
+        '--type',
+        'research',
+        '--out',
+        '.agentloop/tasks/research.md',
+        '--acceptance',
+        'Research plan and findings are recorded as local evidence',
+      ],
+      { cwd: dir },
+    );
+
+    const markdown = await readFile(path.join(dir, '.agentloop/tasks/research.md'), 'utf8');
+    expect(markdown).toContain('- Task type: research');
+    expect(markdown).toContain('- Research plan and findings are recorded as local evidence');
+  });
+
+  test('prints loop guidance when the created task type has a loop template', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+    await mkdir(path.join(dir, '.agentloop/loops'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/loops/research.md'), '# Research Loop\n');
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Interview checkout users',
+        '--type',
+        'research',
+        '--out',
+        '.agentloop/tasks/research-loop.md',
+        '--acceptance',
+        'Research plan and findings are recorded as local evidence',
+      ],
+      { cwd: dir },
+    );
+
+    expect(result.stdout).toContain('Loop guidance: `.agentloop/loops/research.md`');
+    const markdown = await readFile(path.join(dir, '.agentloop/tasks/research-loop.md'), 'utf8');
+    expect(markdown).toContain('- Task type: research');
+    expect(markdown).not.toContain('Loop guidance:');
+  });
+
+  test('prints loop guidance as additive JSON when the loop file exists', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+    await mkdir(path.join(dir, '.agentloop/loops'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/loops/research.md'), '# Research Loop\n');
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Research output',
+        '--type',
+        'research',
+        '--out',
+        '.agentloop/tasks/research-output.md',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+
+    expect(JSON.parse(result.stdout)).toMatchObject({
+      activeTask: {
+        path: '.agentloop/tasks/research-output.md',
+        title: 'Research output',
+        status: 'proposed',
+      },
+      loopGuidance: {
+        taskType: 'research',
+        path: '.agentloop/loops/research.md',
+      },
+    });
+  });
+
+  test('omits loop guidance from JSON when no matching loop template exists', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Unit test cleanup',
+        '--type',
+        'tests',
+        '--out',
+        '.agentloop/tasks/unit-test-cleanup.md',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+
+    expect(JSON.parse(result.stdout)).not.toHaveProperty('loopGuidance');
+  });
+
   test('rejects unsupported non-interactive task types without prompting', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -503,8 +651,18 @@ describe('create-task command', () => {
         'feature',
         '--out',
         '.agentloop/tasks/json-output.md',
+        '--problem',
+        'Agents need parseable task details.',
+        '--outcome',
+        'JSON includes task and active-task fields.',
+        '--likely-file',
+        'src/cli/commands/create-task.ts',
         '--acceptance',
         'JSON includes the created path',
+        '--verification',
+        'npm test -- tests/create-task.test.ts',
+        '--rollback',
+        'Revert the JSON output test fixture.',
         '--json',
       ],
       { cwd: dir },
@@ -521,7 +679,311 @@ describe('create-task command', () => {
         markdown: expect.stringContaining('# JSON output'),
       },
     });
+    const output = JSON.parse(result.stdout);
+    expect(output.task.markdown).toContain(
+      '- Re-check protected areas before changing migrations, auth, secrets, billing, deployment, or public APIs.',
+    );
+    expect(output.task.markdown).not.toContain(
+      'Pre-existing dirty non-evidence files before task creation',
+    );
     expect(result.stdout).not.toContain('Task contract created:');
+  });
+
+  test('warns in JSON when generated task contracts keep review-critical placeholders', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Thin task',
+        '--type',
+        'feature',
+        '--out',
+        '.agentloop/tasks/thin-task.md',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+
+    const output = JSON.parse(result.stdout);
+    expect(output.task.markdown).toContain('# Thin task');
+    expect(output.activeTask).toMatchObject({
+      path: '.agentloop/tasks/thin-task.md',
+      title: 'Thin task',
+      status: 'proposed',
+    });
+    expect(output.warnings).toEqual([
+      {
+        code: 'TASK_CONTRACT_PLACEHOLDER_SECTIONS',
+        message:
+          'Task contract still contains review-critical placeholder sections. Replace them before implementation or review handoff.',
+        sections: [
+          'Problem Statement',
+          'Desired Outcome',
+          'Likely Files or Areas',
+          'Acceptance Criteria',
+          'Verification Commands',
+          'Rollback Notes',
+        ],
+        suggestion: 'Run `agentloop task doctor` or edit the task contract before implementation.',
+      },
+    ]);
+  });
+
+  test('warns in human output when generated task contracts keep review-critical placeholders', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Human thin task',
+        '--type',
+        'bugfix',
+        '--out',
+        '.agentloop/tasks/human-thin-task.md',
+      ],
+      { cwd: dir },
+    );
+
+    expect(result.stdout).toContain(
+      'Warning: Task contract still contains review-critical placeholder sections.',
+    );
+    expect(result.stdout).toContain(
+      [
+        inlineCode('Problem Statement'),
+        inlineCode('Desired Outcome'),
+        inlineCode('Likely Files or Areas'),
+        inlineCode('Acceptance Criteria'),
+        inlineCode('Verification Commands'),
+        inlineCode('Rollback Notes'),
+      ].join(', '),
+    );
+    expect(result.stdout).toContain('Run `agentloop task doctor` or edit the task contract');
+  });
+
+  test('does not warn when generated task contracts have review-critical content', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Complete task',
+        '--type',
+        'feature',
+        '--out',
+        '.agentloop/tasks/complete-task.md',
+        '--problem',
+        'Users need a complete task contract before implementation.',
+        '--outcome',
+        'The task contract has reviewable implementation boundaries.',
+        '--likely-file',
+        'src/cli/commands/create-task.ts',
+        '--acceptance',
+        'The warning is absent for complete contracts.',
+        '--verification',
+        'npm test -- tests/create-task.test.ts',
+        '--rollback',
+        'Revert the focused task creation output change.',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+
+    const output = JSON.parse(result.stdout);
+    expect(output.warnings).toBeUndefined();
+    expect(output.task.markdown).toContain(
+      'Users need a complete task contract before implementation.',
+    );
+  });
+
+  test('warns in JSON when creating a task over dirty non-evidence work', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+    await initializeGitFixture(dir);
+    await mkdir(path.join(dir, 'src'), { recursive: true });
+    await writeFile(path.join(dir, 'src/index.ts'), 'export const value = 1;\n');
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa('git', ['commit', '-m', 'Initial state'], { cwd: dir });
+    await writeFile(path.join(dir, 'src/index.ts'), 'export const value = 2;\n');
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    await writeFile(path.join(dir, 'docs/new-task-guide.md'), '# New task guide\n');
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Dirty work task',
+        '--type',
+        'feature',
+        '--out',
+        '.agentloop/tasks/dirty-work-task.md',
+        '--problem',
+        'Agents need to notice existing dirty work before starting a task.',
+        '--outcome',
+        'The task warning makes scope contamination visible.',
+        '--likely-file',
+        'src/cli/commands/create-task.ts',
+        '--acceptance',
+        'Dirty work warning is emitted.',
+        '--verification',
+        'npm test -- tests/create-task.test.ts',
+        '--rollback',
+        'Revert the dirty work warning.',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+
+    const output = JSON.parse(result.stdout);
+    expect(output.warnings).toEqual([
+      {
+        code: 'DIRTY_WORKTREE_BEFORE_TASK_CREATION',
+        message:
+          'Git already had dirty non-evidence files before this task was created. Review them before treating the new task as isolated.',
+        fileCount: 2,
+        examples: ['src/index.ts', 'docs/new-task-guide.md'],
+        suggestion:
+          'Run `agentloop status --redact-paths` and confirm existing dirty files belong to this task before implementation.',
+      },
+    ]);
+    expect(output.task.markdown).toContain('## Risk Notes');
+    expect(output.task.markdown).toContain(
+      '- Pre-existing dirty non-evidence files before task creation: 2 total; examples: `src/index.ts`, `docs/new-task-guide.md`. Confirm they belong to this task before implementation.',
+    );
+  });
+
+  test('warns in human output when creating a task over dirty non-evidence work', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+    await initializeGitFixture(dir);
+    await mkdir(path.join(dir, 'src'), { recursive: true });
+    await writeFile(path.join(dir, 'src/index.ts'), 'export const value = 1;\n');
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa('git', ['commit', '-m', 'Initial state'], { cwd: dir });
+    await writeFile(path.join(dir, 'src/index.ts'), 'export const value = 2;\n');
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Human dirty work task',
+        '--type',
+        'feature',
+        '--out',
+        '.agentloop/tasks/human-dirty-work-task.md',
+        '--problem',
+        'Agents need to notice existing dirty work before starting a task.',
+        '--outcome',
+        'The task warning makes scope contamination visible.',
+        '--likely-file',
+        'src/cli/commands/create-task.ts',
+        '--acceptance',
+        'Dirty work warning is emitted.',
+        '--verification',
+        'npm test -- tests/create-task.test.ts',
+        '--rollback',
+        'Revert the dirty work warning.',
+      ],
+      { cwd: dir },
+    );
+
+    expect(result.stdout).toContain(
+      'Warning: Git already had dirty non-evidence files before this task was created.',
+    );
+    expect(result.stdout).toContain(
+      `Dirty non-evidence files: 1 total; examples: ${inlineCode('src/index.ts')}`,
+    );
+    expect(result.stdout).toContain('Run `agentloop status --redact-paths`');
+    const markdown = await readFile(
+      path.join(dir, '.agentloop/tasks/human-dirty-work-task.md'),
+      'utf8',
+    );
+    expect(markdown).toContain(
+      '- Pre-existing dirty non-evidence files before task creation: 1 total; examples: `src/index.ts`. Confirm they belong to this task before implementation.',
+    );
+  });
+
+  test('does not warn for AgentLoop evidence-only dirty files before task creation', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+    await initializeGitFixture(dir);
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa('git', ['commit', '-m', 'Initial state'], { cwd: dir });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-20-12-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Evidence only task',
+        '--type',
+        'feature',
+        '--out',
+        '.agentloop/tasks/evidence-only-task.md',
+        '--problem',
+        'Agents need a task without dirty-work false positives.',
+        '--outcome',
+        'AgentLoop evidence churn does not trigger dirty-work warnings.',
+        '--likely-file',
+        'src/cli/commands/create-task.ts',
+        '--acceptance',
+        'Dirty work warning is absent.',
+        '--verification',
+        'npm test -- tests/create-task.test.ts',
+        '--rollback',
+        'Revert the dirty work warning.',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+
+    expect(JSON.parse(result.stdout).warnings).toBeUndefined();
   });
 
   test('warns in JSON when verification commands look like post-verification gates', async () => {
@@ -543,10 +1005,20 @@ describe('create-task command', () => {
         'release',
         '--out',
         '.agentloop/tasks/misplaced-gate.md',
+        '--problem',
+        'Post-verification gates need clear placement.',
+        '--outcome',
+        'The warning stays focused on misplaced gate commands.',
+        '--likely-file',
+        'src/cli/commands/create-task.ts',
+        '--acceptance',
+        'The misplaced gate warning is emitted.',
         '--verification',
         'agentloop ship',
         '--verification',
         'npx --no-install agentloop prepare-pr --github-comment',
+        '--rollback',
+        'Move the command warning behavior back to the previous implementation.',
         '--json',
       ],
       { cwd: dir },

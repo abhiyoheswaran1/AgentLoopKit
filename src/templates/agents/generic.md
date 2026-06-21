@@ -1,4 +1,4 @@
-# Generic Coding Agent Instructions
+# Generic Agent Instructions
 
 Use AgentLoopKit for disciplined repo work.
 
@@ -13,7 +13,7 @@ Before editing:
 - Run `agentloop task done` after verification and handoff when the active task is ready to close.
 - Run `agentloop task archive <path>` only after verification and handoff are complete.
 - Run `agentloop task doctor` when old task files make current work unclear.
-- If you start AgentFlight directly with `npx --yes agentflight start --task "<task>" --yes`, run `agentloop status --redact-paths` afterward; if an AgentFlight placeholder becomes active, run `agentloop task set <path>` to re-pin the detailed task contract.
+- If you start AgentFlight directly with `npx --yes agentflight start --task "<task>" --yes`, run `agentloop status --redact-paths` and `agentloop task doctor --redact-paths` afterward. If an AgentFlight placeholder becomes active, treat it as preserved session evidence: run `agentloop task clear`, then `agentloop task set <path>` for a detailed task or `agentloop create-task` for new scoped work. Do not edit or delete the placeholder as default recovery.
 - Run `agentloop policy list`, `agentloop policy show <policy>`, and `agentloop policy status` before risky edits.
 - Run `agentloop check-gates` before stopping to check review evidence.
 

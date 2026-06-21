@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-02-06-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-02-06",
+  "createdAtEpochMs": 1782000420913,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-clarify-archived-task-evidence-in-artifacts-output.md",
+    "title": "Clarify archived task evidence in artifacts output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-02-01-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-02-06-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-02-06-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 189
+}

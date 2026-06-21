@@ -11,6 +11,7 @@ export type TaskType =
   | 'refactor'
   | 'tests'
   | 'test-generation'
+  | 'research'
   | 'docs'
   | 'release'
   | 'security-review'
@@ -37,6 +38,40 @@ export type TaskContractInput = {
 
 export type TaskOutputPathErrorReason = 'outside-tasks-dir' | 'not-markdown';
 
+const PROBLEM_STATEMENT_PLACEHOLDER = 'Describe the problem this task should solve.';
+const DESIRED_OUTCOME_PLACEHOLDER = 'Describe the concrete result expected from this task.';
+const LIKELY_FILES_PLACEHOLDER = 'None recorded yet.';
+const ACCEPTANCE_CRITERIA_PLACEHOLDER = 'Add acceptance criteria before implementation starts.';
+const VERIFICATION_COMMANDS_PLACEHOLDER = 'No verification command recorded.';
+const ROLLBACK_NOTES_PLACEHOLDER = 'Document how to revert or disable this change.';
+
+export const REVIEW_CRITICAL_TASK_PLACEHOLDERS = [
+  {
+    heading: 'Problem Statement',
+    placeholder: PROBLEM_STATEMENT_PLACEHOLDER,
+  },
+  {
+    heading: 'Desired Outcome',
+    placeholder: DESIRED_OUTCOME_PLACEHOLDER,
+  },
+  {
+    heading: 'Likely Files or Areas',
+    placeholder: LIKELY_FILES_PLACEHOLDER,
+  },
+  {
+    heading: 'Acceptance Criteria',
+    placeholder: ACCEPTANCE_CRITERIA_PLACEHOLDER,
+  },
+  {
+    heading: 'Verification Commands',
+    placeholder: VERIFICATION_COMMANDS_PLACEHOLDER,
+  },
+  {
+    heading: 'Rollback Notes',
+    placeholder: ROLLBACK_NOTES_PLACEHOLDER,
+  },
+] as const;
+
 export class TaskOutputPathError extends AgentLoopError {
   constructor(
     message: string,
@@ -56,6 +91,40 @@ function list(values: string[] | undefined, fallback = 'None recorded yet.') {
   return clean.map((value) => `- ${value}`).join('\n');
 }
 
+function extractMarkdownSectionLines(markdown: string, heading: string) {
+  const lines = markdown.split('\n');
+  const headingIndex = lines.findIndex((line) => line.trim() === `## ${heading}`);
+  if (headingIndex === -1) return [];
+
+  const sectionLines: string[] = [];
+  for (const line of lines.slice(headingIndex + 1)) {
+    if (/^##\s+/.test(line)) break;
+    sectionLines.push(line);
+  }
+
+  return sectionLines.map((line) => line.trim()).filter(Boolean);
+}
+
+function normalizeTaskSectionLine(line: string) {
+  return line
+    .replace(/^\s*-\s+/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export function findPlaceholderTaskSections(markdown: string) {
+  const sections: string[] = [];
+
+  for (const { heading, placeholder } of REVIEW_CRITICAL_TASK_PLACEHOLDERS) {
+    const sectionLines = extractMarkdownSectionLines(markdown, heading);
+    if (sectionLines.some((line) => normalizeTaskSectionLine(line) === placeholder)) {
+      sections.push(heading);
+    }
+  }
+
+  return sections;
+}
+
 export function generateTaskContract(input: TaskContractInput) {
   const createdDate = input.createdDate ?? formatDate();
   return `# ${input.title}
@@ -65,10 +134,10 @@ export function generateTaskContract(input: TaskContractInput) {
 - Status: proposed
 
 ## Problem Statement
-${input.problemStatement || 'Describe the problem this task should solve.'}
+${input.problemStatement || PROBLEM_STATEMENT_PLACEHOLDER}
 
 ## Desired Outcome
-${input.desiredOutcome || 'Describe the concrete result expected from this task.'}
+${input.desiredOutcome || DESIRED_OUTCOME_PLACEHOLDER}
 
 ## Constraints
 ${list(input.constraints)}
@@ -80,16 +149,16 @@ ${list(input.nonGoals)}
 ${list(input.assumptions)}
 
 ## Likely Files or Areas
-${list(input.likelyFiles)}
+${list(input.likelyFiles, LIKELY_FILES_PLACEHOLDER)}
 
 ## Files or Areas Not to Touch
 ${list(input.forbiddenFiles)}
 
 ## Acceptance Criteria
-${list(input.acceptanceCriteria, 'Add acceptance criteria before implementation starts.')}
+${list(input.acceptanceCriteria, ACCEPTANCE_CRITERIA_PLACEHOLDER)}
 
 ## Verification Commands
-${list(input.verificationCommands, 'No verification command recorded.')}
+${list(input.verificationCommands, VERIFICATION_COMMANDS_PLACEHOLDER)}
 
 ## Post-Verification Gates
 ${list(
@@ -109,7 +178,7 @@ ${list(
 )}
 
 ## Rollback Notes
-${input.rollbackNotes || 'Document how to revert or disable this change.'}
+${input.rollbackNotes || ROLLBACK_NOTES_PLACEHOLDER}
 
 ## Handoff Requirements
 - Summarize files changed.

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-05-33-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-05-33",
+  "createdAtEpochMs": 1782012820457,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-show-agentflight-session-status-in-dogfood-gate.md",
+    "title": "Show AgentFlight session status in dogfood gate",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-05-32-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-05-33-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-05-33-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 373
+}

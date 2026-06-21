@@ -36,6 +36,43 @@ describe('PR summary generation', () => {
     expect(summary.markdown).toContain('2 files changed');
   });
 
+  test('does not claim skipped-command coverage without a verification report', () => {
+    const summary = generatePrSummary({
+      timestamp: '2026-06-09-12-32',
+      status: ' M src/index.ts',
+      changedFiles: [{ status: 'M', path: 'src/index.ts' }],
+      taskMarkdown: '# Add settings page\n',
+      diffStat: '1 file changed',
+    });
+
+    expect(summary.markdown).toContain('## Verification Report Not Run');
+    expect(summary.markdown).toContain('- No verification report was available.');
+    expect(summary.markdown).not.toContain('- No skipped commands were recorded.');
+  });
+
+  test('lists verification report Not Run commands in deterministic reviewer summaries', () => {
+    const summary = generatePrSummary({
+      timestamp: '2026-06-09-12-35',
+      status: ' M src/index.ts',
+      changedFiles: [{ status: 'M', path: 'src/index.ts' }],
+      taskMarkdown: '# Add settings page\n',
+      verificationMarkdown: `# Verification Report
+
+Overall status: pass
+
+## Not Run
+- test
+- lint
+`,
+      diffStat: '1 file changed',
+    });
+
+    expect(summary.markdown).toContain('## Verification Report Not Run');
+    expect(summary.markdown).toContain('- test');
+    expect(summary.markdown).toContain('- lint');
+    expect(summary.markdown).not.toContain('- Check the verification report for skipped commands.');
+  });
+
   test('formats task context metadata as safe inline Markdown', () => {
     const summary = generatePrSummary({
       timestamp: '2026-06-11-21-40',
@@ -162,6 +199,44 @@ describe('PR summary generation', () => {
     const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
 
     expect(summary.markdown).toContain('Overall status: pass');
+  });
+
+  test('includes untracked non-evidence files in deterministic summary diff stats', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await execa('git', ['config', 'user.email', 'agentloopkit@example.com'], { cwd: dir });
+    await execa('git', ['config', 'user.name', 'AgentLoopKit Test'], { cwd: dir });
+    await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await mkdir(path.join(dir, 'src'), { recursive: true });
+    await writeFile(path.join(dir, 'src/index.ts'), 'export const value = 1;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
+      '# Demo task\n\n- Status: in-progress\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa('git', ['commit', '-m', 'Initial state'], { cwd: dir });
+    await writeFile(path.join(dir, 'src/index.ts'), 'export const value = 2;\n');
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    await writeFile(path.join(dir, 'docs/new-summary-guide.md'), '# New summary guide\n');
+
+    const summary = await summarizeRepository({ cwd: dir, config, timestamp: '2026-06-09-12-05' });
+
+    expect(summary.changedFiles).toEqual(
+      expect.arrayContaining([
+        { status: 'M', path: 'src/index.ts' },
+        { status: '??', path: 'docs/new-summary-guide.md' },
+      ]),
+    );
+    expect(summary.markdown).toContain('src/index.ts');
+    expect(summary.markdown).toContain('docs/new-summary-guide.md | untracked');
+    expect(summary.diffStat).toContain('docs/new-summary-guide.md | untracked');
   });
 
   test('does not use a stale verification report that predates the task', async () => {

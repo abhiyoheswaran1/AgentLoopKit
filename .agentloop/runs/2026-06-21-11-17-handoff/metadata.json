@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-11-17-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-21-11-17",
+  "createdAtEpochMs": 1782033455140,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-guard-package-metadata-positioning-language.md",
+    "title": "Guard package metadata positioning language",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-11-09-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-11-17-pr-summary.md",
+  "changedFileCount": 655
+}

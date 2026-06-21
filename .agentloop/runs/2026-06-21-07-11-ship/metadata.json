@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-07-11-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-07-11",
+  "createdAtEpochMs": 1782018698954,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-collapse-empty-prepare-pr-optional-section-whitespace.md",
+    "title": "Collapse empty prepare-pr optional-section whitespace",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-07-07-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-07-11-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-07-11-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 449
+}

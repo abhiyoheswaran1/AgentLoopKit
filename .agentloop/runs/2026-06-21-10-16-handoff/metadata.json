@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-10-16-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-21-10-16",
+  "createdAtEpochMs": 1782029812748,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-show-inherited-dirty-work-baseline-in-ship-reports.md",
+    "title": "Show inherited dirty-work baseline in ship reports",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-10-13-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-10-16-pr-summary.md",
+  "changedFileCount": 594
+}

@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-20-23-20-verify",
+  "command": "verify",
+  "createdAt": "2026-06-20-23-20",
+  "createdAtEpochMs": 1781990458963,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-20-use-untracked-aware-diff-stats-in-handoffs-and-reports.md",
+    "title": "Use untracked-aware diff stats in handoffs and reports",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-20-23-18-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 58
+}

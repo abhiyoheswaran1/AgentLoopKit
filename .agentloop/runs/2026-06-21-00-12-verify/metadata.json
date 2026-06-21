@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-00-12-verify",
+  "command": "verify",
+  "createdAt": "2026-06-21-00-12",
+  "createdAtEpochMs": 1781993526048,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-20-mention-dirty-work-risk-in-next-guidance.md",
+    "title": "Mention dirty-work risk in next guidance",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-00-06-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 89
+}

@@ -1,0 +1,55 @@
+ .agentloop/backlog.md                      |  45 +++++
+ .agentloop/harness/commands.md             |   2 +-
+ .agentloop/tasks/README.md                 |   6 +-
+ AGENTLOOP.md                               |   2 +-
+ AGENTS.md                                  |   2 +-
+ CHANGELOG.md                               |  11 +-
+ DECISIONS.md                               |  60 ++++++
+ README.md                                  |   2 +
+ docs/cli-reference.md                      |  15 +-
+ docs/html-reports.md                       |   2 +
+ docs/pr-summaries.md                       |   2 +
+ docs/status.md                             |   4 +
+ docs/task-contracts.md                     |   4 +
+ src/cli/commands/create-task.ts            | 101 +++++++++-
+ src/cli/commands/task.ts                   |  30 ++-
+ src/core/artifacts.ts                      |   3 +-
+ src/core/git.ts                            |  19 ++
+ src/core/html-report.ts                    |   4 +-
+ src/core/pr-summary.ts                     |  10 +-
+ src/core/ship.ts                           |   9 +-
+ src/core/status.ts                         |  18 +-
+ src/core/task-contract.ts                  |  80 +++++++-
+ src/core/task-state.ts                     |  83 ++------
+ src/templates/agents/claude-code.md        |   2 +-
+ src/templates/agents/codex.md              |   2 +-
+ src/templates/agents/cursor.md             |   2 +-
+ src/templates/agents/gemini-cli.md         |   2 +-
+ src/templates/agents/generic.md            |   2 +-
+ src/templates/agents/github-copilot-cli.md |   2 +-
+ src/templates/agents/opencode.md           |   2 +-
+ src/templates/harness/commands.md          |   1 +
+ src/templates/root/AGENTLOOP.md            |   2 +-
+ src/templates/root/AGENTS.md               |   2 +-
+ src/templates/tasks/README.md              |   2 +
+ tests/agent-installation.test.ts           |   4 +
+ tests/artifacts.test.ts                    |   4 +-
+ tests/create-task.test.ts                  | 312 +++++++++++++++++++++++++++++
+ tests/html-report.test.ts                  |  28 +++
+ tests/init.test.ts                         |  27 +++
+ tests/next.test.ts                         |   1 +
+ tests/pr-summary.test.ts                   |  38 ++++
+ tests/ship.test.ts                         |  21 ++
+ tests/status.test.ts                       |   2 +
+ tests/task-state.test.ts                   |  47 ++++-
+ 44 files changed, 905 insertions(+), 114 deletions(-)
+.agentloop/research/interview-cycle-153.md | untracked
+.agentloop/research/interview-cycle-154.md | untracked
+.agentloop/research/interview-cycle-155.md | untracked
+.agentloop/research/interview-cycle-156.md | untracked
+.agentloop/research/interview-cycle-157.md | untracked
+.agentloop/research/interview-cycle-158.md | untracked
+.agentloop/research/interview-cycle-159.md | untracked
+.agentloop/research/interview-cycle-160.md | untracked
+.agentloop/research/interview-cycle-161.md | untracked
+.agentloop/research/interview-cycle-162.md | untracked

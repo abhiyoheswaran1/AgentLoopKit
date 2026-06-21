@@ -119,6 +119,34 @@ describe('HTML report generation', () => {
     expect(html).toContain('Review source changes.');
   });
 
+  test('includes untracked non-evidence files in HTML report diff stats', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await execa('git', ['config', 'user.email', 'agentloopkit@example.com'], { cwd: dir });
+    await execa('git', ['config', 'user.name', 'AgentLoopKit Test'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa('git', ['commit', '-m', 'Initial state'], { cwd: dir });
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 2;\n');
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    await writeFile(path.join(dir, 'docs/new-report-guide.md'), '# New report guide\n');
+
+    const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });
+    const result = await writeHtmlReport({
+      cwd: dir,
+      config,
+      timestamp: '2026-06-10-12-35',
+      nowIso: '2026-06-10T12:35:00.000Z',
+    });
+    const html = await readFile(result.outPath, 'utf8');
+
+    expect(result.metadata.changedFileCount).toBeGreaterThanOrEqual(2);
+    expect(html).toContain('src.ts');
+    expect(html).toContain('docs/new-report-guide.md | untracked');
+  });
+
   test('keeps same-minute generated HTML reports instead of overwriting them', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

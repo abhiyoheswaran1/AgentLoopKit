@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-03-14-verify",
+  "command": "verify",
+  "createdAt": "2026-06-21-03-14",
+  "createdAtEpochMs": 1782004467807,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-add-typecheck-to-maintenance-check.md",
+    "title": "Add typecheck to maintenance check",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-03-13-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 228
+}

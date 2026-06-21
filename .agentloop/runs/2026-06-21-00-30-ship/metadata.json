@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-00-30-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-00-30",
+  "createdAtEpochMs": 1781994631641,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-document-dirty-work-next-guidance-in-status-docs.md",
+    "title": "Document dirty-work next guidance in status docs",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-00-29-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-00-30-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-00-30-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 107
+}

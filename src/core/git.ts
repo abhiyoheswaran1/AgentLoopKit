@@ -1,4 +1,5 @@
 import { execa } from 'execa';
+import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
 
 export type GitFileStatus = {
   status: string;
@@ -49,6 +50,24 @@ export async function getGitStatus(cwd: string) {
 export async function getGitDiffStat(cwd: string) {
   const result = await execa('git', ['diff', '--stat'], { cwd, reject: false });
   return result.exitCode === 0 ? result.stdout : '';
+}
+
+function sanitizeDiffStatPath(filePath: string) {
+  return filePath.replace(/\r/g, '\\r').replace(/\n/g, '\\n');
+}
+
+export function appendUntrackedFilesToDiffStat(diffStat: string, changedFiles: GitFileStatus[]) {
+  const untrackedLines = changedFiles
+    .filter((file) => file.status === '??' && !isAgentLoopEvidenceFile(file.path))
+    .map((file) => `${sanitizeDiffStatPath(file.path)} | untracked`);
+  if (!untrackedLines.length) return diffStat;
+
+  const cleanDiffStat = diffStat.trimEnd();
+  return [cleanDiffStat, ...untrackedLines].filter(Boolean).join('\n');
+}
+
+export function filterNonAgentLoopEvidenceFiles(changedFiles: GitFileStatus[]) {
+  return changedFiles.filter((file) => !isAgentLoopEvidenceFile(file.path));
 }
 
 export async function parseGitStatus(status: string): Promise<GitFileStatus[]> {

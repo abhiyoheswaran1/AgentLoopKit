@@ -190,8 +190,13 @@ describe('check-gates command', () => {
       cwd: dir,
       reject: false,
     });
+    const humanResult = await execa(tsxPath, [cliPath, 'check-gates', '--strict'], {
+      cwd: dir,
+      reject: false,
+    });
 
     expect(result.exitCode).toBe(0);
+    expect(humanResult.exitCode).toBe(0);
     const output = JSON.parse(result.stdout);
     expect(output.overallStatus).toBe('pass');
     expect(output.gates).toEqual(
@@ -204,6 +209,10 @@ describe('check-gates command', () => {
         }),
       ]),
     );
+    expect(humanResult.stdout).toContain(
+      '- [`pass`] `Archived task evidence`: `Demo task` - `.agentloop/tasks/archive/2026-06-12-demo.md`',
+    );
+    expect(humanResult.stdout).not.toContain('- [`pass`] `Task contract`: `Demo task`');
   });
 
   test('does not request another handoff when latest handoff run covers dirty evidence', async () => {
@@ -258,11 +267,22 @@ describe('check-gates command', () => {
       cwd: dir,
       reject: false,
     });
+    const coveredHumanResult = await execa(tsxPath, [cliPath, 'check-gates'], {
+      cwd: dir,
+      reject: false,
+    });
 
     expect(coveredResult.exitCode).toBe(0);
+    expect(coveredHumanResult.exitCode).toBe(0);
     const coveredOutput = JSON.parse(coveredResult.stdout);
     expect(coveredOutput.overallStatus).toBe('pass');
     expect(coveredOutput.nextAction.command).toBe('agentloop create-task');
+    expect(coveredOutput.nextAction.reason).toContain(
+      '1 existing dirty non-evidence file will be present when the new task starts; confirm it belongs to that task before implementation. Examples: `src.ts`.',
+    );
+    expect(coveredHumanResult.stdout).toContain(
+      'Examples: `src.ts`.',
+    );
 
     await writeFile(path.join(dir, 'uncovered.ts'), 'export const uncovered = true;\n');
 
@@ -299,6 +319,61 @@ describe('check-gates command', () => {
         reason: 'Write a reviewer handoff after verification.',
       },
     });
+  });
+
+  test('omits dirty examples when create-task guidance is covered by AgentLoop evidence only', async () => {
+    const dir = await createInitializedRepo();
+    const runId = '2026-06-13-01-12-handoff';
+    const handoffPath = '.agentloop/handoffs/2026-06-13-01-12-pr-summary.md';
+    await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/archive/2026-06-13-docs-hygiene.md'),
+      '# Docs hygiene\n\n- Status: done\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-13-01-06-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/handoffs/.gitkeep'), '');
+    await mkdir(path.join(dir, '.agentloop/runs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/runs/.gitkeep'), '');
+    await commitAll(dir);
+
+    await writeFile(
+      path.join(dir, handoffPath),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+    await writeJson(path.join(dir, '.agentloop/runs', runId, 'metadata.json'), {
+      id: runId,
+      command: 'handoff',
+      createdAt: '2026-06-13-01-12',
+      createdAtEpochMs: 1_001,
+      task: {
+        path: '.agentloop/tasks/2026-06-13-docs-hygiene.md',
+        title: 'Docs hygiene',
+        status: 'done',
+      },
+      verificationReportPath: '.agentloop/reports/2026-06-13-01-06-verification-report.md',
+      handoffPath,
+      changedFileCount: 1,
+    });
+    await writeJson(path.join(dir, '.agentloop/runs', runId, 'changed-files.json'), [
+      { status: 'M', path: handoffPath },
+    ]);
+
+    const result = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.overallStatus).toBe('pass');
+    expect(output.nextAction.command).toBe('agentloop create-task');
+    expect(output.nextAction.reason).not.toContain('existing dirty non-evidence');
+    expect(output.nextAction.reason).not.toContain('Examples:');
   });
 
   test('does not request another handoff when latest handoff summary covers dirty evidence without a run entry', async () => {

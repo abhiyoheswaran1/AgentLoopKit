@@ -8,6 +8,6 @@
 
 ## Output Excerpts
 
-## Commands Not Run
+## Not Run
 
 ## Recommended Next Actions

@@ -98,15 +98,17 @@ agentloop create-task --type bugfix --title "Fix release guard" \
   --post-verification "npm run dogfood:strict"
 ```
 
-Supported task types are `feature`, `bugfix`, `refactor`, `tests`, `test-generation`, `docs`, `release`, `security-review`, `dependency-upgrade`, and `migration`.
+Supported task types are `feature`, `bugfix`, `refactor`, `tests`, `test-generation`, `research`, `docs`, `release`, `security-review`, `dependency-upgrade`, and `migration`.
+
+Use `--type research` when a task is about planning or summarizing local product, customer, usability, or technical research. AgentLoopKit records the research question, evidence source, findings, limits, and follow-up tasks; it does not run interviews, create a user panel, or turn simulated persona notes into real user evidence.
 
 Task contracts record the problem statement, desired outcome, constraints, non-goals, assumptions, likely files, files not to touch, acceptance criteria, verification commands, post-verification gates, risk notes, and rollback notes.
 
-`create-task` sets the new contract as the active task. With `--json`, output includes both `task` and `activeTask`. Use `task set <path>` when you need to switch back to an older or alternate contract.
+`create-task` sets the new contract as the active task. With `--json`, output includes both `task` and `activeTask`. When `.agentloop/loops/<type>.md` exists for the selected task type, human output prints a `Loop guidance` path and JSON output includes an additive `loopGuidance` object with `taskType` and `path`. This is a one-file repo-local hint, not a workflow runner. If Git already has dirty non-evidence files before the task is created, human and JSON output include a warning with a bounded count and path examples so agents can confirm the dirty work belongs to the new task. The generated contract also persists the same bounded count and examples as a Risk Notes bullet for later review. The warning is advisory and does not read file contents or block task creation. Use `task set <path>` when you need to switch back to an older or alternate contract.
 
 Default task paths avoid same-day title collisions by adding a numeric suffix, for example `2026-06-16-fix-login.md` and `2026-06-16-fix-login-2.md`. Explicit `--out` paths stay exact and keep the existing output-path safety checks.
 
-Human-readable `create-task` output keeps generated paths and warning command values on one Markdown line. JSON output keeps raw values for scripts.
+Human-readable `create-task` output keeps generated paths, loop guidance paths, warning command values, and warning path examples on one Markdown line. JSON output keeps raw values for scripts.
 
 Use `--verification` for commands that `agentloop verify --task-commands` may run before the verification report exists. Use `--post-verification` for gates that need existing AgentLoop evidence, such as `npm run dogfood:strict`, `agentloop ship`, `agentloop prepare-pr`, `agentloop check-gates`, `agentloop maintainer-check`, or reviewer-handoff checks. Post-verification gates are recorded in the task contract. They run only when you pass `agentloop verify --post-verification-gates`.
 
@@ -129,14 +131,15 @@ agentloop task show .agentloop/tasks/<task-file>.md
 agentloop task show .agentloop/tasks/<task-file>.md --redact-paths
 agentloop task show .agentloop/tasks/<task-file>.md --json --redact-paths
 agentloop task set .agentloop/tasks/<task-file>.md
-agentloop task status .agentloop/tasks/<task-file>.md in-progress
+agentloop task set .agentloop/tasks/<task-file>.md --redact-paths
+agentloop task status .agentloop/tasks/<task-file>.md in-progress --redact-paths
 agentloop task done
-agentloop task done .agentloop/tasks/<task-file>.md
+agentloop task done .agentloop/tasks/<task-file>.md --redact-paths
 agentloop task current
-agentloop task clear
-agentloop task archive .agentloop/tasks/<task-file>.md
-agentloop task archive --status done --dry-run
-agentloop task archive --status done
+agentloop task clear --redact-paths
+agentloop task archive .agentloop/tasks/<task-file>.md --redact-paths
+agentloop task archive --status done --dry-run --redact-paths
+agentloop task archive --status done --redact-paths
 agentloop task doctor
 agentloop task doctor --redact-paths
 ```
@@ -147,7 +150,10 @@ Human `task list` output prints ordinary task contracts first and then a bounded
 
 Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Use `deferred` for parked work that should remain visible but should not become the next unpinned task.
 
+`task set`, `task status`, `task done`, `task archive`, and `task clear` accept `--redact-paths` for command consistency. Redaction applies only to displayed human or JSON path fields; the commands still write the same task state, status line, or archive destination.
+
 `task done` marks the active task `done`. Pass a path to mark a non-active task done.
+`task clear` removes only the persisted active-task pointer state. Human output distinguishes a cleared pointer from a no-op, and JSON returns `activeTask: null`, `cleared`, and optional `activeTaskPath`. It does not delete task Markdown, including preserved AgentFlight placeholder task files.
 
 Archive task contracts after verification and handoff, not as a substitute for either. Use `task archive --status done --dry-run` to preview a bulk cleanup, then run `task archive --status done` to move finished contracts into `.agentloop/tasks/archive/`. Bulk archive only accepts `done`; parked or active work still requires an explicit path.
 
@@ -168,9 +174,11 @@ agentloop next --json
 agentloop next --redact-paths
 ```
 
-`status` shows the pinned active task, newest open task when no task is pinned, deferred tasks, preserved AgentFlight placeholder tasks, current verification report, newest local run ledger entry, working tree state, Git root, configured commands, missing commands, and next suggested command. Dirty working-tree output reports the total changed-file count plus non-evidence and AgentLoop evidence counts. Clean `review` tasks with passing verification point to `agentloop task done` before the next task starts.
+`status` shows the pinned active task, newest open task when no task is pinned, optional loop guidance for that selected task, deferred tasks, preserved AgentFlight placeholder tasks, current verification report, newest local run ledger entry, working tree state, Git root, configured commands, missing commands, and next suggested command. Human `status` and `next` output label the report line as `Latest previous verification` when no active or open task exists; JSON keeps the existing `latestReport` field. Dirty working-tree output reports the total changed-file count plus non-evidence and AgentLoop evidence counts. When no active/open task exists and the next action is `agentloop create-task`, dirty non-evidence file counts and bounded path examples are called out in the reason so agents can confirm the existing work belongs to the new task. Clean `review` tasks with passing verification point to `agentloop task done` before the next task starts.
 
-Use `--brief` when an agent or script needs one compact human-readable line plus the reason. Combine `--json --brief` for compact machine-readable status with working-tree counts, task summaries, latest evidence summaries, configured command names, next action, and brief text; plain `status --json` keeps the complete changed-file arrays, task arrays, and Markdown fields. Brief output includes the latest run evidence when `.agentloop/runs/` exists. `next` uses the same decision rules but prints only the next action, including the same non-evidence versus AgentLoop evidence dirty-file breakdown for working-tree state. These commands do not run verification commands, call an LLM, read `.env` contents, or write task state.
+Use `--brief` when an agent or script needs one compact human-readable line plus the reason. Combine `--json --brief` for compact machine-readable status with working-tree counts, task summaries, optional loop guidance, latest evidence summaries, configured command names, next action, and brief text; plain `status --json` keeps the complete changed-file arrays, task arrays, and Markdown fields. Brief output includes the latest run evidence when `.agentloop/runs/` exists and renders retained no-active/no-open verification evidence as `verification=previous:<status>`. `next` uses the same decision rules but prints only the next action, including the same loop guidance and non-evidence versus AgentLoop evidence dirty-file breakdown for working-tree state. These commands do not run verification commands, call an LLM, read `.env` contents, or write task state.
+
+When the active task, or the latest open task when none is pinned, has a task type with an existing repo-local `.agentloop/loops/<type>.md` file, human `status` and `next` output print a `Loop guidance` path and JSON output includes an additive `loopGuidance` object with `taskType` and `path`. AgentLoopKit checks only that one implied loop file. It does not scan the loop directory, run the loop, enforce the workflow, or add hints for missing loop files.
 
 For generated timestamped evidence such as verification reports, `status` treats the timestamp in the filename as the artifact order. This keeps the newest AgentLoopKit report selected even when Git operations rewrite filesystem mtimes. Manual, non-generated Markdown files still use the filesystem mtime fallback.
 
@@ -187,7 +195,7 @@ agentloop review-context --json
 agentloop review-context --redact-paths
 ```
 
-`review-context` prints one read-only local snapshot for agents and scripts that do not use MCP. It combines active task state, latest verification, review gates, policy status, artifact inventory, recent run ledger entries, latest ship score, optional imported GitHub issue or PR metadata, working-tree state, safety notes, and the next recommended action. Task artifact counts separate ordinary task contracts from preserved AgentFlight placeholder task contracts.
+`review-context` prints one read-only local snapshot for agents and scripts that do not use MCP. It combines active task state, active task Risk Notes count, latest verification, review gates, policy status, artifact inventory, recent run ledger entries, latest ship score, optional imported GitHub issue or PR metadata, working-tree state, safety notes, and the next recommended action. Human output labels retained verification as `Latest previous verification` when no active or open task exists, and labels gate task evidence as active, latest open, archived, or missing when that gate data is available; JSON keeps the existing `status.latestVerification` object and gate fields. Task artifact counts separate ordinary task contracts from preserved AgentFlight placeholder task contracts. The risk-note signal is count-only; `review-context` does not print the task Risk Notes prose.
 
 The command does not run verification, write files, include full Markdown artifact bodies, read `.env` contents, call external APIs, or post to GitHub.
 Human-readable `review-context` output keeps dynamic values inside single-line inline code. Task titles, report paths, run IDs, imported GitHub metadata paths, and next-action commands with unusual characters stay on one Markdown line. JSON output keeps raw values for scripts.
@@ -254,11 +262,13 @@ agentloop prepare-pr --json --github-comment --redact-paths
 
 `ship` runs the local review-readiness flow. It detects the active task, reads Git status and diff stats, checks current verification evidence, runs gates, writes or links a handoff, calculates a deterministic review-readiness score, writes a Markdown ship report under `.agentloop/reports/`, and records a run under `.agentloop/runs/`.
 
-Human ship reports compact generated AgentLoop evidence in the changed-file section while preserving ordinary changed-file lines. JSON output and run-ledger changed-file evidence keep the full flat changed-file list.
+Human ship reports compact generated AgentLoop evidence in the changed-file section while preserving ordinary changed-file lines. They also render the task contract's Risk Notes as escaped single-line prose, with a clear fallback when no risk notes were recorded. When a generated dirty-work Risk Note records the pre-existing dirty non-evidence count, the report adds an `Inherited Dirty Work` section comparing that baseline with the current non-evidence changed-file count. The diff-stat section keeps Git's tracked-file stat output and appends compact `path | untracked` lines for untracked non-evidence files without reading their contents. JSON output, readiness scoring, and run-ledger changed-file evidence keep the full flat changed-file list.
+
+`prepare-pr` and deterministic handoff summaries render concrete commands from the verification report's `Not Run` section under a `Verification Report Not Run` heading when present. If the report records that nothing was skipped, the PR body uses a clear no-skipped-commands fallback instead of sending reviewers back to the verification report.
 
 The readiness score is evidence-based. It scores task clarity, scope control, verification evidence, evidence freshness, policy and gate compliance, handoff readiness, and risk flags. It does not claim to measure code quality.
 
-The `scope-control` score is based on non-evidence changed files. Generated AgentLoop and AgentFlight evidence churn does not lower the scope-control score by itself, but `ship --json`, the run ledger, risk checks, gate context, and report metadata still keep the full changed-file inventory.
+The `scope-control` score is based on non-evidence changed files. Generated AgentLoop and AgentFlight evidence churn does not lower the scope-control score by itself, but `ship --json`, the run ledger, risk checks, gate context, and report metadata still keep the full changed-file inventory. When the non-evidence change set is broad, ship readiness includes compact review-area counts so reviewers can see whether the scope is mostly source, tests, docs, AgentLoop guidance, CI, config, or other files.
 
 `ship` scores the review evidence it creates during the command, so the generated handoff and ship run can satisfy handoff freshness without requiring an immediate extra `agentloop handoff` run.
 
@@ -268,7 +278,7 @@ Use `ship --github-comment` when CI needs compact review-readiness Markdown for 
 
 Human-readable `ship` output keeps dynamic task, artifact, written report, gate, score, file, and next-action values on one Markdown line. JSON output keeps raw values for scripts.
 
-`prepare-pr` generates a PR title and body from the active task, changed files, verification evidence, ship report, gates, risk notes, rollback notes, and optional imported GitHub issue or PR metadata. It groups changed files by review area so reviewers can scan risk-sensitive paths, source, tests, AgentLoop evidence, docs, CI, config, and other files. Long generated AgentLoop evidence churn is compacted in the human PR body while JSON output keeps the full flat changed-file list. `--github-comment` includes Markdown suitable for a PR comment. The CLI does not read GitHub tokens or post comments by itself.
+`prepare-pr` generates a PR title and body from the active task, changed files, verification evidence, ship report, gates, risk notes, rollback notes, and optional imported GitHub issue or PR metadata. Missing GitHub metadata is omitted cleanly without an empty placeholder section. It groups changed files by review area so reviewers can scan risk-sensitive paths, source, tests, AgentLoop evidence, docs, CI, config, and other files. Long generated AgentLoop evidence churn is compacted in the human PR body while JSON output keeps the full flat changed-file list. `--github-comment` includes Markdown suitable for a PR comment. The CLI does not read GitHub tokens or post comments by itself.
 
 `prepare-pr --write` writes the generated PR description under `.agentloop/handoffs/`. If the default minute-based filename already exists, AgentLoopKit preserves the existing draft and writes the next one with a numeric suffix such as `-2.md`.
 
@@ -319,9 +329,9 @@ agentloop maintainer-check --json
 agentloop maintainer-check --redact-paths
 ```
 
-`maintainer-check` helps maintainers evaluate AI-assisted pull requests. It checks for a task contract, fresh verification evidence, handoff evidence, optional imported GitHub issue or PR metadata, changed file count, dependency and lockfile changes, migrations, auth/security-sensitive files, and generated output files.
+`maintainer-check` helps maintainers evaluate agent-assisted pull requests. It checks for a task contract, fresh verification evidence, handoff evidence, optional imported GitHub issue or PR metadata, changed file count, package manifest and dependency lockfile changes, migrations, auth/security-sensitive files, and generated output files.
 
-The `changed-file-count` check reports total changed files plus AgentLoop evidence file churn. Its broad-change warning is based on non-evidence files so long-running local verification does not hide the smaller review surface. When that warning fires, the message includes compact non-evidence review-area counts such as source, tests, docs, or CI. Dependency, migration, auth/security-sensitive, generated-output, handoff, and task checks still inspect the full changed-file list.
+The `changed-file-count` check reports total changed files plus AgentLoop evidence file churn. Its broad-change warning is based on non-evidence files so long-running local verification does not hide the smaller review surface. When that warning fires, the message includes compact non-evidence review-area counts such as source, tests, docs, or CI. Package manifest, dependency lockfile, migration, auth/security-sensitive, generated-output, handoff, and task checks still inspect the full changed-file list. Human output labels package/dependency warnings as `package-manifest`, `dependency-lockfiles`, or `package-dependency-files`; JSON keeps the existing compatibility check id.
 
 When the repo has dirty files, handoff evidence must come from the latest handoff or ship run and cover those files. An older PR summary still appears in the output, but `maintainer-check` warns that it is stale.
 
@@ -329,7 +339,7 @@ If a verified task was archived after handoff, `maintainer-check` can use the la
 
 Missing imported GitHub metadata is neutral. Invalid local metadata is a warning because reviewers cannot rely on it.
 
-Use `--redact-paths` before pasting maintainer-check output into a public issue, PR, or CI log. Default JSON keeps existing repo-relative paths unchanged for scripts.
+Use `--redact-paths` before pasting maintainer-check output into a public issue, PR, or CI log. It hides local root variants while preserving external `http` and `https` URLs. Default JSON keeps existing repo-relative paths unchanged for scripts.
 
 Human-readable output keeps dynamic check values and evidence paths on one Markdown line. JSON output keeps raw values for scripts.
 
@@ -354,12 +364,14 @@ If the working tree has dirty files and the latest review-evidence run does not 
 
 If dirty files are already covered by handoff or ship evidence for the active non-terminal task, `check-gates` recommends `agentloop task done`. If covered evidence belongs to an archived or completed task, it recommends `agentloop create-task` for the next focused task.
 
+When `check-gates` recommends `agentloop create-task` while dirty non-evidence files already exist, the next-action reason includes a bounded set of repo-relative examples from Git status. AgentLoop evidence-only dirty files are excluded from those examples.
+
 Warnings keep exit code `0` by default. Use `--strict` in CI when warning gates should fail.
 
 Clean committed work does not fail strict gates only because there are no changed files. The Git context gate reports that state as pass when the repo is inside Git.
 
 Use `--redact-paths` when gate output will be copied into a public issue, PR, or CI log. It hides the absolute Git root without changing gate decisions.
-Human-readable output renders dynamic values as single-line inline code, so unusual task paths, branch names, or gate messages cannot break Markdown lists. JSON output keeps raw values for scripts.
+Human-readable output labels archived task fallback rows as `Archived task evidence` so completed task evidence is not presented as an active task contract. It renders dynamic values as single-line inline code, so unusual task paths, branch names, or gate messages cannot break Markdown lists. JSON output keeps raw values for scripts.
 
 See [check-gates.md](check-gates.md).
 
@@ -379,7 +391,7 @@ agentloop handoff --redact-paths
 
 `summarize` previews a deterministic reviewer summary. `handoff` writes that summary to `.agentloop/handoffs/`.
 
-The summary reads Git status, Git diff stats, active task or newest open task, current verification report, and config settings. It groups changed files into review areas and adds review-focus hints from file paths only. Long local AgentLoop evidence churn is compacted in Markdown with a count and grouped evidence directories; JSON output and run-ledger changed-file evidence still keep the full file list. It does not call an LLM.
+The summary reads Git status, Git diff stats, active task or newest open task, current verification report, and config settings. Diff Stats append compact `path | untracked` markers for untracked non-evidence files because Git's native diff stat does not include them. It groups changed files into review areas and adds review-focus hints from file paths only. It also renders concrete commands from the verification report's `Not Run` section under a `Verification Report Not Run` heading when present. Long local AgentLoop evidence churn is compacted in Markdown with a count and grouped evidence directories; JSON output and run-ledger changed-file evidence still keep the full file list. It does not call an LLM or read untracked file contents.
 
 Use `--write-run` when you want a summary or handoff to also create a local run ledger entry under `.agentloop/runs/`. For `summarize`, this does not write a handoff file unless you also pass `--write`; for `handoff`, the handoff file is written by default.
 
@@ -416,13 +428,13 @@ agentloop badge --source gates
 agentloop badge --json
 ```
 
-`artifacts` inventories existing local AgentLoop evidence without writing files. It reports ordinary task counts and statuses, preserved AgentFlight placeholder task artifacts, latest verification report, latest handoff, latest ship report, HTML reports, badges, CI summaries, release notes, and run ledger entries. Latest ordinary task selection excludes AgentFlight placeholder contracts and parked or terminal statuses such as `deferred` and `done`; those tasks still remain in the counts. When no live ordinary task qualifies, `artifacts` can surface the newest archived terminal task as latest task evidence and marks it as `archived` in human and JSON output. Placeholder count and latest metadata stay under the preserved placeholder section. Use `--type` to filter to `task`, `verification`, `handoff`, `ship-report`, `html-report`, `badge`, `ci-summary`, `release-notes`, or `run`. Use `--latest` to print only the latest matching artifact entries. Use `--stale` to preview older verification, handoff, ship report, and run-ledger evidence candidates while keeping the latest evidence protected. Markdown stale previews show the first 50 candidates by default. Use `--type ship-report` with `--stale` to inspect only ship report candidates. Use `--limit <count>` with `--stale` to change the cap while still reporting total and hidden counts. JSON output uses repo-relative paths, returns all stale candidates unless you pass `--limit`, and does not include artifact file contents. `--redact-paths` is accepted for consistency with other shareable evidence commands; artifact inventory paths remain repo-relative.
+`artifacts` inventories existing local AgentLoop evidence without writing files. It reports ordinary task counts and statuses, preserved AgentFlight placeholder task artifacts, latest verification report, latest handoff, latest ship report, HTML reports, badges, CI summaries, release notes, and run ledger entries. Latest ordinary task selection excludes AgentFlight placeholder contracts and parked or terminal statuses such as `deferred` and `done`; those tasks still remain in the counts. When no live ordinary task qualifies, `artifacts` can surface the newest archived terminal task as `Latest archived task evidence` in human output and marks it as `archived` in JSON output. Placeholder count and latest metadata stay under the preserved placeholder section. Use `--type` to filter to `task`, `verification`, `handoff`, `ship-report`, `html-report`, `badge`, `ci-summary`, `release-notes`, or `run`. Use `--latest` to print only the latest matching artifact entries. Use `--stale` to preview older verification, handoff, ship report, and run-ledger evidence candidates while keeping the latest evidence protected. Markdown stale previews show the first 50 candidates by default and include a candidate summary grouped by artifact type before the bounded list. Use `--type ship-report` with `--stale` to inspect only ship report candidates and get a summary scoped to ship reports. Use `--limit <count>` with `--stale` to change the cap while still reporting total and hidden counts. JSON output uses repo-relative paths, returns all stale candidates unless you pass `--limit`, includes deterministic candidate counts by type, and does not include artifact file contents. `--redact-paths` is accepted for consistency with other shareable evidence commands; artifact inventory paths remain repo-relative.
 Generated timestamped verification, handoff, ship, CI-summary, and release-note files are ordered by their filename timestamp and collision suffix. Manual files fall back to filesystem mtime and filename ordering.
 Human-readable `artifacts` output keeps dynamic artifact values inside single-line inline code. When latest run ledger evidence includes readable `changed-files.json`, human run artifact lines separate generated AgentLoop and AgentFlight evidence churn from non-evidence changed-file counts. JSON output keeps raw values for scripts and does not add those human-only split fields.
 
 `artifacts --stale` is a read-only cleanup preview. It does not delete files, write files, read `.env` contents, follow symlinked artifact roots outside the repo, or run verification commands.
 
-`report` writes a local static HTML evidence report from the current task, latest verification report, latest handoff, Git status, diff stats, and deterministic summary.
+`report` writes a local static HTML evidence report from the current task, latest verification report, latest handoff, Git status, diff stats, and deterministic summary. Its Diff Stats section uses the same compact `path | untracked` markers for untracked non-evidence files as ship and handoff evidence.
 
 ```bash
 agentloop report --redact-paths
@@ -484,7 +496,7 @@ npm run release-flow
 
 `test:quick` runs the fast unit-oriented suite through `test:unit`. `test:integration` runs slower CLI workflow tests. `test:release` runs the full Vitest suite through `npm test`.
 
-The dogfood scripts run AgentLoopKit's local self-check path for this repository, including task folder hygiene, public-doc hygiene, dependency audit, harness upgrade audit, review gates, artifact inventory, maintainer reviewability, review context, AgentFlight health, and ProjScan health. Normal dogfood output uses concise human `task doctor`, `upgrade-harness --redact-paths`, `artifacts`, `maintainer-check --redact-paths`, and `review-context --redact-paths` output instead of streaming their full JSON snapshots. JSON mode prints one structured summary with mode, overall status, step results, exit codes, durations, and safety notes for agents and CI logs. It redacts the current workspace root as `[git-root]` before printing structured output.
+The dogfood scripts run AgentLoopKit's local self-check path for this repository, including task folder hygiene, public-doc hygiene, dependency audit, harness upgrade audit, review gates, artifact inventory, maintainer reviewability, review context, AgentFlight health, and ProjScan health. Normal dogfood output uses concise human `task doctor`, `upgrade-harness --redact-paths`, `artifacts`, `maintainer-check --redact-paths`, and `review-context --redact-paths` output instead of streaming their full JSON snapshots. Strict dogfood passes `--strict` to `check-gates` so review-gate warnings fail the run; maintainer-check warnings remain reviewer guidance unless that command exits non-zero. JSON mode prints one structured summary with mode, overall status, step results, exit codes, durations, and safety notes for agents and CI logs. It redacts the current workspace root as `[git-root]` before printing structured output.
 
 The scripts do not publish packages, create tags, post comments, read tokens, read `.env` files, or run verification commands.
 
@@ -537,7 +549,7 @@ Human-readable `release-notes` output keeps dynamic metadata, refs, paths, and e
 
 `release-check` checks local release readiness from package metadata, changelog entries, release scripts, git state, current verification evidence, reviewer handoff, generated release notes, and commits since the current version tag. When the current version tag already exists, it reports whether later commits changed package-impacting files or only repo-local evidence/docs. It warns when `CHANGELOG.md` still has `Unreleased` entries, verification predates the current task, package-impacting files changed after the current version tag, or the latest generated release notes do not mention the local package version. Use `--strict` when warnings should fail CI or a maintainer release gate.
 
-Use `--redact-paths` before pasting release-check output into a public issue, PR, or CI log. Default JSON keeps the absolute Git root for scripts that need it.
+Use `--redact-paths` before pasting release-check output into a public issue, PR, or CI log. It hides local root variants while preserving external `http` and `https` URLs. Default JSON keeps the absolute Git root for scripts that need it.
 Human-readable `release-check` output keeps package metadata, release-delta messages, check messages, paths, refs, and commands on one Markdown line. When generated AgentLoop evidence is dirty, changed-file output separates total, non-evidence, and AgentLoop evidence counts without changing release readiness decisions. JSON output keeps raw values for scripts, including `git.changedFileCount`, `git.nonEvidenceChangedFileCount`, `git.agentLoopEvidenceChangedFileCount`, `releaseDelta.changedFiles`, `releaseDelta.packageImpactingChangedFiles`, and `releaseDelta.recommendation`.
 
 `release-proof` checks post-release evidence across public release channels. It reports whether npm, GitHub Releases, GitHub Marketplace, GHCR, and MCP Registry proof match the local package version. It also reports the version tag commit, current commit, and whether `HEAD` matches the version tag. If public channels match but `HEAD` differs from the tag, use `agentloop release-check` to decide whether unreleased commits need another release. Use `--only <channel>` to re-check one channel after a delayed workflow. Use captured JSON flags when you want deterministic CI or release notes without live registry calls. Use `--strict` when missing proof should fail the command.

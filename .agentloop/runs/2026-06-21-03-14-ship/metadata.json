@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-03-14-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-03-14",
+  "createdAtEpochMs": 1782004495687,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-add-typecheck-to-maintenance-check.md",
+    "title": "Add typecheck to maintenance check",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-03-13-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-03-14-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-03-14-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 231
+}

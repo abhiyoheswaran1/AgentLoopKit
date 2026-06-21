@@ -1,5 +1,7 @@
 import type { GitFileStatus } from './git.js';
 import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
+import { renderChangeAreaCounts } from './change-areas.js';
+import { listItems as markdownListItems, sectionContent } from './markdown-sections.js';
 
 export type ReadinessGateStatus = 'pass' | 'warn' | 'fail';
 
@@ -71,19 +73,8 @@ const READINESS_CLAIMS = [
   'The score is deterministic and based only on local AgentLoopKit evidence.',
 ];
 
-function sectionContent(markdown: string, heading: string) {
-  const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const match = markdown.match(new RegExp(`^## ${escapedHeading}\\s*\\n([\\s\\S]*?)(?=^## |\\z)`, 'm'));
-  return match?.[1]?.trim() ?? '';
-}
-
 function listItems(section: string) {
-  return section
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.startsWith('- '))
-    .map((line) => line.slice(2).trim())
-    .filter((line) => line && !/^none recorded yet\.$/i.test(line));
+  return markdownListItems(section).filter((line) => !/^none recorded yet\.$/i.test(line));
 }
 
 function hasMeaningfulText(value: string, placeholders: RegExp[]) {
@@ -153,8 +144,9 @@ function riskSensitiveFiles(changedFiles: GitFileStatus[]) {
 
 function scopeControl(input: ReadinessScoreInput, warnings: string[]) {
   const totalCount = input.changedFiles.length;
-  const evidenceCount = input.changedFiles.filter((file) => isAgentLoopEvidenceFile(file.path)).length;
-  const count = totalCount - evidenceCount;
+  const nonEvidenceFiles = input.changedFiles.filter((file) => !isAgentLoopEvidenceFile(file.path));
+  const count = nonEvidenceFiles.length;
+  const evidenceCount = totalCount - count;
   const risky = riskSensitiveFiles(input.changedFiles);
   let score = 100;
   let reason =
@@ -173,10 +165,12 @@ function scopeControl(input: ReadinessScoreInput, warnings: string[]) {
     }
   } else if (count > 25) {
     score = 45;
+    const areaCounts = renderChangeAreaCounts(nonEvidenceFiles);
+    const areaSuffix = areaCounts ? ` Non-evidence review areas: ${areaCounts}.` : '';
     reason =
       evidenceCount > 0
-        ? `${count} non-evidence changed files is broad for one review; ${evidenceCount} AgentLoop evidence file(s) also present (${totalCount} total).`
-        : `${count} changed files is broad for one review.`;
+        ? `${count} non-evidence changed files is broad for one review; ${evidenceCount} AgentLoop evidence file(s) also present (${totalCount} total).${areaSuffix}`
+        : `${count} changed files is broad for one review.${areaSuffix}`;
     warnings.push(
       evidenceCount > 0
         ? 'Large non-evidence change set; consider splitting before review.'

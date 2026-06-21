@@ -1,6 +1,6 @@
 # Maintainer Evidence Policy
 
-Require evidence before reviewing agent-generated changes.
+Require evidence before reviewing agent-assisted changes.
 
 - Confirm a task contract exists.
 - Confirm verification evidence is fresh.

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-20-23-01-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-20-23-01",
+  "createdAtEpochMs": 1781989321247,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-20-show-untracked-files-in-ship-diff-stat.md",
+    "title": "Show untracked files in ship diff stat",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-20-22-54-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-20-23-01-ship-report-2.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-20-23-01-pr-summary-2.md",
+  "score": 96,
+  "changedFileCount": 40
+}

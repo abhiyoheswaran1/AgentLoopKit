@@ -4,15 +4,15 @@
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/logo/icon.svg" alt="AgentLoopKit logo" width="96" height="96">
 </p>
 
-A drop-in engineering loop for coding agents.
+A drop-in engineering loop for software agents.
 
 An open-source Baseframe Labs developer tool.
 
-Your coding agent can write code. AgentLoopKit helps you decide whether that code is reviewable, verifiable, and merge-ready.
+Your software agent can produce a diff. AgentLoopKit helps you decide whether that work is reviewable, verifiable, and merge-ready.
 
-It gives Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and other coding agents a local acceptance layer: task contracts, safety rules, verification evidence, review-readiness scores, PR descriptions, and reviewer handoffs.
+It gives Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and other engineering agents a local acceptance layer: task contracts, safety rules, verification evidence, review-readiness scores, PR descriptions, and reviewer handoffs.
 
-Vibe coding produces code. Agentic engineering produces auditable work.
+Unstructured automation produces code. Agentic engineering produces auditable work.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-showcase.png" alt="AgentLoopKit workflow showing task contracts, verification reports, and handoff artifacts" width="100%">
@@ -22,7 +22,7 @@ The screenshots and terminal demo in this README are generated from committed so
 
 ## What It Does
 
-AgentLoopKit is a repo-level toolkit for developers using Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and other coding agents.
+AgentLoopKit is a repo-level toolkit for developers using Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and other engineering agents.
 
 Keep your agent, IDE, and CLI. AgentLoopKit gives those tools a repeatable local workflow:
 
@@ -136,7 +136,7 @@ agentloop create-task --title "Fix login redirect bug" --type bugfix \
   --include-config-commands \
   --verification "npm test -- auth"
 
-# Run Codex, Claude Code, Cursor, OpenCode, Gemini CLI, or another coding agent.
+# Run Codex, Claude Code, Cursor, OpenCode, Gemini CLI, or another software agent.
 
 agentloop verify --task-commands --only-task-commands --progress
 agentloop ship --github-comment
@@ -156,6 +156,8 @@ npx agentloopkit status --brief
 npx agentloopkit next
 npx agentloopkit next --redact-paths
 ```
+
+When `status` or `next` recommends `create-task` in a dirty repo, the reason calls out existing dirty non-evidence files so agents can confirm the next task scope before implementation. When `create-task` sees that same pre-existing dirty work, it also adds a bounded Risk Notes bullet to the generated task contract so later review evidence preserves the baseline count and examples.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo running AgentLoopKit init, task creation, task-aware verification, review-readiness scoring, PR preparation, review context, run history, and file intent lookup" width="100%">
@@ -194,13 +196,13 @@ Use the stricter gate before a release or final handoff:
 npm run dogfood:strict
 ```
 
-Use the maintenance gate when release-proof or npm-status command health, public docs, SchemaStore, policy packs, GitHub metadata, AgentFlight, or ProjScan behavior changes:
+Use the maintenance gate when typecheck, release-proof or npm-status command health, public docs, SchemaStore, policy packs, GitHub metadata, AgentFlight, or ProjScan behavior changes:
 
 ```bash
 npm run maintenance:check
 ```
 
-`maintenance:check` covers public docs, links, non-strict npm release-proof smoke coverage, read-only npm-status safety tests, SchemaStore output and consistency tests, policy-pack inventory and safety tests, GitHub metadata safety and ship-score neutrality tests, AgentFlight, ProjScan, and the non-strict dogfood self-check. Use `npm run dogfood:strict` after fresh handoff or ship evidence exists, when review gates should block the handoff. Strict public release proof remains part of approved release gates.
+`maintenance:check` covers unit tests, typecheck, public docs, links, non-strict npm release-proof smoke coverage, read-only npm-status safety tests, SchemaStore output and consistency tests, policy-pack inventory and safety tests, GitHub metadata safety and ship-score neutrality tests, AgentFlight, ProjScan, and the non-strict dogfood self-check. Use `npm run dogfood:strict` after fresh handoff or ship evidence exists, when review-gate warnings should block the handoff. maintainer-check warnings remain reviewer guidance unless the command exits non-zero. Strict public release proof remains part of approved release gates.
 
 ## Commands
 
@@ -229,7 +231,7 @@ agentloopkit init
 | `agentloop runs --latest`        | Show the newest local ship, verify, or handoff run entry                       |
 | `agentloop show-run <id>`        | Show one local run ledger entry                                                |
 | `agentloop intent <file>`        | Show which runs touched a file and why                                         |
-| `agentloop maintainer-check`     | Check whether an AI-assisted PR is reviewable                                  |
+| `agentloop maintainer-check`     | Check whether an agent-assisted PR is reviewable                                  |
 | `agentloop artifacts`            | Inventory local tasks, reports, ship reports, badges, and run evidence         |
 | `agentloop artifacts --stale`    | Preview capped older local evidence candidates without deleting files          |
 | `agentloop upgrade-harness`      | Inspect older generated guidance without overwriting local edits               |
@@ -314,8 +316,8 @@ For narrower evidence history, `agentloop verify --write-run` and `agentloop han
 
 `agentloop status` includes the newest local run ledger entry when `.agentloop/runs/` exists, so agents can see the latest review-readiness or verification evidence without opening every report.
 Run ledger output uses safe display paths: `.agentloop/...` for AgentLoopKit artifacts, repo-relative paths for repo files, and filenames for older outside absolute paths.
-Use `--redact-paths` with `doctor`, `task list`, `task show`, `status`, `next`, `review-context`, `check-gates`, `artifacts`, `report`, `badge`, `runs`, `show-run`, `intent`, `verify`, `summarize`, `handoff`, `ship`, `prepare-pr`, `maintainer-check`, `upgrade-harness`, `ci-summary`, `release-notes`, `schemastore`, `github import`, `install-agent`, `release-check`, or `release-proof` before pasting output into a public issue, PR, or CI log. That mode replaces local root paths with a placeholder. Default JSON output keeps raw paths for scripts unless the redaction flag is passed. `task show` applies redaction to displayed task contract content. `task list`, `artifacts`, `runs`, `show-run`, `intent`, `schemastore`, and `github import` already use repo-relative paths or catalog metadata, and accept the flag for command consistency.
-`agentloop review-context --json` gives non-MCP agents one read-only local snapshot with status, gates, policies, artifacts, recent runs, latest ship evidence, and the next action.
+Use `--redact-paths` with `doctor`, `task list`, `task show`, `task set`, `task status`, `task done`, `task archive`, `task clear`, `status`, `next`, `review-context`, `check-gates`, `artifacts`, `report`, `badge`, `runs`, `show-run`, `intent`, `verify`, `summarize`, `handoff`, `ship`, `prepare-pr`, `maintainer-check`, `upgrade-harness`, `ci-summary`, `release-notes`, `schemastore`, `github import`, `install-agent`, `release-check`, or `release-proof` before pasting output into a public issue, PR, or CI log. That mode replaces local root paths with a placeholder. Default JSON output keeps raw paths for scripts unless the redaction flag is passed. `task show` applies redaction to displayed task contract content. `task list`, `artifacts`, `runs`, `show-run`, `intent`, `schemastore`, and `github import` already use repo-relative paths or catalog metadata, and accept the flag for command consistency.
+`agentloop review-context --json` gives non-MCP agents one read-only local snapshot with status, active-task risk-note count, gates, policies, artifacts, recent runs, latest ship evidence, and the next action.
 `agentloop upgrade-harness` is read-only. It tells existing users which generated guidance files need manual review after a CLI upgrade. It does not merge templates or overwrite local edits.
 `agentloop schemastore --json` prints the catalog entry for `agentloop.config.json`. Use it when preparing a SchemaStore contribution; the CLI does not submit that contribution for you. `schemastore --redact-paths` is accepted for consistency; catalog values are not local filesystem paths, so output values do not change.
 `agentloop github import --issue-json issue.json --pr-json pr.json` imports explicit local GitHub metadata into `.agentloop/github/context.json`. `review-context`, `prepare-pr`, and `maintainer-check` use that local context when it exists. Missing metadata does not block the loop. `github import --redact-paths` is accepted for consistency; metadata paths are already repo-relative, so output values do not change. The CLI does not call GitHub APIs, read tokens, or run `gh`.
@@ -329,6 +331,7 @@ Shell completions include fixed values for task types, task-list status filters,
 - [Upgrading existing repos](docs/upgrading-existing-repos.md)
 - [Configuration](docs/configuration.md)
 - [Task contracts](docs/task-contracts.md)
+- [Research tasks](docs/research.md)
 - [Verification reports](docs/verification-reports.md)
 - [Status and next action](docs/status.md)
 - [Gate checks](docs/check-gates.md)

@@ -1,5 +1,269 @@
 # Decisions
 
+## 2026-06-21: Status And Next Surface Active Loop Guidance
+
+Typed task guidance should stay visible after task creation because agents often re-enter work through `agentloop status` or `agentloop next`, not the original `create-task` output.
+
+`getAgentLoopStatus` now resolves optional loop guidance for the active task, or the latest open task when none is pinned, by reading that task's `Task type` line and checking only the implied repo-local `.agentloop/loops/<type>.md` file. Human `status` and `next` output print `Loop guidance` when the file exists, and JSON output adds an optional `loopGuidance` object with `taskType` and `path`. Next-action routing, task contract Markdown, command execution, loop enforcement, directory scans, missing-loop hints, dependencies, releases, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Create-Task Surfaces Matching Loop Guidance
+
+Typed task contracts are more useful when the next loop guidance is visible immediately after creation. This matters more now that `research` has a local loop template: users should not need to remember that `.agentloop/loops/research.md` exists.
+
+`create-task` now checks only the one repo-local file implied by the selected type, `.agentloop/loops/<type>.md`. When that file exists, human output prints `Loop guidance` and JSON output adds an optional `loopGuidance` object with `taskType` and `path`. Task contract Markdown, task state, warnings, command execution, loop enforcement, dependencies, releases, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Product Direction Uses Agent-Assisted Engineering Language
+
+Product dogfooding found that internal product-panel and persona files still used narrow assistant-era language even after public docs and package metadata had moved to software-agent and agent-assisted engineering positioning.
+
+Live internal product-direction files now use agent-assisted engineering and software-agent wording. A focused unit test scans `.agentloop/product-panel.md`, `.agentloop/user-personas.md`, and `.agentloop/backlog.md` for unsupported positioning phrases. The guard intentionally excludes archived task evidence and old research artifacts so historical records remain intact. CLI behavior, public-doc semantics, release behavior, dependencies, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Research Tasks Are Local Evidence Workflows
+
+Product dogfooding and persona review showed AgentLoopKit had local simulated research notes, but no explicit task type for users who want to plan or summarize research work as reviewable evidence.
+
+AgentLoopKit now supports a `research` task type, bundled research loop guidance, generated task README guidance, and public docs for research tasks. The feature frames research as local planning, findings, limits, and follow-up task evidence. It does not add interview automation, user panels, analytics ingestion, AI APIs, telemetry, external calls, claims of real user feedback, release behavior, dependencies, tags, publishing, or package version changes.
+
+## 2026-06-21: Task Lifecycle Commands Accept Redacted Output
+
+Dogfooding showed agents naturally append `--redact-paths` to task lifecycle commands when preparing shareable logs, but `task status` and related mutation commands rejected the flag even though they print task paths.
+
+`task set`, `task status`, `task done`, `task archive`, and `task clear` now accept `--redact-paths`. The flag affects only displayed human and JSON path fields by redacting local roots through the existing redaction helper. Task state semantics, status updates, archive movement, task contract format, JSON field shape, release behavior, dependencies, tags, publishing, and package version stay unchanged.
+
+## 2026-06-21: Ship Reports Show Inherited Dirty-Work Baselines
+
+Dogfooding long autonomous sessions showed each small task can inherit a large dirty non-evidence baseline from earlier unreleased work. `create-task` already records that baseline in Risk Notes, but ship reports mostly surfaced the current total through scope warnings, so reviewers had to find the baseline later in the report.
+
+Human ship reports now add an `Inherited Dirty Work` section when task Risk Notes include the generated pre-existing dirty non-evidence count. The section compares the recorded baseline with the current non-evidence changed-file count using the changed-file inventory already collected by `ship`. Readiness scores, ship JSON shape, create-task behavior, run-ledger schema, gate decisions, release behavior, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Review Context Shows Gate Evidence Source
+
+Dogfooding no-active and archived-task cleanup states showed `review-context` had the right next action and previous-verification label, but the gate summary still collapsed task evidence to `Gates: pass`. Agents consuming the one-shot snapshot should not need a separate `check-gates` call just to know whether task evidence is active, latest open, archived, or missing.
+
+Human `review-context` output now appends a task-evidence source label to the gate summary when the task gate is present. The label is derived from the existing gate path plus status task context: active task evidence, latest open task evidence, archived task evidence, missing task evidence, or a generic task evidence fallback. Review-context JSON fields, gate ids, gate messages, gate status semantics, next-action routing, file reads, release behavior, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Maintainer Check Labels Package Warnings Precisely
+
+Dogfooding repeated maintainer-check output showed the message and checklist correctly distinguished package manifest-only changes, but the human row still rendered the compatibility check id `dependency-lockfiles`. In package-manifest-only cases that made the row look like a lockfile warning.
+
+Human `maintainer-check` output now uses display labels for the package/dependency row: `package-manifest`, `dependency-lockfiles`, or `package-dependency-files` depending on the existing message. The JSON check id, status, message, checklist copy, warning/failure semantics, package content parsing behavior, release behavior, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Check Gates Shows Dirty Create-Task Examples
+
+Dogfooding no-active/no-open states showed `status` and `next` included bounded dirty non-evidence examples before recommending `agentloop create-task`, but `check-gates` still showed only the dirty counts. Agents that start from review gates need the same scope cue before opening the next task.
+
+`check-gates` now appends up to five repo-relative dirty non-evidence examples to create-task next-action reasons when dirty non-evidence files exist. It uses the Git status paths already collected by check-gates and excludes AgentLoop evidence files. Gate decisions, strict-mode exit behavior, task evidence resolution, next-action command selection, file-content reads, release behavior, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Check Gates Labels Archived Task Evidence
+
+Dogfooding the no-active/no-open state showed `check-gates` correctly reused archived task evidence after normal cleanup, but the human gate row still said `Task contract`. That preserved the gate contract, but it could make previous task evidence look like an active or current task.
+
+Human `check-gates` output now renders that row as `Archived task evidence` when the task gate path points under a task archive. JSON gate fields, gate pass/warn/fail decisions, strict-mode exit behavior, task evidence resolution, next-action command selection, release behavior, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Review Context Labels Previous Verification
+
+Dogfooding the no-active/no-open state showed `review-context` still printed `Latest verification: pass` after `status`, `next`, and `status --brief` had been tightened to mark retained reports as previous evidence. Since agents use `review-context` as a read-only snapshot, it should not imply archived-task verification is current-task proof.
+
+Human `review-context` output now renders `Latest previous verification` when both `activeTask` and `latestTask` are absent. Active or newest-open task states keep `Latest verification`. Review-context JSON fields, review gates, task selection, next-action routing, verification discovery, release behavior, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Status Brief Labels Previous Verification
+
+Dogfooding after archived tasks showed the full `status` and `next` output had the previous-evidence label, but compact `status --brief` still printed `verification=pass` when no active or open task existed. That compact line is used in automation logs and agent prompts, so it should avoid implying current-task proof.
+
+`status --brief` now renders `verification=previous:<status>` when a latest report exists but both `activeTask` and `latestTask` are absent. Active or newest-open task states keep `verification=<status>`. Structured status fields, next-action routing, verification discovery, release behavior, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Dirty Create-Task Guidance Shows Examples
+
+Dogfooding no-active/no-open states showed `status` and `next` warned about existing dirty non-evidence file counts before recommending `agentloop create-task`, but agents did not see any path examples until after creating the task. That made it harder to decide whether the dirty work belonged to the next task.
+
+Create-task next-action reasons now append up to five repo-relative dirty non-evidence path examples from the already-collected Git status data. The warning remains advisory, AgentLoop evidence-only dirt stays excluded, file contents are not read, and task selection, command selection, verification selection, JSON shape, release behavior, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Next Labels Previous Verification Evidence
+
+Dogfooding the archived-task state showed `agentloop status` used `Latest previous verification`, but `agentloop next` still printed `Latest verification` for the same no-active/no-open state. That kept the lightweight next-action command slightly less precise than the full status view.
+
+Human `next` output now uses `Latest previous verification` when both `activeTask` and `latestTask` are absent, matching `status`. Repos with an active task or newest open task keep the existing `Latest verification` label. JSON output, next-action routing, verification discovery, task selection, command execution, release behavior, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Status Labels Previous Verification Evidence
+
+Dogfooding after task archive showed human `agentloop status` could still show `Latest verification` with a passing report even when no active or open task existed. The next action was already correct, but the label could make previous-task evidence look like current-work evidence.
+
+Human `status` output now uses `Latest previous verification` when both `activeTask` and `latestTask` are absent. Repos with an active task or newest open task keep the existing `Latest verification` label. JSON output, `latestReport` discovery, task selection, next-action ordering, command execution, release behavior, tags, publishing, and package versions stay unchanged.
+
+## 2026-06-21: Verification Not Run Shows Configured Commands
+
+Dogfooding task-only verification showed `Not Run` entries such as `test`, `lint`, and `build` flowing into PR handoffs without the configured command strings. The aliases are stable and useful for scripts, but human reviewers need enough context to understand what each skipped configured check represents.
+
+Verification report Markdown now renders configured `Not Run` entries as `alias: command`, using Markdown-safe inline code for the configured command string. JSON `notRun` remains the existing alias list, and command selection, command execution, task-command parsing, duplicate handling, verification status semantics, release behavior, dependency behavior, tags, publishing, and package version stay unchanged.
+
+## 2026-06-21: Prepare-pr Collapses Missing Optional Sections
+
+Dogfooding the generated PR body showed that missing imported GitHub metadata left an empty visual gap between `Verification Evidence` and `Reviewer Checklist`. The output was technically valid, but reviewer-facing Markdown should look intentional even when optional local context is absent.
+
+`prepare-pr` now trims the imported GitHub metadata section and inserts it only when present. Missing metadata still stays neutral, imported metadata still renders in the same section, and GitHub metadata parsing, command execution, verification parsing, JSON evidence shape, release behavior, dependency behavior, tags, publishing, and package version stay unchanged.
+
+## 2026-06-21: PR Handoffs Name Report Not Run Entries Precisely
+
+Dogfooding the direct `Not Run` handoff rendering showed that the heading could still overstate the evidence gap. The entries are copied from the verification report's structured `Not Run` section, not a full assessment of everything that was or was not verified.
+
+`prepare-pr` and deterministic PR summaries now render the section as `Verification Report Not Run`. The parser source, fallback text, verification report generation, command execution, report JSON shape, release behavior, dependency behavior, tags, publishing, and package version stay unchanged.
+
+## 2026-06-21: Not Run Omits Exact Covered Configured Commands
+
+Dogfooding task-only verification showed PR handoffs could list `typecheck` under a broad unverified-work heading even when the task contract ran the exact same `npm run typecheck` command. The report was technically describing configured shortcuts skipped by `--only-task-commands`, but the reviewer-facing handoff overstated the gap.
+
+Verification now computes `Not Run` after command execution and omits configured `test`, `lint`, `typecheck`, or `build` entries when the exact configured command string appears in executed results. This is exact string equality only: partial coverage such as `npm test -- tests/foo.test.ts` does not cover configured `npm test`. Command execution, exit handling, status semantics, task-command parsing, releases, and publishing stay unchanged.
+
+## 2026-06-21: Ship Scope Warnings Include Review Areas
+
+Dogfooding long autonomous sessions showed `agentloop ship` could warn that a non-evidence change set was broad without saying which review areas made it broad. `maintainer-check` already had compact area counts, but reviewers should not need to cross-reference another command to understand the ship score.
+
+Readiness scoring now reuses a shared change-area count formatter from `change-areas.ts` and appends area counts only when the broad-scope threshold fires. The score weights, dimensions, changed-file inventory, gate decisions, run ledger data, release behavior, and publishing stay unchanged.
+
+## 2026-06-21: Review Checks Reuse Shared URL-Safe Redaction
+
+After URL-safe redaction was fixed for verification evidence, maintainer-check and release-check still had local split-based root-redaction helpers. Dogfooding the refactor exposed a related bug: a `/var/...` temp path embedded in maintainer-check task text was not redacted when the resolved root was `/private/var/...`.
+
+Maintainer-check and release-check now call the shared `redactLocalRoots` helper for redacted check messages, paths, git root, and next-action text. The shared helper also trims inferred labeled AgentLoop artifact paths at the `.agentloop` boundary so `Report: /repo/.agentloop/...` keeps the artifact suffix instead of becoming only `[git-root]`. This does not change check ids, statuses, JSON shape, scoring, command execution, releases, or publishing.
+
+## 2026-06-21: AgentFlight Verification Uses Argument Separator Syntax
+
+Dogfooding created a failed AgentFlight verification record by passing the whole `npm test -- tests/artifacts.test.ts` command as one quoted argument. The later correctly invoked verification passed, but AgentFlight status continued to surface the original failed evidence, which made the handoff less clear.
+
+Repo-local dogfood and maintenance guidance now shows `npx --yes agentflight verify -- npm test -- tests/example.test.ts` and warns not to pass the full command as one quoted string. This is documentation only: it does not change AgentFlight behavior, hide failed evidence, mutate session records, change AgentLoopKit command execution, release, or publish.
+
+## 2026-06-21: Dogfood Surfaces AgentFlight Session Status
+
+Dogfooding showed `npm run dogfood:strict` could pass AgentFlight doctor while `agentflight status` still reported the current session as blocked by an earlier failed verification. Doctor proves tool health, but it does not show whether the session evidence is ready.
+
+The dogfood gate now runs `agentflight status` immediately after `agentflight doctor`, so session-readiness output is visible in normal and strict dogfood logs. The script still uses command exit codes as the gate contract and does not parse AgentFlight human output, rewrite AgentFlight evidence, clear failed records, change maintainer-check warning semantics, release, or publish.
+
+## 2026-06-21: Path Redaction Preserves External URLs
+
+Dogfooding `agentloop verify --redact-paths` with ProjScan output showed Markdown badge URLs being rewritten into malformed text such as `https:[git-root]`. The shared redaction helper inferred `https://...` as a labeled POSIX path because the URL contains a colon followed by slashes.
+
+Local-root redaction now requires whitespace before inferring labeled paths, ignores inferred POSIX roots that start with `//`, and applies longer path variants before shorter ones. That preserves external `http` and `https` URLs while still redacting the configured git root, realpath aliases, and inferred local AgentLoop roots. This does not change verification command execution, release flow, publishing, or dependency behavior.
+
+## 2026-06-21: Stale Artifact Previews Summarize Candidate Types
+
+Long autonomous sessions can leave thousands of local verification reports, handoffs, ship reports, and run ledger entries. `agentloop artifacts --stale --limit 5` stayed safe and bounded, but the human preview could be dominated by the first candidate type, making the cleanup shape hard to understand without JSON or repeated `--type` runs.
+
+Stale artifact previews now include a compact candidate summary grouped by artifact type before the bounded candidate list, and JSON output exposes the same deterministic summary data. Candidate ordering, filtering, kept-evidence protection, default limits, read-only safety, releases, and publishing stay unchanged.
+
+## 2026-06-21: PR Handoffs Surface Not Run Verification Details
+
+`prepare-pr` and deterministic PR summaries told reviewers to check the verification report for skipped commands even when the report had a structured `Not Run` section. That forced reviewers to open another artifact for basic evidence that could be rendered directly in the handoff.
+
+PR handoffs now parse only the verification report's `Not Run` section through the shared Markdown section helper. Concrete skipped commands are rendered directly in `prepare-pr` and `handoff` output, while generated `Nothing skipped.` placeholders become `No skipped commands were recorded.` This does not change verification report generation, readiness scoring, verification command execution, releases, or publishing.
+
+## 2026-06-21: Dogfood Strict Warnings Mean Review Gates
+
+Strict dogfood passed while `maintainer-check` reported warnings during a long dirty implementation batch. That is correct behavior because `maintainer-check` warnings are reviewer guidance unless required evidence fails and the command exits non-zero, but some repo guidance could be read as if every warning from every dogfood step blocks progress.
+
+Dogfood behavior stays unchanged. Strict mode continues to pass `--strict` to `check-gates`, so review-gate warnings fail the run. The script help, repo harness, README, CLI reference, and maintenance guidance now say maintainer-check warnings remain reviewer guidance unless the command exits non-zero. This does not parse human output, change maintainer-check exit codes, alter release flow, release, or publish.
+
+## 2026-06-21: Maintainer Check Names Package Manifest Risk Precisely
+
+Dogfooding showed that `maintainer-check` warned `Dependency or lockfile changes detected.` when only `package.json` changed. That was too broad for script-only package manifest edits and made reviewer guidance sound like an actual dependency update.
+
+The `dependency-lockfiles` check id and warning status stay unchanged for compatibility, but its message now distinguishes package manifest changes, dependency lockfile changes, and combined manifest-plus-lockfile changes from path categories only. The maintainer checklist uses matching copy. This does not parse package contents, change JSON shape, weaken dependency review, alter gates, release, or publish.
+
+## 2026-06-21: Unit Guard Covers Readiness Scoring
+
+The final-section parser bug in readiness scoring was covered by focused tests, but `tests/readiness-score.test.ts` was not part of `npm run test:unit`. Because `maintenance:check` starts with `test:unit`, that meant the recurring guard would not exercise deterministic review-readiness scoring.
+
+`test:unit` now includes `tests/readiness-score.test.ts`, and package-script coverage asserts that inclusion. This slightly increases unit-guard runtime while keeping the integration suite unchanged. It does not alter scoring behavior, maintenance-check step ordering, dependencies, releases, or publishing.
+
+## 2026-06-21: Readiness Scoring Uses Shared Section Parsing
+
+Dogfooding a shared task-section parser exposed that `readiness-score` still had a local regex with an invalid end-of-string pattern. That meant task sections at the end of a file could be missed, including final `Rollback Notes` or final `Risk Notes`.
+
+Readiness scoring now uses the shared line-based section parser and keeps its existing `None recorded yet.` placeholder filtering for list items. This fixes final-section scoring without changing readiness dimensions, weights, public score labels, ship behavior, prepare-pr behavior, review-context behavior, releases, or publishing.
+
+## 2026-06-21: Review Context Reports Risk-Note Count Only
+
+`agentloop review-context` is the compact read-only snapshot agents use before choosing their next step. Dogfooding showed it did not reveal whether the active task had Risk Notes recorded, forcing agents to open the task file just to know whether reviewer risk context exists.
+
+Review context now reads only the active task contract and reports a count-only `activeTaskRiskNotes` signal in JSON plus a concise human line when an active task exists. It does not print the Risk Notes prose, full task Markdown, or any artifact body. This keeps the existing safety boundary while making missing or present task risk context visible. The change does not alter gates, readiness scoring, ship, prepare-pr, broad task scans, releases, or publishing.
+
+## 2026-06-21: Ship Reports Surface Task Risk Notes
+
+Dogfooding showed that dirty-work baselines and other task-level risk notes were visible in `prepare-pr` output but not in the primary `agentloop ship` report. Reviewers could see the readiness score and changed files while missing the task's own risk context.
+
+Ship reports now include a `Task Risk Notes` section sourced from the task contract already loaded for readiness scoring. The section uses the same Markdown prose escaping style as other reviewer-facing lists and falls back to `No task risk notes were recorded.` when the task has no list items. This does not change ship scoring, changed-file collection, run-ledger JSON, `prepare-pr` behavior, dirty-file scans, releases, or publishing.
+
+## 2026-06-21: Maintenance Check Runs Typecheck Directly
+
+Dogfooding found that `npm run maintenance:check` could pass even when `npm run typecheck` failed. That made the recurring near-term guard weaker than the release and handoff expectations it is meant to support.
+
+`maintenance:check` now runs `npm run typecheck` immediately after unit tests, before docs, release-proof smoke, safety tests, AgentFlight, ProjScan, and dogfood. The step uses the existing secret-filtered child process environment and remains non-mutating: no dependency changes, token reads, `.env` reads, release prep, version bump, tag, publish, upload, or GitHub release behavior.
+
+## 2026-06-21: Task Contracts Preserve Dirty-Work Baselines
+
+Long autonomous sessions often create a new task while prior source, docs, tests, or local harness edits are still dirty. `create-task` already warns at creation time, but later ship and handoff evidence can lose the fact that some dirty files predated the task.
+
+When `create-task` emits the dirty-work warning, the generated task contract now also records a Risk Notes bullet with the pre-existing dirty non-evidence count and bounded path examples. It reuses the same warning data, so it does not read file contents, expand scans, change warning codes, rename JSON fields, alter classification, clean files, stash files, release, or publish.
+
+## 2026-06-21: Dirty-Work Guidance Uses Non-Evidence Terminology
+
+Dogfooding showed that dirty-work guidance said `dirty non-AgentLoop files`, but the implementation actually counts dirty files that are not generated AgentLoop/AgentFlight evidence. Local product and harness files under `.agentloop/` can therefore appear in examples, making the old label misleading.
+
+Dirty-work warnings and `status`/`next` create-task reasons now say `dirty non-evidence files`. The warning code, JSON field names, file counts, bounded examples, and classification logic stay unchanged. The change does not read dirty file contents, clean files, hide `.agentloop` product files, mutate task state, release, or publish.
+
+## 2026-06-21: Artifact Inventory Labels Archived Fallback Evidence
+
+`agentloop artifacts` intentionally keeps ordinary current task counts separate from preserved AgentFlight placeholders, while still surfacing the newest archived terminal task as fallback task evidence when no live task qualifies. Dogfooding showed the old human label, `Latest task`, made that fallback look like current work even though JSON already exposed `archived: true`.
+
+Human `artifacts` output now labels that case as `Latest archived task evidence`, including filtered latest task output. Active or open task evidence keeps the existing `Latest task` label, and JSON output stays compatible through the existing task object shape and `archived: true` marker. This does not change task counting, archive behavior, placeholder handling, artifact cleanup, release channels, or publishing.
+
+## 2026-06-21: Task Clear Reports Persisted Pointer Removal
+
+Dogfooding direct AgentFlight recovery showed a confusing edge case: `task doctor` could recommend `agentloop task clear` for an ignored AgentFlight placeholder pointer, but `task clear` printed `No active task set.` because normal active-task selection intentionally ignores placeholders.
+
+`task clear` now reports whether a persisted active-task state file was removed. Human output says `Cleared active task pointer.` and prints the stored path when one existed; JSON returns `activeTask: null`, `cleared`, and optional `activeTaskPath`. A no-state run still reports the existing no-op. This changes output only; it does not delete task Markdown, change placeholder filtering, mutate task contracts, add cleanup automation, release, or publish.
+
+## 2026-06-21: Generated AgentFlight Recovery Guidance Uses The Bounded Path
+
+Task doctor and status now preserve AgentFlight placeholder task files as session evidence and tell agents to clear placeholder active state before pinning or creating a real task. Several generated root, harness, and agent instruction templates still said to run only `agentloop status --redact-paths` and `agentloop task set <path>`, which skipped the diagnostic and preservation guidance.
+
+Generated root guidance, harness commands, bundled agent instructions, and this repo's local harness now use the bounded sequence: run status plus task doctor, treat the placeholder as preserved session evidence, run `agentloop task clear`, then `agentloop task set <path>` or `agentloop create-task`. This does not change AgentFlight behavior, task-state logic, status/next routing, task-doctor diagnostics, placeholder detection, cleanup behavior, release channels, or publishing.
+
+## 2026-06-21: Generated Task Guidance Mirrors Create-Task Warnings
+
+Freshly initialized repos teach agents from `.agentloop/tasks/README.md`. After `create-task` gained dirty-work and placeholder-section warnings, that generated task guidance still described activation and JSON output without explaining the new warning cases.
+
+The task README template now documents both warning paths as advisory, non-mutating guidance. The local AgentLoopKit harness copy is refreshed for dogfooding, and init coverage proves fresh harnesses contain the wording. This does not change `create-task` behavior, warning codes, task-doctor diagnostics, command execution, file cleanup, release channels, or publishing.
+
+## 2026-06-20: Next Guidance Mentions Dirty Work Before Task Creation
+
+After `create-task` gained dirty-work warnings, `status` and `next` could still recommend `agentloop create-task` in a dirty repo without explaining that the next task would inherit existing non-evidence changes.
+
+Create-task recommendations now append a dirty-work reminder when no active/open task exists and the working tree includes non-evidence changes. The command selection stays the same, clean deferred-only states remain no-op, AgentLoop evidence-only dirt does not trigger the extra copy, and the change does not read file contents, mutate tasks, clean files, stash files, release, or publish.
+
+## 2026-06-20: Create-Task Warns Before Mixing Dirty Work
+
+Dogfooding long autonomous sessions showed that after a task is shipped and archived, agents can immediately create another task while source, test, or docs changes from earlier work remain dirty. That makes the next task's changed-file evidence harder to trust.
+
+`create-task` now snapshots Git status before writing the new task and warns when dirty non-evidence files already exist. The warning is advisory, bounded to path examples, available in human and JSON output as `DIRTY_WORKTREE_BEFORE_TASK_CREATION`, and excludes generated AgentLoop/AgentFlight evidence churn. It does not block task creation, read dirty file contents, clean files, stash files, commit files, archive evidence, release, or publish.
+
+## 2026-06-20: Untracked Diff Stat Markers Are Shared Evidence Rendering
+
+After ship reports started showing untracked non-evidence files in Diff Stats, dogfooding found the same `git diff --stat` blind spot in deterministic summaries, handoffs, and HTML reports. A reviewer could see a new file in Changed Files while the adjacent Diff Stats section still omitted it.
+
+Untracked-aware diff-stat rendering now lives in the Git core helper and is reused by ship, summarize/handoff, and HTML report generation. It appends compact `path | untracked` markers only from Git status entries, excludes AgentLoop evidence churn, and does not read untracked file contents, synthesize full diffs, change JSON changed-file arrays, alter run-ledger changed-file evidence, release, or publish.
+
+## 2026-06-20: Ship Diff Stats Acknowledge Untracked Files
+
+Dogfooding showed that `agentloop ship` listed untracked files in the Changed Files section while the Diff Stat block, sourced from `git diff --stat`, omitted them. That made new non-evidence files less visible in reviewer-facing evidence.
+
+Ship reports now append compact `path | untracked` lines for untracked non-evidence files to the diff-stat text. The implementation does not read untracked file contents, synthesize full diffs, change JSON `changedFiles`, change run-ledger changed-file evidence, change AgentLoop evidence compaction, release, or publish.
+
+## 2026-06-20: Create-Task Warns On Placeholder Contracts
+
+Real-repo and dogfood loops showed that later surfaces can catch placeholder task contracts, but the highest-leverage moment is the first write. `agentloop create-task` should remain permissive for draft contracts, while immediately warning agents and maintainers when review-critical sections still contain generated placeholders.
+
+`create-task` now reports `TASK_CONTRACT_PLACEHOLDER_SECTIONS` in JSON and a human warning when generated contracts still have placeholder problem, outcome, likely-file, acceptance, verification, or rollback sections. The detector is shared with `task doctor` through the task-contract core helper so generated defaults and diagnostics stay aligned. This does not make task creation fatal, mutate task content beyond the requested write, change `task doctor` semantics, execute commands, call external services, read tokens, release, or publish.
+
 ## 2026-06-20: Doctor Advisory Mode Preserves Setup Gates
 
 Real-repo trial notes showed that `agentloop doctor` is useful before initialization but can stop copy-paste onboarding scripts because missing config is a serious failure. The default command should keep that non-zero exit for gates, while trial and onboarding docs need an explicit advisory preflight path.
@@ -238,7 +502,7 @@ npm still serves `agentloopkit@0.1.1` while public GitHub releases already exist
 
 ## 2026-06-10: Local-Only Harness Mode Is Explicit
 
-`agentloop init --local-only` exists for developers who want AgentLoopKit files available to local coding agents without committing those files to the target repo. The command writes a marked block to the current clone's `.git/info/exclude` and adds a local-only notice to generated agent guidance. It refuses non-Git folders, does not change `.gitignore`, does not touch global Git config, and does not become the default because shared team harnesses should remain commit-friendly.
+`agentloop init --local-only` exists for developers who want AgentLoopKit files available to local agents without committing those files to the target repo. The command writes a marked block to the current clone's `.git/info/exclude` and adds a local-only notice to generated agent guidance. It refuses non-Git folders, does not change `.gitignore`, does not touch global Git config, and does not become the default because shared team harnesses should remain commit-friendly.
 
 ## 2026-06-10: Next Reuses Status Decisions
 
@@ -292,7 +556,7 @@ Repo-relative config paths are not enough when a directory already exists as a s
 
 ## 2026-06-11: Agent Instruction Writes Stay Repo-Local
 
-`agentloop install-agent` writes Markdown guidance for coding agents, so it follows the same repo-local rule as generated evidence. The command resolves `.agentloop/agents/*.md` and `AGENTS.md` before reading or writing. If either path points outside the repo through a symlink, AgentLoopKit rejects the command and leaves the outside target unchanged.
+`agentloop install-agent` writes Markdown guidance for agents, so it follows the same repo-local rule as generated evidence. The command resolves `.agentloop/agents/*.md` and `AGENTS.md` before reading or writing. If either path points outside the repo through a symlink, AgentLoopKit rejects the command and leaves the outside target unchanged.
 
 ## 2026-06-11: Init Preflights Repo-Local Targets
 
@@ -471,3 +735,15 @@ This avoids a merge engine, force flag, external agent config discovery, or thir
 `check-gates`, `status`, and `maintainer-check` use run-ledger metadata when it exists. During dogfooding, a plain `agentloop handoff` produced a reviewer summary but no run ledger entry, so strict gates kept asking for another handoff even though the latest handoff listed the changed files.
 
 AgentLoopKit now treats the latest handoff Markdown as bounded local evidence when it lists the dirty files. The coverage check reads only that latest handoff file, adds the handoff artifact path itself, and does not scan arbitrary repo prose. Run-ledger evidence remains the stronger source when available.
+
+## 2026-06-21: Product Language Emphasizes Agent-Assisted Engineering
+
+AgentLoopKit should not market itself with cheap assistant-style automation language. Public surfaces now prefer software-agent and agent-assisted engineering wording, including package metadata, CLI descriptions, README copy, generated guidance, MCP descriptions, and reviewability docs.
+
+Public-doc hygiene rejects unsupported positioning phrases before they reach README, docs, examples, or GitHub-facing files. The guard is local and deterministic. It does not change command behavior, schemas, scoring, release behavior, or historical evidence parsing.
+
+## 2026-06-21: Package Metadata Uses The Same Positioning Guard
+
+Package metadata is a public discovery surface, so `package.json` description and keywords follow the same positioning rules as README and docs. Tests now reuse the unsupported-positioning checker against serialized package metadata and assert the current software-agent and agent-assisted keywords.
+
+This stays in test coverage rather than release automation. It does not change package versions, publishing behavior, prepublish checks, dependencies, command behavior, or runtime schemas.

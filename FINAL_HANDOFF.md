@@ -1316,10 +1316,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.37.0` is public.
-- npm latest is `agentloopkit@0.37.0`.
-- GHCR tags include `latest`, `0.37`, and `0.37.0`.
-- MCP Registry lists `0.37.0` as latest.
+- GitHub release `v0.38.0` is public.
+- npm latest is `agentloopkit@0.38.0`.
+- GHCR tags include `latest`, `0.38`, and `0.38.0`.
+- MCP Registry lists `0.38.0` as latest.
 - GitHub Marketplace listing is not live; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
@@ -2481,7 +2481,7 @@ Reddit/dev.to post outline:
 ```text
 Title: I built a local-first engineering loop for coding agents
 
-- Problem: agent-generated work can be hard to review
+- Problem: agent-assisted work can be hard to review
 - Approach: repo-level task contracts, gates, policies, verification reports, and handoffs
 - Install today: npx agentloopkit init
 - What it does not do: no LLM wrapper, no SaaS, no telemetry

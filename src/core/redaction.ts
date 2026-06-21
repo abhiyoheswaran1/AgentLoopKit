@@ -27,9 +27,16 @@ function inferredAgentLoopRoots(value: string) {
   const roots = new Set<string>();
   const windowsPattern = /[A-Za-z]:[\\/][^\r\n`]*?(?=[\\/]\.agentloop(?:[\\/]|$))/g;
   const posixPattern = /\/[^\r\n`]*?(?=\/\.agentloop(?:\/|$))/g;
-  const labeledWindowsPattern = /:\s*([A-Za-z]:[^\r\n`]+)/g;
-  const labeledPosixPattern = /:\s*(\/[^\r\n`]+)/g;
-  const clean = (root: string) => root.trim().replace(/[.,;]+$/, '');
+  const labeledWindowsPattern = /:\s+([A-Za-z]:[^\r\n`]+)/g;
+  const labeledPosixPattern = /:\s+(\/[^\r\n`]+)/g;
+  const clean = (root: string) => {
+    const trimmedRoot = root.trim();
+    const agentLoopIndex = trimmedRoot.search(/[\\/]\.agentloop(?:[\\/]|$)/);
+    const trimmed = (agentLoopIndex === -1 ? trimmedRoot : trimmedRoot.slice(0, agentLoopIndex))
+      .trim()
+      .replace(/[.,;]+$/, '');
+    return trimmed.startsWith('//') ? '' : trimmed;
+  };
 
   for (const match of value.matchAll(windowsPattern)) {
     roots.add(clean(match[0]));
@@ -49,7 +56,9 @@ function inferredAgentLoopRoots(value: string) {
 
 export function redactLocalRoots(value: string, roots: string[], replacement = '[git-root]') {
   let redacted = value;
-  const variants = new Set([...roots, ...inferredAgentLoopRoots(value)].flatMap(pathVariants));
+  const variants = [...new Set([...roots, ...inferredAgentLoopRoots(value)].flatMap(pathVariants))]
+    .filter(Boolean)
+    .sort((left, right) => right.length - left.length);
 
   for (const root of variants) {
     redacted = redacted.split(root).join(replacement);

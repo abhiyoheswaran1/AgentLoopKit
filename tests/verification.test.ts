@@ -151,6 +151,49 @@ describe('verification', () => {
     expect(result.commands[0]?.output).toContain('[git-root]/src/index.ts');
   });
 
+  test('preserves external markdown urls while redacting local paths', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const externalBadge =
+      '[![projscan health](https://img.shields.io/badge/projscan-A-brightgreen)](https://github.com/abhiyoheswaran1/projscan)';
+    const script = `console.log(${JSON.stringify(
+      externalBadge,
+    )}); console.log(process.cwd() + "/src/index.ts")`;
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: `node -e '${script}'`,
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-15-17-11',
+      nowIso: '2026-06-15T17:11:00.000Z',
+      redactPaths: true,
+    });
+    const written = await readFile(result.reportPath, 'utf8');
+
+    expect(result.markdown).toContain(externalBadge);
+    expect(written).toContain(externalBadge);
+    expect(result.commands[0]?.output).toContain(externalBadge);
+    expect(result.markdown).not.toContain('https:[git-root]');
+    expect(written).not.toContain('https:[git-root]');
+    expect(result.commands[0]?.output).not.toContain('https:[git-root]');
+    expect(result.markdown).not.toContain(dir);
+    expect(written).not.toContain(dir);
+    expect(result.markdown).toContain('[git-root]/src/index.ts');
+    expect(written).toContain('[git-root]/src/index.ts');
+    expect(result.commands[0]?.output).toContain('[git-root]/src/index.ts');
+  });
+
   test('emits bounded progress events for executed verification commands', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -2006,7 +2049,7 @@ describe('verification', () => {
             test: "node -e \"require('fs').writeFileSync('configured-test-ran.txt', 'yes')\"",
             lint: "node -e \"require('fs').writeFileSync('configured-lint-ran.txt', 'yes')\"",
             typecheck:
-              "node -e \"require('fs').writeFileSync('configured-typecheck-ran.txt', 'yes')\"",
+              "node -e \"require('fs').writeFileSync('task-typecheck-ran.txt', 'yes')\"",
             build: "node -e \"require('fs').writeFileSync('configured-build-ran.txt', 'yes')\"",
             format: '',
           },
@@ -2025,6 +2068,7 @@ describe('verification', () => {
         '',
         '## Verification Commands',
         "- node -e \"require('fs').writeFileSync('task-command-ran.txt', 'yes'); console.log('task-only-check')\"",
+        "- node -e \"require('fs').writeFileSync('task-typecheck-ran.txt', 'yes')\"",
         '',
       ].join('\n'),
     );
@@ -2044,7 +2088,18 @@ describe('verification', () => {
     );
     const output = JSON.parse(result.stdout);
     expect(output.overallStatus).toBe('pass');
-    expect(output.notRun).toEqual(expect.arrayContaining(['test', 'lint', 'typecheck', 'build']));
+    expect(output.notRun).toEqual(expect.arrayContaining(['test', 'lint', 'build']));
+    expect(output.notRun).not.toContain('typecheck');
+    expect(output.markdown).toContain(
+      '- test: `node -e "require(\'fs\').writeFileSync(\'configured-test-ran.txt\', \'yes\')"',
+    );
+    expect(output.markdown).toContain(
+      '- lint: `node -e "require(\'fs\').writeFileSync(\'configured-lint-ran.txt\', \'yes\')"',
+    );
+    expect(output.markdown).toContain(
+      '- build: `node -e "require(\'fs\').writeFileSync(\'configured-build-ran.txt\', \'yes\')"',
+    );
+    expect(output.markdown).not.toContain('- typecheck:');
     expect(output.commands).toEqual([
       expect.objectContaining({
         key: 'task',
@@ -2052,11 +2107,16 @@ describe('verification', () => {
           "node -e \"require('fs').writeFileSync('task-command-ran.txt', 'yes'); console.log('task-only-check')\"",
         passed: true,
       }),
+      expect.objectContaining({
+        key: 'task',
+        command: "node -e \"require('fs').writeFileSync('task-typecheck-ran.txt', 'yes')\"",
+        passed: true,
+      }),
     ]);
     await expect(readFile(path.join(dir, 'task-command-ran.txt'), 'utf8')).resolves.toBe('yes');
+    await expect(readFile(path.join(dir, 'task-typecheck-ran.txt'), 'utf8')).resolves.toBe('yes');
     await expect(access(path.join(dir, 'configured-test-ran.txt'))).rejects.toThrow();
     await expect(access(path.join(dir, 'configured-lint-ran.txt'))).rejects.toThrow();
-    await expect(access(path.join(dir, 'configured-typecheck-ran.txt'))).rejects.toThrow();
     await expect(access(path.join(dir, 'configured-build-ran.txt'))).rejects.toThrow();
   });
 

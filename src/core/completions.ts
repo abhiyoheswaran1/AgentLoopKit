@@ -25,7 +25,7 @@ const topLevelCommands = [
   ['runs', 'List local run ledger entries'],
   ['show-run', 'Show a local run ledger entry'],
   ['intent', 'Show which runs touched a file'],
-  ['maintainer-check', 'Check whether an AI-assisted PR is reviewable'],
+  ['maintainer-check', 'Check whether an agent-assisted PR is reviewable'],
   ['report', 'Write a local HTML evidence report'],
   ['badge', 'Write a local SVG evidence badge'],
   ['artifacts', 'Inventory local AgentLoop evidence'],

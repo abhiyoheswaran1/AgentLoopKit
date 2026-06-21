@@ -41,7 +41,7 @@ Policy packs group policy Markdown files so maintainers can copy missing policy 
 Bundled packs:
 
 - `agentloop-baseline`: the standard AgentLoopKit safety policies
-- `maintainer-review`: reviewability rules for maintainers evaluating agent-generated changes
+- `maintainer-review`: reviewability rules for maintainers evaluating agent-assisted changes
 
 List packs:
 
@@ -127,7 +127,7 @@ Example `review-evidence-policy.md`:
 ```markdown
 # Review Evidence Policy
 
-- PRs that use a coding agent should include a task contract, verification report, and `agentloop prepare-pr` output.
+- PRs that use an agent should include a task contract, verification report, and `agentloop prepare-pr` output.
 - Maintainers should run `agentloop maintainer-check` before review when AgentLoopKit evidence exists.
 - Changes to auth, billing, migrations, deployment, or lockfiles need explicit risk notes and rollback notes.
 ```

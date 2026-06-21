@@ -57,7 +57,11 @@ async function createMaintainerFixture() {
 }
 
 async function createReviewableFixture(
-  options: { freshHandoffRun?: boolean; dirtySourceFile?: boolean } = {},
+  options: {
+    freshHandoffRun?: boolean;
+    dirtySourceFile?: boolean;
+    taskTitle?: string | ((dir: string) => string);
+  } = {},
 ) {
   const dir = await makeTempDir();
   tempDirs.push(dir);
@@ -76,9 +80,13 @@ async function createReviewableFixture(
   await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
   await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
   const taskPath = path.join(dir, '.agentloop/tasks/2026-06-12-reviewable-change.md');
+  const taskTitle =
+    typeof options.taskTitle === 'function'
+      ? options.taskTitle(dir)
+      : (options.taskTitle ?? 'Reviewable change');
   await writeFile(
     taskPath,
-    '# Reviewable change\n\n- Status: in-progress\n\n## Acceptance Criteria\n- The change is covered.\n\n## Verification Commands\n- npm test\n',
+    `# ${taskTitle}\n\n- Status: in-progress\n\n## Acceptance Criteria\n- The change is covered.\n\n## Verification Commands\n- npm test\n`,
   );
   await setActiveTask({ cwd: dir, config, taskPath });
   await writeFile(
@@ -127,7 +135,7 @@ describe('maintainer-check command', () => {
     tempDirs = [];
   });
 
-  test('warns maintainers about risky but reviewable AI-assisted changes', async () => {
+  test('warns maintainers about risky but reviewable agent-assisted changes', async () => {
     const dir = await createMaintainerFixture();
 
     const result = await execa(tsxPath, [cliPath, 'maintainer-check', '--json'], { cwd: dir });
@@ -310,6 +318,7 @@ describe('maintainer-check command', () => {
     await writeFile(path.join(dir, 'package.json'), '{"scripts":{"test":"vitest"}}\n');
 
     const result = await execa(tsxPath, [cliPath, 'maintainer-check', '--json'], { cwd: dir });
+    const humanResult = await execa(tsxPath, [cliPath, 'maintainer-check'], { cwd: dir });
     const output = JSON.parse(result.stdout);
 
     expect(output.checks).toEqual(
@@ -323,9 +332,73 @@ describe('maintainer-check command', () => {
         expect.objectContaining({
           id: 'dependency-lockfiles',
           status: 'warn',
-          message: 'Dependency or lockfile changes detected.',
+          message: 'Package manifest changes detected.',
         }),
       ]),
+    );
+    expect(output.maintainerChecklist).toContain('Review package manifest changes manually.');
+    expect(humanResult.stdout).toContain(
+      '- [`warn`] `package-manifest`: `Package manifest changes detected.`',
+    );
+    expect(humanResult.stdout).not.toContain(
+      '- [`warn`] `dependency-lockfiles`: `Package manifest changes detected.`',
+    );
+  });
+
+  test('warns specifically about dependency lockfile changes', async () => {
+    const dir = await createReviewableFixture({
+      dirtySourceFile: false,
+      freshHandoffRun: true,
+    });
+
+    await writeFile(path.join(dir, 'pnpm-lock.yaml'), 'lockfileVersion: 9.0\n');
+
+    const result = await execa(tsxPath, [cliPath, 'maintainer-check', '--json'], { cwd: dir });
+    const humanResult = await execa(tsxPath, [cliPath, 'maintainer-check'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'dependency-lockfiles',
+          status: 'warn',
+          message: 'Dependency lockfile changes detected.',
+        }),
+      ]),
+    );
+    expect(output.maintainerChecklist).toContain('Review dependency lockfile changes manually.');
+    expect(humanResult.stdout).toContain(
+      '- [`warn`] `dependency-lockfiles`: `Dependency lockfile changes detected.`',
+    );
+  });
+
+  test('warns specifically about combined package manifest and lockfile changes', async () => {
+    const dir = await createReviewableFixture({
+      dirtySourceFile: false,
+      freshHandoffRun: true,
+    });
+
+    await writeFile(path.join(dir, 'package.json'), '{"scripts":{"test":"vitest"}}\n');
+    await writeFile(path.join(dir, 'package-lock.json'), '{"lockfileVersion":3}\n');
+
+    const result = await execa(tsxPath, [cliPath, 'maintainer-check', '--json'], { cwd: dir });
+    const humanResult = await execa(tsxPath, [cliPath, 'maintainer-check'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+
+    expect(output.checks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'dependency-lockfiles',
+          status: 'warn',
+          message: 'Package manifest and dependency lockfile changes detected.',
+        }),
+      ]),
+    );
+    expect(output.maintainerChecklist).toContain(
+      'Review package manifest and dependency lockfile changes manually.',
+    );
+    expect(humanResult.stdout).toContain(
+      '- [`warn`] `package-dependency-files`: `Package manifest and dependency lockfile changes detected.`',
     );
   });
 
@@ -377,7 +450,11 @@ describe('maintainer-check command', () => {
   });
 
   test('accepts redacted output mode for public maintainer review logs', async () => {
-    const dir = await createReviewableFixture({ freshHandoffRun: true });
+    const externalUrl = 'https://github.com/example/app/issues/42';
+    const dir = await createReviewableFixture({
+      freshHandoffRun: true,
+      taskTitle: (fixtureDir) => `Review ${externalUrl} from ${fixtureDir}/src/index.ts`,
+    });
     const nestedDir = path.join(dir, 'packages', 'web');
     await mkdir(nestedDir, { recursive: true });
     const root = await realpath(dir);
@@ -395,6 +472,12 @@ describe('maintainer-check command', () => {
     expect(humanResult.exitCode).toBe(0);
     expect(jsonResult.stdout).not.toContain(root);
     expect(humanResult.stdout).not.toContain(root);
+    expect(jsonResult.stdout).toContain(externalUrl);
+    expect(humanResult.stdout).toContain(externalUrl);
+    expect(jsonResult.stdout).not.toContain('https:[git-root]');
+    expect(humanResult.stdout).not.toContain('https:[git-root]');
+    expect(jsonResult.stdout).toContain('[git-root]/src/index.ts');
+    expect(humanResult.stdout).toContain('[git-root]/src/index.ts');
     expect(JSON.parse(jsonResult.stdout).status).toBe('pass');
     expect(humanResult.stdout).toContain('# AgentLoopKit Maintainer Check');
   });

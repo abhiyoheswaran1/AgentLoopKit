@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-11-43-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-21-11-43",
+  "createdAtEpochMs": 1782034981125,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-use-engineering-session-wording-in-create-task-guidance.md",
+    "title": "Use engineering-session wording in create-task guidance",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-11-32-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-11-43-pr-summary.md",
+  "changedFileCount": 671
+}

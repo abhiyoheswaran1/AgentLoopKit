@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-04-29-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-04-29",
+  "createdAtEpochMs": 1782008990885,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-clarify-dogfood-strict-warning-boundary.md",
+    "title": "Clarify dogfood strict warning boundary",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-04-28-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-04-29-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-04-29-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 323
+}

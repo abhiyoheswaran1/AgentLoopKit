@@ -136,7 +136,9 @@ export type LatestArtifactInventoryItem =
   | ({ type: 'release-notes' } & ArtifactInventoryNamedArtifact)
   | ({ type: 'run' } & RunSummary);
 
-export type StaleArtifactPreviewType = 'verification' | 'handoff' | 'ship-report' | 'run';
+const staleArtifactPreviewTypes = ['verification', 'handoff', 'ship-report', 'run'] as const;
+
+export type StaleArtifactPreviewType = (typeof staleArtifactPreviewTypes)[number];
 
 export type StaleArtifactPreviewItem = {
   type: StaleArtifactPreviewType;
@@ -144,11 +146,17 @@ export type StaleArtifactPreviewItem = {
   reason: string;
 };
 
+export type StaleArtifactPreviewCandidateSummary = {
+  type: StaleArtifactPreviewType;
+  count: number;
+};
+
 export type StaleArtifactPreview = {
   mode: 'preview';
   writesFiles: false;
   deletesFiles: false;
   candidateCount: number;
+  candidateSummary: StaleArtifactPreviewCandidateSummary[];
   keptCount: number;
   shownCandidateCount: number;
   hiddenCandidateCount: number;
@@ -701,6 +709,19 @@ function includeStaleType(
   return filter === type;
 }
 
+function summarizeStaleCandidates(
+  candidates: StaleArtifactPreviewItem[],
+): StaleArtifactPreviewCandidateSummary[] {
+  const counts = new Map<StaleArtifactPreviewType, number>();
+  for (const candidate of candidates) {
+    counts.set(candidate.type, (counts.get(candidate.type) ?? 0) + 1);
+  }
+
+  return staleArtifactPreviewTypes
+    .map((type) => ({ type, count: counts.get(type) ?? 0 }))
+    .filter((summary) => summary.count > 0);
+}
+
 export async function getStaleArtifactPreview(options: {
   cwd: string;
   config: AgentLoopConfig;
@@ -791,6 +812,7 @@ export async function getStaleArtifactPreview(options: {
     writesFiles: false,
     deletesFiles: false,
     candidateCount,
+    candidateSummary: summarizeStaleCandidates(candidates),
     keptCount: kept.length,
     shownCandidateCount: shownCandidates.length,
     hiddenCandidateCount: candidateCount - shownCandidates.length,
@@ -829,8 +851,9 @@ function formatTaskStatus(task: ArtifactInventoryTask) {
 }
 
 function formatLatestTaskLine(task: ArtifactInventoryTask | null) {
+  const label = task?.archived ? 'Latest archived task evidence' : 'Latest task';
   return task
-    ? `- Latest task: ${inlineCode(task.title)} (${formatTaskStatus(task)}) - ${inlineCode(
+    ? `- ${label}: ${inlineCode(task.title)} (${formatTaskStatus(task)}) - ${inlineCode(
         task.path,
       )}`
     : '- Latest task: not found';
@@ -967,6 +990,11 @@ export function renderStaleArtifactPreviewJson(preview: StaleArtifactPreview) {
 }
 
 export function renderStaleArtifactPreviewMarkdown(preview: StaleArtifactPreview) {
+  const candidateSummaryLines = preview.candidateSummary.length
+    ? preview.candidateSummary
+        .map((summary) => `- ${inlineCode(summary.type)}: ${inlineCode(String(summary.count))}`)
+        .join('\n')
+    : '- No stale evidence candidates found.';
   const candidateLines = preview.candidates.length
     ? preview.candidates
         .map(
@@ -990,6 +1018,9 @@ export function renderStaleArtifactPreviewMarkdown(preview: StaleArtifactPreview
   return `# AgentLoopKit Stale Evidence Preview
 
 This is a read-only preview. No files were deleted.
+
+## Candidate Summary
+${candidateSummaryLines}
 
 ## Candidates
 ${candidateLines}

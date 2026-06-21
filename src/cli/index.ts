@@ -36,7 +36,7 @@ const program = new Command();
 
 program
   .name('agentloop')
-  .description('A drop-in engineering loop for coding agents.')
+  .description('A drop-in engineering loop for software agents.')
   .version(getPackageVersion(), '-V, --version', 'print CLI version');
 
 program.addCommand(initCommand());

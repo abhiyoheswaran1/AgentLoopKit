@@ -1,6 +1,6 @@
 # AgentLoopKit Workspace
 
-This directory contains repo-local engineering loop artifacts for coding agents and reviewers.
+This directory contains repo-local engineering loop artifacts for software agents and reviewers.
 
 `manifest.json` records the AgentLoopKit template generation used to create this harness. `agentloop doctor` reads it and warns when the local harness is missing template metadata, older than the current CLI, invalid, or newer than the CLI supports.
 
@@ -73,7 +73,7 @@ agentloop maintainer-check
 
 `ship` writes a Markdown readiness report under `reports/`, calculates an evidence score, and records a run under `.agentloop/runs/`. The score checks whether reviewers have task, verification, gate, handoff, and risk evidence. It does not measure code quality.
 `prepare-pr` drafts a PR title, grouped body, reviewer checklist, risks, rollback notes, and optional GitHub-comment Markdown.
-`maintainer-check` is read-only and helps reviewers decide whether an AI-assisted PR has enough evidence to review.
+`maintainer-check` is read-only and helps reviewers decide whether an agent-assisted PR has enough evidence to review.
 
 8. Optional: generate a reviewer handoff:
 

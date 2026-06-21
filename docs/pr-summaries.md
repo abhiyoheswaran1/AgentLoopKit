@@ -14,12 +14,15 @@ The summary uses deterministic inputs:
 - latest verification report
 - config
 
+The Diff Stats section starts with Git's native tracked-file diff stat and appends compact `path | untracked` markers for untracked non-evidence files. AgentLoopKit derives those markers from Git status only; it does not read untracked file contents or synthesize line counts.
+
 It includes:
 
 - changed files
 - change areas grouped by path, such as source, tests, docs, CI, config, AgentLoop, and risk-sensitive files
 - review-focus hints based on those path groups
 - verification status
+- verification commands from the report's `Not Run` section under a `Verification Report Not Run` heading, with a clear no-skipped-commands fallback
 - rollback notes
 - reviewer checklist
 

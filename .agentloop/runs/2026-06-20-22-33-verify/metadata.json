@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-20-22-33-verify",
+  "command": "verify",
+  "createdAt": "2026-06-20-22-33",
+  "createdAtEpochMs": 1781987629915,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-20-warn-when-created-tasks-keep-review-placeholders.md",
+    "title": "Warn when created tasks keep review placeholders",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-20-22-32-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 12
+}

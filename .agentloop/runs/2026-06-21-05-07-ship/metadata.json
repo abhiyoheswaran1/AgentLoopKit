@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-05-07-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-05-07",
+  "createdAtEpochMs": 1782011232865,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-summarize-stale-artifact-preview-by-type.md",
+    "title": "Summarize stale artifact preview by type",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-05-00-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-05-07-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-05-07-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 348
+}

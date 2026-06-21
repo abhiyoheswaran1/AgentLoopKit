@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-03-43-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-03-43",
+  "createdAtEpochMs": 1782006198371,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-show-task-risk-note-count-in-review-context.md",
+    "title": "Show task risk-note count in review context",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-03-41-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-03-43-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-03-43-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 263
+}

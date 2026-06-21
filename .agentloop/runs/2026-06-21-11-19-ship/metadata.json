@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-11-19-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-11-19",
+  "createdAtEpochMs": 1782033564983,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-guard-package-metadata-positioning-language.md",
+    "title": "Guard package metadata positioning language",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-11-09-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-11-19-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-11-19-pr-summary.md",
+  "score": 88,
+  "changedFileCount": 660
+}

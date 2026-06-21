@@ -10,7 +10,8 @@ import { escapeMarkdownProse, singleLineInlineCode as inlineCode } from './markd
 import { listRuns } from './runs.js';
 import { readTaskContract } from './task-state.js';
 import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
-import { classifyChangedFiles } from './change-areas.js';
+import { renderChangeAreaCounts } from './change-areas.js';
+import { redactLocalRoots } from './redaction.js';
 
 export type MaintainerCheckStatus = 'pass' | 'warn' | 'fail';
 
@@ -46,25 +47,56 @@ function check(id: string, status: MaintainerCheckStatus, message: string, fileP
   return { id, status, message, ...(filePath ? { path: filePath } : {}) };
 }
 
-function redactLocalRoot(
-  value: string | undefined,
-  root: string,
-  redactPaths: boolean | undefined,
-) {
-  if (!value || !redactPaths || !root || root === path.parse(root).root) return value;
-  return value.split(root).join('[git-root]').split(root.replace(/\\/g, '/')).join('[git-root]');
-}
-
 function redactCheck(check: MaintainerCheck, root: string, redactPaths: boolean | undefined) {
+  const redact = (value: string | undefined) =>
+    value && redactPaths ? redactLocalRoots(value, [root]) : value;
   return {
     ...check,
-    message: redactLocalRoot(check.message, root, redactPaths) ?? check.message,
-    ...(check.path ? { path: redactLocalRoot(check.path, root, redactPaths) ?? check.path } : {}),
+    message: redact(check.message) ?? check.message,
+    ...(check.path ? { path: redact(check.path) ?? check.path } : {}),
   };
 }
 
 function hasPath(changedFiles: string[], pattern: RegExp) {
   return changedFiles.some((filePath) => pattern.test(filePath));
+}
+
+const PACKAGE_MANIFEST_PATTERN = /(^|\/)package\.json$/;
+const DEPENDENCY_LOCKFILE_PATTERN =
+  /(^|\/)(package-lock\.json|pnpm-lock\.yaml|yarn\.lock|bun\.lockb?)$/;
+
+function packageManifestAndLockfileRisk(changedFiles: string[]) {
+  const packageManifestChanged = hasPath(changedFiles, PACKAGE_MANIFEST_PATTERN);
+  const dependencyLockfileChanged = hasPath(changedFiles, DEPENDENCY_LOCKFILE_PATTERN);
+
+  if (packageManifestChanged && dependencyLockfileChanged) {
+    return {
+      status: 'warn' as const,
+      message: 'Package manifest and dependency lockfile changes detected.',
+    };
+  }
+  if (packageManifestChanged) {
+    return { status: 'warn' as const, message: 'Package manifest changes detected.' };
+  }
+  if (dependencyLockfileChanged) {
+    return { status: 'warn' as const, message: 'Dependency lockfile changes detected.' };
+  }
+  return {
+    status: 'pass' as const,
+    message: 'No package manifest or dependency lockfile changes detected.',
+  };
+}
+
+function packageManifestAndLockfileChecklistItem(checks: MaintainerCheck[]) {
+  const dependencyCheck = checks.find((item) => item.id === 'dependency-lockfiles');
+  if (dependencyCheck?.status !== 'warn') return undefined;
+  if (dependencyCheck.message === 'Package manifest changes detected.') {
+    return 'Review package manifest changes manually.';
+  }
+  if (dependencyCheck.message === 'Dependency lockfile changes detected.') {
+    return 'Review dependency lockfile changes manually.';
+  }
+  return 'Review package manifest and dependency lockfile changes manually.';
 }
 
 function changedFileCountMessage(
@@ -75,13 +107,7 @@ function changedFileCountMessage(
 ) {
   const areaCounts =
     nonEvidenceCount > 25 && nonEvidenceFiles.length
-      ? classifyChangedFiles(nonEvidenceFiles)
-          .sort(
-            (left, right) =>
-              right.files.length - left.files.length || left.title.localeCompare(right.title),
-          )
-          .map((area) => `${area.title} ${area.files.length}`)
-          .join(', ')
+      ? renderChangeAreaCounts(nonEvidenceFiles)
       : '';
   const areaSuffix = areaCounts ? ` Non-evidence review areas: ${areaCounts}.` : '';
   if (evidenceCount === 0) return `${totalCount} changed file(s) detected.${areaSuffix}`;
@@ -117,11 +143,18 @@ function escapeSingleLineMarkdownProse(value: string) {
   return escapeMarkdownProse(value).replace(/\r/g, '\\r').replace(/\n/g, '\\n');
 }
 
+function maintainerCheckDisplayId(item: MaintainerCheck) {
+  if (item.id !== 'dependency-lockfiles') return item.id;
+  if (item.message === 'Package manifest changes detected.') return 'package-manifest';
+  if (item.message === 'Dependency lockfile changes detected.') return 'dependency-lockfiles';
+  return 'package-dependency-files';
+}
+
 export function renderMaintainerCheckMarkdown(result: MaintainerCheckResult) {
   const checkLines = result.checks
     .map((item) => {
       const pathSuffix = item.path ? ` (${inlineCode(item.path)})` : '';
-      return `- [${inlineCode(item.status)}] ${inlineCode(item.id)}: ${inlineCode(item.message)}${pathSuffix}`;
+      return `- [${inlineCode(item.status)}] ${inlineCode(maintainerCheckDisplayId(item))}: ${inlineCode(item.message)}${pathSuffix}`;
     })
     .join('\n');
   const checklistLines = result.maintainerChecklist
@@ -265,21 +298,12 @@ export async function runMaintainerCheck(options: {
       ),
     ),
   );
+  const packageRisk = packageManifestAndLockfileRisk(changedFiles);
   checks.push(
     check(
       'dependency-lockfiles',
-      hasPath(
-        changedFiles,
-        /(^|\/)(package\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock|bun\.lockb?)$/,
-      )
-        ? 'warn'
-        : 'pass',
-      hasPath(
-        changedFiles,
-        /(^|\/)(package\.json|package-lock\.json|pnpm-lock\.yaml|yarn\.lock|bun\.lockb?)$/,
-      )
-        ? 'Dependency or lockfile changes detected.'
-        : 'No dependency or lockfile changes detected.',
+      packageRisk.status,
+      packageRisk.message,
     ),
   );
   checks.push(
@@ -319,17 +343,20 @@ export async function runMaintainerCheck(options: {
     ...(outputChecks.some((item) => item.id === 'auth-security-files' && item.status === 'warn')
       ? ['Review auth/security-sensitive files manually.']
       : []),
-    ...(outputChecks.some((item) => item.id === 'dependency-lockfiles' && item.status === 'warn')
-      ? ['Review dependency and lockfile changes manually.']
-      : []),
+    ...[packageManifestAndLockfileChecklistItem(outputChecks)].filter(
+      (item): item is string => Boolean(item),
+    ),
     'Confirm rollback notes are practical.',
   ];
+
+  const suggestedContributorRequest = contributorRequest(outputChecks);
 
   return {
     status,
     checks: outputChecks,
     maintainerChecklist,
-    suggestedContributorRequest:
-      redactLocalRoot(contributorRequest(outputChecks), options.cwd, options.redactPaths) ?? '',
+    suggestedContributorRequest: options.redactPaths
+      ? redactLocalRoots(suggestedContributorRequest, [options.cwd])
+      : suggestedContributorRequest,
   };
 }

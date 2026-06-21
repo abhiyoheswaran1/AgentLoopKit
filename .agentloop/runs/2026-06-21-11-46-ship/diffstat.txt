@@ -1,0 +1,143 @@
+ .agentloop/README.md                               |   2 +-
+ .agentloop/backlog.md                              | 213 ++++++++++++-
+ .../handoffs/2026-06-12-06-13-pr-description.md    |   2 +-
+ .../handoffs/2026-06-12-10-59-release-notes.md     |   2 +-
+ .agentloop/harness/autonomous-dogfooding.md        |  11 +-
+ .agentloop/harness/commands.md                     |   4 +-
+ .agentloop/tasks/README.md                         |   6 +-
+ ...26-06-12-expose-maintainer-check-through-mcp.md |   2 +-
+ .agentloop/user-personas.md                        |   4 +-
+ AGENTLOOP.md                                       |   8 +-
+ AGENTS.md                                          |   8 +-
+ CHANGELOG.md                                       |  47 ++-
+ DECISIONS.md                                       | 250 ++++++++++++++-
+ FINAL_HANDOFF.md                                   |   2 +-
+ README.md                                          |  22 +-
+ docs/cli-reference.md                              |  39 ++-
+ docs/getting-started.md                            |   4 +-
+ docs/html-reports.md                               |   2 +
+ docs/maintenance-guards.md                         |  16 +-
+ docs/mcp.md                                        |   4 +-
+ docs/philosophy.md                                 |   2 +-
+ docs/policies.md                                   |   4 +-
+ docs/policy-examples.md                            |   2 +-
+ docs/pr-summaries.md                               |   3 +
+ docs/status.md                                     |   7 +-
+ docs/task-contracts.md                             |   6 +-
+ docs/verification-reports.md                       |   4 +-
+ examples/security-review/README.md                 |   2 +-
+ package.json                                       |  10 +-
+ scripts/dogfood.mjs                                |  18 +-
+ scripts/maintenance-check.mjs                      |   8 +-
+ scripts/smoke-packed-release.mjs                   |  32 ++
+ src/cli/commands/create-task.ts                    | 125 +++++++-
+ src/cli/commands/maintainer-check.ts               |   2 +-
+ src/cli/commands/next.ts                           |   8 +-
+ src/cli/commands/ship.ts                           |   2 +-
+ src/cli/commands/task.ts                           |  30 +-
+ src/cli/index.ts                                   |   2 +-
+ src/core/agent-installation.ts                     |   2 +-
+ src/core/artifacts.ts                              |  35 ++-
+ src/core/change-areas.ts                           |   7 +
+ src/core/check-gates.ts                            |  45 ++-
+ src/core/completions.ts                            |   2 +-
+ src/core/constants.ts                              |   2 +-
+ src/core/git.ts                                    |  19 ++
+ src/core/html-report.ts                            |   4 +-
+ src/core/maintainer-check.ts                       | 101 +++---
+ src/core/mcp-tools.ts                              |   4 +-
+ src/core/pr-summary.ts                             |  26 +-
+ src/core/prepare-pr.ts                             |  53 ++--
+ src/core/readiness-score.ts                        |  26 +-
+ src/core/redaction.ts                              |  17 +-
+ src/core/release-check.ts                          |  29 +-
+ src/core/review-context.ts                         |  65 +++-
+ src/core/ship.ts                                   |  52 +++-
+ src/core/status.ts                                 |  36 ++-
+ src/core/task-contract.ts                          |  80 ++++-
+ src/core/task-state.ts                             |  83 ++---
+ src/core/upgrade-harness.ts                        |   2 +-
+ src/core/verification.ts                           |  29 +-
+ src/templates/agents/claude-code.md                |   2 +-
+ src/templates/agents/codex.md                      |   2 +-
+ src/templates/agents/cursor.md                     |   2 +-
+ src/templates/agents/gemini-cli.md                 |   2 +-
+ src/templates/agents/generic.md                    |   4 +-
+ src/templates/agents/github-copilot-cli.md         |   2 +-
+ src/templates/agents/opencode.md                   |   2 +-
+ src/templates/handoffs/verification-report.md      |   2 +-
+ src/templates/harness/commands.md                  |   3 +-
+ .../policy-packs/maintainer-review/manifest.json   |   2 +-
+ .../policies/maintainer-evidence-policy.md         |   2 +-
+ src/templates/root/AGENTLOOP.md                    |   8 +-
+ src/templates/root/AGENTS.md                       |   6 +-
+ src/templates/root/agentloop-directory-readme.md   |   4 +-
+ src/templates/tasks/README.md                      |   2 +
+ tests/agent-installation.test.ts                   |   8 +-
+ tests/artifacts.test.ts                            |  41 ++-
+ tests/autonomous-dogfood.test.ts                   |  32 ++
+ tests/check-gates.test.ts                          |  75 +++++
+ tests/create-task.test.ts                          | 343 +++++++++++++++++++++
+ tests/dogfood-script.test.ts                       |  29 +-
+ tests/html-report.test.ts                          |  28 ++
+ tests/init.test.ts                                 |  27 ++
+ tests/maintainer-check.test.ts                     |  93 +++++-
+ tests/maintenance-check-script.test.ts             |  34 +-
+ tests/next.test.ts                                 |  28 ++
+ tests/package-metadata.test.ts                     |  49 +++
+ tests/package-scripts.test.ts                      |   1 +
+ tests/pr-summary.test.ts                           |  75 +++++
+ tests/prepare-pr.test.ts                           |  60 +++-
+ tests/public-docs-hygiene.test.ts                  |  22 ++
+ tests/readiness-score.test.ts                      | 149 +++++++++
+ tests/redaction.test.ts                            |  14 +
+ tests/release-check.test.ts                        |  25 ++
+ tests/review-context.test.ts                       | 191 ++++++++++++
+ tests/ship.test.ts                                 | 104 ++++++-
+ tests/status.test.ts                               | 114 +++++++
+ tests/task-state.test.ts                           |  47 ++-
+ tests/verification.test.ts                         |  66 +++-
+ 99 files changed, 2970 insertions(+), 364 deletions(-)
+.agentloop/research/interview-cycle-153.md | untracked
+.agentloop/research/interview-cycle-154.md | untracked
+.agentloop/research/interview-cycle-155.md | untracked
+.agentloop/research/interview-cycle-156.md | untracked
+.agentloop/research/interview-cycle-157.md | untracked
+.agentloop/research/interview-cycle-158.md | untracked
+.agentloop/research/interview-cycle-159.md | untracked
+.agentloop/research/interview-cycle-160.md | untracked
+.agentloop/research/interview-cycle-161.md | untracked
+.agentloop/research/interview-cycle-162.md | untracked
+.agentloop/research/interview-cycle-163.md | untracked
+.agentloop/research/interview-cycle-164.md | untracked
+.agentloop/research/interview-cycle-165.md | untracked
+.agentloop/research/interview-cycle-166.md | untracked
+.agentloop/research/interview-cycle-167.md | untracked
+.agentloop/research/interview-cycle-168.md | untracked
+.agentloop/research/interview-cycle-169.md | untracked
+.agentloop/research/interview-cycle-170.md | untracked
+.agentloop/research/interview-cycle-171.md | untracked
+.agentloop/research/interview-cycle-172.md | untracked
+.agentloop/research/interview-cycle-173.md | untracked
+.agentloop/research/interview-cycle-174.md | untracked
+.agentloop/research/interview-cycle-175.md | untracked
+.agentloop/research/interview-cycle-176.md | untracked
+.agentloop/research/interview-cycle-177.md | untracked
+.agentloop/research/interview-cycle-178.md | untracked
+.agentloop/research/interview-cycle-179.md | untracked
+.agentloop/research/interview-cycle-180.md | untracked
+.agentloop/research/interview-cycle-181.md | untracked
+.agentloop/research/interview-cycle-182.md | untracked
+.agentloop/research/interview-cycle-183.md | untracked
+.agentloop/research/interview-cycle-184.md | untracked
+.agentloop/research/interview-cycle-185.md | untracked
+.agentloop/research/interview-cycle-186.md | untracked
+.agentloop/research/interview-cycle-187.md | untracked
+.agentloop/research/interview-cycle-188.md | untracked
+.agentloop/research/interview-cycle-189.md | untracked
+.agentloop/research/interview-cycle-190.md | untracked
+.agentloop/research/interview-cycle-191.md | untracked
+.agentloop/research/interview-cycle-192.md | untracked
+.agentloop/research/interview-cycle-193.md | untracked
+src/core/markdown-sections.ts | untracked
+src/core/verification-report-sections.ts | untracked

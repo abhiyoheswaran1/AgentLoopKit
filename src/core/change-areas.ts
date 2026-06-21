@@ -83,6 +83,13 @@ export function classifyChangedFiles(changedFiles: GitFileStatus[]) {
   return [...areas.filter((area) => area.files.length), ...(other.files.length ? [other] : [])];
 }
 
+export function renderChangeAreaCounts(changedFiles: GitFileStatus[]) {
+  return classifyChangedFiles(changedFiles)
+    .sort((left, right) => right.files.length - left.files.length || left.title.localeCompare(right.title))
+    .map((area) => `${area.title} ${area.files.length}`)
+    .join(', ');
+}
+
 export function renderChangedFileLine(file: GitFileStatus) {
   return `- ${file.status} ${inlineCode(file.path)}`;
 }

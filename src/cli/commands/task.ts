@@ -21,6 +21,7 @@ import type {
   BulkTaskArchiveResult,
   ListedTask,
   TaskContract,
+  ClearActiveTaskResult,
   TaskDoctorResult,
 } from '../../core/task-state.js';
 import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
@@ -49,21 +50,92 @@ type TaskListOptions = {
   redactPaths?: boolean;
 };
 
-function printTask(
-  task: Awaited<ReturnType<typeof getActiveTask>> | null,
-  options: { json?: boolean },
-) {
+type TaskOutputOptions = {
+  json?: boolean;
+  cwd?: string;
+  redactPaths?: boolean;
+};
+
+function redactOutputText(value: string, options: TaskOutputOptions) {
+  return options.redactPaths && options.cwd ? redactLocalRoots(value, [options.cwd]) : value;
+}
+
+function taskForOutput(task: ActiveTask, options: TaskOutputOptions): ActiveTask {
+  return {
+    ...task,
+    path: redactOutputText(task.path, options),
+  };
+}
+
+function archivedTaskForOutput(task: ArchivedTask, options: TaskOutputOptions): ArchivedTask {
+  return {
+    ...taskForOutput(task, options),
+    previousPath: redactOutputText(task.previousPath, options),
+  };
+}
+
+function clearResultForOutput(
+  result: ClearActiveTaskResult,
+  options: TaskOutputOptions,
+): ClearActiveTaskResult {
+  return {
+    ...result,
+    ...(result.activeTaskPath
+      ? { activeTaskPath: redactOutputText(result.activeTaskPath, options) }
+      : {}),
+  };
+}
+
+function bulkArchiveResultForOutput(
+  result: BulkTaskArchiveResult,
+  options: TaskOutputOptions,
+): BulkTaskArchiveResult {
+  return {
+    ...result,
+    tasks: result.tasks.map((task) => archivedTaskForOutput(task, options)),
+  };
+}
+
+function printTask(task: ActiveTask | null | undefined, options: TaskOutputOptions) {
+  const outputTask = task ? taskForOutput(task, options) : null;
   if (options.json) {
-    console.log(JSON.stringify({ activeTask: task ?? null }, null, 2));
+    console.log(JSON.stringify({ activeTask: outputTask }, null, 2));
     return;
   }
-  if (!task) {
+  if (!outputTask) {
     console.log('No active task set.');
     console.log('Run `agentloop task set <path>` to pin one.');
     return;
   }
-  console.log(`Active task: ${inlineCode(task.title)} (${inlineCode(task.status)})`);
-  console.log(inlineCode(task.path));
+  console.log(`Active task: ${inlineCode(outputTask.title)} (${inlineCode(outputTask.status)})`);
+  console.log(inlineCode(outputTask.path));
+}
+
+function printClearedTask(result: ClearActiveTaskResult, options: TaskOutputOptions) {
+  const outputResult = clearResultForOutput(result, options);
+  if (options.json) {
+    console.log(
+      JSON.stringify(
+        {
+          activeTask: null,
+          cleared: outputResult.cleared,
+          ...(outputResult.activeTaskPath
+            ? { activeTaskPath: outputResult.activeTaskPath }
+            : {}),
+        },
+        null,
+        2,
+      ),
+    );
+    return;
+  }
+  if (!outputResult.cleared) {
+    printTask(null, options);
+    return;
+  }
+  console.log('Cleared active task pointer.');
+  if (outputResult.activeTaskPath) console.log(inlineCode(outputResult.activeTaskPath));
+  console.log('Run `agentloop task set <path>` to pin one.');
 }
 
 function summarizeTaskList(tasks: ListedTask[]): TaskListSummary {
@@ -187,45 +259,50 @@ function printTaskContract(
   process.stdout.write(outputTask.content);
 }
 
-function printUpdatedTask(task: ActiveTask, options: { json?: boolean }) {
+function printUpdatedTask(task: ActiveTask, options: TaskOutputOptions) {
+  const outputTask = taskForOutput(task, options);
   if (options.json) {
-    console.log(JSON.stringify({ task }, null, 2));
+    console.log(JSON.stringify({ task: outputTask }, null, 2));
     return;
   }
-  console.log(`Updated task status: ${inlineCode(task.title)} (${inlineCode(task.status)})`);
-  console.log(inlineCode(task.path));
-  if (task.status.trim().toLowerCase() === 'done') {
+  console.log(
+    `Updated task status: ${inlineCode(outputTask.title)} (${inlineCode(outputTask.status)})`,
+  );
+  console.log(inlineCode(outputTask.path));
+  if (outputTask.status.trim().toLowerCase() === 'done') {
     console.log(TASK_DONE_NEXT_STEP);
   }
 }
 
-function printArchivedTask(task: ArchivedTask, options: { json?: boolean }) {
+function printArchivedTask(task: ArchivedTask, options: TaskOutputOptions) {
+  const outputTask = archivedTaskForOutput(task, options);
   if (options.json) {
-    console.log(JSON.stringify({ task }, null, 2));
+    console.log(JSON.stringify({ task: outputTask }, null, 2));
     return;
   }
-  console.log(`Archived task: ${inlineCode(task.title)} (${inlineCode(task.status)})`);
-  console.log(`${inlineCode(task.previousPath)} -> ${inlineCode(task.path)}`);
+  console.log(`Archived task: ${inlineCode(outputTask.title)} (${inlineCode(outputTask.status)})`);
+  console.log(`${inlineCode(outputTask.previousPath)} -> ${inlineCode(outputTask.path)}`);
   console.log(TASK_ARCHIVE_NEXT_STEP);
 }
 
-function printBulkTaskArchive(result: BulkTaskArchiveResult, options: { json?: boolean }) {
+function printBulkTaskArchive(result: BulkTaskArchiveResult, options: TaskOutputOptions) {
+  const outputResult = bulkArchiveResultForOutput(result, options);
   if (options.json) {
-    console.log(JSON.stringify({ taskArchive: result }, null, 2));
+    console.log(JSON.stringify({ taskArchive: outputResult }, null, 2));
     return;
   }
 
-  const action = result.dryRun ? 'would archive' : 'archived';
+  const action = outputResult.dryRun ? 'would archive' : 'archived';
   console.log(
-    `Bulk task archive ${result.dryRun ? 'dry run' : 'complete'}: ${action} ${inlineCode(
-      String(result.count),
-    )} task contract(s) with status ${inlineCode(result.status)}.`,
+    `Bulk task archive ${outputResult.dryRun ? 'dry run' : 'complete'}: ${action} ${inlineCode(
+      String(outputResult.count),
+    )} task contract(s) with status ${inlineCode(outputResult.status)}.`,
   );
-  for (const task of result.tasks) {
+  for (const task of outputResult.tasks) {
     console.log(`- ${inlineCode(task.title)}`);
     console.log(`  ${inlineCode(task.previousPath)} -> ${inlineCode(task.path)}`);
   }
-  if (!result.dryRun) {
+  if (!outputResult.dryRun) {
     console.log(BULK_TASK_ARCHIVE_NEXT_STEP);
   }
 }
@@ -295,11 +372,11 @@ function printJsonError(error: AgentLoopError, details: Record<string, unknown> 
   process.exitCode = 1;
 }
 
-function printTaskPathJsonError(error: unknown, options: { json?: boolean }) {
+function printTaskPathJsonError(error: unknown, options: TaskOutputOptions) {
   if (options.json && error instanceof TaskPathError) {
     printJsonError(error, {
-      requestedTask: error.requestedTask,
-      tasksDir: error.tasksDir,
+      requestedTask: redactOutputText(error.requestedTask, options),
+      tasksDir: redactOutputText(error.tasksDir, options),
       reason: error.reason,
     });
     return true;
@@ -401,8 +478,9 @@ export function taskCommand() {
     .command('set')
     .argument('<path>', 'task contract path under .agentloop/tasks')
     .option('--json', 'print machine-readable output')
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .description('Set the active task contract')
-    .action(async (taskPath: string, options: { json?: boolean }) => {
+    .action(async (taskPath: string, options: TaskOutputOptions) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
       let activeTask: ActiveTask;
@@ -417,7 +495,7 @@ export function taskCommand() {
         if (printTaskOutputPathJsonError(error, options)) return;
         throw error;
       }
-      printTask(activeTask, options);
+      printTask(activeTask, { ...options, cwd: workspace.cwd });
     });
 
   command
@@ -425,8 +503,9 @@ export function taskCommand() {
     .argument('<path>', 'task contract path under .agentloop/tasks')
     .argument('<status>', 'one of: proposed, in-progress, blocked, deferred, review, done')
     .option('--json', 'print machine-readable output')
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .description('Update a task contract status')
-    .action(async (taskPath: string, status: string, options: { json?: boolean }) => {
+    .action(async (taskPath: string, status: string, options: TaskOutputOptions) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
       let task: ActiveTask;
@@ -453,15 +532,16 @@ export function taskCommand() {
         }
         throw error;
       }
-      printUpdatedTask(task, options);
+      printUpdatedTask(task, { ...options, cwd: workspace.cwd });
     });
 
   command
     .command('done')
     .argument('[path]', 'task contract path under .agentloop/tasks; defaults to active task')
     .option('--json', 'print machine-readable output')
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .description('Mark a task contract done')
-    .action(async (taskPath: string | undefined, options: { json?: boolean }) => {
+    .action(async (taskPath: string | undefined, options: TaskOutputOptions) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
       let task: ActiveTask;
@@ -479,7 +559,7 @@ export function taskCommand() {
         }
         throw error;
       }
-      printUpdatedTask(task, options);
+      printUpdatedTask(task, { ...options, cwd: workspace.cwd });
     });
 
   command
@@ -488,11 +568,12 @@ export function taskCommand() {
     .option('--status <status>', 'bulk archive task contracts with this status')
     .option('--dry-run', 'preview bulk archive output without moving task contracts')
     .option('--json', 'print machine-readable output')
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .description('Archive a task contract')
     .action(
       async (
         taskPath: string | undefined,
-        options: { status?: string; dryRun?: boolean; json?: boolean },
+        options: TaskOutputOptions & { status?: string; dryRun?: boolean },
       ) => {
         const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
         if (!workspace) return;
@@ -558,7 +639,7 @@ export function taskCommand() {
             if (printTaskOutputPathJsonError(error, options)) return;
             throw error;
           }
-          printBulkTaskArchive(result, options);
+          printBulkTaskArchive(result, { ...options, cwd: workspace.cwd });
           return;
         }
 
@@ -582,7 +663,7 @@ export function taskCommand() {
           if (printTaskOutputPathJsonError(error, options)) return;
           throw error;
         }
-        printArchivedTask(task, options);
+        printArchivedTask(task, { ...options, cwd: workspace.cwd });
       },
     );
 
@@ -615,17 +696,19 @@ export function taskCommand() {
   command
     .command('clear')
     .option('--json', 'print machine-readable output')
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .description('Clear the active task pointer')
-    .action(async (options: { json?: boolean }) => {
+    .action(async (options: TaskOutputOptions) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
+      let result: ClearActiveTaskResult;
       try {
-        await clearActiveTask({ cwd: workspace.cwd, config: workspace.config });
+        result = await clearActiveTask({ cwd: workspace.cwd, config: workspace.config });
       } catch (error) {
         if (printTaskOutputPathJsonError(error, options)) return;
         throw error;
       }
-      printTask(null, options);
+      printClearedTask(result, { ...options, cwd: workspace.cwd });
     });
 
   return command;

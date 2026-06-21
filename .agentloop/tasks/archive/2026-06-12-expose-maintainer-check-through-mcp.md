@@ -8,7 +8,7 @@
 Describe the problem this task should solve.
 
 ## Desired Outcome
-MCP clients can inspect local maintainer reviewability signals for AI-assisted work without command execution, writes, API calls, or token handling.
+MCP clients can inspect local maintainer reviewability signals for agent-assisted work without command execution, writes, API calls, or token handling.
 
 ## Constraints
 - None recorded yet.

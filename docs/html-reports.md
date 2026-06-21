@@ -19,6 +19,8 @@ The report uses local inputs:
 - git diff stats
 - deterministic PR summary output
 
+The Diff Stats sections use Git's tracked-file diff stat plus compact `path | untracked` markers for untracked non-evidence files. Those markers come from Git status only; AgentLoopKit does not read untracked file contents or synthesize line counts.
+
 The changed-file table keeps ordinary source, test, docs, config, and automation paths visible. Generated AgentLoop and AgentFlight evidence paths are compacted into grouped count rows so long local verification sessions do not flood the browser report. Full evidence paths remain available from Git status, JSON-capable AgentLoop commands, and run-ledger artifacts.
 
 It writes:

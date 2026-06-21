@@ -17,6 +17,7 @@ describe('dogfood script helpers', () => {
       'maintainer reviewability check',
       'agent review context',
       'agentflight session health',
+      'agentflight session status',
       'projscan project health',
     ]);
 
@@ -80,7 +81,10 @@ describe('dogfood script helpers', () => {
     expect(steps[9].args).toEqual(['--yes', 'agentflight', 'doctor']);
     expect(steps[9].allowFailure).toBe(false);
     expect(steps[10].command).toBe('npx');
-    expect(steps[10].args).toEqual(['--yes', 'projscan', '--format', 'markdown', 'doctor']);
+    expect(steps[10].args).toEqual(['--yes', 'agentflight', 'status']);
+    expect(steps[10].allowFailure).toBe(false);
+    expect(steps[11].command).toBe('npx');
+    expect(steps[11].args).toEqual(['--yes', 'projscan', '--format', 'markdown', 'doctor']);
   });
 
   test('adds strict gate mode only when requested', () => {
@@ -95,7 +99,18 @@ describe('dogfood script helpers', () => {
       '--strict',
     ]);
     expect(steps[5].allowFailure).toBe(false);
+    expect(steps[7].args).toEqual([
+      '--no-install',
+      'tsx',
+      'src/cli/index.ts',
+      'maintainer-check',
+      '--redact-paths',
+    ]);
+    expect(steps[7].args).not.toContain('--strict');
     expect(steps[7].allowFailure).toBe(false);
+    expect(steps[10].args).toEqual(['--yes', 'agentflight', 'status']);
+    expect(steps[10].args).not.toContain('--strict');
+    expect(steps[10].allowFailure).toBe(false);
   });
 
   test('parses JSON mode without changing strict mode parsing', () => {
@@ -109,6 +124,18 @@ describe('dogfood script helpers', () => {
       strict: true,
       help: false,
     });
+  });
+
+  test('documents the strict warning boundary in help text', () => {
+    expect(dogfood.getDogfoodHelpText()).toContain(
+      'Strict mode treats review-gate warnings as failures.',
+    );
+    expect(dogfood.getDogfoodHelpText()).toContain(
+      'maintainer-check warnings remain reviewer guidance unless the command exits non-zero.',
+    );
+    expect(dogfood.getDogfoodHelpText()).toContain(
+      'AgentFlight status is surfaced as session-readiness evidence without parsing its human output.',
+    );
   });
 
   test('returns a deterministic JSON-friendly summary for passing dogfood steps', async () => {

@@ -143,14 +143,95 @@ describe('ship command', () => {
     const markdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
     expect(markdown).toContain('# AgentLoopKit Ship Report');
     expect(markdown).toContain(
-      'Make agent-generated code reviewable, verifiable, and merge-ready.',
+      'Make agent-assisted work reviewable, verifiable, and merge-ready.',
     );
     expect(markdown).toContain('This is a review-readiness score, not a code-quality score.');
     expect(markdown).toContain('src/auth/callback.ts');
     expect(markdown).toContain('Review risk-sensitive files before merge.');
+    expect(markdown).toContain('## Task Risk Notes');
+    expect(markdown).toContain('- Auth flow touched; review redirect edge cases.');
+    expect(markdown).not.toContain('## Inherited Dirty Work');
     expect(markdown).toContain('.agentloop/reports/');
     expect(markdown).not.toContain('Latest handoff does not cover the current dirty files.');
     expect(markdown).not.toContain(dir);
+  });
+
+  test('surfaces inherited dirty-work baseline in ship report markdown only', async () => {
+    const dir = await createShipFixture();
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-11-fix-login.md');
+    const task = await readFile(taskPath, 'utf8');
+    await writeFile(
+      taskPath,
+      task.replace(
+        '- Auth flow touched; review redirect edge cases.',
+        '- Auth flow touched; review redirect edge cases.\n- Pre-existing dirty non-evidence files before task creation: 1 total; examples: `src/old.ts`. Confirm it belongs to this task before implementation.',
+      ),
+    );
+    await writeFile(path.join(dir, 'src/other.ts'), 'export const other = true;\n');
+
+    const result = await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir, reject: false });
+    const output = JSON.parse(result.stdout);
+    const markdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
+
+    expect(result.exitCode).toBe(1);
+    expect(markdown).toContain('## Inherited Dirty Work');
+    expect(markdown).toContain(
+      '- Task started with `1` dirty non-evidence file(s); current non-evidence changed files: `2` (net `+1`).',
+    );
+    expect(JSON.stringify(output.readiness)).not.toContain('Task started with');
+  });
+
+  test('renders task risk notes safely in ship report markdown', async () => {
+    const dir = await createShipFixture();
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-11-fix-login.md');
+    const task = await readFile(taskPath, 'utf8');
+    await writeFile(
+      taskPath,
+      task.replace(
+        '- Auth flow touched; review redirect edge cases.',
+        '- Auth *flow* touched; review [runbook](https://example.com).\n- - [x] injected checkbox',
+      ),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir, reject: false });
+    expect(result.exitCode).toBe(1);
+    const output = JSON.parse(result.stdout);
+    const markdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
+
+    expect(markdown).toContain('## Task Risk Notes');
+    expect(markdown).toContain(
+      '- Auth \\*flow\\* touched; review \\[runbook\\]\\(https://example.com\\).',
+    );
+    expect(markdown).toContain('- \\- \\[x\\] injected checkbox');
+    expect(markdown).not.toContain('- - [x] injected checkbox');
+  });
+
+  test('renders ship report risk fallback when no task risk notes are recorded', async () => {
+    const dir = await createShipFixture();
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-11-fix-login.md');
+    const task = await readFile(taskPath, 'utf8');
+    await writeFile(
+      taskPath,
+      task.replace(
+        `## Risk Notes
+- Auth flow touched; review redirect edge cases.
+
+## Rollback Notes`,
+        `## Risk Notes
+None recorded yet.
+
+## Rollback Notes`,
+      ),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir, reject: false });
+    expect(result.exitCode).toBe(1);
+    const output = JSON.parse(result.stdout);
+    const markdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
+
+    expect(markdown).toContain('## Task Risk Notes');
+    expect(markdown).toContain('- No task risk notes were recorded.');
+    expect(markdown).not.toContain('None recorded yet.');
   });
 
   test('keeps imported GitHub metadata neutral for ship scoring', async () => {
@@ -241,6 +322,27 @@ describe('ship command', () => {
     );
     expect(markdown).toContain('- Full paths remain in JSON output and run-ledger evidence.');
     expect(markdown).not.toContain(`- ?? \`${evidencePath}\``);
+  });
+
+  test('includes untracked non-evidence files in the ship diff stat', async () => {
+    const dir = await createShipFixture();
+    await mkdir(path.join(dir, 'docs'), { recursive: true });
+    await writeFile(path.join(dir, 'docs/new-review-guide.md'), '# New review guide\n');
+
+    const result = await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+    const markdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
+    const runDiffStat = await readFile(path.join(dir, output.run.path, 'diffstat.txt'), 'utf8');
+
+    expect(output.changedFiles).toEqual(
+      expect.arrayContaining([
+        { status: 'M', path: 'src/auth/callback.ts' },
+        { status: '??', path: 'docs/new-review-guide.md' },
+      ]),
+    );
+    expect(markdown).toContain('src/auth/callback.ts');
+    expect(markdown).toContain('docs/new-review-guide.md | untracked');
+    expect(runDiffStat).toContain('docs/new-review-guide.md | untracked');
   });
 
   test('keeps same-minute ship report and handoff artifacts instead of overwriting them', async () => {

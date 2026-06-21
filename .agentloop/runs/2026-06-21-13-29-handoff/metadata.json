@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-13-29-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-21-13-29",
+  "createdAtEpochMs": 1782041394991,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-surface-task-loop-guidance-after-create-task.md",
+    "title": "Surface task loop guidance after create-task",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-13-19-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-13-29-pr-summary.md",
+  "changedFileCount": 742
+}

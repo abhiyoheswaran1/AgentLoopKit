@@ -8,6 +8,7 @@ describe('maintenance check script helpers', () => {
 
     expect(steps.map((step: { name: string }) => step.name)).toEqual([
       'unit tests',
+      'typecheck',
       'public docs hygiene',
       'markdown links',
       'release proof smoke',
@@ -29,9 +30,14 @@ describe('maintenance check script helpers', () => {
       args: ['run', 'test:unit'],
       allowFailure: false,
     });
-    expect(steps[1].args).toEqual(['run', 'check:public-docs']);
-    expect(steps[2].args).toEqual(['run', 'check:links']);
-    expect(steps[3].args).toEqual([
+    expect(steps[1]).toMatchObject({
+      command: 'npm',
+      args: ['run', 'typecheck'],
+      allowFailure: false,
+    });
+    expect(steps[2].args).toEqual(['run', 'check:public-docs']);
+    expect(steps[3].args).toEqual(['run', 'check:links']);
+    expect(steps[4].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
@@ -40,24 +46,24 @@ describe('maintenance check script helpers', () => {
       'npm',
       '--redact-paths',
     ]);
-    expect(steps[4]).toMatchObject({
+    expect(steps[5]).toMatchObject({
       command: 'npm',
       args: ['test', '--', 'tests/npm-status.test.ts'],
       allowFailure: false,
     });
-    expect(steps[5].args).toEqual([
+    expect(steps[6].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
       'schemastore',
       '--json',
     ]);
-    expect(steps[6]).toMatchObject({
+    expect(steps[7]).toMatchObject({
       command: 'npm',
       args: ['test', '--', 'tests/schemastore.test.ts'],
       allowFailure: false,
     });
-    expect(steps[7].args).toEqual([
+    expect(steps[8].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
@@ -65,12 +71,12 @@ describe('maintenance check script helpers', () => {
       'packs',
       '--json',
     ]);
-    expect(steps[8]).toMatchObject({
+    expect(steps[9]).toMatchObject({
       command: 'npm',
       args: ['test', '--', 'tests/policy-packs.test.ts'],
       allowFailure: false,
     });
-    expect(steps[9].args).toEqual([
+    expect(steps[10].args).toEqual([
       '--no-install',
       'tsx',
       'src/cli/index.ts',
@@ -78,12 +84,12 @@ describe('maintenance check script helpers', () => {
       'import',
       '--help',
     ]);
-    expect(steps[10]).toMatchObject({
+    expect(steps[11]).toMatchObject({
       command: 'npm',
       args: ['test', '--', 'tests/github-metadata.test.ts'],
       allowFailure: false,
     });
-    expect(steps[11]).toMatchObject({
+    expect(steps[12]).toMatchObject({
       command: 'npm',
       args: [
         'test',
@@ -94,9 +100,9 @@ describe('maintenance check script helpers', () => {
       ],
       allowFailure: false,
     });
-    expect(steps[12].args).toEqual(['--yes', 'agentflight@latest', '--version']);
-    expect(steps[13].args).toEqual(['--yes', 'projscan', '--format', 'json', 'doctor']);
-    expect(steps[14].args).toEqual(['run', 'dogfood']);
+    expect(steps[13].args).toEqual(['--yes', 'agentflight@latest', '--version']);
+    expect(steps[14].args).toEqual(['--yes', 'projscan', '--format', 'json', 'doctor']);
+    expect(steps[15].args).toEqual(['run', 'dogfood']);
   });
 
   test('does not include release mutation or credential-reading commands', () => {

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-09-06-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-09-06",
+  "createdAtEpochMs": 1782025621330,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-label-previous-verification-in-review-context.md",
+    "title": "Label previous verification in review context",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-09-04-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-09-06-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-09-06-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 522
+}

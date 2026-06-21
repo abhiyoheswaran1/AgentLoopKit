@@ -22,6 +22,7 @@ async function createPreparePrFixture(
   options: {
     acceptanceCriteria?: string;
     riskNotes?: string;
+    verificationMarkdown?: string;
   } = {},
 ) {
   const dir = await makeTempDir();
@@ -93,7 +94,7 @@ Revert the auth callback change.
   await setActiveTask({ cwd: dir, config, taskPath });
   await writeFile(
     path.join(dir, '.agentloop/reports/2026-06-11-12-00-verification-report.md'),
-    '# Verification Report\n\n- Overall status: pass\n',
+    options.verificationMarkdown ?? '# Verification Report\n\n- Overall status: pass\n',
   );
   await mkdir(path.join(dir, 'src/auth'), { recursive: true });
   await writeFile(path.join(dir, 'src/auth/callback.ts'), 'export const redirect = "old";\n');
@@ -123,6 +124,10 @@ describe('prepare-pr command', () => {
     expect(output.body).toContain('## Changed Files');
     expect(output.body).toContain('src/auth/callback.ts');
     expect(output.body).toContain('## Verification Evidence');
+    expect(output.body).toMatch(
+      /## Verification Evidence\n\n- Overall status: pass \(`\.agentloop\/reports\/[^`]+`\)\n\n## Reviewer Checklist/,
+    );
+    expect(output.body).not.toMatch(/## Verification Evidence[\s\S]*\n\n\n## Reviewer Checklist/);
     expect(output.body).toContain('Password-reset login redirects to the requested page.');
     expect(output.body).toContain('Existing session login still redirects to the dashboard.');
     expect(output.body).toContain('Reviewer can see every acceptance criterion in the PR body.');
@@ -152,6 +157,58 @@ describe('prepare-pr command', () => {
       runId: shipRuns[0].id,
     });
   });
+
+  test(
+    'lists verification commands that were not run in the PR body',
+    async () => {
+      const dir = await createPreparePrFixture({
+        verificationMarkdown: `# Verification Report
+
+- Overall status: pass
+
+## Not Run
+- test: \`npm test\`
+- lint: \`npm run lint\`
+`,
+      });
+
+      const output = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'prepare-pr', '--json'], { cwd: dir })).stdout,
+      );
+
+      expect(output.body).toContain('## Verification Report Not Run');
+      expect(output.body).toContain('- test: `npm test`');
+      expect(output.body).toContain('- lint: `npm run lint`');
+      expect(output.body).not.toContain(
+        '- Check the verification report for skipped commands or untested areas.',
+      );
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
+
+  test(
+    'uses a clear fallback when the verification report says nothing was skipped',
+    async () => {
+      const dir = await createPreparePrFixture({
+        verificationMarkdown: `# Verification Report
+
+- Overall status: pass
+
+## Not Run
+- Nothing skipped.
+`,
+      });
+
+      const output = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'prepare-pr', '--json'], { cwd: dir })).stdout,
+      );
+
+      expect(output.body).toContain('## Verification Report Not Run');
+      expect(output.body).toContain('- No skipped commands were recorded.');
+      expect(output.body).not.toContain('- Nothing skipped.');
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
 
   test(
     'escapes Markdown control characters in generated PR body and GitHub comment lists',
@@ -247,6 +304,7 @@ describe('prepare-pr command', () => {
       expect(output.body).toContain(
         '- PR excerpt: Implements \\[the fix\\]\\(https://example.com\\).',
       );
+      expect(output.body).toMatch(/## Imported GitHub Context\n\n[\s\S]*\n\n## Reviewer Checklist/);
       expect(output.body).not.toContain(dir);
     },
     CLI_PREPARE_PR_TEST_TIMEOUT_MS,

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-06-18-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-06-18",
+  "createdAtEpochMs": 1782015537401,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-show-review-area-counts-in-ship-scope-warnings.md",
+    "title": "Show review-area counts in ship scope warnings",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-06-15-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-06-18-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-06-18-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 411
+}

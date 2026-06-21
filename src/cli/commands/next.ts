@@ -11,6 +11,7 @@ type NextActionResult = {
   activeTask: AgentLoopStatusResult['activeTask'] | null;
   staleTaskState?: AgentLoopStatusResult['staleTaskState'];
   latestTask: AgentLoopStatusResult['latestTask'] | null;
+  loopGuidance?: AgentLoopStatusResult['loopGuidance'];
   deferredTasks: AgentLoopStatusResult['deferredTasks'];
   agentFlightPlaceholderTasks: AgentLoopStatusResult['agentFlightPlaceholderTasks'];
   latestReport: AgentLoopStatusResult['latestReport'] | null;
@@ -38,6 +39,12 @@ function formatActiveTask(result: NextActionResult) {
 function formatReport(result: NextActionResult) {
   if (!result.latestReport) return 'none';
   return `${singleLineInlineCode(result.latestReport.overallStatus)} - ${singleLineInlineCode(result.latestReport.path)}`;
+}
+
+function formatLatestVerificationLabel(result: NextActionResult) {
+  return result.activeTask || result.latestTask
+    ? 'Latest verification'
+    : 'Latest previous verification';
 }
 
 function formatDeferredTasks(tasks: AgentLoopStatusResult['deferredTasks']) {
@@ -69,6 +76,7 @@ function toNextActionResult(status: AgentLoopStatusResult): NextActionResult {
     activeTask: status.activeTask ?? null,
     ...(status.staleTaskState ? { staleTaskState: status.staleTaskState } : {}),
     latestTask: status.latestTask ?? null,
+    ...(status.loopGuidance ? { loopGuidance: status.loopGuidance } : {}),
     deferredTasks: status.deferredTasks,
     agentFlightPlaceholderTasks: status.agentFlightPlaceholderTasks,
     latestReport: status.latestReport ?? null,
@@ -89,6 +97,9 @@ function formatWorkingTree(workingTree: NextActionResult['workingTree']) {
 
 function renderNextAction(result: NextActionResult) {
   const workingTree = formatWorkingTree(result.workingTree);
+  const loopGuidance = result.loopGuidance
+    ? `- Loop guidance: ${singleLineInlineCode(result.loopGuidance.path)}\n`
+    : '';
   const nextAction =
     result.command === 'none'
       ? `No command required.\n\n${result.reason}`
@@ -100,9 +111,9 @@ ${nextAction}
 
 - Active task: ${formatActiveTask(result)}
 - Latest open task: ${formatTask(result.latestTask)}
-- Deferred tasks: ${formatDeferredTasks(result.deferredTasks)}
+${loopGuidance}- Deferred tasks: ${formatDeferredTasks(result.deferredTasks)}
 - AgentFlight placeholders: ${formatAgentFlightPlaceholderTasks(result.agentFlightPlaceholderTasks)}
-- Latest verification: ${formatReport(result)}
+- ${formatLatestVerificationLabel(result)}: ${formatReport(result)}
 - Working tree: ${singleLineInlineCode(workingTree)}
 `;
 }

@@ -13,6 +13,7 @@ import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import {
+  appendUntrackedFilesToDiffStat,
   getGitBranch,
   getGitCommit,
   getGitDiffStat,
@@ -305,7 +306,7 @@ export async function writeHtmlReport(options: WriteHtmlReportOptions): Promise<
       rootDir: cwd,
     }));
 
-  const [status, branch, commit, diffStat, taskMarkdown, verificationMarkdown, handoffMarkdown] =
+  const [status, branch, commit, rawDiffStat, taskMarkdown, verificationMarkdown, handoffMarkdown] =
     await Promise.all([
       getGitStatus(cwd),
       getGitBranch(cwd),
@@ -316,6 +317,7 @@ export async function writeHtmlReport(options: WriteHtmlReportOptions): Promise<
       readMarkdownIfExists(handoffPath),
     ]);
   const changedFiles = await parseGitStatus(status);
+  const diffStat = appendUntrackedFilesToDiffStat(rawDiffStat, changedFiles);
   const summary = await summarizeRepository({
     cwd,
     config: options.config,

@@ -1,6 +1,6 @@
 # Maintenance Guards
 
-AgentLoopKit's near-term work is maintenance discipline, adoption polish, and trust. Use these guards before changing release, docs, schema, policy, or GitHub metadata behavior.
+AgentLoopKit's near-term work is maintenance discipline, adoption polish, and trust. Use these guards before changing typecheck, release, docs, schema, policy, or GitHub metadata behavior.
 
 ## Release Pipeline
 
@@ -123,15 +123,23 @@ agentloop maintainer-check --redact-paths
 
 ## Regular Maintenance Check
 
-Use the maintenance gate during ongoing development when release-proof or npm-status command health, public docs, SchemaStore, policy packs, GitHub metadata, AgentFlight, or ProjScan behavior changes:
+Use the maintenance gate during ongoing development when typecheck, release-proof or npm-status command health, public docs, SchemaStore, policy packs, GitHub metadata, AgentFlight, or ProjScan behavior changes:
 
 ```bash
 npm run maintenance:check
 ```
 
-That gate runs unit tests, public-doc hygiene, link checks, a non-strict npm-only release-proof smoke check, focused read-only npm-status safety tests, SchemaStore output and focused consistency tests, policy-pack inventory, focused policy-pack safety tests, the read-only GitHub metadata import surface, focused GitHub metadata safety tests, ship-score neutrality coverage for imported GitHub metadata, AgentFlight version, ProjScan health, and the non-strict dogfood self-check.
+That gate runs unit tests, typecheck, public-doc hygiene, link checks, a non-strict npm-only release-proof smoke check, focused read-only npm-status safety tests, SchemaStore output and focused consistency tests, policy-pack inventory, focused policy-pack safety tests, the read-only GitHub metadata import surface, focused GitHub metadata safety tests, ship-score neutrality coverage for imported GitHub metadata, AgentFlight version, ProjScan health, and the non-strict dogfood self-check. Dogfood prints AgentFlight doctor and status output so session health and readiness are visible; AgentFlight status remains exit-code based and its human output is not parsed.
 
-Run `npm run dogfood:strict` after fresh handoff or ship evidence exists, when review gates should block the final handoff.
+When recording focused AgentFlight verification, pass the executable and arguments after `--`:
+
+```bash
+npx --yes agentflight verify -- npm test -- tests/example.test.ts
+```
+
+Do not pass the full verification command as one quoted string; AgentFlight records command arguments directly, and a quoted shell-style command can create failed evidence for a command that was never executed.
+
+Run `npm run dogfood:strict` after fresh handoff or ship evidence exists, when review-gate warnings should block the final handoff. maintainer-check warnings remain reviewer guidance unless the command exits non-zero.
 
 Strict public release proof belongs in approved release gates, not the regular development maintenance guard. Use the full release gate only for approved releases:
 

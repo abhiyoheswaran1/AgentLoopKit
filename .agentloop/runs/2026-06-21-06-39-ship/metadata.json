@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-06-39-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-06-39",
+  "createdAtEpochMs": 1782016796212,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-omit-exact-covered-commands-from-verification-not-run.md",
+    "title": "Omit exact covered commands from verification Not Run",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-06-36-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-06-39-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-06-39-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 424
+}

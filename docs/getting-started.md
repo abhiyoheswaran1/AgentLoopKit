@@ -172,7 +172,7 @@ npx agentloopkit completion powershell
 These commands print scripts to stdout. AgentLoopKit does not edit shell profile files.
 Generated scripts include fixed values for task types and status transitions, the `done` archive status, agent names, policy subcommands, completion shells, artifact types, badge sources, `summarize` and `handoff` formats, and `release-proof --only` channels.
 
-Ask your coding agent to read:
+Ask your agent to read:
 
 - `AGENTS.md`
 - `AGENTLOOP.md`
@@ -204,7 +204,7 @@ npx agentloopkit npm-status
 
 `ship` is the main review-readiness command. It checks task evidence, changed files, verification freshness, gates, handoff evidence, and risks. It writes a ship report, records a run under `.agentloop/runs/`, and calculates an evidence score that does not claim to measure code quality.
 `prepare-pr` generates PR copy from local evidence. It does not read GitHub tokens, call GitHub APIs, or post comments.
-`maintainer-check` is a read-only reviewability check for AI-assisted PRs. It checks task evidence, fresh verification, handoff or ship coverage, risky file areas, lockfile changes, migrations, and generated output.
+`maintainer-check` is a read-only reviewability check for agent-assisted PRs. It checks task evidence, fresh verification, handoff or ship coverage, risky file areas, lockfile changes, migrations, and generated output.
 If you import local issue or PR JSON with `agentloop github import`, `review-context`, `prepare-pr`, and `maintainer-check` include that context in their output. Missing GitHub metadata is not a blocker.
 `runs` and `intent` inspect local run metadata. They do not read target file contents.
 `artifacts --stale` previews older local evidence candidates and caps terminal output by default. Add `--type ship-report` when you only want ship report candidates, or `--limit <count>` to change the cap. JSON output stays complete unless you pass `--limit`. The command does not delete files or write cleanup changes.

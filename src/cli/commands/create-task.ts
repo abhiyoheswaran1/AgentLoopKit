@@ -1,11 +1,19 @@
+import path from 'node:path';
 import { Command } from 'commander';
 import prompts from 'prompts';
 import { AgentLoopConfig } from '../../core/config.js';
 import { TASK_TYPES } from '../../core/constants.js';
 import { AgentLoopError } from '../../core/errors.js';
+import { pathExists } from '../../core/file-system.js';
+import { filterNonAgentLoopEvidenceFiles, getGitStatus, parseGitStatus } from '../../core/git.js';
 import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { findLikelyPostVerificationGates } from '../../core/post-verification-gates.js';
-import { createTaskContractFile, TaskOutputPathError, TaskType } from '../../core/task-contract.js';
+import {
+  createTaskContractFile,
+  findPlaceholderTaskSections,
+  TaskOutputPathError,
+  TaskType,
+} from '../../core/task-contract.js';
 import { setActiveTask } from '../../core/task-state.js';
 import { loadWorkspaceForJsonCommand } from '../json-errors.js';
 
@@ -60,12 +68,47 @@ function verificationCommandsFromOptions(
   return uniqueCommands([...configuredVerificationCommands(config), ...explicitCommands]);
 }
 
-type CreateTaskWarning = {
-  code: 'POST_VERIFICATION_GATE_IN_VERIFICATION_COMMANDS';
-  message: string;
-  commands: string[];
-  suggestion: string;
-};
+const DIRTY_WORKTREE_EXAMPLE_LIMIT = 5;
+
+type CreateTaskWarning =
+  | {
+      code: 'DIRTY_WORKTREE_BEFORE_TASK_CREATION';
+      message: string;
+      fileCount: number;
+      examples: string[];
+      suggestion: string;
+    }
+  | {
+      code: 'POST_VERIFICATION_GATE_IN_VERIFICATION_COMMANDS';
+      message: string;
+      commands: string[];
+      suggestion: string;
+    }
+  | {
+      code: 'TASK_CONTRACT_PLACEHOLDER_SECTIONS';
+      message: string;
+      sections: string[];
+      suggestion: string;
+    };
+
+async function dirtyWorktreeWarnings(cwd: string): Promise<CreateTaskWarning[]> {
+  const changedFiles = filterNonAgentLoopEvidenceFiles(await parseGitStatus(await getGitStatus(cwd)));
+  if (changedFiles.length === 0) return [];
+
+  return [
+    {
+      code: 'DIRTY_WORKTREE_BEFORE_TASK_CREATION',
+      message:
+        'Git already had dirty non-evidence files before this task was created. Review them before treating the new task as isolated.',
+      fileCount: changedFiles.length,
+      examples: changedFiles
+        .slice(0, DIRTY_WORKTREE_EXAMPLE_LIMIT)
+        .map((changedFile) => changedFile.path),
+      suggestion:
+        'Run `agentloop status --redact-paths` and confirm existing dirty files belong to this task before implementation.',
+    },
+  ];
+}
 
 function postVerificationGateWarnings(commands: string[] | undefined): CreateTaskWarning[] {
   const flaggedCommands = findLikelyPostVerificationGates(commands);
@@ -87,6 +130,58 @@ function postVerificationGateWarnings(commands: string[] | undefined): CreateTas
   ];
 }
 
+function placeholderSectionWarnings(markdown: string): CreateTaskWarning[] {
+  const sections = findPlaceholderTaskSections(markdown);
+  if (sections.length === 0) return [];
+
+  return [
+    {
+      code: 'TASK_CONTRACT_PLACEHOLDER_SECTIONS',
+      message:
+        'Task contract still contains review-critical placeholder sections. Replace them before implementation or review handoff.',
+      sections,
+      suggestion: 'Run `agentloop task doctor` or edit the task contract before implementation.',
+    },
+  ];
+}
+
+function printHumanWarning(warning: CreateTaskWarning) {
+  console.log(`Warning: ${warning.message}`);
+  if (warning.code === 'DIRTY_WORKTREE_BEFORE_TASK_CREATION') {
+    console.log(
+      `Dirty non-evidence files: ${warning.fileCount} total; examples: ${warning.examples
+        .map(inlineCode)
+        .join(', ')}`,
+    );
+    console.log(`Suggestion: ${warning.suggestion}`);
+    return;
+  }
+  if (warning.code === 'POST_VERIFICATION_GATE_IN_VERIFICATION_COMMANDS') {
+    console.log(`Move to --post-verification: ${warning.commands.map(inlineCode).join(', ')}`);
+    return;
+  }
+  console.log(`Review-critical placeholders: ${warning.sections.map(inlineCode).join(', ')}`);
+  console.log(
+    `Suggestion: Run ${inlineCode('agentloop task doctor')} or edit the task contract before implementation.`,
+  );
+}
+
+function dirtyWorktreeRiskNotes(warnings: CreateTaskWarning[]) {
+  const warning = warnings.find(
+    (candidate): candidate is Extract<
+      CreateTaskWarning,
+      { code: 'DIRTY_WORKTREE_BEFORE_TASK_CREATION' }
+    > => candidate.code === 'DIRTY_WORKTREE_BEFORE_TASK_CREATION',
+  );
+  if (!warning) return [];
+
+  return [
+    `Pre-existing dirty non-evidence files before task creation: ${warning.fileCount} total; examples: ${warning.examples
+      .map(inlineCode)
+      .join(', ')}. Confirm they belong to this task before implementation.`,
+  ];
+}
+
 function resolveTaskType(value: unknown) {
   if (typeof value !== 'string') return undefined;
   const type = value.trim();
@@ -99,6 +194,22 @@ function resolveTaskType(value: unknown) {
 
 function supportedTaskTypesHelp() {
   return `\nSupported task types:\n${TASK_TYPES.map((type) => `  - ${type}`).join('\n')}\n`;
+}
+
+type LoopGuidance = {
+  taskType: TaskType;
+  path: string;
+};
+
+async function loopGuidanceForTaskType(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  taskType: TaskType;
+}): Promise<LoopGuidance | undefined> {
+  const agentloopDir = options.config.paths.agentloopDir.replace(/\\/g, '/');
+  const loopPath = path.posix.join(agentloopDir, 'loops', `${options.taskType}.md`);
+  if (!(await pathExists(path.resolve(options.cwd, loopPath)))) return undefined;
+  return { taskType: options.taskType, path: loopPath };
 }
 
 function printJsonError(error: AgentLoopError, details: Record<string, unknown> = {}) {
@@ -189,13 +300,14 @@ async function collectInteractive(initial: { title?: string; type?: TaskType }) 
     postVerificationCommands: String(answers.postVerificationCommands ?? '')
       .split(';')
       .filter(Boolean),
+    riskNotes: [],
     rollbackNotes: answers.rollbackNotes,
   };
 }
 
 export function createTaskCommand() {
   return new Command('create-task')
-    .description('Create a task contract for an agentic coding session')
+    .description('Create a task contract for an agentic engineering session')
     .option('--title <title>', 'task title')
     .option('--type <type>', 'task type')
     .option('--out <path>', 'output file path')
@@ -253,6 +365,7 @@ export function createTaskCommand() {
       const title = typeof options.title === 'string' ? options.title : undefined;
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json === true);
       if (!workspace) return;
+      const preCreateWarnings = await dirtyWorktreeWarnings(workspace.cwd);
       const input =
         title && type
           ? {
@@ -277,7 +390,10 @@ export function createTaskCommand() {
         result = await createTaskContractFile({
           cwd: workspace.cwd,
           config: workspace.config,
-          input,
+          input: {
+            ...input,
+            riskNotes: [...(input.riskNotes ?? []), ...dirtyWorktreeRiskNotes(preCreateWarnings)],
+          },
           out: typeof options.out === 'string' ? options.out : undefined,
         });
       } catch (error) {
@@ -291,16 +407,30 @@ export function createTaskCommand() {
         }
         throw error;
       }
-      const warnings = postVerificationGateWarnings(input.verificationCommands);
+      const warnings = [
+        ...preCreateWarnings,
+        ...postVerificationGateWarnings(input.verificationCommands),
+        ...placeholderSectionWarnings(result.markdown),
+      ];
       const activeTask = await setActiveTask({
         cwd: workspace.cwd,
         config: workspace.config,
         taskPath: result.path,
       });
+      const loopGuidance = await loopGuidanceForTaskType({
+        cwd: workspace.cwd,
+        config: workspace.config,
+        taskType: input.type,
+      });
       if (options.json) {
         console.log(
           JSON.stringify(
-            warnings.length ? { task: result, activeTask, warnings } : { task: result, activeTask },
+            {
+              task: result,
+              activeTask,
+              ...(loopGuidance ? { loopGuidance } : {}),
+              ...(warnings.length ? { warnings } : {}),
+            },
             null,
             2,
           ),
@@ -309,9 +439,11 @@ export function createTaskCommand() {
       }
       console.log(`Task contract created: ${inlineCode(result.path)}`);
       console.log(`Active task set: ${inlineCode(activeTask.path)}`);
+      if (loopGuidance) {
+        console.log(`Loop guidance: ${inlineCode(loopGuidance.path)}`);
+      }
       for (const warning of warnings) {
-        console.log(`Warning: ${warning.message}`);
-        console.log(`Move to --post-verification: ${warning.commands.map(inlineCode).join(', ')}`);
+        printHumanWarning(warning);
       }
     });
 }

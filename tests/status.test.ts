@@ -61,6 +61,37 @@ describe('status command', () => {
     );
   });
 
+  test('shows loop guidance for the active task when a matching loop file exists', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-21-feature-task.md'),
+      taskContractMarkdown('Feature task', { status: 'in-progress', taskType: 'feature' }),
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-21-feature-task.md',
+      }),
+    );
+
+    const [jsonResult, humanResult] = await Promise.all([
+      execa(tsxPath, [cliPath, 'status', '--json'], { cwd: dir }),
+      execa(tsxPath, [cliPath, 'status'], { cwd: dir }),
+    ]);
+
+    const status = JSON.parse(jsonResult.stdout);
+    expect(status.loopGuidance).toEqual({
+      taskType: 'feature',
+      path: '.agentloop/loops/feature.md',
+    });
+    expect(humanResult.stdout).toContain('- Loop guidance: `.agentloop/loops/feature.md`');
+    expect(status.nextAction.command).toBe('agentloop verify');
+  });
+
   test('prints machine-readable repo status with latest unpinned task and report', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -549,6 +580,21 @@ Document how to revert or disable this change.
     tempDirs.push(dir);
     await execa('git', ['init', '-q'], { cwd: dir });
     await initializeAgentLoop({ cwd: dir });
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa(
+      'git',
+      [
+        '-c',
+        'user.name=AgentLoopKit Test',
+        '-c',
+        'user.email=test@example.com',
+        'commit',
+        '-m',
+        'baseline',
+        '-q',
+      ],
+      { cwd: dir },
+    );
     await writeFile(path.join(dir, 'changed.txt'), 'unscoped change\n');
 
     const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
@@ -561,6 +607,48 @@ Document how to revert or disable this change.
     expect(status.workingTree.dirty).toBe(true);
     expect(status.latestRun).toBeUndefined();
     expect(status.nextAction.command).toBe('agentloop create-task');
+    expect(status.nextAction.reason).toContain('1 existing dirty non-evidence file');
+    expect(status.nextAction.reason).toContain('Examples: `changed.txt`.');
+  });
+
+  test('omits dirty-work guidance when only AgentLoop evidence is dirty', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa(
+      'git',
+      [
+        '-c',
+        'user.name=AgentLoopKit Test',
+        '-c',
+        'user.email=test@example.com',
+        'commit',
+        '-m',
+        'baseline',
+        '-q',
+      ],
+      { cwd: dir },
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-17-00-40-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(0);
+    const status = JSON.parse(result.stdout);
+    expect(status.workingTree.nonEvidenceChangedFileCount).toBe(0);
+    expect(status.workingTree.agentLoopEvidenceChangedFileCount).toBe(1);
+    expect(status.nextAction.command).toBe('agentloop create-task');
+    expect(status.nextAction.reason).not.toContain('existing dirty non-evidence');
+    expect(status.nextAction.reason).not.toContain('Examples:');
   });
 
   test('separates AgentLoop evidence churn in working tree status output', async () => {
@@ -979,6 +1067,62 @@ Document how to revert or disable this change.
     expect(markdownResult.stdout).toContain('Active task: No task contract found.');
   });
 
+  test('labels latest verification as previous evidence when no active or open task exists', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-done-task.md'),
+      '# Done task\n\n- Status: done\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'status', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const markdownResult = await execa(tsxPath, [cliPath, 'status'], {
+      cwd: dir,
+      reject: false,
+    });
+    const briefResult = await execa(tsxPath, [cliPath, 'status', '--brief'], {
+      cwd: dir,
+      reject: false,
+    });
+    const compactJsonResult = await execa(tsxPath, [cliPath, 'status', '--json', '--brief'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(markdownResult.exitCode).toBe(0);
+    expect(briefResult.exitCode).toBe(0);
+    expect(compactJsonResult.exitCode).toBe(0);
+    const status = JSON.parse(jsonResult.stdout);
+    const compactStatus = JSON.parse(compactJsonResult.stdout);
+    expect(status.activeTask).toBeNull();
+    expect(status.latestTask).toBeNull();
+    expect(status.latestReport).toMatchObject({
+      overallStatus: 'pass',
+      path: '.agentloop/reports/2026-06-09-12-30-verification-report.md',
+    });
+    expect(status.latestPreviousReport).toBeUndefined();
+    expect(status.nextAction.command).toBe('agentloop create-task');
+    expect(markdownResult.stdout).toContain(
+      '- Latest previous verification: `pass` - `.agentloop/reports/2026-06-09-12-30-verification-report.md`',
+    );
+    expect(markdownResult.stdout).not.toContain('- Latest verification: `pass`');
+    expect(briefResult.stdout).toContain('verification=previous:pass');
+    expect(briefResult.stdout).not.toContain('verification=pass;');
+    expect(compactStatus.latestReport.overallStatus).toBe('pass');
+    expect(compactStatus.latestPreviousReport).toBeUndefined();
+    expect(compactStatus.brief).toContain('verification=previous:pass');
+  });
+
   test('ignores deferred tasks when choosing the latest unpinned task', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -1106,6 +1250,7 @@ Document how to revert or disable this change.
     expect(status.nextAction.command).toBe('agentloop create-task');
     expect(status.nextAction.reason).toContain('maintainer approval');
     expect(status.nextAction.reason).toContain('Create a non-release task');
+    expect(status.nextAction.reason).toContain('existing dirty non-evidence files');
   });
 
   test('separates AgentFlight placeholders from deferred roadmap tasks', async () => {

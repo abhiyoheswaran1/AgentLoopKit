@@ -171,7 +171,7 @@ describe('dogfood start script helpers', () => {
     ]);
 
     expect(options.errors).toContain(
-      'Unsupported task type "investigation". Supported task types: feature, bugfix, refactor, tests, test-generation, docs, release, security-review, dependency-upgrade, migration.',
+      'Unsupported task type "investigation". Supported task types: feature, bugfix, refactor, tests, test-generation, research, docs, release, security-review, dependency-upgrade, migration.',
     );
 
     let startedProcesses = 0;

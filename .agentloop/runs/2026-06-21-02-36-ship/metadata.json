@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-02-36-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-02-36",
+  "createdAtEpochMs": 1782002180054,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-align-dirty-work-guidance-with-non-evidence-wording.md",
+    "title": "Align dirty-work guidance with non-evidence wording",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-02-26-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-02-36-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-02-36-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 201
+}

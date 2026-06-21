@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-05-38-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-05-38",
+  "createdAtEpochMs": 1782013122434,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-document-safe-agentflight-verify-command-syntax.md",
+    "title": "Document safe AgentFlight verify command syntax",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-05-37-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-05-38-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-05-38-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 384
+}

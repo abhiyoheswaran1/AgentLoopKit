@@ -25,7 +25,7 @@ Before changing code:
 - Treat local `.agentloop/policies/*.md` files as the repo's safety guidance. A `modified` policy is a local decision to review, not a failure.
 - Run `agentloop ship` before review to score evidence readiness, write a ship report, and record a run under `.agentloop/runs/`.
 - Run `agentloop prepare-pr` after `ship` when reviewers need a PR title, grouped body, risks, rollback notes, and checklist.
-- Run `agentloop maintainer-check` when evaluating whether an AI-assisted PR has enough evidence to review.
+- Run `agentloop maintainer-check` when evaluating whether an agent-assisted PR has enough evidence to review.
 - Run `agentloop runs`, `agentloop show-run <id>`, and `agentloop intent <file>` to inspect local run history and file intent.
 - Run `agentloop check-gates` when you need a quick evidence gate without the full ship report.
 - Run `agentloop report` after verification and handoff or ship evidence when a local HTML evidence artifact helps review.
@@ -40,10 +40,10 @@ Before changing code:
 - Do not run destructive git or filesystem commands unless the user asks for them.
 - Do not read or print secrets. If env files exist, mention only their paths.
 - Run the configured verification commands before claiming completion.
-- Run `npm run dogfood` during meaningful AgentLoopKit changes to exercise the local self-check path, including dependency audit. Use `npm run dogfood:strict` before final handoff or release prep when warnings should block progress.
+- Run `npm run dogfood` during meaningful AgentLoopKit changes to exercise the local self-check path, including dependency audit. Use `npm run dogfood:strict` before final handoff or release prep when review-gate warnings should block progress; maintainer-check warnings remain reviewer guidance unless the command exits non-zero.
 - Run `npm run maintenance:check` for the near-term maintenance guard covering unit checks, public-doc hygiene, link checks, and strict dogfood.
 - Use AgentFlight for meaningful autonomous sessions: `npx --yes agentflight start --task "<task>" --yes`, `npx --yes agentflight status`, `npx --yes agentflight doctor`, and `npx --yes agentflight report`.
-- After raw `agentflight start`, run `agentloop status --redact-paths`; if an AgentFlight placeholder becomes active, run `agentloop task set <path>` to re-pin the detailed AgentLoop task.
+- After raw `agentflight start`, run `agentloop status --redact-paths` and `agentloop task doctor --redact-paths`. If an AgentFlight placeholder becomes active, treat it as preserved session evidence: run `agentloop task clear`, then `agentloop task set <path>` for a detailed task or `agentloop create-task` for new scoped work. Do not edit or delete the placeholder as default recovery.
 - Use ProjScan during implementation: `npx --yes projscan doctor --format markdown`, `npx --yes projscan start`, or a more specific ProjScan command when repo-risk context is needed.
 - Before making product-direction decisions, review `.agentloop/product-panel.md`, `.agentloop/user-personas.md`, `.agentloop/backlog.md`, and the latest files under `.agentloop/research/`.
 - Treat `.agentloop/research/` and product-panel output as simulated internal decision support. Do not present it as real user feedback, adoption, testimonials, or interviews in public docs.
@@ -52,7 +52,7 @@ Before changing code:
 
 Agent roster:
 
-Use these roles as routing hints when a coding-agent session needs focused expertise. One session may cover multiple roles, but the handoff should name which roles mattered.
+Use these roles as routing hints when an agent session needs focused expertise. One session may cover multiple roles, but the handoff should name which roles mattered.
 
 - Product Maintainer: Use for scope, positioning, roadmap, backlog, and release-channel decisions. Owns README claims, ROADMAP.md, DECISIONS.md, and public tradeoffs.
 - CLI Engineer: Use for command behavior, flags, JSON output, exit codes, path handling, and package-manager detection. Owns `src/cli/`, `src/core/`, and command tests.

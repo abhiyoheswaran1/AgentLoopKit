@@ -307,6 +307,26 @@ function uniqueCommandEntries(entries: Array<[VerificationCommandKey, string]>) 
   return { commands: result, skippedDuplicateCommands };
 }
 
+function notRunConfiguredCommandKeys(
+  config: AgentLoopConfig,
+  options: VerificationOptions,
+  results: VerificationCommandResult[],
+) {
+  const executedCommands = new Set(results.map((result) => result.command.trim()).filter(Boolean));
+  return (['test', 'lint', 'typecheck', 'build'] as const).filter((key) => {
+    const configuredCommand = config.commands[key]?.trim();
+    if (configuredCommand && executedCommands.has(configuredCommand)) return false;
+    if (options.skip?.[key]) return true;
+    return !configuredCommand;
+  });
+}
+
+function renderNotRunItem(config: AgentLoopConfig, key: VerificationCommandKey) {
+  if (key === 'custom' || key === 'task' || key === 'post-verification') return key;
+  const command = config.commands[key]?.trim();
+  return command ? `${key}: ${inlineCode(command)}` : key;
+}
+
 async function commandEntries(
   config: AgentLoopConfig,
   options: VerificationOptions,
@@ -574,12 +594,6 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
   const ciContext = detectCiContext(env);
   const commandSelection = await commandEntries(options.config, options);
   const commands = commandSelection.commands;
-  const notRun = [
-    ...(['test', 'lint', 'typecheck', 'build'] as const).filter((key) => {
-      if (options.skip?.[key]) return true;
-      return !options.config.commands[key];
-    }),
-  ];
 
   const results: VerificationCommandResult[] = [];
   const totalCommands = commands.length;
@@ -608,6 +622,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
     });
     results.push(result);
   }
+  const notRun = notRunConfiguredCommandKeys(options.config, options, results);
 
   const redactionRoots = options.redactPaths
     ? [options.cwd, await realpath(options.cwd).catch(() => options.cwd)]
@@ -662,7 +677,7 @@ ${
 
 ${renderPostVerificationGatesContext(renderOptions.postVerificationGates)}
 ## Not Run
-${notRun.length ? notRun.map((item) => `- ${item}`).join('\n') : '- Nothing skipped.'}
+${notRun.length ? notRun.map((item) => `- ${renderNotRunItem(options.config, item)}`).join('\n') : '- Nothing skipped.'}
 
 ## Recommended Next Actions
 ${

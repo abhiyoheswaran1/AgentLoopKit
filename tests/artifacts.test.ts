@@ -762,10 +762,10 @@ describe('artifacts command', () => {
     expect(markdownResult.stdout).toContain('- Tasks: 1 total (`deferred`: 1)');
     expect(markdownResult.stdout).toContain('- AgentFlight placeholder tasks: 1 preserved');
     expect(markdownResult.stdout).toContain(
-      '- Latest task: `Archived review task` (`done`, `archived`) - `.agentloop/tasks/archive/2026-06-17-archived-review-task.md`',
+      '- Latest archived task evidence: `Archived review task` (`done`, `archived`) - `.agentloop/tasks/archive/2026-06-17-archived-review-task.md`',
     );
     expect(latestTaskResult.stdout).toContain(
-      '- Latest task: `Archived review task` (`done`, `archived`) - `.agentloop/tasks/archive/2026-06-17-archived-review-task.md`',
+      '- Latest archived task evidence: `Archived review task` (`done`, `archived`) - `.agentloop/tasks/archive/2026-06-17-archived-review-task.md`',
     );
   });
 
@@ -1372,6 +1372,12 @@ describe('artifacts command', () => {
         writesFiles: false,
         deletesFiles: false,
         candidateCount: 4,
+        candidateSummary: [
+          { type: 'verification', count: 1 },
+          { type: 'handoff', count: 1 },
+          { type: 'ship-report', count: 1 },
+          { type: 'run', count: 1 },
+        ],
         keptCount: 4,
         shownCandidateCount: 4,
         hiddenCandidateCount: 0,
@@ -1437,6 +1443,11 @@ describe('artifacts command', () => {
     expect(markdownResult.stderr).toBe('');
     expect(markdownResult.stdout).toContain('# AgentLoopKit Stale Evidence Preview');
     expect(markdownResult.stdout).toContain('This is a read-only preview. No files were deleted.');
+    expect(markdownResult.stdout).toContain('## Candidate Summary');
+    expect(markdownResult.stdout).toContain('- `verification`: `1`');
+    expect(markdownResult.stdout).toContain('- `handoff`: `1`');
+    expect(markdownResult.stdout).toContain('- `ship-report`: `1`');
+    expect(markdownResult.stdout).toContain('- `run`: `1`');
     expect(markdownResult.stdout).toContain(
       '- `verification` `.agentloop/reports/2026-06-10-09-00-verification-report.md` - Older verification report; latest verification evidence is kept.',
     );
@@ -1486,6 +1497,7 @@ describe('artifacts command', () => {
     expect(JSON.parse(jsonResult.stdout)).toMatchObject({
       stale: {
         candidateCount: 1,
+        candidateSummary: [{ type: 'ship-report', count: 1 }],
         keptCount: 1,
         shownCandidateCount: 1,
         hiddenCandidateCount: 0,
@@ -1509,6 +1521,11 @@ describe('artifacts command', () => {
 
     expect(markdownResult.exitCode).toBe(0);
     expect(markdownResult.stderr).toBe('');
+    expect(markdownResult.stdout).toContain('## Candidate Summary');
+    expect(markdownResult.stdout).toContain('- `ship-report`: `1`');
+    expect(markdownResult.stdout).not.toContain('- `verification`:');
+    expect(markdownResult.stdout).not.toContain('- `handoff`:');
+    expect(markdownResult.stdout).not.toContain('- `run`:');
     expect(markdownResult.stdout).toContain(
       '- `ship-report` `.agentloop/reports/2026-06-10-09-10-ship-report.md` - Older ship report; latest ship evidence is kept.',
     );
@@ -1565,6 +1582,12 @@ describe('artifacts command', () => {
     expect(jsonResult.stderr).toBe('');
     const json = JSON.parse(jsonResult.stdout);
     expect(json.stale.candidateCount).toBe(59);
+    expect(json.stale.candidateSummary).toEqual([
+      { type: 'verification', count: 56 },
+      { type: 'handoff', count: 1 },
+      { type: 'ship-report', count: 1 },
+      { type: 'run', count: 1 },
+    ]);
     expect(json.stale.shownCandidateCount).toBe(59);
     expect(json.stale.hiddenCandidateCount).toBe(0);
     expect(json.stale.limit).toBeNull();
@@ -1572,6 +1595,11 @@ describe('artifacts command', () => {
 
     expect(markdownResult.exitCode).toBe(0);
     expect(markdownResult.stderr).toBe('');
+    expect(markdownResult.stdout).toContain('## Candidate Summary');
+    expect(markdownResult.stdout).toContain('- `verification`: `56`');
+    expect(markdownResult.stdout).toContain('- `handoff`: `1`');
+    expect(markdownResult.stdout).toContain('- `ship-report`: `1`');
+    expect(markdownResult.stdout).toContain('- `run`: `1`');
     expect(markdownResult.stdout).toContain('- Showing `50` of `59` candidate(s).');
     expect(markdownResult.stdout).toContain('- Hidden candidates: `9`.');
     expect(markdownResult.stdout).toContain(
@@ -1605,6 +1633,12 @@ describe('artifacts command', () => {
     expect(jsonResult.stderr).toBe('');
     const json = JSON.parse(jsonResult.stdout);
     expect(json.stale.candidateCount).toBe(4);
+    expect(json.stale.candidateSummary).toEqual([
+      { type: 'verification', count: 1 },
+      { type: 'handoff', count: 1 },
+      { type: 'ship-report', count: 1 },
+      { type: 'run', count: 1 },
+    ]);
     expect(json.stale.shownCandidateCount).toBe(2);
     expect(json.stale.hiddenCandidateCount).toBe(2);
     expect(json.stale.limit).toBe(2);
@@ -1616,6 +1650,9 @@ describe('artifacts command', () => {
 
     expect(markdownResult.exitCode).toBe(0);
     expect(markdownResult.stderr).toBe('');
+    expect(markdownResult.stdout).toContain('## Candidate Summary');
+    expect(markdownResult.stdout).toContain('- `ship-report`: `1`');
+    expect(markdownResult.stdout).toContain('- `run`: `1`');
     expect(markdownResult.stdout).toContain('- Showing `2` of `4` candidate(s).');
     expect(markdownResult.stdout).toContain('- Hidden candidates: `2`.');
     expect(markdownResult.stdout).toContain(

@@ -34,6 +34,10 @@ describe('agent installation', () => {
     expect(agentsMd).toContain('AgentLoopKit');
     expect(codexMd).toContain('Codex');
     expect(codexMd).toContain('verification evidence');
+    expect(codexMd).toContain('agentloop task doctor --redact-paths');
+    expect(codexMd).toContain('agentloop task clear');
+    expect(codexMd).toContain('agentloop create-task');
+    expect(codexMd).toContain('preserved session evidence');
   });
 
   test('preserves an existing agent instruction file and appends missing AGENTS.md reference', async () => {
@@ -259,7 +263,7 @@ describe('agent installation', () => {
     expect(rawPayload.agents[0].agentsPath).toBe(path.join(resolvedDir, 'AGENTS.md'));
     await expect(
       readFile(path.join(dir, '.agentloop/agents/generic.md'), 'utf8'),
-    ).resolves.toContain('Generic Coding Agent');
+    ).resolves.toContain('Generic Agent');
     await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toContain(
       '.agentloop/agents/github-copilot-cli.md',
     );
@@ -286,7 +290,7 @@ describe('agent installation', () => {
     });
     await expect(
       readFile(path.join(dir, '.agentloop/agents/generic.md'), 'utf8'),
-    ).resolves.toContain('Generic Coding Agent');
+    ).resolves.toContain('Generic Agent');
     await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toContain(
       '.agentloop/agents/github-copilot-cli.md',
     );

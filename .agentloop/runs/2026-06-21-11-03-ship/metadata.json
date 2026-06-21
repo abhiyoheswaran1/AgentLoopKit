@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-11-03-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-11-03",
+  "createdAtEpochMs": 1782032642446,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-enforce-agent-assisted-product-language.md",
+    "title": "Enforce agent-assisted product language",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-10-49-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-11-03-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-11-03-pr-summary.md",
+  "score": 88,
+  "changedFileCount": 642
+}

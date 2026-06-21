@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-07-56-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-07-56",
+  "createdAtEpochMs": 1782021374740,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-label-previous-verification-evidence-in-no-active-status.md",
+    "title": "Label previous verification evidence in no-active status",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-07-49-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-07-56-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-07-56-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 473
+}

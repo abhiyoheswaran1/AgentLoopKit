@@ -2,7 +2,13 @@ import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
 import { formatTimestamp } from './dates.js';
-import { getGitDiffStat, getGitStatus, parseGitStatus, GitFileStatus } from './git.js';
+import {
+  appendUntrackedFilesToDiffStat,
+  getGitDiffStat,
+  getGitStatus,
+  parseGitStatus,
+  GitFileStatus,
+} from './git.js';
 import { pathExists, writeTextFile } from './file-system.js';
 import { resolveExplicitArtifactPath, resolveUniqueOutputArtifactPath } from './artifacts.js';
 import {
@@ -10,7 +16,8 @@ import {
   getLatestVerificationReportPath,
   resolveCurrentVerificationEvidence,
 } from './evidence.js';
-import { fencedCodeBlock, inlineCode } from './markdown-format.js';
+import { escapeMarkdownProse, fencedCodeBlock, inlineCode } from './markdown-format.js';
+import { verificationNotRunItems } from './verification-report-sections.js';
 import {
   classifyChangedFiles,
   renderCompactChangeAreas,
@@ -64,6 +71,15 @@ function renderDiffStat(diffStat?: string) {
   return trimmed ? fencedCodeBlock('text', trimmed) : 'No diff stats available.';
 }
 
+function renderVerificationNotRun(markdown: string | undefined) {
+  if (!markdown) return '- No verification report was available.';
+  const items = verificationNotRunItems(markdown);
+  if (!items.length) return '- No skipped commands were recorded.';
+  return items
+    .map((item) => `- ${escapeMarkdownProse(item).replace(/\r/g, '\\r').replace(/\n/g, '\\n')}`)
+    .join('\n');
+}
+
 export function generatePrSummary(input: PrSummaryInput) {
   const taskTitle = extractLine(input.taskMarkdown, /^#\s+(.+)$/m, 'No task contract found.');
   const verification = extractLine(
@@ -103,8 +119,8 @@ ${renderReviewFocus(input.changedFiles)}
 ## Verification Performed
 - ${verificationLine}
 
-## Verification Not Performed
-- Check the verification report for skipped commands.
+## Verification Report Not Run
+${renderVerificationNotRun(input.verificationMarkdown)}
 
 ## Risks
 - Re-check protected files such as migrations, secrets, auth, billing, deployment, and public APIs before merge.
@@ -141,7 +157,7 @@ export async function summarizeRepository(options: {
   const timestamp = options.timestamp ?? formatTimestamp();
   const status = await getGitStatus(options.cwd);
   const changedFiles = await parseGitStatus(status);
-  const diffStat = await getGitDiffStat(options.cwd);
+  const diffStat = appendUntrackedFilesToDiffStat(await getGitDiffStat(options.cwd), changedFiles);
   const taskPath =
     (options.taskPath
       ? await resolveExplicitArtifactPath({

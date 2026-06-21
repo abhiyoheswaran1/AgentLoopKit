@@ -19,7 +19,7 @@ const displayNames: Record<SupportedAgent, string> = {
   opencode: 'OpenCode',
   'gemini-cli': 'Gemini CLI',
   'github-copilot-cli': 'GitHub Copilot CLI',
-  generic: 'Generic Coding Agent',
+  generic: 'Generic Agent',
 };
 
 export async function installAgentInstructions(options: { cwd: string; agent: SupportedAgent }) {

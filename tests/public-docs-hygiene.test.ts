@@ -70,6 +70,28 @@ describe('public docs hygiene', () => {
     );
   });
 
+  test('rejects cheap assistant positioning in public docs', async () => {
+    const cheapAssistant = ['AI', 'coding', 'assistant'].join(' ');
+    const cheapAssisted = ['AI', 'assisted'].join('-');
+    const cheapCoding = ['AI', 'coding', 'workflow'].join(' ');
+    const cheapAutomation = ['Vibe', 'coding'].join(' ');
+    const generatedAgent = ['agent', 'generated'].join('-');
+    const dir = await makeFixture(
+      [
+        '# AgentLoopKit',
+        '',
+        `AgentLoopKit is an ${cheapAssistant} for ${cheapAssisted} PRs.`,
+        `${cheapAutomation} teams can use ${generatedAgent} changes as proof.`,
+        `${cheapCoding} copy is not allowed.`,
+        '',
+      ].join('\n'),
+    );
+
+    await expect(runHygiene({ cwd: dir, version: '1.2.3' })).rejects.toThrow(
+      'unsupported positioning',
+    );
+  });
+
   test('rejects unsupported marketplace and package-manager availability claims', async () => {
     const dir = await makeFixture(
       [

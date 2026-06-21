@@ -37,6 +37,12 @@ export function createMaintenanceCheckSteps() {
       allowFailure: false,
     },
     {
+      name: 'typecheck',
+      command: 'npm',
+      args: ['run', 'typecheck'],
+      allowFailure: false,
+    },
+    {
       name: 'public docs hygiene',
       command: 'npm',
       args: ['run', 'check:public-docs'],
@@ -141,7 +147,7 @@ Usage:
   npm run maintenance:check
   node scripts/maintenance-check.mjs --json
 
-Runs the near-term roadmap health gate: unit tests, public docs hygiene, link checking, release-proof smoke coverage, npm-status safety tests, SchemaStore output and consistency tests, policy-pack inventory and safety tests, read-only GitHub metadata import help, GitHub metadata safety tests, ship-score neutrality coverage, AgentFlight version, ProjScan health, and the dogfood self-check.
+Runs the near-term roadmap health gate: unit tests, typecheck, public docs hygiene, link checking, release-proof smoke coverage, npm-status safety tests, SchemaStore output and consistency tests, policy-pack inventory and safety tests, read-only GitHub metadata import help, GitHub metadata safety tests, ship-score neutrality coverage, AgentFlight version, ProjScan health, and the dogfood self-check.
 
 This script does not publish packages, create tags, create GitHub releases, require strict public release proof, upload files, post comments, read .env contents, or pass token-like environment variables to child processes.`);
 }

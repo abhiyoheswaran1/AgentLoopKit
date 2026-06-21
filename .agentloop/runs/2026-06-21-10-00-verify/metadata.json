@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-10-00-verify",
+  "command": "verify",
+  "createdAt": "2026-06-21-10-00",
+  "createdAtEpochMs": 1782028844041,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-show-gate-evidence-source-in-review-context.md",
+    "title": "Show gate evidence source in review context",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-09-59-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 571
+}

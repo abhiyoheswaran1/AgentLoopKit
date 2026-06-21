@@ -98,6 +98,28 @@ const INTERNAL_CHATTER_CLAIMS = [
   { label: 'npm latest remains wording', pattern: /\bnpm latest remains\b/i },
 ];
 
+const UNSUPPORTED_POSITIONING_CLAIMS = [
+  { label: 'cheap assisted-positioning phrase', pattern: /\bA[Ii][-\s]assisted\b/i },
+  { label: 'cheap generated-positioning phrase', pattern: /\bA[Ii][-\s]generated\b/i },
+  {
+    label: 'cheap coding-positioning phrase',
+    pattern: new RegExp(String.raw`\bA[Ii][-\s]+coding\b`, 'i'),
+  },
+  {
+    label: 'cheap assistant-positioning phrase',
+    pattern: new RegExp(String.raw`\bA[Ii][-\s]+coding[-\s]+assistant\b`, 'i'),
+  },
+  {
+    label: 'generic assistant-positioning phrase',
+    pattern: new RegExp(String.raw`\bcoding[-\s]+assistant\b`, 'i'),
+  },
+  {
+    label: 'cheap automation-positioning phrase',
+    pattern: new RegExp(String.raw`\bvibe[-\s]+coding\b`, 'i'),
+  },
+  { label: 'generated-agent-positioning phrase', pattern: /\bagent[-\s]generated\b/i },
+];
+
 const REAL_REPO_TRIAL_REQUIRED_BOUNDARIES = [
   {
     label: 'no-public-proof boundary',
@@ -283,6 +305,16 @@ export function assertPublicDocsDoNotPinVersions(files) {
 export function assertPublicDocsAvoidUnsupportedClaims(files) {
   for (const file of files) {
     const filePath = toPosixPath(file.filePath);
+    const unsupportedPositioningClaim = UNSUPPORTED_POSITIONING_CLAIMS.find((claim) =>
+      claim.pattern.test(file.content),
+    );
+
+    if (unsupportedPositioningClaim) {
+      throw new Error(
+        `${filePath} contains unsupported positioning: ${unsupportedPositioningClaim.label}. Use agent-assisted engineering and reviewability language instead.`,
+      );
+    }
+
     const unsupportedAdoptionClaim = UNSUPPORTED_ADOPTION_CLAIMS.find((claim) =>
       claim.pattern.test(file.content),
     );

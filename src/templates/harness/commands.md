@@ -38,7 +38,7 @@ agentloop create-task --type feature --title "Describe the next focused change" 
 - Follow local `.agentloop/policies/*.md` files as repo policy. Treat `modified` as a reviewed local rule, not an error.
 - Use `agentloop ship` before review to score evidence readiness, write a ship report, and record a run under `.agentloop/runs/`.
 - Use `agentloop prepare-pr` after `ship` when reviewers need a PR title, grouped body, risks, rollback notes, and checklist.
-- Use `agentloop maintainer-check` when evaluating whether an AI-assisted PR has enough evidence to review.
+- Use `agentloop maintainer-check` when evaluating whether an agent-assisted PR has enough evidence to review.
 - Use `agentloop runs`, `agentloop show-run <id>`, and `agentloop intent <file>` to inspect local run history and file intent.
 - Use `agentloop check-gates` to check task, verification, handoff or ship, task-folder hygiene, harness, policy, and git evidence before review.
 - Use `agentloop check-gates --strict` in CI when warning gates should fail.
@@ -51,6 +51,7 @@ agentloop create-task --type feature --title "Describe the next focused change" 
 - Use `agentloop release-proof` after public release workflows finish to check npm, GitHub Releases, GitHub Marketplace, GHCR, and MCP Registry proof against local package metadata.
 - Run targeted checks while developing.
 - Run configured verification before claiming completion.
+- After raw `agentflight start`, run `agentloop status --redact-paths` and `agentloop task doctor --redact-paths`. If an AgentFlight placeholder becomes active, treat it as preserved session evidence: run `agentloop task clear`, then `agentloop task set <path>` for a detailed task or `agentloop create-task` for new scoped work. Do not edit or delete the placeholder as default recovery.
 - Use `agentloop verify --task <path> --task-commands` only after reviewing task-defined commands.
 - If a command fails, report the failure and fix it when reasonable.
 - If a command is not configured, say so in the handoff.

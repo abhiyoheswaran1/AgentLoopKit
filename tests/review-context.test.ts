@@ -14,6 +14,79 @@ const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 let tempDirs: string[] = [];
 
+function makeMinimalReviewContext(input: {
+  activeTask?: { path: string; title: string; status: string } | null;
+  latestTask?: { path: string; title: string; status: string } | null;
+  taskGate?: { status: 'pass' | 'warn' | 'fail'; path?: string; message?: string } | null;
+}) {
+  return {
+    status: {
+      project: { name: 'demo', type: 'generic', packageManager: 'npm' },
+      workingTree: {
+        dirty: false,
+        changedFileCount: 0,
+        nonEvidenceChangedFileCount: 0,
+        agentLoopEvidenceChangedFileCount: 0,
+        changedFiles: [],
+      },
+      activeTask: input.activeTask ?? null,
+      activeTaskRiskNotes: null,
+      latestTask: input.latestTask ?? null,
+      latestVerification: null,
+      latestRun: undefined,
+      nextAction: {
+        command: 'agentloop create-task',
+        reason: 'Create a task.',
+      },
+    },
+    gates: {
+      strict: false,
+      overallStatus: input.taskGate?.status ?? 'pass',
+      gates: input.taskGate
+        ? [
+            {
+              id: 'task-contract',
+              name: 'Task contract',
+              status: input.taskGate.status,
+              message: input.taskGate.message ?? 'Task evidence',
+              ...(input.taskGate.path ? { path: input.taskGate.path } : {}),
+            },
+          ]
+        : [],
+      nextAction: {
+        command: 'agentloop create-task',
+        reason: 'Create a task.',
+      },
+    },
+    policies: {
+      policies: [],
+      summary: { current: 1, modified: 0, missing: 0, extra: 0 },
+    },
+    artifacts: {
+      tasks: { count: 0, byStatus: {}, latest: null },
+      verificationReports: { count: 0, latest: null },
+      handoffs: { count: 0, latest: null },
+      shipReports: { count: 0, latest: null },
+      htmlReports: { count: 0, latest: null },
+      badges: { count: 0, latest: null },
+      ciSummaries: { count: 0, latest: null },
+      releaseNotes: { count: 0, latest: null },
+      runs: { count: 0, latest: null },
+    },
+    recentRuns: [],
+    latestShip: null,
+    githubMetadata: {
+      status: 'missing',
+      path: '.agentloop/github/context.json',
+    },
+    safety: {
+      readOnly: true,
+      includesMarkdownContent: false,
+      commandsRun: [],
+    },
+  } as Awaited<ReturnType<typeof getReviewContext>>;
+}
+
 async function createRepoWithReviewContextEvidence() {
   const dir = await makeTempDir();
   tempDirs.push(dir);
@@ -150,6 +223,8 @@ describe('review-context command', () => {
     expect(payload.status.activeTask).toMatchObject({
       title: 'Fix login redirect bug',
     });
+    expect(payload.status.activeTaskRiskNotes).toEqual({ count: 1 });
+    expect(JSON.stringify(payload)).not.toContain('Touches auth-adjacent routing');
     expect(payload.status.latestVerification).toEqual({
       path: '.agentloop/reports/2026-06-10-12-30-verification-report.md',
       title: 'Verification Report',
@@ -218,6 +293,7 @@ describe('review-context command', () => {
 
     expect(result.stdout).toContain('# AgentLoopKit Review Context');
     expect(result.stdout).toContain('- Active task: `Fix login redirect bug`');
+    expect(result.stdout).toContain('- Active task risk notes: `1` recorded');
     expect(result.stdout).toContain('- Latest verification: `pass`');
     expect(result.stdout).toContain('- Gates: `warn`');
     expect(result.stdout).toContain(
@@ -228,6 +304,7 @@ describe('review-context command', () => {
     expect(result.stdout).toContain('Run `agentloop handoff`.');
     expect(result.stdout).not.toContain(dir);
     expect(result.stdout).not.toContain('Review handoff.');
+    expect(result.stdout).not.toContain('Touches auth-adjacent routing');
   });
 
   test('separates AgentLoop evidence churn in recent runs for human output', async () => {
@@ -290,6 +367,9 @@ describe('review-context command', () => {
           path: '.agentloop/tasks/fix\nlogin.md',
           title: 'Fix\nlogin redirect',
           status: 'review\nready',
+        },
+        activeTaskRiskNotes: {
+          count: 2,
         },
         latestTask: null,
         latestVerification: {
@@ -358,6 +438,7 @@ describe('review-context command', () => {
 
     expect(markdown).toContain('`Fix\\nlogin redirect`');
     expect(markdown).toContain('`review\\nready`');
+    expect(markdown).toContain('- Active task risk notes: `2` recorded');
     expect(markdown).toContain('`.agentloop/reports/verification\\nreport.md`');
     expect(markdown).toContain('- Gates: `warn`');
     expect(markdown).toContain(
@@ -370,6 +451,116 @@ describe('review-context command', () => {
     expect(markdown).toContain('Run `agentloop\\nhandoff`.');
     expect(markdown).not.toContain('`Fix\nlogin redirect`');
     expect(markdown).not.toContain('Run `agentloop\nhandoff`.');
+  });
+
+  test('labels task evidence source in human gate summary', () => {
+    const activePath = '.agentloop/tasks/2026-06-10-active.md';
+    const latestPath = '.agentloop/tasks/2026-06-10-latest.md';
+    const archivedPath = '.agentloop/tasks/archive/2026-06-10-archived.md';
+    const cases = [
+      {
+        context: makeMinimalReviewContext({
+          activeTask: { path: activePath, title: 'Active task', status: 'review' },
+          taskGate: { status: 'pass', path: activePath },
+        }),
+        expected: '- Gates: `pass` (task evidence: `Active task evidence`)',
+      },
+      {
+        context: makeMinimalReviewContext({
+          latestTask: { path: latestPath, title: 'Latest task', status: 'proposed' },
+          taskGate: { status: 'pass', path: latestPath },
+        }),
+        expected: '- Gates: `pass` (task evidence: `Latest open task evidence`)',
+      },
+      {
+        context: makeMinimalReviewContext({
+          taskGate: { status: 'pass', path: archivedPath },
+        }),
+        expected: '- Gates: `pass` (task evidence: `Archived task evidence`)',
+      },
+      {
+        context: makeMinimalReviewContext({
+          taskGate: { status: 'fail', message: 'No task contract found.' },
+        }),
+        expected: '- Gates: `fail` (task evidence: `Missing task evidence`)',
+      },
+    ];
+
+    for (const item of cases) {
+      expect(renderReviewContextMarkdown(item.context)).toContain(item.expected);
+    }
+  });
+
+  test('omits active task risk-note count when no task is active', () => {
+    const context = {
+      status: {
+        project: { name: 'demo', type: 'generic', packageManager: 'npm' },
+        workingTree: {
+          dirty: false,
+          changedFileCount: 0,
+          nonEvidenceChangedFileCount: 0,
+          agentLoopEvidenceChangedFileCount: 0,
+          changedFiles: [],
+        },
+        activeTask: null,
+        activeTaskRiskNotes: null,
+        latestTask: null,
+        latestVerification: {
+          path: '.agentloop/reports/2026-06-10-12-30-verification-report.md',
+          title: 'Verification Report',
+          overallStatus: 'pass',
+        },
+        latestRun: undefined,
+        nextAction: {
+          command: 'agentloop create-task',
+          reason: 'Create a task.',
+        },
+      },
+      gates: {
+        strict: false,
+        overallStatus: 'pass',
+        gates: [],
+        nextAction: {
+          command: 'agentloop create-task',
+          reason: 'Create a task.',
+        },
+      },
+      policies: {
+        policies: [],
+        summary: { current: 1, modified: 0, missing: 0, extra: 0 },
+      },
+      artifacts: {
+        tasks: { count: 0, byStatus: {}, latest: null },
+        verificationReports: { count: 0, latest: null },
+        handoffs: { count: 0, latest: null },
+        shipReports: { count: 0, latest: null },
+        htmlReports: { count: 0, latest: null },
+        badges: { count: 0, latest: null },
+        ciSummaries: { count: 0, latest: null },
+        releaseNotes: { count: 0, latest: null },
+        runs: { count: 0, latest: null },
+      },
+      recentRuns: [],
+      latestShip: null,
+      githubMetadata: {
+        status: 'missing',
+        path: '.agentloop/github/context.json',
+      },
+      safety: {
+        readOnly: true,
+        includesMarkdownContent: false,
+        commandsRun: [],
+      },
+    } as Awaited<ReturnType<typeof getReviewContext>>;
+
+    const markdown = renderReviewContextMarkdown(context);
+
+    expect(markdown).toContain('- Active task: none');
+    expect(markdown).toContain(
+      '- Latest previous verification: `pass` - `.agentloop/reports/2026-06-10-12-30-verification-report.md`',
+    );
+    expect(markdown).not.toContain('- Latest verification: `pass`');
+    expect(markdown).not.toContain('Active task risk notes:');
   });
 
   test('accepts redacted output mode for human and JSON output', async () => {

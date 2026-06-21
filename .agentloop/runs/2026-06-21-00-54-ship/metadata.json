@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-00-54-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-00-54",
+  "createdAtEpochMs": 1781996043995,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-align-generated-task-guidance-with-create-task-warnings.md",
+    "title": "Align generated task guidance with create-task warnings",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-00-50-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-00-54-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-00-54-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 134
+}

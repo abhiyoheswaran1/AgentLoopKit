@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-04-47-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-04-47",
+  "createdAtEpochMs": 1782010043790,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-surface-verification-not-run-details-in-pr-handoffs.md",
+    "title": "Surface verification not-run details in PR handoffs",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-04-42-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-04-47-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-04-47-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 337
+}

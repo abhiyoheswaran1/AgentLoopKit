@@ -48,6 +48,6 @@ Local policy files are repo guidance. If `agentloop policy status` reports `modi
 
 Use `agentloop ship` as the main stop condition for meaningful code changes. It writes a ship report, records run evidence under `.agentloop/runs/`, and scores review-readiness evidence without claiming to measure code quality.
 
-Use `agentloop prepare-pr` when reviewers need PR-ready copy. Use `agentloop maintainer-check` when reviewing whether an AI-assisted change has enough task, verification, handoff or ship, and risk evidence.
+Use `agentloop prepare-pr` when reviewers need PR-ready copy. Use `agentloop maintainer-check` when reviewing whether an agent-assisted change has enough task, verification, handoff or ship, and risk evidence.
 
 Use `agentloop upgrade-harness` after AgentLoopKit CLI upgrades. It reports stale local guidance and writes nothing.

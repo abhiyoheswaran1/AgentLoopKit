@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-09-22-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-09-22",
+  "createdAtEpochMs": 1782026526072,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-label-archived-task-evidence-in-check-gates.md",
+    "title": "Label archived task evidence in check-gates",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-09-17-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-09-22-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-09-22-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 536
+}

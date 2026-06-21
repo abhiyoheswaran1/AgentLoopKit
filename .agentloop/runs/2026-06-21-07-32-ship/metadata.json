@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-07-32-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-07-32",
+  "createdAtEpochMs": 1782019943624,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-show-command-strings-for-verification-not-run-entries.md",
+    "title": "Show command strings for verification Not Run entries",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-07-27-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-07-32-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-07-32-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 461
+}

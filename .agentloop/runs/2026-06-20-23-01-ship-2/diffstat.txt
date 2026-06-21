@@ -1,0 +1,14 @@
+ .agentloop/backlog.md           |  12 ++++
+ CHANGELOG.md                    |   3 +-
+ DECISIONS.md                    |  12 ++++
+ docs/cli-reference.md           |   2 +-
+ docs/task-contracts.md          |   1 +
+ src/cli/commands/create-task.ts |  61 +++++++++++++---
+ src/core/ship.ts                |  20 +++++-
+ src/core/task-contract.ts       |  80 +++++++++++++++++++--
+ src/core/task-state.ts          |  62 +----------------
+ tests/create-task.test.ts       | 151 ++++++++++++++++++++++++++++++++++++++++
+ tests/ship.test.ts              |  21 ++++++
+ 11 files changed, 345 insertions(+), 80 deletions(-)
+.agentloop/research/interview-cycle-153.md | untracked
+.agentloop/research/interview-cycle-154.md | untracked

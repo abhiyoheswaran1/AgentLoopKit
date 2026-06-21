@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-10-03-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-10-03",
+  "createdAtEpochMs": 1782029016976,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-show-gate-evidence-source-in-review-context.md",
+    "title": "Show gate evidence source in review context",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-09-59-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-10-03-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-10-03-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 579
+}

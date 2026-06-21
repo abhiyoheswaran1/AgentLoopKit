@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-12-48-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-21-12-48",
+  "createdAtEpochMs": 1782038918984,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-add-local-research-task-workflow.md",
+    "title": "Add local research task workflow",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-12-38-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-12-48-pr-summary.md",
+  "changedFileCount": 710
+}

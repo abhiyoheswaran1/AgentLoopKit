@@ -262,6 +262,27 @@ describe('release-check command', () => {
 
   test('redacts local git root paths when requested', async () => {
     const dir = await createReleaseRepo();
+    const externalUrl = 'https://github.com/example/app';
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify(
+        {
+          name: externalUrl,
+          version: '1.2.3',
+          scripts: {
+            test: 'echo test',
+            lint: 'echo lint',
+            typecheck: 'echo typecheck',
+            build: 'echo build',
+            'smoke:release': 'echo smoke',
+          },
+        },
+        null,
+        2,
+      ),
+    );
+    await git(dir, ['add', 'package.json']);
+    await git(dir, ['commit', '-m', 'Use package URL fixture']);
     const nestedDir = path.join(dir, 'packages', 'web');
     await mkdir(nestedDir, { recursive: true });
     const root = await realpath(dir);
@@ -290,9 +311,13 @@ describe('release-check command', () => {
     const redacted = JSON.parse(redactedJsonResult.stdout);
     expect(redacted.git.root).toBe('[git-root]');
     expect(JSON.stringify(redacted)).not.toContain(root);
+    expect(JSON.stringify(redacted)).toContain(externalUrl);
+    expect(JSON.stringify(redacted)).not.toContain('https:[git-root]');
 
     expect(redactedHumanResult.exitCode).toBe(0);
     expect(redactedHumanResult.stdout).not.toContain(root);
+    expect(redactedHumanResult.stdout).toContain(externalUrl);
+    expect(redactedHumanResult.stdout).not.toContain('https:[git-root]');
   });
 
   test('stays read-only while reporting dirty working tree risk', async () => {

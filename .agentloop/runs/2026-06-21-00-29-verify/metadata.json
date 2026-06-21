@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-00-29-verify",
+  "command": "verify",
+  "createdAt": "2026-06-21-00-29",
+  "createdAtEpochMs": 1781994568319,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-document-dirty-work-next-guidance-in-status-docs.md",
+    "title": "Document dirty-work next guidance in status docs",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-00-29-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 104
+}

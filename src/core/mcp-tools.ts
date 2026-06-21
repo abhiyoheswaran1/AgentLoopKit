@@ -170,7 +170,7 @@ const tools: McpToolDefinition[] = [
   },
   {
     name: 'agentloop_maintainer_check',
-    description: 'Read local maintainer reviewability checks for AI-assisted changes.',
+    description: 'Read local maintainer reviewability checks for agent-assisted changes.',
     inputSchema: emptyInputSchema,
   },
   {
@@ -210,7 +210,7 @@ const tools: McpToolDefinition[] = [
   {
     name: 'agentloop_review_context',
     description:
-      'Read one local reviewability snapshot for coding agents, without running commands or returning artifact bodies.',
+      'Read one local reviewability snapshot for agents, without running commands or returning artifact bodies.',
     inputSchema: emptyInputSchema,
   },
   {

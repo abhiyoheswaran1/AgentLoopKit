@@ -200,9 +200,31 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     expect(dogfoodGuide).toContain(
       'Run `npm run dogfood:strict` after fresh handoff or ship evidence exists',
     );
+    expect(dogfoodGuide).toContain('review-gate warnings should block the handoff');
+    expect(dogfoodGuide).toContain('npx --yes agentflight status');
+    expect(dogfoodGuide).toContain(
+      'AgentFlight status remains exit-code based and its human output is not parsed',
+    );
+    expect(dogfoodGuide).toContain(
+      'maintainer-check warnings remain reviewer guidance unless the command exits non-zero',
+    );
     expect(dogfoodGuide.indexOf('agentloop handoff --write-run')).toBeLessThan(
       dogfoodGuide.indexOf('npm run dogfood:strict'),
     );
+  });
+
+  test('documents safe AgentFlight verify command syntax', async () => {
+    const dogfoodGuide = await readFile('.agentloop/harness/autonomous-dogfooding.md', 'utf8');
+    const maintenance = await readFile('docs/maintenance-guards.md', 'utf8');
+
+    for (const content of [dogfoodGuide, maintenance]) {
+      expect(content).toContain(
+        'npx --yes agentflight verify -- npm test -- tests/example.test.ts',
+      );
+      expect(content).toContain(
+        'Do not pass the full verification command as one quoted string',
+      );
+    }
   });
 
   test('documents that dogfood start uses the source CLI before a build exists', async () => {
@@ -262,6 +284,16 @@ describe('AgentLoopKit autonomous dogfood harness', () => {
     expect(maintenanceCommandText).toContain('npm run dogfood');
     expect(maintenance).toContain(
       'Run `npm run dogfood:strict` after fresh handoff or ship evidence exists',
+    );
+    expect(maintenance).toContain('review-gate warnings should block the final handoff');
+    expect(maintenance).toContain(
+      'Dogfood prints AgentFlight doctor and status output so session health and readiness are visible',
+    );
+    expect(maintenance).toContain(
+      'AgentFlight status remains exit-code based and its human output is not parsed',
+    );
+    expect(maintenance).toContain(
+      'maintainer-check warnings remain reviewer guidance unless the command exits non-zero',
     );
     expect(maintenance).toContain('Strict public release proof belongs in approved release gates');
   });

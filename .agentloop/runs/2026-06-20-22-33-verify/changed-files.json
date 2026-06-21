@@ -1,0 +1,50 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/backlog.md"
+  },
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "DECISIONS.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/task-contracts.md"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/commands/create-task.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/task-contract.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/task-state.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/create-task.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-20-22-32-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/research/interview-cycle-153.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-20-set-agentloopkit-product-direction-and-implement-non-release-improvements.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-20-warn-when-created-tasks-keep-review-placeholders.md"
+  }
+]

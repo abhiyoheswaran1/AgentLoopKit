@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-12-12-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-21-12-12",
+  "createdAtEpochMs": 1782036735378,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-accept-redact-paths-on-task-lifecycle-commands.md",
+    "title": "Accept redact-paths on task lifecycle commands",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-11-59-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-12-12-pr-summary.md",
+  "changedFileCount": 687
+}

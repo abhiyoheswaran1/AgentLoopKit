@@ -27,7 +27,7 @@ Internal target-user model for product decisions. This is simulated persona work
 
 ## Open Source Maintainer
 
-- Reviews AI-generated PRs.
+- Reviews agent-assisted PRs.
 - Wants contributors and agents to provide clear verification evidence.
 - Wants less messy diffs.
 - Wants a reviewer-friendly summary.
@@ -39,9 +39,9 @@ Internal target-user model for product decisions. This is simulated persona work
 - Could later pay for team features.
 - Wants this to work across multiple repos.
 
-## AI-Skeptical Senior Engineer
+## Automation-Skeptical Senior Engineer
 
-- Does not trust vibe coding.
+- Does not trust unstructured automation.
 - Might accept AgentLoopKit if it improves reviewability, test discipline, and safety.
 - Wants deterministic, inspectable outputs.
 
@@ -56,4 +56,4 @@ Internal target-user model for product decisions. This is simulated persona work
 
 - Wants standards for agentic work across internal repos.
 - Wants policy templates, review gates, and safe defaults.
-- Wants to avoid each team inventing its own AI-agent workflow.
+- Wants to avoid each team inventing its own agent-assisted workflow.

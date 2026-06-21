@@ -66,6 +66,7 @@ const requiredPolicyFiles = [
   '.agentloop/policies/git-policy.md',
   '.agentloop/policies/secrets-policy.md',
 ];
+const DIRTY_WORKTREE_EXAMPLE_LIMIT = 5;
 const taskStateRecoveryDiagnosticIds = new Set([
   'active-task-agentflight-placeholder',
   'active-task-missing',
@@ -122,8 +123,19 @@ function chooseNextAction(
     activeTask?: ActiveTask;
     dirty: boolean;
     dirtyCoveredByLatestHandoffRun: boolean;
+    dirtyNonEvidenceFileCount: number;
+    dirtyNonEvidenceFileExamples: string[];
   },
 ) {
+  const withDirtyCreateTaskGuidance = (reason: string) => {
+    if (input.dirtyNonEvidenceFileCount === 0) return reason;
+    const noun = input.dirtyNonEvidenceFileCount === 1 ? 'file' : 'files';
+    const pronoun = input.dirtyNonEvidenceFileCount === 1 ? 'it belongs' : 'they belong';
+    const examples = input.dirtyNonEvidenceFileExamples.length
+      ? ` Examples: ${input.dirtyNonEvidenceFileExamples.map(gateInlineCode).join(', ')}.`
+      : '';
+    return `${reason} ${input.dirtyNonEvidenceFileCount} existing dirty non-evidence ${noun} will be present when the new task starts; confirm ${pronoun} to that task before implementation.${examples}`;
+  };
   const task = gates.find((item) => item.id === 'task-contract');
   const report = gates.find((item) => item.id === 'verification-report');
   const handoff = gates.find((item) => item.id === 'handoff-summary');
@@ -131,7 +143,9 @@ function chooseNextAction(
   if (task?.status === 'fail') {
     return {
       command: 'agentloop create-task',
-      reason: 'Create a task contract before review gates can pass.',
+      reason: withDirtyCreateTaskGuidance(
+        'Create a task contract before review gates can pass.',
+      ),
     };
   }
   if (report?.status === 'fail') {
@@ -177,8 +191,9 @@ function chooseNextAction(
     }
     return {
       command: 'agentloop create-task',
-      reason:
+      reason: withDirtyCreateTaskGuidance(
         'Gate evidence covers the current dirty files. Start the next task, or review the existing handoff before committing.',
+      ),
     };
   }
   return {
@@ -209,13 +224,24 @@ function changedFileGateMessage(input: {
   return `${input.changedFileCount} changed file(s) detected (${input.nonEvidenceChangedFileCount} non-evidence, ${input.agentLoopEvidenceChangedFileCount} AgentLoop evidence).`;
 }
 
+function gateDisplayName(item: GateCheck) {
+  if (
+    item.id === 'task-contract' &&
+    item.path &&
+    /(^|[\\/])archive[\\/]/.test(item.path)
+  ) {
+    return 'Archived task evidence';
+  }
+  return item.name;
+}
+
 function renderMarkdown(result: Omit<CheckGatesResult, 'markdown'>) {
   const gateLines = result.gates
     .map((item) => {
       const suffix = item.path ? ` - ${gateInlineCode(item.path)}` : '';
-      return `- [${gateInlineCode(item.status)}] ${gateInlineCode(item.name)}: ${gateInlineCode(
-        item.message,
-      )}${suffix}`;
+      return `- [${gateInlineCode(item.status)}] ${gateInlineCode(
+        gateDisplayName(item),
+      )}: ${gateInlineCode(item.message)}${suffix}`;
     })
     .join('\n');
   const gitLine = result.git.isRepository
@@ -325,9 +351,8 @@ export async function checkGates(options: {
 
   const inGit = await isInsideGitRepo(options.cwd);
   const changedFiles = inGit ? await parseGitStatus(await getGitStatus(options.cwd)) : [];
-  const agentLoopEvidenceChangedFileCount = changedFiles.filter((file) =>
-    isAgentLoopEvidenceFile(file.path),
-  ).length;
+  const dirtyNonEvidenceFiles = changedFiles.filter((file) => !isAgentLoopEvidenceFile(file.path));
+  const agentLoopEvidenceChangedFileCount = changedFiles.length - dirtyNonEvidenceFiles.length;
   const nonEvidenceChangedFileCount = changedFiles.length - agentLoopEvidenceChangedFileCount;
   const latestRun = options.projectedReviewEvidenceRun ?? (await listRuns(options.cwd))[0];
   const latestHandoffRunCoversDirtyFiles = await dirtyCoveredByLatestHandoffRun(
@@ -449,6 +474,10 @@ export async function checkGates(options: {
       activeTask: await getActiveTask(options),
       dirty: changedFiles.length > 0,
       dirtyCoveredByLatestHandoffRun: latestHandoffRunCoversDirtyFiles,
+      dirtyNonEvidenceFileCount: dirtyNonEvidenceFiles.length,
+      dirtyNonEvidenceFileExamples: dirtyNonEvidenceFiles
+        .slice(0, DIRTY_WORKTREE_EXAMPLE_LIMIT)
+        .map((file) => file.path),
     }),
   };
   return { ...withoutMarkdown, markdown: renderMarkdown(withoutMarkdown) };

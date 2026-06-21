@@ -15,6 +15,7 @@ import {
   writeTextFile,
 } from './file-system.js';
 import { findLikelyPostVerificationGates } from './post-verification-gates.js';
+import { findPlaceholderTaskSections } from './task-contract.js';
 
 type TaskState = {
   version: 1;
@@ -41,6 +42,11 @@ export type TaskContract = ActiveTask & {
 
 export type ArchivedTask = ActiveTask & {
   previousPath: string;
+};
+
+export type ClearActiveTaskResult = {
+  cleared: boolean;
+  activeTaskPath?: string;
 };
 
 export type BulkTaskArchiveResult = {
@@ -123,33 +129,6 @@ const TASK_DOCTOR_TASK_LIMIT = 25;
 const TASK_DOCTOR_RECENT_RUN_LIMIT = 10;
 const TASK_DOCTOR_RECENT_REPORT_LIMIT = 10;
 const TASK_DOCTOR_MAX_EVIDENCE_FILE_BYTES = 64 * 1024;
-const REVIEW_CRITICAL_PLACEHOLDERS = [
-  {
-    heading: 'Problem Statement',
-    placeholder: 'Describe the problem this task should solve.',
-  },
-  {
-    heading: 'Desired Outcome',
-    placeholder: 'Describe the concrete result expected from this task.',
-  },
-  {
-    heading: 'Likely Files or Areas',
-    placeholder: 'None recorded yet.',
-  },
-  {
-    heading: 'Acceptance Criteria',
-    placeholder: 'Add acceptance criteria before implementation starts.',
-  },
-  {
-    heading: 'Verification Commands',
-    placeholder: 'No verification command recorded.',
-  },
-  {
-    heading: 'Rollback Notes',
-    placeholder: 'Document how to revert or disable this change.',
-  },
-] as const;
-
 function repoPath(...segments: string[]) {
   return segments.join('/');
 }
@@ -450,40 +429,6 @@ function extractMarkdownListSection(markdown: string, heading: string) {
   return sectionLines.map((line) => line.match(/^\s*-\s+(.+)$/)?.[1]?.trim() ?? '').filter(Boolean);
 }
 
-function extractMarkdownSectionLines(markdown: string, heading: string) {
-  const lines = markdown.split('\n');
-  const headingIndex = lines.findIndex((line) => line.trim() === `## ${heading}`);
-  if (headingIndex === -1) return [];
-
-  const sectionLines: string[] = [];
-  for (const line of lines.slice(headingIndex + 1)) {
-    if (/^##\s+/.test(line)) break;
-    sectionLines.push(line);
-  }
-
-  return sectionLines.map((line) => line.trim()).filter(Boolean);
-}
-
-function normalizeTaskSectionLine(line: string) {
-  return line
-    .replace(/^\s*-\s+/, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function findPlaceholderTaskSections(markdown: string) {
-  const sections: string[] = [];
-
-  for (const { heading, placeholder } of REVIEW_CRITICAL_PLACEHOLDERS) {
-    const sectionLines = extractMarkdownSectionLines(markdown, heading);
-    if (sectionLines.some((line) => normalizeTaskSectionLine(line) === placeholder)) {
-      sections.push(heading);
-    }
-  }
-
-  return sections;
-}
-
 function parseTaskStatus(status: string): TaskStatus {
   const clean = status.trim().toLowerCase();
   if ((TASK_STATUSES as readonly string[]).includes(clean)) return clean as TaskStatus;
@@ -698,8 +643,20 @@ export async function getFallbackTaskPath(options: { cwd: string; config: AgentL
   return task ? path.resolve(options.cwd, task.path) : undefined;
 }
 
-export async function clearActiveTask(options: { cwd: string; config: AgentLoopConfig }) {
-  await rm(resolveStatePath(options.cwd, options.config), { force: true });
+export async function clearActiveTask(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+}): Promise<ClearActiveTaskResult> {
+  const statePath = resolveStatePath(options.cwd, options.config);
+  const stateFileExists = await pathExists(statePath);
+  const state = stateFileExists ? await readState(options.cwd, options.config) : undefined;
+
+  await rm(statePath, { force: true });
+
+  return {
+    cleared: stateFileExists,
+    ...(state?.activeTaskPath ? { activeTaskPath: state.activeTaskPath } : {}),
+  };
 }
 
 export async function listTasks(options: {

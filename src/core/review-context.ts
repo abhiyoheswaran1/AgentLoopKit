@@ -11,7 +11,27 @@ import { readGithubMetadataContext, type GithubMetadataContext } from './github-
 import { getPolicyStatus } from './policy.js';
 import { listRuns } from './runs.js';
 import { getAgentLoopStatus } from './status.js';
+import { readTaskContract } from './task-state.js';
 import type { GitFileStatus } from './git.js';
+import { listItems, sectionContent } from './markdown-sections.js';
+
+async function readActiveTaskRiskNoteCount(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  activeTaskPath?: string;
+}) {
+  if (!options.activeTaskPath) return null;
+  try {
+    const task = await readTaskContract({
+      cwd: options.cwd,
+      config: options.config,
+      taskPath: options.activeTaskPath,
+    });
+    return { count: listItems(sectionContent(task.content, 'Risk Notes')).length };
+  } catch {
+    return null;
+  }
+}
 
 export async function getReviewContext(options: {
   cwd: string;
@@ -33,12 +53,18 @@ export async function getReviewContext(options: {
   const recentRuns = runs.slice(0, 5);
   const latestShip =
     recentRuns.find((run) => run.command === 'ship' && run.score !== undefined) ?? null;
+  const activeTaskRiskNotes = await readActiveTaskRiskNoteCount({
+    cwd: options.cwd,
+    config: options.config,
+    activeTaskPath: status.activeTask?.path,
+  });
 
   return {
     status: {
       project: status.project,
       workingTree: status.workingTree,
       activeTask: status.activeTask,
+      activeTaskRiskNotes,
       latestTask: status.latestTask,
       latestVerification: status.latestReport
         ? {
@@ -80,11 +106,46 @@ function formatTask(task: Awaited<ReturnType<typeof getReviewContext>>['status']
   return `${inlineCode(task.title)} (${inlineCode(task.status)}) - ${inlineCode(task.path)}`;
 }
 
+function formatActiveTaskRiskNotes(
+  status: Awaited<ReturnType<typeof getReviewContext>>['status'],
+) {
+  if (!status.activeTask) return '';
+  const count = status.activeTaskRiskNotes?.count ?? 0;
+  return `- Active task risk notes: ${inlineCode(String(count))} recorded\n`;
+}
+
 function formatLatestVerification(
   report: Awaited<ReturnType<typeof getReviewContext>>['status']['latestVerification'],
 ) {
   if (!report) return 'missing';
   return `${inlineCode(report.overallStatus)} - ${inlineCode(report.path)}`;
+}
+
+function formatLatestVerificationLabel(
+  status: Awaited<ReturnType<typeof getReviewContext>>['status'],
+) {
+  return status.activeTask || status.latestTask
+    ? 'Latest verification'
+    : 'Latest previous verification';
+}
+
+function formatGateSummary(context: Awaited<ReturnType<typeof getReviewContext>>) {
+  const taskGate = context.gates.gates.find((item) => item.id === 'task-contract');
+  const source = formatTaskGateEvidenceSource(context, taskGate);
+  const suffix = source ? ` (task evidence: ${inlineCode(source)})` : '';
+  return `${inlineCode(context.gates.overallStatus)}${suffix}`;
+}
+
+function formatTaskGateEvidenceSource(
+  context: Awaited<ReturnType<typeof getReviewContext>>,
+  taskGate: Awaited<ReturnType<typeof getReviewContext>>['gates']['gates'][number] | undefined,
+) {
+  if (!taskGate) return undefined;
+  if (taskGate.status === 'fail' || !taskGate.path) return 'Missing task evidence';
+  if (context.status.activeTask?.path === taskGate.path) return 'Active task evidence';
+  if (context.status.latestTask?.path === taskGate.path) return 'Latest open task evidence';
+  if (/(^|[\\/])archive[\\/]/.test(taskGate.path)) return 'Archived task evidence';
+  return 'Task evidence';
 }
 
 function formatLatestShip(ship: Awaited<ReturnType<typeof getReviewContext>>['latestShip']) {
@@ -184,8 +245,8 @@ export function renderReviewContextMarkdown(
   return `# AgentLoopKit Review Context
 
 - Active task: ${formatTask(context.status.activeTask)}
-- Latest verification: ${formatLatestVerification(context.status.latestVerification)}
-- Gates: ${inlineCode(context.gates.overallStatus)}
+${formatActiveTaskRiskNotes(context.status)}- ${formatLatestVerificationLabel(context.status)}: ${formatLatestVerification(context.status.latestVerification)}
+- Gates: ${formatGateSummary(context)}
 - Policy status: ${inlineCode(String(policy.current))} current, ${inlineCode(
     String(policy.modified),
   )} modified, ${inlineCode(String(policy.missing))} missing, ${inlineCode(

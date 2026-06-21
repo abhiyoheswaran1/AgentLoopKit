@@ -1,0 +1,22 @@
+ .agentloop/backlog.md           |  18 +++++
+ CHANGELOG.md                    |   4 +-
+ DECISIONS.md                    |  18 +++++
+ docs/cli-reference.md           |   6 +-
+ docs/html-reports.md            |   2 +
+ docs/pr-summaries.md            |   2 +
+ docs/task-contracts.md          |   1 +
+ src/cli/commands/create-task.ts |  61 +++++++++++++---
+ src/core/git.ts                 |  15 ++++
+ src/core/html-report.ts         |   4 +-
+ src/core/pr-summary.ts          |  10 ++-
+ src/core/ship.ts                |   9 ++-
+ src/core/task-contract.ts       |  80 +++++++++++++++++++--
+ src/core/task-state.ts          |  62 +----------------
+ tests/create-task.test.ts       | 151 ++++++++++++++++++++++++++++++++++++++++
+ tests/html-report.test.ts       |  28 ++++++++
+ tests/pr-summary.test.ts        |  38 ++++++++++
+ tests/ship.test.ts              |  21 ++++++
+ 18 files changed, 444 insertions(+), 86 deletions(-)
+.agentloop/research/interview-cycle-153.md | untracked
+.agentloop/research/interview-cycle-154.md | untracked
+.agentloop/research/interview-cycle-155.md | untracked

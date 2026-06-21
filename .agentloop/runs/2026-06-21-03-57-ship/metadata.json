@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-03-57-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-03-57",
+  "createdAtEpochMs": 1782007077188,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-add-readiness-score-tests-to-unit-guard.md",
+    "title": "Add readiness-score tests to unit guard",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-03-55-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-03-57-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-03-57-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 295
+}

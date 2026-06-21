@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-03-35-verify",
+  "command": "verify",
+  "createdAt": "2026-06-21-03-35",
+  "createdAtEpochMs": 1782005716324,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-show-task-risk-notes-in-ship-reports.md",
+    "title": "Show task risk notes in ship reports",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-03-32-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 244
+}

@@ -39,7 +39,7 @@ agentloop create-task --type security-review --title "Review password reset flow
 
 1. Run `agentloop doctor` and note risk-file categories.
 2. Create or pin a `security-review` task contract.
-3. Ask the coding agent to read `AGENTS.md`, `AGENTLOOP.md`, and `.agentloop/policies/security-policy.md`.
+3. Ask the agent to read `AGENTS.md`, `AGENTLOOP.md`, and `.agentloop/policies/security-policy.md`.
 4. Keep scope narrow: name the auth, secrets, permissions, dependency, or deployment files under review.
 5. Run `agentloop verify --task <task>`.
 6. Run `agentloop handoff --task <task>`.

@@ -93,7 +93,7 @@ const TOPIC_SUGGESTIONS: Record<HarnessTopicId, { title: string; copyMarkdown: s
   'maintainer-check': {
     title: 'Maintainer reviewability check',
     copyMarkdown:
-      '- Run `agentloop maintainer-check` when evaluating whether an AI-assisted PR has enough task and verification evidence to review.',
+      '- Run `agentloop maintainer-check` when evaluating whether an agent-assisted PR has enough task and verification evidence to review.',
   },
   'review-context': {
     title: 'Read-only agent context snapshot',

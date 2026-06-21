@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-11-46-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-11-46",
+  "createdAtEpochMs": 1782035210733,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-use-engineering-session-wording-in-create-task-guidance.md",
+    "title": "Use engineering-session wording in create-task guidance",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-11-32-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-11-46-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-11-46-pr-summary.md",
+  "score": 88,
+  "changedFileCount": 676
+}

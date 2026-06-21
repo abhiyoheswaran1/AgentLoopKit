@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-11-01-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-21-11-01",
+  "createdAtEpochMs": 1782032487558,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-enforce-agent-assisted-product-language.md",
+    "title": "Enforce agent-assisted product language",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-10-49-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-11-01-pr-summary.md",
+  "changedFileCount": 637
+}

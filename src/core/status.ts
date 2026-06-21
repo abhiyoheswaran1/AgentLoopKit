@@ -40,6 +40,11 @@ export type StatusReport = StatusArtifact & {
   overallStatus: string;
 };
 
+export type StatusLoopGuidance = {
+  taskType: string;
+  path: string;
+};
+
 export type AgentLoopStatusResult = {
   project: AgentLoopConfig['project'];
   git: {
@@ -63,6 +68,7 @@ export type AgentLoopStatusResult = {
     message: string;
   };
   latestTask: StatusTask | null;
+  loopGuidance?: StatusLoopGuidance;
   deferredTasks: StatusTask[];
   agentFlightPlaceholderTasks: StatusTask[];
   latestReport?: StatusReport;
@@ -96,6 +102,7 @@ export type AgentLoopStatusBriefJson = {
   activeTask: AgentLoopStatusResult['activeTask'];
   staleTaskState?: AgentLoopStatusResult['staleTaskState'];
   latestTask: AgentLoopStatusResult['latestTask'];
+  loopGuidance?: AgentLoopStatusResult['loopGuidance'];
   deferredTasks: StatusTaskListSummary;
   agentFlightPlaceholderTasks: StatusTaskListSummary;
   latestReport?: AgentLoopStatusResult['latestReport'];
@@ -114,6 +121,7 @@ const STALE_NEXT_ACTION_DIAGNOSTICS = new Set([
   'active-task-deferred',
   'active-task-older-than-runs',
 ]);
+const DIRTY_WORKTREE_EXAMPLE_LIMIT = 5;
 
 function pickStaleTaskStateDiagnostic(diagnostics: TaskDoctorDiagnostic[]) {
   const diagnostic = diagnostics.find((candidate) =>
@@ -217,6 +225,34 @@ async function isReleaseChannelTask(cwd: string, task: StatusTask) {
   }
 }
 
+function isSafeTaskType(value: string) {
+  return /^[a-z0-9-]+$/.test(value);
+}
+
+async function readLoopGuidanceForTask(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  task: StatusTask | null;
+}): Promise<StatusLoopGuidance | undefined> {
+  if (!options.task) return undefined;
+
+  let markdown: string;
+  try {
+    markdown = await readFile(path.resolve(options.cwd, options.task.path), 'utf8');
+  } catch {
+    return undefined;
+  }
+  const taskType = extractTaskType(markdown);
+  if (taskType === 'unknown' || !isSafeTaskType(taskType)) return undefined;
+
+  const agentloopDir = options.config.paths.agentloopDir.replace(/\\/g, '/');
+  const loopPath = path.posix.join(agentloopDir, 'loops', `${taskType}.md`);
+  const loopStat = await stat(path.resolve(options.cwd, loopPath)).catch(() => undefined);
+  if (!loopStat?.isFile()) return undefined;
+
+  return { taskType, path: loopPath };
+}
+
 async function allDeferredTasksAreReleaseChannel(cwd: string, tasks: StatusTask[]) {
   if (!tasks.length) return false;
   const taskTypes = await Promise.all(tasks.map((task) => isReleaseChannelTask(cwd, task)));
@@ -232,9 +268,20 @@ function chooseNextAction(input: {
   latestReport?: StatusReport;
   latestRun?: RunSummary;
   dirty: boolean;
+  nonEvidenceChangedFileCount: number;
+  dirtyNonEvidenceFileExamples: string[];
   dirtyCoveredByLatestHandoffRun: boolean;
   activeTaskHasReviewCriticalPlaceholders: boolean;
 }) {
+  const withDirtyCreateTaskGuidance = (reason: string) => {
+    if (input.nonEvidenceChangedFileCount === 0) return reason;
+    const noun = `dirty non-evidence file${input.nonEvidenceChangedFileCount === 1 ? '' : 's'}`;
+    const examples = input.dirtyNonEvidenceFileExamples.length
+      ? ` Examples: ${input.dirtyNonEvidenceFileExamples.map(singleLineInlineCode).join(', ')}.`
+      : '';
+    return `${reason} ${input.nonEvidenceChangedFileCount} existing ${noun} will be present when the new task starts; confirm they belong to that task before implementation.${examples}`;
+  };
+
   if (input.staleTaskState) {
     return {
       command: 'agentloop task doctor',
@@ -274,7 +321,9 @@ function chooseNextAction(input: {
         }
         return {
           command: 'agentloop create-task',
-          reason: `${count} ${noun} ${count === 1 ? 'is' : 'are'} parked for maintainer approval. Create a non-release task for current work, or move release work back to proposed only after maintainer approval.`,
+          reason: withDirtyCreateTaskGuidance(
+            `${count} ${noun} ${count === 1 ? 'is' : 'are'} parked for maintainer approval. Create a non-release task for current work, or move release work back to proposed only after maintainer approval.`,
+          ),
         };
       }
       if (!input.dirty) {
@@ -285,12 +334,14 @@ function chooseNextAction(input: {
       }
       return {
         command: 'agentloop create-task',
-        reason: `${count} deferred task contract${count === 1 ? ' is' : 's are'} parked. Create a new task for current work, or move a deferred task back to proposed when it is ready.`,
+        reason: withDirtyCreateTaskGuidance(
+          `${count} deferred task contract${count === 1 ? ' is' : 's are'} parked. Create a new task for current work, or move a deferred task back to proposed when it is ready.`,
+        ),
       };
     }
     return {
       command: 'agentloop create-task',
-      reason: 'No task contract was found.',
+      reason: withDirtyCreateTaskGuidance('No task contract was found.'),
     };
   }
   if (input.activeTask.status.trim().toLowerCase() === 'done') {
@@ -436,7 +487,9 @@ function renderBrief(result: StatusRenderInput) {
   const task = result.activeTask ?? result.latestTask;
   const taskTitle = task?.title ?? 'none';
   const taskStatus = task?.status ?? 'none';
-  const verification = result.latestReport?.overallStatus ?? 'missing';
+  const verificationStatus = result.latestReport?.overallStatus ?? 'missing';
+  const verification =
+    result.latestReport && !task ? `previous:${verificationStatus}` : verificationStatus;
   const run = result.latestRun
     ? result.latestRun.score === undefined
       ? `${result.latestRun.command} ${result.latestRun.overallStatus ?? `${result.latestRun.changedFileCount} files`}`
@@ -481,7 +534,12 @@ function renderMarkdown(result: StatusRenderInput) {
             ? `none active; ${result.agentFlightPlaceholderTasks.length} AgentFlight placeholder task${result.agentFlightPlaceholderTasks.length === 1 ? '' : 's'} preserved.`
             : 'No task contract found.';
   const latestTask = formatTaskMarkdown(result.latestTask);
+  const loopGuidance = result.loopGuidance
+    ? `- Loop guidance: ${singleLineInlineCode(result.loopGuidance.path)}\n`
+    : '';
   const latestReport = formatReportMarkdown(result.latestReport);
+  const latestVerificationLabel =
+    result.activeTask || result.latestTask ? 'Latest verification' : 'Latest previous verification';
   const latestRun = formatRunSummaryMarkdown(result.latestRun);
 
   const nextAction =
@@ -497,9 +555,9 @@ ${gitLines.join('\n')}
 - Working tree: ${singleLineInlineCode(workingTree)}
 - Active task: ${activeTask}
 - Latest open task: ${latestTask}
-- Deferred tasks: ${formatDeferredTaskSummaryMarkdown(result.deferredTasks)}
+${loopGuidance}- Deferred tasks: ${formatDeferredTaskSummaryMarkdown(result.deferredTasks)}
 - AgentFlight placeholders: ${formatAgentFlightPlaceholderSummaryMarkdown(result.agentFlightPlaceholderTasks)}
-- Latest verification: ${latestReport}
+- ${latestVerificationLabel}: ${latestReport}
 - Latest run: ${latestRun}
 - Configured commands: ${formatMarkdownList(result.commands.configured)}
 - Missing commands: ${formatMarkdownList(result.commands.missing)}
@@ -531,6 +589,7 @@ export function toBriefStatusJson(result: AgentLoopStatusResult): AgentLoopStatu
     activeTask: result.activeTask,
     ...(result.staleTaskState ? { staleTaskState: result.staleTaskState } : {}),
     latestTask: result.latestTask,
+    ...(result.loopGuidance ? { loopGuidance: result.loopGuidance } : {}),
     deferredTasks: summarizeStatusTasks(result.deferredTasks),
     agentFlightPlaceholderTasks: summarizeStatusTasks(result.agentFlightPlaceholderTasks),
     ...(result.latestReport ? { latestReport: result.latestReport } : {}),
@@ -563,6 +622,10 @@ export async function getAgentLoopStatus(options: {
     isAgentLoopEvidenceFile(file.path),
   ).length;
   const nonEvidenceChangedFileCount = changedFiles.length - agentLoopEvidenceChangedFileCount;
+  const dirtyNonEvidenceFileExamples = changedFiles
+    .filter((file) => !isAgentLoopEvidenceFile(file.path))
+    .slice(0, DIRTY_WORKTREE_EXAMPLE_LIMIT)
+    .map((file) => file.path);
   const taskDoctorDiagnostics = (await inspectTaskDirectory(options)).diagnostics;
   const staleTaskState = pickStaleTaskStateDiagnostic(taskDoctorDiagnostics);
   const activeTaskPath = await getActiveTaskPath(options);
@@ -591,6 +654,11 @@ export async function getAgentLoopStatus(options: {
       : timestampedReport;
   const activeTask = stripTaskTimestamp(timestampedActiveTask) ?? null;
   const latestTask = stripTaskTimestamp(timestampedLatestTask) ?? null;
+  const loopGuidance = await readLoopGuidanceForTask({
+    cwd: options.cwd,
+    config: options.config,
+    task: activeTask ?? latestTask,
+  });
   const deferredTasks = listedTasks
     .filter((task) => task.status.trim().toLowerCase() === 'deferred')
     .filter((task) => task.source !== 'agentflight-placeholder')
@@ -640,6 +708,8 @@ export async function getAgentLoopStatus(options: {
     latestReport,
     latestRun,
     dirty: changedFiles.length > 0,
+    nonEvidenceChangedFileCount,
+    dirtyNonEvidenceFileExamples,
     dirtyCoveredByLatestHandoffRun: latestHandoffRunCoversDirtyFiles,
     activeTaskHasReviewCriticalPlaceholders: hasActiveTaskPlaceholderDiagnostic(
       taskDoctorDiagnostics,
@@ -665,6 +735,7 @@ export async function getAgentLoopStatus(options: {
     activeTask,
     ...(staleTaskState ? { staleTaskState } : {}),
     latestTask,
+    ...(loopGuidance ? { loopGuidance } : {}),
     deferredTasks,
     agentFlightPlaceholderTasks,
     latestReport,

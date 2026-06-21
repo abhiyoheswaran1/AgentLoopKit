@@ -15,7 +15,9 @@ describe('package scripts', () => {
     expect(packageJson.scripts['test:unit']).toContain('tests/github-metadata.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/github-action-runner.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/release-proof.test.ts');
+    expect(packageJson.scripts['test:unit']).toContain('tests/readiness-score.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/public-docs-hygiene.test.ts');
+    expect(packageJson.scripts['test:unit']).toContain('tests/product-positioning.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/dogfood-start-script.test.ts');
     expect(packageJson.scripts['test:unit']).toContain('tests/maintenance-check-script.test.ts');
     expect(packageJson.scripts['test:unit']).not.toContain('tests/doctor.test.ts');

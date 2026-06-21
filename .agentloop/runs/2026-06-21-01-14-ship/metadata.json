@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-01-14-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-01-14",
+  "createdAtEpochMs": 1781997243610,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-align-agentflight-placeholder-recovery-guidance.md",
+    "title": "Align AgentFlight placeholder recovery guidance",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-01-11-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-01-14-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-01-14-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 160
+}

@@ -15,7 +15,7 @@ function parseTimeoutMs(value: unknown) {
 
 export function shipCommand() {
   return new Command('ship')
-    .description('Run the local review-readiness flow for agent-generated changes')
+    .description('Run the local review-readiness flow for agent-assisted changes')
     .option('--json', 'print machine-readable output')
     .option('--run-verify', 'run verification before scoring instead of reusing current evidence')
     .option('--task-commands', 'when using --run-verify, also run verification commands from the task contract')

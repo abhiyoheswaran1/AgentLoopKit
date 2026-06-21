@@ -22,7 +22,8 @@ Use verification commands for checks that `agentloop verify --task-commands` can
 
 Verification command list items may be written as plain list text or Markdown inline code, for example `- npm test` or ``- `npm test` ``. AgentLoopKit unwraps one balanced inline-code wrapper before execution.
 
-Supported task types are `feature`, `bugfix`, `refactor`, `tests`, `test-generation`, `docs`, `release`, `security-review`, `dependency-upgrade`, and `migration`.
+Supported task types are `feature`, `bugfix`, `refactor`, `tests`, `test-generation`, `research`, `docs`, `release`, `security-review`, `dependency-upgrade`, and `migration`.
+Use `research` for local research planning and findings tasks. Record the research question, evidence source, limits, and follow-up recommendations. If you use simulated persona notes, keep them labeled as internal decision support, not external evidence.
 
 In monorepos, include package-specific verification commands when root commands do not prove the touched package. Examples include `pnpm --filter <package> test`, `npm --workspace <package> test`, or a package-local command from inside `packages/<name>`.
 
@@ -39,7 +40,9 @@ agentloop task doctor
 ```
 
 `agentloop task list --json` is safe for agents and scripts. It reads task files and does not create or update `.agentloop/state.json`.
-`agentloop create-task` sets the new contract as the active task. `agentloop create-task --json` returns the created task path, Markdown content, and active-task metadata for scripts and agents.
+`agentloop create-task` sets the new contract as the active task. `agentloop create-task --json` returns the created task path, Markdown content, active-task metadata, and optional `loopGuidance` for scripts and agents. Loop guidance appears only when `.agentloop/loops/<type>.md` exists for the selected task type; it is a repo-local hint, not a workflow runner.
+When Git already has dirty non-evidence files before the new task is written, `create-task` keeps creating the contract but prints a warning. JSON output includes `DIRTY_WORKTREE_BEFORE_TASK_CREATION` with a dirty-file count and bounded path examples so agents can confirm the existing work belongs to the new task before implementation. The generated contract also records a bounded Risk Notes bullet with the same count and examples for later review. AgentLoopKit does not read dirty file contents, clean files, or block task creation for this warning.
+When the generated contract still contains review-critical placeholder sections, `create-task` keeps writing the draft contract but prints a warning. JSON output includes `TASK_CONTRACT_PLACEHOLDER_SECTIONS` with the section names so agents can pause before implementation, run `agentloop task doctor`, or fill in the missing task-specific content. Fully specified contracts do not produce this warning.
 For unsupported `--type` values, `agentloop create-task --json` returns a parseable error with `supportedTaskTypes` and writes no task file.
 `agentloop task show --json` returns one task contract's metadata and Markdown content without changing active state.
 `agentloop task status --json` updates only the task contract's `- Status:` line. Supported statuses are `proposed`, `in-progress`, `blocked`, `deferred`, `review`, and `done`. Use `deferred` for parked work that should stay visible without becoming the next unpinned task.

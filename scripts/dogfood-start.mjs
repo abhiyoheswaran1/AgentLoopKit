@@ -44,6 +44,7 @@ const TASK_TYPES = [
   'refactor',
   'tests',
   'test-generation',
+  'research',
   'docs',
   'release',
   'security-review',

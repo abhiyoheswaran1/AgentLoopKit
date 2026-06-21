@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-20-23-23-ship",
+  "command": "ship",
+  "createdAt": "2026-06-20-23-23",
+  "createdAtEpochMs": 1781990614702,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-20-use-untracked-aware-diff-stats-in-handoffs-and-reports.md",
+    "title": "Use untracked-aware diff stats in handoffs and reports",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-20-23-18-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-20-23-23-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-20-23-23-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 61
+}

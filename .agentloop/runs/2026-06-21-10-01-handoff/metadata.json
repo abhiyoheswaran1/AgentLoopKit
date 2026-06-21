@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-10-01-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-21-10-01",
+  "createdAtEpochMs": 1782028886279,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-show-gate-evidence-source-in-review-context.md",
+    "title": "Show gate evidence source in review context",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-09-59-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-10-01-pr-summary.md",
+  "changedFileCount": 574
+}

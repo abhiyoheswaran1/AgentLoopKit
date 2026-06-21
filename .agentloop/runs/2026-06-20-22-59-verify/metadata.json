@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-20-22-59-verify",
+  "command": "verify",
+  "createdAt": "2026-06-20-22-59",
+  "createdAtEpochMs": 1781989143661,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-20-show-untracked-files-in-ship-diff-stat.md",
+    "title": "Show untracked files in ship diff stat",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-20-22-54-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 29
+}

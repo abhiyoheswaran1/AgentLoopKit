@@ -1,0 +1,105 @@
+ .agentloop/backlog.md                         | 171 +++++++++++++
+ .agentloop/harness/autonomous-dogfooding.md   |  11 +-
+ .agentloop/harness/commands.md                |   2 +-
+ .agentloop/tasks/README.md                    |   6 +-
+ AGENTLOOP.md                                  |   2 +-
+ AGENTS.md                                     |   4 +-
+ CHANGELOG.md                                  |  32 ++-
+ DECISIONS.md                                  | 186 +++++++++++++++
+ README.md                                     |   8 +-
+ docs/cli-reference.md                         |  33 +--
+ docs/html-reports.md                          |   2 +
+ docs/maintenance-guards.md                    |  16 +-
+ docs/pr-summaries.md                          |   3 +
+ docs/status.md                                |   5 +
+ docs/task-contracts.md                        |   6 +-
+ docs/verification-reports.md                  |   4 +-
+ package.json                                  |   2 +-
+ scripts/dogfood.mjs                           |  18 +-
+ scripts/maintenance-check.mjs                 |   8 +-
+ src/cli/commands/create-task.ts               | 123 +++++++++-
+ src/cli/commands/next.ts                      |   8 +-
+ src/cli/commands/task.ts                      |  30 ++-
+ src/core/artifacts.ts                         |  35 ++-
+ src/core/change-areas.ts                      |   7 +
+ src/core/git.ts                               |  19 ++
+ src/core/html-report.ts                       |   4 +-
+ src/core/maintainer-check.ts                  |  92 ++++---
+ src/core/pr-summary.ts                        |  26 +-
+ src/core/prepare-pr.ts                        |  53 ++---
+ src/core/readiness-score.ts                   |  26 +-
+ src/core/redaction.ts                         |  17 +-
+ src/core/release-check.ts                     |  29 +--
+ src/core/review-context.ts                    |  36 ++-
+ src/core/ship.ts                              |  19 +-
+ src/core/status.ts                            |  22 +-
+ src/core/task-contract.ts                     |  80 ++++++-
+ src/core/task-state.ts                        |  83 ++-----
+ src/core/verification.ts                      |  29 ++-
+ src/templates/agents/claude-code.md           |   2 +-
+ src/templates/agents/codex.md                 |   2 +-
+ src/templates/agents/cursor.md                |   2 +-
+ src/templates/agents/gemini-cli.md            |   2 +-
+ src/templates/agents/generic.md               |   2 +-
+ src/templates/agents/github-copilot-cli.md    |   2 +-
+ src/templates/agents/opencode.md              |   2 +-
+ src/templates/handoffs/verification-report.md |   2 +-
+ src/templates/harness/commands.md             |   1 +
+ src/templates/root/AGENTLOOP.md               |   2 +-
+ src/templates/root/AGENTS.md                  |   2 +-
+ src/templates/tasks/README.md                 |   2 +
+ tests/agent-installation.test.ts              |   4 +
+ tests/artifacts.test.ts                       |  41 +++-
+ tests/autonomous-dogfood.test.ts              |  32 +++
+ tests/create-task.test.ts                     | 330 ++++++++++++++++++++++++++
+ tests/dogfood-script.test.ts                  |  29 ++-
+ tests/html-report.test.ts                     |  28 +++
+ tests/init.test.ts                            |  27 +++
+ tests/maintainer-check.test.ts                |  76 +++++-
+ tests/maintenance-check-script.test.ts        |  34 +--
+ tests/next.test.ts                            |  11 +
+ tests/package-scripts.test.ts                 |   1 +
+ tests/pr-summary.test.ts                      |  75 ++++++
+ tests/prepare-pr.test.ts                      |  60 ++++-
+ tests/readiness-score.test.ts                 | 149 ++++++++++++
+ tests/redaction.test.ts                       |  14 ++
+ tests/release-check.test.ts                   |  25 ++
+ tests/review-context.test.ts                  |  72 ++++++
+ tests/ship.test.ts                            |  76 ++++++
+ tests/status.test.ts                          |  42 ++++
+ tests/task-state.test.ts                      |  47 +++-
+ tests/verification.test.ts                    |  66 +++++-
+ 71 files changed, 2233 insertions(+), 286 deletions(-)
+.agentloop/research/interview-cycle-153.md | untracked
+.agentloop/research/interview-cycle-154.md | untracked
+.agentloop/research/interview-cycle-155.md | untracked
+.agentloop/research/interview-cycle-156.md | untracked
+.agentloop/research/interview-cycle-157.md | untracked
+.agentloop/research/interview-cycle-158.md | untracked
+.agentloop/research/interview-cycle-159.md | untracked
+.agentloop/research/interview-cycle-160.md | untracked
+.agentloop/research/interview-cycle-161.md | untracked
+.agentloop/research/interview-cycle-162.md | untracked
+.agentloop/research/interview-cycle-163.md | untracked
+.agentloop/research/interview-cycle-164.md | untracked
+.agentloop/research/interview-cycle-165.md | untracked
+.agentloop/research/interview-cycle-166.md | untracked
+.agentloop/research/interview-cycle-167.md | untracked
+.agentloop/research/interview-cycle-168.md | untracked
+.agentloop/research/interview-cycle-169.md | untracked
+.agentloop/research/interview-cycle-170.md | untracked
+.agentloop/research/interview-cycle-171.md | untracked
+.agentloop/research/interview-cycle-172.md | untracked
+.agentloop/research/interview-cycle-173.md | untracked
+.agentloop/research/interview-cycle-174.md | untracked
+.agentloop/research/interview-cycle-175.md | untracked
+.agentloop/research/interview-cycle-176.md | untracked
+.agentloop/research/interview-cycle-177.md | untracked
+.agentloop/research/interview-cycle-178.md | untracked
+.agentloop/research/interview-cycle-179.md | untracked
+.agentloop/research/interview-cycle-180.md | untracked
+.agentloop/research/interview-cycle-181.md | untracked
+.agentloop/research/interview-cycle-182.md | untracked
+.agentloop/research/interview-cycle-183.md | untracked
+src/core/markdown-sections.ts | untracked
+src/core/verification-report-sections.ts | untracked

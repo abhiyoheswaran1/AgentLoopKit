@@ -1,18 +1,25 @@
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { AgentLoopConfig } from './config.js';
+import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
 import { resolveUniqueOutputArtifactPath } from './artifacts.js';
 import { renderCompactChangedFiles } from './change-areas.js';
 import { checkGates } from './check-gates.js';
 import { formatTimestamp } from './dates.js';
 import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
-import { getGitDiffStat, getGitStatus, parseGitStatus } from './git.js';
+import {
+  appendUntrackedFilesToDiffStat,
+  getGitDiffStat,
+  getGitStatus,
+  parseGitStatus,
+} from './git.js';
 import { writeTextFile } from './file-system.js';
 import {
   escapeMarkdownProse,
   fencedCodeBlock,
   singleLineInlineCode as inlineCode,
 } from './markdown-format.js';
+import { listItems, sectionContent } from './markdown-sections.js';
 import { summarizeRepository } from './pr-summary.js';
 import { toSafeDisplayPath } from './display-path.js';
 import {
@@ -40,7 +47,7 @@ export type ShipResult = {
 };
 
 type ShipRenderInput = Omit<ShipResult, 'markdown' | 'run'>;
-type ShipMarkdownInput = ShipRenderInput & { cwd: string };
+type ShipMarkdownInput = ShipRenderInput & { cwd: string; taskRiskNotes: string[] };
 
 function relativePath(cwd: string | undefined, filePath: string | undefined) {
   if (!filePath) return undefined;
@@ -75,6 +82,36 @@ function renderList(values: string[], fallback: string) {
   return values.length
     ? values.map((value) => `- ${escapeSingleLineMarkdownProse(value)}`).join('\n')
     : `- ${escapeSingleLineMarkdownProse(fallback)}`;
+}
+
+function inheritedDirtyBaselineCount(taskRiskNotes: string[]) {
+  for (const note of taskRiskNotes) {
+    const match = note.match(
+      /^Pre-existing dirty non-evidence files before task creation:\s*(\d+)\s+total\b/i,
+    );
+    if (!match) continue;
+    return Number.parseInt(match[1], 10);
+  }
+  return undefined;
+}
+
+function renderInheritedDirtyWorkSection(input: ShipMarkdownInput) {
+  const baselineCount = inheritedDirtyBaselineCount(input.taskRiskNotes);
+  if (baselineCount === undefined) return '\n';
+
+  const currentCount = input.changedFiles.filter(
+    (file) => !isAgentLoopEvidenceFile(file.path),
+  ).length;
+  const delta = currentCount - baselineCount;
+  const deltaLabel = delta > 0 ? `+${delta}` : String(delta);
+
+  return `
+## Inherited Dirty Work
+
+- Task started with ${inlineCode(String(baselineCount))} dirty non-evidence file(s); current non-evidence changed files: ${inlineCode(
+    String(currentCount),
+  )} (net ${inlineCode(deltaLabel)}).
+`;
 }
 
 export function renderShipGithubComment(input: ShipResult, cwd?: string) {
@@ -115,7 +152,7 @@ function renderShipMarkdown(input: ShipMarkdownInput) {
 
   return `# AgentLoopKit Ship Report
 
-Make agent-generated code reviewable, verifiable, and merge-ready.
+Make agent-assisted work reviewable, verifiable, and merge-ready.
 
 - Generated: ${inlineCode(input.timestamp)}
 - Review readiness score: ${inlineCode(String(input.readiness.totalScore))}/100
@@ -153,6 +190,10 @@ ${renderList(input.readiness.blockers, 'No blockers recorded.')}
 ## Recommended Next Actions
 
 ${renderList(input.readiness.recommendedNextActions, 'Review the diff and open the PR when ready.')}
+${renderInheritedDirtyWorkSection(input)}
+## Task Risk Notes
+
+${renderList(input.taskRiskNotes, 'No task risk notes were recorded.')}
 
 ## Changed Files
 
@@ -183,7 +224,7 @@ export async function createShipReport(options: {
   const timestamp = options.timestamp ?? formatTimestamp();
   const gitStatus = await getGitStatus(options.cwd);
   const changedFiles = await parseGitStatus(gitStatus);
-  const diffStat = await getGitDiffStat(options.cwd);
+  const diffStat = appendUntrackedFilesToDiffStat(await getGitDiffStat(options.cwd), changedFiles);
   const evidence = await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
   const task = evidence.taskPath
     ? await readTaskContract({
@@ -192,6 +233,7 @@ export async function createShipReport(options: {
         taskPath: evidence.taskPath,
       })
     : null;
+  const taskRiskNotes = task ? listItems(sectionContent(task.content, 'Risk Notes')) : [];
 
   let verificationReportPath = evidence.currentReportPath;
   let verificationMarkdown =
@@ -285,7 +327,7 @@ export async function createShipReport(options: {
     diffStat,
     shipReportPath,
   };
-  const markdown = renderShipMarkdown({ ...withoutMarkdown, cwd: options.cwd });
+  const markdown = renderShipMarkdown({ ...withoutMarkdown, cwd: options.cwd, taskRiskNotes });
   await writeTextFile(shipReportPath, markdown);
   const run = await writeShipRun({
     cwd: options.cwd,

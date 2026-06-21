@@ -15,6 +15,7 @@ import {
   parseGitStatus,
 } from './git.js';
 import { singleLineInlineCode as inlineCode } from './markdown-format.js';
+import { redactLocalRoots } from './redaction.js';
 
 export type ReleaseCheckStatus = 'pass' | 'warn' | 'fail';
 
@@ -98,24 +99,17 @@ function relativePath(cwd: string, filePath: string) {
   return path.relative(cwd, filePath).split(path.sep).join('/') || '.';
 }
 
-function redactLocalRoot(
-  value: string | undefined,
-  root: string,
-  redactPaths: boolean | undefined,
-) {
-  if (!value || !redactPaths || !root || root === path.parse(root).root) return value;
-  return value.split(root).join('[git-root]').split(root.replace(/\\/g, '/')).join('[git-root]');
-}
-
 function redactReleaseCheck(
   check: ReleaseReadinessCheck,
   root: string,
   redactPaths: boolean | undefined,
 ) {
+  const redact = (value: string | undefined) =>
+    value && redactPaths ? redactLocalRoots(value, [root]) : value;
   return {
     ...check,
-    message: redactLocalRoot(check.message, root, redactPaths) ?? check.message,
-    ...(check.path ? { path: redactLocalRoot(check.path, root, redactPaths) ?? check.path } : {}),
+    message: redact(check.message) ?? check.message,
+    ...(check.path ? { path: redact(check.path) ?? check.path } : {}),
   };
 }
 
@@ -767,6 +761,8 @@ export async function checkReleaseReadiness(options: {
     redactReleaseCheck(item, resolvedGitRoot, options.redactPaths),
   );
   const rawNextAction = chooseNextAction(checks, releaseDelta);
+  const redact = (value: string) =>
+    options.redactPaths ? redactLocalRoots(value, [resolvedGitRoot]) : value;
   const withoutMarkdown = {
     strict,
     overallStatus: overallStatus(outputChecks, strict),
@@ -778,8 +774,7 @@ export async function checkReleaseReadiness(options: {
       isRepository: inGit,
       branch: inGit ? await getGitBranch(options.cwd) : '',
       commit: inGit ? await getGitCommit(options.cwd) : '',
-      root:
-        redactLocalRoot(resolvedGitRoot, resolvedGitRoot, options.redactPaths) ?? resolvedGitRoot,
+      root: redact(resolvedGitRoot),
       targetIsRoot,
       changedFileCount: changedFiles.length,
       nonEvidenceChangedFileCount,
@@ -788,12 +783,8 @@ export async function checkReleaseReadiness(options: {
     releaseDelta,
     checks: outputChecks,
     nextAction: {
-      command:
-        redactLocalRoot(rawNextAction.command, resolvedGitRoot, options.redactPaths) ??
-        rawNextAction.command,
-      reason:
-        redactLocalRoot(rawNextAction.reason, resolvedGitRoot, options.redactPaths) ??
-        rawNextAction.reason,
+      command: redact(rawNextAction.command),
+      reason: redact(rawNextAction.reason),
     },
     safety: {
       does: [

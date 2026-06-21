@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-06-01-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-06-01",
+  "createdAtEpochMs": 1782014494297,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-reuse-shared-url-safe-redaction-in-review-checks.md",
+    "title": "Reuse shared URL-safe redaction in review checks",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-05-57-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-06-01-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-06-01-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 398
+}

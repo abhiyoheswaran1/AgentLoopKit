@@ -24,7 +24,7 @@ Before changing code:
 - Treat local `.agentloop/policies/*.md` files as the repo's safety guidance. A `modified` policy is a local decision to review, not a failure.
 - Run `agentloop ship` before review to score evidence readiness, write a ship report, and record a run under `.agentloop/runs/`.
 - Run `agentloop prepare-pr` after `ship` when a reviewer needs a PR title, grouped body, risks, rollback notes, and checklist.
-- Run `agentloop maintainer-check` when evaluating whether an AI-assisted PR has enough evidence to review.
+- Run `agentloop maintainer-check` when evaluating whether an agent-assisted PR has enough evidence to review.
 - Run `agentloop runs`, `agentloop show-run <id>`, and `agentloop intent <file>` to inspect local run history and file intent.
 - Run `agentloop check-gates` when you need a quick evidence gate without the full ship report.
 - Run `agentloop report` after verification and handoff or ship evidence when a local HTML evidence artifact helps review.
@@ -39,12 +39,12 @@ Before changing code:
 - Do not read or print secrets. If env files exist, mention only their paths.
 - Run the configured verification commands before claiming completion.
 - Use AgentFlight for meaningful autonomous sessions: `npx --yes agentflight start --task "<task>" --yes`, `npx --yes agentflight status`, `npx --yes agentflight doctor`, and `npx --yes agentflight report`.
-- After raw `agentflight start`, run `agentloop status --redact-paths`; if an AgentFlight placeholder becomes active, run `agentloop task set <path>` to re-pin the detailed AgentLoop task.
+- After raw `agentflight start`, run `agentloop status --redact-paths` and `agentloop task doctor --redact-paths`. If an AgentFlight placeholder becomes active, treat it as preserved session evidence: run `agentloop task clear`, then `agentloop task set <path>` for a detailed task or `agentloop create-task` for new scoped work. Do not edit or delete the placeholder as default recovery.
 - Generate review evidence with changed files, tests run, risks, rollback notes, and reviewer checklist.
 
 Agent roster:
 
-Use these roles as routing hints when a coding-agent session needs focused expertise. One session may cover multiple roles, but the handoff should name which roles mattered.
+Use these roles as routing hints when an agent session needs focused expertise. One session may cover multiple roles, but the handoff should name which roles mattered.
 
 - Product Maintainer: Use for scope, positioning, roadmap, backlog, and release-channel decisions. Owns README claims, ROADMAP.md, DECISIONS.md, and public tradeoffs.
 - CLI Engineer: Use for command behavior, flags, JSON output, exit codes, path handling, and package-manager detection. Owns `src/cli/`, `src/core/`, and command tests.

@@ -9,6 +9,8 @@ import {
   escapeMarkdownProse,
   singleLineInlineCode as inlineCode,
 } from './markdown-format.js';
+import { listItems, sectionContent } from './markdown-sections.js';
+import { verificationNotRunItems } from './verification-report-sections.js';
 import { resolveUniqueOutputArtifactPath } from './artifacts.js';
 import { createShipReport, ShipResult } from './ship.js';
 import { listRuns, readRun } from './runs.js';
@@ -43,31 +45,9 @@ type PreparePrShipEvidence = Pick<
   | 'handoffPath'
   | 'changedFiles'
 > &
-  Pick<PreparePrResult, 'shipEvidence'>;
-
-function sectionContent(markdown: string, heading: string) {
-  const lines = markdown.split(/\r?\n/);
-  const headingLine = `## ${heading}`;
-  const startIndex = lines.findIndex((line) => line.trim() === headingLine);
-  if (startIndex === -1) return '';
-
-  const sectionLines: string[] = [];
-  for (const line of lines.slice(startIndex + 1)) {
-    if (/^##\s+/.test(line.trim())) break;
-    sectionLines.push(line);
-  }
-
-  return sectionLines.join('\n').trim();
-}
-
-function listItems(section: string) {
-  return section
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.startsWith('- '))
-    .map((line) => line.slice(2).trim())
-    .filter(Boolean);
-}
+  Pick<PreparePrResult, 'shipEvidence'> & {
+    verificationMarkdown?: string;
+  };
 
 function renderMarkdownList(values: string[], fallback: string) {
   return values.length
@@ -121,6 +101,14 @@ function verificationLine(ship: PreparePrShipEvidence, cwd: string) {
     ? ` (${inlineCode(relativePath(cwd, ship.verificationReportPath))})`
     : '';
   return `Overall status: ${ship.verification.status}${report}`;
+}
+
+function verificationNotRunLines(markdown: string | undefined) {
+  if (!markdown) return renderMarkdownList([], 'No verification report was available.');
+  return renderMarkdownList(
+    verificationNotRunItems(markdown),
+    'No skipped commands were recorded.',
+  );
 }
 
 function escapedInlineProse(value: string) {
@@ -199,6 +187,8 @@ function buildPrBody(input: {
   const acceptance = listItems(sectionContent(taskContent, 'Acceptance Criteria'));
   const risks = listItems(sectionContent(taskContent, 'Risk Notes'));
   const rollback = sectionContent(taskContent, 'Rollback Notes');
+  const githubMetadataSection = renderGithubMetadataSection(input.githubMetadata).trimEnd();
+  const optionalGithubMetadataSection = githubMetadataSection ? `\n\n${githubMetadataSection}` : '';
 
   return `# ${escapeSingleLineMarkdownProse(title)}
 
@@ -224,9 +214,7 @@ ${renderMarkdownList(acceptance, 'No acceptance criteria were recorded.')}
 
 ## Verification Evidence
 
-- ${verificationLine(input.ship, input.cwd)}
-
-${renderGithubMetadataSection(input.githubMetadata)}
+- ${verificationLine(input.ship, input.cwd)}${optionalGithubMetadataSection}
 
 ## Reviewer Checklist
 
@@ -243,9 +231,9 @@ ${renderMarkdownList(risks, 'No risk notes were recorded.')}
 
 ${escapeSingleLineMarkdownProse(rollback || 'No rollback notes were recorded.')}
 
-## What Was Not Verified
+## Verification Report Not Run
 
-- Check the verification report for skipped commands or untested areas.
+${verificationNotRunLines(input.ship.verificationMarkdown)}
 `;
 }
 
@@ -311,6 +299,7 @@ async function findReusableShipEvidence(options: {
         fresh: true,
         path: relativePath(options.cwd, verificationReportPath),
       },
+      verificationMarkdown,
       verificationReportPath: relativePath(options.cwd, verificationReportPath),
       shipReportPath: relativePath(options.cwd, run.shipReportPath),
       handoffPath: run.handoffPath ? relativePath(options.cwd, run.handoffPath) : undefined,
@@ -337,8 +326,12 @@ async function refreshShipEvidence(options: {
     timestamp: options.timestamp,
     redactPaths: options.redactPaths,
   });
+  const verificationMarkdown = result.verificationReportPath
+    ? await readFile(resolveMaybeRepoPath(options.cwd, result.verificationReportPath), 'utf8')
+    : undefined;
   return {
     ...result,
+    verificationMarkdown,
     shipEvidence: {
       source: 'refreshed',
       runId: result.run.id,

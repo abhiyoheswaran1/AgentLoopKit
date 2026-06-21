@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-03-50-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-03-50",
+  "createdAtEpochMs": 1782006641498,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-fix-readiness-scoring-final-section-parsing.md",
+    "title": "Fix readiness scoring final-section parsing",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-03-49-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-03-50-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-03-50-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 279
+}

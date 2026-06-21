@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-13-11-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-13-11",
+  "createdAtEpochMs": 1782040296112,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-guard-internal-product-positioning-language.md",
+    "title": "Guard internal product positioning language",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-13-01-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-13-11-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-13-11-pr-summary.md",
+  "score": 88,
+  "changedFileCount": 732
+}

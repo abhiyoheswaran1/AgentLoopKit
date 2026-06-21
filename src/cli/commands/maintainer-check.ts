@@ -7,7 +7,7 @@ import { loadWorkspaceForJsonCommand } from '../json-errors.js';
 
 export function maintainerCheckCommand() {
   return new Command('maintainer-check')
-    .description('Check whether an AI-assisted PR is ready for maintainer review')
+    .description('Check whether an agent-assisted PR is ready for maintainer review')
     .option('--json', 'print machine-readable output')
     .option('--redact-paths', 'redact local absolute paths in public output')
     .action(async (options: { json?: boolean; redactPaths?: boolean }) => {

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-12-18-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-12-18",
+  "createdAtEpochMs": 1782037105072,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-accept-redact-paths-on-task-lifecycle-commands.md",
+    "title": "Accept redact-paths on task lifecycle commands",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-11-59-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-12-18-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-12-18-pr-summary.md",
+  "score": 88,
+  "changedFileCount": 692
+}

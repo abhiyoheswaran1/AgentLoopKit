@@ -82,7 +82,16 @@ npm run build
 agentloop verify --task-commands --write-run
 npx --yes projscan doctor --format markdown
 npx --yes agentflight doctor
+npx --yes agentflight status
 ```
+
+When recording focused AgentFlight verification, pass the executable and arguments after `--`:
+
+```bash
+npx --yes agentflight verify -- npm test -- tests/example.test.ts
+```
+
+Do not pass the full verification command as one quoted string; AgentFlight records command arguments directly, and a quoted shell-style command can create failed evidence for a command that was never executed.
 
 For release work, run the release gate only after the maintainer asks for a release:
 
@@ -104,7 +113,7 @@ npx --yes agentflight snapshot --note "Handoff ready"
 npx --yes agentflight report
 ```
 
-Run `npm run dogfood:strict` after fresh handoff or ship evidence exists. Strict dogfood includes `check-gates --strict`, so running it before reviewer evidence is written will correctly fail and ask for `agentloop handoff`.
+Run `npm run dogfood:strict` after fresh handoff or ship evidence exists, when review-gate warnings should block the handoff. Strict dogfood includes `check-gates --strict`, so running it before reviewer evidence is written will correctly fail and ask for `agentloop handoff`. It also prints AgentFlight doctor and status output so session health and readiness are visible; AgentFlight status remains exit-code based and its human output is not parsed. maintainer-check warnings remain reviewer guidance unless the command exits non-zero.
 
 Keep the handoff honest:
 

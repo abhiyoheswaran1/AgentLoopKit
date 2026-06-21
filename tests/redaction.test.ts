@@ -48,4 +48,18 @@ describe('redaction', () => {
     expect(redacted).not.toContain('D:\\a\\AgentLoopKit\\repo');
     expect(redacted).not.toContain('/tmp/agentloopkit/repo');
   });
+
+  test('preserves external URLs while inferring local roots', () => {
+    const text = [
+      'Docs: https://github.com/example/app',
+      'Report: /tmp/agentloopkit/repo/.agentloop/reports/local-report.md',
+    ].join('\n');
+
+    const redacted = redactLocalRoots(text, []);
+
+    expect(redacted).toContain('Docs: https://github.com/example/app');
+    expect(redacted).toContain('Report: [git-root]/.agentloop/reports/local-report.md');
+    expect(redacted).not.toContain('https:[git-root]');
+    expect(redacted).not.toContain('/tmp/agentloopkit/repo');
+  });
 });

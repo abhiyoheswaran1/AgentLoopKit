@@ -111,6 +111,61 @@ describe('next command', () => {
     expect(await exists(path.join(dir, 'marker.txt'))).toBe(false);
   });
 
+  test('shows loop guidance for the selected active task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-21-feature-task.md'),
+      taskContractMarkdown('Feature task', { status: 'in-progress', taskType: 'feature' }),
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({
+        version: 1,
+        activeTaskPath: '.agentloop/tasks/2026-06-21-feature-task.md',
+      }),
+    );
+
+    const [jsonResult, humanResult] = await Promise.all([
+      execa(tsxPath, [cliPath, 'next', '--json'], { cwd: dir }),
+      execa(tsxPath, [cliPath, 'next'], { cwd: dir }),
+    ]);
+
+    const next = JSON.parse(jsonResult.stdout);
+    expect(next.loopGuidance).toEqual({
+      taskType: 'feature',
+      path: '.agentloop/loops/feature.md',
+    });
+    expect(humanResult.stdout).toContain('- Loop guidance: `.agentloop/loops/feature.md`');
+    expect(next.command).toBe('agentloop verify');
+  });
+
+  test('shows loop guidance for the selected latest open task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-21-feature-task.md'),
+      taskContractMarkdown('Feature task', { status: 'proposed', taskType: 'feature' }),
+    );
+
+    const [jsonResult, humanResult] = await Promise.all([
+      execa(tsxPath, [cliPath, 'next', '--json'], { cwd: dir }),
+      execa(tsxPath, [cliPath, 'next'], { cwd: dir }),
+    ]);
+
+    const next = JSON.parse(jsonResult.stdout);
+    expect(next.command).toBe('agentloop task set .agentloop/tasks/2026-06-21-feature-task.md');
+    expect(next.loopGuidance).toEqual({
+      taskType: 'feature',
+      path: '.agentloop/loops/feature.md',
+    });
+    expect(humanResult.stdout).toContain('- Loop guidance: `.agentloop/loops/feature.md`');
+  });
+
   test('separates AgentLoop evidence churn in working tree output', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -528,6 +583,21 @@ Document how to revert or disable this change.
     tempDirs.push(dir);
     await execa('git', ['init', '-q'], { cwd: dir });
     await initializeAgentLoop({ cwd: dir });
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa(
+      'git',
+      [
+        '-c',
+        'user.name=AgentLoopKit Test',
+        '-c',
+        'user.email=test@example.com',
+        'commit',
+        '-m',
+        'baseline',
+        '-q',
+      ],
+      { cwd: dir },
+    );
     const taskPath = path.join(dir, '.agentloop/tasks/2026-06-10-complete-task.md');
     const reportPath = path.join(dir, '.agentloop/reports/2026-06-10-08-00-verification-report.md');
     await mkdir(path.dirname(reportPath), { recursive: true });
@@ -541,13 +611,26 @@ Document how to revert or disable this change.
       cwd: dir,
       reject: false,
     });
+    const humanResult = await execa(tsxPath, [cliPath, 'next'], {
+      cwd: dir,
+      reject: false,
+    });
 
     expect(result.exitCode).toBe(0);
+    expect(humanResult.exitCode).toBe(0);
     const next = JSON.parse(result.stdout);
     expect(next.activeTask).toBeNull();
     expect(next.latestTask).toBeNull();
     expect(next.latestReport.overallStatus).toBe('pass');
+    expect(next.latestPreviousReport).toBeUndefined();
     expect(next.command).toBe('agentloop create-task');
+    expect(next.reason).toContain('1 existing dirty non-evidence file');
+    expect(next.reason).toContain('Examples: `changed.txt`.');
+    expect(humanResult.stdout).toContain('Examples: `changed.txt`.');
+    expect(humanResult.stdout).toContain(
+      '- Latest previous verification: `pass` - `.agentloop/reports/2026-06-10-08-00-verification-report.md`',
+    );
+    expect(humanResult.stdout).not.toContain('- Latest verification: `pass`');
   });
 
   test('recommends pinning an unpinned open task before continuing', async () => {

@@ -139,7 +139,7 @@ If the repo installs AgentLoopKit as a dev dependency, use the local binary shap
 
 Run the MCP server from a repository that already has `agentloop.config.json`. The server reads that repo's local AgentLoopKit evidence and returns display-safe paths. It does not initialize the repo for you.
 
-Ask the agent to call read-only tools such as `agentloop_review_context`, `agentloop_status`, `agentloop_latest_ship_report`, `agentloop_list_runs`, `agentloop_file_intent`, or `agentloop_maintainer_check` before reviewing an agent-generated change.
+Ask the agent to call read-only tools such as `agentloop_review_context`, `agentloop_status`, `agentloop_latest_ship_report`, `agentloop_list_runs`, `agentloop_file_intent`, or `agentloop_maintainer_check` before reviewing an agent-assisted change.
 
 ## Tools
 
@@ -157,7 +157,7 @@ Ask the agent to call read-only tools such as `agentloop_review_context`, `agent
 | `agentloop_list_runs`                  | Recent local run ledger entries with bounded `limit` input                                                                                               |
 | `agentloop_show_run`                   | One local run ledger entry by run id, including metadata, score JSON, changed files, and diffstat                                                        |
 | `agentloop_file_intent`                | Local run ledger matches for one repo-relative file path                                                                                                 |
-| `agentloop_maintainer_check`           | Local maintainer reviewability checks for AI-assisted changes                                                                                            |
+| `agentloop_maintainer_check`           | Local maintainer reviewability checks for agent-assisted changes                                                                                            |
 | `agentloop_check_gates`                | Local review gate status for task, verification, handoff, harness, policy, and git evidence                                                              |
 | `agentloop_artifacts`                  | Local artifact and run-ledger inventory metadata, with optional `type` and `latest` filters                                                              |
 | `agentloop_review_context`             | One reviewability snapshot that combines status, gates, policy status, artifact inventory, recent runs, and latest ship evidence                         |

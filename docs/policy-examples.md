@@ -137,7 +137,7 @@ Use both root and package commands when a change touches shared code.
 
 ## Open-Source Maintainer Workflow
 
-Use when maintainers review outside contributions or agent-generated pull requests.
+Use when maintainers review outside contributions or agent-assisted pull requests.
 
 Suggested additions:
 

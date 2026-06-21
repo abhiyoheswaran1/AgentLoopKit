@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-09-50-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-09-50",
+  "createdAtEpochMs": 1782028246191,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-clarify-maintainer-check-package-warning-labels.md",
+    "title": "Clarify maintainer-check package warning labels",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-09-47-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-09-50-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-09-50-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 560
+}

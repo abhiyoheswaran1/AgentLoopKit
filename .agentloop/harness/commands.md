@@ -30,7 +30,7 @@ Rules:
 - Follow local `.agentloop/policies/*.md` files as repo policy. Treat `modified` as a reviewed local rule, not an error.
 - Use `agentloop ship` before review to score evidence readiness, write a ship report, and record a run under `.agentloop/runs/`.
 - Use `agentloop prepare-pr` after `ship` when reviewers need a PR title, grouped body, risks, rollback notes, and checklist.
-- Use `agentloop maintainer-check` when evaluating whether an AI-assisted PR has enough evidence to review.
+- Use `agentloop maintainer-check` when evaluating whether an agent-assisted PR has enough evidence to review.
 - Use `agentloop runs`, `agentloop show-run <id>`, and `agentloop intent <file>` to inspect local run history and file intent.
 - Use `agentloop check-gates` when you need a quick evidence gate without the full ship report.
 - Use `agentloop report` after verification and handoff or ship evidence when reviewers need one local HTML evidence artifact.
@@ -44,7 +44,7 @@ Rules:
 - Run configured verification before claiming completion.
 - Dogfood dependency audit, AgentFlight, and ProjScan during implementation work in this repository.
 - Use `npx --yes agentflight start --task "<task>" --yes` at the beginning of meaningful autonomous work.
-- After raw `agentflight start`, run `agentloop status --redact-paths`; if an AgentFlight placeholder becomes active, run `agentloop task set <path>` to re-pin the detailed AgentLoop task.
+- After raw `agentflight start`, run `agentloop status --redact-paths` and `agentloop task doctor --redact-paths`. If an AgentFlight placeholder becomes active, treat it as preserved session evidence: run `agentloop task clear`, then `agentloop task set <path>` for a detailed task or `agentloop create-task` for new scoped work. Do not edit or delete the placeholder as default recovery.
 - Use `npx --yes agentflight status`, `npx --yes agentflight doctor`, and `npx --yes agentflight report` before final handoff when a session record helps review.
 - Use `.agentloop/product-panel.md`, `.agentloop/user-personas.md`, `.agentloop/backlog.md`, and `.agentloop/research/` to guide product decisions. Treat those files as internal decision support, not public evidence.
 - Use `.agentloop/harness/autonomous-dogfooding.md` for the full self-dogfood workflow.

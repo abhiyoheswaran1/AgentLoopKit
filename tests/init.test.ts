@@ -47,6 +47,9 @@ describe('init', () => {
     expect(result.commands.missing).toEqual(['lint', 'typecheck', 'build', 'format']);
     expect(result.git).toEqual({ isRepository: false, root: '', targetIsRoot: false });
     expect(result.created.some((file) => file.endsWith('.agentloop/loops/feature.md'))).toBe(true);
+    expect(result.created.some((file) => file.endsWith('.agentloop/loops/research.md'))).toBe(
+      true,
+    );
     expect(result.created.some((file) => file.endsWith('.agentloop/README.md'))).toBe(true);
     expect(result.created.some((file) => file.endsWith('.agentloop/manifest.json'))).toBe(true);
     expect(manifest).toMatchObject({
@@ -78,6 +81,9 @@ describe('init', () => {
     await expect(readFile(path.join(dir, '.agentloop/tasks/README.md'), 'utf8')).resolves.toContain(
       'package-specific verification commands',
     );
+    await expect(readFile(path.join(dir, '.agentloop/tasks/README.md'), 'utf8')).resolves.toContain(
+      'research',
+    );
   });
 
   test('generated onboarding includes a risk-aware first task example', async () => {
@@ -101,8 +107,35 @@ describe('init', () => {
     expect(workspaceReadme).toContain('agentloop verify --task <path> --task-commands');
     expect(workspaceReadme).toContain('agentloop artifacts');
     expect(taskReadme).toContain('--risk "Touches account preferences"');
+    expect(taskReadme).toContain('dirty non-evidence files');
+    expect(taskReadme).toContain('review-critical placeholder sections');
+    expect(taskReadme).toContain('does not read dirty file contents, clean files, or block task creation');
     expect(commandsGuide).toContain('agentloop create-task --type feature --title');
     expect(commandsGuide).toContain('agentloop artifacts');
+  });
+
+  test('generated guidance includes bounded AgentFlight placeholder recovery', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'demo-agentflight-recovery',
+      scripts: { test: 'vitest' },
+    });
+
+    await initializeAgentLoop({ cwd: dir });
+
+    const agentsMd = await readFile(path.join(dir, 'AGENTS.md'), 'utf8');
+    const agentLoopMd = await readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8');
+    const commandsGuide = await readFile(path.join(dir, '.agentloop/harness/commands.md'), 'utf8');
+
+    for (const content of [agentsMd, agentLoopMd, commandsGuide]) {
+      expect(content).toContain('agentloop status --redact-paths');
+      expect(content).toContain('agentloop task doctor --redact-paths');
+      expect(content).toContain('agentloop task clear');
+      expect(content).toContain('agentloop task set <path>');
+      expect(content).toContain('agentloop create-task');
+      expect(content).toContain('preserved session evidence');
+    }
   });
 
   test('safely appends to an existing AGENTS.md', async () => {

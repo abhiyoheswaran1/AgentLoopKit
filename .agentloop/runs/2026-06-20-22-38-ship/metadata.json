@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-20-22-38-ship",
+  "command": "ship",
+  "createdAt": "2026-06-20-22-38",
+  "createdAtEpochMs": 1781987932345,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-20-warn-when-created-tasks-keep-review-placeholders.md",
+    "title": "Warn when created tasks keep review placeholders",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-20-22-32-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-20-22-38-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-20-22-38-pr-summary.md",
+  "score": 100,
+  "changedFileCount": 15
+}

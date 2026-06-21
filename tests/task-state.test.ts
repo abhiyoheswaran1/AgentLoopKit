@@ -918,12 +918,57 @@ describe('task command', () => {
     });
 
     const clearResult = await execa(tsxPath, [cliPath, 'task', 'clear', '--json'], { cwd: dir });
-    expect(JSON.parse(clearResult.stdout)).toEqual({ activeTask: null });
+    expect(JSON.parse(clearResult.stdout)).toEqual({
+      activeTask: null,
+      cleared: true,
+      activeTaskPath: '.agentloop/tasks/2026-06-09-demo.md',
+    });
 
     const emptyResult = await execa(tsxPath, [cliPath, 'task', 'current', '--json'], {
       cwd: dir,
     });
     expect(JSON.parse(emptyResult.stdout)).toEqual({ activeTask: null });
+  });
+
+  test('clear reports when it clears an ignored AgentFlight placeholder pointer', async () => {
+    const { dir } = await createTaskStateFixture();
+    const title = 'Recover ignored AgentFlight pointer';
+    const placeholderPath = '.agentloop/tasks/2026-06-16-recover-ignored-agentflight-pointer.md';
+    await writeFile(path.join(dir, placeholderPath), agentFlightPlaceholderMarkdown(title, 'proposed'));
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: placeholderPath,
+    });
+
+    const humanResult = await execa(tsxPath, [cliPath, 'task', 'clear'], { cwd: dir });
+
+    expect(humanResult.stdout).toContain('Cleared active task pointer.');
+    expect(humanResult.stdout).toContain(placeholderPath);
+    await expect(readFile(path.join(dir, '.agentloop/state.json'), 'utf8')).rejects.toThrow();
+    await expect(readFile(path.join(dir, placeholderPath), 'utf8')).resolves.toContain(title);
+
+    await writeJson(path.join(dir, '.agentloop/state.json'), {
+      version: 1,
+      activeTaskPath: placeholderPath,
+    });
+
+    const jsonResult = await execa(tsxPath, [cliPath, 'task', 'clear', '--json'], { cwd: dir });
+
+    expect(JSON.parse(jsonResult.stdout)).toEqual({
+      activeTask: null,
+      cleared: true,
+      activeTaskPath: placeholderPath,
+    });
+  });
+
+  test('clear reports no-op when no active task state exists', async () => {
+    const { dir } = await createTaskStateFixture();
+
+    const humanResult = await execa(tsxPath, [cliPath, 'task', 'clear'], { cwd: dir });
+    const jsonResult = await execa(tsxPath, [cliPath, 'task', 'clear', '--json'], { cwd: dir });
+
+    expect(humanResult.stdout).toContain('No active task set.');
+    expect(JSON.parse(jsonResult.stdout)).toEqual({ activeTask: null, cleared: false });
   });
 
   test('lists task contracts from the CLI without writing state', async () => {
@@ -1795,6 +1840,87 @@ describe('task command', () => {
       },
     });
     expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: review\n');
+  });
+
+  test('accepts redact-paths on task lifecycle update commands', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+    const relativeTaskPath = '.agentloop/tasks/2026-06-09-demo.md';
+
+    for (const subcommand of ['set', 'status', 'done', 'archive', 'clear']) {
+      const help = await execa(tsxPath, [cliPath, 'task', subcommand, '--help'], {
+        cwd: dir,
+        timeout: CLI_PROCESS_TIMEOUT_MS,
+      });
+      expect(help.stdout).toContain('--redact-paths');
+    }
+
+    await execa(tsxPath, [cliPath, 'task', 'set', relativeTaskPath, '--redact-paths'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+
+    await execa(
+      tsxPath,
+      [cliPath, 'task', 'status', relativeTaskPath, 'review', '--redact-paths'],
+      {
+        cwd: dir,
+        timeout: CLI_PROCESS_TIMEOUT_MS,
+      },
+    );
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: review\n');
+
+    await execa(tsxPath, [cliPath, 'task', 'done', '--redact-paths'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+    expect(await readFile(taskPath, 'utf8')).toBe('# Demo task\n\n- Status: done\n');
+
+    await execa(tsxPath, [cliPath, 'task', 'clear', '--redact-paths'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+    await expect(readFile(path.join(dir, '.agentloop/state.json'), 'utf8')).rejects.toThrow();
+
+    const archiveResult = await execa(
+      tsxPath,
+      [cliPath, 'task', 'archive', relativeTaskPath, '--redact-paths'],
+      {
+        cwd: dir,
+        timeout: CLI_PROCESS_TIMEOUT_MS,
+      },
+    );
+    expect(archiveResult.stdout).toContain(
+      '`.agentloop/tasks/2026-06-09-demo.md` -> `.agentloop/tasks/archive/2026-06-09-demo.md`',
+    );
+  });
+
+  test('redacts stored absolute active task paths when clearing task state', async () => {
+    const { dir, taskPath } = await createTaskStateFixture();
+    const statePath = path.join(dir, '.agentloop/state.json');
+
+    await writeJson(statePath, { version: 1, activeTaskPath: taskPath });
+    const humanResult = await execa(tsxPath, [cliPath, 'task', 'clear', '--redact-paths'], {
+      cwd: dir,
+      timeout: CLI_PROCESS_TIMEOUT_MS,
+    });
+    expect(humanResult.stdout).toContain('[git-root]/.agentloop/tasks/2026-06-09-demo.md');
+    expect(humanResult.stdout).not.toContain(dir);
+
+    await writeJson(statePath, { version: 1, activeTaskPath: taskPath });
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'task', 'clear', '--json', '--redact-paths'],
+      {
+        cwd: dir,
+        timeout: CLI_PROCESS_TIMEOUT_MS,
+      },
+    );
+    expect(JSON.parse(jsonResult.stdout)).toEqual({
+      activeTask: null,
+      cleared: true,
+      activeTaskPath: '[git-root]/.agentloop/tasks/2026-06-09-demo.md',
+    });
+    expect(jsonResult.stdout).not.toContain(dir);
   });
 
   test('marks the active task done from the CLI without a path', async () => {

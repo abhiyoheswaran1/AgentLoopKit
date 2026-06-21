@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-03-57-verify",
+  "command": "verify",
+  "createdAt": "2026-06-21-03-57",
+  "createdAtEpochMs": 1782007063836,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-add-readiness-score-tests-to-unit-guard.md",
+    "title": "Add readiness-score tests to unit guard",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-03-55-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 292
+}

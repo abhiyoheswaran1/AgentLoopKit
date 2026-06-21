@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-14-38-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-14-38",
+  "createdAtEpochMs": 1782045518208,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-surface-active-task-loop-guidance-in-status.md",
+    "title": "Surface active task loop guidance in status",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-14-03-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-14-38-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-14-38-pr-summary.md",
+  "score": 88,
+  "changedFileCount": 759
+}

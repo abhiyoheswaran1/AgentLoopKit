@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-06-56-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-06-56",
+  "createdAtEpochMs": 1782017814935,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-rename-pr-not-run-handoff-section-for-clarity.md",
+    "title": "Rename PR Not Run handoff section for clarity",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-06-52-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-06-56-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-06-56-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 437
+}
