@@ -1,0 +1,6 @@
+ .../2026-06-21-release-agentloopkit-0-38-0.md      | 62 ---------------
+ FINAL_HANDOFF.md                                   | 35 +++++----
+ docs/launch-checklist.md                           |  2 +-
+ docs/npm-publishing.md                             | 10 +--
+ docs/release-status.md                             | 89 ++++++++++------------
+ 5 files changed, 70 insertions(+), 128 deletions(-)

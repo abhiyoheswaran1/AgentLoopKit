@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-21
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 Unreleased AgentLoopKit improvements after 0.37.0 are verified and approved for release.

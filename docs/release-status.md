@@ -1,34 +1,37 @@
 # Release Status
 
-Last checked: June 20, 2026.
+Last checked: June 21, 2026.
 
 ## Current State
 
-- Current public release: `v0.37.0`
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.37.0>
-- Release asset: `agentloopkit-0.37.0.tgz`
-- Release asset SHA-256: `ecd8dcfafffee74f470243b0911265cb64d1191007f4bf15459fcd32cac2d61a`
-- Release tag `v0.37.0` points at commit `7efddc80`.
-- npm latest: `0.37.0`
-- CI run: `27864617915`
-- CLI Smoke run: `27864617902`
-- Publish workflow run: `27864623264`
-- Docker workflow run: `27864623265`
-- MCP Registry workflow run: `27864800014`
+- Current public release: `v0.38.0`
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.38.0>
+- Release asset: `agentloopkit-0.38.0.tgz`
+- Release asset SHA-256: `e14e41ac1aba0a4e7d04291b058f32081e3196920aaf226c6f8eacad129e51f5`
+- Release tag `v0.38.0` points at commit `4b8b2b18`.
+- npm latest: `0.38.0`
+- CI run: `27906736138`
+- CLI Smoke run: `27907171309` after post-release smoke-fixture alignment on `main`
+- Publish workflow run: `27906747820`
+- Docker workflow run: `27906747802`
+- MCP Registry workflow run: `27906960454`
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
-GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirms the `0.37.0` image.
+GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirms the `0.38.0` image.
 
-The MCP Registry metadata points at npm package `agentloopkit@0.37.0`.
+The MCP Registry metadata points at npm package `agentloopkit@0.38.0`.
 
-GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 20, 2026.
+GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 21, 2026.
+
+Post-release note: the release commit CLI Smoke run `27906736133` failed because the repository smoke script still expected the older archived-task label. The published package smoke passed, and commit `bfd33dfe` updated the smoke fixture on `main`; CLI Smoke run `27907171309` passed after that docs/test-only alignment.
 
 ## Latest Release Highlights
 
-Released in `0.37.0`:
+Released in `0.38.0`:
 
-- `agentloop doctor --advisory` shows diagnostics without failing the shell, which makes onboarding and real-repo preflight checks easier to use.
-- `agentloop status` and `agentloop next` now route active task contracts with review-critical placeholder sections to `agentloop task doctor` before verification or handoff.
+- Loop guidance is now surfaced in `status`, `next`, and `create-task` for typed task contracts.
+- Local research task workflows, product-positioning guards, dirty-work warnings, and clearer review evidence labels are included.
+- Maintainer and release evidence checks now have stronger redaction, task-risk, and verification-report details.
 
 ## Use The Current CLI
 
@@ -37,7 +40,7 @@ npm is the primary install path:
 ```bash
 npx agentloopkit init
 tmp=$(mktemp -d)
-(cd "$tmp" && npx --yes agentloopkit@0.37.0 version)
+(cd "$tmp" && npx --yes agentloopkit@0.38.0 version)
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -61,44 +64,36 @@ After each publish:
 
 ## Verification Evidence
 
-Local release gate for `0.37.0`:
+Local release gate for `0.38.0`:
 
-- `node scripts/prepublish-check.mjs`
-- `npm run lint`
-- `npm run typecheck`
-- `npm test`
-- `npm run build`
-- `npm run check:public-docs`
-- `npm run check:links`
-- `git diff --check`
+- `npx --no-install tsx src/cli/index.ts verify --task-commands --progress --redact-paths`
 - `npm run dogfood:strict`
-- `npm run smoke:release`
-- `node dist/cli/index.js release-check --strict`
-- `npm run release-flow`
+- `npx --no-install tsx src/cli/index.ts release-check --strict --redact-paths`
+
+Post-release repository smoke alignment:
+
+- `npm test -- tests/distribution-artifacts.test.ts -t "CLI smoke script covers artifacts archived task fallback"`
+- `node scripts/smoke-cli.mjs`
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: latest `0.37.0`
+- `npm view agentloopkit version versions --json`: latest `0.38.0`
 - `npx --no-install agentloop npm-status --agentloopkit --expect-current`: latest matches local package version
-- `npm run smoke:published -- --version 0.37.0`: passed
-- `npx --yes agentloopkit@0.37.0 version`: `0.37.0` from a clean temporary directory
-- GitHub release asset digest: `ecd8dcfafffee74f470243b0911265cb64d1191007f4bf15459fcd32cac2d61a`
+- `npm run smoke:published -- --version 0.38.0`: passed
+- `npx --yes agentloopkit@0.38.0 version`: `0.38.0` from a clean temporary directory
+- GitHub release asset digest: `e14e41ac1aba0a4e7d04291b058f32081e3196920aaf226c6f8eacad129e51f5`
 - `npx --no-install agentloop release-proof --redact-paths`: npm, GitHub Release, GHCR, and MCP Registry passed; GitHub Marketplace warned
 - `npx --no-install agentloop release-proof --strict --only github-marketplace --redact-paths`: failed because the Marketplace URL returned 404
-- GHCR image tag `0.37.0` is confirmed by release proof
-- MCP Registry metadata points at `agentloopkit@0.37.0`
+- GHCR image tag `0.38.0` is confirmed by release proof
+- MCP Registry metadata points at `agentloopkit@0.38.0`
 
-Latest release-status documentation checks:
+Latest release-status documentation and proof commands on post-release `main`:
 
-- `npm run release-flow`
-- `npm run maintenance:check`
-- `npm run dogfood:strict`
-- `npm run smoke:published -- --version 0.37.0`
-- `npx --no-install agentloop npm-status --agentloopkit --expect-current`
-- `npx --no-install agentloop release-proof --redact-paths`
-- `npx --no-install agentloop release-proof --strict --only github-marketplace --redact-paths`
+- `npm run check:public-docs`
 - `npm run check:links`
-- `node scripts/prepublish-check.mjs`
+- `npm test -- tests/public-docs-hygiene.test.ts tests/package-metadata.test.ts`
+- `npx --no-install tsx src/cli/index.ts npm-status --agentloopkit --expect-current`
+- `npx --no-install tsx src/cli/index.ts release-proof --redact-paths`
+- `npx --no-install tsx src/cli/index.ts release-proof --strict --only github-marketplace --redact-paths` (expected failure while Marketplace publication remains deferred)
 - `git diff --check`
-- `npx --yes pnpm@10.12.1 audit --audit-level high`
 - `npx --yes projscan doctor --format markdown`

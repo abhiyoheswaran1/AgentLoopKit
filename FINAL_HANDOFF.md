@@ -78,20 +78,29 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.37.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.37.0>
-- Release asset: `agentloopkit-0.37.0.tgz`
-- Release asset SHA-256: `ecd8dcfafffee74f470243b0911265cb64d1191007f4bf15459fcd32cac2d61a`
-- Release tag: `v0.37.0` at commit `7efddc80`
-- CI run: `27864617915`
-- CLI Smoke run: `27864617902`
-- Publish workflow run: `27864623264`
-- Docker workflow run: `27864623265`
-- MCP Registry workflow run: `27864800014`
-- Post-publish npm proof: npm latest is `0.37.0`
-- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.37.0`
-- MCP Registry proof: metadata points at `agentloopkit@0.37.0`
+- Current npm release: `agentloopkit@0.38.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.38.0>
+- Release asset: `agentloopkit-0.38.0.tgz`
+- Release asset SHA-256: `e14e41ac1aba0a4e7d04291b058f32081e3196920aaf226c6f8eacad129e51f5`
+- Release tag: `v0.38.0` at commit `4b8b2b18`
+- CI run: `27906736138`
+- CLI Smoke run: `27907171309` after post-release smoke-fixture alignment on `main`
+- Publish workflow run: `27906747820`
+- Docker workflow run: `27906747802`
+- MCP Registry workflow run: `27906960454`
+- Post-publish npm proof: npm latest is `0.38.0`
+- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.38.0`
+- MCP Registry proof: metadata points at `agentloopkit@0.38.0`
 - GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof
+
+## 0.38.0 release summary
+
+Included:
+
+- Loop guidance in `status`, `next`, and `create-task` for typed task contracts.
+- Local research task workflows, product-positioning guards, dirty-work warnings, and clearer review evidence labels.
+- Stronger maintainer and release evidence checks, redaction, task-risk handling, and verification report details.
+- Post-release repository smoke alignment for archived task fallback wording; the published package smoke for `0.38.0` passed.
 
 ## 0.37.0 release summary
 
