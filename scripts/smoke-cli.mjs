@@ -2800,7 +2800,7 @@ async function smokeCli({ keep = false } = {}) {
     );
     assert(
       archivedTaskArtifactsHuman.stdout.includes(
-        '- Latest task: `Smoke CLI flow` (`done`, `archived`) - `.agentloop/tasks/archive/smoke-cli-flow.md`',
+        '- Latest archived task evidence: `Smoke CLI flow` (`done`, `archived`) - `.agentloop/tasks/archive/smoke-cli-flow.md`',
       ),
       'artifacts --type task --latest did not report the archived task fallback.',
     );

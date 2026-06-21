@@ -875,7 +875,7 @@ describe('distribution artifacts', () => {
       "archivedTaskArtifacts.tasks?.latest?.path === '.agentloop/tasks/archive/smoke-cli-flow.md'",
     );
     expect(smokeScript).toContain(
-      "'- Latest task: `Smoke CLI flow` (`done`, `archived`) - `.agentloop/tasks/archive/smoke-cli-flow.md`'",
+      "'- Latest archived task evidence: `Smoke CLI flow` (`done`, `archived`) - `.agentloop/tasks/archive/smoke-cli-flow.md`'",
     );
     expect(smokeScript).toContain('Artifacts archived task fallback smoke passed.');
   });
