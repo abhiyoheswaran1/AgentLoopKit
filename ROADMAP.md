@@ -58,7 +58,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
 - Release tag `v0.39.0` points at the published release commit.
-- Current `main` contains the 0.39.0 release batch for evidence-map, resume-pack, Guard, context-budget, and monorepo detection improvements.
+- Current `main` contains post-release proof documentation after `v0.39.0`.
 
 ## Near Term
 

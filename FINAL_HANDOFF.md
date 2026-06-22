@@ -78,20 +78,32 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.38.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.38.0>
-- Release asset: `agentloopkit-0.38.0.tgz`
-- Release asset SHA-256: `e14e41ac1aba0a4e7d04291b058f32081e3196920aaf226c6f8eacad129e51f5`
-- Release tag: `v0.38.0` at commit `4b8b2b18`
-- CI run: `27906736138`
-- CLI Smoke run: `27907171309` after post-release smoke-fixture alignment on `main`
-- Publish workflow run: `27906747820`
-- Docker workflow run: `27906747802`
-- MCP Registry workflow run: `27906960454`
-- Post-publish npm proof: npm latest is `0.38.0`
-- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.38.0`
-- MCP Registry proof: metadata points at `agentloopkit@0.38.0`
+- Current npm release: `agentloopkit@0.39.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.39.0>
+- Release asset: `agentloopkit-0.39.0.tgz`
+- Release asset SHA-256: `28fbc79f0d107f5b2707da2bdb0a1ecc0bd7b9d75a9aa17c9e3d53b1cb2f35da`
+- Release tag: `v0.39.0` at commit `748d91a7`
+- CI run: `27943684306`
+- CLI Smoke run: `27943684358`
+- Publish workflow run: `27943702972`
+- Docker workflow run: `27943702983`
+- MCP Registry workflow run: `27944147934`
+- Post-publish npm proof: npm latest is `0.39.0`
+- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.39.0`
+- MCP Registry proof: metadata points at `agentloopkit@0.39.0`
 - GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof
+
+## 0.39.0 release summary
+
+Included:
+
+- `agentloop guard` for drift, proof debt, baselines, stale verification, watch mode, report writing, and context-budget pressure.
+- `agentloop explain-diff` evidence maps for changed-file coverage, recent run evidence, verification freshness, and risk areas.
+- `agentloop resume-pack` continuation briefs for Codex, Claude, Cursor, generic agents, and human reviewers.
+- Context-budget estimates in Guard, resume packs, and review context.
+- README context-budget visual and regenerated terminal GIF.
+- Nested package-manifest monorepo detection in `doctor`.
+- Cleaner AgentLoop evidence classification for task state and repo-local task contracts.
 
 ## 0.38.0 release summary
 
