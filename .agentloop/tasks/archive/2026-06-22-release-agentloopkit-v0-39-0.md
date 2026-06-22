@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-22
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 Unreleased Evidence Map, Guard, resume-pack, context-budget, research-task, doctor monorepo, stabilization, and README visual improvements are verified locally but not public.
