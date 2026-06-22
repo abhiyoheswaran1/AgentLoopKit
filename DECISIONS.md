@@ -1,5 +1,21 @@
 # Decisions
 
+## 2026-06-21: Guard Adds Local Drift And Context-Budget Control
+
+AgentLoopKit should help maintainers catch scope drift, stale verification, proof debt, and wasteful continuation context while work is still in progress. Token economy is part of the product value, but it should be implemented as transparent repo-aware context selection rather than hidden prompt rewriting or provider proxying.
+
+`agentloop guard` now builds on the Evidence Map to report `pass`, `warn`, or `fail`, with `--strict` available for local scripts and CI gates. It supports bounded `--watch` snapshots, explicit Markdown reports under `.agentloop/reports`, and explicit JSON baselines under `.agentloop/guard` so inherited dirty work can be separated from new drift. Guard, Resume Pack, and Review Context share context-budget estimates and compact continuation guidance. Context-budget pressure remains advisory so token-economy guidance does not block otherwise reviewable work.
+
+The boundary is explicit: context-budget values are character-count estimates for planning, not provider tokenizer output or billing claims. Guard is read-only by default and does not run verification, read changed file contents, read `.env` contents, call external APIs, intercept prompts, proxy provider traffic, post comments, publish packages, create tags, bump versions, or mutate task/Git state. No dependencies, release workflows, package metadata, tags, or publishing behavior changed.
+
+## 2026-06-21: Evidence Map Explains Agent-Assisted Diffs
+
+AgentLoopKit should make software-agent work explainable before review, not just create more artifacts. Maintainers need one local answer to: which changed files are explained by the task, which are unexplained or forbidden, whether verification is fresh, which paths are risk-sensitive, and what command should run next.
+
+The new evidence-map core correlates Git status paths with task `Likely Files or Areas`, `Files or Areas Not to Touch`, fresh verification evidence, recent local run-ledger coverage, and path-based risk categories. `agentloop explain-diff` exposes the map directly, `review-context`, `ship`, and `prepare-pr` reuse compact summaries, and `agentloop resume-pack` creates local continuation briefs for Codex, Claude, Cursor, generic agents, and human reviewers.
+
+The boundary is explicit: this is path-based local evidence, not semantic correctness, security certification, review approval, telemetry, hosted state, or an LLM workflow. It does not read changed file contents, read `.env` contents, call external APIs, post to GitHub, publish packages, create tags, bump versions, change dependencies, or alter release workflows.
+
 ## 2026-06-21: Status And Next Surface Active Loop Guidance
 
 Typed task guidance should stay visible after task creation because agents often re-enter work through `agentloop status` or `agentloop next`, not the original `create-task` output.

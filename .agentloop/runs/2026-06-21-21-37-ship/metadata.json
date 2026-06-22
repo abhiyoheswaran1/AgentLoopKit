@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-21-37-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-21-37",
+  "createdAtEpochMs": 1782070683861,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-build-explainable-agent-work-evidence-map.md",
+    "title": "Build explainable agent work evidence map",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-21-14-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-21-37-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-21-37-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 27
+}

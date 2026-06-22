@@ -1,0 +1,214 @@
+[
+  {
+    "status": "M",
+    "path": "DECISIONS.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "ROADMAP.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/index.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/agentloop-evidence.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/artifact-paths.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/completions.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/prepare-pr.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/review-context.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/ship.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/cli-docs-drift.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/prepare-pr.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/review-context.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/ship.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-21-21-37-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-21-21-14-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-21-21-37-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-21-22-38-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-21-22-42-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-21-21-37-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-21-21-37-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-21-21-37-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-21-21-37-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-21-21-37-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-21-21-37-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-21-21-37-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-21-21-37-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-21-21-37-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-21-22-39-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-21-22-39-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-21-22-39-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-21-build-agentloop-guard-live-drift-detection-and-context-budget-control-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-21-build-agentloop-guard-live-drift-detection-and-context-budget-control.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-21-build-agentloopkit-evidence-map-explain-diff-and-resume-pack.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-21-build-explainable-agent-work-evidence-map.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/evidence-map.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/guard.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/superpowers/plans/2026-06-21-agentloop-guard.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/superpowers/plans/2026-06-21-evidence-map.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/superpowers/specs/2026-06-21-agentloop-guard-design.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/superpowers/specs/2026-06-21-evidence-map-design.md"
+  },
+  {
+    "status": "??",
+    "path": "src/cli/commands/explain-diff.ts"
+  },
+  {
+    "status": "??",
+    "path": "src/cli/commands/guard.ts"
+  },
+  {
+    "status": "??",
+    "path": "src/cli/commands/resume-pack.ts"
+  },
+  {
+    "status": "??",
+    "path": "src/core/context-budget.ts"
+  },
+  {
+    "status": "??",
+    "path": "src/core/evidence-map.ts"
+  },
+  {
+    "status": "??",
+    "path": "src/core/guard.ts"
+  },
+  {
+    "status": "??",
+    "path": "src/core/resume-pack.ts"
+  },
+  {
+    "status": "??",
+    "path": "tests/cli-explain-diff.test.ts"
+  },
+  {
+    "status": "??",
+    "path": "tests/evidence-map.test.ts"
+  },
+  {
+    "status": "??",
+    "path": "tests/guard.test.ts"
+  },
+  {
+    "status": "??",
+    "path": "tests/resume-pack.test.ts"
+  }
+]

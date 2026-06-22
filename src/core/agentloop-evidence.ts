@@ -7,8 +7,13 @@ export function agentLoopEvidenceGroup(filePath: string) {
   if (normalizedPath.startsWith('.agentloop/handoffs/')) return '.agentloop/handoffs/';
   if (normalizedPath.startsWith('.agentloop/reports/')) return '.agentloop/reports/';
   if (normalizedPath.startsWith('.agentloop/runs/')) return '.agentloop/runs/';
+  if (normalizedPath.startsWith('.agentloop/guard/')) return '.agentloop/guard/';
+  if (normalizedPath === '.agentloop/state.json') return '.agentloop/state.json';
   if (normalizedPath.startsWith('.agentloop/tasks/archive/')) return '.agentloop/tasks/archive/';
-  if (/^\.agentloop\/tasks\/\d{4}-\d{2}-\d{2}-.+\.md$/.test(normalizedPath)) {
+  if (
+    /^\.agentloop\/tasks\/[^/]+\.md$/.test(normalizedPath) &&
+    normalizedPath !== '.agentloop/tasks/README.md'
+  ) {
     return '.agentloop/tasks/';
   }
   if (normalizedPath === '.agentflight/current' || normalizedPath.startsWith('.agentflight/current/')) {

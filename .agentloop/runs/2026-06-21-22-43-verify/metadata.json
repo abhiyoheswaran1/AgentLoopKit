@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-22-43-verify",
+  "command": "verify",
+  "createdAt": "2026-06-21-22-43",
+  "createdAtEpochMs": 1782074614207,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-build-agentloop-guard-live-drift-detection-and-context-budget-control-2.md",
+    "title": "Build AgentLoop Guard live drift detection and context budget control",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-22-42-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 53
+}

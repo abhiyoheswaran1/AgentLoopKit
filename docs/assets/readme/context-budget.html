@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AgentLoopKit Context Budget</title>
+    <style>
+      :root {
+        --ink: oklch(22% 0.028 142);
+        --muted: oklch(47% 0.025 142);
+        --paper: oklch(96% 0.012 182);
+        --surface: oklch(99% 0.008 162);
+        --line: oklch(82% 0.024 156);
+        --green: oklch(52% 0.11 145);
+        --blue: oklch(46% 0.08 236);
+        --rust: oklch(54% 0.12 42);
+        --terminal: oklch(18% 0.022 145);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background:
+          linear-gradient(90deg, oklch(88% 0.018 178 / 34%) 1px, transparent 1px),
+          linear-gradient(180deg, oklch(88% 0.018 178 / 28%) 1px, transparent 1px),
+          linear-gradient(135deg, var(--paper), oklch(92% 0.018 88));
+        background-size:
+          80px 80px,
+          80px 80px,
+          auto;
+        color: var(--ink);
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+      }
+
+      .canvas {
+        width: 1440px;
+        height: 960px;
+        padding: 42px 82px;
+      }
+
+      .topline {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 34px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 22px;
+        font-weight: 800;
+      }
+
+      .mark {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        box-shadow: 0 16px 40px oklch(24% 0.03 145 / 14%);
+      }
+
+      .badge {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 9px 15px;
+        color: var(--muted);
+        background: oklch(99% 0.006 120 / 78%);
+        font-size: 15px;
+      }
+
+      h1 {
+        max-width: 910px;
+        margin: 0 0 18px;
+        font-size: 58px;
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+
+      .lede {
+        max-width: 760px;
+        margin: 0 0 26px;
+        color: var(--muted);
+        font-size: 22px;
+        line-height: 1.4;
+      }
+
+      .board {
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: oklch(99% 0.008 112 / 88%);
+        box-shadow: 0 32px 90px oklch(36% 0.04 112 / 15%);
+        overflow: hidden;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .metric {
+        padding: 26px 30px;
+        border-right: 1px solid var(--line);
+      }
+
+      .metric:last-child {
+        border-right: 0;
+      }
+
+      .label {
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .value {
+        font-size: 44px;
+        line-height: 1;
+        font-weight: 850;
+      }
+
+      .green {
+        color: var(--green);
+      }
+
+      .blue {
+        color: var(--blue);
+      }
+
+      .rust {
+        color: var(--rust);
+      }
+
+      .comparison {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 350px;
+      }
+
+      .panel {
+        padding: 30px 34px;
+      }
+
+      .panel:first-child {
+        border-right: 1px solid var(--line);
+      }
+
+      .panel h2 {
+        margin: 0 0 16px;
+        font-size: 25px;
+      }
+
+      .bar-wrap {
+        margin: 22px 0 18px;
+      }
+
+      .bar-label {
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+
+      .bar {
+        height: 30px;
+        border-radius: 999px;
+        background: oklch(89% 0.03 145);
+        overflow: hidden;
+      }
+
+      .fill-wide {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--rust), oklch(60% 0.12 55));
+      }
+
+      .fill-compact {
+        width: 10.4%;
+        min-width: 42px;
+        height: 100%;
+        background: linear-gradient(90deg, var(--green), var(--blue));
+      }
+
+      .terminal {
+        border-radius: 20px;
+        background: var(--terminal);
+        color: oklch(88% 0.02 145);
+        padding: 18px 22px;
+        font:
+          16px/1.48 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+      }
+
+      .terminal .prompt {
+        color: oklch(75% 0.13 145);
+      }
+
+      .terminal .dim {
+        color: oklch(70% 0.018 145);
+      }
+
+      .bullets {
+        margin: 18px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 16px;
+      }
+
+      .bullets li::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin-right: 10px;
+        border-radius: 999px;
+        background: var(--green);
+        vertical-align: 1px;
+      }
+
+      .footnote {
+        padding: 18px 30px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="canvas">
+      <div class="topline">
+        <div class="brand">
+          <img class="mark" src="../../logo/icon.svg" alt="" />
+          <span>AgentLoopKit</span>
+        </div>
+        <div class="badge">local evidence, compact continuation</div>
+      </div>
+
+      <h1>Give the next agent the proof, not the whole mess.</h1>
+      <p class="lede">
+        Guard and resume packs turn broad local work into a compact, task-backed continuation brief with
+        transparent context-budget estimates.
+      </p>
+
+      <section class="board" aria-label="Context budget example">
+        <div class="metrics">
+          <div class="metric">
+            <div class="label">Current repo example</div>
+            <div class="value blue">83</div>
+            <div class="label">changed files</div>
+          </div>
+          <div class="metric">
+            <div class="label">Broad file context</div>
+            <div class="value rust">967</div>
+            <div class="label">estimated tokens</div>
+          </div>
+          <div class="metric">
+            <div class="label">Resume pack</div>
+            <div class="value green">101</div>
+            <div class="label">estimated tokens</div>
+          </div>
+        </div>
+
+        <div class="comparison">
+          <div class="panel">
+            <h2>Before: broad changed-file context</h2>
+            <div class="bar-wrap">
+              <div class="bar-label">
+                <span>changed-file list</span>
+                <strong>967</strong>
+              </div>
+              <div class="bar"><div class="fill-wide"></div></div>
+            </div>
+            <ul class="bullets">
+              <li>Long file lists and stale chat history compete for attention.</li>
+              <li>Reviewers still need to open task, verification, and handoff evidence.</li>
+              <li>Agents can miss whether verification is fresh or scope-backed.</li>
+            </ul>
+          </div>
+
+          <div class="panel">
+            <h2>After: compact resume pack</h2>
+            <div class="bar-wrap">
+              <div class="bar-label">
+                <span>task-backed continuation</span>
+                <strong>101</strong>
+              </div>
+              <div class="bar"><div class="fill-compact"></div></div>
+            </div>
+            <div class="terminal">
+              <span class="prompt">$</span> agentloop resume-pack --for codex --redact-paths<br />
+              <span class="dim">Evidence map:</span> 83 changed files; verification stale<br />
+              <span class="dim">Context budget:</span> 967 -> 101 estimated tokens<br />
+              <span class="dim">Next action:</span> agentloop verify
+            </div>
+          </div>
+        </div>
+
+        <div class="footnote">
+          Estimates use AgentLoopKit's transparent chars-divided-by-four heuristic. They are planning guidance,
+          not provider tokenizer counts or billing claims.
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

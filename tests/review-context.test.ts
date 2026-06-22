@@ -7,12 +7,52 @@ import { createTaskContractFile } from '../src/core/task-contract.js';
 import { loadAgentLoopConfig } from '../src/core/config.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { getReviewContext, renderReviewContextMarkdown } from '../src/core/review-context.js';
+import type { EvidenceMap } from '../src/core/evidence-map.js';
+import type { ContextBudgetSummary } from '../src/core/context-budget.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
 
 let tempDirs: string[] = [];
+
+function minimalEvidenceMap(): EvidenceMap {
+  return {
+    summary: {
+      reviewability: 'reviewable',
+      changedFileCount: 0,
+      nonEvidenceChangedFileCount: 0,
+      agentLoopEvidenceChangedFileCount: 0,
+    },
+    task: null,
+    verification: { status: 'missing', fresh: false, label: 'missing' },
+    files: [],
+    coverage: {
+      coveredFileCount: 0,
+      unexplainedFileCount: 0,
+      forbiddenFileCount: 0,
+      unexplainedExamples: [],
+    },
+    risk: {
+      riskSensitiveFileCount: 0,
+      riskSensitiveExamples: [],
+    },
+    nextActions: [],
+    claims: [],
+  };
+}
+
+function minimalContextBudget(): ContextBudgetSummary {
+  return {
+    heuristic: 'chars-divided-by-four',
+    changedFileCount: 0,
+    nonEvidenceChangedFileCount: 0,
+    estimatedFileListTokens: 0,
+    estimatedResumePackTokens: 0,
+    savingsCommand: 'agentloop resume-pack --for codex --redact-paths',
+    note: 'Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter.',
+  };
+}
 
 function makeMinimalReviewContext(input: {
   activeTask?: { path: string; title: string; status: string } | null;
@@ -73,6 +113,8 @@ function makeMinimalReviewContext(input: {
       releaseNotes: { count: 0, latest: null },
       runs: { count: 0, latest: null },
     },
+    evidenceMap: minimalEvidenceMap(),
+    contextBudget: minimalContextBudget(),
     recentRuns: [],
     latestShip: null,
     githubMetadata: {
@@ -223,6 +265,14 @@ describe('review-context command', () => {
     expect(payload.status.activeTask).toMatchObject({
       title: 'Fix login redirect bug',
     });
+    expect(payload.evidenceMap.summary).toMatchObject({
+      reviewability: expect.any(String),
+      changedFileCount: expect.any(Number),
+      nonEvidenceChangedFileCount: expect.any(Number),
+    });
+    expect(payload.evidenceMap.claims).toContain(
+      'Evidence coverage is path-based local AgentLoopKit evidence, not proof of code correctness.',
+    );
     expect(payload.status.activeTaskRiskNotes).toEqual({ count: 1 });
     expect(JSON.stringify(payload)).not.toContain('Touches auth-adjacent routing');
     expect(payload.status.latestVerification).toEqual({
@@ -292,6 +342,9 @@ describe('review-context command', () => {
     const result = await execa(tsxPath, [cliPath, 'review-context'], { cwd: dir });
 
     expect(result.stdout).toContain('# AgentLoopKit Review Context');
+    expect(result.stdout).toContain('- Evidence map:');
+    expect(result.stdout).toContain('- Context budget:');
+    expect(result.stdout).toContain('`agentloop resume-pack --for codex --redact-paths`');
     expect(result.stdout).toContain('- Active task: `Fix login redirect bug`');
     expect(result.stdout).toContain('- Active task risk notes: `1` recorded');
     expect(result.stdout).toContain('- Latest verification: `pass`');
@@ -407,6 +460,8 @@ describe('review-context command', () => {
         releaseNotes: { count: 0, latest: null },
         runs: { count: 1, latest: null },
       },
+      evidenceMap: minimalEvidenceMap(),
+      contextBudget: minimalContextBudget(),
       recentRuns: [
         {
           id: '2026-06-16\nship',
@@ -540,6 +595,8 @@ describe('review-context command', () => {
         releaseNotes: { count: 0, latest: null },
         runs: { count: 0, latest: null },
       },
+      evidenceMap: minimalEvidenceMap(),
+      contextBudget: minimalContextBudget(),
       recentRuns: [],
       latestShip: null,
       githubMetadata: {

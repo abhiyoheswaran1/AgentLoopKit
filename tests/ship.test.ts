@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { mkdir, readFile, realpath, rename, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, realpath, rename, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
@@ -75,6 +75,9 @@ Users land on the intended destination after a successful login.
 ## Non-Goals
 - Do not redesign the login UI.
 
+## Likely Files or Areas
+- src/auth
+
 ## Acceptance Criteria
 - Password-reset login redirects to the requested page.
 - Existing login redirect tests still pass.
@@ -120,6 +123,15 @@ describe('ship command', () => {
       'This is a review-readiness score, not a code-quality score.',
     );
     expect(output.changedFiles).toEqual([{ status: 'M', path: 'src/auth/callback.ts' }]);
+    expect(output.evidenceMap.summary).toMatchObject({
+      reviewability: 'reviewable',
+      changedFileCount: 1,
+      nonEvidenceChangedFileCount: 1,
+    });
+    expect(output.evidenceMap.coverage).toMatchObject({
+      coveredFileCount: 1,
+      unexplainedFileCount: 0,
+    });
     expect(output.shipReportPath).toMatch(/\.agentloop\/reports\/.+-ship-report\.md$/);
     expect(output.handoffPath).toMatch(/\.agentloop\/handoffs\/.+-pr-summary\.md$/);
     expect(output.shipReportPath).not.toContain(dir);
@@ -148,12 +160,65 @@ describe('ship command', () => {
     expect(markdown).toContain('This is a review-readiness score, not a code-quality score.');
     expect(markdown).toContain('src/auth/callback.ts');
     expect(markdown).toContain('Review risk-sensitive files before merge.');
+    expect(markdown).toContain('## Evidence Map');
+    expect(markdown).toContain(
+      '- Evidence map: `1` changed file(s); `1` covered, `0` unexplained; verification `fresh`; `1` risk-sensitive.',
+    );
     expect(markdown).toContain('## Task Risk Notes');
     expect(markdown).toContain('- Auth flow touched; review redirect edge cases.');
     expect(markdown).not.toContain('## Inherited Dirty Work');
     expect(markdown).toContain('.agentloop/reports/');
     expect(markdown).not.toContain('Latest handoff does not cover the current dirty files.');
     expect(markdown).not.toContain(dir);
+  });
+
+  test('uses fresh evidence map verification after ship runs verification', async () => {
+    const dir = await createShipFixture();
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'typescript-package',
+      packageManager: 'npm',
+      commands: { test: 'node -e "process.exit(0)"' },
+    });
+    await writeJson(path.join(dir, 'agentloop.config.json'), config);
+    await git(dir, ['add', 'agentloop.config.json']);
+    await git(dir, ['commit', '-m', 'Use passing verification command']);
+
+    const staleReportPath = path.join(
+      dir,
+      '.agentloop/reports/2026-06-11-12-00-verification-report.md',
+    );
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-11-fix-login.md');
+    await utimes(
+      staleReportPath,
+      new Date('2020-01-01T00:00:00Z'),
+      new Date('2020-01-01T00:00:00Z'),
+    );
+    await utimes(
+      taskPath,
+      new Date('2020-01-02T00:00:00Z'),
+      new Date('2020-01-02T00:00:00Z'),
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'ship', '--json', '--run-verify'], {
+      cwd: dir,
+    });
+    const output = JSON.parse(result.stdout);
+    const markdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
+
+    expect(output.verification).toMatchObject({ status: 'pass', fresh: true });
+    expect(output.evidenceMap.verification).toMatchObject({
+      status: 'pass',
+      fresh: true,
+      label: 'fresh',
+    });
+    expect(output.evidenceMap.nextActions).toEqual([
+      {
+        command: 'agentloop ship',
+        reason: 'Local task, verification, and changed-file evidence look reviewable.',
+      },
+    ]);
+    expect(markdown).toContain('verification `fresh`');
   });
 
   test('surfaces inherited dirty-work baseline in ship report markdown only', async () => {

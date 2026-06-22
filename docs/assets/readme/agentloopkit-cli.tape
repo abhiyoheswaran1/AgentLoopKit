@@ -20,7 +20,7 @@ Set LoopOffset 0%
 Set Theme "Catppuccin Mocha"
 
 Hide
-Type@1ms "npm pack --pack-destination /tmp --silent >/tmp/agentloopkit-vhs-pack.txt && rm -rf /tmp/agentloopkit-vhs-demo && mkdir /tmp/agentloopkit-vhs-demo && cd /tmp/agentloopkit-vhs-demo && git init -q && npm init -y >/dev/null && npm pkg set scripts.test='echo test suite passed' scripts.typecheck='echo typecheck passed' scripts.build='echo build passed' >/dev/null && npm install -D /tmp/$(tail -n 1 /tmp/agentloopkit-vhs-pack.txt) >/dev/null && clear"
+Type@1ms "npm pack --pack-destination /tmp --silent >/tmp/agentloopkit-vhs-pack.txt && rm -rf /tmp/agentloopkit-vhs-demo && mkdir /tmp/agentloopkit-vhs-demo && cd /tmp/agentloopkit-vhs-demo && git init -q && git config user.email demo@example.invalid && git config user.name 'AgentLoopKit Demo' && npm init -y >/dev/null && npm pkg set scripts.test='echo test suite passed' scripts.typecheck='echo typecheck passed' scripts.build='echo build passed' >/dev/null && npm install -D /tmp/$(tail -n 1 /tmp/agentloopkit-vhs-pack.txt) >/dev/null && git add package.json package-lock.json && git commit -m baseline >/dev/null && clear"
 Enter
 Wait
 Show
@@ -28,6 +28,12 @@ Show
 Type "npx agentloopkit init"
 Enter
 Sleep 1.6s
+
+Hide
+Type@1ms "git add AGENTS.md AGENTLOOP.md agentloop.config.json .agentloop && git commit -m 'add agentloop harness' >/dev/null && clear"
+Enter
+Wait
+Show
 
 Type "npx agentloop create-task --title login-redirect --type bugfix --acceptance redirect-returns-to-requested-page --verification true"
 Enter
@@ -46,6 +52,18 @@ Sleep 1.4s
 Type "npx agentloop verify --task-commands"
 Enter
 Sleep 3.6s
+
+Type "npx agentloop guard"
+Enter
+Sleep 2.2s
+
+Type "npx agentloop explain-diff"
+Enter
+Sleep 2.2s
+
+Type "npx agentloop resume-pack --for codex"
+Enter
+Sleep 2.4s
 
 Type "npx agentloop ship --github-comment"
 Enter

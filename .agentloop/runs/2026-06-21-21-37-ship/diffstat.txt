@@ -1,0 +1,22 @@
+ DECISIONS.md                 |  8 ++++++
+ README.md                    | 11 ++++++--
+ ROADMAP.md                   |  2 ++
+ docs/cli-reference.md        | 30 ++++++++++++++++++--
+ src/cli/index.ts             |  4 +++
+ src/core/prepare-pr.ts       | 24 +++++++++++++++-
+ src/core/review-context.ts   | 14 ++++++++-
+ src/core/ship.ts             | 32 +++++++++++++++++++--
+ tests/prepare-pr.test.ts     | 11 ++++++++
+ tests/review-context.test.ts | 39 ++++++++++++++++++++++++++
+ tests/ship.test.ts           | 67 +++++++++++++++++++++++++++++++++++++++++++-
+ 11 files changed, 233 insertions(+), 9 deletions(-)
+docs/evidence-map.md | untracked
+docs/superpowers/plans/2026-06-21-evidence-map.md | untracked
+docs/superpowers/specs/2026-06-21-evidence-map-design.md | untracked
+src/cli/commands/explain-diff.ts | untracked
+src/cli/commands/resume-pack.ts | untracked
+src/core/evidence-map.ts | untracked
+src/core/resume-pack.ts | untracked
+tests/cli-explain-diff.test.ts | untracked
+tests/evidence-map.test.ts | untracked
+tests/resume-pack.test.ts | untracked

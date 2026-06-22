@@ -16,6 +16,7 @@ export type OutputArtifactType =
   | 'badge'
   | 'ci-summary'
   | 'release-notes'
+  | 'guard-baseline'
   | 'agent-instructions'
   | 'agents-md'
   | 'init-file'
@@ -29,6 +30,7 @@ const outputArtifactLabels: Record<OutputArtifactType, string> = {
   badge: 'Badge',
   'ci-summary': 'CI summary',
   'release-notes': 'Release notes',
+  'guard-baseline': 'Guard baseline',
   'agent-instructions': 'Agent instructions',
   'agents-md': 'AGENTS.md',
   'init-file': 'Init file',

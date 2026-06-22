@@ -95,6 +95,42 @@ describe('project detection', () => {
     });
   });
 
+  test('detects nested package manifests as monorepo markers', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, 'apps/web'), { recursive: true });
+    await mkdir(path.join(dir, 'functions'), { recursive: true });
+    await mkdir(path.join(dir, 'firestore-tests'), { recursive: true });
+    await writeJson(path.join(dir, 'apps/web/package.json'), { name: 'web' });
+    await writeJson(path.join(dir, 'functions/package.json'), { name: 'functions' });
+    await writeJson(path.join(dir, 'firestore-tests/package.json'), {
+      name: 'firestore-tests',
+    });
+
+    await expect(detectMonorepo(dir)).resolves.toEqual({
+      detected: true,
+      markers: [
+        'nested package manifests: apps/web/package.json, functions/package.json, firestore-tests/package.json',
+      ],
+    });
+  });
+
+  test('caps nested package manifest marker examples', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    for (const name of ['admin', 'api', 'console', 'docs', 'site', 'web']) {
+      await mkdir(path.join(dir, 'apps', name), { recursive: true });
+      await writeJson(path.join(dir, 'apps', name, 'package.json'), { name });
+    }
+
+    await expect(detectMonorepo(dir)).resolves.toEqual({
+      detected: true,
+      markers: [
+        'nested package manifests: apps/admin/package.json, apps/api/package.json, apps/console/package.json, apps/docs/package.json, apps/site/package.json (+1 more)',
+      ],
+    });
+  });
+
   test('detects common monorepo tool config files', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

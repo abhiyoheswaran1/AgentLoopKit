@@ -1,0 +1,42 @@
+ DECISIONS.md                             |  16 +++++++
+ README.md                                |  20 +++++++-
+ ROADMAP.md                               |   3 ++
+ docs/assets/readme/README.md             |   1 +
+ docs/assets/readme/agentloopkit-cli.gif  | Bin 1471375 -> 2441225 bytes
+ docs/assets/readme/agentloopkit-cli.tape |  20 +++++++-
+ docs/cli-reference.md                    |  56 ++++++++++++++++++++--
+ src/cli/index.ts                         |   6 +++
+ src/core/agentloop-evidence.ts           |   7 ++-
+ src/core/artifact-paths.ts               |   2 +
+ src/core/completions.ts                  |   1 +
+ src/core/prepare-pr.ts                   |  24 +++++++++-
+ src/core/project-detection.ts            |  79 ++++++++++++++++++++++++++++++-
+ src/core/review-context.ts               |  28 ++++++++++-
+ src/core/ship.ts                         |  32 ++++++++++++-
+ tests/cli-docs-drift.test.ts             |   1 +
+ tests/doctor.test.ts                     |  28 +++++++++++
+ tests/prepare-pr.test.ts                 |  11 +++++
+ tests/project-detection.test.ts          |  36 ++++++++++++++
+ tests/review-context.test.ts             |  57 ++++++++++++++++++++++
+ tests/ship.test.ts                       |  67 +++++++++++++++++++++++++-
+ 21 files changed, 482 insertions(+), 13 deletions(-)
+.agentloop/research/real-repo-usefulness-trials-2026-06-22.md | untracked
+docs/assets/readme/agentloopkit-context-budget.png | untracked
+docs/assets/readme/context-budget.html | untracked
+docs/evidence-map.md | untracked
+docs/guard.md | untracked
+docs/superpowers/plans/2026-06-21-agentloop-guard.md | untracked
+docs/superpowers/plans/2026-06-21-evidence-map.md | untracked
+docs/superpowers/specs/2026-06-21-agentloop-guard-design.md | untracked
+docs/superpowers/specs/2026-06-21-evidence-map-design.md | untracked
+src/cli/commands/explain-diff.ts | untracked
+src/cli/commands/guard.ts | untracked
+src/cli/commands/resume-pack.ts | untracked
+src/core/context-budget.ts | untracked
+src/core/evidence-map.ts | untracked
+src/core/guard.ts | untracked
+src/core/resume-pack.ts | untracked
+tests/cli-explain-diff.test.ts | untracked
+tests/evidence-map.test.ts | untracked
+tests/guard.test.ts | untracked
+tests/resume-pack.test.ts | untracked

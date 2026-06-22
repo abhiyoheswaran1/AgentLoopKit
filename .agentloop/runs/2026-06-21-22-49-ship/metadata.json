@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-21-22-49-ship",
+  "command": "ship",
+  "createdAt": "2026-06-21-22-49",
+  "createdAtEpochMs": 1782074969009,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-build-agentloop-guard-live-drift-detection-and-context-budget-control-2.md",
+    "title": "Build AgentLoop Guard live drift detection and context budget control",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-22-42-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-21-22-49-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-21-22-49-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 56
+}

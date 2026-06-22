@@ -78,6 +78,9 @@ Login redirects users to the wrong page after password reset.
 ## Desired Outcome
 Users land on the intended destination after a successful login.
 
+## Likely Files or Areas
+- src/auth
+
 ## Acceptance Criteria
 ${acceptanceCriteria}
 
@@ -123,6 +126,14 @@ describe('prepare-pr command', () => {
     expect(output.body).toContain('# Fix login redirect bug');
     expect(output.body).toContain('## Changed Files');
     expect(output.body).toContain('src/auth/callback.ts');
+    expect(output.body).toContain('## Evidence Map');
+    expect(output.body).toContain(
+      '- Evidence map: `1` changed file(s); `1` covered, `0` unexplained; verification `fresh`; `1` risk-sensitive.',
+    );
+    expect(output.evidenceMap.summary).toMatchObject({
+      reviewability: 'reviewable',
+      changedFileCount: 1,
+    });
     expect(output.body).toContain('## Verification Evidence');
     expect(output.body).toMatch(
       /## Verification Evidence\n\n- Overall status: pass \(`\.agentloop\/reports\/[^`]+`\)\n\n## Reviewer Checklist/,

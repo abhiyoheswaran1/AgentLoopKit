@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-22-08-26-ship",
+  "command": "ship",
+  "createdAt": "2026-06-22-08-26",
+  "createdAtEpochMs": 1782109614305,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-22-stabilize-unreleased-batch-and-run-real-repo-trials.md",
+    "title": "Stabilize unreleased batch and run real repo trials",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-22-08-16-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-22-08-26-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-22-08-26-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 93
+}

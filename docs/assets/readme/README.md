@@ -20,6 +20,7 @@ Regenerate the Playwright screenshots:
 ```bash
 npx playwright screenshot --viewport-size=1440,960 "file://$(pwd | sed 's/ /%20/g')/docs/assets/readme/showcase.html" docs/assets/readme/agentloopkit-showcase.png
 npx playwright screenshot --viewport-size=1440,960 "file://$(pwd | sed 's/ /%20/g')/docs/assets/readme/verification.html" docs/assets/readme/agentloopkit-verification.png
+npx playwright screenshot --viewport-size=1440,960 "file://$(pwd | sed 's/ /%20/g')/docs/assets/readme/context-budget.html" docs/assets/readme/agentloopkit-context-budget.png
 ```
 
 Do not edit the generated PNG or GIF files by hand.

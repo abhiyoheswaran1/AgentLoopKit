@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-21-21-37-verify",
+  "command": "verify",
+  "createdAt": "2026-06-21-21-37",
+  "createdAtEpochMs": 1782070624928,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-21-build-explainable-agent-work-evidence-map.md",
+    "title": "Build explainable agent work evidence map",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-21-21-14-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 24
+}

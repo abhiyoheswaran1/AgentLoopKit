@@ -17,6 +17,7 @@ import { listRuns, readRun } from './runs.js';
 import { readTaskContract, TaskContract } from './task-state.js';
 import { renderCompactChangeAreas } from './change-areas.js';
 import { toSafeDisplayPath } from './display-path.js';
+import { buildEvidenceMap, renderEvidenceMapCompactMarkdown, type EvidenceMap } from './evidence-map.js';
 
 export type PreparePrResult = {
   titleSuggestion: string;
@@ -31,6 +32,7 @@ export type PreparePrResult = {
   };
   githubMetadata: GithubMetadataContext;
   readiness: ShipResult['readiness'];
+  evidenceMap: EvidenceMap;
   changedFiles: ShipResult['changedFiles'];
 };
 
@@ -47,6 +49,7 @@ type PreparePrShipEvidence = Pick<
 > &
   Pick<PreparePrResult, 'shipEvidence'> & {
     verificationMarkdown?: string;
+    evidenceMap?: EvidenceMap;
   };
 
 function renderMarkdownList(values: string[], fallback: string) {
@@ -178,6 +181,7 @@ function buildPrBody(input: {
   cwd: string;
   task: TaskContract | null;
   ship: PreparePrShipEvidence;
+  evidenceMap: EvidenceMap;
   githubMetadata: GithubMetadataContext;
 }) {
   const title = input.task?.title ?? 'AgentLoopKit review-ready changes';
@@ -207,6 +211,10 @@ ${renderCompactChangeAreas(input.ship.changedFiles)}
 - Score: ${input.ship.readiness.totalScore}/100
 ${input.ship.readiness.claims.map((claim) => `- ${escapeSingleLineMarkdownProse(claim)}`).join('\n')}
 - Ship report: ${inlineCode(relativePath(input.cwd, input.ship.shipReportPath))}
+
+## Evidence Map
+
+${renderEvidenceMapCompactMarkdown(input.evidenceMap)}
 
 ## Acceptance Criteria
 
@@ -349,6 +357,13 @@ export async function preparePullRequest(options: {
 }) {
   const preparedShip =
     (await findReusableShipEvidence(options)) ?? (await refreshShipEvidence(options));
+  const evidenceMap =
+    preparedShip.evidenceMap ??
+    (await buildEvidenceMap({
+      cwd: options.cwd,
+      config: options.config,
+      changedFiles: preparedShip.changedFiles,
+    }));
   const [evidence, githubMetadata] = await Promise.all([
     resolveCurrentOrLatestRunTaskVerificationEvidence(options),
     readGithubMetadataContext({ cwd: options.cwd, config: options.config }),
@@ -360,7 +375,13 @@ export async function preparePullRequest(options: {
         taskPath: evidence.taskPath,
       })
     : null;
-  const body = buildPrBody({ cwd: options.cwd, task, ship: preparedShip, githubMetadata });
+  const body = buildPrBody({
+    cwd: options.cwd,
+    task,
+    ship: preparedShip,
+    evidenceMap,
+    githubMetadata,
+  });
   const githubComment = options.githubComment
     ? buildGithubComment(preparedShip, options.cwd)
     : undefined;
@@ -390,6 +411,7 @@ export async function preparePullRequest(options: {
     shipEvidence: preparedShip.shipEvidence,
     githubMetadata,
     readiness: preparedShip.readiness,
+    evidenceMap,
     changedFiles: preparedShip.changedFiles,
   } satisfies PreparePrResult;
 }

@@ -572,6 +572,34 @@ describe('doctor', () => {
     expect(result.markdown).toContain(expectedMessage);
   });
 
+  test('warns when nested package manifests indicate a monorepo layout', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await mkdir(path.join(dir, 'apps/web'), { recursive: true });
+    await mkdir(path.join(dir, 'functions'), { recursive: true });
+    await mkdir(path.join(dir, 'firestore-tests'), { recursive: true });
+    await writeFile(path.join(dir, 'apps/web/package.json'), '{"name":"web"}');
+    await writeFile(path.join(dir, 'functions/package.json'), '{"name":"functions"}');
+    await writeFile(
+      path.join(dir, 'firestore-tests/package.json'),
+      '{"name":"firestore-tests"}',
+    );
+
+    const result = await runDoctor({ cwd: dir });
+    const monorepoCheck = result.checks.find((check) => check.name === 'Monorepo');
+    const expectedMessage =
+      'workspace markers detected: nested package manifests: apps/web/package.json, functions/package.json, firestore-tests/package.json. Root checks may not cover every package; add package-specific verification commands to the task contract, such as pnpm --filter <package> test, npm --workspace <package> test, or cd packages/<name> && npm test. AgentLoopKit does not run workspace commands automatically.';
+
+    expect(result.serious).toHaveLength(0);
+    expect(monorepoCheck).toEqual({
+      name: 'Monorepo',
+      status: 'warn',
+      message: expectedMessage,
+    });
+    expect(result.markdown).toContain(expectedMessage);
+  });
+
   test('shows risk file categories with capped path examples', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

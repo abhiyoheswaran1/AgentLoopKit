@@ -14,6 +14,16 @@ import { getAgentLoopStatus } from './status.js';
 import { readTaskContract } from './task-state.js';
 import type { GitFileStatus } from './git.js';
 import { listItems, sectionContent } from './markdown-sections.js';
+import {
+  buildEvidenceMap,
+  renderEvidenceMapCompactMarkdown,
+  type EvidenceMap,
+} from './evidence-map.js';
+import {
+  buildContextBudget,
+  renderContextBudgetCompactMarkdown,
+  type ContextBudgetSummary,
+} from './context-budget.js';
 
 async function readActiveTaskRiskNoteCount(options: {
   cwd: string;
@@ -50,6 +60,8 @@ export async function getReviewContext(options: {
     listRuns(options.cwd),
     readGithubMetadataContext({ cwd: options.cwd, config: options.config }),
   ]);
+  const evidenceMap = await buildEvidenceMap({ cwd: options.cwd, config: options.config });
+  const contextBudget = buildContextBudget({ evidenceMap });
   const recentRuns = runs.slice(0, 5);
   const latestShip =
     recentRuns.find((run) => run.command === 'ship' && run.score !== undefined) ?? null;
@@ -84,6 +96,8 @@ export async function getReviewContext(options: {
     },
     policies,
     artifacts: renderArtifactInventoryJson(inventory) as ArtifactInventory,
+    evidenceMap,
+    contextBudget,
     recentRuns,
     latestShip: latestShip
       ? {
@@ -235,6 +249,16 @@ function formatWorkingTree(context: Awaited<ReturnType<typeof getReviewContext>>
   return `dirty (${workingTree.changedFileCount}; ${workingTree.nonEvidenceChangedFileCount} non-evidence, ${workingTree.agentLoopEvidenceChangedFileCount} AgentLoop evidence)`;
 }
 
+function formatEvidenceMap(context: { evidenceMap?: EvidenceMap }) {
+  if (!context.evidenceMap) return '';
+  return `${renderEvidenceMapCompactMarkdown(context.evidenceMap)}\n`;
+}
+
+function formatContextBudget(context: { contextBudget?: ContextBudgetSummary }) {
+  if (!context.contextBudget) return '';
+  return `${renderContextBudgetCompactMarkdown(context.contextBudget)}\n`;
+}
+
 export function renderReviewContextMarkdown(
   context: Awaited<ReturnType<typeof getReviewContext>>,
   options?: { recentRunChangedFiles?: Map<string, GitFileStatus[]> },
@@ -245,7 +269,9 @@ export function renderReviewContextMarkdown(
   return `# AgentLoopKit Review Context
 
 - Active task: ${formatTask(context.status.activeTask)}
-${formatActiveTaskRiskNotes(context.status)}- ${formatLatestVerificationLabel(context.status)}: ${formatLatestVerification(context.status.latestVerification)}
+${formatActiveTaskRiskNotes(context.status)}${formatEvidenceMap(context)}${formatContextBudget(
+    context,
+  )}- ${formatLatestVerificationLabel(context.status)}: ${formatLatestVerification(context.status.latestVerification)}
 - Gates: ${formatGateSummary(context)}
 - Policy status: ${inlineCode(String(policy.current))} current, ${inlineCode(
     String(policy.modified),

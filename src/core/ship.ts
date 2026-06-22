@@ -6,7 +6,10 @@ import { resolveUniqueOutputArtifactPath } from './artifacts.js';
 import { renderCompactChangedFiles } from './change-areas.js';
 import { checkGates } from './check-gates.js';
 import { formatTimestamp } from './dates.js';
-import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
+import {
+  resolveCurrentOrLatestRunTaskVerificationEvidence,
+  resolveCurrentVerificationEvidence,
+} from './evidence.js';
 import {
   appendUntrackedFilesToDiffStat,
   getGitDiffStat,
@@ -23,6 +26,11 @@ import { listItems, sectionContent } from './markdown-sections.js';
 import { summarizeRepository } from './pr-summary.js';
 import { toSafeDisplayPath } from './display-path.js';
 import {
+  buildEvidenceMap,
+  renderEvidenceMapCompactMarkdown,
+  type EvidenceMap,
+} from './evidence-map.js';
+import {
   evaluateReviewReadiness,
   ReadinessVerificationInput,
   ReviewReadinessResult,
@@ -38,6 +46,7 @@ export type ShipResult = {
   verification: ReadinessVerificationInput;
   verificationReportPath?: string;
   gates: Awaited<ReturnType<typeof checkGates>>;
+  evidenceMap: EvidenceMap;
   handoffPath?: string;
   changedFiles: Awaited<ReturnType<typeof parseGitStatus>>;
   diffStat: string;
@@ -190,6 +199,10 @@ ${renderList(input.readiness.blockers, 'No blockers recorded.')}
 ## Recommended Next Actions
 
 ${renderList(input.readiness.recommendedNextActions, 'Review the diff and open the PR when ready.')}
+
+## Evidence Map
+
+${renderEvidenceMapCompactMarkdown(input.evidenceMap)}
 ${renderInheritedDirtyWorkSection(input)}
 ## Task Risk Notes
 
@@ -225,7 +238,7 @@ export async function createShipReport(options: {
   const gitStatus = await getGitStatus(options.cwd);
   const changedFiles = await parseGitStatus(gitStatus);
   const diffStat = appendUntrackedFilesToDiffStat(await getGitDiffStat(options.cwd), changedFiles);
-  const evidence = await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
+  let evidence = await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
   const task = evidence.taskPath
     ? await readTaskContract({
         cwd: options.cwd,
@@ -249,10 +262,24 @@ export async function createShipReport(options: {
     });
     verificationReportPath = verification.reportPath;
     verificationMarkdown = verification.markdown;
+    evidence = {
+      taskPath: evidence.taskPath,
+      ...(await resolveCurrentVerificationEvidence({
+        cwd: options.cwd,
+        taskPath: evidence.taskPath,
+        reportPath: verification.reportPath,
+      })),
+    };
   } else if (!verificationReportPath && evidence.latestReportPath) {
     verificationReportPath = evidence.latestReportPath;
     verificationMarkdown = await readFile(evidence.latestReportPath, 'utf8');
   }
+
+  const evidenceMap = await buildEvidenceMap({
+    cwd: options.cwd,
+    config: options.config,
+    changedFiles,
+  });
 
   const verification: ReadinessVerificationInput = {
     status: extractOverallStatus(verificationMarkdown),
@@ -322,6 +349,7 @@ export async function createShipReport(options: {
     verification,
     verificationReportPath,
     gates,
+    evidenceMap,
     handoffPath,
     changedFiles,
     diffStat,

@@ -195,12 +195,62 @@ agentloop review-context --json
 agentloop review-context --redact-paths
 ```
 
-`review-context` prints one read-only local snapshot for agents and scripts that do not use MCP. It combines active task state, active task Risk Notes count, latest verification, review gates, policy status, artifact inventory, recent run ledger entries, latest ship score, optional imported GitHub issue or PR metadata, working-tree state, safety notes, and the next recommended action. Human output labels retained verification as `Latest previous verification` when no active or open task exists, and labels gate task evidence as active, latest open, archived, or missing when that gate data is available; JSON keeps the existing `status.latestVerification` object and gate fields. Task artifact counts separate ordinary task contracts from preserved AgentFlight placeholder task contracts. The risk-note signal is count-only; `review-context` does not print the task Risk Notes prose.
+`review-context` prints one read-only local snapshot for agents and scripts that do not use MCP. It combines active task state, active task Risk Notes count, latest verification, review gates, policy status, artifact inventory, recent run ledger entries, latest ship score, optional imported GitHub issue or PR metadata, working-tree state, context-budget estimates, safety notes, and the next recommended action. Human output labels retained verification as `Latest previous verification` when no active or open task exists, and labels gate task evidence as active, latest open, archived, or missing when that gate data is available; JSON keeps the existing `status.latestVerification` object and gate fields. Task artifact counts separate ordinary task contracts from preserved AgentFlight placeholder task contracts. The risk-note signal is count-only; `review-context` does not print the task Risk Notes prose.
 
 The command does not run verification, write files, include full Markdown artifact bodies, read `.env` contents, call external APIs, or post to GitHub.
 Human-readable `review-context` output keeps dynamic values inside single-line inline code. Task titles, report paths, run IDs, imported GitHub metadata paths, and next-action commands with unusual characters stay on one Markdown line. JSON output keeps raw values for scripts.
 
 Human Recent Runs entries separate generated AgentLoop and AgentFlight evidence churn from non-evidence changed-file counts when local run evidence is available. `review-context --json` keeps the existing run summaries unchanged.
+
+## Guard
+
+```bash
+agentloop guard
+agentloop guard --strict
+agentloop guard --json
+agentloop guard --redact-paths
+agentloop guard --watch --interval-ms 2000 --max-iterations 5
+agentloop guard --write-report
+agentloop guard --write-report --out .agentloop/reports/local-guard-report.md
+agentloop guard --write-baseline .agentloop/guard/baseline.json
+agentloop guard --baseline .agentloop/guard/baseline.json
+```
+
+`guard` checks local drift, proof debt, and context-budget pressure from the current evidence map. It reports `pass`, `warn`, or `fail`; default output is advisory, while `--strict` exits non-zero for `warn` or `fail`.
+
+`--watch` repeats snapshots until interrupted or until `--max-iterations` is reached. `--write-report` explicitly writes Markdown under `.agentloop/reports`. `--write-baseline` explicitly writes changed non-evidence file paths under `.agentloop/guard`, and `--baseline` compares the current changed non-evidence set with that saved baseline.
+
+Guard context-budget estimates use a simple character-count heuristic. They are useful for choosing compact continuation commands such as `agentloop resume-pack --for codex --redact-paths`, but they are not provider tokenizer output or billing claims. Context-budget pressure is advisory; by itself it does not fail `--strict`.
+
+Default `guard` is read-only. It does not run verification, read changed file contents, read `.env` contents, call an LLM, intercept prompts, proxy provider traffic, call GitHub APIs, post comments, publish packages, create tags, upload files, mutate task state, or change Git state.
+
+See [guard.md](guard.md).
+
+## Evidence Map And Resume Packs
+
+```bash
+agentloop explain-diff
+agentloop explain-diff --json
+agentloop explain-diff --redact-paths
+
+agentloop resume-pack --for codex
+agentloop resume-pack --for claude
+agentloop resume-pack --for cursor
+agentloop resume-pack --for generic
+agentloop resume-pack --for human
+agentloop resume-pack --json
+agentloop resume-pack --json --redact-paths
+```
+
+`explain-diff` builds a deterministic local evidence map for the current Git status. It maps changed file paths to active task scope, forbidden task scope, recent run-ledger coverage, verification freshness, risk-sensitive path categories, and exact next actions. Human output is compact reviewer Markdown; JSON output exposes the full file-level map.
+
+`resume-pack` renders a compact continuation brief for Codex, Claude, Cursor, generic agents, or human reviewers. It includes task context, reviewability, evidence-map summary, next actions, context-budget estimates, safety boundaries, and the local evidence claim. Invalid targets fail before work starts.
+
+Both commands are read-only. They do not run verification commands, read changed file contents, read `.env` contents, call an LLM, intercept prompts, proxy provider traffic, call GitHub APIs, read tokens, post comments, publish packages, create tags, upload files, or mutate task state.
+
+Use `--redact-paths` before copying output into a public issue, PR, or CI log. Human-readable output keeps dynamic task, path, status, and next-action values on one Markdown line. JSON output keeps raw values for scripts unless redaction is requested.
+
+See [evidence-map.md](evidence-map.md).
 
 ## Verification
 
@@ -262,7 +312,7 @@ agentloop prepare-pr --json --github-comment --redact-paths
 
 `ship` runs the local review-readiness flow. It detects the active task, reads Git status and diff stats, checks current verification evidence, runs gates, writes or links a handoff, calculates a deterministic review-readiness score, writes a Markdown ship report under `.agentloop/reports/`, and records a run under `.agentloop/runs/`.
 
-Human ship reports compact generated AgentLoop evidence in the changed-file section while preserving ordinary changed-file lines. They also render the task contract's Risk Notes as escaped single-line prose, with a clear fallback when no risk notes were recorded. When a generated dirty-work Risk Note records the pre-existing dirty non-evidence count, the report adds an `Inherited Dirty Work` section comparing that baseline with the current non-evidence changed-file count. The diff-stat section keeps Git's tracked-file stat output and appends compact `path | untracked` lines for untracked non-evidence files without reading their contents. JSON output, readiness scoring, and run-ledger changed-file evidence keep the full flat changed-file list.
+Human ship reports compact generated AgentLoop evidence in the changed-file section while preserving ordinary changed-file lines. They also render the task contract's Risk Notes as escaped single-line prose, with a clear fallback when no risk notes were recorded. When a generated dirty-work Risk Note records the pre-existing dirty non-evidence count, the report adds an `Inherited Dirty Work` section comparing that baseline with the current non-evidence changed-file count. The report includes a compact `Evidence Map` section that shows changed-file coverage, unexplained files, verification freshness, and risk-sensitive file counts. The diff-stat section keeps Git's tracked-file stat output and appends compact `path | untracked` lines for untracked non-evidence files without reading their contents. JSON output, readiness scoring, evidence-map data, and run-ledger changed-file evidence keep the full flat changed-file list.
 
 `prepare-pr` and deterministic handoff summaries render concrete commands from the verification report's `Not Run` section under a `Verification Report Not Run` heading when present. If the report records that nothing was skipped, the PR body uses a clear no-skipped-commands fallback instead of sending reviewers back to the verification report.
 
@@ -278,7 +328,7 @@ Use `ship --github-comment` when CI needs compact review-readiness Markdown for 
 
 Human-readable `ship` output keeps dynamic task, artifact, written report, gate, score, file, and next-action values on one Markdown line. JSON output keeps raw values for scripts.
 
-`prepare-pr` generates a PR title and body from the active task, changed files, verification evidence, ship report, gates, risk notes, rollback notes, and optional imported GitHub issue or PR metadata. Missing GitHub metadata is omitted cleanly without an empty placeholder section. It groups changed files by review area so reviewers can scan risk-sensitive paths, source, tests, AgentLoop evidence, docs, CI, config, and other files. Long generated AgentLoop evidence churn is compacted in the human PR body while JSON output keeps the full flat changed-file list. `--github-comment` includes Markdown suitable for a PR comment. The CLI does not read GitHub tokens or post comments by itself.
+`prepare-pr` generates a PR title and body from the active task, changed files, verification evidence, ship report, evidence map, gates, risk notes, rollback notes, and optional imported GitHub issue or PR metadata. Missing GitHub metadata is omitted cleanly without an empty placeholder section. It groups changed files by review area so reviewers can scan risk-sensitive paths, source, tests, AgentLoop evidence, docs, CI, config, and other files. Long generated AgentLoop evidence churn is compacted in the human PR body while JSON output keeps the full flat changed-file list. `--github-comment` includes Markdown suitable for a PR comment. The CLI does not read GitHub tokens or post comments by itself.
 
 `prepare-pr --write` writes the generated PR description under `.agentloop/handoffs/`. If the default minute-based filename already exists, AgentLoopKit preserves the existing draft and writes the next one with a numeric suffix such as `-2.md`.
 

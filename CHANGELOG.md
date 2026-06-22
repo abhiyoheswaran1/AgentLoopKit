@@ -4,6 +4,18 @@
 
 - No unreleased changes yet.
 
+## 0.39.0
+
+- Added `agentloop guard` for local drift, proof-debt, stale-verification, baseline, watch-mode, report-writing, and context-budget checks.
+- Added deterministic evidence maps through `agentloop explain-diff`, with changed-file coverage against active task scope, recent run evidence, verification freshness, and risk-sensitive areas.
+- Added `agentloop resume-pack` for compact continuation briefs tailored to Codex, Claude, Cursor, generic agents, and human reviewers.
+- Added context-budget estimates to Guard, resume packs, and review context so agents can choose compact local evidence instead of pasting broad chat history or changed-file lists.
+- Added Guard and evidence-map summaries into `review-context`, `ship`, and `prepare-pr` so normal review surfaces explain scope coverage and next actions.
+- Added public Guard and evidence-map docs plus README visuals for the context-budget workflow and regenerated terminal demo.
+- Changed `doctor` monorepo detection to catch nested package manifests such as `apps/*/package.json`, `functions/package.json`, and test package layouts when the root package does not declare workspaces.
+- Changed AgentLoop evidence classification so `.agentloop/state.json` and repo-local task contracts are treated as local evidence instead of unexplained product work.
+- Fixed real-repo trial friction around generated harness baselines by documenting when to commit the initialized AgentLoop files before feature work.
+
 ## 0.38.0
 
 - Added additive `status` and `next` loop guidance so agents re-entering a task see the matching `.agentloop/loops/<type>.md` file when it exists.

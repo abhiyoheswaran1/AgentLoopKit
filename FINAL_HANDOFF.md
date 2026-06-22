@@ -1325,10 +1325,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.38.0` is public.
-- npm latest is `agentloopkit@0.38.0`.
-- GHCR tags include `latest`, `0.38`, and `0.38.0`.
-- MCP Registry lists `0.38.0` as latest.
+- GitHub release `v0.39.0` is public.
+- npm latest is `agentloopkit@0.39.0`.
+- GHCR tags include `latest`, `0.39`, and `0.39.0`.
+- MCP Registry lists `0.39.0` as latest.
 - GitHub Marketplace listing is not live; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
