@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-23
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The Context Contract and README demo work is verified locally but unreleased. Users need it on npm, GitHub Releases, GHCR, MCP Registry, and main.

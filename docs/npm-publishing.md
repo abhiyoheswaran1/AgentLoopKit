@@ -22,7 +22,7 @@ As of June 23, 2026:
 - Release tag `v0.40.0` points at the published release commit.
 - GitHub Marketplace publication remains deferred until maintainer approval for the owner-only listing step.
 
-The `0.40.0` release uses GitHub release automation, npm trusted publishing, Docker/GHCR, and MCP Registry. The GitHub Marketplace URL still returned 404 during the last completed post-release proof.
+The `0.40.0` release completed through GitHub release automation, npm trusted publishing, Docker/GHCR, and MCP Registry. The GitHub Marketplace URL still returned 404 during post-release proof.
 
 ## Release Rule
 

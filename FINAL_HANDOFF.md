@@ -82,16 +82,16 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Current npm release: `agentloopkit@0.40.0`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.40.0>
 - Release asset: `agentloopkit-0.40.0.tgz`
-- Release asset SHA-256: pending post-release proof
-- Release tag: `v0.40.0` at the published release commit
-- CI run: pending post-release proof
-- CLI Smoke run: pending post-release proof
-- Publish workflow run: pending post-release proof
-- Docker workflow run: pending post-release proof
-- MCP Registry workflow run: pending post-release proof
-- Post-publish npm proof: npm latest is `0.40.0` after publish workflows finish
-- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.40.0` after Docker workflow completion
-- MCP Registry proof: metadata points at `agentloopkit@0.40.0` after MCP Registry workflow completion
+- Release asset SHA-256: `b3157017f4538b9da912347a7c0af86192c6225f207d149261ca02b19cfb127b`
+- Release tag: `v0.40.0` at commit `c8232e60`
+- CI run: `28011486152`
+- CLI Smoke run: `28011486519`
+- Publish workflow run: `28011534708`
+- Docker workflow run: `28011535413`
+- MCP Registry workflow run: `28012018829`
+- Post-publish npm proof: npm latest is `0.40.0`
+- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.40.0`
+- MCP Registry proof: metadata points at `agentloopkit@0.40.0`
 - GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof
 
 ## 0.40.0 release summary

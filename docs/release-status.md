@@ -11,19 +11,19 @@ Last checked: June 23, 2026.
 - Release tag `v0.40.0` points at the published release commit.
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.40.0>
 - Release asset: `agentloopkit-0.40.0.tgz`
-- Release asset SHA-256: to be captured after GitHub release upload.
-- CI run: to be captured after release workflows finish.
-- CLI Smoke run: to be captured after release workflows finish.
-- Publish workflow run: to be captured after npm trusted publishing finishes.
-- Docker workflow run: to be captured after GHCR publishing finishes.
-- MCP Registry workflow run: to be captured after MCP Registry publishing finishes.
+- Release asset SHA-256: `b3157017f4538b9da912347a7c0af86192c6225f207d149261ca02b19cfb127b`
+- CI run: `28011486152`
+- CLI Smoke run: `28011486519`
+- Publish workflow run: `28011534708`
+- Docker workflow run: `28011535413`
+- MCP Registry workflow run: `28012018829`
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
-GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirms the `0.40.0` image after the release workflows finish.
+GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirms the `0.40.0` image.
 
-The MCP Registry metadata points at npm package `agentloopkit@0.40.0` after the release workflows finish.
+The MCP Registry metadata points at npm package `agentloopkit@0.40.0`.
 
-GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 22, 2026.
+GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 23, 2026.
 
 ## Latest Release Highlights
 
@@ -69,21 +69,21 @@ After each publish:
 
 Local release gate for `0.40.0`:
 
-- `npm run release-flow`: pending for the release commit
-- `node dist/cli/index.js release-check --strict --redact-paths`: pending after local release flow
+- `npm run release-flow`: passed on commit `c8232e60`
+- `node dist/cli/index.js release-check --strict --redact-paths`: passed from a clean tree on commit `c8232e60`
 - `npx --yes projscan doctor --format markdown`: A/90 with the known reviewed `prepublishOnly` advisory
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: pending
-- `node dist/cli/index.js npm-status --agentloopkit --expect-current`: pending
-- `npm run smoke:published -- --version 0.40.0`: pending
-- `npx --yes agentloopkit@0.40.0 version`: pending from a clean temporary directory
-- GitHub release asset digest: pending
-- `node dist/cli/index.js release-proof --redact-paths`: pending
+- `npm view agentloopkit version versions --json`: latest `0.40.0`
+- `node dist/cli/index.js npm-status --agentloopkit --expect-current`: latest matches local package version
+- `npm run smoke:published -- --version 0.40.0`: passed
+- `npx --yes agentloopkit@0.40.0 version`: `0.40.0` from a clean temporary directory
+- GitHub release asset digest: `b3157017f4538b9da912347a7c0af86192c6225f207d149261ca02b19cfb127b`
+- `node dist/cli/index.js release-proof --redact-paths`: npm, GitHub Release, GHCR, and MCP Registry passed; GitHub Marketplace warned
 - `node dist/cli/index.js release-proof --strict --only github-marketplace --redact-paths`: expected to fail while Marketplace publication remains deferred
-- GHCR image tag `0.40.0`: pending release proof
-- MCP Registry metadata points at `agentloopkit@0.40.0`: pending release proof
+- GHCR image tag `0.40.0`: confirmed by release proof
+- MCP Registry metadata points at `agentloopkit@0.40.0`: confirmed by release proof
 
 Latest release-status documentation and proof commands on post-release `main`:
 
