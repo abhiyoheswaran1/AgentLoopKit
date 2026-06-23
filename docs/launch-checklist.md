@@ -8,8 +8,8 @@ For a read-only registry check, see [npm-status.md](npm-status.md).
 
 ## Current Release Policy
 
-- Current public package line: `0.39.0`.
-- Active release candidate: none.
+- Current public package line: `0.40.0`.
+- Active release candidate: `0.40.0` until post-publish proof is complete.
 - Do not bump versions, create tags, publish npm, publish GitHub Releases, publish GHCR, or publish MCP Registry entries during active implementation.
 - Cut the next version only when the maintainer asks for release prep.
 - Use GitHub Releases and npm trusted publishing as the public source of truth.

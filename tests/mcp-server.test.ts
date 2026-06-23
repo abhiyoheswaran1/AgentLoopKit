@@ -2,6 +2,7 @@ import path from 'node:path';
 import { rm, symlink, writeFile } from 'node:fs/promises';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
 import { callMcpTool } from '../src/core/mcp-tools.js';
@@ -11,6 +12,10 @@ let tempDirs: string[] = [];
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
+
+async function git(cwd: string, args: string[]) {
+  return execa('git', args, { cwd });
+}
 
 describe('mcp-server command', () => {
   afterEach(async () => {
@@ -41,10 +46,43 @@ describe('mcp-server command', () => {
       const status = await client.callTool({ name: 'agentloop_status', arguments: {} });
 
       expect(tools.tools.map((tool) => tool.name)).toContain('agentloop_status');
+      expect(tools.tools.map((tool) => tool.name)).toContain('agentloop_context_pack');
       expect(JSON.stringify(status.content)).toContain('Check MCP');
     } finally {
       await client.close();
     }
+  });
+
+  test('exposes context budget and context pack as read-only MCP tools', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await git(dir, ['init', '-q']);
+    await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
+    await git(dir, ['config', 'user.name', 'AgentLoopKit Test']);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'index.ts'), 'export const value = "old";\n');
+    await git(dir, ['add', '.']);
+    await git(dir, ['commit', '-m', 'Initial state']);
+    await writeFile(path.join(dir, 'index.ts'), 'export const value = "new";\n');
+
+    const budget = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_context_budget',
+    });
+    const pack = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_context_pack',
+      arguments: { target: 'codex', goal: 'continue' },
+    });
+
+    expect(budget.payload.contextBudget).toMatchObject({
+      heuristic: 'chars-divided-by-four',
+    });
+    expect(pack.payload.contextPack).toMatchObject({
+      target: 'codex',
+      goal: 'continue',
+    });
+    expect(JSON.stringify(pack.payload)).toContain('provider traffic');
   });
 
   test('does not expose report or handoff content from symlinked roots outside the repo', async () => {

@@ -12,17 +12,17 @@ For a compact current-state summary, see [release-status.md](release-status.md).
 
 ## Current State
 
-As of June 22, 2026:
+As of June 23, 2026:
 
-- npm latest is `agentloopkit@0.39.0`.
-- GitHub release `v0.39.0` is public with attached `agentloopkit-0.39.0.tgz`.
+- npm latest is `agentloopkit@0.40.0`.
+- GitHub release `v0.40.0` is public with attached `agentloopkit-0.40.0.tgz`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - GitHub releases publish npm through trusted publishing.
 - GHCR and MCP Registry publishing run from GitHub release workflows after npm succeeds.
-- Release tag `v0.39.0` points at the published release commit.
+- Release tag `v0.40.0` points at the published release commit.
 - GitHub Marketplace publication remains deferred until maintainer approval for the owner-only listing step.
 
-The `0.39.0` release completed through GitHub release automation, npm trusted publishing, Docker/GHCR, and MCP Registry. The GitHub Marketplace URL still returned 404 during post-release proof.
+The `0.40.0` release uses GitHub release automation, npm trusted publishing, Docker/GHCR, and MCP Registry. The GitHub Marketplace URL still returned 404 during the last completed post-release proof.
 
 ## Release Rule
 
@@ -60,7 +60,7 @@ Run these before publishing:
 npm run release-flow
 ```
 
-`release-flow` runs the local metadata guard, lint, typecheck, full tests, build, public-doc hygiene, link checking, strict dogfood gate, packed-package smoke, and strict `agentloop release-check`.
+`release-flow` runs the local metadata guard, lint, typecheck, full tests, build, public-doc hygiene, link checking, the non-strict dogfood self-check, and packed-package smoke. Run `npm run dogfood:strict` and `agentloop release-check --strict` after fresh verification and handoff or ship evidence exists, because those strict gates check review evidence.
 
 `prepublishOnly` runs the local changelog metadata guard, typecheck, tests, and build.
 

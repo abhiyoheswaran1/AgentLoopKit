@@ -1,0 +1,24 @@
+ README.md                                  | 38 ++++++++++--
+ docs/cli-reference.md                      | 30 +++++++++
+ docs/mcp.md                                |  6 +-
+ src/cli/index.ts                           |  2 +
+ src/core/completions.ts                    |  1 +
+ src/core/mcp-tools.ts                      | 98 ++++++++++++++++++++++++++++++
+ src/mcp/server.ts                          |  2 +-
+ src/templates/agents/claude-code.md        |  1 +
+ src/templates/agents/codex.md              |  1 +
+ src/templates/agents/cursor.md             |  1 +
+ src/templates/agents/gemini-cli.md         |  1 +
+ src/templates/agents/generic.md            |  1 +
+ src/templates/agents/github-copilot-cli.md |  1 +
+ src/templates/agents/opencode.md           |  1 +
+ tests/cli-docs-drift.test.ts               |  1 +
+ tests/mcp-server.test.ts                   | 38 ++++++++++++
+ tests/mcp-tools.test.ts                    |  3 +
+ 17 files changed, 220 insertions(+), 6 deletions(-)
+.agentloop/research/interview-cycle-196.md | untracked
+docs/context.md | untracked
+docs/superpowers/plans/2026-06-22-agentloop-context-contract-v1.md | untracked
+src/cli/commands/context.ts | untracked
+src/core/context-contract.ts | untracked
+tests/context-contract.test.ts | untracked

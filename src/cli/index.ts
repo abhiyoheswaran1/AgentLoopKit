@@ -33,6 +33,7 @@ import { githubCommand } from './commands/github.js';
 import { explainDiffCommand } from './commands/explain-diff.js';
 import { resumePackCommand } from './commands/resume-pack.js';
 import { guardCommand } from './commands/guard.js';
+import { contextCommand } from './commands/context.js';
 import { getPackageVersion } from '../core/version.js';
 
 const program = new Command();
@@ -51,6 +52,7 @@ program.addCommand(handoffCommand());
 program.addCommand(statusCommand());
 program.addCommand(nextCommand());
 program.addCommand(reviewContextCommand());
+program.addCommand(contextCommand());
 program.addCommand(explainDiffCommand());
 program.addCommand(resumePackCommand());
 program.addCommand(guardCommand());

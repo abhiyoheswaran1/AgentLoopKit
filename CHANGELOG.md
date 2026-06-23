@@ -4,6 +4,15 @@
 
 - No unreleased changes yet.
 
+## 0.40.0
+
+- Added `agentloop context budget`, `agentloop context pack`, and `agentloop context show` as a unified Context Contract for software agents.
+- Added auditable context-pack receipts that explain included evidence, omitted broad context, source handles, verification freshness, next actions, and context-budget estimates.
+- Added read-only MCP tools for context budget, context pack, and context handle expansion so agent platforms can consume the same contract directly.
+- Added generated agent guidance that tells Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and generic agents to request a context pack before broad repo reads.
+- Added public Context Contract documentation, CLI reference coverage, README positioning, an ASCII workflow diagram, a context-budget visual, and a regenerated terminal demo GIF.
+- Added tests for context-pack JSON and Markdown output, redacted handle expansion, MCP tool exposure, CLI docs drift, and public documentation hygiene.
+
 ## 0.39.0
 
 - Added `agentloop guard` for local drift, proof-debt, stale-verification, baseline, watch-mode, report-writing, and context-budget checks.

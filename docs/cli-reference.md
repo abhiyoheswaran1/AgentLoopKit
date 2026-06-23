@@ -202,6 +202,36 @@ Human-readable `review-context` output keeps dynamic values inside single-line i
 
 Human Recent Runs entries separate generated AgentLoop and AgentFlight evidence churn from non-evidence changed-file counts when local run evidence is available. `review-context --json` keeps the existing run summaries unchanged.
 
+## AgentLoop Context
+
+```bash
+agentloop context budget
+agentloop context budget --json
+agentloop context budget --redact-paths
+
+agentloop context pack --for codex --goal continue
+agentloop context pack --for claude --goal review
+agentloop context pack --for cursor --goal research
+agentloop context pack --for generic --goal handoff --json
+agentloop context pack --json --redact-paths
+
+agentloop context show task:active
+agentloop context show verification:latest
+agentloop context show run:latest
+agentloop context show evidence-map:current
+agentloop context show context-budget:current
+```
+
+`context budget` shows local context pressure and compact-pack guidance. It estimates broad changed-file context versus compact evidence-pack context with a transparent character-count heuristic. The estimate is planning guidance, not provider tokenizer output or a billing claim.
+
+`context pack` builds an auditable local context pack for Codex, Claude Code, Cursor, generic agents, or human reviewers. Supported goals are `continue`, `review`, `debug`, `handoff`, and `research`. The pack includes a receipt that explains what was included, what was omitted, why each decision was made, and which local source handles can expand the exact evidence.
+
+`context show <handle>` expands a local source handle. Supported v1 handles include `task:active`, `verification:latest`, `run:latest`, `evidence-map:current`, and `context-budget:current`.
+
+Context commands are read-only. They do not run verification, read changed file contents beyond local AgentLoop evidence, read `.env` contents, call an LLM, intercept prompts, proxy provider traffic, post comments, publish packages, create tags, upload files, or mutate task state.
+
+See [context.md](context.md).
+
 ## Guard
 
 ```bash
@@ -550,7 +580,7 @@ The dogfood scripts run AgentLoopKit's local self-check path for this repository
 
 The scripts do not publish packages, create tags, post comments, read tokens, read `.env` files, or run verification commands.
 
-`release-flow` runs the local release gate: prepublish metadata check, lint, typecheck, full tests, build, public docs hygiene, link checking, strict dogfood, packed release smoke, and `agentloop release-check --strict --redact-paths`. It does not publish packages, create tags, or create GitHub releases.
+`release-flow` runs the local release gate: prepublish metadata check, lint, typecheck, full tests, build, public docs hygiene, link checking, the non-strict dogfood self-check, and packed release smoke. It does not publish packages, create tags, or create GitHub releases. Run `npm run dogfood:strict` and `agentloop release-check --strict` after fresh verification and handoff or ship evidence exists.
 
 ## Release Notes And npm Status
 

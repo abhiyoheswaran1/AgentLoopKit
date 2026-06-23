@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-22-22-21-ship",
+  "command": "ship",
+  "createdAt": "2026-06-22-22-21",
+  "createdAtEpochMs": 1782159691075,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-22-add-readme-demo-gif-and-context-polish.md",
+    "title": "Add README demo GIF and public Context Contract polish",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-22-22-19-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-22-22-21-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-22-22-21-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 65
+}

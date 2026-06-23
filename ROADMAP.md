@@ -22,6 +22,7 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Local evidence inventory with `agentloop artifacts`
 - Local reviewability snapshot with `agentloop review-context`
 - Local evidence map with `agentloop explain-diff`, review-surface reuse, and compact `agentloop resume-pack` continuation briefs
+- Local Context Contract with `agentloop context budget`, `context pack`, `context show`, reversible source handles, context receipts, and MCP tools
 - Local Guard checks with `agentloop guard` for drift, proof debt, baselines, and context-budget pressure
 - Local template manifest checks and manual migration guidance
 - Local safety policy inspection with `agentloop policy`
@@ -50,15 +51,15 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 
 ## Current State
 
-- GitHub release `v0.39.0` is public.
-- npm latest is `agentloopkit@0.39.0`.
-- GHCR and MCP Registry are live for `0.39.0`.
+- GitHub release `v0.40.0` is public.
+- npm latest is `agentloopkit@0.40.0`.
+- GHCR and MCP Registry are live for `0.40.0`.
 - GitHub Marketplace listing is pending owner UI publication for the composite Action.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
-- Release tag `v0.39.0` points at the published release commit.
-- Current `main` contains post-release proof documentation after `v0.39.0`.
+- Release tag `v0.40.0` points at the published release commit.
+- Current `main` contains release proof documentation after `v0.40.0`.
 
 ## Near Term
 

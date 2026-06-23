@@ -330,6 +330,9 @@ describe('mcp tools', () => {
       'agentloop_check_gates',
       'agentloop_artifacts',
       'agentloop_review_context',
+      'agentloop_context_budget',
+      'agentloop_context_pack',
+      'agentloop_context_show',
       'agentloop_list_handoffs',
       'agentloop_latest_handoff',
     ]);

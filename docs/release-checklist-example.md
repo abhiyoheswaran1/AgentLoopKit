@@ -51,7 +51,8 @@ Collect this after release metadata is ready and before publishing:
 - intended release version;
 - `CHANGELOG.md` section for the intended version;
 - `npm run release-flow` result;
-- lint, typecheck, test, build, link-check, strict dogfood, release-check, and packed-release smoke results from the release gate;
+- lint, typecheck, test, build, link-check, non-strict dogfood, and packed-release smoke results from `release-flow`;
+- strict dogfood and release-check results after fresh verification and handoff or ship evidence exists;
 - packed tarball name and SHA-256;
 
 ## Post-Publish Proof

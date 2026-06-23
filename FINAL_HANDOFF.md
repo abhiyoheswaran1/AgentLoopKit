@@ -2,7 +2,7 @@
 
 ## Product summary
 
-AgentLoopKit is a local-first, npm-distributed engineering loop for coding agents. It gives existing tools like Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and generic agents repo-level task contracts, safety policies, verification reports, and reviewer handoffs.
+AgentLoopKit is a local-first, npm-distributed engineering loop for software agents. It gives existing tools like Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and generic agents repo-level task contracts, context contracts, safety policies, verification reports, and reviewer handoffs.
 
 It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
@@ -35,6 +35,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - read-only npm registry status checks with `agentloop npm-status`
 - read-only local evidence inventory with `agentloop artifacts`
 - read-only local reviewability snapshot with `agentloop review-context`
+- read-only Context Contract with `agentloop context budget`, `agentloop context pack`, `agentloop context show`, reversible source handles, and receipts
 - next-action shortcut with `agentloop next`
 - status and next routing for active task contracts that still contain review-critical placeholder sections
 - prepublish metadata guard that blocks npm publish while `CHANGELOG.md` has unreleased entries
@@ -78,20 +79,31 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.39.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.39.0>
-- Release asset: `agentloopkit-0.39.0.tgz`
-- Release asset SHA-256: `28fbc79f0d107f5b2707da2bdb0a1ecc0bd7b9d75a9aa17c9e3d53b1cb2f35da`
-- Release tag: `v0.39.0` at commit `748d91a7`
-- CI run: `27943684306`
-- CLI Smoke run: `27943684358`
-- Publish workflow run: `27943702972`
-- Docker workflow run: `27943702983`
-- MCP Registry workflow run: `27944147934`
-- Post-publish npm proof: npm latest is `0.39.0`
-- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.39.0`
-- MCP Registry proof: metadata points at `agentloopkit@0.39.0`
+- Current npm release: `agentloopkit@0.40.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.40.0>
+- Release asset: `agentloopkit-0.40.0.tgz`
+- Release asset SHA-256: pending post-release proof
+- Release tag: `v0.40.0` at the published release commit
+- CI run: pending post-release proof
+- CLI Smoke run: pending post-release proof
+- Publish workflow run: pending post-release proof
+- Docker workflow run: pending post-release proof
+- MCP Registry workflow run: pending post-release proof
+- Post-publish npm proof: npm latest is `0.40.0` after publish workflows finish
+- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.40.0` after Docker workflow completion
+- MCP Registry proof: metadata points at `agentloopkit@0.40.0` after MCP Registry workflow completion
 - GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof
+
+## 0.40.0 release summary
+
+Included:
+
+- `agentloop context budget`, `agentloop context pack`, and `agentloop context show` as the unified Context Contract.
+- Auditable context-pack receipts for included evidence, omitted broad context, source handles, verification freshness, next actions, and context-budget estimates.
+- MCP tools for read-only context budget, context pack, and context handle expansion.
+- Generated agent guidance that asks software agents to build a context pack before broad repo reads.
+- README and docs coverage for the Context Contract workflow, ASCII diagram, context-budget visual, and regenerated terminal demo GIF.
+- Test coverage for context CLI output, handle redaction, MCP exposure, CLI docs drift, and public-doc hygiene.
 
 ## 0.39.0 release summary
 
@@ -1337,10 +1349,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.39.0` is public.
-- npm latest is `agentloopkit@0.39.0`.
-- GHCR tags include `latest`, `0.39`, and `0.39.0`.
-- MCP Registry lists `0.39.0` as latest.
+- GitHub release `v0.40.0` is public.
+- npm latest is `agentloopkit@0.40.0`.
+- GHCR tags include `latest`, `0.40`, and `0.40.0`.
+- MCP Registry lists `0.40.0` as latest.
 - GitHub Marketplace listing is not live; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.
@@ -2472,41 +2484,41 @@ Top remaining items:
 GitHub repo description:
 
 ```text
-A drop-in engineering loop for coding agents: task contracts, verification reports, reviewer handoffs, and repo-level safety policies.
+A drop-in engineering loop for software agents: task contracts, context packs, verification reports, reviewer handoffs, and repo-level safety policies.
 ```
 
 Product Hunt style tagline:
 
 ```text
-Make coding agents work like disciplined engineers.
+Make software-agent work reviewable before it reaches a maintainer.
 ```
 
 Twitter/X launch post:
 
 ```text
-I built AgentLoopKit: a local-first npm CLI that gives Codex, Claude Code, Cursor, OpenCode, Gemini CLI, and other coding agents a repo-level engineering loop.
+I built AgentLoopKit: a local-first npm CLI that gives Codex, Claude Code, Cursor, OpenCode, Gemini CLI, and other software agents a repo-level engineering loop.
 
 npx agentloopkit init
 
-It generates task contracts, safety policies, verification reports, and PR handoffs. No telemetry. No cloud. No LLM required.
+It generates task contracts, context packs, safety policies, verification reports, and PR handoffs. No telemetry. No cloud. No LLM required.
 ```
 
 Hacker News title:
 
 ```text
-Show HN: AgentLoopKit, a repo-level engineering loop for coding agents
+Show HN: AgentLoopKit, a repo-level engineering loop for software agents
 ```
 
 Reddit/dev.to post outline:
 
 ```text
-Title: I built a local-first engineering loop for coding agents
+Title: I built a local-first engineering loop for software agents
 
 - Problem: agent-assisted work can be hard to review
-- Approach: repo-level task contracts, gates, policies, verification reports, and handoffs
+- Approach: repo-level task contracts, context packs, gates, policies, verification reports, and handoffs
 - Install today: npx agentloopkit init
 - What it does not do: no LLM wrapper, no SaaS, no telemetry
-- Example workflow: create-task, verify, handoff
+- Example workflow: create-task, context pack, verify, handoff
 - Ask: feedback from people using Codex, Claude Code, Cursor, OpenCode, Gemini CLI, or Copilot CLI
 ```
 

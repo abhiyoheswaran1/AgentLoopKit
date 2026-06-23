@@ -40,9 +40,10 @@ describe('package scripts', () => {
     expect(releaseFlow).toContain('npm run build');
     expect(releaseFlow).toContain('npm run check:public-docs');
     expect(releaseFlow).toContain('npm run check:links');
-    expect(releaseFlow).toContain('npm run dogfood:strict');
+    expect(releaseFlow).toContain('npm run dogfood');
+    expect(releaseFlow).not.toContain('npm run dogfood:strict');
     expect(releaseFlow).toContain('npm run smoke:release');
-    expect(releaseFlow).toContain('node dist/cli/index.js release-check --strict --redact-paths');
+    expect(releaseFlow).not.toContain('release-check --strict');
     expect(releaseFlow).not.toMatch(/\bnpm\s+publish\b/);
     expect(releaseFlow).not.toMatch(/\bgh\s+release\b/);
   });

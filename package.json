@@ -1,6 +1,6 @@
 {
   "name": "agentloopkit",
-  "version": "0.39.0",
+  "version": "0.40.0",
   "mcpName": "io.github.abhiyoheswaran1/agentloopkit",
   "description": "A drop-in engineering loop for software agents.",
   "type": "module",
@@ -65,7 +65,7 @@
     "maintenance:check": "node scripts/maintenance-check.mjs",
     "smoke:published": "node scripts/smoke-published-package.mjs",
     "smoke:release": "node scripts/smoke-packed-release.mjs",
-    "release-flow": "node scripts/prepublish-check.mjs && npm run lint && npm run typecheck && npm run test:release && npm run build && npm run check:public-docs && npm run check:links && npm run dogfood:strict && npm run smoke:release && node dist/cli/index.js release-check --strict --redact-paths",
+    "release-flow": "node scripts/prepublish-check.mjs && npm run lint && npm run typecheck && npm run test:release && npm run build && npm run check:public-docs && npm run check:links && npm run dogfood && npm run smoke:release",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",

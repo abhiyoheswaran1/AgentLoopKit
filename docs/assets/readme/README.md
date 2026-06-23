@@ -4,16 +4,19 @@ These files generate the screenshots and terminal animation used in the root REA
 
 The screenshot HTML uses the official logo from `docs/logo/icon.svg`. Use the SVG source for docs visuals so the rounded app icon edge stays clean on light backgrounds.
 
-Regenerate the terminal GIF:
+Regenerate the terminal GIFs:
 
 ```bash
 npx pnpm@10.12.1 build
 vhs docs/assets/readme/agentloopkit-cli.tape
+vhs docs/assets/readme/agentloopkit-context-contract.tape
 ```
 
 Run VHS from the repository root. The tape packs the local build to `/tmp`, installs it into a clean temp repository, hides the setup work with `Hide`/`Wait`/`Show`, then records the visible AgentLoopKit loop.
 
 The current GIF uses a 1200x720 Catppuccin Mocha terminal and shows `init`, task creation, task-aware verification, `ship --github-comment`, `prepare-pr --github-comment`, `review-context`, run history, and file intent lookup.
+
+The Context Contract GIF uses the same terminal style and shows `init`, scoped task creation, `status`, `context budget`, `context pack`, `context show`, verification, and ship evidence in a repo with many local changed files.
 
 Regenerate the Playwright screenshots:
 

@@ -139,7 +139,7 @@ If the repo installs AgentLoopKit as a dev dependency, use the local binary shap
 
 Run the MCP server from a repository that already has `agentloop.config.json`. The server reads that repo's local AgentLoopKit evidence and returns display-safe paths. It does not initialize the repo for you.
 
-Ask the agent to call read-only tools such as `agentloop_review_context`, `agentloop_status`, `agentloop_latest_ship_report`, `agentloop_list_runs`, `agentloop_file_intent`, or `agentloop_maintainer_check` before reviewing an agent-assisted change.
+Ask the agent to call read-only tools such as `agentloop_context_pack`, `agentloop_review_context`, `agentloop_status`, `agentloop_latest_ship_report`, `agentloop_list_runs`, `agentloop_file_intent`, or `agentloop_maintainer_check` before reviewing an agent-assisted change.
 
 ## Tools
 
@@ -161,6 +161,9 @@ Ask the agent to call read-only tools such as `agentloop_review_context`, `agent
 | `agentloop_check_gates`                | Local review gate status for task, verification, handoff, harness, policy, and git evidence                                                              |
 | `agentloop_artifacts`                  | Local artifact and run-ledger inventory metadata, with optional `type` and `latest` filters                                                              |
 | `agentloop_review_context`             | One reviewability snapshot that combines status, gates, policy status, artifact inventory, recent runs, and latest ship evidence                         |
+| `agentloop_context_budget`             | Local context pressure and compact-pack guidance without running commands                                                                                 |
+| `agentloop_context_pack`               | Auditable context pack with receipts, context-budget estimates, and source handles                                                                        |
+| `agentloop_context_show`               | Expansion for one local context source handle, such as `task:active` or `evidence-map:current`                                                           |
 | `agentloop_list_handoffs`              | Recent reviewer handoff summaries                                                                                                                        |
 | `agentloop_latest_handoff`             | Latest reviewer handoff Markdown content                                                                                                                 |
 
@@ -177,6 +180,7 @@ It does not:
 - archive tasks
 - call external APIs
 - read `.env` contents
+- intercept prompts or proxy provider traffic
 - upload data
 - publish packages or create releases
 

@@ -20,6 +20,15 @@ import { getActiveTask, listTasks, readTaskContract } from './task-state.js';
 import { getPolicyStatus, listPolicies, readPolicy } from './policy.js';
 import { runMaintainerCheck } from './maintainer-check.js';
 import { checkGates } from './check-gates.js';
+import {
+  buildContextBudgetContract,
+  buildContextPack,
+  CONTEXT_PACK_GOALS,
+  RESUME_PACK_TARGETS,
+  showContextHandle,
+  type ContextPackGoal,
+  type ResumePackTarget,
+} from './context-contract.js';
 import { getReviewContext } from './review-context.js';
 import {
   findFileIntent,
@@ -214,6 +223,49 @@ const tools: McpToolDefinition[] = [
     inputSchema: emptyInputSchema,
   },
   {
+    name: 'agentloop_context_budget',
+    description:
+      'Read local context pressure and compact-pack savings guidance without running commands.',
+    inputSchema: emptyInputSchema,
+  },
+  {
+    name: 'agentloop_context_pack',
+    description:
+      'Read an auditable local context pack with receipts, context-budget estimates, and source handles.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        target: {
+          type: 'string',
+          enum: [...RESUME_PACK_TARGETS],
+          description: 'Target reader. Defaults to generic.',
+        },
+        goal: {
+          type: 'string',
+          enum: [...CONTEXT_PACK_GOALS],
+          description: 'Context pack goal. Defaults to continue.',
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'agentloop_context_show',
+    description:
+      'Expand one local context source handle, such as task:active or evidence-map:current.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        handle: {
+          type: 'string',
+          description: 'Source handle to expand.',
+        },
+      },
+      required: ['handle'],
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'agentloop_list_handoffs',
     description: 'List recent local reviewer handoff summaries.',
     inputSchema: {
@@ -353,6 +405,30 @@ function readArtifactTypeArgument(
   return value;
 }
 
+function readContextTargetArgument(
+  args: Record<string, unknown> | undefined,
+): ResumePackTarget {
+  const value = args?.target;
+  if (value === undefined) return 'generic';
+  if (typeof value !== 'string' || !(RESUME_PACK_TARGETS as readonly string[]).includes(value)) {
+    throw new AgentLoopError(
+      `MCP tool argument "target" must be one of: ${RESUME_PACK_TARGETS.join(', ')}.`,
+    );
+  }
+  return value as ResumePackTarget;
+}
+
+function readContextGoalArgument(args: Record<string, unknown> | undefined): ContextPackGoal {
+  const value = args?.goal;
+  if (value === undefined) return 'continue';
+  if (typeof value !== 'string' || !(CONTEXT_PACK_GOALS as readonly string[]).includes(value)) {
+    throw new AgentLoopError(
+      `MCP tool argument "goal" must be one of: ${CONTEXT_PACK_GOALS.join(', ')}.`,
+    );
+  }
+  return value as ContextPackGoal;
+}
+
 export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolResult> {
   const config = await loadAgentLoopConfig(options.cwd);
 
@@ -435,6 +511,28 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
     }
     case 'agentloop_review_context': {
       return textResult(await getReviewContext({ cwd: options.cwd, config }));
+    }
+    case 'agentloop_context_budget': {
+      const contextBudget = await buildContextBudgetContract({ cwd: options.cwd, config });
+      return textResult({
+        evidenceMap: contextBudget.evidenceMap,
+        contextBudget: contextBudget.contextBudget,
+        markdown: contextBudget.markdown,
+        safety: contextBudget.safety,
+      });
+    }
+    case 'agentloop_context_pack': {
+      const target = readContextTargetArgument(options.arguments);
+      const goal = readContextGoalArgument(options.arguments);
+      return textResult({
+        contextPack: await buildContextPack({ cwd: options.cwd, config, target, goal }),
+      });
+    }
+    case 'agentloop_context_show': {
+      const handle = readStringArgument(options.arguments, 'handle');
+      return textResult({
+        contextHandle: await showContextHandle({ cwd: options.cwd, config, handle }),
+      });
     }
     case 'agentloop_list_handoffs': {
       const limit = readLimitArgument(options.arguments);

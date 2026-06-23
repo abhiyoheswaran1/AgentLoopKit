@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-22-15-23-ship",
+  "command": "ship",
+  "createdAt": "2026-06-22-15-23",
+  "createdAtEpochMs": 1782134640760,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-22-build-agentloop-context-contract-v1.md",
+    "title": "Build AgentLoop Context Contract v1",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-22-14-55-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-22-15-23-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-22-15-23-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 36
+}

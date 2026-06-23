@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-23-09-57-ship",
+  "command": "ship",
+  "createdAt": "2026-06-23-09-57",
+  "createdAtEpochMs": 1782201479434,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-23-release-agentloopkit-0-40-0.md",
+    "title": "Release AgentLoopKit 0.40.0",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-23-09-39-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-23-09-57-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-23-09-57-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 91
+}

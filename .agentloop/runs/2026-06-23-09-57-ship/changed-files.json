@@ -1,0 +1,366 @@
+[
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "FINAL_HANDOFF.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "ROADMAP.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/assets/readme/README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/launch-checklist.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/mcp.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/npm-publishing.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/release-checklist-example.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/release-status.md"
+  },
+  {
+    "status": "M",
+    "path": "package.json"
+  },
+  {
+    "status": "M",
+    "path": "server.json"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/index.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/completions.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/mcp-tools.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/mcp/server.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/claude-code.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/codex.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/cursor.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/gemini-cli.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/generic.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/github-copilot-cli.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/opencode.md"
+  },
+  {
+    "status": "M",
+    "path": "tests/cli-docs-drift.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/mcp-server.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/mcp-tools.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/package-scripts.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-22-13-40-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-22-15-23-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-22-22-17-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-22-22-21-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-23-09-57-release-notes.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-22-13-39-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-22-14-55-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-22-15-23-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-22-22-15-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-22-22-17-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-22-22-19-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-22-22-21-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-23-09-16-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-23-09-39-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/research/interview-cycle-196.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-13-40-handoff/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-13-40-handoff/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-13-40-handoff/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-13-40-handoff/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-15-23-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-15-23-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-15-23-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-15-23-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-15-23-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-15-23-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-15-23-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-15-23-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-15-23-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-17-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-17-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-17-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-17-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-17-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-17-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-17-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-17-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-17-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-20-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-20-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-20-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-21-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-21-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-21-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-21-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-21-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-22-22-21-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-09-33-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-09-33-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-09-33-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-22-add-readme-demo-gif-and-public-context-contract-polish.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-22-build-agentloop-context-contract-v1-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-23-release-agentloopkit-0-40-0-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-23-release-agentloopkit-0-40-0.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-22-add-readme-demo-gif-and-context-polish.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-22-agentloop-context-contract-product-research.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-22-build-agentloop-context-contract-v1.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/assets/readme/agentloopkit-context-contract.gif"
+  },
+  {
+    "status": "??",
+    "path": "docs/assets/readme/agentloopkit-context-contract.tape"
+  },
+  {
+    "status": "??",
+    "path": "docs/context.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/superpowers/plans/2026-06-22-agentloop-context-contract-v1.md"
+  },
+  {
+    "status": "??",
+    "path": "src/cli/commands/context.ts"
+  },
+  {
+    "status": "??",
+    "path": "src/core/context-contract.ts"
+  },
+  {
+    "status": "??",
+    "path": "tests/context-contract.test.ts"
+  }
+]
