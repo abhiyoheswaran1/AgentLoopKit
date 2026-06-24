@@ -80,20 +80,30 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.41.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.41.0>
-- Release asset: `agentloopkit-0.41.0.tgz`
-- Release asset SHA-256: `fc4d2ebb8fc4c73a26da8e245133c9761753a96eefd4051fef8a5178332832ad`
-- Release tag: `v0.41.0` at commit `a96c79af`
-- CI run: `28080114443`
-- CLI Smoke run: `28080114448`
-- Publish workflow run: `28080142680`
-- Docker workflow run: `28080142721`
-- MCP Registry workflow run: `28080541615`
-- Post-publish npm proof: npm latest is `0.41.0`
-- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.41.0`
-- MCP Registry proof: metadata points at `agentloopkit@0.41.0`
+- Current npm release: `agentloopkit@0.42.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.42.0>
+- Release asset: `agentloopkit-0.42.0.tgz`
+- Release asset SHA-256: pending post-release proof
+- Release tag: `v0.42.0` at release commit
+- CI run: pending post-release proof
+- CLI Smoke run: pending post-release proof
+- Publish workflow run: pending post-release proof
+- Docker workflow run: pending post-release proof
+- MCP Registry workflow run: pending post-release proof
+- Post-publish npm proof: pending post-release proof
+- GHCR proof: pending post-release proof for image tag `0.42.0`
+- MCP Registry proof: pending post-release proof for `agentloopkit@0.42.0`
 - GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof
+
+## 0.42.0 release summary
+
+Included:
+
+- Start and Context now prefer current-work task evidence so archived, terminal, deferred, and AgentFlight placeholder tasks stay as previous evidence.
+- No-current-task Start and Context routing now sends agents toward task setup without active-task handles or ship guidance when only previous release or handoff evidence exists.
+- `upgrade-harness` now checks generated files for both `agentloop start` and `agentloop context show`.
+- `doctor` now describes current agent-readiness topics, including Start preflight and source-handle expansion.
+- Generated harness templates moved to template version 2 with Start/Context readiness guidance.
 
 ## 0.41.0 release summary
 
@@ -1361,10 +1371,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.41.0` is public.
-- npm latest is `agentloopkit@0.41.0`.
-- GHCR tags include `latest`, `0.41`, and `0.41.0`.
-- MCP Registry lists `0.41.0` as latest.
+- GitHub release `v0.42.0` is public.
+- npm latest is `agentloopkit@0.42.0`.
+- GHCR tags include `latest`, `0.42`, and `0.42.0`.
+- MCP Registry lists `0.42.0` as latest.
 - GitHub Marketplace listing is not live; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.

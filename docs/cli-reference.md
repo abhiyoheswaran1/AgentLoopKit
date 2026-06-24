@@ -40,9 +40,9 @@ agentloop upgrade-harness --json
 agentloop upgrade-harness --json --redact-paths
 ```
 
-`upgrade-harness` inspects existing generated guidance after a CLI upgrade. It reads `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, `.agentloop/README.md`, and `.agentloop/manifest.json`, then reports whether the harness mentions the current review-readiness loop: `ship`, `prepare-pr`, run ledger or file intent, `maintainer-check`, `review-context`, and upgrade guidance.
+`upgrade-harness` inspects existing generated guidance after a CLI upgrade. It reads `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, `.agentloop/README.md`, and `.agentloop/manifest.json`, then reports whether the harness mentions the current agent-readiness loop: `agentloop start`, `agentloop context show`, `ship`, `prepare-pr`, run ledger or file intent, `maintainer-check`, `review-context`, and upgrade guidance.
 
-Use `--details` or `--suggestions` when you want copyable Markdown guidance for missing current-loop topics. JSON output includes the same suggestions as structured data.
+Use `--details` or `--suggestions` when you want copyable Markdown guidance for missing current-loop topics. Existing repos can copy the Start/Context snippet without letting AgentLoopKit overwrite local instructions. JSON output includes the same suggestions as structured data.
 
 The command is read-only. It does not overwrite guidance, merge templates, create tasks, run verification commands, read `.env` contents, call external APIs, or upload files. Use `init --dry-run` after `upgrade-harness` when you also want to see missing generated files.
 
@@ -68,7 +68,7 @@ agentloop doctor --advisory
 agentloop doctor --redact-paths
 ```
 
-`doctor` checks setup health, template manifest state, configured commands, Git root, current working tree, package name, package manager detection, project type detection, missing commands, monorepo signals, and risk-file categories.
+`doctor` checks setup health, template manifest state, generated guidance readiness, configured commands, Git root, current working tree, package name, package manager detection, project type detection, missing commands, monorepo signals, and risk-file categories.
 
 Env files are reported by path only. AgentLoopKit does not read `.env` contents.
 Risk-file scanning is bounded; on very large repos, doctor reports when the scan stops early so you can run targeted checks.
@@ -210,7 +210,9 @@ agentloop start --for claude --goal review --json
 agentloop start --for generic --goal research
 ```
 
-`start` briefs a software agent before broad repo reads. It combines the active task, decisive preflight state, next safe command, evidence map, verification freshness, context-budget impact, read-first source handles, risk summary, and source handles. Supported targets are `codex`, `claude`, `cursor`, `generic`, and `human`. Supported goals are `implement`, `continue`, `review`, `debug`, `handoff`, and `research`.
+`start` briefs a software agent before broad repo reads. It combines the current task when one exists, decisive preflight state, next safe command, evidence map, verification freshness, context-budget impact, read-first source handles, risk summary, and source handles. Supported targets are `codex`, `claude`, `cursor`, `generic`, and `human`. Supported goals are `implement`, `continue`, `review`, `debug`, `handoff`, and `research`.
+
+Start uses current-work task evidence. Archived, `done`, `deferred`, and AgentFlight placeholder tasks stay as previous evidence. When a repo has no current task, Start reports `needs-task`, omits `task:active` handles, and routes agents toward task setup.
 
 Preflight states are `ready-to-continue`, `needs-task`, `needs-verification`, `scope-drift`, `review-ready`, `blocked-by-risk`, and `evidence-only`. JSON output includes `preflight`, `riskSummary`, `impact.summary`, source handles, and the same safety boundary as human output.
 

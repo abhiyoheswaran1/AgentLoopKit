@@ -116,7 +116,7 @@ function chooseDoctorNextActions(checks: DoctorCheck[]): DoctorNextAction[] {
       nextAction(
         'upgrade-harness',
         'agentloop upgrade-harness --details',
-        'Generated guidance is missing current-loop topics such as ship, prepare-pr, run ledger, review context, or maintainer-check.',
+        'Generated guidance is missing current agent-readiness topics such as agentloop start, context source handles, ship, prepare-pr, run ledger, review context, or maintainer-check.',
       ),
     );
   }
@@ -375,8 +375,8 @@ export async function runDoctor(options: {
       'Harness guidance',
       harnessUpgrade.status === 'pass' ? 'pass' : 'warn',
       harnessUpgrade.status === 'pass'
-        ? 'generated guidance mentions the current review-readiness loop'
-        : 'generated guidance is missing current review-readiness loop topics; run agentloop upgrade-harness --details for copyable suggestions',
+        ? 'generated guidance mentions the current agent-readiness loop'
+        : 'generated guidance is missing current agent-readiness topics; run agentloop upgrade-harness --details for copyable suggestions',
     ),
   );
 

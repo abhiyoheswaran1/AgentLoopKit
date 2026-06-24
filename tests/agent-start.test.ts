@@ -117,6 +117,77 @@ Revert the copy change.
   return dir;
 }
 
+async function createArchivedStartFixture() {
+  const dir = await makeTempDir();
+  tempDirs.push(dir);
+
+  await git(dir, ['init', '-q']);
+  await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
+  await git(dir, ['config', 'user.name', 'AgentLoopKit Test']);
+
+  const config = createDefaultConfig({
+    name: 'demo',
+    type: 'typescript-package',
+    packageManager: 'npm',
+    commands: { test: 'npm test' },
+  });
+  await writeJson(path.join(dir, 'agentloop.config.json'), config);
+  await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+  await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+  await mkdir(path.join(dir, '.agentloop/runs/2026-06-24-08-10-handoff'), { recursive: true });
+
+  await writeFile(
+    path.join(dir, '.agentloop/tasks/archive/2026-06-24-release-previous-work.md'),
+    `# Release previous work
+
+- Created date: 2026-06-24
+- Task type: release
+- Status: done
+
+## Problem Statement
+Previous release work needed publication.
+
+## Desired Outcome
+Previous release evidence is preserved.
+
+## Likely Files or Areas
+- README.md
+
+## Acceptance Criteria
+- Previous release evidence is archived.
+
+## Verification Commands
+- npm test
+
+## Rollback Notes
+No active work rollback is needed.
+`,
+  );
+  await writeFile(
+    path.join(dir, '.agentloop/reports/2026-06-24-08-10-verification-report.md'),
+    '# Verification Report\n\n- Overall status: pass\n',
+  );
+  await writeJson(path.join(dir, '.agentloop/runs/2026-06-24-08-10-handoff/metadata.json'), {
+    id: '2026-06-24-08-10-handoff',
+    command: 'handoff',
+    createdAt: '2026-06-24-08-10',
+    createdAtEpochMs: Date.parse('2026-06-24T08:10:00Z'),
+    task: {
+      path: '.agentloop/tasks/2026-06-24-release-previous-work.md',
+      title: 'Release previous work',
+      status: 'done',
+    },
+    verificationReportPath: '.agentloop/reports/2026-06-24-08-10-verification-report.md',
+    handoffPath: '.agentloop/handoffs/2026-06-24-08-10-pr-summary.md',
+    changedFileCount: 0,
+  });
+
+  await git(dir, ['add', '.']);
+  await git(dir, ['commit', '-m', 'Archived release evidence']);
+
+  return dir;
+}
+
 describe('start command', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
@@ -241,6 +312,31 @@ describe('start command', () => {
     });
     expect(payload.riskSummary.blockers).toBeGreaterThanOrEqual(1);
     expect(payload.nextCommand.command).toContain('agentloop');
+  });
+
+  test('does not treat archived latest-run task evidence as active work', async () => {
+    const dir = await createArchivedStartFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'start', '--for', 'codex', '--goal', 'implement', '--json'],
+      { cwd: dir },
+    );
+    const payload = JSON.parse(result.stdout);
+
+    expect(payload.preflight).toMatchObject({
+      state: 'needs-task',
+      task: null,
+    });
+    expect(payload.nextCommand.command).not.toBe('agentloop ship');
+    expect(payload.readFirst.some((route: { handle: string }) => route.handle === 'task:active')).toBe(
+      false,
+    );
+    expect(payload.sourceHandles.some((handle: { id: string }) => handle.id === 'task:active')).toBe(
+      false,
+    );
+    expect(payload.markdown).toContain('No active task contract found.');
+    expect(payload.markdown).not.toContain('Release previous work');
   });
 
   test('uses scope-drift state when changed files are outside task evidence', async () => {

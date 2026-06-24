@@ -24,6 +24,8 @@ agentloop create-task --title "Describe the next focused change" --type feature
 agentloop task set .agentloop/tasks/<task-file>.md
 agentloop task doctor
 agentloop status
+agentloop start --for generic --goal implement --redact-paths
+agentloop context show <handle>
 agentloop review-context
 agentloop policy list
 agentloop policy show security
@@ -50,4 +52,4 @@ Use `agentloop ship` as the main stop condition for meaningful code changes. It 
 
 Use `agentloop prepare-pr` when reviewers need PR-ready copy. Use `agentloop maintainer-check` when reviewing whether an agent-assisted change has enough task, verification, handoff or ship, and risk evidence.
 
-Use `agentloop upgrade-harness` after AgentLoopKit CLI upgrades. It reports stale local guidance and writes nothing.
+Use `agentloop upgrade-harness` after AgentLoopKit CLI upgrades. It reports stale local guidance, including missing Start/Context agent-readiness guidance, and writes nothing.

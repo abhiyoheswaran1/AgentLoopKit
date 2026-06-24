@@ -4,36 +4,36 @@ Last checked: June 24, 2026.
 
 ## Current State
 
-- GitHub release `v0.41.0` is public.
-- npm latest is `agentloopkit@0.41.0`.
-- GHCR and MCP Registry are live for `0.41.0`.
+- GitHub release `v0.42.0` is public.
+- npm latest is `agentloopkit@0.42.0`.
+- GHCR and MCP Registry are live for `0.42.0`.
 - GitHub Marketplace listing is pending owner UI publication for the composite Action.
-- Release tag `v0.41.0` points at the published release commit.
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.41.0>
-- Release asset: `agentloopkit-0.41.0.tgz`
-- Release asset SHA-256: `fc4d2ebb8fc4c73a26da8e245133c9761753a96eefd4051fef8a5178332832ad`
-- CI run: `28080114443`
-- CLI Smoke run: `28080114448`
-- Publish workflow run: `28080142680`
-- Docker workflow run: `28080142721`
-- MCP Registry workflow run: `28080541615`
+- Release tag `v0.42.0` points at the published release commit.
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.42.0>
+- Release asset: `agentloopkit-0.42.0.tgz`
+- Release asset SHA-256: pending post-release proof.
+- CI run: pending post-release proof.
+- CLI Smoke run: pending post-release proof.
+- Publish workflow run: pending post-release proof.
+- Docker workflow run: pending post-release proof.
+- MCP Registry workflow run: pending post-release proof.
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
-GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirms the `0.41.0` image.
+GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirms the `0.42.0` image after release workflows finish.
 
-The MCP Registry metadata points at npm package `agentloopkit@0.41.0`.
+The MCP Registry metadata points at npm package `agentloopkit@0.42.0` after release workflows finish.
 
-GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 24, 2026.
+GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during the previous post-release proof on June 24, 2026.
 
 ## Latest Release Highlights
 
-Released in `0.41.0`:
+Released in `0.42.0`:
 
-- `agentloop start` gives software agents a compact repo preflight before broad reads.
-- Start reports the active task, preflight state, read-first handles, risk summary, next safe command, verification freshness, and estimated context avoided.
-- MCP exposes the same Start briefing through `agentloop_start`.
-- Generated agent instructions route Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and generic agents to `agentloop start`.
-- README and docs center the Start preflight workflow and regenerated terminal demo GIF.
+- `agentloop start` and `agentloop context` now use current-work task evidence so archived, terminal, deferred, and AgentFlight placeholder tasks stay as previous evidence.
+- Start no-current-task routing now sends agents toward task setup without `task:active` handles or `agentloop ship` guidance when only previous release or handoff evidence exists.
+- `agentloop upgrade-harness` now checks whether generated harness files mention both `agentloop start` and `agentloop context show`.
+- `agentloop doctor` reports current agent-readiness topics, including Start preflight and source-handle expansion.
+- Generated templates are now at template version 2 with Start/Context readiness guidance in root and harness files.
 
 ## Use The Current CLI
 
@@ -42,7 +42,7 @@ npm is the primary install path:
 ```bash
 npx agentloopkit init
 tmp=$(mktemp -d)
-(cd "$tmp" && npx --yes agentloopkit@0.41.0 version)
+(cd "$tmp" && npx --yes agentloopkit@0.42.0 version)
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -66,23 +66,23 @@ After each publish:
 
 ## Verification Evidence
 
-Local release gate for `0.41.0`:
+Local release gate for `0.42.0`:
 
-- `npm run release-flow`: passed on commit `a96c79af`
-- `node dist/cli/index.js release-check --strict --redact-paths`: passed from a clean tree on commit `a96c79af`
+- `npm run release-flow`: pending on release commit
+- `node dist/cli/index.js release-check --strict --redact-paths`: pending on release commit
 - `npx --yes projscan doctor --format markdown`: A/90 with the known reviewed `prepublishOnly` advisory
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: latest `0.41.0`
-- `node dist/cli/index.js npm-status --agentloopkit --expect-current`: latest matches local package version
-- `npm run smoke:published -- --version 0.41.0`: passed
-- `npx --yes agentloopkit@0.41.0 version`: `0.41.0` from a clean temporary directory
-- GitHub release asset digest: `fc4d2ebb8fc4c73a26da8e245133c9761753a96eefd4051fef8a5178332832ad`
-- `node dist/cli/index.js release-proof --redact-paths`: npm, GitHub Release, GHCR, and MCP Registry passed; GitHub Marketplace warned
+- `npm view agentloopkit version versions --json`: pending post-release proof
+- `node dist/cli/index.js npm-status --agentloopkit --expect-current`: pending post-release proof
+- `npm run smoke:published -- --version 0.42.0`: pending post-release proof
+- `npx --yes agentloopkit@0.42.0 version`: pending post-release proof
+- GitHub release asset digest: pending post-release proof
+- `node dist/cli/index.js release-proof --redact-paths`: pending post-release proof
 - `node dist/cli/index.js release-proof --strict --only github-marketplace --redact-paths`: expected to fail while Marketplace publication remains deferred
-- GHCR image tag `0.41.0`: confirmed by release proof
-- MCP Registry metadata points at `agentloopkit@0.41.0`: confirmed by release proof
+- GHCR image tag `0.42.0`: pending post-release proof
+- MCP Registry metadata points at `agentloopkit@0.42.0`: pending post-release proof
 
 Latest release-status documentation and proof commands on post-release `main`:
 

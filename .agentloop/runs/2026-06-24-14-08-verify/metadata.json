@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-14-08-verify",
+  "command": "verify",
+  "createdAt": "2026-06-24-14-08",
+  "createdAtEpochMs": 1782302910209,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-audit-agent-guidance-readiness-for-start.md",
+    "title": "Audit agent guidance readiness for Start",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-14-06-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 80
+}

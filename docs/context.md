@@ -44,11 +44,11 @@ Agent session / review / research handoff
 
 ## What It Solves
 
-Software agents often waste context on broad file lists, stale chat history, old logs, and repeated repo explanation. AgentLoopKit can do better because it already knows the active task contract, changed-file evidence map, verification freshness, run ledger, and next action.
+Software agents often waste context on broad file lists, stale chat history, old logs, and repeated repo explanation. AgentLoopKit can do better because it already knows the current task contract, changed-file evidence map, verification freshness, run ledger, and next action.
 
 Start gives the agent:
 
-- the exact active task
+- the current active or open task when one exists
 - the current preflight state
 - the next safe command
 - the first source handles to read
@@ -57,6 +57,8 @@ Start gives the agent:
 - which local handle expands the source truth
 
 The lower-level context contract then explains what was included, what was omitted, why, and how to retrieve source truth.
+
+Start and Context use a current-work rule. Archived, `done`, `deferred`, and AgentFlight placeholder tasks remain previous evidence. The next agent session gets task setup guidance instead of `task:active` handles or `agentloop ship` guidance from old work.
 
 The savings number is a planning estimate. AgentLoopKit uses a transparent character-count heuristic so teams can compare broad changed-file context against a compact context pack. It does not claim provider-token counts, billable-token savings, or universal percentages.
 
@@ -69,7 +71,7 @@ agentloop start --for codex --goal implement --redact-paths
 agentloop start --for human --goal review --json
 ```
 
-`start` is the canonical agent entry point. It returns a compact preflight with a decisive state such as `ready-to-continue`, `needs-task`, `needs-verification`, `scope-drift`, `review-ready`, `blocked-by-risk`, or `evidence-only`. It also shows the active task, next safe command, read-first handles, do-not-broad-scan guidance, risk summary, impact ledger, and source handles. Use `context show <handle>` to expand source truth after reading the briefing.
+`start` is the canonical agent entry point. It returns a compact preflight with a decisive state such as `ready-to-continue`, `needs-task`, `needs-verification`, `scope-drift`, `review-ready`, `blocked-by-risk`, or `evidence-only`. It also shows the current task when one exists, next safe command, read-first handles, do-not-broad-scan guidance, risk summary, impact ledger, and source handles. Use `context show <handle>` to expand source truth after reading the briefing. When only previous task evidence exists, Start reports `needs-task` instead of treating archived evidence as current work.
 
 ### Budget
 

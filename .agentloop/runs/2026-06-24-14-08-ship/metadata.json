@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-14-08-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-14-08",
+  "createdAtEpochMs": 1782302930187,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-audit-agent-guidance-readiness-for-start.md",
+    "title": "Audit agent guidance readiness for Start",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-14-06-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-14-08-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-14-08-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 83
+}

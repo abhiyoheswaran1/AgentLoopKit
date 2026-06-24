@@ -41,6 +41,8 @@ Use `agentloop task done` after verification and handoff or ship evidence when t
 ```bash
 agentloop status
 agentloop next
+agentloop start --for generic --goal implement --redact-paths
+agentloop context show <handle>
 agentloop review-context
 agentloop artifacts
 agentloop upgrade-harness
@@ -143,7 +145,7 @@ agentloop check-gates --strict
 `check-gates` inspects local evidence. It does not run tests or call an LLM.
 `review-context` returns one read-only snapshot with status, gates, policies, artifacts, recent runs, latest ship evidence, and next action.
 `artifacts` inventories existing local task, report, handoff, badge, CI summary, release-note, and run evidence without writing files.
-`upgrade-harness` reads existing generated guidance and reports missing current-loop topics such as `ship`, `prepare-pr`, `runs`, `intent`, `review-context`, and `maintainer-check`. It does not overwrite edited harness files.
+`upgrade-harness` reads existing generated guidance and reports missing current-loop topics such as `agentloop start`, `agentloop context show`, `ship`, `prepare-pr`, `runs`, `intent`, `review-context`, and `maintainer-check`. It does not overwrite edited harness files.
 `report` reads local evidence and writes one static HTML file under `reports/`.
 `badge` reads local evidence and writes SVG files under `reports/`.
 `ci-summary` reads allowlisted CI provenance and local evidence, then writes Markdown under `reports/` when `--write` is passed.

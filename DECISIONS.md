@@ -1,5 +1,21 @@
 # Decisions
 
+## 2026-06-24: Harness Readiness Requires Start And Source Handles
+
+Existing repos can keep generated guidance that mentions review-readiness commands but does not tell software agents how to start from the current repo truth. `upgrade-harness` should audit that gap instead of adding another setup command.
+
+Harness guidance now has an `agent-start` topic. The topic is present only when a generated guidance file mentions both `agentloop start` and `agentloop context show`, so a repo does not look current when agents can run the preflight but cannot expand source truth. `doctor` reuses the same audit and names the missing category as agent-readiness guidance.
+
+Generated templates move to template version 2. Existing repos still get a read-only path: run `agentloop upgrade-harness --details`, copy the relevant Start/Context snippet, and keep local edits under maintainer control.
+
+## 2026-06-24: Start And Context Use Current-Work Task Evidence
+
+`agentloop start` and `agentloop context` should brief the next agent session from current work, not from archived release or handoff evidence. Review surfaces can still use archived run task evidence, but the agent entry point needs a stricter task rule.
+
+Start and Context now accept only active or open real task contracts for `task:active` handles. Archived, terminal, deferred, and AgentFlight placeholder tasks stay as previous evidence. If a repo has only previous evidence, Start reports `needs-task`, omits the `task:active` handle, and routes agents away from `agentloop ship`.
+
+The boundary stays read-only and local: no verification commands run, no changed file contents are read, no `.env` contents are read, no provider traffic is intercepted, no external services are called, no task state is mutated, no releases are prepared, and no package versions or tags change.
+
 ## 2026-06-23: Start Preflight Gets Decisive States And Impact Summary
 
 `agentloop start` should show the repo's current truth before a software agent reads broadly. The command now exposes a sharper preflight model with states such as `ready-to-continue`, `needs-task`, `needs-verification`, `scope-drift`, `review-ready`, `blocked-by-risk`, and `evidence-only`.

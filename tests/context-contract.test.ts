@@ -99,6 +99,84 @@ Revert the copy change.
   return dir;
 }
 
+async function createArchivedContextFixture(options: { activePointer?: boolean } = {}) {
+  const dir = await makeTempDir();
+  tempDirs.push(dir);
+
+  await git(dir, ['init', '-q']);
+  await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
+  await git(dir, ['config', 'user.name', 'AgentLoopKit Test']);
+
+  const config = createDefaultConfig({
+    name: 'demo',
+    type: 'typescript-package',
+    packageManager: 'npm',
+    commands: { test: 'npm test' },
+  });
+  await writeJson(path.join(dir, 'agentloop.config.json'), config);
+  await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+  await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+  await mkdir(path.join(dir, '.agentloop/runs/2026-06-24-08-10-handoff'), { recursive: true });
+
+  const archivedTaskPath = path.join(
+    dir,
+    '.agentloop/tasks/archive/2026-06-24-release-previous-work.md',
+  );
+  await writeFile(
+    archivedTaskPath,
+    `# Release previous work
+
+- Created date: 2026-06-24
+- Task type: release
+- Status: done
+
+## Problem Statement
+Previous release work needed publication.
+
+## Desired Outcome
+Previous release evidence is preserved.
+
+## Likely Files or Areas
+- README.md
+
+## Acceptance Criteria
+- Previous release evidence is archived.
+
+## Verification Commands
+- npm test
+
+## Rollback Notes
+No active work rollback is needed.
+`,
+  );
+  if (options.activePointer) {
+    await setActiveTask({ cwd: dir, config, taskPath: archivedTaskPath });
+  }
+  await writeFile(
+    path.join(dir, '.agentloop/reports/2026-06-24-08-10-verification-report.md'),
+    '# Verification Report\n\n- Overall status: pass\n',
+  );
+  await writeJson(path.join(dir, '.agentloop/runs/2026-06-24-08-10-handoff/metadata.json'), {
+    id: '2026-06-24-08-10-handoff',
+    command: 'handoff',
+    createdAt: '2026-06-24-08-10',
+    createdAtEpochMs: Date.parse('2026-06-24T08:10:00Z'),
+    task: {
+      path: '.agentloop/tasks/2026-06-24-release-previous-work.md',
+      title: 'Release previous work',
+      status: 'done',
+    },
+    verificationReportPath: '.agentloop/reports/2026-06-24-08-10-verification-report.md',
+    handoffPath: '.agentloop/handoffs/2026-06-24-08-10-pr-summary.md',
+    changedFileCount: 0,
+  });
+
+  await git(dir, ['add', '.']);
+  await git(dir, ['commit', '-m', 'Archived release evidence']);
+
+  return dir;
+}
+
 describe('context command', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
@@ -164,6 +242,25 @@ describe('context command', () => {
     });
   });
 
+  test('does not label archived latest-run task evidence as active context', async () => {
+    const dir = await createArchivedContextFixture();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'context', 'pack', '--for', 'codex', '--goal', 'continue', '--json'],
+      { cwd: dir },
+    );
+    const payload = JSON.parse(result.stdout);
+
+    expect(payload.evidenceMap.task).toBeNull();
+    expect(payload.handles.some((handle: { id: string }) => handle.id === 'task:active')).toBe(
+      false,
+    );
+    expect(payload.evidenceMap.nextActions[0].command).toBe('agentloop create-task');
+    expect(payload.markdown).toContain('- Active task: none');
+    expect(payload.markdown).not.toContain('Release previous work');
+  });
+
   test('shows local source truth by handle with optional local-path redaction', async () => {
     const dir = await createContextFixture();
 
@@ -175,6 +272,18 @@ describe('context command', () => {
     expect(result.stdout).toContain('## Problem Statement');
     expect(result.stdout).toContain('[git-root]');
     expect(result.stdout).not.toContain(dir);
+  });
+
+  test('does not expand an archived active pointer through task active handle', async () => {
+    const dir = await createArchivedContextFixture({ activePointer: true });
+
+    const result = await execa(tsxPath, [cliPath, 'context', 'show', 'task:active'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stderr).toContain('No active task is available for handle task:active.');
   });
 
   test('supports research as an explicit context-pack goal', async () => {

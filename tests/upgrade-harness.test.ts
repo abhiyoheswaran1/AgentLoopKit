@@ -51,7 +51,7 @@ describe('upgrade-harness command', () => {
         expect.objectContaining({
           path: 'AGENTS.md',
           status: 'review',
-          missingTopics: expect.arrayContaining(['ship', 'prepare-pr', 'run-ledger']),
+          missingTopics: expect.arrayContaining(['ship', 'prepare-pr', 'run-ledger', 'agent-start']),
         }),
       ]),
     );
@@ -93,13 +93,42 @@ describe('upgrade-harness command', () => {
           topic: 'prepare-pr',
           copyMarkdown: expect.stringContaining('agentloop prepare-pr'),
         }),
+        expect.objectContaining({
+          topic: 'agent-start',
+          copyMarkdown: expect.stringContaining(
+            'agentloop start --for generic --goal implement --redact-paths',
+          ),
+        }),
       ]),
     );
     expect(humanResult.stdout).toContain('## Copyable Guidance');
     expect(humanResult.stdout).toContain('### ship');
     expect(humanResult.stdout).toContain('agentloop ship');
     expect(humanResult.stdout).toContain('agentloop prepare-pr');
+    expect(humanResult.stdout).toContain('agentloop context show <handle>');
     await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toBe(before);
+  });
+
+  test('requires source-handle expansion guidance for agent-start readiness', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeOldHarness(dir);
+    await writeFile(
+      path.join(dir, 'AGENTS.md'),
+      '# AGENTS\n\nBefore broad repo reads, run `agentloop start --for generic --goal implement --redact-paths`.\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'upgrade-harness', '--json'], { cwd: dir });
+
+    const output = JSON.parse(result.stdout);
+    expect(output.files).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: 'AGENTS.md',
+          missingTopics: expect.arrayContaining(['agent-start']),
+        }),
+      ]),
+    );
   });
 
   test('passes for a freshly initialized current harness', async () => {

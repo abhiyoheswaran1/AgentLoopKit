@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-12-11-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-12-11",
+  "createdAtEpochMs": 1782295921061,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-harden-agentloop-start-truth-consistency-2.md",
+    "title": "Harden AgentLoop Start truth consistency",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-12-05-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-12-11-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-12-11-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 19
+}

@@ -16,6 +16,7 @@ import {
   renderEvidenceMapMarkdown,
   type EvidenceMap,
 } from './evidence-map.js';
+import { getCurrentWorkTaskPath } from './evidence.js';
 import {
   escapeMarkdownProse,
   singleLineInlineCode as inlineCode,
@@ -26,7 +27,7 @@ import {
   type ResumePackTarget,
 } from './resume-pack.js';
 import { listRuns, readRun, type RunSummary } from './runs.js';
-import { getActiveTask, readTaskContract } from './task-state.js';
+import { readTaskContract } from './task-state.js';
 
 export { RESUME_PACK_TARGETS };
 export type { ResumePackTarget };
@@ -360,6 +361,7 @@ export async function buildContextBudgetContract(options: {
   const evidenceMap = await buildEvidenceMap({
     cwd: options.cwd,
     config: options.config,
+    taskEvidenceMode: 'current-work',
   });
   const contextBudget = buildContextBudget({
     evidenceMap,
@@ -383,6 +385,7 @@ export async function buildContextPack(options: {
     buildEvidenceMap({
       cwd: options.cwd,
       config: options.config,
+      taskEvidenceMode: 'current-work',
     }),
     listRuns(options.cwd),
   ]);
@@ -434,14 +437,17 @@ export async function showContextHandle(options: {
 }): Promise<ContextShowResult> {
   switch (options.handle) {
     case 'task:active': {
-      const activeTask = await getActiveTask({ cwd: options.cwd, config: options.config });
-      if (!activeTask) {
+      const activeTaskPath = await getCurrentWorkTaskPath({
+        cwd: options.cwd,
+        config: options.config,
+      });
+      if (!activeTaskPath) {
         throw new AgentLoopError('No active task is available for handle task:active.', 'CONTEXT_HANDLE_EMPTY');
       }
       const task = await readTaskContract({
         cwd: options.cwd,
         config: options.config,
-        taskPath: activeTask.path,
+        taskPath: activeTaskPath,
       });
       return {
         handle: options.handle,
@@ -484,6 +490,7 @@ export async function showContextHandle(options: {
       const evidenceMap = await buildEvidenceMap({
         cwd: options.cwd,
         config: options.config,
+        taskEvidenceMode: 'current-work',
       });
       return {
         handle: options.handle,

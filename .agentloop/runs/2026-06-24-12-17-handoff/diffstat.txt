@@ -1,0 +1,14 @@
+ CHANGELOG.md                   |   5 +-
+ DECISIONS.md                   |   8 +++
+ README.md                      |   8 +--
+ docs/cli-reference.md          |   4 +-
+ docs/context.md                |   8 +--
+ docs/mcp.md                    |   4 +-
+ src/core/context-contract.ts   |  15 ++++--
+ src/core/evidence-map.ts       |  13 ++++-
+ src/core/evidence.ts           |  54 ++++++++++++++++++++
+ tests/agent-start.test.ts      |  96 ++++++++++++++++++++++++++++++++++++
+ tests/context-contract.test.ts | 109 +++++++++++++++++++++++++++++++++++++++++
+ 11 files changed, 308 insertions(+), 16 deletions(-)
+docs/superpowers/plans/2026-06-24-agentloop-start-truth-consistency.md | untracked
+docs/superpowers/specs/2026-06-24-agentloop-start-truth-consistency-design.md | untracked

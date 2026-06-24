@@ -54,7 +54,7 @@ describe('init', () => {
     expect(result.created.some((file) => file.endsWith('.agentloop/manifest.json'))).toBe(true);
     expect(manifest).toMatchObject({
       version: 1,
-      templateVersion: 1,
+      templateVersion: 2,
       generatedBy: 'agentloopkit',
     });
     expect(config).toContain(

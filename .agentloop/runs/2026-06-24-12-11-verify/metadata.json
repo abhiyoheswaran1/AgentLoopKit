@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-12-11-verify",
+  "command": "verify",
+  "createdAt": "2026-06-24-12-11",
+  "createdAtEpochMs": 1782295909728,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-harden-agentloop-start-truth-consistency-2.md",
+    "title": "Harden AgentLoop Start truth consistency",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-12-05-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 16
+}

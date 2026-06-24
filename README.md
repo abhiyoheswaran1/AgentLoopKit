@@ -103,12 +103,13 @@ npx --yes agentloopkit@latest upgrade-harness --details --redact-paths
 npx --yes agentloopkit@latest init --dry-run
 ```
 
-`init` skips existing generated files and appends to unmarked `AGENTS.md` files instead of overwriting maintainer edits. Use `upgrade-harness` to find older guidance that does not mention the current review-readiness loop, then copy only the useful pieces into `AGENTS.md`, `AGENTLOOP.md`, or `.agentloop/harness/*`.
+`init` skips existing generated files and appends to unmarked `AGENTS.md` files instead of overwriting maintainer edits. Use `upgrade-harness` to find older guidance that does not tell agents to run `agentloop start` before broad reads or expand source handles with `agentloop context show <handle>`. Copy only the useful pieces into `AGENTS.md`, `AGENTLOOP.md`, or `.agentloop/harness/*`.
 
 You can use the latest loop before refreshing old guidance:
 
 ```bash
 npx --yes agentloopkit@latest create-task --type bugfix --title "Fix checkout bug"
+npx --yes agentloopkit@latest start --for generic --goal implement --redact-paths
 npx --yes agentloopkit@latest verify
 npx --yes agentloopkit@latest ship
 npx --yes agentloopkit@latest prepare-pr
@@ -162,9 +163,11 @@ npx agentloopkit next --redact-paths
 
 When `status` or `next` recommends `create-task` in a dirty repo, the reason calls out existing dirty non-evidence files so agents can confirm the next task scope before implementation. When `create-task` sees that same pre-existing dirty work, it also adds a bounded Risk Notes bullet to the generated task contract so later review evidence preserves the baseline count and examples.
 
-Use `agentloop start --for codex --goal implement --redact-paths` when a software agent needs the repo truth before broad reads. Start is the preflight: exact task, decisive state, next safe command, read-first handles, risk summary, verification freshness, context-budget impact, and source handles. Use `agentloop context show <handle>` to expand source truth only when needed. Use `agentloop context pack --for codex --goal continue --redact-paths` when you need the lower-level receipt and omission details directly. Use `agentloop guard` when you want a live local check for scope drift, stale verification, proof debt, and context-budget pressure before review. Use `agentloop explain-diff` when you need to understand whether the current changed files are covered by task scope, recent run evidence, fresh verification, and risk guidance. Use `agentloop resume-pack --for codex`, `--for claude`, `--for cursor`, `--for generic`, or `--for human` when you need the older compact continuation surface. These commands are read-only by default and use local evidence only.
+Use `agentloop start --for codex --goal implement --redact-paths` when a software agent needs the repo truth before broad reads. Start is the preflight: current task when one exists, decisive state, next safe command, read-first handles, risk summary, verification freshness, context-budget impact, and source handles. Use `agentloop context show <handle>` to expand source truth only when needed. Use `agentloop context pack --for codex --goal continue --redact-paths` when you need the lower-level receipt and omission details directly. Use `agentloop guard` when you want a live local check for scope drift, stale verification, proof debt, and context-budget pressure before review. Use `agentloop explain-diff` when you need to understand whether the current changed files are covered by task scope, recent run evidence, fresh verification, and risk guidance. Use `agentloop resume-pack --for codex`, `--for claude`, `--for cursor`, `--for generic`, or `--for human` when you need the older compact continuation surface. These commands are read-only by default and use local evidence only.
 
 `agentloop start` is the agent starting point. It keeps agents from guessing by turning task state, changed files, verification, risk, and context pressure into one compact preflight. The Context Contract sits underneath it: `context pack` explains why each item is present, names what was left out, and provides local handles for the source truth. A large changed-file list becomes a small briefing the agent can expand only when it needs detail.
+
+Start uses a strict current-work rule. It accepts active or open task contracts. Archived, `done`, `deferred`, and AgentFlight placeholder tasks stay as previous evidence. Start and Context omit `task:active` handles and `agentloop ship` guidance for old work. In a clean repo with only previous evidence, Start tells the agent that no active task exists.
 
 ```text
 Your software agent / app
@@ -178,7 +181,7 @@ Your software agent / app
  |------------------------------------------------------------------------|
  | State -> Next Safe Command -> Read First -> Risk -> Impact -> Handles   |
  |                                      |                                  |
- |                                      +-- task:active                    |
+ |                                      +-- task:active (current work only)|
  |                                      +-- verification:latest            |
  |                                      +-- run:latest                     |
  |                                      +-- evidence-map:current           |
@@ -203,7 +206,7 @@ The context-budget example is generated from local AgentLoopKit output in this r
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-context-contract.gif" alt="Terminal demo running AgentLoopKit Start preflight with state, next command, context budget, source-handle expansion, and verification evidence" width="100%">
 </p>
 
-The terminal demo is generated from committed VHS sources in this repository. It shows the intended agent workflow: run Start preflight, see what not to broad-scan, expand only the active task handle, and verify with local evidence.
+The terminal demo is generated from committed VHS sources in this repository. It shows the intended agent workflow: run Start preflight, see what not to broad-scan, expand the current task handle when one exists, and verify with local evidence.
 
 ## Dogfood Gate
 

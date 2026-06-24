@@ -9,6 +9,7 @@ import {
 import { pathExists, readTextIfExists } from './file-system.js';
 
 export type HarnessTopicId =
+  | 'agent-start'
   | 'ship'
   | 'prepare-pr'
   | 'run-ledger'
@@ -56,9 +57,15 @@ export type HarnessUpgradeReport = {
 type TopicDefinition = {
   id: HarnessTopicId;
   needles: string[];
+  match?: 'any' | 'all';
 };
 
 const TOPICS: TopicDefinition[] = [
+  {
+    id: 'agent-start',
+    needles: ['agentloop start', 'agentloop context show'],
+    match: 'all',
+  },
   { id: 'ship', needles: ['agentloop ship'] },
   { id: 'prepare-pr', needles: ['agentloop prepare-pr'] },
   { id: 'run-ledger', needles: ['.agentloop/runs', 'agentloop runs', 'agentloop intent'] },
@@ -75,6 +82,11 @@ const HARNESS_FILES = [
 ] as const;
 
 const TOPIC_SUGGESTIONS: Record<HarnessTopicId, { title: string; copyMarkdown: string }> = {
+  'agent-start': {
+    title: 'Agent Start preflight and source handles',
+    copyMarkdown:
+      '- Before broad repo reads, run `agentloop start --for generic --goal implement --redact-paths`; then expand only needed source truth with `agentloop context show <handle>`.',
+  },
   ship: {
     title: 'Review-readiness ship gate',
     copyMarkdown:
@@ -113,9 +125,12 @@ function repoPath(cwd: string, relativePath: string) {
 
 function detectPresentTopics(content: string) {
   const normalized = content.toLowerCase();
-  return TOPICS.filter((topic) =>
-    topic.needles.some((needle) => normalized.includes(needle.toLowerCase())),
-  ).map((topic) => topic.id);
+  return TOPICS.filter((topic) => {
+    const matcher = (needle: string) => normalized.includes(needle.toLowerCase());
+    return topic.match === 'all'
+      ? topic.needles.every(matcher)
+      : topic.needles.some(matcher);
+  }).map((topic) => topic.id);
 }
 
 async function inspectHarnessFile(cwd: string, relativePath: string): Promise<HarnessUpgradeFile> {
@@ -206,10 +221,10 @@ function buildNextSteps(report: Pick<HarnessUpgradeReport, 'manifest' | 'files'>
       'Manually copy the relevant guidance into AGENTS.md, AGENTLOOP.md, or .agentloop/harness/*; AgentLoopKit will not overwrite local edits.',
     );
     nextSteps.push(
-      'Use the current loop for new work now: `agentloop create-task`, `agentloop verify`, `agentloop ship`, `agentloop prepare-pr`, `agentloop maintainer-check`.',
+      'Use the current loop for new work now: `agentloop create-task`, `agentloop start`, `agentloop verify`, `agentloop ship`, `agentloop prepare-pr`, `agentloop maintainer-check`.',
     );
   } else {
-    nextSteps.push('Harness guidance already mentions the current review-readiness loop.');
+    nextSteps.push('Harness guidance already mentions the current agent-readiness loop.');
   }
 
   return nextSteps;

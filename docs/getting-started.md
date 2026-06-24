@@ -80,7 +80,7 @@ npx --yes agentloopkit@latest upgrade-harness --details --redact-paths
 npx --yes agentloopkit@latest init --dry-run
 ```
 
-`upgrade-harness` reads existing `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, and `.agentloop/README.md`. It reports whether those files mention the current review-readiness loop: `ship`, `prepare-pr`, run ledger, file intent, `review-context`, `maintainer-check`, and upgrade guidance. It writes nothing.
+`upgrade-harness` reads existing `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, and `.agentloop/README.md`. It reports whether those files mention the current agent-readiness loop: `agentloop start`, `agentloop context show`, `ship`, `prepare-pr`, run ledger, file intent, `review-context`, `maintainer-check`, and upgrade guidance. It writes nothing.
 
 `init --dry-run` shows missing generated files. A non-dry `init` creates missing files and skips existing ones. AgentLoopKit does not overwrite edited harness files or merge templates automatically.
 

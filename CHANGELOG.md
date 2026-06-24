@@ -4,6 +4,16 @@
 
 - No unreleased changes yet.
 
+## 0.42.0
+
+- Added `agent-start` guidance readiness checks to `upgrade-harness` so older generated harness files must mention both `agentloop start` and `agentloop context show`.
+- Changed `doctor` harness warnings to describe current agent-readiness topics, including Start preflight and source-handle expansion.
+- Updated generated harness templates to template version 2 with Start/Context readiness guidance in `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, and `.agentloop/README.md`.
+- Changed `agentloop start` and `agentloop context` to use current-work task evidence so archived, terminal, deferred, and AgentFlight placeholder tasks stay as previous evidence.
+- Changed Start and Context no-current-task routing so previous release or handoff evidence routes agents toward task setup without `task:active` handles or `agentloop ship` guidance.
+- Added regression coverage for archived latest-run evidence and archived active-task pointers in Start and Context.
+- Updated README, Context, CLI reference, and MCP docs with the Start current-work guarantee.
+
 ## 0.41.0
 
 - Added `agentloop start` as the repo-native preflight for software agents, with active task, decisive preflight state, read-first source handles, risk summary, next safe command, and context-budget impact.

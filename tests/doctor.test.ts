@@ -35,7 +35,7 @@ describe('doctor', () => {
     expect(result.checks).toContainEqual({
       name: 'Template manifest',
       status: 'pass',
-      message: 'template version 1 is current',
+      message: 'template version 2 is current',
     });
     expect(result.markdown).toContain('AgentLoopKit Doctor');
   });
@@ -350,7 +350,7 @@ describe('doctor', () => {
       name: 'Harness guidance',
       status: 'warn',
       message:
-        'generated guidance is missing current review-readiness loop topics; run agentloop upgrade-harness --details for copyable suggestions',
+        'generated guidance is missing current agent-readiness topics; run agentloop upgrade-harness --details for copyable suggestions',
     });
     expect(result.nextActions).toEqual(
       expect.arrayContaining([
@@ -358,7 +358,7 @@ describe('doctor', () => {
           id: 'upgrade-harness',
           command: 'agentloop upgrade-harness --details',
           reason:
-            'Generated guidance is missing current-loop topics such as ship, prepare-pr, run ledger, review context, or maintainer-check.',
+            'Generated guidance is missing current agent-readiness topics such as agentloop start, context source handles, ship, prepare-pr, run ledger, review context, or maintainer-check.',
         },
       ]),
     );
@@ -504,7 +504,7 @@ describe('doctor', () => {
           name: 'Template manifest',
           status: 'warn',
           message:
-            'template version 0 is older than current version 1; review docs/template-migrations.md and rerun agentloop init to add missing files',
+            'template version 0 is older than current version 2; review docs/template-migrations.md and rerun agentloop init to add missing files',
         },
       ]),
     });

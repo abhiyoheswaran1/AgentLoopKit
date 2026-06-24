@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-12-17-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-24-12-17",
+  "createdAtEpochMs": 1782296231027,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-harden-agentloop-start-truth-consistency-2.md",
+    "title": "Harden AgentLoop Start truth consistency",
+    "status": "review"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-12-12-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-12-17-pr-summary.md",
+  "changedFileCount": 36
+}

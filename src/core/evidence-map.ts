@@ -3,7 +3,10 @@ import { readFile } from 'node:fs/promises';
 import type { AgentLoopConfig } from './config.js';
 import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
 import { classifyChangedFiles } from './change-areas.js';
-import { resolveCurrentOrLatestRunTaskVerificationEvidence } from './evidence.js';
+import {
+  resolveCurrentOrLatestRunTaskVerificationEvidence,
+  resolveCurrentWorkTaskVerificationEvidence,
+} from './evidence.js';
 import { getGitStatus, parseGitStatus, type GitFileStatus } from './git.js';
 import {
   escapeMarkdownProse,
@@ -80,6 +83,8 @@ export type EvidenceMap = {
   nextActions: EvidenceMapNextAction[];
   claims: string[];
 };
+
+export type EvidenceMapTaskEvidenceMode = 'current-or-latest-run' | 'current-work';
 
 type PathPattern = {
   value: string;
@@ -331,8 +336,12 @@ export async function buildEvidenceMap(options: {
   config: AgentLoopConfig;
   changedFiles?: GitFileStatus[];
   recentRunLimit?: number;
+  taskEvidenceMode?: EvidenceMapTaskEvidenceMode;
 }): Promise<EvidenceMap> {
-  const evidence = await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
+  const evidence =
+    options.taskEvidenceMode === 'current-work'
+      ? await resolveCurrentWorkTaskVerificationEvidence(options)
+      : await resolveCurrentOrLatestRunTaskVerificationEvidence(options);
   const task = evidence.taskPath
     ? await readTaskContract({
         cwd: options.cwd,

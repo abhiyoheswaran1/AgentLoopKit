@@ -22,6 +22,9 @@ export type CurrentTaskVerificationEvidence = CurrentVerificationEvidence & {
 
 const STALE_VERIFICATION_MESSAGE =
   'Latest verification report predates the current task. Rerun verification.';
+const PREVIOUS_VERIFICATION_MESSAGE =
+  'Latest verification report has no current task. Treat it as previous evidence until a task is created or pinned.';
+const CURRENT_WORK_TASK_STATUSES = new Set(['proposed', 'in-progress', 'blocked', 'review']);
 
 function relativePath(cwd: string, filePath: string) {
   return path.relative(cwd, filePath).split(path.sep).join('/') || '.';
@@ -36,11 +39,34 @@ function isPostVerificationTaskStatus(status: string) {
   return normalized === 'review' || normalized === 'done';
 }
 
+function isArchivedTaskPath(options: { cwd: string; config: AgentLoopConfig; taskPath: string }) {
+  return resolvesInsidePath(
+    path.resolve(options.cwd, options.config.paths.tasksDir, 'archive'),
+    options.taskPath,
+  );
+}
+
 export async function getCurrentTaskPath(options: { cwd: string; config: AgentLoopConfig }) {
   const activeTaskPath = await getActiveTaskPath(options);
   if (activeTaskPath) {
     const activeTask = await readTaskMetadata(options.cwd, activeTaskPath);
     if (activeTask.source !== 'agentflight-placeholder') return activeTaskPath;
+  }
+  return getFallbackTaskPath(options);
+}
+
+export async function getCurrentWorkTaskPath(options: { cwd: string; config: AgentLoopConfig }) {
+  const activeTaskPath = await getActiveTaskPath(options);
+  if (activeTaskPath) {
+    const activeTask = await readTaskMetadata(options.cwd, activeTaskPath);
+    const status = activeTask.status.trim().toLowerCase();
+    if (
+      !activeTask.source &&
+      CURRENT_WORK_TASK_STATUSES.has(status) &&
+      !isArchivedTaskPath({ ...options, taskPath: activeTaskPath })
+    ) {
+      return activeTaskPath;
+    }
   }
   return getFallbackTaskPath(options);
 }
@@ -91,9 +117,20 @@ export async function resolveCurrentVerificationEvidence(options: {
   cwd: string;
   taskPath?: string;
   reportPath?: string;
+  previousWhenNoTask?: boolean;
 }): Promise<CurrentVerificationEvidence> {
   if (!options.reportPath) return {};
   if (!options.taskPath) {
+    if (options.previousWhenNoTask) {
+      return {
+        latestReportPath: options.reportPath,
+        staleReport: {
+          path: options.reportPath,
+          relativePath: relativePath(options.cwd, options.reportPath),
+          message: PREVIOUS_VERIFICATION_MESSAGE,
+        },
+      };
+    }
     return {
       currentReportPath: options.reportPath,
       latestReportPath: options.reportPath,
@@ -138,6 +175,23 @@ export async function resolveCurrentTaskVerificationEvidence(options: {
       cwd: options.cwd,
       taskPath,
       reportPath,
+    })),
+  };
+}
+
+export async function resolveCurrentWorkTaskVerificationEvidence(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+}): Promise<CurrentTaskVerificationEvidence> {
+  const taskPath = await getCurrentWorkTaskPath(options);
+  const reportPath = await getLatestVerificationReportPath(options);
+  return {
+    taskPath,
+    ...(await resolveCurrentVerificationEvidence({
+      cwd: options.cwd,
+      taskPath,
+      reportPath,
+      previousWhenNoTask: true,
     })),
   };
 }

@@ -21,8 +21,10 @@ npx --yes agentloopkit@latest upgrade-harness --json
 npx --yes agentloopkit@latest init --dry-run
 ```
 
-`upgrade-harness` reads existing generated guidance and reports whether it mentions the current review-readiness loop:
+`upgrade-harness` reads existing generated guidance and reports whether it mentions the current agent-readiness loop:
 
+- `agentloop start`
+- `agentloop context show`
 - `agentloop ship`
 - `agentloop prepare-pr`
 - `.agentloop/runs/`, `agentloop runs`, or `agentloop intent`
@@ -61,6 +63,19 @@ The manifest records:
 - `generatedBy`: package name
 
 `agentloop doctor` reads this file and reports whether the installed template generation is current for the CLI you are running.
+
+## Template Version 2
+
+Version 2 adds Agent Start readiness guidance to generated `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, and `.agentloop/README.md`.
+
+Existing repos do not need an automatic rewrite. Run `agentloop upgrade-harness --details` and copy the Start/Context guidance that fits your repo:
+
+```text
+agentloop start --for generic --goal implement --redact-paths
+agentloop context show <handle>
+```
+
+This keeps software agents pointed at the current repo preflight before broad reads, while source handles preserve a local expansion path.
 
 ## Doctor Warnings
 

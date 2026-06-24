@@ -23,6 +23,8 @@ Rules:
 - Use `agentloop task doctor` to find missing, legacy, unsupported, terminal, or misplaced post-verification gate task issues without mutating task files.
 - Use `agentloop status` to inspect pinned active task, latest open task, parked deferred tasks, latest report, dirty files, and next action.
 - Use `agentloop next` when you only need the next recommended loop command.
+- Use `agentloop start --for generic --goal implement --redact-paths` before broad repo reads when a software agent needs the current task, evidence, risk, context budget, and source handles.
+- Use `agentloop context show <handle>` after Start when the agent needs to expand exact local source truth.
 - Use `agentloop review-context` when an agent needs one read-only snapshot of task, gate, policy, artifact, run, and next-action state.
 - Use `agentloop artifacts` when you need a read-only inventory of local task, report, handoff, badge, CI summary, release-note, and run evidence.
 - Use `agentloop upgrade-harness` after updating AgentLoopKit to inspect older generated guidance without overwriting local edits.
