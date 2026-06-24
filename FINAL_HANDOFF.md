@@ -83,16 +83,16 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Current npm release: `agentloopkit@0.42.0`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.42.0>
 - Release asset: `agentloopkit-0.42.0.tgz`
-- Release asset SHA-256: pending post-release proof
-- Release tag: `v0.42.0` at release commit
-- CI run: pending post-release proof
-- CLI Smoke run: pending post-release proof
-- Publish workflow run: pending post-release proof
-- Docker workflow run: pending post-release proof
-- MCP Registry workflow run: pending post-release proof
-- Post-publish npm proof: pending post-release proof
-- GHCR proof: pending post-release proof for image tag `0.42.0`
-- MCP Registry proof: pending post-release proof for `agentloopkit@0.42.0`
+- Release asset SHA-256: `a5fea35f90976cace3cd00943d6290817a43b3989aefa7aaf66ed9e69f6674b2`
+- Release tag: `v0.42.0` at commit `43245063`
+- CI run: `28099488561`
+- CLI Smoke run: `28099488491`
+- Publish workflow run: `28099521155`
+- Docker workflow run: `28099521058`
+- MCP Registry workflow run: `28100013921`
+- Post-publish npm proof: npm latest is `0.42.0`
+- GHCR proof: `agentloop release-proof --redact-paths` confirms image tag `0.42.0`
+- MCP Registry proof: metadata points at `agentloopkit@0.42.0`
 - GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof
 
 ## 0.42.0 release summary

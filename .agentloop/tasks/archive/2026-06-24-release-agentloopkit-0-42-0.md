@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-24
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 AgentLoopKit has user-facing Start/Context current-work fixes, agent guidance readiness checks, and template version 2 ready to publish.
