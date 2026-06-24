@@ -81,7 +81,7 @@ ruff check .
 mypy .
 ```
 
-Use the repo's real commands instead of adding tools just for AgentLoopKit.
+Use the repo's real commands instead of adding tools only for AgentLoopKit.
 
 ## Docs-Only Repo
 

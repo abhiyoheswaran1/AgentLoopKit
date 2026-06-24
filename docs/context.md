@@ -1,10 +1,11 @@
 # AgentLoop Context Contract
 
-AgentLoop Context Contract turns local repo evidence into a compact, auditable pack for software agents and reviewers.
+AgentLoop Start Preflight turns local repo evidence into a compact, auditable briefing for software agents and reviewers.
 
-Use it when a session starts, resumes after an interruption, prepares for review, or needs to continue local research without pasting a long transcript.
+Use `agentloop start` when a session begins and the agent needs the shortest read-first briefing. Use `agentloop context` when the agent or reviewer needs the lower-level receipt, omission list, budget, and source-handle expansion.
 
 ```bash
+agentloop start --for codex --goal implement --redact-paths
 agentloop context budget
 agentloop context pack --for codex --goal continue --redact-paths
 agentloop context show task:active
@@ -12,7 +13,7 @@ agentloop context show task:active
 
 ![AgentLoopKit Context Contract terminal demo](assets/readme/agentloopkit-context-contract.gif)
 
-The demo shows the intended loop: measure context pressure, build a compact pack, expand a source handle only when the agent needs detail, then verify with local evidence.
+The demo shows the lower-level context loop: measure context pressure, build a compact pack, expand a source handle only when the agent needs detail, then verify with local evidence.
 
 ```text
 Your software agent / app
@@ -21,22 +22,22 @@ Your software agent / app
         |
         | task contracts - diffs - verification - runs - research notes - logs
         v
- +-----------------------------------------------------------------------+
- | AgentLoop Context Contract  (runs locally; source truth stays in repo) |
- |-----------------------------------------------------------------------|
- | Context Budget  ->  Evidence Map  ->  Pack Receipt  ->  Source Handles |
- |                                      |                                 |
- |                                      +-- task:active                   |
- |                                      +-- verification:latest           |
- |                                      +-- run:latest                    |
- |                                      +-- evidence-map:current          |
- |                                      +-- context-budget:current        |
- |                                                                       |
- | Goals: continue - review - debug - handoff - research                  |
- | MCP tools - generated agent instructions - transparent heuristics      |
- +-----------------------------------------------------------------------+
+ +------------------------------------------------------------------------+
+ | AgentLoop Start Preflight + Context Contract (source truth stays here) |
+ |------------------------------------------------------------------------|
+ | State -> Next Safe Command -> Read First -> Risk -> Impact -> Handles   |
+ |                                      |                                  |
+ |                                      +-- task:active                    |
+ |                                      +-- verification:latest            |
+ |                                      +-- run:latest                     |
+ |                                      +-- evidence-map:current           |
+ |                                      +-- context-budget:current         |
+ |                                                                        |
+ | Goals: implement - continue - review - debug - handoff - research       |
+ | MCP tools - generated agent instructions - transparent local heuristics |
+ +------------------------------------------------------------------------+
         |
-        | compact context pack + retrieval handles
+        | compact preflight + retrieval handles
         v
 Agent session / review / research handoff
 ```
@@ -45,18 +46,30 @@ Agent session / review / research handoff
 
 Software agents often waste context on broad file lists, stale chat history, old logs, and repeated repo explanation. AgentLoopKit can do better because it already knows the active task contract, changed-file evidence map, verification freshness, run ledger, and next action.
 
-The context contract gives the agent:
+Start gives the agent:
 
-- what was included
-- why it was included
-- what was omitted
-- why it was omitted
+- the exact active task
+- the current preflight state
+- the next safe command
+- the first source handles to read
+- the risk and proof summary
 - how much context pressure was avoided by using a compact pack
 - which local handle expands the source truth
+
+The lower-level context contract then explains what was included, what was omitted, why, and how to retrieve source truth.
 
 The savings number is a planning estimate. AgentLoopKit uses a transparent character-count heuristic so teams can compare broad changed-file context against a compact context pack. It does not claim provider-token counts, billable-token savings, or universal percentages.
 
 ## Commands
+
+### Start
+
+```bash
+agentloop start --for codex --goal implement --redact-paths
+agentloop start --for human --goal review --json
+```
+
+`start` is the canonical agent entry point. It returns a compact preflight with a decisive state such as `ready-to-continue`, `needs-task`, `needs-verification`, `scope-drift`, `review-ready`, `blocked-by-risk`, or `evidence-only`. It also shows the active task, next safe command, read-first handles, do-not-broad-scan guidance, risk summary, impact ledger, and source handles. Use `context show <handle>` to expand source truth after reading the briefing.
 
 ### Budget
 

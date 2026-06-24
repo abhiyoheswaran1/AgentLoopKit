@@ -16,6 +16,7 @@ const publicCommands = [
   'handoff',
   'status',
   'next',
+  'start',
   'review-context',
   'context',
   'guard',

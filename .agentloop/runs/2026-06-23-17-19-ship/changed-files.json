@@ -1,0 +1,326 @@
+[
+  {
+    "status": "M",
+    "path": "AGENTLOOP.md"
+  },
+  {
+    "status": "M",
+    "path": "AGENTS.md"
+  },
+  {
+    "status": "M",
+    "path": "DECISIONS.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/assets/readme/README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/assets/readme/agentloopkit-context-contract.gif"
+  },
+  {
+    "status": "M",
+    "path": "docs/assets/readme/agentloopkit-context-contract.tape"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/context.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/getting-started.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/mcp.md"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/index.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/completions.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/mcp-tools.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/mcp/server.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/claude-code.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/codex.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/cursor.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/gemini-cli.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/generic.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/github-copilot-cli.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/opencode.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/root/AGENTLOOP.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/root/AGENTS.md"
+  },
+  {
+    "status": "M",
+    "path": "tests/cli-docs-drift.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/mcp-server.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/mcp-tools.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-23-14-56-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-23-15-30-pr-summary-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-23-15-30-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-23-14-39-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-23-14-56-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-23-14-57-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-23-15-30-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-23-16-35-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-23-16-36-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-23-16-58-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-14-56-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-14-56-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-14-56-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-14-56-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-14-56-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-14-56-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-14-56-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-14-56-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-14-56-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-13-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-13-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-13-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-30-ship-2/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-30-ship-2/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-30-ship-2/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-30-ship-2/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-30-ship-2/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-30-ship-2/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-30-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-30-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-30-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-30-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-30-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-15-30-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-16-35-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-16-35-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-16-35-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-16-57-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-16-57-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-16-57-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-17-19-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-17-19-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-23-17-19-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-23-build-agentloop-start-context-router-and-impact-ledger-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-23-make-agentloop-start-a-sharper-repo-preflight-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-23-make-agentloop-start-a-sharper-repo-preflight.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-23-build-agentloop-start-context-router-and-impact-ledger.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/superpowers/plans/2026-06-23-agentloop-start-context-router.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/superpowers/plans/2026-06-23-agentloop-start-preflight-polish.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/superpowers/specs/2026-06-23-agentloop-start-context-router-design.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/superpowers/specs/2026-06-23-agentloop-start-preflight-polish-design.md"
+  },
+  {
+    "status": "??",
+    "path": "src/cli/commands/start.ts"
+  },
+  {
+    "status": "??",
+    "path": "src/core/agent-start.ts"
+  },
+  {
+    "status": "??",
+    "path": "tests/agent-start.test.ts"
+  }
+]

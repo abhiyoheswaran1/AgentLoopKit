@@ -18,6 +18,7 @@ const topLevelCommands = [
   ['handoff', 'Write a reviewer handoff'],
   ['status', 'Show current loop state'],
   ['next', 'Show the next recommended loop action'],
+  ['start', 'Brief a software agent with current task, evidence, risk, and context routing'],
   ['review-context', 'Show one reviewability context snapshot'],
   ['context', 'Measure and package local context for software agents'],
   ['guard', 'Check local drift, proof debt, and context-budget pressure'],

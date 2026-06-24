@@ -46,6 +46,7 @@ describe('mcp-server command', () => {
       const status = await client.callTool({ name: 'agentloop_status', arguments: {} });
 
       expect(tools.tools.map((tool) => tool.name)).toContain('agentloop_status');
+      expect(tools.tools.map((tool) => tool.name)).toContain('agentloop_start');
       expect(tools.tools.map((tool) => tool.name)).toContain('agentloop_context_pack');
       expect(JSON.stringify(status.content)).toContain('Check MCP');
     } finally {
@@ -53,7 +54,7 @@ describe('mcp-server command', () => {
     }
   });
 
-  test('exposes context budget and context pack as read-only MCP tools', async () => {
+  test('exposes start, context budget, and context pack as read-only MCP tools', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await git(dir, ['init', '-q']);
@@ -69,6 +70,11 @@ describe('mcp-server command', () => {
       cwd: dir,
       name: 'agentloop_context_budget',
     });
+    const start = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_start',
+      arguments: { target: 'codex', goal: 'implement' },
+    });
     const pack = await callMcpTool({
       cwd: dir,
       name: 'agentloop_context_pack',
@@ -78,6 +84,12 @@ describe('mcp-server command', () => {
     expect(budget.payload.contextBudget).toMatchObject({
       heuristic: 'chars-divided-by-four',
     });
+    expect(start.payload.start).toMatchObject({
+      target: 'codex',
+      goal: 'implement',
+    });
+    expect(JSON.stringify(start.payload)).toContain('readFirst');
+    expect(JSON.stringify(start.payload)).toContain('Impact Ledger');
     expect(pack.payload.contextPack).toMatchObject({
       target: 'codex',
       goal: 'continue',

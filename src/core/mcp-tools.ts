@@ -29,6 +29,11 @@ import {
   type ContextPackGoal,
   type ResumePackTarget,
 } from './context-contract.js';
+import {
+  AGENT_START_GOALS,
+  buildAgentStart,
+  type AgentStartGoal,
+} from './agent-start.js';
 import { getReviewContext } from './review-context.js';
 import {
   findFileIntent,
@@ -221,6 +226,27 @@ const tools: McpToolDefinition[] = [
     description:
       'Read one local reviewability snapshot for agents, without running commands or returning artifact bodies.',
     inputSchema: emptyInputSchema,
+  },
+  {
+    name: 'agentloop_start',
+    description:
+      'Read a compact software-agent start briefing with task, evidence, risk, context routing, and impact metrics.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        target: {
+          type: 'string',
+          enum: [...RESUME_PACK_TARGETS],
+          description: 'Target reader. Defaults to generic.',
+        },
+        goal: {
+          type: 'string',
+          enum: [...AGENT_START_GOALS],
+          description: 'Start briefing goal. Defaults to implement.',
+        },
+      },
+      additionalProperties: false,
+    },
   },
   {
     name: 'agentloop_context_budget',
@@ -429,6 +455,17 @@ function readContextGoalArgument(args: Record<string, unknown> | undefined): Con
   return value as ContextPackGoal;
 }
 
+function readStartGoalArgument(args: Record<string, unknown> | undefined): AgentStartGoal {
+  const value = args?.goal;
+  if (value === undefined) return 'implement';
+  if (typeof value !== 'string' || !(AGENT_START_GOALS as readonly string[]).includes(value)) {
+    throw new AgentLoopError(
+      `MCP tool argument "goal" must be one of: ${AGENT_START_GOALS.join(', ')}.`,
+    );
+  }
+  return value as AgentStartGoal;
+}
+
 export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolResult> {
   const config = await loadAgentLoopConfig(options.cwd);
 
@@ -511,6 +548,13 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
     }
     case 'agentloop_review_context': {
       return textResult(await getReviewContext({ cwd: options.cwd, config }));
+    }
+    case 'agentloop_start': {
+      const target = readContextTargetArgument(options.arguments);
+      const goal = readStartGoalArgument(options.arguments);
+      return textResult({
+        start: await buildAgentStart({ cwd: options.cwd, config, target, goal }),
+      });
     }
     case 'agentloop_context_budget': {
       const contextBudget = await buildContextBudgetContract({ cwd: options.cwd, config });

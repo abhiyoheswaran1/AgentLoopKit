@@ -139,7 +139,7 @@ If the repo installs AgentLoopKit as a dev dependency, use the local binary shap
 
 Run the MCP server from a repository that already has `agentloop.config.json`. The server reads that repo's local AgentLoopKit evidence and returns display-safe paths. It does not initialize the repo for you.
 
-Ask the agent to call read-only tools such as `agentloop_context_pack`, `agentloop_review_context`, `agentloop_status`, `agentloop_latest_ship_report`, `agentloop_list_runs`, `agentloop_file_intent`, or `agentloop_maintainer_check` before reviewing an agent-assisted change.
+Ask the agent to call `agentloop_start` first when it needs a repo preflight before broad reads. The tool returns the active task, preflight state, next safe command, read-first handles, risk summary, impact summary, and source handles. Use lower-level read-only tools such as `agentloop_context_pack`, `agentloop_review_context`, `agentloop_status`, `agentloop_latest_ship_report`, `agentloop_list_runs`, `agentloop_file_intent`, or `agentloop_maintainer_check` when the agent needs more detail.
 
 ## Tools
 
@@ -161,6 +161,7 @@ Ask the agent to call read-only tools such as `agentloop_context_pack`, `agentlo
 | `agentloop_check_gates`                | Local review gate status for task, verification, handoff, harness, policy, and git evidence                                                              |
 | `agentloop_artifacts`                  | Local artifact and run-ledger inventory metadata, with optional `type` and `latest` filters                                                              |
 | `agentloop_review_context`             | One reviewability snapshot that combines status, gates, policy status, artifact inventory, recent runs, and latest ship evidence                         |
+| `agentloop_start`                      | Compact software-agent preflight with task, state, next command, evidence, risk summary, context routing, and impact metrics                              |
 | `agentloop_context_budget`             | Local context pressure and compact-pack guidance without running commands                                                                                 |
 | `agentloop_context_pack`               | Auditable context pack with receipts, context-budget estimates, and source handles                                                                        |
 | `agentloop_context_show`               | Expansion for one local context source handle, such as `task:active` or `evidence-map:current`                                                           |

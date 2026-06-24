@@ -330,6 +330,7 @@ describe('mcp tools', () => {
       'agentloop_check_gates',
       'agentloop_artifacts',
       'agentloop_review_context',
+      'agentloop_start',
       'agentloop_context_budget',
       'agentloop_context_pack',
       'agentloop_context_show',
@@ -380,6 +381,11 @@ describe('mcp tools', () => {
     });
     const artifacts = await callMcpTool({ cwd: dir, name: 'agentloop_artifacts' });
     const reviewContext = await callMcpTool({ cwd: dir, name: 'agentloop_review_context' });
+    const start = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_start',
+      arguments: { target: 'codex', goal: 'review' },
+    });
     const latestVerificationArtifacts = await callMcpTool({
       cwd: dir,
       name: 'agentloop_artifacts',
@@ -404,6 +410,20 @@ describe('mcp tools', () => {
     const gatesPayload = gates.payload as GatesPayload;
     const artifactsPayload = artifacts.payload as ArtifactsPayload;
     const reviewContextPayload = reviewContext.payload as ReviewContextPayload;
+    const startPayload = start.payload as {
+      start: {
+        target: string;
+        goal: string;
+        preflight: {
+          state: string;
+          headline: string;
+          reason: string;
+        };
+        readFirst: Array<{ handle: string }>;
+        riskSummary: { blockers: number; warnings: number; topRisks: string[] };
+        impact: { verificationFreshness: string; summary: string };
+      };
+    };
     const latestVerificationArtifactsPayload =
       latestVerificationArtifacts.payload as LatestArtifactsPayload;
     const handoffsPayload = handoffs.payload as HandoffsPayload;
@@ -550,6 +570,17 @@ describe('mcp tools', () => {
       includesMarkdownContent: false,
       commandsRun: [],
     });
+    expect(startPayload.start.target).toBe('codex');
+    expect(startPayload.start.goal).toBe('review');
+    expect(startPayload.start.preflight).toMatchObject({
+      state: 'scope-drift',
+    });
+    expect(startPayload.start.preflight.headline).toMatch(/scope/i);
+    expect(startPayload.start.preflight.reason).toContain('outside local task');
+    expect(startPayload.start.readFirst[0].handle).toBe('evidence-map:current');
+    expect(startPayload.start.impact.verificationFreshness).toBe('fresh');
+    expect(startPayload.start.impact.summary).toContain('estimated context');
+    expect(startPayload.start.riskSummary.blockers).toBe(0);
     expect(JSON.stringify(reviewContext.payload)).not.toContain(dir);
     expect(JSON.stringify(reviewContext.payload)).not.toContain('Route implementation handoff.');
     expect(latestVerificationArtifactsPayload.latest).toEqual([

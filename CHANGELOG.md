@@ -4,6 +4,15 @@
 
 - No unreleased changes yet.
 
+## 0.41.0
+
+- Added `agentloop start` as the repo-native preflight for software agents, with active task, decisive preflight state, read-first source handles, risk summary, next safe command, and context-budget impact.
+- Added Start preflight states for ready continuation, missing task, missing or stale verification, scope drift, review-ready work, blocked risk, and evidence-only sessions.
+- Added `agentloop_start` to the read-only MCP surface so agent platforms can request the same briefing without broad repo scans.
+- Added Start guidance to generated Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, and generic agent instructions.
+- Added Start-focused README, CLI reference, MCP, getting-started, and Context Contract docs plus a regenerated README demo GIF centered on the preflight flow.
+- Added Start tests for JSON shape, Markdown output, goal-aware states, scope drift, risk blocking, MCP payloads, and docs drift.
+
 ## 0.40.0
 
 - Added `agentloop context budget`, `agentloop context pack`, and `agentloop context show` as a unified Context Contract for software agents.

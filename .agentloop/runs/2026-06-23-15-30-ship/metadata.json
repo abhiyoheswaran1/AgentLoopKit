@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-23-15-30-ship",
+  "command": "ship",
+  "createdAt": "2026-06-23-15-30",
+  "createdAtEpochMs": 1782221460613,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-23-build-agentloop-start-context-router-and-impact-ledger.md",
+    "title": "Build AgentLoop Start context router and impact ledger",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-23-14-57-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-23-15-30-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-23-15-30-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 50
+}

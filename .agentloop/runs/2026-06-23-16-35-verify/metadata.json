@@ -1,0 +1,15 @@
+{
+  "id": "2026-06-23-16-35-verify",
+  "command": "verify",
+  "createdAt": "2026-06-23-16-35",
+  "createdAtEpochMs": 1782225332443,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-23-make-agentloop-start-a-sharper-repo-preflight-2.md",
+    "title": "Make AgentLoop Start a sharper repo preflight",
+    "status": "proposed",
+    "source": "agentflight-placeholder"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-23-16-35-verification-report.md",
+  "overallStatus": "not-run",
+  "changedFileCount": 70
+}

@@ -59,13 +59,14 @@ After `init` and `doctor`, the shortest useful loop is:
 ```bash
 npx agentloopkit create-task --type bugfix --title "Fix checkout bug" --include-config-commands
 npx agentloopkit status --brief
+npx agentloopkit start --for codex --goal implement --redact-paths
 npx agentloopkit verify --task-commands --progress
 npx agentloopkit ship
 npx agentloopkit prepare-pr
 npx agentloopkit task done
 ```
 
-`create-task` sets the new contract as active. `verify --task-commands` runs the reviewed commands copied into the task contract. `ship` records review-readiness evidence, `prepare-pr` drafts reviewer copy, and `task done` closes the focused task. This path does not post to GitHub, publish packages, call an LLM, or run hidden commands.
+`create-task` sets the new contract as active. `start` gives the next software agent a repo preflight with the current state, active task, next safe command, read-first source handles, risk summary, verification freshness, context-budget impact, and source handles. `verify --task-commands` runs the reviewed commands copied into the task contract. `ship` records review-readiness evidence, `prepare-pr` drafts reviewer copy, and `task done` closes the focused task. This path does not post to GitHub, publish packages, call an LLM, or run hidden commands.
 
 ## Existing Repos And Harness Upgrades
 
@@ -87,6 +88,7 @@ You can use the latest loop even if old generated docs have not been refreshed:
 
 ```bash
 npx --yes agentloopkit@latest create-task --type bugfix --title "Fix checkout bug"
+npx --yes agentloopkit@latest start --for generic --goal implement --redact-paths
 npx --yes agentloopkit@latest verify
 npx --yes agentloopkit@latest ship
 npx --yes agentloopkit@latest prepare-pr

@@ -16,7 +16,7 @@ Run VHS from the repository root. The tape packs the local build to `/tmp`, inst
 
 The current GIF uses a 1200x720 Catppuccin Mocha terminal and shows `init`, task creation, task-aware verification, `ship --github-comment`, `prepare-pr --github-comment`, `review-context`, run history, and file intent lookup.
 
-The Context Contract GIF uses the same terminal style and shows `init`, scoped task creation, `status`, `context budget`, `context pack`, `context show`, verification, and ship evidence in a repo with many local changed files.
+The Context Contract GIF uses the same terminal style and shows `init`, scoped task creation, Start preflight, source-handle expansion, verification, and ship evidence in a repo with many local changed files.
 
 Regenerate the Playwright screenshots:
 

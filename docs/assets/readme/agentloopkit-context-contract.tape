@@ -53,17 +53,7 @@ Enter
 Wait
 Show
 
-Type "npx agentloop status --brief --redact-paths"
-Enter
-Wait
-Sleep 1.2s
-
-Type "npx agentloop context budget --redact-paths"
-Enter
-Wait
-Sleep 2s
-
-Type "npx agentloop context pack --for codex --goal continue --redact-paths"
+Type "npx agentloop start --for codex --goal implement --redact-paths"
 Enter
 Wait
 Sleep 2.4s

@@ -202,6 +202,20 @@ Human-readable `review-context` output keeps dynamic values inside single-line i
 
 Human Recent Runs entries separate generated AgentLoop and AgentFlight evidence churn from non-evidence changed-file counts when local run evidence is available. `review-context --json` keeps the existing run summaries unchanged.
 
+## AgentLoop Start
+
+```bash
+agentloop start --for codex --goal implement --redact-paths
+agentloop start --for claude --goal review --json
+agentloop start --for generic --goal research
+```
+
+`start` briefs a software agent before broad repo reads. It combines the active task, decisive preflight state, next safe command, evidence map, verification freshness, context-budget impact, read-first source handles, risk summary, and source handles. Supported targets are `codex`, `claude`, `cursor`, `generic`, and `human`. Supported goals are `implement`, `continue`, `review`, `debug`, `handoff`, and `research`.
+
+Preflight states are `ready-to-continue`, `needs-task`, `needs-verification`, `scope-drift`, `review-ready`, `blocked-by-risk`, and `evidence-only`. JSON output includes `preflight`, `riskSummary`, `impact.summary`, source handles, and the same safety boundary as human output.
+
+The command is read-only. It does not run verification, read changed file contents, read `.env` contents, call an LLM, intercept prompts, proxy provider traffic, post comments, publish packages, create tags, upload files, or mutate task state. Token estimates use a transparent character-count heuristic, not provider tokenizer output or billing claims.
+
 ## AgentLoop Context
 
 ```bash

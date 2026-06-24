@@ -1,5 +1,21 @@
 # Decisions
 
+## 2026-06-23: Start Preflight Gets Decisive States And Impact Summary
+
+`agentloop start` should show the repo's current truth before a software agent reads broadly. The command now exposes a sharper preflight model with states such as `ready-to-continue`, `needs-task`, `needs-verification`, `scope-drift`, `review-ready`, `blocked-by-risk`, and `evidence-only`.
+
+The output puts the active task and next safe command before read-first handles, then shows do-not-broad-scan guidance, risk summary, impact summary, source handles, and the safety boundary. JSON and MCP payloads add `preflight`, `riskSummary`, and `impact.summary` so agent clients can consume the same model without parsing prose.
+
+The boundary stays local and deterministic: Start still does not run verification, read changed file contents, read `.env` contents, call an LLM, intercept prompts, proxy provider traffic, upload files, post comments, publish packages, create tags, change versions, or mutate task state. Context estimates remain transparent character-count planning estimates, not provider tokenizer output or billing claims.
+
+## 2026-06-23: Start Briefings Become The Agent Entry Point
+
+AgentLoopKit should give software agents one local command to run before broad repo reads. `agentloop start` now composes the existing Context Contract, Evidence Map, verification freshness, run ledger, and context-budget estimates into a compact briefing with read-first source handles, risk warnings, do-not-broad-scan guidance, an impact ledger, and the next command.
+
+The Context Contract remains the lower-level evidence surface. `agentloop context pack` keeps the full receipt, omission list, and source-handle contract; `agentloop context show <handle>` expands source truth. `agentloop start` routes agents to the right handles for goals such as implement, review, debug, handoff, and research.
+
+The boundary stays local and deterministic: `start` does not run verification, read changed file contents, read `.env` contents, call an LLM, intercept prompts, proxy provider traffic, upload files, post comments, publish packages, create tags, change versions, or mutate task state. Impact metrics use the existing transparent character-count heuristic. They are planning estimates, not provider tokenizer output or billing claims.
+
 ## 2026-06-21: Guard Adds Local Drift And Context-Budget Control
 
 AgentLoopKit should help maintainers catch scope drift, stale verification, proof debt, and wasteful continuation context while work is still in progress. Token economy is part of the product value, but it should be implemented as transparent repo-aware context selection rather than hidden prompt rewriting or provider proxying.

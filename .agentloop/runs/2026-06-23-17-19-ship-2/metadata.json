@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-23-17-19-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-23-17-19",
+  "createdAtEpochMs": 1782227991923,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-23-make-agentloop-start-a-sharper-repo-preflight.md",
+    "title": "Make AgentLoop Start a sharper repo preflight",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-23-16-58-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-23-17-19-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-23-17-19-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 81
+}

@@ -15,7 +15,7 @@ export async function startAgentLoopMcpServer(options: { cwd: string }) {
         tools: {},
       },
       instructions:
-        'Read-only AgentLoopKit server. Exposes local task contracts, policies, policy template status, verification reports, ship reports, artifact inventory metadata, run ledger summaries and details, file intent matches, maintainer reviewability checks, gate status, handoffs, status, next action, context budgets, context packs, and context source-handle expansion. It does not run verification commands, read env file contents, call external APIs, upload files, or mutate repository files.',
+        'Read-only AgentLoopKit server. Exposes local task contracts, policies, policy template status, verification reports, ship reports, artifact inventory metadata, run ledger summaries and details, file intent matches, maintainer reviewability checks, gate status, handoffs, status, next action, start briefings, context budgets, context packs, and context source-handle expansion. It does not run verification commands, read env file contents, call external APIs, upload files, or mutate repository files.',
     },
   );
 

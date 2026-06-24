@@ -1,0 +1,44 @@
+ AGENTLOOP.md                                       |   2 +-
+ AGENTS.md                                          |   1 +
+ CHANGELOG.md                                       |   9 +++
+ DECISIONS.md                                       |  16 +++++
+ FINAL_HANDOFF.md                                   |  46 +++++++++------
+ README.md                                          |  47 +++++++--------
+ ROADMAP.md                                         |  11 ++--
+ docs/assets/readme/README.md                       |   2 +-
+ .../readme/agentloopkit-context-contract.gif       | Bin 1466571 -> 1364155 bytes
+ .../readme/agentloopkit-context-contract.tape      |  12 +---
+ docs/cli-reference.md                              |  14 +++++
+ docs/context.md                                    |  59 +++++++++++--------
+ docs/getting-started.md                            |   4 +-
+ docs/launch-checklist.md                           |   4 +-
+ docs/mcp.md                                        |   3 +-
+ docs/npm-publishing.md                             |  10 ++--
+ docs/policy-examples.md                            |   2 +-
+ docs/release-status.md                             |  65 ++++++++++-----------
+ package.json                                       |   2 +-
+ server.json                                        |   4 +-
+ src/cli/index.ts                                   |   2 +
+ src/core/completions.ts                            |   1 +
+ src/core/mcp-tools.ts                              |  44 ++++++++++++++
+ src/mcp/server.ts                                  |   2 +-
+ src/templates/agents/claude-code.md                |   2 +-
+ src/templates/agents/codex.md                      |   2 +-
+ src/templates/agents/cursor.md                     |   2 +-
+ src/templates/agents/gemini-cli.md                 |   2 +-
+ src/templates/agents/generic.md                    |   2 +-
+ src/templates/agents/github-copilot-cli.md         |   2 +-
+ src/templates/agents/opencode.md                   |   2 +-
+ src/templates/root/AGENTLOOP.md                    |   2 +-
+ src/templates/root/AGENTS.md                       |   1 +
+ tests/cli-docs-drift.test.ts                       |   1 +
+ tests/mcp-server.test.ts                           |  14 ++++-
+ tests/mcp-tools.test.ts                            |  31 ++++++++++
+ 36 files changed, 288 insertions(+), 137 deletions(-)
+docs/superpowers/plans/2026-06-23-agentloop-start-context-router.md | untracked
+docs/superpowers/plans/2026-06-23-agentloop-start-preflight-polish.md | untracked
+docs/superpowers/specs/2026-06-23-agentloop-start-context-router-design.md | untracked
+docs/superpowers/specs/2026-06-23-agentloop-start-preflight-polish-design.md | untracked
+src/cli/commands/start.ts | untracked
+src/core/agent-start.ts | untracked
+tests/agent-start.test.ts | untracked
