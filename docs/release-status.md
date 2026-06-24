@@ -11,12 +11,12 @@ Last checked: June 24, 2026.
 - Release tag `v0.41.0` points at the published release commit.
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.41.0>
 - Release asset: `agentloopkit-0.41.0.tgz`
-- Release asset SHA-256: pending post-release proof.
-- CI run: pending post-release proof.
-- CLI Smoke run: pending post-release proof.
-- Publish workflow run: pending post-release proof.
-- Docker workflow run: pending post-release proof.
-- MCP Registry workflow run: pending post-release proof.
+- Release asset SHA-256: `fc4d2ebb8fc4c73a26da8e245133c9761753a96eefd4051fef8a5178332832ad`
+- CI run: `28080114443`
+- CLI Smoke run: `28080114448`
+- Publish workflow run: `28080142680`
+- Docker workflow run: `28080142721`
+- MCP Registry workflow run: `28080541615`
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
 GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirms the `0.41.0` image.
@@ -68,17 +68,17 @@ After each publish:
 
 Local release gate for `0.41.0`:
 
-- `npm run release-flow`: pending on release commit
-- `node dist/cli/index.js release-check --strict --redact-paths`: pending on release commit
+- `npm run release-flow`: passed on commit `a96c79af`
+- `node dist/cli/index.js release-check --strict --redact-paths`: passed from a clean tree on commit `a96c79af`
 - `npx --yes projscan doctor --format markdown`: A/90 with the known reviewed `prepublishOnly` advisory
 
 Post-publish checks:
 
 - `npm view agentloopkit version versions --json`: latest `0.41.0`
 - `node dist/cli/index.js npm-status --agentloopkit --expect-current`: latest matches local package version
-- `npm run smoke:published -- --version 0.41.0`: pending post-release proof
-- `npx --yes agentloopkit@0.41.0 version`: pending post-release proof
-- GitHub release asset digest: pending post-release proof
+- `npm run smoke:published -- --version 0.41.0`: passed
+- `npx --yes agentloopkit@0.41.0 version`: `0.41.0` from a clean temporary directory
+- GitHub release asset digest: `fc4d2ebb8fc4c73a26da8e245133c9761753a96eefd4051fef8a5178332832ad`
 - `node dist/cli/index.js release-proof --redact-paths`: npm, GitHub Release, GHCR, and MCP Registry passed; GitHub Marketplace warned
 - `node dist/cli/index.js release-proof --strict --only github-marketplace --redact-paths`: expected to fail while Marketplace publication remains deferred
 - GHCR image tag `0.41.0`: confirmed by release proof

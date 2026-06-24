@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-24
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The Start Preflight and Context Contract polish is verified locally but unreleased. Users need the new start briefing, context-budget proof, docs, and generated agent guidance through the configured public channels.
