@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-25
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The unreleased Start, Context, Guard, Doctor, MCP, run-ledger, docs, and hardening work is approved for public release.

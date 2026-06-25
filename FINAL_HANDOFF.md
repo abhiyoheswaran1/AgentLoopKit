@@ -83,17 +83,21 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Current npm release: `agentloopkit@0.43.0`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.43.0>
 - Release asset: `agentloopkit-0.43.0.tgz`
-- Release asset SHA-256: pending post-release proof
-- Release tag: `v0.43.0` at release commit
-- CI run: pending post-release proof
-- CLI Smoke run: pending post-release proof
-- Publish workflow run: pending post-release proof
-- Docker workflow run: pending post-release proof
-- MCP Registry workflow run: pending post-release proof
-- Post-publish npm proof: pending post-release proof
-- GHCR proof: pending post-release proof for image tag `0.43.0`
-- MCP Registry proof: pending post-release proof for `agentloopkit@0.43.0`
-- GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof
+- Release asset SHA-256: `73a3398543146ce97e391345df2a41f9b2323a08880309964ff1eaac8427455e`
+- Release tag: `v0.43.0` at release commit `22e8b89520da84bf5eaa617ec9e2ce6f9367c678`
+- Post-release smoke-fix commit: `8db2805c3ac154f8ff83bae00f47cb3f74bde846`
+- CI run for the release commit: `28160014887` passed
+- CI run for the smoke-fix commit: `28160682228` passed
+- CLI Smoke run for the release commit: `28160015187` failed because a stale-artifact smoke fixture omitted required run metadata. Commit `8db2805c` fixed the fixture.
+- CLI Smoke run for the smoke-fix commit: `28160682240` passed on Linux, macOS, and Windows
+- Publish workflow run: `28160043176` passed
+- Docker workflow run: `28160043174` passed
+- MCP Registry workflow run: `28160527170` passed
+- Post-publish npm proof: npm latest is `agentloopkit@0.43.0`; `agentloop npm-status --agentloopkit --expect-current` passed
+- Published-package smoke: `npm run smoke:published -- --version 0.43.0` passed
+- GHCR proof: `agentloop release-proof --redact-paths` confirmed image tag `0.43.0`
+- MCP Registry proof: `agentloop release-proof --redact-paths` confirmed metadata for `agentloopkit@0.43.0`
+- GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 25, 2026
 
 ## 0.43.0 release summary
 
