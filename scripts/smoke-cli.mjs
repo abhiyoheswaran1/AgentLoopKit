@@ -453,6 +453,7 @@ async function prepareStaleArtifactLimitSmokeRepo(tempRoot) {
     command: 'verify',
     createdAt: '2026-06-10-09-15',
     createdAtEpochMs: 1781082900000,
+    changedFileCount: 1,
     verificationReportPath: staleVerificationPath,
   });
   await writeRunMetadataFixture(staleArtifactRepo, {
@@ -460,6 +461,7 @@ async function prepareStaleArtifactLimitSmokeRepo(tempRoot) {
     command: 'ship',
     createdAt: '2026-06-10-09-45',
     createdAtEpochMs: 1781084700000,
+    changedFileCount: 1,
     verificationReportPath: latestVerificationPath,
     handoffPath: latestHandoffPath,
     shipReportPath: latestShipReportPath,
