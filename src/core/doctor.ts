@@ -1,6 +1,11 @@
 import path from 'node:path';
 import { realpath } from 'node:fs/promises';
 import { AGENTLOOP_MANIFEST_FILE, CONFIG_FILE, CURRENT_TEMPLATE_VERSION } from './constants.js';
+import {
+  buildAgentReadiness,
+  renderAgentReadiness,
+  type DoctorAgentReadiness,
+} from './agent-readiness.js';
 import { loadAgentLoopConfig } from './config.js';
 import { pathExists, readTextIfExists } from './file-system.js';
 import { commandExists, getGitRoot, getGitStatus, isInsideGitRepo } from './git.js';
@@ -30,6 +35,12 @@ export type DoctorNextAction = {
 
 export type DoctorOverallStatus = 'pass' | 'warn' | 'fail';
 
+export type {
+  DoctorAgentReadiness,
+  DoctorAgentReadinessItem,
+  DoctorAgentReadinessStatus,
+} from './agent-readiness.js';
+
 export type DoctorResult = {
   checks: DoctorCheck[];
   warnings: DoctorCheck[];
@@ -43,6 +54,7 @@ export type DoctorResult = {
     root: string;
     targetIsRoot: boolean;
   };
+  agentReadiness: DoctorAgentReadiness;
   markdown: string;
 };
 
@@ -84,6 +96,10 @@ function hasWarnOrFail(checks: DoctorCheck[], name: string) {
   return item?.status === 'warn' || item?.status === 'fail';
 }
 
+function checkStatus(checks: DoctorCheck[], name: string) {
+  return checks.find((candidate) => candidate.name === name)?.status;
+}
+
 function chooseDoctorNextActions(checks: DoctorCheck[]): DoctorNextAction[] {
   const actions: DoctorNextAction[] = [];
   const missingHarness =
@@ -117,6 +133,16 @@ function chooseDoctorNextActions(checks: DoctorCheck[]): DoctorNextAction[] {
         'upgrade-harness',
         'agentloop upgrade-harness --details',
         'Generated guidance is missing current agent-readiness topics such as agentloop start, context source handles, ship, prepare-pr, run ledger, review context, or maintainer-check.',
+      ),
+    );
+  }
+
+  if (hasWarnOrFail(checks, 'Agent readiness')) {
+    actions.push(
+      nextAction(
+        'review-agent-readiness',
+        'review Agent Readiness Matrix',
+        'Update stale generated guidance or installed agent instruction files before asking agents to broad-read the repo.',
       ),
     );
   }
@@ -175,7 +201,17 @@ function chooseDoctorNextActions(checks: DoctorCheck[]): DoctorNextAction[] {
     );
   }
 
-  if (hasWarnOrFail(checks, 'Potential risk files') || hasWarnOrFail(checks, 'Risk file scan')) {
+  if (hasWarnOrFail(checks, 'Risk file scan')) {
+    actions.push(
+      nextAction(
+        'complete-risk-scan',
+        'rerun doctor with higher risk scan caps or review targeted paths',
+        'Risk-file scanning stopped early; complete targeted checks before autonomous work.',
+      ),
+    );
+  }
+
+  if (checkStatus(checks, 'Potential risk files') === 'warn') {
     actions.push(
       nextAction(
         'review-risk-files',
@@ -456,6 +492,16 @@ export async function runDoctor(options: {
     checks.push(check('Tests', 'warn', 'no test command detected'));
   }
 
+  const agentReadiness = await buildAgentReadiness(cwd);
+  checks.push(
+    check(
+      'Agent readiness',
+      agentReadiness.status === 'pass' ? 'pass' : 'warn',
+      agentReadiness.status === 'pass'
+        ? 'generated and installed agent guidance is ready'
+        : 'Agent Readiness Matrix has missing or stale guidance; review the matrix below',
+    ),
+  );
   const outputChecks = checks.map((item) =>
     redactDoctorCheck(item, redactionRoots, options.redactPaths),
   );
@@ -477,6 +523,8 @@ ${outputChecks
   })
   .join('\n')}
 
+${renderAgentReadiness(agentReadiness)}
+
 ${renderNextActions(nextActions)}
 `;
 
@@ -492,6 +540,7 @@ ${renderNextActions(nextActions)}
       ...git,
       root: redactLocalDoctorPaths(git.root, redactionRoots, options.redactPaths),
     },
+    agentReadiness,
     markdown,
   };
 }

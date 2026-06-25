@@ -63,7 +63,13 @@ type TopicDefinition = {
 const TOPICS: TopicDefinition[] = [
   {
     id: 'agent-start',
-    needles: ['agentloop start', 'agentloop context show'],
+    needles: [
+      'agentloop doctor',
+      'agentloop start',
+      'agentloop context handles',
+      'agentloop context show',
+      'avoid broad',
+    ],
     match: 'all',
   },
   { id: 'ship', needles: ['agentloop ship'] },
@@ -85,7 +91,7 @@ const TOPIC_SUGGESTIONS: Record<HarnessTopicId, { title: string; copyMarkdown: s
   'agent-start': {
     title: 'Agent Start preflight and source handles',
     copyMarkdown:
-      '- Before broad repo reads, run `agentloop start --for generic --goal implement --redact-paths`; then expand only needed source truth with `agentloop context show <handle>`.',
+      '- Before broad repo or file reads, run `agentloop doctor --redact-paths`, then `agentloop start --for generic --goal implement --redact-paths`; list handles with `agentloop context handles`, then expand only needed source truth with `agentloop context show <handle>` to avoid broad repo reads.',
   },
   ship: {
     title: 'Review-readiness ship gate',

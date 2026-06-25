@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-23-11-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-23-11",
+  "createdAtEpochMs": 1782335465408,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-run-parallel-unreleased-batch-bug-hunt.md",
+    "title": "Run parallel unreleased-batch bug hunt",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-23-09-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-23-11-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-23-11-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 389
+}

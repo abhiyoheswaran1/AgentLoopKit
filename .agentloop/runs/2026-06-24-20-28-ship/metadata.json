@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-20-28-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-20-28",
+  "createdAtEpochMs": 1782325729604,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-hydrate-bounded-mcp-run-summaries-consistently.md",
+    "title": "Hydrate bounded MCP run summaries consistently",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-20-26-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-20-28-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-20-28-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 176
+}

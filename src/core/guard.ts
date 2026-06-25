@@ -3,6 +3,8 @@ import { readFile } from 'node:fs/promises';
 import type { AgentLoopConfig } from './config.js';
 import {
   buildEvidenceMap,
+  compactEvidenceMap,
+  type CompactEvidenceMap,
   type EvidenceMap,
 } from './evidence-map.js';
 import {
@@ -87,6 +89,22 @@ export type GuardWatchResult = {
   snapshots: GuardSnapshot[];
 };
 
+export type CompactGuardFinding = GuardFinding & {
+  pathCount?: number;
+  pathsOmitted?: true;
+  handle?: 'evidence-map:current';
+  command?: 'agentloop context show evidence-map:current';
+};
+
+export type CompactGuardSnapshot = Omit<GuardSnapshot, 'evidenceMap' | 'findings'> & {
+  evidenceMap: CompactEvidenceMap;
+  findings: CompactGuardFinding[];
+};
+
+export type CompactGuardWatchResult = Omit<GuardWatchResult, 'snapshots'> & {
+  snapshots: CompactGuardSnapshot[];
+};
+
 export class GuardBaselineError extends AgentLoopError {
   constructor(message: string, public readonly baselinePath: string) {
     super(message, 'GUARD_BASELINE_INVALID');
@@ -95,6 +113,7 @@ export class GuardBaselineError extends AgentLoopError {
 }
 
 const BASELINE_EXAMPLE_LIMIT = 5;
+const COMPACT_FINDING_PATH_LIMIT = 5;
 const CONTEXT_BUDGET_WARN_FILE_COUNT = 20;
 const CONTEXT_BUDGET_WARN_TOKEN_COUNT = 2000;
 const DEFAULT_GUARD_REPORT_NAME = 'guard-report.md';
@@ -103,6 +122,33 @@ function statusFromFindings(findings: GuardFinding[]): GuardStatus {
   if (findings.some((finding) => finding.severity === 'fail')) return 'fail';
   if (findings.some((finding) => finding.severity === 'warn')) return 'warn';
   return 'pass';
+}
+
+function compactGuardFinding(finding: GuardFinding): CompactGuardFinding {
+  if (!finding.paths || finding.paths.length <= COMPACT_FINDING_PATH_LIMIT) return finding;
+  return {
+    ...finding,
+    paths: finding.paths.slice(0, COMPACT_FINDING_PATH_LIMIT),
+    pathCount: finding.paths.length,
+    pathsOmitted: true,
+    handle: 'evidence-map:current',
+    command: 'agentloop context show evidence-map:current',
+  };
+}
+
+export function compactGuardSnapshot(snapshot: GuardSnapshot): CompactGuardSnapshot {
+  return {
+    ...snapshot,
+    evidenceMap: compactEvidenceMap(snapshot.evidenceMap),
+    findings: snapshot.findings.map(compactGuardFinding),
+  };
+}
+
+export function compactGuardWatchResult(watch: GuardWatchResult): CompactGuardWatchResult {
+  return {
+    ...watch,
+    snapshots: watch.snapshots.map(compactGuardSnapshot),
+  };
 }
 
 function buildFindings(map: EvidenceMap, contextBudget: GuardContextBudget): GuardFinding[] {
@@ -319,6 +365,7 @@ export async function buildGuardSnapshot(options: {
   const evidenceMap = await buildEvidenceMap({
     cwd: options.cwd,
     config: options.config,
+    taskEvidenceMode: 'current-work',
   });
   const contextBudget = buildContextBudget({ evidenceMap });
   const findings = buildFindings(evidenceMap, contextBudget);

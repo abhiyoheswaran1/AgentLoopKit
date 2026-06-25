@@ -19,12 +19,16 @@ This directory contains AgentLoopKit's own repo-local engineering loop artifacts
 
 ## Dogfood Commands
 
+Run Start before broad repo reads, then expand only the source handles that matter to avoid broad scans:
+
 ```bash
 agentloop create-task --title "Describe the next focused change" --type feature
 agentloop task set .agentloop/tasks/<task-file>.md
 agentloop task doctor
 agentloop status
+agentloop doctor --redact-paths
 agentloop start --for generic --goal implement --redact-paths
+agentloop context handles
 agentloop context show <handle>
 agentloop review-context
 agentloop policy list
@@ -43,6 +47,8 @@ agentloop badge
 agentloop ci-summary
 agentloop release-proof
 ```
+
+For MCP-capable clients with tools already configured, ask the agent to call `agentloop_start` before broad reads. To configure a client, use `agentloop mcp-server` as that client's stdio command.
 
 Use `npx projscan doctor --format markdown` during implementation work in this repository.
 

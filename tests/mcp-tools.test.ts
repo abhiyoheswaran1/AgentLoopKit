@@ -1,17 +1,21 @@
 import path from 'node:path';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, utimes, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
-import { afterEach, describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
 import { createTaskContractFile } from '../src/core/task-contract.js';
 import { loadAgentLoopConfig } from '../src/core/config.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { callMcpTool, listMcpTools } from '../src/core/mcp-tools.js';
+import * as runsModule from '../src/core/runs.js';
 import { makeTempDir, removeTempDir } from './helpers.js';
 
 let tempDirs: string[] = [];
 
 type StatusPayload = {
+  git: {
+    root: string;
+  };
   nextAction: {
     command: string;
   };
@@ -79,6 +83,11 @@ type RunsPayload = {
   runs: Array<{
     id: string;
     command: string;
+    task?: {
+      path: string;
+      title: string;
+      status: string;
+    } | null;
     score?: number;
     verificationReportPath?: string;
     shipReportPath?: string;
@@ -110,6 +119,14 @@ type IntentPayload = {
     why: string;
     shipReportPath?: string;
   }>;
+  search: {
+    totalRunCount: number;
+    inspectedRunCount: number;
+    scanLimit: number;
+    matchLimit: number;
+    truncated: boolean;
+    stoppedAfterMatches: boolean;
+  };
 };
 
 type MaintainerCheckPayload = {
@@ -189,6 +206,17 @@ type ReviewContextPayload = {
     };
   };
   artifacts: ArtifactsPayload;
+  evidenceMap: {
+    files?: unknown;
+    fileList: {
+      omitted: true;
+      handle: string;
+      command: string;
+    };
+    summary: {
+      changedFileCount: number;
+    };
+  };
   recentRuns: Array<{
     id: string;
     command: string;
@@ -203,7 +231,9 @@ type ReviewContextPayload = {
   safety: {
     readOnly: boolean;
     includesMarkdownContent: boolean;
-    commandsRun: string[];
+    localGitStatus: boolean;
+    verificationCommandsRun: boolean;
+    projectCommandsRun: boolean;
   };
 };
 
@@ -217,7 +247,9 @@ type LatestArtifactsPayload = {
 
 type HandoffsPayload = {
   handoffs: Array<{
+    path: string;
     title: string;
+    modifiedAt: string;
   }>;
 };
 
@@ -254,6 +286,7 @@ async function createInitializedRepo() {
     },
   });
   await setActiveTask({ cwd: dir, config, taskPath: task.path });
+  const taskRelativePath = path.relative(dir, task.path).split(path.sep).join('/');
   await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
   await writeFile(
     path.join(dir, '.agentloop/reports/2026-06-10-12-30-verification-report.md'),
@@ -278,8 +311,8 @@ async function createInitializedRepo() {
         createdAt: '2026-06-10-12-32',
         createdAtEpochMs: Date.parse('2026-06-10T12:32:00Z'),
         task: {
-          path: '.agentloop/tasks/2026-06-10-add-api-route.md',
-          title: 'Add API route',
+          path: taskRelativePath,
+          title: 'Stored API route snapshot',
           status: 'review',
         },
         verificationReportPath: path.join(outsideDir, 'private-verification-report.md'),
@@ -308,6 +341,7 @@ async function createInitializedRepo() {
 
 describe('mcp tools', () => {
   afterEach(async () => {
+    vi.restoreAllMocks();
     await Promise.all(tempDirs.map(removeTempDir));
     tempDirs = [];
   });
@@ -332,6 +366,7 @@ describe('mcp tools', () => {
       'agentloop_review_context',
       'agentloop_start',
       'agentloop_context_budget',
+      'agentloop_context_handles',
       'agentloop_context_pack',
       'agentloop_context_show',
       'agentloop_list_handoffs',
@@ -386,6 +421,7 @@ describe('mcp tools', () => {
       name: 'agentloop_start',
       arguments: { target: 'codex', goal: 'review' },
     });
+    const contextHandles = await callMcpTool({ cwd: dir, name: 'agentloop_context_handles' });
     const latestVerificationArtifacts = await callMcpTool({
       cwd: dir,
       name: 'agentloop_artifacts',
@@ -424,11 +460,26 @@ describe('mcp tools', () => {
         impact: { verificationFreshness: string; summary: string };
       };
     };
+    const contextHandlesPayload = contextHandles.payload as {
+      contextHandles: {
+        handles: Array<{ id: string; available: boolean; command: string }>;
+        markdown: string;
+        safety: {
+          readOnly: true;
+          localEvidenceOnly: true;
+          localGitStatus: true;
+          verificationCommandsRun: false;
+          projectCommandsRun: false;
+        };
+      };
+    };
     const latestVerificationArtifactsPayload =
       latestVerificationArtifacts.payload as LatestArtifactsPayload;
     const handoffsPayload = handoffs.payload as HandoffsPayload;
     const handoffPayload = handoff.payload as HandoffPayload;
 
+    expect(statusPayload.git.root).toBe('[git-root]');
+    expect(JSON.stringify(statusPayload)).not.toContain(dir);
     expect(statusPayload.nextAction.command).toBe('agentloop handoff');
     expect(nextPayload.command).toBe('agentloop handoff');
     expect(tasksPayload.tasks[0]).toMatchObject({ title: 'Add API route', active: true });
@@ -487,6 +538,11 @@ describe('mcp tools', () => {
           shipReportPath: '.agentloop/reports/2026-06-10-12-32-ship-report.md',
         }),
       ],
+      search: expect.objectContaining({
+        totalRunCount: 1,
+        inspectedRunCount: 1,
+        truncated: false,
+      }),
     });
     expect(intentPayload.runs[0].shipReportPath).not.toContain(dir);
     expect(maintainerCheckPayload.checks).toEqual(
@@ -552,6 +608,14 @@ describe('mcp tools', () => {
       path: '.agentloop/reports/2026-06-10-12-30-verification-report.md',
       overallStatus: 'pass',
     });
+    expect(reviewContextPayload.evidenceMap.files).toBeUndefined();
+    expect(reviewContextPayload.evidenceMap.fileList).toMatchObject({
+      omitted: true,
+      handle: 'evidence-map:current',
+      command: 'agentloop context show evidence-map:current',
+    });
+    expect(reviewContextPayload.evidenceMap.summary.changedFileCount).toBeGreaterThan(0);
+    expect(JSON.stringify(reviewContext.payload)).not.toContain('"coveredByTask"');
     expect(reviewContextPayload.recentRuns).toEqual([
       expect.objectContaining({
         id: '2026-06-10-12-32-ship',
@@ -568,7 +632,9 @@ describe('mcp tools', () => {
     expect(reviewContextPayload.safety).toEqual({
       readOnly: true,
       includesMarkdownContent: false,
-      commandsRun: [],
+      localGitStatus: true,
+      verificationCommandsRun: false,
+      projectCommandsRun: false,
     });
     expect(startPayload.start.target).toBe('codex');
     expect(startPayload.start.goal).toBe('review');
@@ -581,6 +647,29 @@ describe('mcp tools', () => {
     expect(startPayload.start.impact.verificationFreshness).toBe('fresh');
     expect(startPayload.start.impact.summary).toContain('estimated context');
     expect(startPayload.start.riskSummary.blockers).toBe(0);
+    expect(contextHandlesPayload.contextHandles.handles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'task:active',
+          available: true,
+          command: 'agentloop context show task:active',
+        }),
+        expect.objectContaining({
+          id: 'evidence-map:current',
+          available: true,
+        }),
+      ]),
+    );
+    expect(contextHandlesPayload.contextHandles.markdown).toContain(
+      '# AgentLoopKit Context Handles',
+    );
+    expect(contextHandlesPayload.contextHandles.safety).toEqual({
+      readOnly: true,
+      localEvidenceOnly: true,
+      localGitStatus: true,
+      verificationCommandsRun: false,
+      projectCommandsRun: false,
+    });
     expect(JSON.stringify(reviewContext.payload)).not.toContain(dir);
     expect(JSON.stringify(reviewContext.payload)).not.toContain('Route implementation handoff.');
     expect(latestVerificationArtifactsPayload.latest).toEqual([
@@ -593,6 +682,153 @@ describe('mcp tools', () => {
     ]);
     expect(handoffsPayload.handoffs[0]).toMatchObject({ title: 'PR Summary' });
     expect(handoffPayload.handoff.content).toContain('Route implementation handoff.');
+  });
+
+  test('uses bounded run listing for MCP run summaries', async () => {
+    const { dir } = await createInitializedRepo();
+    const listRunsSpy = vi.spyOn(runsModule, 'listRuns');
+
+    const runs = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_list_runs',
+      arguments: { limit: 1 },
+    });
+
+    expect((runs.payload as RunsPayload).runs).toHaveLength(1);
+    expect((runs.payload as RunsPayload).runs[0].task).toMatchObject({
+      title: 'Add API route',
+      status: 'proposed',
+    });
+    expect(listRunsSpy).toHaveBeenCalledWith(dir, { limit: 1 });
+  });
+
+  test('bounds MCP latest artifact run lookup without changing full artifact inventory', async () => {
+    const { dir } = await createInitializedRepo();
+    const listRunsSpy = vi.spyOn(runsModule, 'listRuns');
+
+    await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_artifacts',
+      arguments: { latest: true },
+    });
+    expect(listRunsSpy).toHaveBeenLastCalledWith(dir, { limit: 1 });
+
+    listRunsSpy.mockClear();
+    await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_artifacts',
+    });
+    expect(listRunsSpy).toHaveBeenLastCalledWith(dir);
+    listRunsSpy.mockRestore();
+  });
+
+  test('bounds MCP handoff list content reads before applying the limit', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify({ name: 'demo', scripts: { test: 'vitest' } }, null, 2),
+    );
+    await initializeAgentLoop({ cwd: dir });
+    const handoffsDir = path.join(dir, '.agentloop/handoffs');
+    await mkdir(handoffsDir, { recursive: true });
+    const newest = path.join(handoffsDir, '2026-06-10-12-35-pr-summary.md');
+    const older = path.join(handoffsDir, '2026-06-10-12-34-pr-summary.md');
+    const oldest = path.join(handoffsDir, '2026-06-10-12-33-pr-summary.md');
+    await writeFile(newest, '# Newest PR Summary\n\nNewest handoff.\n');
+    await writeFile(older, '# Older PR Summary\n\nOlder handoff.\n');
+    await writeFile(oldest, '# Oldest PR Summary\n\nOldest handoff.\n');
+    await utimes(oldest, new Date('2026-06-10T12:33:00Z'), new Date('2026-06-10T12:33:00Z'));
+    await utimes(older, new Date('2026-06-10T12:34:00Z'), new Date('2026-06-10T12:34:00Z'));
+    await utimes(newest, new Date('2026-06-10T12:35:00Z'), new Date('2026-06-10T12:35:00Z'));
+
+    const handoffs = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_list_handoffs',
+      arguments: { limit: 1 },
+    });
+
+    expect((handoffs.payload as HandoffsPayload).handoffs).toEqual([
+      {
+        path: '.agentloop/handoffs/2026-06-10-12-35-pr-summary.md',
+        title: 'Newest PR Summary',
+        modifiedAt: new Date('2026-06-10T12:35:00Z').toISOString(),
+      },
+    ]);
+    expect(JSON.stringify(handoffs.payload)).not.toContain('Newest handoff.');
+    expect(JSON.stringify(handoffs.payload)).not.toContain('modifiedMs');
+    expect(handoffs.content[0].text).toBe(JSON.stringify(handoffs.payload, null, 2));
+  });
+
+  test('skips oversized selected MCP handoff summaries', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify({ name: 'demo', scripts: { test: 'vitest' } }, null, 2),
+    );
+    await initializeAgentLoop({ cwd: dir });
+    const handoffsDir = path.join(dir, '.agentloop/handoffs');
+    await mkdir(handoffsDir, { recursive: true });
+    const handoff = path.join(handoffsDir, '2026-06-10-12-36-pr-summary.md');
+    await writeFile(handoff, `# Oversized PR Summary\n\n${'x'.repeat(1_048_577)}\n`);
+    await utimes(
+      handoff,
+      new Date('2026-06-10T12:36:00Z'),
+      new Date('2026-06-10T12:36:00Z'),
+    );
+
+    const handoffs = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_list_handoffs',
+      arguments: { limit: 1 },
+    });
+
+    expect((handoffs.payload as HandoffsPayload).handoffs).toEqual([]);
+    expect(JSON.stringify(handoffs.payload)).not.toContain('Oversized PR Summary');
+  });
+
+  test('redacts local roots when expanding context handles through MCP', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify({ name: 'demo', scripts: { test: 'vitest' } }, null, 2),
+    );
+    await initializeAgentLoop({ cwd: dir });
+    const config = await loadAgentLoopConfig(dir);
+    const task = await createTaskContractFile({
+      cwd: dir,
+      config,
+      input: {
+        title: 'Check MCP redaction',
+        type: 'feature',
+        problemStatement: `Local root appears in a fixture: ${dir}`,
+        desiredOutcome: 'MCP context handle expansion can redact local roots.',
+        acceptanceCriteria: ['MCP output redacts local root paths'],
+        verificationCommands: ['npm test'],
+        rollbackNotes: 'Remove the redaction fixture.',
+      },
+    });
+    await setActiveTask({ cwd: dir, config, taskPath: task.path });
+
+    const unredacted = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_context_show',
+      arguments: { handle: 'task:active' },
+    });
+    const redacted = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_context_show',
+      arguments: { handle: 'task:active', redactPaths: true },
+    });
+
+    expect(JSON.stringify(unredacted.payload)).toContain(dir);
+    expect(JSON.stringify(redacted.payload)).toContain('[git-root]');
+    expect(JSON.stringify(redacted.payload)).not.toContain(dir);
   });
 
   test('rejects unknown tools and policy traversal attempts', async () => {

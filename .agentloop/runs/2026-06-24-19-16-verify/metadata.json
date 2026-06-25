@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-19-16-verify",
+  "command": "verify",
+  "createdAt": "2026-06-24-19-16",
+  "createdAtEpochMs": 1782321372180,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-optimize-agentloop-start-run-ledger-listing.md",
+    "title": "Optimize AgentLoop Start run ledger listing",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-19-15-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 83
+}

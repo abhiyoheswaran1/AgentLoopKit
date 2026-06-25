@@ -1,12 +1,20 @@
 import path from 'node:path';
-import { access, mkdir, readFile, symlink, writeFile } from 'node:fs/promises';
+import { access, chmod, mkdir, readFile, symlink, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
-import { afterEach, describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import { toSafeDisplayPath } from '../src/core/display-path.js';
 import { singleLineInlineCode } from '../src/core/markdown-format.js';
-import { findFileIntent, listRuns, readRun, writeVerificationRun } from '../src/core/runs.js';
+import {
+  findFileIntent,
+  findFileIntentWithSearch,
+  listRuns,
+  readRun,
+  readRunChangedFiles,
+  writeVerificationRun,
+} from '../src/core/runs.js';
 import { setActiveTask } from '../src/core/task-state.js';
+import { RUN_ARTIFACT_MAX_BYTES } from '../src/core/run-artifacts.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -100,6 +108,7 @@ Revert the auth callback change.
 
 describe('run ledger commands', () => {
   afterEach(async () => {
+    vi.restoreAllMocks();
     await Promise.all(tempDirs.map(removeTempDir));
     tempDirs = [];
   });
@@ -136,6 +145,11 @@ describe('run ledger commands', () => {
       expect(shown.run.metadata.id).toBe(ship.run.id);
       expect(shown.run.score.totalScore).toBe(ship.readiness.totalScore);
       expect(intent.file).toBe('src/auth/callback.ts');
+      expect(intent.search).toMatchObject({
+        totalRunCount: 1,
+        inspectedRunCount: 1,
+        truncated: false,
+      });
       expect(intent.runs).toEqual([
         expect.objectContaining({
           id: ship.run.id,
@@ -222,6 +236,11 @@ describe('run ledger commands', () => {
       expect(showRedactedJson).toEqual(showJson);
       expect(intentRedactedHuman.stdout).toBe(intentHuman.stdout);
       expect(intentRedactedJson).toEqual(intentJson);
+      expect(intentHuman.stdout).toContain('Searched newest');
+      expect(intentJson.search).toMatchObject({
+        inspectedRunCount: 1,
+        truncated: false,
+      });
     },
     CLI_LEDGER_TEST_TIMEOUT_MS,
   );
@@ -439,6 +458,44 @@ describe('run ledger commands', () => {
       expect.objectContaining({ id: '2026-06-12-00-00-c-handoff', command: 'handoff' }),
       expect.objectContaining({ id: '2026-06-12-00-00-a-verify', command: 'verify' }),
     ]);
+  });
+
+  test('keeps legacy run metadata that omits task state', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const runId = '2026-06-12-00-00-ship';
+    const runDir = path.join(dir, '.agentloop/runs', runId);
+    await mkdir(runDir, { recursive: true });
+    await writeFile(
+      path.join(runDir, 'metadata.json'),
+      JSON.stringify(
+        {
+          id: runId,
+          command: 'ship',
+          createdAt: '2026-06-12-00-00',
+          score: 96,
+          shipReportPath: '.agentloop/reports/ship-report.md',
+          changedFileCount: 3,
+        },
+        null,
+        2,
+      ),
+    );
+
+    await expect(listRuns(dir)).resolves.toEqual([
+      expect.objectContaining({
+        id: runId,
+        command: 'ship',
+        task: null,
+        score: 96,
+      }),
+    ]);
+    await expect(readRun(dir, runId)).resolves.toMatchObject({
+      metadata: {
+        id: runId,
+        task: null,
+      },
+    });
   });
 
   test('limits run ledger CLI output for recent and latest runs', async () => {
@@ -722,6 +779,208 @@ describe('run ledger commands', () => {
     );
   });
 
+  test('can list bounded run summaries without hydrating task files', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const runsDir = path.join(dir, '.agentloop/runs');
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-12-fix-login.md');
+    await mkdir(path.join(runsDir, '2026-06-12-00-00-old-ship'), { recursive: true });
+    await mkdir(path.join(runsDir, '2026-06-13-00-00-new-verify'), { recursive: true });
+    await mkdir(path.dirname(taskPath), { recursive: true });
+    await writeFile(taskPath, '# Current task title\n\n- Status: done\n');
+
+    await writeFile(
+      path.join(runsDir, '2026-06-12-00-00-old-ship/metadata.json'),
+      JSON.stringify(
+        {
+          id: '2026-06-12-00-00-old-ship',
+          command: 'ship',
+          createdAt: '2026-06-12-00-00',
+          createdAtEpochMs: 1_000,
+          task: {
+            path: '.agentloop/tasks/2026-06-12-fix-login.md',
+            title: 'Stored task title',
+            status: 'in-progress',
+          },
+          score: 90,
+          changedFileCount: 1,
+        },
+        null,
+        2,
+      ),
+    );
+    await writeFile(
+      path.join(runsDir, '2026-06-13-00-00-new-verify/metadata.json'),
+      JSON.stringify(
+        {
+          id: '2026-06-13-00-00-new-verify',
+          command: 'verify',
+          createdAt: '2026-06-13-00-00',
+          createdAtEpochMs: 2_000,
+          task: null,
+          overallStatus: 'pass',
+          changedFileCount: 1,
+        },
+        null,
+        2,
+      ),
+    );
+
+    await expect(listRuns(dir, { limit: 1, hydrateTask: false })).resolves.toEqual([
+      expect.objectContaining({ id: '2026-06-13-00-00-new-verify' }),
+    ]);
+    await expect(
+      listRuns(dir, {
+        limit: 1,
+        taskPath: '.agentloop/tasks/2026-06-12-fix-login.md',
+        hydrateTask: false,
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        id: '2026-06-12-00-00-old-ship',
+        task: {
+          path: '.agentloop/tasks/2026-06-12-fix-login.md',
+          title: 'Stored task title',
+          status: 'in-progress',
+        },
+      }),
+    ]);
+    await expect(listRuns(dir, { limit: 1, taskPath, hydrateTask: true })).resolves.toEqual([
+      expect.objectContaining({
+        id: '2026-06-12-00-00-old-ship',
+        task: {
+          path: '.agentloop/tasks/2026-06-12-fix-login.md',
+          title: 'Current task title',
+          status: 'done',
+        },
+      }),
+    ]);
+  });
+
+  test('preselects newest run buckets before reading metadata for unfiltered limits', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'typescript-package',
+      packageManager: 'npm',
+    });
+    await writeJson(path.join(dir, 'agentloop.config.json'), config);
+    const runsDir = path.join(dir, '.agentloop/runs');
+    const oldRunDir = path.join(runsDir, '2026-06-12-00-00-old-ship');
+    const newRunDir = path.join(runsDir, '2026-06-13-00-00-new-verify');
+    await mkdir(oldRunDir, { recursive: true });
+    await mkdir(newRunDir, { recursive: true });
+
+    const oldMetadataPath = path.join(oldRunDir, 'metadata.json');
+    await writeJson(oldMetadataPath, {
+      id: '2026-06-12-00-00-old-ship',
+      command: 'ship',
+      createdAt: '2026-06-12-00-00',
+      createdAtEpochMs: 1_000,
+      task: null,
+      score: 90,
+      changedFileCount: 1,
+    });
+    await chmod(oldMetadataPath, 0o000);
+    await writeJson(path.join(newRunDir, 'metadata.json'), {
+      id: '2026-06-13-00-00-new-verify',
+      command: 'verify',
+      createdAt: '2026-06-13-00-00',
+      createdAtEpochMs: 2_000,
+      task: null,
+      overallStatus: 'pass',
+      changedFileCount: 1,
+    });
+
+    await expect(listRuns(dir, { limit: 1, hydrateTask: false })).resolves.toEqual([
+      expect.objectContaining({ id: '2026-06-13-00-00-new-verify' }),
+    ]);
+
+    const latest = JSON.parse(
+      (await execa(tsxPath, [cliPath, 'runs', '--latest', '--json'], { cwd: dir })).stdout,
+    );
+    expect(latest.runs).toEqual([
+      expect.objectContaining({ id: '2026-06-13-00-00-new-verify' }),
+    ]);
+  });
+
+  test('normalizes bounded run summary limit edge cases', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const runsDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-ship');
+    await mkdir(runsDir, { recursive: true });
+    await writeJson(path.join(runsDir, 'metadata.json'), {
+      id: '2026-06-12-00-00-ship',
+      command: 'ship',
+      createdAt: '2026-06-12-00-00',
+      createdAtEpochMs: 1_000,
+      task: null,
+      score: 90,
+      changedFileCount: 1,
+    });
+
+    await expect(listRuns(dir, { limit: 0 })).resolves.toEqual([]);
+    await expect(listRuns(dir, { limit: -1 })).resolves.toEqual([]);
+    await expect(listRuns(dir, { limit: Number.NaN })).resolves.toEqual([]);
+    await expect(listRuns(dir, { limit: Number.POSITIVE_INFINITY })).resolves.toEqual([]);
+    await expect(listRuns(dir, { limit: 1.9 })).resolves.toEqual([
+      expect.objectContaining({ id: '2026-06-12-00-00-ship' }),
+    ]);
+  });
+
+  test('matches archived and active task paths when filtering run summaries', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const runsRoot = path.join(dir, '.agentloop/runs');
+    await mkdir(path.join(runsRoot, '2026-06-12-00-00-active-ship'), { recursive: true });
+    await mkdir(path.join(runsRoot, '2026-06-13-00-00-archived-ship'), { recursive: true });
+
+    await writeJson(path.join(runsRoot, '2026-06-12-00-00-active-ship/metadata.json'), {
+      id: '2026-06-12-00-00-active-ship',
+      command: 'ship',
+      createdAt: '2026-06-12-00-00',
+      createdAtEpochMs: 1_000,
+      task: {
+        path: '.agentloop/tasks/2026-06-12-fix-login.md',
+        title: 'Stored active task',
+        status: 'done',
+      },
+      changedFileCount: 1,
+    });
+    await writeJson(path.join(runsRoot, '2026-06-13-00-00-archived-ship/metadata.json'), {
+      id: '2026-06-13-00-00-archived-ship',
+      command: 'ship',
+      createdAt: '2026-06-13-00-00',
+      createdAtEpochMs: 2_000,
+      task: {
+        path: '.agentloop/tasks/archive/2026-06-12-fix-login.md',
+        title: 'Stored archived task',
+        status: 'done',
+      },
+      changedFileCount: 1,
+    });
+
+    await expect(
+      listRuns(dir, {
+        hydrateTask: false,
+        taskPath: '.agentloop/tasks/2026-06-12-fix-login.md',
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({ id: '2026-06-13-00-00-archived-ship' }),
+      expect.objectContaining({ id: '2026-06-12-00-00-active-ship' }),
+    ]);
+    await expect(
+      listRuns(dir, {
+        hydrateTask: false,
+        taskPath: '.agentloop/tasks/archive/2026-06-12-fix-login.md',
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({ id: '2026-06-13-00-00-archived-ship' }),
+      expect.objectContaining({ id: '2026-06-12-00-00-active-ship' }),
+    ]);
+  });
+
   test('falls back to stored run task metadata when the task file is missing', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -833,5 +1092,359 @@ describe('run ledger commands', () => {
         file: 'src/auth/callback.ts',
       }),
     ]);
+  });
+
+  test('reads changed-file artifacts directly with sanitized paths and safe misses', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir('agentloopkit-outside-changed-files-');
+    tempDirs.push(dir, outsideDir);
+    const runsDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-ship');
+    await mkdir(runsDir, { recursive: true });
+
+    await expect(readRunChangedFiles(dir, '2026-06-12-00-00-ship')).resolves.toEqual([]);
+    await writeJson(path.join(runsDir, 'changed-files.json'), [
+      { path: path.join(dir, 'src/auth/callback.ts'), status: 'M' },
+      { path: path.join(outsideDir, 'private.ts'), status: 'M' },
+    ]);
+
+    await expect(readRunChangedFiles(dir, '2026-06-12-00-00-ship')).resolves.toEqual([
+      { path: 'src/auth/callback.ts', status: 'M' },
+      { path: 'private.ts', status: 'M' },
+    ]);
+    await expect(readRunChangedFiles(dir, '2026-06-12-00-00-missing')).rejects.toMatchObject({
+      code: 'RUN_NOT_FOUND',
+    });
+    await expect(readRunChangedFiles(dir, '.')).rejects.toMatchObject({
+      code: 'RUN_ID_INVALID',
+    });
+  });
+
+  test('finds file intent without hydrating unrelated run artifacts', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir('agentloopkit-outside-intent-artifacts-');
+    tempDirs.push(dir, outsideDir);
+    const runDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-ship');
+    await mkdir(runDir, { recursive: true });
+    await writeJson(path.join(runDir, 'metadata.json'), {
+      id: '2026-06-12-00-00-ship',
+      command: 'ship',
+      createdAt: '2026-06-12-00-00',
+      createdAtEpochMs: 1_000,
+      task: {
+        path: '.agentloop/tasks/2026-06-12-fix-login.md',
+        title: 'Fix login redirect',
+        status: 'done',
+      },
+      score: 95,
+      changedFileCount: 1,
+    });
+    await writeJson(path.join(runDir, 'changed-files.json'), [
+      { path: path.join(dir, 'src/auth/callback.ts'), status: 'M' },
+    ]);
+    await writeJson(path.join(outsideDir, 'score.json'), { totalScore: 99 });
+    await symlink(path.join(outsideDir, 'score.json'), path.join(runDir, 'score.json'));
+    await writeFile(path.join(outsideDir, 'diffstat.txt'), 'outside diffstat\n');
+    await symlink(path.join(outsideDir, 'diffstat.txt'), path.join(runDir, 'diffstat.txt'));
+
+    await expect(findFileIntent(dir, 'src/auth/callback.ts')).resolves.toEqual([
+      expect.objectContaining({
+        id: '2026-06-12-00-00-ship',
+        file: 'src/auth/callback.ts',
+        why: 'Changed in ship run for task "Fix login redirect".',
+      }),
+    ]);
+  });
+
+  test('hydrates matched task metadata for file intent reasons', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const runDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-ship');
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-12-fix-login.md');
+    await mkdir(runDir, { recursive: true });
+    await mkdir(path.dirname(taskPath), { recursive: true });
+    await writeFile(
+      taskPath,
+      '# Current login redirect title\n\n- Status: done\n\n## Problem Statement\nStored title changed.\n',
+    );
+    await writeJson(path.join(runDir, 'metadata.json'), {
+      id: '2026-06-12-00-00-ship',
+      command: 'ship',
+      createdAt: '2026-06-12-00-00',
+      createdAtEpochMs: 1_000,
+      task: {
+        path: '.agentloop/tasks/2026-06-12-fix-login.md',
+        title: 'Stored login title',
+        status: 'in-progress',
+      },
+      score: 95,
+      changedFileCount: 1,
+    });
+    await writeJson(path.join(runDir, 'changed-files.json'), [
+      { path: 'src/auth/callback.ts', status: 'M' },
+    ]);
+
+    await expect(findFileIntent(dir, 'src/auth/callback.ts')).resolves.toEqual([
+      expect.objectContaining({
+        task: expect.objectContaining({
+          title: 'Current login redirect title',
+          status: 'done',
+        }),
+        why: 'Changed in ship run for task "Current login redirect title".',
+      }),
+    ]);
+  });
+
+  test('orders file intent matches by run metadata timestamp within the same minute', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const runsRoot = path.join(dir, '.agentloop/runs');
+    const newerRun = path.join(runsRoot, '2026-06-12-00-00-a-ship');
+    const olderRun = path.join(runsRoot, '2026-06-12-00-00-c-ship');
+    await mkdir(newerRun, { recursive: true });
+    await mkdir(olderRun, { recursive: true });
+
+    const base = {
+      command: 'ship',
+      createdAt: '2026-06-12-00-00',
+      task: {
+        path: '.agentloop/tasks/2026-06-12-fix-login.md',
+        title: 'Fix login redirect',
+        status: 'done',
+      },
+      score: 95,
+      changedFileCount: 1,
+    };
+    await writeJson(path.join(newerRun, 'metadata.json'), {
+      ...base,
+      id: '2026-06-12-00-00-a-ship',
+      createdAtEpochMs: 2_000,
+    });
+    await writeJson(path.join(olderRun, 'metadata.json'), {
+      ...base,
+      id: '2026-06-12-00-00-c-ship',
+      createdAtEpochMs: 1_000,
+    });
+    await writeJson(path.join(newerRun, 'changed-files.json'), [
+      { path: 'src/auth/callback.ts', status: 'M' },
+    ]);
+    await writeJson(path.join(olderRun, 'changed-files.json'), [
+      { path: 'src/auth/callback.ts', status: 'M' },
+    ]);
+
+    const intent = await findFileIntentWithSearch(dir, 'src/auth/callback.ts');
+
+    expect(intent.runs.map((run) => run.id)).toEqual([
+      '2026-06-12-00-00-a-ship',
+      '2026-06-12-00-00-c-ship',
+    ]);
+  });
+
+  test('bounds file intent lookup newest-first and reports truncated search context', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    async function writeIntentRun(index: number) {
+      const id = `2026-06-12-00-${String(index).padStart(2, '0')}-ship`;
+      const runDirectory = path.join(dir, '.agentloop/runs', id);
+      await mkdir(runDirectory, { recursive: true });
+      await writeJson(path.join(runDirectory, 'metadata.json'), {
+        id,
+        command: 'ship',
+        createdAt: `2026-06-12-00-${String(index).padStart(2, '0')}`,
+        createdAtEpochMs: index,
+        task: {
+          path: `.agentloop/tasks/2026-06-12-task-${index}.md`,
+          title: `Task ${index}`,
+          status: 'done',
+        },
+        score: 90,
+        changedFileCount: 1,
+      });
+      await writeJson(path.join(runDirectory, 'changed-files.json'), [
+        { path: 'src/auth/callback.ts', status: 'M' },
+      ]);
+    }
+
+    for (let index = 1; index <= 12; index += 1) {
+      await writeIntentRun(index);
+    }
+
+    const intent = await findFileIntentWithSearch(dir, 'src/auth/callback.ts', {
+      matchLimit: 3,
+      scanLimit: 50,
+    });
+
+    expect(intent.file).toBe('src/auth/callback.ts');
+    expect(intent.runs.map((run) => run.id)).toEqual([
+      '2026-06-12-00-12-ship',
+      '2026-06-12-00-11-ship',
+      '2026-06-12-00-10-ship',
+    ]);
+    expect(intent.search).toEqual({
+      totalRunCount: 12,
+      inspectedRunCount: 3,
+      scanLimit: 50,
+      matchLimit: 3,
+      truncated: true,
+      stoppedAfterMatches: true,
+    });
+  });
+
+  test('normalizes in-repo absolute intent paths and rejects outside paths', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir('agentloopkit-outside-intent-path-');
+    tempDirs.push(dir, outsideDir);
+    const runDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-ship');
+    await mkdir(runDir, { recursive: true });
+    await writeJson(path.join(runDir, 'metadata.json'), {
+      id: '2026-06-12-00-00-ship',
+      command: 'ship',
+      createdAt: '2026-06-12-00-00',
+      createdAtEpochMs: 1_000,
+      task: null,
+      score: 95,
+      changedFileCount: 1,
+    });
+    await writeJson(path.join(runDir, 'changed-files.json'), [
+      { path: path.join(dir, 'src/auth/callback.ts'), status: 'M' },
+    ]);
+
+    await expect(findFileIntent(dir, path.join(dir, 'src/auth/callback.ts'))).resolves.toEqual([
+      expect.objectContaining({
+        file: 'src/auth/callback.ts',
+      }),
+    ]);
+    await expect(findFileIntent(dir, path.join(outsideDir, 'secret.ts'))).rejects.toMatchObject({
+      code: 'RUN_INTENT_FILE_INVALID',
+    });
+    await expect(findFileIntent(dir, '../secret.ts')).rejects.toMatchObject({
+      code: 'RUN_INTENT_FILE_INVALID',
+    });
+
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({
+        name: 'demo',
+        type: 'typescript-package',
+        packageManager: 'npm',
+      }),
+    );
+    const invalidJson = await execa(tsxPath, [cliPath, 'intent', '../secret.ts', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    expect(invalidJson.exitCode).toBe(1);
+    expect(JSON.parse(invalidJson.stdout)).toEqual({
+      error: expect.objectContaining({
+        code: 'RUN_INTENT_FILE_INVALID',
+      }),
+    });
+  });
+
+  test('does not follow symlinked run metadata or artifacts', async () => {
+    const dir = await makeTempDir();
+    const outsideDir = await makeTempDir('agentloopkit-outside-run-artifacts-');
+    tempDirs.push(dir, outsideDir);
+    const metadataSymlinkRun = path.join(dir, '.agentloop/runs/2026-06-12-00-00-metadata');
+    const changedFilesSymlinkRun = path.join(
+      dir,
+      '.agentloop/runs/2026-06-12-00-00-changed-files',
+    );
+    const diffstatSymlinkRun = path.join(dir, '.agentloop/runs/2026-06-12-00-00-diffstat');
+    await mkdir(metadataSymlinkRun, { recursive: true });
+    await mkdir(changedFilesSymlinkRun, { recursive: true });
+    await mkdir(diffstatSymlinkRun, { recursive: true });
+
+    await writeJson(path.join(outsideDir, 'metadata.json'), {
+      id: '2026-06-12-00-00-metadata',
+      command: 'ship',
+      createdAt: '2026-06-12-00-00',
+      createdAtEpochMs: 1_000,
+      task: null,
+      score: 90,
+      changedFileCount: 1,
+    });
+    await symlink(
+      path.join(outsideDir, 'metadata.json'),
+      path.join(metadataSymlinkRun, 'metadata.json'),
+    );
+
+    await writeJson(path.join(changedFilesSymlinkRun, 'metadata.json'), {
+      id: '2026-06-12-00-00-changed-files',
+      command: 'ship',
+      createdAt: '2026-06-12-00-00',
+      createdAtEpochMs: 2_000,
+      task: null,
+      score: 91,
+      changedFileCount: 1,
+    });
+    await writeJson(path.join(outsideDir, 'changed-files.json'), [
+      { path: path.join(outsideDir, 'secret.ts'), status: 'M' },
+    ]);
+    await symlink(
+      path.join(outsideDir, 'changed-files.json'),
+      path.join(changedFilesSymlinkRun, 'changed-files.json'),
+    );
+
+    await writeJson(path.join(diffstatSymlinkRun, 'metadata.json'), {
+      id: '2026-06-12-00-00-diffstat',
+      command: 'ship',
+      createdAt: '2026-06-12-00-00',
+      createdAtEpochMs: 3_000,
+      task: null,
+      score: 92,
+      changedFileCount: 1,
+    });
+    await writeFile(path.join(outsideDir, 'diffstat.txt'), 'secret diffstat\n');
+    await symlink(path.join(outsideDir, 'diffstat.txt'), path.join(diffstatSymlinkRun, 'diffstat.txt'));
+
+    await expect(listRuns(dir, { hydrateTask: false })).resolves.not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: '2026-06-12-00-00-metadata' })]),
+    );
+    await expect(readRun(dir, '2026-06-12-00-00-metadata')).rejects.toMatchObject({
+      code: 'RUN_FILE_UNSAFE',
+    });
+    await expect(readRunChangedFiles(dir, '2026-06-12-00-00-changed-files')).rejects.toMatchObject({
+      code: 'RUN_FILE_UNSAFE',
+    });
+    await expect(readRun(dir, '2026-06-12-00-00-diffstat')).rejects.toMatchObject({
+      code: 'RUN_FILE_UNSAFE',
+    });
+  });
+
+  test('rejects oversized run artifacts before reading them', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const metadataRunDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-metadata');
+    const changedFilesRunDir = path.join(dir, '.agentloop/runs/2026-06-12-00-00-changed-files');
+    await mkdir(metadataRunDir, { recursive: true });
+    await mkdir(changedFilesRunDir, { recursive: true });
+
+    await writeFile(
+      path.join(metadataRunDir, 'metadata.json'),
+      'x'.repeat(RUN_ARTIFACT_MAX_BYTES + 1),
+    );
+    await writeJson(path.join(changedFilesRunDir, 'metadata.json'), {
+      id: '2026-06-12-00-00-changed-files',
+      command: 'ship',
+      createdAt: '2026-06-12-00-00',
+      createdAtEpochMs: 1_000,
+      task: null,
+      score: 90,
+      changedFileCount: 1,
+    });
+    await writeJson(path.join(changedFilesRunDir, 'changed-files.json'), [
+      { path: `${'a'.repeat(RUN_ARTIFACT_MAX_BYTES)}.ts`, status: 'M' },
+    ]);
+
+    await expect(listRuns(dir, { hydrateTask: false })).resolves.not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: '2026-06-12-00-00-metadata' })]),
+    );
+    await expect(readRun(dir, '2026-06-12-00-00-metadata')).rejects.toMatchObject({
+      code: 'RUN_FILE_TOO_LARGE',
+    });
+    await expect(readRunChangedFiles(dir, '2026-06-12-00-00-changed-files')).rejects.toMatchObject({
+      code: 'RUN_FILE_TOO_LARGE',
+    });
   });
 });

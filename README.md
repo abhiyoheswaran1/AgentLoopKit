@@ -67,6 +67,8 @@ npx agentloopkit init --local-only
 
 `--local-only` writes the harness, asks Git for this clone's metadata directory, then adds a marked block to that clone's `info/exclude` for `.agentloop/`, `AGENTS.md`, `AGENTLOOP.md`, and `agentloop.config.json`. It does not edit `.gitignore`, global Git config, shell profiles, or other project files.
 
+The examples below use `agentloop` after setup. If you are not installing the package locally or exposing its binary on `PATH`, keep using the one-off form, for example `npx --yes agentloopkit@latest doctor --redact-paths`.
+
 Check the published package explicitly:
 
 ```bash
@@ -103,7 +105,9 @@ npx --yes agentloopkit@latest upgrade-harness --details --redact-paths
 npx --yes agentloopkit@latest init --dry-run
 ```
 
-`init` skips existing generated files and appends to unmarked `AGENTS.md` files instead of overwriting maintainer edits. Use `upgrade-harness` to find older guidance that does not tell agents to run `agentloop start` before broad reads or expand source handles with `agentloop context show <handle>`. Copy only the useful pieces into `AGENTS.md`, `AGENTLOOP.md`, or `.agentloop/harness/*`.
+These commands inspect the published package. This repository may document unreleased guidance before the next publish; check [release status](docs/release-status.md) before expecting `agentloopkit@latest` to include new subcommands.
+
+`init` skips existing generated files and appends to unmarked `AGENTS.md` files instead of overwriting maintainer edits. Use `upgrade-harness` to find older guidance that does not tell agents to run `agentloop doctor` and `agentloop start` before broad reads, list handles with `agentloop context handles` when available, or expand source truth with `agentloop context show <handle>`. Copy only the useful pieces into `AGENTS.md`, `AGENTLOOP.md`, or `.agentloop/harness/*`.
 
 You can use the latest loop before refreshing old guidance:
 
@@ -132,6 +136,19 @@ agentloop task done
 ```
 
 That sequence creates a task contract, checks the repo setup, gives the next software agent a compact start briefing, runs only reviewed verification commands, records review-readiness evidence, drafts PR copy, and closes the active task. It does not post to GitHub, publish packages, call an LLM, or run hidden commands.
+
+### Make Your Agent Start Here
+
+Before a software agent broad-scans the repo, run:
+
+```bash
+agentloop doctor --redact-paths
+agentloop start --for codex --goal implement --redact-paths
+agentloop context handles --redact-paths
+agentloop context show <handle-from-start> --redact-paths
+```
+
+`doctor` checks the Agent Readiness Matrix: Doctor-before-Start guidance, Start guidance, context-handle guidance, broad-read avoidance, MCP guidance, and installed agent instruction files. `start` gives the current task, proof, risk, context budget, and source handles. `context handles` lists which handles are available now. `context show` expands exact local source truth only when the agent needs detail.
 
 ```bash
 npx agentloopkit init
@@ -163,9 +180,11 @@ npx agentloopkit next --redact-paths
 
 When `status` or `next` recommends `create-task` in a dirty repo, the reason calls out existing dirty non-evidence files so agents can confirm the next task scope before implementation. When `create-task` sees that same pre-existing dirty work, it also adds a bounded Risk Notes bullet to the generated task contract so later review evidence preserves the baseline count and examples.
 
-Use `agentloop start --for codex --goal implement --redact-paths` when a software agent needs the repo truth before broad reads. Start is the preflight: current task when one exists, decisive state, next safe command, read-first handles, risk summary, verification freshness, context-budget impact, and source handles. Use `agentloop context show <handle>` to expand source truth only when needed. Use `agentloop context pack --for codex --goal continue --redact-paths` when you need the lower-level receipt and omission details directly. Use `agentloop guard` when you want a live local check for scope drift, stale verification, proof debt, and context-budget pressure before review. Use `agentloop explain-diff` when you need to understand whether the current changed files are covered by task scope, recent run evidence, fresh verification, and risk guidance. Use `agentloop resume-pack --for codex`, `--for claude`, `--for cursor`, `--for generic`, or `--for human` when you need the older compact continuation surface. These commands are read-only by default and use local evidence only.
+Use `agentloop start --for codex --goal implement --redact-paths` when a software agent needs the repo truth before broad reads. Start is the preflight: current task when one exists, decisive state, next safe command, read-first handles, risk summary, verification freshness, context-budget impact, and source handles. Use `agentloop context handles` to list available handles and normal empty states, then `agentloop context show <handle>` to expand source truth only when needed. Use `agentloop context pack --for codex --goal continue --redact-paths` when you need the lower-level receipt and omission details directly. Use `agentloop guard` when you want a live local check for scope drift, stale verification, proof debt, and context-budget pressure before review. Use `agentloop explain-diff` when you need to understand whether the current changed files are covered by task scope, recent run evidence, fresh verification, and risk guidance. Use `agentloop resume-pack --for codex`, `--for claude`, `--for cursor`, `--for generic`, or `--for human` when you need the older compact continuation surface. These commands are read-only by default and use local evidence only.
 
 `agentloop start` is the agent starting point. It keeps agents from guessing by turning task state, changed files, verification, risk, and context pressure into one compact preflight. The Context Contract sits underneath it: `context pack` explains why each item is present, names what was left out, and provides local handles for the source truth. A large changed-file list becomes a small briefing the agent can expand only when it needs detail.
+
+JSON and MCP context budget/pack payloads keep that boundary: they include compact evidence fields and the `evidence-map:current` handle, but they do not send the full changed-file list unless the agent expands that local handle.
 
 Start uses a strict current-work rule. It accepts active or open task contracts. Archived, `done`, `deferred`, and AgentFlight placeholder tasks stay as previous evidence. Start and Context omit `task:active` handles and `agentloop ship` guidance for old work. In a clean repo with only previous evidence, Start tells the agent that no active task exists.
 
@@ -197,16 +216,18 @@ Agent session / review / research handoff
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-context-budget.png" alt="AgentLoopKit context budget example showing broad changed-file context compressed into a compact resume pack with transparent token estimates" width="100%">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-context-budget.png" alt="AgentLoopKit context budget example showing broad changed-file context compressed into a compact context pack with transparent token estimates" width="100%">
 </p>
 
-The context-budget example is generated from local AgentLoopKit output in this repository. Token estimates use a transparent character-count heuristic for planning, not provider tokenizer counts or billing claims. The percentage changes with repo state; the point is that agents can start from selected evidence and expand source handles instead of pasting broad history.
+The context-budget example is generated from local AgentLoopKit output in this repository. Token estimates use `ceil(character_count / 4)` for planning, not provider tokenizer counts or billing claims. The percentage changes with repo state; the point is that agents can start from selected evidence and expand source handles instead of pasting broad history.
+
+Run the repeatable [Start usefulness demo](docs/start-usefulness-demo.md) to create a temporary messy repo and see `agentloop doctor` check agent-readiness guidance, then `agentloop start` report context avoided, broad files avoided, stale proof, scope drift, source handles, and the next safe command.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-context-contract.gif" alt="Terminal demo running AgentLoopKit Start preflight with state, next command, context budget, source-handle expansion, and verification evidence" width="100%">
 </p>
 
-The terminal demo is generated from committed VHS sources in this repository. It shows the intended agent workflow: run Start preflight, see what not to broad-scan, expand the current task handle when one exists, and verify with local evidence.
+The terminal demo is generated from committed VHS sources in this repository. It shows the intended agent workflow: check readiness with Doctor, run Start preflight, see what not to broad-scan, expand the current task handle when one exists, and verify with local evidence.
 
 ## Dogfood Gate
 
@@ -259,14 +280,14 @@ agentloopkit init
 | Command                          | Purpose                                                                        |
 | -------------------------------- | ------------------------------------------------------------------------------ |
 | `agentloop init`                 | Generate the repo harness and config                                           |
-| `agentloop doctor`               | Check setup health, commands, git state, and risk files; use `--advisory` for first-run preflight |
+| `agentloop doctor`               | Check setup health, agent readiness, commands, git state, and risk files; use `--advisory` for first-run preflight |
 | `agentloop create-task`          | Create a scoped task contract                                                  |
 | `agentloop task ...`             | List, show, pin, update, archive, and inspect task state                       |
 | `agentloop status`               | Show active task, latest report, latest run, dirty files, and next step        |
 | `agentloop next`                 | Print only the next recommended loop action                                    |
 | `agentloop start`                | Run a repo-native agent preflight with task, evidence, risk, proof, and impact |
 | `agentloop review-context`       | Show one read-only reviewability context snapshot                              |
-| `agentloop context`              | Build context budgets, auditable packs, and source-handle expansions           |
+| `agentloop context`              | List handles, build context budgets and packs, and expand source truth         |
 | `agentloop guard`                | Check local drift, proof debt, and context-budget pressure                     |
 | `agentloop explain-diff`         | Explain the current diff with local task, verification, run, and risk evidence |
 | `agentloop resume-pack`          | Generate a compact local continuation brief for agents or reviewers            |
@@ -278,7 +299,7 @@ agentloopkit init
 | `agentloop check-gates`          | Check review evidence without running tests                                    |
 | `agentloop runs --latest`        | Show the newest local ship, verify, or handoff run entry                       |
 | `agentloop show-run <id>`        | Show one local run ledger entry                                                |
-| `agentloop intent <file>`        | Show which runs touched a file and why                                         |
+| `agentloop intent <file>`        | Show bounded newest-first run matches for one file and why                     |
 | `agentloop maintainer-check`     | Check whether an agent-assisted PR is reviewable                                  |
 | `agentloop artifacts`            | Inventory local tasks, reports, ship reports, badges, and run evidence         |
 | `agentloop artifacts --stale`    | Preview capped older local evidence candidates without deleting files          |
@@ -367,7 +388,7 @@ For narrower evidence history, `agentloop verify --write-run` and `agentloop han
 `agentloop status` includes the newest local run ledger entry when `.agentloop/runs/` exists, so agents can see the latest review-readiness or verification evidence without opening every report.
 Run ledger output uses safe display paths: `.agentloop/...` for AgentLoopKit artifacts, repo-relative paths for repo files, and filenames for older outside absolute paths.
 Use `--redact-paths` with `doctor`, `task list`, `task show`, `task set`, `task status`, `task done`, `task archive`, `task clear`, `status`, `next`, `start`, `review-context`, `context`, `guard`, `explain-diff`, `resume-pack`, `check-gates`, `artifacts`, `report`, `badge`, `runs`, `show-run`, `intent`, `verify`, `summarize`, `handoff`, `ship`, `prepare-pr`, `maintainer-check`, `upgrade-harness`, `ci-summary`, `release-notes`, `schemastore`, `github import`, `install-agent`, `release-check`, or `release-proof` before pasting output into a public issue, PR, or CI log. That mode replaces local root paths with a placeholder. Default JSON output keeps raw paths for scripts unless the redaction flag is passed. `task show` applies redaction to displayed task contract content. `task list`, `artifacts`, `runs`, `show-run`, `intent`, `schemastore`, and `github import` already use repo-relative paths or catalog metadata, and accept the flag for command consistency.
-`agentloop review-context --json` gives non-MCP agents one read-only local snapshot with status, active-task risk-note count, evidence map, context-budget estimates, gates, policies, artifacts, recent runs, latest ship evidence, and the next action.
+`agentloop review-context --json` gives non-MCP agents one read-only local snapshot with status, active-task risk-note count, compact evidence map, context-budget estimates, gates, policies, artifacts, recent runs, latest ship evidence, and the next action. It omits the full changed-file list by default and points agents to `agentloop context show evidence-map:current` when they need file-level detail.
 `agentloop upgrade-harness` is read-only. It tells existing users which generated guidance files need manual review after a CLI upgrade. It does not merge templates or overwrite local edits.
 `agentloop schemastore --json` prints the catalog entry for `agentloop.config.json`. Use it when preparing a SchemaStore contribution; the CLI does not submit that contribution for you. `schemastore --redact-paths` is accepted for consistency; catalog values are not local filesystem paths, so output values do not change.
 `agentloop github import --issue-json issue.json --pr-json pr.json` imports explicit local GitHub metadata into `.agentloop/github/context.json`. `review-context`, `prepare-pr`, and `maintainer-check` use that local context when it exists. Missing metadata does not block the loop. `github import --redact-paths` is accepted for consistency; metadata paths are already repo-relative, so output values do not change. The CLI does not call GitHub APIs, read tokens, or run `gh`.

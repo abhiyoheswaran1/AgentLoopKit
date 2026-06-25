@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-22-10-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-22-10",
+  "createdAtEpochMs": 1782331838353,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-align-guard-with-missing-task-preflight.md",
+    "title": "Align Guard with missing task preflight",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-22-09-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-22-10-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-22-10-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 341
+}

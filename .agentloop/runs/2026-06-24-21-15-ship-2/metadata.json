@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-21-15-ship-2",
+  "command": "ship",
+  "createdAt": "2026-06-24-21-15",
+  "createdAtEpochMs": 1782328517512,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-avoid-full-run-hydration-in-file-intent-lookup-2.md",
+    "title": "Avoid full run hydration in file intent lookup",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-21-12-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-21-15-ship-report-2.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-21-15-pr-summary-2.md",
+  "score": 92,
+  "changedFileCount": 236
+}

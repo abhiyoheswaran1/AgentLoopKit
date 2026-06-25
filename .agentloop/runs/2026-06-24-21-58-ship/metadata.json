@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-21-58-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-21-58",
+  "createdAtEpochMs": 1782331128332,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-avoid-misleading-prepare-pr-verification-gaps.md",
+    "title": "Avoid misleading prepare-pr verification gaps",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-21-57-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-21-58-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-21-58-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 313
+}

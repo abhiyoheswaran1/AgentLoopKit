@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-22-17-verify",
+  "command": "verify",
+  "createdAt": "2026-06-24-22-17",
+  "createdAtEpochMs": 1782332275938,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-add-compact-guard-json-output.md",
+    "title": "Add compact Guard JSON output",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-22-16-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 353
+}

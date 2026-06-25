@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-21-29-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-21-29",
+  "createdAtEpochMs": 1782329391182,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-bound-mcp-handoff-listing-work-2.md",
+    "title": "Bound MCP handoff listing work",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-21-26-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-21-29-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-21-29-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 268
+}

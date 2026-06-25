@@ -15,9 +15,19 @@ async function git(cwd: string, args: string[]) {
   return execa('git', args, { cwd });
 }
 
-async function createGuardFixture(options: { verification?: boolean } = {}) {
+async function createGuardFixture(
+  options: {
+    verification?: boolean;
+    includeLocalPathInTaskTitle?: boolean;
+    likelyAreas?: string[];
+    forbiddenAreas?: string[];
+  } = {},
+) {
   const dir = await makeTempDir();
   tempDirs.push(dir);
+  const taskTitle = options.includeLocalPathInTaskTitle ? `Fix auth copy ${dir}` : 'Fix auth copy';
+  const likelyAreas = options.likelyAreas ?? ['src/auth'];
+  const forbiddenAreas = options.forbiddenAreas ?? ['docs/private.md'];
 
   await git(dir, ['init', '-q']);
   await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
@@ -37,7 +47,7 @@ async function createGuardFixture(options: { verification?: boolean } = {}) {
   const taskPath = path.join(dir, '.agentloop/tasks/2026-06-11-fix-auth-copy.md');
   await writeFile(
     taskPath,
-    `# Fix auth copy
+    `# ${taskTitle}
 
 - Created date: 2026-06-11
 - Task type: bugfix
@@ -50,10 +60,10 @@ Auth copy is unclear.
 Users understand the auth redirect.
 
 ## Likely Files or Areas
-- src/auth
+${likelyAreas.map((area) => `- ${area}`).join('\n')}
 
 ## Files or Areas Not to Touch
-- docs/private.md
+${forbiddenAreas.map((area) => `- ${area}`).join('\n')}
 
 ## Acceptance Criteria
 - Auth copy is clearer.
@@ -91,6 +101,31 @@ Revert the copy change.
   return dir;
 }
 
+async function writeRunTaskMetadata(dir: string) {
+  const runId = '2026-06-11-12-30-ship';
+  const runDir = path.join(dir, '.agentloop/runs', runId);
+  await mkdir(runDir, { recursive: true });
+  await writeFile(
+    path.join(runDir, 'metadata.json'),
+    JSON.stringify(
+      {
+        id: runId,
+        command: 'ship',
+        createdAt: '2026-06-11-12-30',
+        task: {
+          path: '.agentloop/tasks/2026-06-11-fix-auth-copy.md',
+          title: 'Fix auth copy',
+          status: 'in-progress',
+        },
+        score: 96,
+        changedFileCount: 1,
+      },
+      null,
+      2,
+    ),
+  );
+}
+
 describe('guard command', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
@@ -111,7 +146,7 @@ describe('guard command', () => {
   });
 
   test('emits JSON and returns non-zero in strict mode when evidence is not reviewable', async () => {
-    const dir = await createGuardFixture();
+    const dir = await createGuardFixture({ includeLocalPathInTaskTitle: true });
 
     const result = await execa(
       tsxPath,
@@ -134,12 +169,70 @@ describe('guard command', () => {
       heuristic: 'chars-divided-by-four',
       savingsCommand: 'agentloop resume-pack --for codex --redact-paths',
     });
+    expect(payload.evidenceMap.task.title).toBe('Fix auth copy [git-root]');
     expect(payload.safety).toMatchObject({
       readOnlyByDefault: true,
       writesFiles: false,
       localEvidenceOnly: true,
     });
     expect(result.stdout).not.toContain(dir);
+  });
+
+  test('supports compact JSON output without changing default JSON shape', async () => {
+    const dir = await createGuardFixture({ verification: true });
+
+    const fullResult = await execa(tsxPath, [cliPath, 'guard', '--json', '--redact-paths'], {
+      cwd: dir,
+    });
+    const compactResult = await execa(
+      tsxPath,
+      [cliPath, 'guard', '--json', '--compact', '--redact-paths'],
+      {
+        cwd: dir,
+      },
+    );
+    const fullPayload = JSON.parse(fullResult.stdout);
+    const compactPayload = JSON.parse(compactResult.stdout);
+
+    expect(fullPayload.evidenceMap.files).toEqual(expect.any(Array));
+    expect(fullPayload.evidenceMap.fileList).toBeUndefined();
+    expect(compactPayload.evidenceMap.files).toBeUndefined();
+    expect(compactPayload.evidenceMap.fileList).toMatchObject({
+      omitted: true,
+      changedFileCount: 1,
+      handle: 'evidence-map:current',
+    });
+    expect(compactPayload.status).toBe(fullPayload.status);
+    expect(compactPayload.findings).toEqual(fullPayload.findings);
+  });
+
+  test('caps long changed-file path lists in compact findings', async () => {
+    const dir = await createGuardFixture({
+      verification: true,
+      likelyAreas: ['src'],
+      forbiddenAreas: ['src'],
+    });
+    await mkdir(path.join(dir, 'src/bulk'), { recursive: true });
+    for (let index = 0; index < 12; index += 1) {
+      await writeFile(path.join(dir, `src/bulk/file-${index}.ts`), `export const value${index} = true;\n`);
+    }
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'guard', '--json', '--compact', '--redact-paths'],
+      { cwd: dir },
+    );
+    const payload = JSON.parse(result.stdout);
+    const finding = payload.findings.find((item: { id: string }) => item.id === 'forbidden-files');
+
+    expect(finding).toMatchObject({
+      id: 'forbidden-files',
+      pathCount: 13,
+      pathsOmitted: true,
+      handle: 'evidence-map:current',
+      command: 'agentloop context show evidence-map:current',
+    });
+    expect(finding.paths).toHaveLength(5);
   });
 
   test('returns zero in strict mode when task scope and verification are reviewable', async () => {
@@ -159,6 +252,44 @@ describe('guard command', () => {
         expect.objectContaining({
           id: 'guard-pass',
           severity: 'info',
+        }),
+      ]),
+    );
+  });
+
+  test('blocks when no active task exists even if latest run has task evidence', async () => {
+    const dir = await createGuardFixture({ verification: true });
+    await writeRunTaskMetadata(dir);
+    await execa(
+      tsxPath,
+      [cliPath, 'task', 'status', '.agentloop/tasks/2026-06-11-fix-auth-copy.md', 'done'],
+      { cwd: dir },
+    );
+    await execa(tsxPath, [cliPath, 'task', 'clear'], { cwd: dir });
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'guard', '--strict', '--json', '--redact-paths'],
+      { cwd: dir, reject: false },
+    );
+    const payload = JSON.parse(result.stdout);
+
+    expect(result.exitCode).toBe(1);
+    expect(payload.status).toBe('fail');
+    expect(payload.evidenceMap.task).toBeNull();
+    expect(payload.evidenceMap.summary.reviewability).toBe('blocked');
+    expect(payload.findings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'task-missing',
+          severity: 'fail',
+        }),
+      ]),
+    );
+    expect(payload.findings).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'guard-pass',
         }),
       ]),
     );
@@ -212,6 +343,38 @@ describe('guard command', () => {
     expect(payload.snapshots).toHaveLength(2);
     expect(payload.snapshots[0].status).toBe('pass');
     expect(payload.snapshots[1].iteration).toBe(2);
+  });
+
+  test('compacts each watch snapshot when compact JSON is requested', async () => {
+    const dir = await createGuardFixture({ verification: true });
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'guard',
+        '--watch',
+        '--max-iterations',
+        '2',
+        '--interval-ms',
+        '5',
+        '--json',
+        '--compact',
+        '--redact-paths',
+      ],
+      { cwd: dir },
+    );
+    const payload = JSON.parse(result.stdout);
+
+    expect(payload.mode).toBe('watch');
+    expect(payload.snapshots).toHaveLength(2);
+    for (const snapshot of payload.snapshots) {
+      expect(snapshot.evidenceMap.files).toBeUndefined();
+      expect(snapshot.evidenceMap.fileList).toMatchObject({
+        omitted: true,
+        changedFileCount: 1,
+      });
+    }
   });
 
   test('writes reports and baselines only when explicitly requested', async () => {

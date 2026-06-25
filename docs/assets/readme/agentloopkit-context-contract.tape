@@ -53,6 +53,11 @@ Enter
 Wait
 Show
 
+Type "npx agentloop doctor --redact-paths"
+Enter
+Wait
+Sleep 1.4s
+
 Type "npx agentloop start --for codex --goal implement --redact-paths"
 Enter
 Wait

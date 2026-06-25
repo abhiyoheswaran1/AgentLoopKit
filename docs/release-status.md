@@ -1,39 +1,39 @@
 # Release Status
 
-Last checked: June 24, 2026.
+Last checked: June 25, 2026.
 
 ## Current State
 
-- GitHub release `v0.42.0` is public.
-- npm latest is `agentloopkit@0.42.0`.
-- GHCR and MCP Registry are live for `0.42.0`.
+- GitHub release `v0.43.0` is public.
+- npm latest is `agentloopkit@0.43.0`.
+- GHCR and MCP Registry are live for `0.43.0`.
 - GitHub Marketplace listing is pending owner UI publication for the composite Action.
-- Release tag `v0.42.0` points at the published release commit.
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.42.0>
-- Release asset: `agentloopkit-0.42.0.tgz`
-- Release asset SHA-256: `a5fea35f90976cace3cd00943d6290817a43b3989aefa7aaf66ed9e69f6674b2`
-- CI run: `28099488561`
-- CLI Smoke run: `28099488491`
-- Publish workflow run: `28099521155`
-- Docker workflow run: `28099521058`
-- MCP Registry workflow run: `28100013921`
+- Release tag `v0.43.0` points at the published release commit.
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.43.0>
+- Release asset: `agentloopkit-0.43.0.tgz`
+- Release asset SHA-256: pending post-release proof.
+- CI run: pending post-release proof.
+- CLI Smoke run: pending post-release proof.
+- Publish workflow run: pending post-release proof.
+- Docker workflow run: pending post-release proof.
+- MCP Registry workflow run: pending post-release proof.
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
-GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirms the `0.42.0` image.
+GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirms the `0.43.0` image after release workflows finish.
 
-The MCP Registry metadata points at npm package `agentloopkit@0.42.0`.
+The MCP Registry metadata points at npm package `agentloopkit@0.43.0` after release workflows finish.
 
-GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 24, 2026.
+GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during the previous post-release proof on June 24, 2026.
 
 ## Latest Release Highlights
 
-Released in `0.42.0`:
+Released in `0.43.0`:
 
-- `agentloop start` and `agentloop context` now use current-work task evidence so archived, terminal, deferred, and AgentFlight placeholder tasks stay as previous evidence.
-- Start no-current-task routing now sends agents toward task setup without `task:active` handles or `agentloop ship` guidance when only previous release or handoff evidence exists.
-- `agentloop upgrade-harness` now checks whether generated harness files mention both `agentloop start` and `agentloop context show`.
-- `agentloop doctor` reports current agent-readiness topics, including Start preflight and source-handle expansion.
-- Generated templates are now at template version 2 with Start/Context readiness guidance in root and harness files.
+- `agentloop context handles` lists available source handles, reasons, and exact expansion commands.
+- `agentloop start` now shows a usefulness proof with estimated context avoided, broad files avoided, stale proof, scope drift, source handles, verification freshness, and the next safe command.
+- `agentloop doctor` reports the Agent Readiness Matrix for Start guidance, context handles, broad-read avoidance, MCP guidance, and installed agent instructions.
+- `agentloop guard --json --compact` returns bounded evidence-map data and handle expansion guidance for large dirty repos.
+- Review context, context packs, MCP payloads, and run-ledger lookups avoid broad evidence dumps by default and point agents to source handles.
 
 ## Use The Current CLI
 
@@ -42,7 +42,7 @@ npm is the primary install path:
 ```bash
 npx agentloopkit init
 tmp=$(mktemp -d)
-(cd "$tmp" && npx --yes agentloopkit@0.42.0 version)
+(cd "$tmp" && npx --yes agentloopkit@0.43.0 version)
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -66,23 +66,23 @@ After each publish:
 
 ## Verification Evidence
 
-Local release gate for `0.42.0`:
+Local release gate for `0.43.0`:
 
-- `npm run release-flow`: passed on commit `43245063`
-- `node dist/cli/index.js release-check --strict --redact-paths`: passed from a clean tree on commit `43245063` before tag creation
+- `npm run release-flow`: pending on release commit
+- `node dist/cli/index.js release-check --strict --redact-paths`: pending on release commit
 - `npx --yes projscan doctor --format markdown`: A/90 with the known reviewed `prepublishOnly` advisory
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: latest `0.42.0`
-- `node dist/cli/index.js npm-status --agentloopkit --expect-current`: latest matches local package version
-- `npm run smoke:published -- --version 0.42.0`: passed
-- `npx --yes agentloopkit@0.42.0 version`: `0.42.0` from a clean temporary directory
-- GitHub release asset digest: `a5fea35f90976cace3cd00943d6290817a43b3989aefa7aaf66ed9e69f6674b2`
-- `node dist/cli/index.js release-proof --redact-paths`: npm, GitHub Release, GHCR, and MCP Registry passed; GitHub Marketplace warned
+- `npm view agentloopkit version versions --json`: pending post-release proof
+- `node dist/cli/index.js npm-status --agentloopkit --expect-current`: pending post-release proof
+- `npm run smoke:published -- --version 0.43.0`: pending post-release proof
+- `npx --yes agentloopkit@0.43.0 version`: pending post-release proof
+- GitHub release asset digest: pending post-release proof
+- `node dist/cli/index.js release-proof --redact-paths`: pending post-release proof
 - `node dist/cli/index.js release-proof --strict --only github-marketplace --redact-paths`: expected to fail while Marketplace publication remains deferred
-- GHCR image tag `0.42.0`: confirmed by release proof
-- MCP Registry metadata points at `agentloopkit@0.42.0`: confirmed by release proof
+- GHCR image tag `0.43.0`: pending post-release proof
+- MCP Registry metadata points at `agentloopkit@0.43.0`: pending post-release proof
 
 Latest release-status documentation and proof commands on post-release `main`:
 

@@ -179,6 +179,10 @@ type InventoryFile = {
   mtimeMs: number;
 };
 
+type ArtifactInventoryRunJson = Omit<RunSummary, 'task'> & {
+  task?: NonNullable<RunSummary['task']>;
+};
+
 type GeneratedArtifactSortKey = {
   timestamp: string;
   sequence: number;
@@ -475,9 +479,10 @@ function latestArchivedTask(tasks: ArtifactInventoryTask[]) {
   );
 }
 
-async function listRunInventory(cwd: string) {
+async function listRunInventory(cwd: string, options: { limit?: number } = {}) {
   try {
-    return await listRuns(cwd);
+    if (options.limit === undefined) return await listRuns(cwd);
+    return await listRuns(cwd, { limit: options.limit });
   } catch (error) {
     if (error instanceof AgentLoopError && error.code === 'RUN_PATH_INVALID') return [];
     throw error;
@@ -487,6 +492,7 @@ async function listRunInventory(cwd: string) {
 export async function getArtifactInventory(options: {
   cwd: string;
   config: AgentLoopConfig;
+  runLimit?: number;
 }): Promise<ArtifactInventory> {
   const reportsDir = options.config.paths.reportsDir;
   const handoffsDir = options.config.paths.handoffsDir;
@@ -554,7 +560,7 @@ export async function getArtifactInventory(options: {
       extension: '.md',
       pattern: releaseNotesPattern,
     }),
-    listRunInventory(options.cwd),
+    listRunInventory(options.cwd, { limit: options.runLimit }),
   ]);
   const taskArtifacts = await Promise.all(
     taskFiles.map((file) => readTaskInventory(options.cwd, file)),
@@ -934,7 +940,7 @@ function selectedArtifactTypes(options: ArtifactInventoryRenderOptions) {
 function latestArtifactForType(
   inventory: ArtifactInventory,
   type: ArtifactInventoryFilterType,
-): LatestArtifactInventoryItem | null {
+): LatestArtifactInventoryItem | ({ type: 'run' } & ArtifactInventoryRunJson) | null {
   switch (type) {
     case 'task':
       return inventory.tasks.latest ? { type, ...inventory.tasks.latest } : null;
@@ -955,17 +961,39 @@ function latestArtifactForType(
     case 'release-notes':
       return inventory.releaseNotes.latest ? { type, ...inventory.releaseNotes.latest } : null;
     case 'run':
-      return inventory.runs.latest ? { type, ...inventory.runs.latest } : null;
+      return inventory.runs.latest ? { type, ...runSummaryJson(inventory.runs.latest) } : null;
   }
 }
 
 function latestArtifacts(
   inventory: ArtifactInventory,
   options: ArtifactInventoryRenderOptions,
-): LatestArtifactInventoryItem[] {
+): Array<LatestArtifactInventoryItem | ({ type: 'run' } & ArtifactInventoryRunJson)> {
   return selectedArtifactTypes(options)
     .map((type) => latestArtifactForType(inventory, type))
-    .filter((artifact): artifact is LatestArtifactInventoryItem => artifact !== null);
+    .filter(
+      (artifact): artifact is LatestArtifactInventoryItem | ({ type: 'run' } & ArtifactInventoryRunJson) =>
+        artifact !== null,
+    );
+}
+
+function runSummaryJson(run: RunSummary): ArtifactInventoryRunJson {
+  const { task, ...summary } = run;
+  return task ? { ...summary, task } : summary;
+}
+
+function runInventoryJson(inventory: ArtifactInventory['runs']) {
+  return {
+    count: inventory.count,
+    latest: inventory.latest ? runSummaryJson(inventory.latest) : null,
+  };
+}
+
+function artifactInventoryJson(inventory: ArtifactInventory) {
+  return {
+    ...inventory,
+    runs: runInventoryJson(inventory.runs),
+  };
 }
 
 export function renderArtifactInventoryJson(
@@ -977,12 +1005,18 @@ export function renderArtifactInventoryJson(
   }
 
   if (options.type) {
+    if (options.type === 'run') {
+      return {
+        runs: runInventoryJson(inventory.runs),
+      };
+    }
+
     return {
       [artifactInventoryJsonKeys[options.type]]: inventory[artifactInventoryJsonKeys[options.type]],
     };
   }
 
-  return inventory;
+  return artifactInventoryJson(inventory);
 }
 
 export function renderStaleArtifactPreviewJson(preview: StaleArtifactPreview) {

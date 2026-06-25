@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-22-26-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-22-26",
+  "createdAtEpochMs": 1782332777706,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-reduce-doctor-risk-scan-evidence-noise.md",
+    "title": "Reduce Doctor risk-scan evidence noise",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-22-24-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-22-26-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-22-26-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 372
+}

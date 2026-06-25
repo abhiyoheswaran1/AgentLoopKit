@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-18-45-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-18-45",
+  "createdAtEpochMs": 1782319559463,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-add-agentloop-agent-readiness-matrix-2.md",
+    "title": "Add AgentLoop agent readiness matrix",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-18-42-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-18-45-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-18-45-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 68
+}

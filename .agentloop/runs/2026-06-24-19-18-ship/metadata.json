@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-19-18-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-19-18",
+  "createdAtEpochMs": 1782321509504,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-optimize-agentloop-start-run-ledger-listing.md",
+    "title": "Optimize AgentLoop Start run ledger listing",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-19-15-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-19-18-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-19-18-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 86
+}

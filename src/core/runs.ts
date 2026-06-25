@@ -6,40 +6,22 @@ import { isInsidePath, normalizeExistingAncestor, pathExists, writeTextFile } fr
 import { ReviewReadinessResult } from './readiness-score.js';
 import { toSafeDisplayPath } from './display-path.js';
 import { readTaskMetadata } from './task-state.js';
+import type { RunCommand, RunMetadata, RunSummary } from './run-types.js';
+import {
+  isIgnorableRunListError,
+  parseChangedFiles,
+  readRunJsonFileAtPath,
+  readRunMetadataFileAtPath,
+  readSafeRunTextFile,
+} from './run-artifacts.js';
 
-export type RunCommand = 'ship' | 'verify' | 'handoff';
+export type { RunCommand, RunMetadata, RunSummary } from './run-types.js';
 
-export type RunMetadata = {
-  id: string;
-  command: RunCommand;
-  createdAt: string;
-  createdAtEpochMs?: number;
-  task: {
-    path: string;
-    title: string;
-    status: string;
-  } | null;
-  verificationReportPath?: string;
-  shipReportPath?: string;
-  handoffPath?: string;
-  score?: number;
-  overallStatus?: string;
-  changedFileCount: number;
+export type ListRunsOptions = {
+  limit?: number;
+  taskPath?: string;
+  hydrateTask?: boolean;
 };
-
-export type RunSummary = Pick<
-  RunMetadata,
-  | 'id'
-  | 'command'
-  | 'createdAt'
-  | 'task'
-  | 'score'
-  | 'overallStatus'
-  | 'changedFileCount'
-  | 'verificationReportPath'
-  | 'shipReportPath'
-  | 'handoffPath'
->;
 
 export type RunRecord = {
   metadata: RunMetadata;
@@ -53,8 +35,33 @@ export type IntentMatch = RunSummary & {
   why: string;
 };
 
+export type FileIntentSearch = {
+  totalRunCount: number;
+  inspectedRunCount: number;
+  scanLimit: number;
+  matchLimit: number;
+  truncated: boolean;
+  stoppedAfterMatches: boolean;
+};
+
+export type FileIntentResult = {
+  file: string;
+  runs: IntentMatch[];
+  search: FileIntentSearch;
+};
+
+export type FindFileIntentOptions = {
+  scanLimit?: number;
+  matchLimit?: number;
+};
+
 type SortableRunSummary = {
   summary: RunSummary;
+  preciseTimestampMs: number;
+};
+
+type SortableRunMetadata = {
+  metadata: RunMetadata;
   preciseTimestampMs: number;
 };
 
@@ -68,8 +75,14 @@ function runsRoot(cwd: string) {
   return root;
 }
 
+const RUN_LIST_CONCURRENCY = 32;
+export const FILE_INTENT_DEFAULT_SCAN_LIMIT = 50;
+export const FILE_INTENT_DEFAULT_MATCH_LIMIT = 10;
+export const FILE_INTENT_MAX_SCAN_LIMIT = 500;
+export const FILE_INTENT_MAX_MATCH_LIMIT = 50;
+
 function validateRunId(id: string) {
-  if (!/^[A-Za-z0-9._-]+$/.test(id) || id.includes('..')) {
+  if (!/^[A-Za-z0-9._-]+$/.test(id) || id === '.' || id.includes('..')) {
     throw new AgentLoopError(`Invalid run id: ${id}`, 'RUN_ID_INVALID');
   }
 }
@@ -125,6 +138,39 @@ function sanitizeChangedFiles(cwd: string, changedFiles: GitFileStatus[]): GitFi
   }));
 }
 
+function normalizeDisplayPath(value: string) {
+  return value.trim().replace(/\\/g, '/').replace(/^\.\/+/, '');
+}
+
+export function normalizeFileIntentPath(cwd: string, file: string) {
+  const platformPath = file.replace(/\\/g, path.sep);
+  const absolutePath = path.isAbsolute(platformPath)
+    ? path.resolve(platformPath)
+    : path.resolve(cwd, platformPath);
+  const relativePath = path.relative(path.resolve(cwd), absolutePath);
+  if (!relativePath || relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+    throw new AgentLoopError(
+      'Intent file must be a repo-relative path inside the current repository.',
+      'RUN_INTENT_FILE_INVALID',
+    );
+  }
+  return relativePath.split(path.sep).join('/');
+}
+
+function comparableTaskPath(cwd: string, value: string) {
+  const normalized = normalizeDisplayPath(toSafeDisplayPath(cwd, value));
+  const archivePrefix = '.agentloop/tasks/archive/';
+  if (normalized.startsWith(archivePrefix)) {
+    return `.agentloop/tasks/${path.posix.basename(normalized)}`;
+  }
+  return normalized;
+}
+
+function matchesTaskPath(cwd: string, runTaskPath: string | undefined, requestedTaskPath: string | undefined) {
+  if (!runTaskPath || !requestedTaskPath) return false;
+  return comparableTaskPath(cwd, runTaskPath) === comparableTaskPath(cwd, requestedTaskPath);
+}
+
 function toSummary(metadata: RunMetadata): RunSummary {
   return {
     id: metadata.id,
@@ -140,8 +186,13 @@ function toSummary(metadata: RunMetadata): RunSummary {
   };
 }
 
-async function readJsonFile<T>(filePath: string): Promise<T> {
-  return JSON.parse(await readFile(filePath, 'utf8')) as T;
+async function readRunMetadataFile(
+  cwd: string,
+  id: string,
+  options: { required?: boolean } = {},
+): Promise<{ metadata: RunMetadata; mtimeMs: number } | undefined> {
+  const directory = runDir(cwd, id);
+  return readRunMetadataFileAtPath(path.join(directory, 'metadata.json'), id, options);
 }
 
 async function readTaskIfPresent(cwd: string, taskPath: string) {
@@ -319,76 +370,257 @@ export async function writeHandoffRun(options: {
   };
 }
 
-export async function listRuns(cwd: string): Promise<RunSummary[]> {
+function normalizeRunLimit(limit: number | undefined) {
+  if (limit === undefined) return undefined;
+  if (!Number.isFinite(limit) || limit <= 0) return 0;
+  return Math.floor(limit);
+}
+
+function normalizeFileIntentBound(value: number | undefined, defaults: { fallback: number; max: number }) {
+  if (value === undefined) return defaults.fallback;
+  if (!Number.isFinite(value) || value <= 0) return defaults.fallback;
+  return Math.min(Math.floor(value), defaults.max);
+}
+
+function compareRuns(a: SortableRunMetadata, b: SortableRunMetadata) {
+  const minuteCompare = b.metadata.createdAt.localeCompare(a.metadata.createdAt);
+  if (minuteCompare !== 0) return minuteCompare;
+  const preciseCompare = b.preciseTimestampMs - a.preciseTimestampMs;
+  if (preciseCompare !== 0) return preciseCompare;
+  return b.metadata.id.localeCompare(a.metadata.id);
+}
+
+function appendSortableRun(
+  runs: SortableRunMetadata[],
+  run: SortableRunMetadata,
+  limit: number | undefined,
+) {
+  runs.push(run);
+  if (limit === undefined) return;
+  runs.sort(compareRuns);
+  if (runs.length > limit) runs.pop();
+}
+
+function runMinutePrefix(id: string) {
+  return id.match(/^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}/)?.[0] ?? id;
+}
+
+function selectRunDirectoryEntries(
+  entries: Array<{ name: string; isDirectory(): boolean }>,
+  options: { limit: number | undefined; taskPath?: string },
+) {
+  const directories = entries.filter((entry) => entry.isDirectory());
+  if (options.limit === undefined || options.taskPath) return directories;
+
+  const sorted = directories.slice().sort((left, right) => right.name.localeCompare(left.name));
+  const initial = sorted.slice(0, options.limit);
+  if (initial.length < options.limit) return initial;
+
+  const boundaryPrefix = runMinutePrefix(initial[initial.length - 1].name);
+  let selectedCount = initial.length;
+  while (
+    selectedCount < sorted.length &&
+    runMinutePrefix(sorted[selectedCount].name) === boundaryPrefix
+  ) {
+    selectedCount += 1;
+  }
+  return sorted.slice(0, selectedCount);
+}
+
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  concurrency: number,
+  mapper: (item: T) => Promise<R>,
+) {
+  const results = new Array<R>(items.length);
+  let nextIndex = 0;
+  const workerCount = Math.min(concurrency, items.length);
+  await Promise.all(
+    Array.from({ length: workerCount }, async () => {
+      while (nextIndex < items.length) {
+        const currentIndex = nextIndex;
+        nextIndex += 1;
+        results[currentIndex] = await mapper(items[currentIndex]);
+      }
+    }),
+  );
+  return results;
+}
+
+export async function listRuns(cwd: string, options: ListRunsOptions = {}): Promise<RunSummary[]> {
+  const limit = normalizeRunLimit(options.limit);
+  if (limit === 0) return [];
   const root = runsRoot(cwd);
   if (!(await pathExists(root))) return [];
   const entries = await readdir(root, { withFileTypes: true });
-  const runs: SortableRunSummary[] = [];
+  const runs: SortableRunMetadata[] = [];
+  const selectedEntries = selectRunDirectoryEntries(entries, {
+    limit,
+    taskPath: options.taskPath,
+  });
 
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    const metadataPath = path.join(root, entry.name, 'metadata.json');
-    if (!(await pathExists(metadataPath))) continue;
-    const metadata = await readJsonFile<RunMetadata>(metadataPath);
-    const hydratedMetadata = await hydrateRunMetadata(cwd, metadata);
-    const metadataStat = await stat(metadataPath);
-    runs.push({
-      summary: toSummary(hydratedMetadata),
-      preciseTimestampMs: metadata.createdAtEpochMs ?? metadataStat.mtimeMs,
+  const candidates = await mapWithConcurrency(selectedEntries, RUN_LIST_CONCURRENCY, async (entry) => {
+    const metadataFile = await readRunMetadataFileAtPath(
+      path.join(root, entry.name, 'metadata.json'),
+      entry.name,
+    ).catch((error: unknown) => {
+      if (isIgnorableRunListError(error)) return undefined;
+      throw error;
     });
+    if (!metadataFile) return undefined;
+    const safeMetadata = sanitizeRunMetadata(cwd, metadataFile.metadata);
+    if (
+      options.taskPath &&
+      !matchesTaskPath(cwd, safeMetadata.task?.path, options.taskPath)
+    ) {
+      return undefined;
+    }
+    return {
+      metadata: safeMetadata,
+      preciseTimestampMs: metadataFile.metadata.createdAtEpochMs ?? metadataFile.mtimeMs,
+    };
+  });
+
+  for (const run of candidates) {
+    if (!run) continue;
+    appendSortableRun(runs, run, limit);
   }
 
-  return runs
-    .sort((a, b) => {
-      const minuteCompare = b.summary.createdAt.localeCompare(a.summary.createdAt);
-      if (minuteCompare !== 0) return minuteCompare;
-      const preciseCompare = b.preciseTimestampMs - a.preciseTimestampMs;
-      if (preciseCompare !== 0) return preciseCompare;
-      return b.summary.id.localeCompare(a.summary.id);
-    })
-    .map((run) => run.summary);
+  const selectedRuns = runs.sort(compareRuns);
+  const boundedRuns = limit === undefined ? selectedRuns : selectedRuns.slice(0, limit);
+
+  if (options.hydrateTask === false) {
+    return boundedRuns.map((run) => toSummary(run.metadata));
+  }
+
+  const hydratedRuns: SortableRunSummary[] = [];
+  for (const run of boundedRuns) {
+    hydratedRuns.push({
+      summary: toSummary(await hydrateRunMetadata(cwd, run.metadata)),
+      preciseTimestampMs: run.preciseTimestampMs,
+    });
+  }
+  return hydratedRuns.map((run) => run.summary);
+}
+
+export async function readRunChangedFiles(cwd: string, id: string): Promise<GitFileStatus[]> {
+  const directory = runDir(cwd, id);
+  if (!(await pathExists(directory))) throw new AgentLoopError(`Run not found: ${id}`, 'RUN_NOT_FOUND');
+  const changedFilesArtifact = await readRunJsonFileAtPath(
+    path.join(directory, 'changed-files.json'),
+    'changed-files.json',
+  );
+  if (!changedFilesArtifact) return [];
+  const changedFiles = parseChangedFiles(changedFilesArtifact.value);
+  return sanitizeChangedFiles(cwd, changedFiles);
 }
 
 export async function readRun(cwd: string, id: string): Promise<RunRecord> {
   const directory = runDir(cwd, id);
   if (!(await pathExists(directory))) throw new AgentLoopError(`Run not found: ${id}`, 'RUN_NOT_FOUND');
-  const scorePath = path.join(directory, 'score.json');
-  const changedFilesPath = path.join(directory, 'changed-files.json');
-  const metadata = await hydrateRunMetadata(
-    cwd,
-    await readJsonFile<RunMetadata>(path.join(directory, 'metadata.json')),
+  const metadataFile = await readRunMetadataFile(cwd, id, { required: true });
+  if (!metadataFile) throw new AgentLoopError(`Run not found: ${id}`, 'RUN_NOT_FOUND');
+  const metadata = await hydrateRunMetadata(cwd, metadataFile.metadata);
+  const scoreArtifact = await readRunJsonFileAtPath(path.join(directory, 'score.json'), 'score.json');
+  const diffStatArtifact = await readSafeRunTextFile(
+    path.join(directory, 'diffstat.txt'),
+    'diffstat.txt',
   );
-  const changedFiles = (await pathExists(changedFilesPath))
-    ? await readJsonFile<GitFileStatus[]>(changedFilesPath)
-    : [];
   return {
     metadata,
-    score: (await pathExists(scorePath)) ? await readJsonFile<ReviewReadinessResult>(scorePath) : null,
-    changedFiles: sanitizeChangedFiles(cwd, changedFiles),
-    diffStat: (await pathExists(path.join(directory, 'diffstat.txt')))
-      ? await readFile(path.join(directory, 'diffstat.txt'), 'utf8')
-      : '',
+    score: scoreArtifact ? (scoreArtifact.value as ReviewReadinessResult) : null,
+    changedFiles: await readRunChangedFiles(cwd, id),
+    diffStat: diffStatArtifact?.text ?? '',
   };
 }
 
-export async function findFileIntent(cwd: string, file: string): Promise<IntentMatch[]> {
-  const normalizedFile = file.replace(/\\/g, '/');
-  const runs = await listRuns(cwd);
-  const matches: IntentMatch[] = [];
+async function listRunIdsNewestFirst(cwd: string) {
+  const root = runsRoot(cwd);
+  if (!(await pathExists(root))) return [];
+  const entries = await readdir(root, { withFileTypes: true });
+  return entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort((a, b) => b.localeCompare(a));
+}
 
-  for (const run of runs) {
-    const record = await readRun(cwd, run.id);
-    if (!record.changedFiles.some((changedFile) => changedFile.path.replace(/\\/g, '/') === normalizedFile)) {
+async function hydrateRunSummaryTask(cwd: string, run: RunSummary): Promise<RunSummary> {
+  const currentTask = run.task ? await readTaskIfPresent(cwd, run.task.path) : undefined;
+  return currentTask ? { ...run, task: currentTask } : run;
+}
+
+function isIgnorableFileIntentError(error: unknown) {
+  return (
+    isIgnorableRunListError(error) ||
+    (error instanceof AgentLoopError && error.code === 'RUN_NOT_FOUND')
+  );
+}
+
+export async function findFileIntentWithSearch(
+  cwd: string,
+  file: string,
+  options: FindFileIntentOptions = {},
+): Promise<FileIntentResult> {
+  const normalizedFile = normalizeFileIntentPath(cwd, file);
+  const scanLimit = normalizeFileIntentBound(options.scanLimit, {
+    fallback: FILE_INTENT_DEFAULT_SCAN_LIMIT,
+    max: FILE_INTENT_MAX_SCAN_LIMIT,
+  });
+  const matchLimit = normalizeFileIntentBound(options.matchLimit, {
+    fallback: FILE_INTENT_DEFAULT_MATCH_LIMIT,
+    max: FILE_INTENT_MAX_MATCH_LIMIT,
+  });
+  const runIds = await listRunIdsNewestFirst(cwd);
+  const runSummaries = await listRuns(cwd, { limit: scanLimit, hydrateTask: false });
+  const matches: IntentMatch[] = [];
+  let inspectedRunCount = 0;
+  let stoppedAfterMatches = false;
+
+  for (const run of runSummaries) {
+    if (inspectedRunCount >= scanLimit) break;
+    if (matches.length >= matchLimit) {
+      stoppedAfterMatches = true;
+      break;
+    }
+    inspectedRunCount += 1;
+
+    const changedFiles = await readRunChangedFiles(cwd, run.id).catch((error: unknown) => {
+      if (isIgnorableFileIntentError(error)) return undefined;
+      throw error;
+    });
+    if (!changedFiles) continue;
+    if (!changedFiles.some((changedFile) => changedFile.path.replace(/\\/g, '/') === normalizedFile)) {
       continue;
     }
+
+    const hydratedRun = await hydrateRunSummaryTask(cwd, run);
     matches.push({
-      ...run,
+      ...hydratedRun,
       file: normalizedFile,
-      why: intentWhy(run.command, run.task?.title ?? 'unknown task'),
+      why: intentWhy(hydratedRun.command, hydratedRun.task?.title ?? 'unknown task'),
     });
   }
 
-  return matches;
+  return {
+    file: normalizedFile,
+    runs: matches,
+    search: {
+      totalRunCount: runIds.length,
+      inspectedRunCount,
+      scanLimit,
+      matchLimit,
+      truncated: inspectedRunCount < runIds.length,
+      stoppedAfterMatches,
+    },
+  };
+}
+
+export async function findFileIntent(
+  cwd: string,
+  file: string,
+  options: FindFileIntentOptions = {},
+): Promise<IntentMatch[]> {
+  return (await findFileIntentWithSearch(cwd, file, options)).runs;
 }
 
 function intentWhy(command: RunCommand, title: string) {

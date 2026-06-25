@@ -206,6 +206,11 @@ describe('start command', () => {
     expect(result.stdout).toContain('# AgentLoop Start');
     expect(result.stdout).toContain('Agent briefing:');
     expect(result.stdout).toContain('Preflight:');
+    expect(result.stdout).toContain('## Usefulness Proof');
+    expect(result.stdout).toContain('Preflight state:');
+    expect(result.stdout).toContain('Context avoided:');
+    expect(result.stdout).toContain('Source handles available:');
+    expect(result.stdout).toContain('Next safe command:');
     expect(result.stdout).toContain('## Active Task');
     expect(result.stdout).toContain('## Next Safe Command');
     expect(result.stdout).toContain('## Read First');
@@ -220,10 +225,44 @@ describe('start command', () => {
 
   test('emits JSON for agents and automation', async () => {
     const dir = await createStartFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-23-fix-auth-copy.md'),
+      `# Fix auth copy ${dir}
+
+- Created date: 2026-06-23
+- Task type: bugfix
+- Status: in-progress
+
+## Problem Statement
+Auth copy is unclear.
+
+## Desired Outcome
+Users understand the auth redirect.
+
+## Likely Files or Areas
+- src/auth
+
+## Files or Areas Not to Touch
+- src/billing
+
+## Acceptance Criteria
+- Auth copy is clearer.
+
+## Verification Commands
+- npm test -- auth
+
+## Rollback Notes
+Revert the copy change.
+`,
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-23-10-20-verification-report.md'),
+      '# Verification Report\n\n- Overall status: pass\n',
+    );
 
     const result = await execa(
       tsxPath,
-      [cliPath, 'start', '--for', 'codex', '--goal', 'implement', '--json'],
+      [cliPath, 'start', '--for', 'codex', '--goal', 'implement', '--json', '--redact-paths'],
       { cwd: dir },
     );
     const payload = JSON.parse(result.stdout);
@@ -234,13 +273,23 @@ describe('start command', () => {
     expect(payload.preflight).toMatchObject({
       state: 'ready-to-continue',
       task: {
-        title: 'Fix auth copy',
+        title: 'Fix auth copy [git-root]',
         status: 'in-progress',
         path: '.agentloop/tasks/2026-06-23-fix-auth-copy.md',
       },
     });
     expect(payload.preflight.headline).toMatch(/ready/i);
     expect(payload.preflight.reason).toContain('task');
+    expect(payload.usefulnessProof).toMatchObject({
+      preflightState: 'ready-to-continue',
+      staleProofCaught: false,
+      scopeDriftCaught: false,
+      nextSafeCommand: 'agentloop ship',
+    });
+    expect(payload.usefulnessProof.sourceHandlesAvailable).toEqual(
+      expect.arrayContaining(['task:active', 'evidence-map:current', 'context-budget:current']),
+    );
+    expect(payload.usefulnessProof.summary).toContain('agent can continue');
     expect(payload.readFirst[0].handle).toBe('task:active');
     expect(payload.impact.verificationFreshness).toBe('fresh');
     expect(payload.impact.scopeDriftFileCount).toBe(0);
@@ -255,10 +304,13 @@ describe('start command', () => {
     ).toBe(true);
     expect(payload.contextPack).toBeUndefined();
     expect(JSON.stringify(payload)).not.toContain('"files"');
+    expect(result.stdout).not.toContain(dir);
     expect(payload.safety).toMatchObject({
       readOnly: true,
       localEvidenceOnly: true,
-      commandsRun: [],
+      localGitStatus: true,
+      verificationCommandsRun: false,
+      projectCommandsRun: false,
     });
   });
 

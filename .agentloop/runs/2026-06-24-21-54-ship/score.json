@@ -1,0 +1,69 @@
+{
+  "totalScore": 92,
+  "dimensions": [
+    {
+      "id": "task-clarity",
+      "label": "Task clarity",
+      "score": 100,
+      "weight": 15,
+      "reason": "100/100 task evidence present."
+    },
+    {
+      "id": "scope-control",
+      "label": "Scope control",
+      "score": 45,
+      "weight": 15,
+      "reason": "68 non-evidence changed files is broad for one review; 233 AgentLoop evidence file(s) also present (301 total). Non-evidence review areas: Source 31, Documentation 14, AgentLoop 12, Tests 11."
+    },
+    {
+      "id": "verification-evidence",
+      "label": "Verification evidence",
+      "score": 100,
+      "weight": 25,
+      "reason": "Latest verification report passed."
+    },
+    {
+      "id": "evidence-freshness",
+      "label": "Evidence freshness",
+      "score": 100,
+      "weight": 15,
+      "reason": "Verification evidence matches current task timing."
+    },
+    {
+      "id": "policy-gate-compliance",
+      "label": "Policy and gate compliance",
+      "score": 100,
+      "weight": 15,
+      "reason": "Review gates passed."
+    },
+    {
+      "id": "handoff-readiness",
+      "label": "Handoff readiness",
+      "score": 100,
+      "weight": 10,
+      "reason": "Reviewer handoff evidence exists."
+    },
+    {
+      "id": "risk-flags",
+      "label": "Risk flags",
+      "score": 100,
+      "weight": 5,
+      "reason": "No risk-sensitive files detected."
+    }
+  ],
+  "strengths": [
+    "Task contract has problem, outcome, acceptance criteria, verification commands, risk notes, and rollback notes.",
+    "Verification evidence is passing.",
+    "Review gates pass.",
+    "Reviewer handoff exists."
+  ],
+  "warnings": [
+    "Large non-evidence change set; consider splitting before review."
+  ],
+  "blockers": [],
+  "recommendedNextActions": [],
+  "claims": [
+    "This is a review-readiness score, not a code-quality score.",
+    "The score is deterministic and based only on local AgentLoopKit evidence."
+  ]
+}

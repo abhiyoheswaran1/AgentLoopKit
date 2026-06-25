@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-23-10-verify",
+  "command": "verify",
+  "createdAt": "2026-06-24-23-10",
+  "createdAtEpochMs": 1782335457031,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-run-parallel-unreleased-batch-bug-hunt.md",
+    "title": "Run parallel unreleased-batch bug hunt",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-23-09-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 386
+}

@@ -18,8 +18,10 @@ Before changing code:
 - Use `agentloop task doctor` when old task files or misplaced post-verification gates need a read-only cleanup checklist.
 - Run `agentloop status` when you need the pinned active task, latest open task, parked deferred tasks, verification, dirty-file, and next-action state.
 - Run `agentloop next` when you only need the next recommended loop command.
-- Run `agentloop start --for generic --goal implement --redact-paths` before broad repo reads when a software agent needs a compact task, evidence, risk, context-budget, and source-handle briefing.
-- Run `agentloop context show <handle>` after Start when the agent needs to expand exact local source truth.
+- Run `agentloop doctor --redact-paths` before Start when you need to confirm agent-readiness guidance is current.
+- Run `agentloop start --for generic --goal implement --redact-paths` before broad repo reads when a software agent needs a compact task, evidence, risk, context-budget, and source-handle briefing, and avoid broad repo reads.
+- Run `agentloop context handles` after Start when the agent needs the available source-handle list, then `agentloop context show <handle>` to expand exact local source truth.
+- If MCP tools are already configured, call `agentloop_start` before broad reads. To configure a client, use `agentloop mcp-server` as that client's stdio command.
 - Run `agentloop review-context` when an agent needs one read-only snapshot of task, gate, policy, artifact, run, and next-action state.
 - Run `agentloop artifacts` when you need a read-only inventory of local task, report, handoff, badge, CI summary, release-note, and run evidence.
 - Run `agentloop upgrade-harness` after updating AgentLoopKit to see whether older generated guidance should be reviewed manually.

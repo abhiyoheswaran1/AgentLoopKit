@@ -138,6 +138,33 @@ describe('init', () => {
     }
   });
 
+  test('generated guidance tells MCP-capable agents how to start from repo context', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'demo-mcp-readiness',
+      scripts: { test: 'vitest' },
+    });
+
+    await initializeAgentLoop({ cwd: dir });
+
+    const agentsMd = await readFile(path.join(dir, 'AGENTS.md'), 'utf8');
+    const agentLoopMd = await readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8');
+    const workspaceReadme = await readFile(path.join(dir, '.agentloop/README.md'), 'utf8');
+    const commandsGuide = await readFile(path.join(dir, '.agentloop/harness/commands.md'), 'utf8');
+    const codexGuide = await readFile(path.join(dir, '.agentloop/agents/codex.md'), 'utf8');
+
+    for (const content of [agentsMd, agentLoopMd, workspaceReadme, commandsGuide]) {
+      expect(content).toContain('agentloop doctor --redact-paths');
+      expect(content.indexOf('agentloop doctor --redact-paths')).toBeLessThan(
+        content.indexOf('agentloop start'),
+      );
+      expect(content).toContain('agentloop mcp-server');
+      expect(content).toContain('agentloop_start');
+    }
+    expect(codexGuide).toContain('agentloop_start');
+  });
+
   test('safely appends to an existing AGENTS.md', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

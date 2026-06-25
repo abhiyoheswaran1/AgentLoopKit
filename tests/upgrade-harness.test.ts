@@ -95,6 +95,10 @@ describe('upgrade-harness command', () => {
         }),
         expect.objectContaining({
           topic: 'agent-start',
+          copyMarkdown: expect.stringContaining('agentloop doctor --redact-paths'),
+        }),
+        expect.objectContaining({
+          topic: 'agent-start',
           copyMarkdown: expect.stringContaining(
             'agentloop start --for generic --goal implement --redact-paths',
           ),
@@ -105,17 +109,88 @@ describe('upgrade-harness command', () => {
     expect(humanResult.stdout).toContain('### ship');
     expect(humanResult.stdout).toContain('agentloop ship');
     expect(humanResult.stdout).toContain('agentloop prepare-pr');
+    expect(humanResult.stdout).toContain('agentloop context handles');
     expect(humanResult.stdout).toContain('agentloop context show <handle>');
     await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toBe(before);
   });
 
-  test('requires source-handle expansion guidance for agent-start readiness', async () => {
+  test('agent-start suggestion satisfies the agent-start topic detector', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeOldHarness(dir);
+
+    const suggestionsResult = await execa(
+      tsxPath,
+      [cliPath, 'upgrade-harness', '--suggestions', '--json'],
+      { cwd: dir },
+    );
+    const suggestions = JSON.parse(suggestionsResult.stdout).suggestions as Array<{
+      topic: string;
+      copyMarkdown: string;
+    }>;
+    const agentStartSuggestion = suggestions.find((item) => item.topic === 'agent-start');
+    expect(agentStartSuggestion).toBeDefined();
+    await writeFile(path.join(dir, 'AGENTS.md'), `# AGENTS\n\n${agentStartSuggestion!.copyMarkdown}\n`);
+
+    const result = await execa(tsxPath, [cliPath, 'upgrade-harness', '--json'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+    const agentsFile = output.files.find((file: { path: string }) => file.path === 'AGENTS.md');
+
+    expect(agentsFile.missingTopics).not.toContain('agent-start');
+    expect(agentsFile.presentTopics).toContain('agent-start');
+  });
+
+  test('requires source-handle inventory and expansion guidance for agent-start readiness', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await writeOldHarness(dir);
     await writeFile(
       path.join(dir, 'AGENTS.md'),
       '# AGENTS\n\nBefore broad repo reads, run `agentloop start --for generic --goal implement --redact-paths`.\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'upgrade-harness', '--json'], { cwd: dir });
+
+    const output = JSON.parse(result.stdout);
+    expect(output.files).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: 'AGENTS.md',
+          missingTopics: expect.arrayContaining(['agent-start']),
+        }),
+      ]),
+    );
+  });
+
+  test('requires source-handle inventory guidance for agent-start readiness', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeOldHarness(dir);
+    await writeFile(
+      path.join(dir, 'AGENTS.md'),
+      '# AGENTS\n\nRun `agentloop start --for generic --goal implement --redact-paths`, then `agentloop context show <handle>`. Avoid broad repo reads.\n',
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'upgrade-harness', '--json'], { cwd: dir });
+
+    const output = JSON.parse(result.stdout);
+    expect(output.files).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: 'AGENTS.md',
+          missingTopics: expect.arrayContaining(['agent-start']),
+        }),
+      ]),
+    );
+  });
+
+  test('requires broad-read avoidance guidance for agent-start readiness', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeOldHarness(dir);
+    await writeFile(
+      path.join(dir, 'AGENTS.md'),
+      '# AGENTS\n\nRun `agentloop start --for generic --goal implement --redact-paths`, then `agentloop context show <handle>`.\n',
     );
 
     const result = await execa(tsxPath, [cliPath, 'upgrade-harness', '--json'], { cwd: dir });

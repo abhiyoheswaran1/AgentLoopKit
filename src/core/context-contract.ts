@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { readFile } from 'node:fs/promises';
 import type { AgentLoopConfig } from './config.js';
 import {
   latestMarkdownFile,
@@ -12,8 +11,10 @@ import {
 import { AgentLoopError } from './errors.js';
 import {
   buildEvidenceMap,
+  compactEvidenceMap,
   renderEvidenceMapCompactMarkdown,
   renderEvidenceMapMarkdown,
+  type CompactEvidenceMap,
   type EvidenceMap,
 } from './evidence-map.js';
 import { getCurrentWorkTaskPath } from './evidence.js';
@@ -22,6 +23,7 @@ import {
   singleLineInlineCode as inlineCode,
 } from './markdown-format.js';
 import { redactLocalRoots } from './redaction.js';
+import { readSafeMarkdownFile } from './safe-markdown-file.js';
 import {
   RESUME_PACK_TARGETS,
   type ResumePackTarget,
@@ -52,6 +54,11 @@ export type ContextHandle = {
   sourcePath?: string;
 };
 
+export type ContextHandleInventoryItem = ContextHandle & {
+  available: boolean;
+  unavailableReason?: string;
+};
+
 export type ContextReceiptItem = {
   section: string;
   reason: string;
@@ -64,8 +71,14 @@ export type ContextReceipt = {
 };
 
 export type ContextBudgetContractResult = {
-  evidenceMap: EvidenceMap;
+  evidenceMap: CompactEvidenceMap;
   contextBudget: ContextBudgetSummary;
+  markdown: string;
+  safety: ContextSafety;
+};
+
+export type ContextHandleInventoryResult = {
+  handles: ContextHandleInventoryItem[];
   markdown: string;
   safety: ContextSafety;
 };
@@ -74,12 +87,16 @@ export type ContextPackResult = {
   target: ResumePackTarget;
   goal: ContextPackGoal;
   guidance: string;
-  evidenceMap: EvidenceMap;
+  evidenceMap: CompactEvidenceMap;
   contextBudget: ContextBudgetSummary;
   receipt: ContextReceipt;
   handles: ContextHandle[];
   markdown: string;
   safety: ContextSafety;
+};
+
+export type ContextPackInternalResult = Omit<ContextPackResult, 'evidenceMap'> & {
+  evidenceMap: EvidenceMap;
 };
 
 export type ContextShowResult = {
@@ -92,13 +109,17 @@ export type ContextShowResult = {
 type ContextSafety = {
   readOnly: true;
   localEvidenceOnly: true;
-  commandsRun: [];
+  localGitStatus: true;
+  verificationCommandsRun: false;
+  projectCommandsRun: false;
 };
 
 const SAFETY: ContextSafety = {
   readOnly: true,
   localEvidenceOnly: true,
-  commandsRun: [],
+  localGitStatus: true,
+  verificationCommandsRun: false,
+  projectCommandsRun: false,
 };
 
 const DEFAULT_CONTEXT_PACK_COMMAND =
@@ -134,8 +155,15 @@ function handleById(handles: ContextHandle[], id: string) {
   return handles.some((handle) => handle.id === id) ? [id] : [];
 }
 
-function buildHandles(input: { evidenceMap: EvidenceMap; latestRun?: RunSummary }) {
-  const handles: ContextHandle[] = [
+function baseContextHandles(input: { latestRun?: RunSummary }) {
+  return [
+    {
+      id: 'task:active',
+      kind: 'task',
+      label: 'Active task contract',
+      command: 'agentloop context show task:active',
+      reason: 'Expands the active local task contract.',
+    },
     {
       id: 'evidence-map:current',
       kind: 'evidence-map',
@@ -150,41 +178,90 @@ function buildHandles(input: { evidenceMap: EvidenceMap; latestRun?: RunSummary 
       command: 'agentloop context show context-budget:current',
       reason: 'Expands the context-pressure estimate and compact-pack command.',
     },
-  ];
-
-  if (input.evidenceMap.task) {
-    handles.unshift({
-      id: 'task:active',
-      kind: 'task',
-      label: 'Active task contract',
-      command: 'agentloop context show task:active',
-      reason: 'Expands the active local task contract.',
-      sourcePath: input.evidenceMap.task.path,
-    });
-  }
-
-  if (input.evidenceMap.verification.path) {
-    handles.push({
+    {
       id: 'verification:latest',
       kind: 'verification',
       label: 'Latest verification report',
       command: 'agentloop context show verification:latest',
       reason: 'Expands the latest local verification report.',
-      sourcePath: input.evidenceMap.verification.path,
-    });
-  }
-
-  if (input.latestRun) {
-    handles.push({
+    },
+    {
       id: 'run:latest',
       kind: 'run',
       label: 'Latest run ledger entry',
       command: 'agentloop context show run:latest',
       reason: 'Expands the newest local AgentLoopKit run ledger record.',
-    });
-  }
+      sourcePath: input.latestRun ? `.agentloop/runs/${input.latestRun.id}` : undefined,
+    },
+  ] satisfies ContextHandle[];
+}
 
-  return handles;
+function buildContextHandleInventoryItems(input: {
+  taskPath?: string;
+  verificationReportPath?: string;
+  latestRun?: RunSummary;
+}): ContextHandleInventoryItem[] {
+  return baseContextHandles({ latestRun: input.latestRun }).map((handle) => {
+    switch (handle.id) {
+      case 'task:active':
+        return input.taskPath
+          ? {
+              ...handle,
+              available: true,
+              sourcePath: input.taskPath,
+            }
+          : {
+              ...handle,
+              available: false,
+              unavailableReason: 'No active task contract is available.',
+            };
+      case 'verification:latest':
+        return input.verificationReportPath
+          ? {
+              ...handle,
+              available: true,
+              sourcePath: input.verificationReportPath,
+            }
+          : {
+              ...handle,
+              available: false,
+              unavailableReason: 'No verification report is available.',
+            };
+      case 'run:latest':
+        return input.latestRun
+          ? {
+              ...handle,
+              available: true,
+            }
+          : {
+              ...handle,
+              available: false,
+              unavailableReason: 'No run ledger entry is available.',
+            };
+      default:
+        return {
+          ...handle,
+          available: true,
+        };
+    }
+  });
+}
+
+function buildHandles(input: { evidenceMap: EvidenceMap; latestRun?: RunSummary }) {
+  return buildContextHandleInventoryItems({
+    taskPath: input.evidenceMap.task?.path,
+    verificationReportPath: input.evidenceMap.verification.path,
+    latestRun: input.latestRun,
+  })
+    .filter((handle) => handle.available)
+    .map((handle) => ({
+      id: handle.id,
+      kind: handle.kind,
+      label: handle.label,
+      command: handle.command,
+      reason: handle.reason,
+      ...(handle.sourcePath ? { sourcePath: handle.sourcePath } : {}),
+    }));
 }
 
 function buildReceipt(input: { evidenceMap: EvidenceMap; handles: ContextHandle[] }): ContextReceipt {
@@ -281,6 +358,49 @@ function renderHandles(handles: ContextHandle[]) {
     .join('\n');
 }
 
+function renderInventoryHandles(handles: ContextHandleInventoryItem[]) {
+  if (!handles.length) return '- None.';
+  return handles
+    .map((handle) => {
+      const source = handle.sourcePath ? ` Source: ${inlineCode(handle.sourcePath)}.` : '';
+      const unavailable = handle.unavailableReason
+        ? ` Reason: ${escapeMarkdownProse(handle.unavailableReason)}`
+        : '';
+      return `- ${inlineCode(handle.id)} - ${escapeMarkdownProse(handle.reason)} Command: ${inlineCode(
+        handle.command,
+      )}.${source}${unavailable}`;
+    })
+    .join('\n');
+}
+
+export function renderContextHandleInventoryMarkdown(input: {
+  handles: ContextHandleInventoryItem[];
+}) {
+  const availableHandles = input.handles.filter((handle) => handle.available);
+  const unavailableHandles = input.handles.filter((handle) => !handle.available);
+
+  return `# AgentLoopKit Context Handles
+
+Use ${inlineCode('agentloop context show <handle>')} only when needed.
+
+## Available
+
+${renderInventoryHandles(availableHandles)}
+
+## Unavailable
+
+${renderInventoryHandles(unavailableHandles)}
+
+## Safety Boundary
+
+- Read-only local evidence command.
+- Does not run verification, read changed file contents, read ${inlineCode(
+    '.env',
+  )} contents, call an LLM, intercept prompts, proxy provider traffic, publish packages, create tags, upload files, or mutate task state.
+- Unavailable handles are normal empty states; create task, verification, or run evidence before expanding them.
+`;
+}
+
 export function renderContextBudgetContractMarkdown(input: {
   contextBudget: ContextBudgetSummary;
 }) {
@@ -349,7 +469,7 @@ ${renderContextBudgetForContextMarkdown(input.contextBudget)}
 
 ${input.evidenceMap.claims.map((claim) => `- ${escapeMarkdownProse(claim)}`).join('\n')}
 - Generated from local AgentLoopKit evidence only.
-- No verification commands were run while generating this context pack.
+- May inspect local Git status. No verification, build, test, install, provider, or network commands were run while generating this context pack.
 - Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter.
 `;
 }
@@ -368,26 +488,55 @@ export async function buildContextBudgetContract(options: {
     savingsCommand: DEFAULT_CONTEXT_PACK_COMMAND,
   });
   return {
-    evidenceMap,
+    evidenceMap: compactEvidenceMap(evidenceMap),
     contextBudget,
     markdown: renderContextBudgetContractMarkdown({ contextBudget }),
     safety: SAFETY,
   };
 }
 
-export async function buildContextPack(options: {
+export async function buildContextHandleInventory(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+}): Promise<ContextHandleInventoryResult> {
+  const latestRunsPromise = listRuns(options.cwd, { limit: 1, hydrateTask: false });
+  const [taskPath, verificationReportPath, runs] = await Promise.all([
+    getCurrentWorkTaskPath({
+      cwd: options.cwd,
+      config: options.config,
+    }),
+    latestVerificationReportPath(options.cwd, options.config),
+    latestRunsPromise,
+  ]);
+  const handles = buildContextHandleInventoryItems({
+    taskPath: taskPath ? path.relative(options.cwd, taskPath).split(path.sep).join('/') : undefined,
+    verificationReportPath: verificationReportPath
+      ? path.relative(options.cwd, verificationReportPath).split(path.sep).join('/')
+      : undefined,
+    latestRun: runs[0],
+  });
+
+  return {
+    handles,
+    markdown: renderContextHandleInventoryMarkdown({ handles }),
+    safety: SAFETY,
+  };
+}
+
+async function buildContextPackInternal(options: {
   cwd: string;
   config: AgentLoopConfig;
   target: ResumePackTarget;
   goal: ContextPackGoal;
-}): Promise<ContextPackResult> {
+}): Promise<ContextPackInternalResult> {
+  const latestRunsPromise = listRuns(options.cwd, { limit: 1, hydrateTask: false });
   const [evidenceMap, runs] = await Promise.all([
     buildEvidenceMap({
       cwd: options.cwd,
       config: options.config,
       taskEvidenceMode: 'current-work',
     }),
-    listRuns(options.cwd),
+    latestRunsPromise,
   ]);
   const contextBudget = buildContextBudget({
     evidenceMap,
@@ -415,6 +564,28 @@ export async function buildContextPack(options: {
       handles,
     }),
     safety: SAFETY,
+  };
+}
+
+export async function buildContextPackWithFullEvidence(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  target: ResumePackTarget;
+  goal: ContextPackGoal;
+}): Promise<ContextPackInternalResult> {
+  return buildContextPackInternal(options);
+}
+
+export async function buildContextPack(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  target: ResumePackTarget;
+  goal: ContextPackGoal;
+}): Promise<ContextPackResult> {
+  const contextPack = await buildContextPackInternal(options);
+  return {
+    ...contextPack,
+    evidenceMap: compactEvidenceMap(contextPack.evidenceMap),
   };
 }
 
@@ -464,15 +635,25 @@ export async function showContextHandle(options: {
           'CONTEXT_HANDLE_EMPTY',
         );
       }
+      const report = await readSafeMarkdownFile(reportPath, {
+        required: true,
+        codePrefix: 'CONTEXT_HANDLE',
+      });
+      if (!report) {
+        throw new AgentLoopError(
+          'No verification report is available for handle verification:latest.',
+          'CONTEXT_HANDLE_EMPTY',
+        );
+      }
       return {
         handle: options.handle,
         kind: 'verification',
-        content: redactContextContent(await readFile(reportPath, 'utf8'), options),
+        content: redactContextContent(report.content, options),
         safety: SAFETY,
       };
     }
     case 'run:latest': {
-      const [latestRun] = await listRuns(options.cwd);
+      const [latestRun] = await listRuns(options.cwd, { limit: 1, hydrateTask: false });
       if (!latestRun) {
         throw new AgentLoopError('No run is available for handle run:latest.', 'CONTEXT_HANDLE_EMPTY');
       }

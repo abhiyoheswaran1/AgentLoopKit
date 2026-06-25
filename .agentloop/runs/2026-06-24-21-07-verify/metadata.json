@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-21-07-verify",
+  "command": "verify",
+  "createdAt": "2026-06-24-21-07",
+  "createdAtEpochMs": 1782328062976,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-avoid-full-run-hydration-in-file-intent-lookup-2.md",
+    "title": "Avoid full run hydration in file intent lookup",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-21-05-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 216
+}

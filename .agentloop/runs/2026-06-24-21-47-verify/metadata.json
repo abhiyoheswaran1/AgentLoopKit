@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-21-47-verify",
+  "command": "verify",
+  "createdAt": "2026-06-24-21-47",
+  "createdAtEpochMs": 1782330475460,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-bound-mcp-evidence-listing-work-2.md",
+    "title": "Bound MCP evidence listing work",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-21-45-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 283
+}

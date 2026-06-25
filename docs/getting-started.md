@@ -80,7 +80,9 @@ npx --yes agentloopkit@latest upgrade-harness --details --redact-paths
 npx --yes agentloopkit@latest init --dry-run
 ```
 
-`upgrade-harness` reads existing `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, and `.agentloop/README.md`. It reports whether those files mention the current agent-readiness loop: `agentloop start`, `agentloop context show`, `ship`, `prepare-pr`, run ledger, file intent, `review-context`, `maintainer-check`, and upgrade guidance. It writes nothing.
+These commands inspect the published package. This repository can document unreleased guidance before the next publish; check [release status](release-status.md) before expecting `agentloopkit@latest` to include new subcommands.
+
+`upgrade-harness` reads existing `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, and `.agentloop/README.md`. It reports whether those files mention the current agent-readiness loop for the installed CLI, including Doctor, Start, source-handle expansion, broad-read avoidance, `ship`, `prepare-pr`, run ledger, file intent, `review-context`, `maintainer-check`, and upgrade guidance. It writes nothing.
 
 `init --dry-run` shows missing generated files. A non-dry `init` creates missing files and skips existing ones. AgentLoopKit does not overwrite edited harness files or merge templates automatically.
 
@@ -197,6 +199,7 @@ npx agentloopkit artifacts --stale
 npx agentloopkit artifacts --stale --type ship-report
 npx agentloopkit artifacts --stale --limit 25
 npx agentloopkit intent <file>
+npx agentloopkit intent <file> --scan-limit 100 --match-limit 20
 npx agentloopkit report
 npx agentloopkit badge
 npx agentloopkit ci-summary
@@ -208,7 +211,7 @@ npx agentloopkit npm-status
 `prepare-pr` generates PR copy from local evidence. It does not read GitHub tokens, call GitHub APIs, or post comments.
 `maintainer-check` is a read-only reviewability check for agent-assisted PRs. It checks task evidence, fresh verification, handoff or ship coverage, risky file areas, lockfile changes, migrations, and generated output.
 If you import local issue or PR JSON with `agentloop github import`, `review-context`, `prepare-pr`, and `maintainer-check` include that context in their output. Missing GitHub metadata is not a blocker.
-`runs` and `intent` inspect local run metadata. They do not read target file contents.
+`runs` and `intent` inspect local run metadata. They do not read target file contents. `intent` searches newest run evidence first, reports its search bound, and lets you raise `--scan-limit` or adjust `--match-limit` when older evidence matters.
 `artifacts --stale` previews older local evidence candidates and caps terminal output by default. Add `--type ship-report` when you only want ship report candidates, or `--limit <count>` to change the cap. JSON output stays complete unless you pass `--limit`. The command does not delete files or write cleanup changes.
 Human-readable `artifacts` output keeps artifact titles, paths, statuses, and run IDs on one Markdown line. JSON output keeps raw values for scripts.
 `check-gates` does not run tests. It checks whether task, verification, handoff or ship, task-folder hygiene, harness, policy, and git evidence exists before review.

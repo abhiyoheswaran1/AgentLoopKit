@@ -13,7 +13,7 @@ import {
   singleLineInlineCode as inlineCode,
 } from './markdown-format.js';
 import { listItems, sectionContent } from './markdown-sections.js';
-import { listRuns, readRun, type RunSummary } from './runs.js';
+import { listRuns, readRunChangedFiles, type RunSummary } from './runs.js';
 import { readTaskContract, type TaskContract } from './task-state.js';
 import { toSafeDisplayPath } from './display-path.js';
 
@@ -84,6 +84,16 @@ export type EvidenceMap = {
   claims: string[];
 };
 
+export type CompactEvidenceMap = Omit<EvidenceMap, 'files'> & {
+  fileList: {
+    omitted: true;
+    changedFileCount: number;
+    handle: 'evidence-map:current';
+    command: 'agentloop context show evidence-map:current';
+    reason: string;
+  };
+};
+
 export type EvidenceMapTaskEvidenceMode = 'current-or-latest-run' | 'current-work';
 
 type PathPattern = {
@@ -103,8 +113,37 @@ const CLAIMS = [
   'The evidence map does not read changed file contents, call external APIs, publish, tag, or upload artifacts.',
 ];
 
+export function compactEvidenceMap(evidenceMap: EvidenceMap): CompactEvidenceMap {
+  const { files, ...compact } = evidenceMap;
+  return {
+    ...compact,
+    fileList: {
+      omitted: true,
+      changedFileCount: files.length,
+      handle: 'evidence-map:current',
+      command: 'agentloop context show evidence-map:current',
+      reason:
+        'Full changed-file detail is omitted from compact JSON/MCP context packs; expand the local evidence-map handle only when needed.',
+    },
+  };
+}
+
 function normalizePath(value: string) {
   return value.trim().replace(/\\/g, '/').replace(/^\.\/+/, '');
+}
+
+function comparableTaskPath(value: string) {
+  const normalized = normalizePath(value);
+  const archivePrefix = '.agentloop/tasks/archive/';
+  if (normalized.startsWith(archivePrefix)) {
+    return `.agentloop/tasks/${path.posix.basename(normalized)}`;
+  }
+  return normalized;
+}
+
+function sameTaskPath(left: string | undefined, right: string | undefined) {
+  if (!left || !right) return false;
+  return comparableTaskPath(left) === comparableTaskPath(right);
 }
 
 function unwrapInlineCode(value: string) {
@@ -217,32 +256,40 @@ async function readRecentRunCoverage(options: {
   cwd: string;
   taskPath?: string;
   recentRunLimit: number;
+  runSummaries?: RunSummary[] | Promise<RunSummary[]>;
 }): Promise<RecentRunCoverage[]> {
   const taskPath = options.taskPath ? normalizePath(toSafeDisplayPath(options.cwd, options.taskPath)) : undefined;
-  const runs = (await listRuns(options.cwd))
-    .filter((run) => !taskPath || normalizePath(run.task?.path ?? '') === taskPath)
+  const availableRuns = options.runSummaries
+    ? await options.runSummaries
+    : await listRuns(options.cwd, {
+        hydrateTask: false,
+        limit: options.recentRunLimit,
+        taskPath: options.taskPath,
+      });
+  const runs = availableRuns
+    .filter((run) => !taskPath || sameTaskPath(run.task?.path, taskPath))
     .slice(0, options.recentRunLimit);
 
   const coverage: RecentRunCoverage[] = [];
   for (const run of runs) {
-    const record = await readRun(options.cwd, run.id).catch(() => undefined);
-    if (!record) continue;
+    const changedFiles = await readRunChangedFiles(options.cwd, run.id).catch(() => undefined);
+    if (!changedFiles) continue;
     coverage.push({
       run,
-      paths: new Set(record.changedFiles.map((file) => normalizePath(file.path))),
+      paths: new Set(changedFiles.map((file) => normalizePath(file.path))),
     });
   }
   return coverage;
 }
 
-function findRunCoverage(filePath: string, runs: RecentRunCoverage[]) {
+function findRunCoverage(filePath: string, runs: RecentRunCoverage[], currentTaskTitle?: string) {
   const normalizedPath = normalizePath(filePath);
   for (const run of runs) {
     if (!run.paths.has(normalizedPath)) continue;
     return {
       id: run.run.id,
       command: run.run.command,
-      taskTitle: run.run.task?.title ?? 'unknown task',
+      taskTitle: currentTaskTitle ?? run.run.task?.title ?? 'unknown task',
     };
   }
   return undefined;
@@ -336,6 +383,7 @@ export async function buildEvidenceMap(options: {
   config: AgentLoopConfig;
   changedFiles?: GitFileStatus[];
   recentRunLimit?: number;
+  runSummaries?: RunSummary[] | Promise<RunSummary[]>;
   taskEvidenceMode?: EvidenceMapTaskEvidenceMode;
 }): Promise<EvidenceMap> {
   const evidence =
@@ -367,6 +415,7 @@ export async function buildEvidenceMap(options: {
     cwd: options.cwd,
     taskPath: evidence.taskPath,
     recentRunLimit: options.recentRunLimit ?? DEFAULT_RECENT_RUN_LIMIT,
+    runSummaries: options.runSummaries,
   });
 
   const files = changedFiles.map((file): EvidenceMapFile => {
@@ -374,7 +423,7 @@ export async function buildEvidenceMap(options: {
     const area = evidenceArea(normalizedPath, areas.get(normalizedPath) ?? 'other');
     const agentLoopEvidence = isAgentLoopEvidenceFile(file.path);
     const coveredByTask = !agentLoopEvidence && pathMatchesAny(file.path, likelyPatterns);
-    const runCoverage = agentLoopEvidence ? undefined : findRunCoverage(file.path, runs);
+    const runCoverage = agentLoopEvidence ? undefined : findRunCoverage(file.path, runs, task?.title);
     const coveredByRun = Boolean(runCoverage);
     const forbiddenByTask = !agentLoopEvidence && pathMatchesAny(file.path, forbiddenPatterns);
     const riskSensitive = !agentLoopEvidence && isRiskSensitivePath(normalizedPath);
@@ -454,12 +503,37 @@ function renderExamples(values: string[]) {
   return values.length ? values.map(escapedInlinePath).join(', ') : 'none';
 }
 
-export function renderEvidenceMapCompactMarkdown(map: EvidenceMap) {
+export function renderEvidenceMapCompactMarkdown(
+  map: Pick<EvidenceMap, 'summary' | 'coverage' | 'verification' | 'risk'>,
+) {
   return `- Evidence map: ${inlineCode(String(map.summary.changedFileCount))} changed file(s); ${inlineCode(
     String(map.coverage.coveredFileCount),
   )} covered, ${inlineCode(String(map.coverage.unexplainedFileCount))} unexplained; verification ${inlineCode(
     map.verification.label,
   )}; ${inlineCode(String(map.risk.riskSensitiveFileCount))} risk-sensitive.`;
+}
+
+function renderChangedFileDetails(files: EvidenceMapFile[]) {
+  if (!files.length) return '- None.';
+  return files
+    .map((file) => {
+      const flags = [
+        `area:${file.area}`,
+        file.agentLoopEvidence ? 'agentloop-evidence' : undefined,
+        file.coveredByTask ? 'covered-by-task' : undefined,
+        file.coveredByRun
+          ? `covered-by-run:${file.runCoverage?.id ?? 'unknown'}`
+          : undefined,
+        file.forbiddenByTask ? 'forbidden-by-task' : undefined,
+        file.riskSensitive ? 'risk-sensitive' : undefined,
+        file.unexplained ? 'unexplained' : undefined,
+      ].filter((flag): flag is string => Boolean(flag));
+      const flagText = flags.map((flag) => inlineCode(flag)).join(', ');
+      return `- ${inlineCode(file.path)} (${inlineCode(file.status)}): ${flagText} - ${escapeMarkdownProse(
+        file.explanation,
+      )}`;
+    })
+    .join('\n');
 }
 
 export function renderEvidenceMapMarkdown(map: EvidenceMap) {
@@ -488,6 +562,10 @@ export function renderEvidenceMapMarkdown(map: EvidenceMap) {
 - Risk-sensitive files: ${inlineCode(String(map.risk.riskSensitiveFileCount))}
 - Unexplained examples: ${unexplained}
 - Risk examples: ${risky}
+
+## Changed Files
+
+${renderChangedFileDetails(map.files)}
 
 ## Claims
 

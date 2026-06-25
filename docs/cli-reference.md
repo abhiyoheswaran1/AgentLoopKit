@@ -40,7 +40,7 @@ agentloop upgrade-harness --json
 agentloop upgrade-harness --json --redact-paths
 ```
 
-`upgrade-harness` inspects existing generated guidance after a CLI upgrade. It reads `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, `.agentloop/README.md`, and `.agentloop/manifest.json`, then reports whether the harness mentions the current agent-readiness loop: `agentloop start`, `agentloop context show`, `ship`, `prepare-pr`, run ledger or file intent, `maintainer-check`, `review-context`, and upgrade guidance.
+`upgrade-harness` inspects existing generated guidance after a CLI upgrade. It reads `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, `.agentloop/README.md`, and `.agentloop/manifest.json`, then reports whether the harness mentions the current agent-readiness loop: `agentloop doctor`, `agentloop start`, `agentloop context handles`, `agentloop context show`, broad-read avoidance, `ship`, `prepare-pr`, run ledger or file intent, `maintainer-check`, `review-context`, and upgrade guidance.
 
 Use `--details` or `--suggestions` when you want copyable Markdown guidance for missing current-loop topics. Existing repos can copy the Start/Context snippet without letting AgentLoopKit overwrite local instructions. JSON output includes the same suggestions as structured data.
 
@@ -66,12 +66,16 @@ agentloop doctor --json
 agentloop doctor --strict
 agentloop doctor --advisory
 agentloop doctor --redact-paths
+agentloop doctor --risk-scan-max-depth 4
+agentloop doctor --risk-scan-max-entries 1000
 ```
 
 `doctor` checks setup health, template manifest state, generated guidance readiness, configured commands, Git root, current working tree, package name, package manager detection, project type detection, missing commands, monorepo signals, and risk-file categories.
 
+Human and JSON output include an Agent Readiness Matrix. It reports whether generated guidance tells agents to run Doctor before Start, run Start, expand context handles, avoid broad reads, use `agentloop_start` through MCP, and whether installed agent instruction files are ready.
+
 Env files are reported by path only. AgentLoopKit does not read `.env` contents.
-Risk-file scanning is bounded; on very large repos, doctor reports when the scan stops early so you can run targeted checks.
+Risk-file scanning is bounded; on very large repos, doctor reports when the scan stops early so you can run targeted checks. The scan ignores local AgentLoopKit and AgentFlight evidence ledgers such as `.agentloop/runs/`, `.agentloop/reports/`, `.agentloop/tasks/`, and `.agentflight/` so session metadata does not masquerade as application auth or security code. Use `--risk-scan-max-depth` or `--risk-scan-max-entries` when a monorepo needs a faster setup audit before deeper package-specific review.
 
 Warnings keep exit code `0` by default. Use `--strict` when warnings should fail CI or a team setup gate.
 
@@ -195,7 +199,7 @@ agentloop review-context --json
 agentloop review-context --redact-paths
 ```
 
-`review-context` prints one read-only local snapshot for agents and scripts that do not use MCP. It combines active task state, active task Risk Notes count, latest verification, review gates, policy status, artifact inventory, recent run ledger entries, latest ship score, optional imported GitHub issue or PR metadata, working-tree state, context-budget estimates, safety notes, and the next recommended action. Human output labels retained verification as `Latest previous verification` when no active or open task exists, and labels gate task evidence as active, latest open, archived, or missing when that gate data is available; JSON keeps the existing `status.latestVerification` object and gate fields. Task artifact counts separate ordinary task contracts from preserved AgentFlight placeholder task contracts. The risk-note signal is count-only; `review-context` does not print the task Risk Notes prose.
+`review-context` prints one read-only local snapshot for agents and scripts that do not use MCP. It combines active task state, active task Risk Notes count, latest verification, review gates, policy status, artifact inventory, recent run ledger entries, latest ship score, optional imported GitHub issue or PR metadata, working-tree state, context-budget estimates, safety notes, and the next recommended action. Human output labels retained verification as `Latest previous verification` when no active or open task exists, and labels gate task evidence as active, latest open, archived, or missing when that gate data is available; JSON keeps the existing `status.latestVerification` object and gate fields. JSON evidence-map data is compact by default and points to `agentloop context show evidence-map:current` for full changed-file detail. Task artifact counts separate ordinary task contracts from preserved AgentFlight placeholder task contracts. The risk-note signal is count-only; `review-context` does not print the task Risk Notes prose.
 
 The command does not run verification, write files, include full Markdown artifact bodies, read `.env` contents, call external APIs, or post to GitHub.
 Human-readable `review-context` output keeps dynamic values inside single-line inline code. Task titles, report paths, run IDs, imported GitHub metadata paths, and next-action commands with unusual characters stay on one Markdown line. JSON output keeps raw values for scripts.
@@ -210,7 +214,7 @@ agentloop start --for claude --goal review --json
 agentloop start --for generic --goal research
 ```
 
-`start` briefs a software agent before broad repo reads. It combines the current task when one exists, decisive preflight state, next safe command, evidence map, verification freshness, context-budget impact, read-first source handles, risk summary, and source handles. Supported targets are `codex`, `claude`, `cursor`, `generic`, and `human`. Supported goals are `implement`, `continue`, `review`, `debug`, `handoff`, and `research`.
+Run `agentloop doctor --redact-paths` before the first agent session in a repo to check agent-readiness guidance. Then `start` briefs a software agent before broad repo reads. It combines the current task when one exists, decisive preflight state, usefulness proof, next safe command, evidence map, verification freshness, context-budget impact, read-first source handles, risk summary, and source handles. The usefulness proof names the preflight state, estimated context avoided, broad files avoided, stale proof, scope drift, source handles, verification freshness, and next safe command. Supported targets are `codex`, `claude`, `cursor`, `generic`, and `human`. Supported goals are `implement`, `continue`, `review`, `debug`, `handoff`, and `research`.
 
 Start uses current-work task evidence. Archived, `done`, `deferred`, and AgentFlight placeholder tasks stay as previous evidence. When a repo has no current task, Start reports `needs-task`, omits `task:active` handles, and routes agents toward task setup.
 
@@ -225,6 +229,10 @@ agentloop context budget
 agentloop context budget --json
 agentloop context budget --redact-paths
 
+agentloop context handles
+agentloop context handles --json
+agentloop context handles --redact-paths
+
 agentloop context pack --for codex --goal continue
 agentloop context pack --for claude --goal review
 agentloop context pack --for cursor --goal research
@@ -238,9 +246,15 @@ agentloop context show evidence-map:current
 agentloop context show context-budget:current
 ```
 
-`context budget` shows local context pressure and compact-pack guidance. It estimates broad changed-file context versus compact evidence-pack context with a transparent character-count heuristic. The estimate is planning guidance, not provider tokenizer output or a billing claim.
+`context budget` shows local context pressure and compact-pack guidance. It estimates tokens as `ceil(character_count / 4)`: broad context is the newline-joined changed-file path list, and compact context is the compact evidence summary plus next actions. The estimate is planning guidance, not provider tokenizer output or a billing claim.
+
+`context budget --json` returns compact evidence-map data. It keeps summary, coverage, risk, verification, next actions, claims, and a local `evidence-map:current` expansion handle. It omits the full changed-file detail by default.
+
+`context handles` lists source handles with availability, reasons, and expansion commands. It marks missing task, verification, or run evidence as unavailable instead of failing the inventory command.
 
 `context pack` builds an auditable local context pack for Codex, Claude Code, Cursor, generic agents, or human reviewers. Supported goals are `continue`, `review`, `debug`, `handoff`, and `research`. The pack includes a receipt that explains what was included, what was omitted, why each decision was made, and which local source handles can expand the exact evidence.
+
+`context pack --json` and the matching MCP tool return the same compact evidence-map shape. Use `agentloop context show evidence-map:current` or `agentloop_context_show` when an agent needs the full changed-file evidence map.
 
 `context show <handle>` expands a local source handle. Supported v1 handles include `task:active`, `verification:latest`, `run:latest`, `evidence-map:current`, and `context-budget:current`.
 
@@ -254,8 +268,10 @@ See [context.md](context.md).
 agentloop guard
 agentloop guard --strict
 agentloop guard --json
+agentloop guard --json --compact
 agentloop guard --redact-paths
 agentloop guard --watch --interval-ms 2000 --max-iterations 5
+agentloop guard --watch --json --compact --interval-ms 2000 --max-iterations 5
 agentloop guard --write-report
 agentloop guard --write-report --out .agentloop/reports/local-guard-report.md
 agentloop guard --write-baseline .agentloop/guard/baseline.json
@@ -263,6 +279,8 @@ agentloop guard --baseline .agentloop/guard/baseline.json
 ```
 
 `guard` checks local drift, proof debt, and context-budget pressure from the current evidence map. It reports `pass`, `warn`, or `fail`; default output is advisory, while `--strict` exits non-zero for `warn` or `fail`.
+
+Use `--compact` with `--json` when an agent needs Guard status without the full changed-file evidence list. Compact JSON replaces `evidenceMap.files` with `evidenceMap.fileList`, including the local expansion handle `agentloop context show evidence-map:current`.
 
 `--watch` repeats snapshots until interrupted or until `--max-iterations` is reached. `--write-report` explicitly writes Markdown under `.agentloop/reports`. `--write-baseline` explicitly writes changed non-evidence file paths under `.agentloop/guard`, and `--baseline` compares the current changed non-evidence set with that saved baseline.
 
@@ -399,6 +417,7 @@ agentloop show-run <id>
 agentloop show-run <id> --json
 agentloop show-run <id> --redact-paths
 agentloop intent src/auth/callback.ts
+agentloop intent src/auth/callback.ts --scan-limit 100 --match-limit 20
 agentloop intent src/auth/callback.ts --json
 agentloop intent src/auth/callback.ts --redact-paths
 ```
@@ -415,7 +434,7 @@ Human-readable run-ledger output keeps dynamic run ids, commands, file paths, an
 
 `--redact-paths` is accepted on `runs`, `show-run`, and `intent` for consistency with other shareable evidence commands. Run ledger paths are already display-safe, so human and JSON output values do not change.
 
-`intent <file>` reads the local run ledger and shows which previous AgentLoopKit runs changed that file. It uses local ledger metadata only.
+`intent <file>` reads bounded newest-first run evidence and shows which previous AgentLoopKit runs changed that file. It checks changed-file artifacts before hydrating matching metadata, so one file lookup does not hydrate every run record. Defaults inspect the newest 50 run entries and return up to 10 matches. Use `--scan-limit <count>` when you need older evidence, and `--match-limit <count>` when a noisy file needs more or fewer matches. Human and JSON output include search counts and whether older entries were not inspected.
 
 ## Maintainer Check
 
@@ -703,7 +722,9 @@ See [github-metadata.md](github-metadata.md).
 agentloop mcp-server
 ```
 
-The MCP server is read-only. It exposes existing repo evidence to MCP clients through stdio: status, next action, task contracts, active task, policies, policy template status, latest verification report, latest ship report, artifact inventory metadata, review context snapshots, run ledger summaries and details, file intent matches, maintainer reviewability checks, gate status, and handoff summaries.
+The MCP server is read-only. It exposes existing repo evidence to MCP clients through stdio: status, next action, task contracts, active task, policies, policy template status, latest verification report, latest ship report, artifact inventory metadata, review context snapshots, run ledger summaries and details, file intent matches, maintainer reviewability checks, gate status, Start preflight through `agentloop_start`, context budgets, context handle inventory through `agentloop_context_handles`, context packs, context handle expansion, and handoff summaries.
+
+Run `agentloop doctor --redact-paths` after setup when you want to confirm the generated guidance tells MCP-capable agents to call `agentloop_start` before broad reads.
 
 It does not run verification commands, edit files, call external APIs, read `.env` contents, or upload data.
 

@@ -10,13 +10,15 @@ import { singleLineInlineCode as inlineCode } from './markdown-format.js';
 import { readGithubMetadataContext, type GithubMetadataContext } from './github-metadata.js';
 import { getPolicyStatus } from './policy.js';
 import { listRuns } from './runs.js';
-import { getAgentLoopStatus } from './status.js';
+import { getAgentLoopStatus, type AgentLoopStatusResult } from './status.js';
 import { readTaskContract } from './task-state.js';
 import type { GitFileStatus } from './git.js';
 import { listItems, sectionContent } from './markdown-sections.js';
 import {
   buildEvidenceMap,
+  compactEvidenceMap,
   renderEvidenceMapCompactMarkdown,
+  type CompactEvidenceMap,
   type EvidenceMap,
 } from './evidence-map.js';
 import {
@@ -24,6 +26,18 @@ import {
   renderContextBudgetCompactMarkdown,
   type ContextBudgetSummary,
 } from './context-budget.js';
+
+const REVIEW_CONTEXT_CHANGED_FILE_EXAMPLE_LIMIT = 5;
+
+function compactReviewWorkingTree(workingTree: AgentLoopStatusResult['workingTree']) {
+  const { changedFiles, ...summary } = workingTree;
+  return {
+    ...summary,
+    changedFileExamples: changedFiles.slice(0, REVIEW_CONTEXT_CHANGED_FILE_EXAMPLE_LIMIT),
+    changedFileExampleLimit: REVIEW_CONTEXT_CHANGED_FILE_EXAMPLE_LIMIT,
+    changedFilesOmitted: changedFiles.length > REVIEW_CONTEXT_CHANGED_FILE_EXAMPLE_LIMIT,
+  };
+}
 
 async function readActiveTaskRiskNoteCount(options: {
   cwd: string;
@@ -74,7 +88,7 @@ export async function getReviewContext(options: {
   return {
     status: {
       project: status.project,
-      workingTree: status.workingTree,
+      workingTree: compactReviewWorkingTree(status.workingTree),
       activeTask: status.activeTask,
       activeTaskRiskNotes,
       latestTask: status.latestTask,
@@ -96,7 +110,7 @@ export async function getReviewContext(options: {
     },
     policies,
     artifacts: renderArtifactInventoryJson(inventory) as ArtifactInventory,
-    evidenceMap,
+    evidenceMap: compactEvidenceMap(evidenceMap),
     contextBudget,
     recentRuns,
     latestShip: latestShip
@@ -110,7 +124,9 @@ export async function getReviewContext(options: {
     safety: {
       readOnly: true,
       includesMarkdownContent: false,
-      commandsRun: [],
+      localGitStatus: true,
+      verificationCommandsRun: false,
+      projectCommandsRun: false,
     },
   };
 }
@@ -249,7 +265,7 @@ function formatWorkingTree(context: Awaited<ReturnType<typeof getReviewContext>>
   return `dirty (${workingTree.changedFileCount}; ${workingTree.nonEvidenceChangedFileCount} non-evidence, ${workingTree.agentLoopEvidenceChangedFileCount} AgentLoop evidence)`;
 }
 
-function formatEvidenceMap(context: { evidenceMap?: EvidenceMap }) {
+function formatEvidenceMap(context: { evidenceMap?: EvidenceMap | CompactEvidenceMap }) {
   if (!context.evidenceMap) return '';
   return `${renderEvidenceMapCompactMarkdown(context.evidenceMap)}\n`;
 }
@@ -295,7 +311,7 @@ ${context.status.nextAction.reason}
 
 ## Safety
 
-This snapshot is read-only. It does not run commands, write files, include full Markdown artifact bodies, read ${inlineCode(
+This snapshot is read-only. It may inspect local Git status, but it does not run verification, build, test, install, provider, or network commands. It does not write files, include full Markdown artifact bodies, read ${inlineCode(
     '.env',
   )} contents, or call external APIs.
 `;

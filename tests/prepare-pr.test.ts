@@ -20,6 +20,7 @@ async function git(cwd: string, args: string[]) {
 
 async function createPreparePrFixture(
   options: {
+    desiredOutcome?: string;
     acceptanceCriteria?: string;
     riskNotes?: string;
     verificationMarkdown?: string;
@@ -76,7 +77,7 @@ async function createPreparePrFixture(
 Login redirects users to the wrong page after password reset.
 
 ## Desired Outcome
-Users land on the intended destination after a successful login.
+${options.desiredOutcome ?? 'Users land on the intended destination after a successful login.'}
 
 ## Likely Files or Areas
 - src/auth
@@ -198,6 +199,62 @@ describe('prepare-pr command', () => {
   );
 
   test(
+    'filters not-run commands when equivalent task-command evidence passed',
+    async () => {
+      const dir = await createPreparePrFixture({
+        verificationMarkdown: `# Verification Report
+
+- Overall status: pass
+
+## Commands Run
+### task: \`npm run typecheck\`
+
+- Exit code: 0
+- Status: pass
+
+### task: \`npm run build\`
+
+- Exit code: 0
+- Status: pass
+
+### task: \`npm run dogfood\`
+
+- Exit code: 0
+- Status: pass
+
+\`\`\`text
+## task folder hygiene
+dogfood output can contain Markdown headings.
+\`\`\`
+
+### task: \`npm run lint\`
+
+- Exit code: 0
+- Status: pass
+
+## Not Run
+- test: \`npx pnpm@10.12.1 test\`
+- lint: \`npx pnpm@10.12.1 lint\`
+- typecheck: \`npx pnpm@10.12.1 typecheck\`
+- build: \`npx pnpm@10.12.1 build\`
+`,
+      });
+
+      const output = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'prepare-pr', '--json'], { cwd: dir })).stdout,
+      );
+
+      expect(output.body).toContain('## Verification Report Not Run');
+      expect(output.body).toContain('- test: `npx pnpm@10.12.1 test`');
+      expect(output.body).not.toContain('- lint: `npx pnpm@10.12.1 lint`');
+      expect(output.body).not.toContain('- typecheck: `npx pnpm@10.12.1 typecheck`');
+      expect(output.body).not.toContain('- build: `npx pnpm@10.12.1 build`');
+      expect(output.body).not.toContain('- No skipped commands were recorded.');
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
+
+  test(
     'uses a clear fallback when the verification report says nothing was skipped',
     async () => {
       const dir = await createPreparePrFixture({
@@ -249,6 +306,32 @@ describe('prepare-pr command', () => {
       expect(output.body).not.toContain('- See [runbook](https://example.com).');
       expect(output.githubComment).toContain('src/auth/\\[callback\\].ts');
       expect(output.githubComment).not.toContain('src/auth/[callback].ts');
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
+
+  test(
+    'normalizes multiline task prose without damaging inline command snippets',
+    async () => {
+      const dir = await createPreparePrFixture({
+        desiredOutcome: `File-intent lookup inspects bounded evidence.
+The command stays deterministic for reviewers.`,
+        acceptanceCriteria:
+          '- `agentloop intent <file>` reports bounded search context for older evidence.',
+      });
+
+      const output = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'prepare-pr', '--json'], { cwd: dir })).stdout,
+      );
+
+      expect(output.body).toContain(
+        'File-intent lookup inspects bounded evidence. The command stays deterministic for reviewers.',
+      );
+      expect(output.body).toContain(
+        '- `agentloop intent <file>` reports bounded search context for older evidence.',
+      );
+      expect(output.body).not.toContain('\\nThe command stays deterministic');
+      expect(output.body).not.toContain('`agentloop intent <file\\>`');
     },
     CLI_PREPARE_PR_TEST_TIMEOUT_MS,
   );
@@ -591,7 +674,7 @@ describe('prepare-pr command', () => {
         runId: ship.run.id,
       });
       expect(output.body).toContain(
-        '- This is a review-readiness score.\\nDo not split this list item.',
+        '- This is a review-readiness score. Do not split this list item.',
       );
       expect(output.body).toContain('- Ship report: `.agentloop/reports/ship\\nreport.md`');
       expect(output.body).toContain('- Issue labels: `bug\\ntriage`');
@@ -603,11 +686,11 @@ describe('prepare-pr command', () => {
       expect(output.githubComment).toContain('- Ship report: `.agentloop/reports/ship\\nreport.md`');
       expect(output.githubComment).toContain('- Handoff: `.agentloop/handoffs/review\\nhandoff.md`');
       expect(output.githubComment).toContain(
-        '- This is a review-readiness score.\\nDo not split this list item.',
+        '- This is a review-readiness score. Do not split this list item.',
       );
-      expect(output.githubComment).toContain('- Blocker line one\\nBlocker line two');
-      expect(output.githubComment).toContain('- Warning line one\\nWarning line two');
-      expect(output.githubComment).toContain('- Next action line one\\nNext action line two');
+      expect(output.githubComment).toContain('- Blocker line one Blocker line two');
+      expect(output.githubComment).toContain('- Warning line one Warning line two');
+      expect(output.githubComment).toContain('- Next action line one Next action line two');
 
       expect(output.body).not.toContain('ship\nreport.md`');
       expect(output.body).not.toContain('bug\ntriage`');

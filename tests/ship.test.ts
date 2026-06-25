@@ -551,8 +551,8 @@ None recorded yet.
     expect(comment).toContain(
       `- Ship report: ${singleLineInlineCode('.agentloop/reports/ship\n-report.md')}`,
     );
-    expect(comment).toContain('- Risk-sensitive files changed: src/auth/callback\\n-extra.ts');
-    expect(comment).toContain('- Review file src/auth/callback\\n-extra.ts before merge.');
+    expect(comment).toContain('- Risk-sensitive files changed: src/auth/callback\\n\\-extra.ts');
+    expect(comment).toContain('- Review file src/auth/callback\\n\\-extra.ts before merge.');
     expect(comment).not.toContain('\n- [x] injected');
     expect(comment).not.toContain('report\n-path.md');
     expect(comment).not.toContain('callback\n-extra.ts');

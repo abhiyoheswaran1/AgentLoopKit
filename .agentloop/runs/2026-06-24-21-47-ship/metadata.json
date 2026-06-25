@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-21-47-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-21-47",
+  "createdAtEpochMs": 1782330480360,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-bound-mcp-evidence-listing-work-2.md",
+    "title": "Bound MCP evidence listing work",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-21-45-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-21-47-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-21-47-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 286
+}

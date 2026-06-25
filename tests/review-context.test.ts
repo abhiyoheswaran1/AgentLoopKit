@@ -7,7 +7,7 @@ import { createTaskContractFile } from '../src/core/task-contract.js';
 import { loadAgentLoopConfig } from '../src/core/config.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { getReviewContext, renderReviewContextMarkdown } from '../src/core/review-context.js';
-import type { EvidenceMap } from '../src/core/evidence-map.js';
+import { compactEvidenceMap, type EvidenceMap } from '../src/core/evidence-map.js';
 import type { ContextBudgetSummary } from '../src/core/context-budget.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -54,6 +54,25 @@ function minimalContextBudget(): ContextBudgetSummary {
   };
 }
 
+function minimalReviewWorkingTree(
+  input: {
+    dirty?: boolean;
+    changedFileCount?: number;
+    nonEvidenceChangedFileCount?: number;
+    agentLoopEvidenceChangedFileCount?: number;
+  } = {},
+) {
+  return {
+    dirty: input.dirty ?? false,
+    changedFileCount: input.changedFileCount ?? 0,
+    nonEvidenceChangedFileCount: input.nonEvidenceChangedFileCount ?? 0,
+    agentLoopEvidenceChangedFileCount: input.agentLoopEvidenceChangedFileCount ?? 0,
+    changedFileExamples: [],
+    changedFileExampleLimit: 5,
+    changedFilesOmitted: false,
+  };
+}
+
 function makeMinimalReviewContext(input: {
   activeTask?: { path: string; title: string; status: string } | null;
   latestTask?: { path: string; title: string; status: string } | null;
@@ -62,13 +81,7 @@ function makeMinimalReviewContext(input: {
   return {
     status: {
       project: { name: 'demo', type: 'generic', packageManager: 'npm' },
-      workingTree: {
-        dirty: false,
-        changedFileCount: 0,
-        nonEvidenceChangedFileCount: 0,
-        agentLoopEvidenceChangedFileCount: 0,
-        changedFiles: [],
-      },
+      workingTree: minimalReviewWorkingTree(),
       activeTask: input.activeTask ?? null,
       activeTaskRiskNotes: null,
       latestTask: input.latestTask ?? null,
@@ -113,7 +126,7 @@ function makeMinimalReviewContext(input: {
       releaseNotes: { count: 0, latest: null },
       runs: { count: 0, latest: null },
     },
-    evidenceMap: minimalEvidenceMap(),
+    evidenceMap: compactEvidenceMap(minimalEvidenceMap()),
     contextBudget: minimalContextBudget(),
     recentRuns: [],
     latestShip: null,
@@ -124,7 +137,9 @@ function makeMinimalReviewContext(input: {
     safety: {
       readOnly: true,
       includesMarkdownContent: false,
-      commandsRun: [],
+      localGitStatus: true,
+      verificationCommandsRun: false,
+      projectCommandsRun: false,
     },
   } as Awaited<ReturnType<typeof getReviewContext>>;
 }
@@ -265,11 +280,26 @@ describe('review-context command', () => {
     expect(payload.status.activeTask).toMatchObject({
       title: 'Fix login redirect bug',
     });
+    expect(payload.status.workingTree.changedFiles).toBeUndefined();
+    expect(payload.status.workingTree.changedFileExamples).toHaveLength(5);
+    expect(payload.status.workingTree.changedFileExampleLimit).toBe(5);
+    expect(payload.status.workingTree.changedFilesOmitted).toBe(true);
     expect(payload.evidenceMap.summary).toMatchObject({
       reviewability: expect.any(String),
       changedFileCount: expect.any(Number),
       nonEvidenceChangedFileCount: expect.any(Number),
     });
+    expect(payload.evidenceMap.files).toBeUndefined();
+    expect(payload.evidenceMap.fileList).toMatchObject({
+      omitted: true,
+      handle: 'evidence-map:current',
+      command: 'agentloop context show evidence-map:current',
+    });
+    expect(payload.evidenceMap.coverage).toBeTruthy();
+    expect(payload.evidenceMap.risk).toBeTruthy();
+    expect(payload.evidenceMap.verification).toBeTruthy();
+    expect(payload.evidenceMap.nextActions.length).toBeGreaterThan(0);
+    expect(JSON.stringify(payload)).not.toContain('"coveredByTask"');
     expect(payload.evidenceMap.claims).toContain(
       'Evidence coverage is path-based local AgentLoopKit evidence, not proof of code correctness.',
     );
@@ -331,7 +361,9 @@ describe('review-context command', () => {
     expect(payload.safety).toEqual({
       readOnly: true,
       includesMarkdownContent: false,
-      commandsRun: [],
+      localGitStatus: true,
+      verificationCommandsRun: false,
+      projectCommandsRun: false,
     });
     expect(JSON.stringify(payload)).not.toContain(dir);
   });
@@ -409,13 +441,12 @@ describe('review-context command', () => {
     const context = {
       status: {
         project: { name: 'demo', type: 'generic', packageManager: 'npm' },
-        workingTree: {
+        workingTree: minimalReviewWorkingTree({
           dirty: true,
           changedFileCount: 2,
           nonEvidenceChangedFileCount: 1,
           agentLoopEvidenceChangedFileCount: 1,
-          changedFiles: [],
-        },
+        }),
         activeTask: {
           path: '.agentloop/tasks/fix\nlogin.md',
           title: 'Fix\nlogin redirect',
@@ -460,7 +491,7 @@ describe('review-context command', () => {
         releaseNotes: { count: 0, latest: null },
         runs: { count: 1, latest: null },
       },
-      evidenceMap: minimalEvidenceMap(),
+      evidenceMap: compactEvidenceMap(minimalEvidenceMap()),
       contextBudget: minimalContextBudget(),
       recentRuns: [
         {
@@ -485,7 +516,9 @@ describe('review-context command', () => {
       safety: {
         readOnly: true,
         includesMarkdownContent: false,
-        commandsRun: [],
+        localGitStatus: true,
+        verificationCommandsRun: false,
+        projectCommandsRun: false,
       },
     } as Awaited<ReturnType<typeof getReviewContext>>;
 
@@ -550,13 +583,7 @@ describe('review-context command', () => {
     const context = {
       status: {
         project: { name: 'demo', type: 'generic', packageManager: 'npm' },
-        workingTree: {
-          dirty: false,
-          changedFileCount: 0,
-          nonEvidenceChangedFileCount: 0,
-          agentLoopEvidenceChangedFileCount: 0,
-          changedFiles: [],
-        },
+        workingTree: minimalReviewWorkingTree(),
         activeTask: null,
         activeTaskRiskNotes: null,
         latestTask: null,
@@ -595,7 +622,7 @@ describe('review-context command', () => {
         releaseNotes: { count: 0, latest: null },
         runs: { count: 0, latest: null },
       },
-      evidenceMap: minimalEvidenceMap(),
+      evidenceMap: compactEvidenceMap(minimalEvidenceMap()),
       contextBudget: minimalContextBudget(),
       recentRuns: [],
       latestShip: null,
@@ -606,7 +633,9 @@ describe('review-context command', () => {
       safety: {
         readOnly: true,
         includesMarkdownContent: false,
-        commandsRun: [],
+        localGitStatus: true,
+        verificationCommandsRun: false,
+        projectCommandsRun: false,
       },
     } as Awaited<ReturnType<typeof getReviewContext>>;
 

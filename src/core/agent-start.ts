@@ -1,9 +1,9 @@
 import type { AgentLoopConfig } from './config.js';
 import {
-  buildContextPack,
+  buildContextPackWithFullEvidence,
   type ContextHandle,
   type ContextPackGoal,
-  type ContextPackResult,
+  type ContextPackInternalResult,
 } from './context-contract.js';
 import type { EvidenceMap } from './evidence-map.js';
 import {
@@ -73,6 +73,19 @@ export type AgentStartImpact = {
     | 'attention-required';
 };
 
+export type AgentStartUsefulnessProof = {
+  preflightState: AgentStartPreflightState;
+  summary: string;
+  contextAvoidedTokens: number;
+  contextReductionPercent: number | null;
+  broadChangedFilesAvoided: number;
+  staleProofCaught: boolean;
+  scopeDriftCaught: boolean;
+  verificationFreshness: EvidenceMap['verification']['label'];
+  sourceHandlesAvailable: string[];
+  nextSafeCommand: string;
+};
+
 export type AgentStartBroadScanGuidance = {
   changedFileCount: number;
   nonEvidenceChangedFileCount: number;
@@ -120,11 +133,12 @@ export type AgentStartResult = {
   doNotBroadScan: AgentStartBroadScanGuidance;
   risk: AgentStartRisk[];
   riskSummary: AgentStartRiskSummary;
+  usefulnessProof: AgentStartUsefulnessProof;
   impact: AgentStartImpact;
   nextCommand: AgentStartNextCommand;
   sourceHandles: ContextHandle[];
   markdown: string;
-  safety: ContextPackResult['safety'];
+  safety: ContextPackInternalResult['safety'];
 };
 
 const GOAL_CONTEXT_MAP: Record<AgentStartGoal, ContextPackGoal> = {
@@ -343,6 +357,58 @@ function buildRiskSummary(risks: AgentStartRisk[]): AgentStartRiskSummary {
   };
 }
 
+function usefulnessSummary(input: {
+  preflight: AgentStartPreflight;
+  impact: AgentStartImpact;
+  sourceHandleCount: number;
+}) {
+  const handleText = `${input.sourceHandleCount} source ${pluralize(
+    input.sourceHandleCount,
+    'handle',
+  )}`;
+  switch (input.preflight.state) {
+    case 'ready-to-continue':
+      return `Local evidence says the agent can continue with ${handleText} and ${input.impact.estimatedContextAvoidedTokens} estimated context token(s) avoided.`;
+    case 'review-ready':
+      return `Local evidence says this work is ready for review with ${handleText} available for source expansion.`;
+    case 'needs-task':
+      return `AgentLoopKit caught missing task scope before implementation; create or pin a task before broad reads.`;
+    case 'needs-verification':
+      return `AgentLoopKit caught missing or stale proof before handoff; refresh verification before review.`;
+    case 'scope-drift':
+      return `AgentLoopKit caught changed files outside local task or run evidence before review.`;
+    case 'blocked-by-risk':
+      return `AgentLoopKit caught a blocking risk before the agent continued.`;
+    case 'evidence-only':
+      return `Only local AgentLoop evidence changed; use ${handleText} if details matter.`;
+  }
+}
+
+function buildUsefulnessProof(input: {
+  preflight: AgentStartPreflight;
+  impact: AgentStartImpact;
+  sourceHandles: ContextHandle[];
+  nextCommand: AgentStartNextCommand;
+}): AgentStartUsefulnessProof {
+  const sourceHandlesAvailable = input.sourceHandles.map((handle) => handle.id);
+  return {
+    preflightState: input.preflight.state,
+    summary: usefulnessSummary({
+      preflight: input.preflight,
+      impact: input.impact,
+      sourceHandleCount: sourceHandlesAvailable.length,
+    }),
+    contextAvoidedTokens: input.impact.estimatedContextAvoidedTokens,
+    contextReductionPercent: input.impact.estimatedContextReductionPercent,
+    broadChangedFilesAvoided: input.impact.broadChangedFileCount,
+    staleProofCaught: input.impact.staleEvidenceCaught,
+    scopeDriftCaught: input.impact.scopeDriftFileCount > 0,
+    verificationFreshness: input.impact.verificationFreshness,
+    sourceHandlesAvailable,
+    nextSafeCommand: input.nextCommand.command,
+  };
+}
+
 function reviewReadinessDelta(map: EvidenceMap): AgentStartImpact['reviewReadinessDelta'] {
   if (!map.task) return 'task-contract-required';
   if (map.verification.label !== 'fresh') return 'verification-required';
@@ -354,7 +420,7 @@ function reviewReadinessDelta(map: EvidenceMap): AgentStartImpact['reviewReadine
   return 'attention-required';
 }
 
-function buildImpact(pack: ContextPackResult): AgentStartImpact {
+function buildImpact(pack: ContextPackInternalResult): AgentStartImpact {
   const broad = pack.contextBudget.estimatedFileListTokens;
   const compact = pack.contextBudget.estimatedResumePackTokens;
   const avoided = Math.max(0, broad - compact);
@@ -500,6 +566,26 @@ function renderHandles(handles: ContextHandle[]) {
     .join('\n');
 }
 
+function renderUsefulnessProof(proof: AgentStartUsefulnessProof) {
+  const sourceHandles = proof.sourceHandlesAvailable.length
+    ? proof.sourceHandlesAvailable.map(inlineCode).join(', ')
+    : 'none';
+  return `## Usefulness Proof
+
+- ${escapeMarkdownProse(proof.summary)}
+- Preflight state: ${inlineCode(proof.preflightState)}
+- Context avoided: ${inlineCode(String(proof.contextAvoidedTokens))} estimated token(s) (${inlineCode(
+    renderReduction(proof.contextReductionPercent),
+  )})
+- Broad changed files avoided: ${inlineCode(String(proof.broadChangedFilesAvoided))}
+- Stale proof caught: ${inlineCode(String(proof.staleProofCaught))}
+- Scope drift caught: ${inlineCode(String(proof.scopeDriftCaught))}
+- Verification freshness: ${inlineCode(proof.verificationFreshness)}
+- Source handles available: ${sourceHandles}
+- Next safe command: ${inlineCode(proof.nextSafeCommand)}
+`;
+}
+
 function renderReduction(value: number | null) {
   return value === null ? 'n/a' : `${value}%`;
 }
@@ -519,6 +605,8 @@ Agent briefing: ${escapeMarkdownProse(input.summary)}
 - Goal: ${inlineCode(input.goal)}
 - Status: ${inlineCode(input.status)}
 - Preflight: ${inlineCode(input.preflight.state)} - ${escapeMarkdownProse(input.preflight.reason)}
+
+${renderUsefulnessProof(input.usefulnessProof)}
 
 ## Active Task
 
@@ -591,7 +679,7 @@ export async function buildAgentStart(options: {
   target: ResumePackTarget;
   goal: AgentStartGoal;
 }): Promise<AgentStartResult> {
-  const contextPack = await buildContextPack({
+  const contextPack = await buildContextPackWithFullEvidence({
     cwd: options.cwd,
     config: options.config,
     target: options.target,
@@ -604,6 +692,7 @@ export async function buildAgentStart(options: {
     risks,
   });
   const impact = buildImpact(contextPack);
+  const resolvedNextCommand = nextCommand(contextPack.evidenceMap);
   const withoutMarkdown = {
     target: options.target,
     goal: options.goal,
@@ -614,8 +703,14 @@ export async function buildAgentStart(options: {
     doNotBroadScan: buildBroadScanGuidance(impact),
     risk: risks,
     riskSummary: buildRiskSummary(risks),
+    usefulnessProof: buildUsefulnessProof({
+      preflight,
+      impact,
+      sourceHandles: contextPack.handles,
+      nextCommand: resolvedNextCommand,
+    }),
     impact,
-    nextCommand: nextCommand(contextPack.evidenceMap),
+    nextCommand: resolvedNextCommand,
     sourceHandles: contextPack.handles,
     safety: contextPack.safety,
   };

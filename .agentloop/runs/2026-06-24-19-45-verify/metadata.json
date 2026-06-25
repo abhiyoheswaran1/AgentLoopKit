@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-19-45-verify",
+  "command": "verify",
+  "createdAt": "2026-06-24-19-45",
+  "createdAtEpochMs": 1782323154829,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-add-context-handle-inventory.md",
+    "title": "Add context handle inventory",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-19-45-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 112
+}

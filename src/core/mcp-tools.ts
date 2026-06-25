@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readdir, readFile, stat } from 'node:fs/promises';
+import { lstat, readdir } from 'node:fs/promises';
 import { loadAgentLoopConfig } from './config.js';
 import { toSafeDisplayPath } from './display-path.js';
 import {
@@ -22,6 +22,7 @@ import { runMaintainerCheck } from './maintainer-check.js';
 import { checkGates } from './check-gates.js';
 import {
   buildContextBudgetContract,
+  buildContextHandleInventory,
   buildContextPack,
   CONTEXT_PACK_GOALS,
   RESUME_PACK_TARGETS,
@@ -35,9 +36,16 @@ import {
   type AgentStartGoal,
 } from './agent-start.js';
 import { getReviewContext } from './review-context.js';
+import { redactLocalRoots } from './redaction.js';
+import { readSafeMarkdownFile, SAFE_MARKDOWN_MAX_BYTES } from './safe-markdown-file.js';
 import {
-  findFileIntent,
+  FILE_INTENT_DEFAULT_MATCH_LIMIT,
+  FILE_INTENT_DEFAULT_SCAN_LIMIT,
+  FILE_INTENT_MAX_MATCH_LIMIT,
+  FILE_INTENT_MAX_SCAN_LIMIT,
+  findFileIntentWithSearch,
   listRuns,
+  normalizeFileIntentPath,
   readRun,
 } from './runs.js';
 
@@ -78,6 +86,7 @@ const emptyInputSchema = {
   additionalProperties: false,
 };
 
+const defaultMcpListLimit = 20;
 const tools: McpToolDefinition[] = [
   {
     name: 'agentloop_status',
@@ -177,6 +186,18 @@ const tools: McpToolDefinition[] = [
           type: 'string',
           description: 'Repo-relative file path, for example "src/auth/callback.ts".',
         },
+        scanLimit: {
+          type: 'number',
+          minimum: 1,
+          maximum: FILE_INTENT_MAX_SCAN_LIMIT,
+          description: `Maximum newest run entries to inspect. Defaults to ${FILE_INTENT_DEFAULT_SCAN_LIMIT}.`,
+        },
+        matchLimit: {
+          type: 'number',
+          minimum: 1,
+          maximum: FILE_INTENT_MAX_MATCH_LIMIT,
+          description: `Maximum matching run entries to return. Defaults to ${FILE_INTENT_DEFAULT_MATCH_LIMIT}.`,
+        },
       },
       required: ['file'],
       additionalProperties: false,
@@ -252,6 +273,21 @@ const tools: McpToolDefinition[] = [
     name: 'agentloop_context_budget',
     description:
       'Read local context pressure and compact-pack savings guidance without running commands.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        redactPaths: {
+          type: 'boolean',
+          description: 'Redact the local AgentLoop root from returned budget payloads.',
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'agentloop_context_handles',
+    description:
+      'List local context source handles with availability, reasons, and expansion commands.',
     inputSchema: emptyInputSchema,
   },
   {
@@ -271,6 +307,10 @@ const tools: McpToolDefinition[] = [
           enum: [...CONTEXT_PACK_GOALS],
           description: 'Context pack goal. Defaults to continue.',
         },
+        redactPaths: {
+          type: 'boolean',
+          description: 'Redact the local AgentLoop root from returned context pack payloads.',
+        },
       },
       additionalProperties: false,
     },
@@ -285,6 +325,10 @@ const tools: McpToolDefinition[] = [
         handle: {
           type: 'string',
           description: 'Source handle to expand.',
+        },
+        redactPaths: {
+          type: 'boolean',
+          description: 'Redact the local AgentLoop root from returned handle content.',
         },
       },
       required: ['handle'],
@@ -330,8 +374,28 @@ function textResult(payload: Record<string, unknown>): McpToolResult {
   };
 }
 
+function redactedTextResult(payload: Record<string, unknown>, cwd: string, redactPaths: boolean) {
+  if (!redactPaths) return textResult(payload);
+  return textResult(JSON.parse(redactLocalRoots(JSON.stringify(payload), [cwd])) as Record<string, unknown>);
+}
+
 function extractHeading(markdown: string, fallback: string) {
   return markdown.match(/^#\s+(.+)$/m)?.[1]?.trim() || fallback;
+}
+
+function compareHandoffCandidates(left: HandoffCandidate, right: HandoffCandidate) {
+  if (left.modifiedMs !== right.modifiedMs) return right.modifiedMs - left.modifiedMs;
+  return left.path.localeCompare(right.path);
+}
+
+function appendHandoffCandidate(
+  candidates: HandoffCandidate[],
+  candidate: HandoffCandidate,
+  limit: number,
+) {
+  candidates.push(candidate);
+  candidates.sort(compareHandoffCandidates);
+  if (candidates.length > limit) candidates.pop();
 }
 
 function toStoredPath(cwd: string, absolutePath: string) {
@@ -340,14 +404,17 @@ function toStoredPath(cwd: string, absolutePath: string) {
 
 async function readMarkdownArtifact(cwd: string, filePath: string | undefined, key: string) {
   if (!filePath) return { [key]: null };
-  const content = await readFile(filePath, 'utf8');
-  const fileStat = await stat(filePath);
+  const file = await readSafeMarkdownFile(filePath, {
+    required: true,
+    codePrefix: 'MCP_MARKDOWN',
+  });
+  if (!file) return { [key]: null };
   return {
     [key]: {
       path: toStoredPath(cwd, filePath),
-      title: extractHeading(content, path.basename(filePath, '.md')),
-      modifiedAt: fileStat.mtime.toISOString(),
-      content,
+      title: extractHeading(file.content, path.basename(filePath, '.md')),
+      modifiedAt: file.modifiedAt,
+      content: file.content,
     },
   };
 }
@@ -356,35 +423,50 @@ async function listHandoffs(cwd: string, handoffsDir: string, limit: number) {
   if (!resolvesInsidePath(cwd, handoffsDir)) return [];
   if (!(await pathExists(handoffsDir))) return [];
   const entries = await readdir(handoffsDir, { withFileTypes: true });
-  const handoffs = await Promise.all(
-    entries
-      .filter((entry) => entry.isFile() && prSummaryPattern.test(entry.name))
-      .map(async (entry): Promise<HandoffWithSort> => {
-        const filePath = path.join(handoffsDir, entry.name);
-        const [content, fileStat] = await Promise.all([readFile(filePath, 'utf8'), stat(filePath)]);
+  const candidates: HandoffCandidate[] = [];
+  for (const entry of entries) {
+    if (!entry.isFile() || !prSummaryPattern.test(entry.name)) continue;
+    const filePath = path.join(handoffsDir, entry.name);
+    const fileStat = await lstat(filePath).catch(() => undefined);
+    if (
+      !fileStat?.isFile() ||
+      fileStat.isSymbolicLink() ||
+      fileStat.size > SAFE_MARKDOWN_MAX_BYTES
+    ) {
+      continue;
+    }
+    appendHandoffCandidate(
+      candidates,
+      {
+        filePath,
+        path: toStoredPath(cwd, filePath),
+        fallbackTitle: path.basename(filePath, '.md'),
+        modifiedAt: fileStat.mtime.toISOString(),
+        modifiedMs: fileStat.mtimeMs,
+      },
+      limit,
+    );
+  }
+
+  return Promise.all(
+    candidates
+      .map(async (handoff): Promise<HandoffSummary | undefined> => {
+        const file = await readSafeMarkdownFile(handoff.filePath);
+        if (!file) return undefined;
         return {
-          path: toStoredPath(cwd, filePath),
-          title: extractHeading(content, path.basename(filePath, '.md')),
-          modifiedAt: fileStat.mtime.toISOString(),
-          modifiedMs: fileStat.mtimeMs,
+          path: handoff.path,
+          title: extractHeading(file.content, handoff.fallbackTitle),
+          modifiedAt: file.modifiedAt,
         };
       }),
-  );
-
-  return handoffs
-    .sort((left, right) => {
-      if (left.modifiedMs !== right.modifiedMs) return right.modifiedMs - left.modifiedMs;
-      return left.path.localeCompare(right.path);
-    })
-    .slice(0, limit)
-    .map((handoff) => ({
-      path: handoff.path,
-      title: handoff.title,
-      modifiedAt: handoff.modifiedAt,
-    }));
+  ).then((handoffs) => handoffs.filter((handoff): handoff is HandoffSummary => Boolean(handoff)));
 }
 
-type HandoffWithSort = HandoffSummary & {
+type HandoffCandidate = {
+  filePath: string;
+  path: string;
+  fallbackTitle: string;
+  modifiedAt: string;
   modifiedMs: number;
 };
 
@@ -398,9 +480,22 @@ function readStringArgument(args: Record<string, unknown> | undefined, key: stri
 
 function readLimitArgument(args: Record<string, unknown> | undefined) {
   const value = args?.limit;
-  if (value === undefined) return 20;
+  if (value === undefined) return defaultMcpListLimit;
   if (typeof value !== 'number' || !Number.isInteger(value) || value < 1 || value > 50) {
     throw new AgentLoopError('MCP tool argument "limit" must be an integer from 1 to 50.');
+  }
+  return value;
+}
+
+function readOptionalPositiveIntegerArgument(
+  args: Record<string, unknown> | undefined,
+  key: string,
+  max: number,
+) {
+  const value = args?.[key];
+  if (value === undefined) return undefined;
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < 1 || value > max) {
+    throw new AgentLoopError(`MCP tool argument "${key}" must be an integer from 1 to ${max}.`);
   }
   return value;
 }
@@ -471,7 +566,7 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
 
   switch (options.name) {
     case 'agentloop_status': {
-      const status = await getAgentLoopStatus({ cwd: options.cwd, config });
+      const status = await getAgentLoopStatus({ cwd: options.cwd, config, redactPaths: true });
       return textResult(status as unknown as Record<string, unknown>);
     }
     case 'agentloop_next': {
@@ -519,7 +614,7 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
     case 'agentloop_list_runs': {
       const limit = readLimitArgument(options.arguments);
       return textResult({
-        runs: (await listRuns(options.cwd)).slice(0, limit),
+        runs: await listRuns(options.cwd, { limit }),
       });
     }
     case 'agentloop_show_run': {
@@ -527,11 +622,24 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
       return textResult({ run: await readRun(options.cwd, id) });
     }
     case 'agentloop_file_intent': {
-      const file = readStringArgument(options.arguments, 'file').replace(/\\/g, '/');
-      return textResult({
-        file,
-        runs: await findFileIntent(options.cwd, file),
-      });
+      const file = normalizeFileIntentPath(
+        options.cwd,
+        readStringArgument(options.arguments, 'file'),
+      );
+      return textResult(
+        await findFileIntentWithSearch(options.cwd, file, {
+          scanLimit: readOptionalPositiveIntegerArgument(
+            options.arguments,
+            'scanLimit',
+            FILE_INTENT_MAX_SCAN_LIMIT,
+          ),
+          matchLimit: readOptionalPositiveIntegerArgument(
+            options.arguments,
+            'matchLimit',
+            FILE_INTENT_MAX_MATCH_LIMIT,
+          ),
+        }),
+      );
     }
     case 'agentloop_maintainer_check': {
       return textResult(await runMaintainerCheck({ cwd: options.cwd, config }));
@@ -543,7 +651,11 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
     case 'agentloop_artifacts': {
       const type = readArtifactTypeArgument(options.arguments);
       const latest = readBooleanArgument(options.arguments, 'latest', false);
-      const inventory = await getArtifactInventory({ cwd: options.cwd, config });
+      const inventory = await getArtifactInventory({
+        cwd: options.cwd,
+        config,
+        ...(latest ? { runLimit: 1 } : {}),
+      });
       return textResult(renderArtifactInventoryJson(inventory, { type, latest }));
     }
     case 'agentloop_review_context': {
@@ -557,25 +669,38 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
       });
     }
     case 'agentloop_context_budget': {
+      const redactPaths = readBooleanArgument(options.arguments, 'redactPaths', false);
       const contextBudget = await buildContextBudgetContract({ cwd: options.cwd, config });
-      return textResult({
+      return redactedTextResult({
         evidenceMap: contextBudget.evidenceMap,
         contextBudget: contextBudget.contextBudget,
         markdown: contextBudget.markdown,
         safety: contextBudget.safety,
+      }, options.cwd, redactPaths);
+    }
+    case 'agentloop_context_handles': {
+      return textResult({
+        contextHandles: await buildContextHandleInventory({ cwd: options.cwd, config }),
       });
     }
     case 'agentloop_context_pack': {
       const target = readContextTargetArgument(options.arguments);
       const goal = readContextGoalArgument(options.arguments);
-      return textResult({
+      const redactPaths = readBooleanArgument(options.arguments, 'redactPaths', false);
+      return redactedTextResult({
         contextPack: await buildContextPack({ cwd: options.cwd, config, target, goal }),
-      });
+      }, options.cwd, redactPaths);
     }
     case 'agentloop_context_show': {
       const handle = readStringArgument(options.arguments, 'handle');
+      const redactPaths = readBooleanArgument(options.arguments, 'redactPaths', false);
       return textResult({
-        contextHandle: await showContextHandle({ cwd: options.cwd, config, handle }),
+        contextHandle: await showContextHandle({
+          cwd: options.cwd,
+          config,
+          handle,
+          redactPaths,
+        }),
       });
     }
     case 'agentloop_list_handoffs': {

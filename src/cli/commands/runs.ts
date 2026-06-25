@@ -1,7 +1,15 @@
 import { Command } from 'commander';
 import { isAgentLoopEvidenceFile } from '../../core/agentloop-evidence.js';
 import { AgentLoopError } from '../../core/errors.js';
-import { findFileIntent, listRuns, readRun } from '../../core/runs.js';
+import {
+  FILE_INTENT_DEFAULT_MATCH_LIMIT,
+  FILE_INTENT_DEFAULT_SCAN_LIMIT,
+  FILE_INTENT_MAX_MATCH_LIMIT,
+  FILE_INTENT_MAX_SCAN_LIMIT,
+  findFileIntentWithSearch,
+  listRuns,
+  readRun,
+} from '../../core/runs.js';
 import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import type { GitFileStatus } from '../../core/git.js';
 import {
@@ -68,8 +76,29 @@ function parseRunsLimit(options: { latest?: boolean; limit?: string }) {
   return parsed;
 }
 
-function limitRuns(runs: Awaited<ReturnType<typeof listRuns>>, limit: number | undefined) {
-  return limit === undefined ? runs : runs.slice(0, limit);
+function parsePositiveBoundedOption(
+  value: string | undefined,
+  option: string,
+  max: number,
+): number | undefined {
+  if (value === undefined) return undefined;
+  const parsed = Number.parseInt(value, 10);
+  if (!/^\d+$/.test(value) || !Number.isSafeInteger(parsed) || parsed < 1 || parsed > max) {
+    throw new CliOptionError(`--${option} must be an integer from 1 to ${max}.`, 'RUN_LIMIT_INVALID', {
+      option,
+      value,
+    });
+  }
+  return parsed;
+}
+
+function formatIntentSearch(search: Awaited<ReturnType<typeof findFileIntentWithSearch>>['search']) {
+  const suffix = search.truncated
+    ? `; use --scan-limit <count> to inspect more than ${search.scanLimit}`
+    : '';
+  return `Searched newest ${inlineCode(String(search.inspectedRunCount))} of ${inlineCode(
+    String(search.totalRunCount),
+  )} run entries${suffix}.`;
 }
 
 export function runsCommand() {
@@ -95,7 +124,7 @@ export function runsCommand() {
       }
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
-      const runs = limitRuns(await listRuns(workspace.cwd), limit);
+      const runs = await listRuns(workspace.cwd, { limit });
       if (options.json) console.log(JSON.stringify({ runs }, null, 2));
       else await printRuns(workspace.cwd, runs);
     });
@@ -145,24 +174,72 @@ export function intentCommand() {
   return new Command('intent')
     .description('Show which local AgentLoopKit runs touched a file')
     .argument('<file>', 'repo-relative file path')
+    .option(
+      '--scan-limit <count>',
+      `inspect at most this many newest run entries (default: ${FILE_INTENT_DEFAULT_SCAN_LIMIT})`,
+    )
+    .option(
+      '--match-limit <count>',
+      `return at most this many matching run entries (default: ${FILE_INTENT_DEFAULT_MATCH_LIMIT})`,
+    )
     .option('--json', 'print machine-readable output')
     .option(
       '--redact-paths',
       'accept common public-output redaction flag; run ledger paths are already display-safe',
     )
-    .action(async (file: string, options: { json?: boolean }) => {
-      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
-      if (!workspace) return;
-      const runs = await findFileIntent(workspace.cwd, file);
-      if (options.json) {
-        console.log(JSON.stringify({ file: file.replace(/\\/g, '/'), runs }, null, 2));
-        return;
-      }
-      if (!runs.length) {
-        console.log(`No AgentLoopKit run intent found for ${inlineCode(file)}.`);
-        return;
-      }
-      console.log(`AgentLoopKit intent for ${inlineCode(file)}:`);
-      for (const run of runs) console.log(`- ${inlineCode(run.id)}: ${inlineCode(run.why)}`);
-    });
+    .action(
+      async (
+        file: string,
+        options: { json?: boolean; scanLimit?: string; matchLimit?: string },
+      ) => {
+        let scanLimit: number | undefined;
+        let matchLimit: number | undefined;
+        try {
+          scanLimit = parsePositiveBoundedOption(
+            options.scanLimit,
+            'scan-limit',
+            FILE_INTENT_MAX_SCAN_LIMIT,
+          );
+          matchLimit = parsePositiveBoundedOption(
+            options.matchLimit,
+            'match-limit',
+            FILE_INTENT_MAX_MATCH_LIMIT,
+          );
+        } catch (error) {
+          if (options.json && error instanceof AgentLoopError) {
+            printAgentLoopJsonError(error);
+            return;
+          }
+          throw error;
+        }
+        const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+        if (!workspace) return;
+        let intent: Awaited<ReturnType<typeof findFileIntentWithSearch>>;
+        try {
+          intent = await findFileIntentWithSearch(workspace.cwd, file, {
+            scanLimit,
+            matchLimit,
+          });
+        } catch (error) {
+          if (options.json && error instanceof AgentLoopError) {
+            printAgentLoopJsonError(error);
+            return;
+          }
+          throw error;
+        }
+        if (options.json) {
+          console.log(JSON.stringify(intent, null, 2));
+          return;
+        }
+        if (!intent.runs.length) {
+          console.log(`No AgentLoopKit run intent found for ${inlineCode(intent.file)}.`);
+          console.log(formatIntentSearch(intent.search));
+          return;
+        }
+        console.log(`AgentLoopKit intent for ${inlineCode(intent.file)}:`);
+        for (const run of intent.runs)
+          console.log(`- ${inlineCode(run.id)}: ${inlineCode(run.why)}`);
+        console.log(formatIntentSearch(intent.search));
+      },
+    );
 }

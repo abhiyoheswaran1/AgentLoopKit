@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-22-26-verify",
+  "command": "verify",
+  "createdAt": "2026-06-24-22-26",
+  "createdAtEpochMs": 1782332772538,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-reduce-doctor-risk-scan-evidence-noise.md",
+    "title": "Reduce Doctor risk-scan evidence noise",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-22-24-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 369
+}

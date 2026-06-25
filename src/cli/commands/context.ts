@@ -1,7 +1,9 @@
 import { Command } from 'commander';
 import { AgentLoopError } from '../../core/errors.js';
+import { redactLocalRoots } from '../../core/redaction.js';
 import {
   buildContextBudgetContract,
+  buildContextHandleInventory,
   buildContextPack,
   CONTEXT_PACK_GOALS,
   RESUME_PACK_TARGETS,
@@ -47,6 +49,11 @@ function printJsonErrorIfNeeded(error: unknown, json: boolean | undefined) {
   return false;
 }
 
+function stringifyContextOutput(value: unknown, cwd: string, redactPaths: boolean | undefined) {
+  const output = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+  return redactPaths === true ? redactLocalRoots(output, [cwd]) : output;
+}
+
 export function contextCommand() {
   const command = new Command('context').description(
     'Measure and package local AgentLoopKit context for software agents',
@@ -68,8 +75,28 @@ export function contextCommand() {
         config: workspace.config,
       });
 
-      if (options.json) console.log(JSON.stringify(result, null, 2));
-      else console.log(result.markdown);
+      if (options.json) console.log(stringifyContextOutput(result, workspace.cwd, options.redactPaths));
+      else console.log(stringifyContextOutput(result.markdown, workspace.cwd, options.redactPaths));
+    });
+
+  command
+    .command('handles')
+    .description('List local context source handles with availability and expansion commands')
+    .option('--json', 'print machine-readable output')
+    .option(
+      '--redact-paths',
+      'redact local absolute paths in public output; context paths are repo-relative by default',
+    )
+    .action(async (options: { json?: boolean; redactPaths?: boolean }) => {
+      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+      if (!workspace) return;
+      const result = await buildContextHandleInventory({
+        cwd: workspace.cwd,
+        config: workspace.config,
+      });
+
+      if (options.json) console.log(stringifyContextOutput(result, workspace.cwd, options.redactPaths));
+      else console.log(stringifyContextOutput(result.markdown, workspace.cwd, options.redactPaths));
     });
 
   command
@@ -102,8 +129,8 @@ export function contextCommand() {
         goal,
       });
 
-      if (options.json) console.log(JSON.stringify(result, null, 2));
-      else console.log(result.markdown);
+      if (options.json) console.log(stringifyContextOutput(result, workspace.cwd, options.redactPaths));
+      else console.log(stringifyContextOutput(result.markdown, workspace.cwd, options.redactPaths));
     });
 
   command

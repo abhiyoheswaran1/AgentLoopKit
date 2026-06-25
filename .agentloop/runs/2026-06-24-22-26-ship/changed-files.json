@@ -1,0 +1,1490 @@
+[
+  {
+    "status": "M",
+    "path": ".agentloop/README.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/agents/claude-code.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/agents/codex.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/agents/cursor.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/agents/gemini-cli.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/agents/generic.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/agents/github-copilot-cli.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/agents/opencode.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/harness/commands.md"
+  },
+  {
+    "status": "M",
+    "path": ".agentloop/loops/research.md"
+  },
+  {
+    "status": "M",
+    "path": "AGENTLOOP.md"
+  },
+  {
+    "status": "M",
+    "path": "AGENTS.md"
+  },
+  {
+    "status": "M",
+    "path": "README.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/assets/readme/agentloopkit-context-contract.gif"
+  },
+  {
+    "status": "M",
+    "path": "docs/assets/readme/agentloopkit-context-contract.tape"
+  },
+  {
+    "status": "M",
+    "path": "docs/cli-reference.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/context.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/getting-started.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/mcp.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/release-status.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/research.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/template-migrations.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/upgrading-existing-repos.md"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/commands/context.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/commands/doctor.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/commands/guard.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/cli/commands/runs.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/agent-start.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/artifacts.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/context-contract.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/doctor.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/evidence-map.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/guard.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/markdown-format.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/mcp-tools.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/prepare-pr.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/review-context.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/runs.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/safety.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/upgrade-harness.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/core/verification-report-sections.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/mcp/server.ts"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/claude-code.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/codex.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/cursor.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/gemini-cli.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/generic.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/github-copilot-cli.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/agents/opencode.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/harness/commands.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/loops/research.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/root/AGENTLOOP.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/root/AGENTS.md"
+  },
+  {
+    "status": "M",
+    "path": "src/templates/root/agentloop-directory-readme.md"
+  },
+  {
+    "status": "M",
+    "path": "tests/agent-start.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/context-contract.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/doctor.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/guard.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/init.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/markdown-format.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/mcp-server.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/mcp-tools.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/prepare-pr.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/review-context.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/runs.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/safety.test.ts"
+  },
+  {
+    "status": "M",
+    "path": "tests/upgrade-harness.test.ts"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-17-04-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-18-45-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-19-18-pr-summary-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-19-18-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-19-47-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-19-51-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-20-02-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-20-14-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-20-28-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-20-44-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-20-55-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-21-08-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-21-15-pr-summary-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-21-15-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-21-24-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-21-29-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-21-47-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-21-54-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-21-58-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-22-03-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-22-10-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/handoffs/2026-06-24-22-18-pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-17-02-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-17-04-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-18-42-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-18-45-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-19-15-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-19-18-ship-report-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-19-18-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-19-45-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-19-47-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-19-50-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-19-51-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-20-01-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-20-02-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-20-06-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-20-13-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-20-14-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-20-26-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-20-28-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-20-42-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-20-44-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-20-52-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-20-55-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-05-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-08-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-12-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-15-ship-report-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-15-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-21-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-24-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-26-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-29-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-41-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-45-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-47-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-53-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-54-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-57-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-21-58-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-22-02-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-22-03-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-22-09-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-22-10-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-22-16-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-22-18-ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-24-22-24-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-17-03-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-17-03-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-17-03-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-17-04-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-17-04-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-17-04-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-17-04-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-17-04-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-17-04-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-18-43-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-18-43-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-18-43-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-18-45-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-18-45-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-18-45-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-18-45-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-18-45-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-18-45-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-16-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-16-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-16-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-18-ship-2/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-18-ship-2/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-18-ship-2/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-18-ship-2/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-18-ship-2/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-18-ship-2/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-18-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-18-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-18-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-18-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-18-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-18-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-45-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-45-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-45-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-47-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-47-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-47-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-47-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-47-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-47-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-50-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-50-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-50-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-51-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-51-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-51-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-51-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-51-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-19-51-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-02-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-02-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-02-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-02-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-02-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-02-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-02-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-02-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-02-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-08-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-08-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-08-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-14-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-14-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-14-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-14-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-14-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-14-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-14-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-14-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-14-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-27-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-27-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-27-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-28-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-28-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-28-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-28-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-28-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-28-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-43-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-43-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-43-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-44-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-44-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-44-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-44-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-44-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-44-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-53-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-53-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-53-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-55-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-55-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-55-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-55-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-55-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-20-55-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-07-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-07-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-07-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-08-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-08-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-08-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-08-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-08-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-08-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-14-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-14-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-14-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-15-ship-2/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-15-ship-2/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-15-ship-2/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-15-ship-2/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-15-ship-2/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-15-ship-2/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-15-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-15-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-15-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-15-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-15-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-15-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-22-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-22-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-22-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-24-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-24-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-24-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-24-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-24-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-24-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-28-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-28-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-28-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-29-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-29-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-29-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-29-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-29-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-29-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-43-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-43-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-43-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-47-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-47-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-47-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-47-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-47-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-47-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-47-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-47-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-47-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-54-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-54-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-54-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-54-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-54-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-54-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-54-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-54-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-54-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-58-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-58-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-58-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-58-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-58-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-58-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-58-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-58-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-21-58-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-03-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-03-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-03-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-03-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-03-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-03-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-03-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-03-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-03-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-10-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-10-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-10-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-10-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-10-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-10-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-10-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-10-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-10-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-17-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-17-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-17-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-18-ship/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-18-ship/diffstat.txt"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-18-ship/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-18-ship/pr-summary.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-18-ship/score.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-18-ship/ship-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-26-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-26-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-24-22-26-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-add-agentloop-agent-readiness-matrix.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-add-compact-guard-json-output-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-add-context-handle-inventory-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-align-guard-with-missing-task-preflight-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-avoid-full-run-hydration-in-file-intent-lookup.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-avoid-misleading-prepare-pr-verification-gaps-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-bound-mcp-evidence-listing-work.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-bound-mcp-handoff-listing-work.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-compact-context-pack-json-payloads-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-compact-review-context-evidence-payload-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-hydrate-bounded-mcp-run-summaries-consistently-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-optimize-agentloop-start-run-ledger-listing-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-prove-agentloop-start-usefulness.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-reduce-doctor-risk-scan-evidence-noise-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-24-reduce-doctor-risk-scan-evidence-noise.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-add-agentloop-agent-readiness-matrix-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-add-compact-guard-json-output.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-add-context-handle-inventory.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-align-guard-with-missing-task-preflight.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-avoid-full-run-hydration-in-file-intent-lookup-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-avoid-full-run-hydration-in-file-intent-lookup.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-avoid-misleading-prepare-pr-verification-gaps.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-bound-mcp-evidence-listing-work-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-bound-mcp-evidence-listing-work.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-bound-mcp-handoff-listing-work-2.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-bound-mcp-handoff-listing-work.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-compact-context-pack-json-payloads.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-compact-review-context-evidence-payload.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-hydrate-bounded-mcp-run-summaries-consistently.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-optimize-agentloop-start-run-ledger-listing.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-24-prove-agentloop-start-usefulness-2.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/start-usefulness-demo.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/superpowers/plans/2026-06-24-agent-readiness-matrix.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/superpowers/plans/2026-06-24-agentloop-start-usefulness-proof.md"
+  },
+  {
+    "status": "??",
+    "path": "src/core/agent-readiness.ts"
+  },
+  {
+    "status": "??",
+    "path": "src/core/run-artifacts.ts"
+  },
+  {
+    "status": "??",
+    "path": "src/core/run-types.ts"
+  }
+]

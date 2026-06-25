@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-20-27-verify",
+  "command": "verify",
+  "createdAt": "2026-06-24-20-27",
+  "createdAtEpochMs": 1782325632321,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-hydrate-bounded-mcp-run-summaries-consistently.md",
+    "title": "Hydrate bounded MCP run summaries consistently",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-20-26-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 173
+}

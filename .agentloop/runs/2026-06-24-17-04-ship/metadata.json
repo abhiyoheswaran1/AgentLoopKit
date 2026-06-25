@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-17-04-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-17-04",
+  "createdAtEpochMs": 1782313458520,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-prove-agentloop-start-usefulness-2.md",
+    "title": "Prove AgentLoop Start usefulness",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-17-02-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-17-04-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-17-04-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 20
+}

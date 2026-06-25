@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-20-44-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-20-44",
+  "createdAtEpochMs": 1782326694561,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-compact-context-pack-json-payloads.md",
+    "title": "Compact context pack JSON payloads",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-20-42-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-20-44-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-20-44-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 190
+}

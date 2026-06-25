@@ -119,7 +119,7 @@ function escapedInlineProse(value: string) {
 }
 
 function escapeSingleLineMarkdownProse(value: string) {
-  return escapeMarkdownProse(value).replace(/\r/g, '\\r').replace(/\n/g, '\\n');
+  return escapeMarkdownProse(value.replace(/\s+/g, ' ').trim());
 }
 
 function githubItemLine(

@@ -81,7 +81,10 @@ export function startCommand() {
       });
 
       if (options.json) {
-        console.log(JSON.stringify(result, null, 2));
+        const output = JSON.stringify(result, null, 2);
+        console.log(
+          options.redactPaths === true ? redactLocalRoots(output, [workspace.cwd]) : output,
+        );
         return;
       }
 

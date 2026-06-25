@@ -5,8 +5,11 @@ AgentLoopKit includes a read-only MCP stdio server for MCP clients that need loc
 Start it from a repository that already has AgentLoopKit initialized:
 
 ```bash
+npx --yes agentloopkit@latest doctor --redact-paths
 npx --yes agentloopkit@latest mcp-server
 ```
+
+`doctor --redact-paths` checks whether the installed package and generated guidance are ready for the current release. The Agent Readiness Matrix, `agentloop context handles`, and expanded Start/Context readiness checks are available on unreleased `main` and will appear in `agentloopkit@latest` after the next publish.
 
 Example MCP client configuration:
 
@@ -115,18 +118,20 @@ args = ["--yes", "agentloopkit@latest", "mcp-server"]
 
 ### Repo-Pinned Install
 
-If the repo installs AgentLoopKit as a dev dependency, use the local binary shape when your client resolves commands from the repository:
+If the repo installs AgentLoopKit as a dev dependency, use `npx --no-install` so the MCP client resolves the repo-local binary without relying on a global `agentloop` on `PATH`:
 
 ```json
 {
   "mcpServers": {
     "agentloopkit": {
-      "command": "agentloop",
-      "args": ["mcp-server"]
+      "command": "npx",
+      "args": ["--no-install", "agentloop", "mcp-server"]
     }
   }
 }
 ```
+
+Use a bare `agentloop` command only when your MCP client explicitly resolves `node_modules/.bin` from the repository.
 
 ### Client Docs Checked
 
@@ -139,7 +144,9 @@ If the repo installs AgentLoopKit as a dev dependency, use the local binary shap
 
 Run the MCP server from a repository that already has `agentloop.config.json`. The server reads that repo's local AgentLoopKit evidence and returns display-safe paths. It does not initialize the repo for you.
 
-Ask the agent to call `agentloop_start` first when it needs a repo preflight before broad reads. The tool returns the current task when one exists, preflight state, next safe command, read-first handles, risk summary, impact summary, and source handles. Archived, `done`, `deferred`, and AgentFlight placeholder tasks stay as previous evidence. Use lower-level read-only tools such as `agentloop_context_pack`, `agentloop_review_context`, `agentloop_status`, `agentloop_latest_ship_report`, `agentloop_list_runs`, `agentloop_file_intent`, or `agentloop_maintainer_check` when the agent needs more detail.
+Ask the agent to call `agentloop_start` first when it needs a repo preflight before broad reads. The tool returns the current task when one exists, preflight state, next safe command, read-first handles, risk summary, impact summary, and source handles. Archived, `done`, `deferred`, and AgentFlight placeholder tasks stay as previous evidence. Use lower-level read-only tools such as `agentloop_context_handles`, `agentloop_context_pack`, `agentloop_review_context`, `agentloop_status`, `agentloop_latest_ship_report`, `agentloop_list_runs`, `agentloop_file_intent`, or `agentloop_maintainer_check` when the agent needs more detail. Run `agentloop doctor --redact-paths` when you need to confirm the repo guidance tells MCP-capable agents to start there.
+
+`agentloop_context_budget` and `agentloop_context_pack` return compact evidence-map payloads. They include summary, coverage, risk, verification, next actions, claims, and a local `evidence-map:current` expansion handle. They do not include the full changed-file detail by default. Pass `redactPaths: true` when the client may show the payload outside the local machine. Use `agentloop_context_show` with `handle: "evidence-map:current"` when an MCP client needs the full local evidence map.
 
 ## Tools
 
@@ -156,16 +163,17 @@ Ask the agent to call `agentloop_start` first when it needs a repo preflight bef
 | `agentloop_latest_ship_report`         | Latest ship/readiness report metadata and Markdown content                                                                                               |
 | `agentloop_list_runs`                  | Recent local run ledger entries with bounded `limit` input                                                                                               |
 | `agentloop_show_run`                   | One local run ledger entry by run id, including metadata, score JSON, changed files, and diffstat                                                        |
-| `agentloop_file_intent`                | Local run ledger matches for one repo-relative file path                                                                                                 |
+| `agentloop_file_intent`                | Bounded newest-first run ledger matches for one repo-relative file path, with optional `scanLimit` and `matchLimit` controls                             |
 | `agentloop_maintainer_check`           | Local maintainer reviewability checks for agent-assisted changes                                                                                            |
 | `agentloop_check_gates`                | Local review gate status for task, verification, handoff, harness, policy, and git evidence                                                              |
 | `agentloop_artifacts`                  | Local artifact and run-ledger inventory metadata, with optional `type` and `latest` filters                                                              |
 | `agentloop_review_context`             | One reviewability snapshot that combines status, gates, policy status, artifact inventory, recent runs, and latest ship evidence                         |
 | `agentloop_start`                      | Compact software-agent preflight with current task state, next command, evidence, risk summary, context routing, and impact metrics                       |
 | `agentloop_context_budget`             | Local context pressure and compact-pack guidance without running commands                                                                                 |
+| `agentloop_context_handles`            | Local context source-handle inventory with availability, reasons, and expansion commands                                                                  |
 | `agentloop_context_pack`               | Auditable context pack with receipts, context-budget estimates, and source handles                                                                        |
-| `agentloop_context_show`               | Expansion for one local context source handle, such as `task:active` or `evidence-map:current`                                                           |
-| `agentloop_list_handoffs`              | Recent reviewer handoff summaries                                                                                                                        |
+| `agentloop_context_show`               | Expansion for one local context source handle, such as `task:active` or `evidence-map:current`; accepts `redactPaths: true` for shareable output          |
+| `agentloop_list_handoffs`              | Recent reviewer handoff summaries; skips unsafe or oversized Markdown files                                                                               |
 | `agentloop_latest_handoff`             | Latest reviewer handoff Markdown content                                                                                                                 |
 
 ## Safety
@@ -187,8 +195,9 @@ It does not:
 
 It reads the same local AgentLoopKit files that CLI commands such as `status`, `policy`, `ship`, `runs`, and `handoff` already use.
 Run ledger paths exposed through MCP use the same display-safe paths as the CLI: `.agentloop/...` for AgentLoopKit artifacts, repo-relative paths for repo files, and basenames for older outside absolute paths.
-`agentloop_file_intent` reads run ledger metadata and does not read the target file contents.
+`agentloop_file_intent` reads bounded newest-first run evidence and does not read the target file contents. It checks changed-file artifacts before hydrating matching metadata, returns search counts, and accepts optional `scanLimit` and `matchLimit` inputs when an agent needs older or noisier file history.
 `agentloop_review_context` returns metadata and scores only; it does not include full report, handoff, task, or policy Markdown bodies.
+`agentloop_list_handoffs` returns bounded summary metadata and skips handoff Markdown files that are symlinks, no longer regular files, too large to read safely, or disappear during listing. `agentloop_latest_handoff` remains strict for the selected latest handoff content.
 
 ## Registry
 

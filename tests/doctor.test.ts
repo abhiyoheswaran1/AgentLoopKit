@@ -37,7 +37,20 @@ describe('doctor', () => {
       status: 'pass',
       message: 'template version 2 is current',
     });
+    expect(result.checks).toContainEqual({
+      name: 'Agent readiness',
+      status: 'pass',
+      message: 'generated and installed agent guidance is ready',
+    });
+    expect(result.agentReadiness.status).toBe('pass');
+    expect(result.agentReadiness.required.doctorPreflight).toBe(true);
+    expect(result.agentReadiness.required.startPreflight).toBe(true);
+    expect(result.agentReadiness.required.contextHandles).toBe(true);
+    expect(result.agentReadiness.required.broadReadAvoidance).toBe(true);
     expect(result.markdown).toContain('AgentLoopKit Doctor');
+    expect(result.markdown).toContain('## Agent Readiness Matrix');
+    expect(result.markdown).toContain('Codex guidance');
+    expect(result.markdown).toContain('MCP guidance');
   });
 
   test('reports git root context for repository root targets', async () => {
@@ -90,6 +103,89 @@ describe('doctor', () => {
       name: 'AGENTS.md',
       status: 'pass',
       message: 'found',
+    });
+    expect(doctor.agentReadiness.matrix).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'codex', label: 'Codex guidance', status: 'ready' }),
+        expect.objectContaining({ id: 'mcp', label: 'MCP guidance', status: 'documented' }),
+      ]),
+    );
+  });
+
+  test('doctor CLI accepts risk scan caps for large repos', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await mkdir(path.join(dir, 'src'), { recursive: true });
+    await writeFile(path.join(dir, 'src/auth-session.ts'), 'export const session = true;');
+    await writeFile(path.join(dir, 'src/billing.ts'), 'export const billing = true;');
+    await writeFile(path.join(dir, 'src/extra.ts'), 'export const extra = true;');
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'doctor', '--json', '--risk-scan-max-entries', '2'],
+      {
+        cwd: dir,
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(0);
+    const doctor = JSON.parse(result.stdout);
+    expect(doctor.checks).toContainEqual({
+      name: 'Risk file scan',
+      status: 'warn',
+      message: 'Risk scan stopped after 2 entries; review large repos with targeted checks.',
+    });
+  });
+
+  test('doctor CLI rejects non-positive risk scan caps', async () => {
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'doctor', '--risk-scan-max-depth', '0'],
+      {
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('--risk-scan-max-depth must be a positive integer');
+  });
+
+  test('doctor CLI rejects unsafe risk scan caps', async () => {
+    const unsafeCap = '9'.repeat(400);
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'doctor', '--risk-scan-max-entries', unsafeCap],
+      {
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain('--risk-scan-max-entries must be a positive integer');
+  });
+
+  test('doctor CLI prints JSON errors for invalid risk scan caps', async () => {
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'doctor', '--json', '--risk-scan-max-depth', '0'],
+      {
+        reject: false,
+      },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toBe('');
+    expect(JSON.parse(result.stdout)).toEqual({
+      error: {
+        code: 'DOCTOR_OPTION_INVALID',
+        message: expect.stringContaining('--risk-scan-max-depth must be a positive integer'),
+        option: 'risk-scan-max-depth',
+        value: '0',
+        max: 64,
+      },
     });
   });
 
@@ -488,6 +584,162 @@ describe('doctor', () => {
     );
   });
 
+  test('agent readiness does not follow symlinked agent guidance files', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, '.env.local'), 'SECRET_VALUE=do-not-read\n');
+    await rm(path.join(dir, '.agentloop/agents/codex.md'));
+    await symlink(path.join(dir, '.env.local'), path.join(dir, '.agentloop/agents/codex.md'));
+
+    const result = await runDoctor({ cwd: dir });
+    const codex = result.agentReadiness.matrix.find((item) => item.id === 'codex');
+
+    expect(codex).toMatchObject({ status: 'missing' });
+    expect(JSON.stringify(result)).not.toContain('SECRET_VALUE');
+    expect(JSON.stringify(result)).not.toContain('do-not-read');
+  });
+
+  test('strict mode fails when required agent readiness guidance is missing', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await execFileAsync('git', ['config', 'user.email', 'demo@example.invalid'], { cwd: dir });
+    await execFileAsync('git', ['config', 'user.name', 'AgentLoopKit Test'], { cwd: dir });
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'demo-readiness-strict',
+      scripts: {
+        test: 'echo test',
+        lint: 'echo lint',
+        typecheck: 'echo typecheck',
+        build: 'echo build',
+      },
+    });
+    await initializeAgentLoop({ cwd: dir });
+    await execFileAsync('git', ['add', '.'], { cwd: dir });
+    await execFileAsync('git', ['commit', '-m', 'baseline'], { cwd: dir });
+    await rm(path.join(dir, '.agentloop/agents/codex.md'));
+    await execFileAsync('git', ['add', '-u'], { cwd: dir });
+    await execFileAsync('git', ['commit', '-m', 'remove codex guidance'], { cwd: dir });
+
+    const result = await execa(tsxPath, [cliPath, 'doctor', '--strict', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    const output = JSON.parse(result.stdout);
+    expect(output.overallStatus).toBe('fail');
+    expect(output.warnings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'Agent readiness',
+          status: 'warn',
+        }),
+      ]),
+    );
+    expect(output.agentReadiness.matrix).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'codex', status: 'missing', required: true }),
+      ]),
+    );
+  });
+
+  test('agent readiness treats oversized guidance files as missing', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    const oversizedGuidance = [
+      'Run `agentloop start --for codex --goal implement --redact-paths` before broad reads.',
+      'Run `agentloop context show <handle>` only when needed.',
+      'Avoid broad repo reads.',
+      'x'.repeat(270_000),
+    ].join('\n');
+    await writeFile(path.join(dir, '.agentloop/agents/codex.md'), oversizedGuidance);
+
+    const result = await runDoctor({ cwd: dir });
+    const codex = result.agentReadiness.matrix.find((item) => item.id === 'codex');
+
+    expect(codex).toMatchObject({ status: 'missing' });
+  });
+
+  test('agent readiness treats empty installed agent guidance as stale', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, '.agentloop/agents/codex.md'), '');
+
+    const result = await runDoctor({ cwd: dir });
+    const codex = result.agentReadiness.matrix.find((item) => item.id === 'codex');
+
+    expect(result.agentReadiness.status).toBe('warn');
+    expect(codex).toMatchObject({
+      status: 'needs-update',
+      message:
+        'Agent-specific guidance should mention agentloop start, agentloop context handles, agentloop context show, and broad-read avoidance.',
+    });
+  });
+
+  test('stale optional installed agent guidance makes readiness advisory warn', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, '.agentloop/agents/claude-code.md'), 'Read AGENTS.md only.\n');
+
+    const result = await runDoctor({ cwd: dir });
+    const claude = result.agentReadiness.matrix.find((item) => item.id === 'claude-code');
+
+    expect(result.agentReadiness.status).toBe('warn');
+    expect(claude).toMatchObject({ status: 'needs-update', required: false });
+    expect(result.checks).toContainEqual(
+      expect.objectContaining({
+        name: 'Agent readiness',
+        status: 'warn',
+      }),
+    );
+  });
+
+  test('agent readiness requires explicit broad-read avoidance and MCP start guidance', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    const unsafeGuidance = [
+      'Run `agentloop start --for generic --goal implement --redact-paths` before broad repo reads.',
+      'Run `agentloop context show <handle>`.',
+      'Then broad-read everything.',
+      'Start `agentloop mcp-server`.',
+    ].join('\n');
+
+    await writeFile(path.join(dir, 'AGENTS.md'), unsafeGuidance);
+    await writeFile(path.join(dir, 'AGENTLOOP.md'), unsafeGuidance);
+    await writeFile(path.join(dir, '.agentloop/README.md'), unsafeGuidance);
+    await writeFile(path.join(dir, '.agentloop/harness/commands.md'), unsafeGuidance);
+
+    const result = await runDoctor({ cwd: dir });
+
+    expect(result.agentReadiness.required).toMatchObject({
+      doctorPreflight: false,
+      startPreflight: true,
+      contextHandles: false,
+      broadReadAvoidance: false,
+      mcpGuidance: false,
+    });
+
+    const onlyToolGuidance = [
+      'Run `agentloop start --for generic --goal implement --redact-paths` before broad repo reads.',
+      'Run `agentloop context show <handle>`.',
+      'Avoid broad repo reads.',
+      'Ask MCP-capable agents to call `agentloop_start`.',
+    ].join('\n');
+    await writeFile(path.join(dir, 'AGENTS.md'), onlyToolGuidance);
+    await writeFile(path.join(dir, 'AGENTLOOP.md'), onlyToolGuidance);
+    await writeFile(path.join(dir, '.agentloop/README.md'), onlyToolGuidance);
+    await writeFile(path.join(dir, '.agentloop/harness/commands.md'), onlyToolGuidance);
+
+    const onlyToolResult = await runDoctor({ cwd: dir });
+    expect(onlyToolResult.agentReadiness.required.mcpGuidance).toBe(false);
+  });
+
   test('warns when template manifest is stale, invalid, or newer than the CLI', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -659,6 +911,39 @@ describe('doctor', () => {
     expect(result.markdown).not.toContain('do-not-print');
   });
 
+  test('excludes local evidence ledgers from risk file warnings', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initializeAgentLoop({ cwd: dir });
+    await mkdir(path.join(dir, '.agentflight/sessions'), { recursive: true });
+    await mkdir(path.join(dir, '.agentloop/runs/2026-06-24-auth-security'), { recursive: true });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await mkdir(path.join(dir, 'src/auth'), { recursive: true });
+    await writeFile(path.join(dir, '.agentflight/sessions/af-auth-session.json'), '{}');
+    await writeFile(
+      path.join(dir, '.agentloop/runs/2026-06-24-auth-security/metadata.json'),
+      '{}',
+    );
+    await writeFile(path.join(dir, '.agentloop/reports/security-auth-report.json'), '{}');
+    await writeFile(path.join(dir, 'src/auth/session.ts'), 'export const session = true;');
+
+    const result = await runDoctor({ cwd: dir });
+
+    expect(result.checks).toContainEqual({
+      name: 'Potential risk files',
+      status: 'warn',
+      message: '1 risk file(s) detected',
+    });
+    expect(result.checks).toContainEqual({
+      name: 'Risk files: auth',
+      status: 'warn',
+      message: '1 detected: src/auth/session.ts',
+    });
+    expect(result.markdown).not.toContain('.agentflight/sessions/af-auth-session.json');
+    expect(result.markdown).not.toContain('.agentloop/runs/2026-06-24-auth-security/metadata.json');
+    expect(result.markdown).not.toContain('.agentloop/reports/security-auth-report.json');
+  });
+
   test('warns when risk file scanning is truncated', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
@@ -674,6 +959,21 @@ describe('doctor', () => {
       name: 'Risk file scan',
       status: 'warn',
       message: 'Risk scan stopped after 2 entries; review large repos with targeted checks.',
+    });
+    expect(result.checks).toContainEqual({
+      name: 'Potential risk files',
+      status: 'pass',
+      message: 'none detected',
+    });
+    expect(result.nextActions).toContainEqual({
+      id: 'complete-risk-scan',
+      command: 'rerun doctor with higher risk scan caps or review targeted paths',
+      reason: 'Risk-file scanning stopped early; complete targeted checks before autonomous work.',
+    });
+    expect(result.nextActions).not.toContainEqual({
+      id: 'review-risk-files',
+      command: 'review risk files before starting autonomous work',
+      reason: 'Risk files were detected; protect sensitive areas in the task contract before editing.',
     });
   });
 });

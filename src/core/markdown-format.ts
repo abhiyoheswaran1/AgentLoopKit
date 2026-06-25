@@ -17,12 +17,26 @@ export function singleLineInlineCode(content: string) {
   return inlineCode(content.replace(/\r/g, '\\r').replace(/\n/g, '\\n'));
 }
 
-export function escapeMarkdownProse(content: string) {
+function escapeMarkdownText(content: string) {
   return content
     .replace(/\\/g, '\\\\')
-    .replace(/([[\]()*_{}#+!|>])/g, '\\$1')
-    .replace(/^(\s*)([-=])/g, '$1\\$2')
-    .replace(/^(\s*)(\d+)\./g, '$1$2\\.');
+    .replace(/^(\s*)>/gm, '$1\\>')
+    .replace(/([[\]()*_{}#+!|])/g, '\\$1')
+    .replace(/^(\s*)([-=])/gm, '$1\\$2')
+    .replace(/^(\s*)(\d+)\./gm, '$1$2\\.');
+}
+
+export function escapeMarkdownProse(content: string) {
+  let escaped = '';
+  let cursor = 0;
+  const inlineCodePattern = /(`+)([\s\S]*?)\1/g;
+  for (const match of content.matchAll(inlineCodePattern)) {
+    escaped += escapeMarkdownText(content.slice(cursor, match.index));
+    escaped += match[0];
+    cursor = (match.index ?? 0) + match[0].length;
+  }
+  escaped += escapeMarkdownText(content.slice(cursor));
+  return escaped;
 }
 
 export function fencedCodeBlock(info: string, content: string) {

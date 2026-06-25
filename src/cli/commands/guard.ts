@@ -2,6 +2,8 @@ import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
 import {
   buildGuardSnapshot,
+  compactGuardSnapshot,
+  compactGuardWatchResult,
   GuardBaselineError,
   renderGuardMarkdown,
   runGuardWatch,
@@ -15,6 +17,7 @@ import {
   printAgentLoopJsonError,
   printOutputPathJsonError,
 } from '../json-errors.js';
+import { redactLocalRoots } from '../../core/redaction.js';
 
 const DEFAULT_INTERVAL_MS = 2000;
 
@@ -51,6 +54,11 @@ function setStrictExitCode(snapshots: GuardSnapshot[]) {
   if (snapshots.some(shouldFailStrict)) process.exitCode = 1;
 }
 
+function stringifyGuardJson(value: unknown, cwd: string, redactPaths: boolean | undefined) {
+  const output = JSON.stringify(value, null, 2);
+  return redactPaths === true ? redactLocalRoots(output, [cwd]) : output;
+}
+
 export function guardCommand() {
   return new Command('guard')
     .description('Check local drift, proof debt, and context-budget pressure')
@@ -63,6 +71,7 @@ export function guardCommand() {
     .option('--baseline <path>', 'compare current changed files with a Guard baseline')
     .option('--write-baseline <path>', 'write current changed files to a Guard baseline JSON file')
     .option('--json', 'print machine-readable output')
+    .option('--compact', 'with --json, omit full changed-file evidence and include an expandable handle')
     .option('--redact-paths', 'redact local absolute paths in public output')
     .action(
       async (options: {
@@ -75,6 +84,7 @@ export function guardCommand() {
         baseline?: string;
         writeBaseline?: string;
         json?: boolean;
+        compact?: boolean;
         redactPaths?: boolean;
       }) => {
         let intervalMs: number;
@@ -115,7 +125,15 @@ export function guardCommand() {
                     console.log(renderGuardMarkdown(snapshot));
                   },
             });
-            if (options.json) console.log(JSON.stringify(watch, null, 2));
+            if (options.json) {
+              console.log(
+                stringifyGuardJson(
+                  options.compact ? compactGuardWatchResult(watch) : watch,
+                  workspace.cwd,
+                  options.redactPaths,
+                ),
+              );
+            }
             setStrictExitCode(watch.snapshots);
             return;
           }
@@ -164,7 +182,15 @@ export function guardCommand() {
             };
           }
 
-          if (options.json) console.log(JSON.stringify(snapshot, null, 2));
+          if (options.json) {
+            console.log(
+              stringifyGuardJson(
+                options.compact ? compactGuardSnapshot(snapshot) : snapshot,
+                workspace.cwd,
+                options.redactPaths,
+              ),
+            );
+          }
           else console.log(renderGuardMarkdown(snapshot));
           setStrictExitCode([snapshot]);
         } catch (error) {

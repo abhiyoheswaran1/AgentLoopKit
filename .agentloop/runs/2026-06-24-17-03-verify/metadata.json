@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-17-03-verify",
+  "command": "verify",
+  "createdAt": "2026-06-24-17-03",
+  "createdAtEpochMs": 1782313392993,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-prove-agentloop-start-usefulness-2.md",
+    "title": "Prove AgentLoop Start usefulness",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-17-02-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 17
+}

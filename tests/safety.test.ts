@@ -38,6 +38,39 @@ describe('safety scanning', () => {
     expect(risks.security).toEqual([]);
   });
 
+  test('ignores local evidence ledgers while preserving real source risk files', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await mkdir(path.join(dir, '.agentflight/sessions'), { recursive: true });
+    await mkdir(path.join(dir, '.agentflight/evidence/af-auth-review'), { recursive: true });
+    await mkdir(path.join(dir, '.agentloop/runs/2026-06-24-auth-security'), { recursive: true });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+    await mkdir(path.join(dir, 'src/auth'), { recursive: true });
+    await mkdir(path.join(dir, 'src/security'), { recursive: true });
+    await writeFile(path.join(dir, '.agentflight/sessions/af-auth-session.json'), '{}');
+    await writeFile(
+      path.join(dir, '.agentflight/evidence/af-auth-review/security-output.json'),
+      '{}',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/runs/2026-06-24-auth-security/metadata.json'),
+      '{}',
+    );
+    await writeFile(path.join(dir, '.agentloop/reports/security-auth-report.json'), '{}');
+    await writeFile(path.join(dir, '.agentloop/tasks/archive/auth-security-task.json'), '{}');
+    await writeFile(path.join(dir, 'src/auth/session.ts'), 'export const session = true;');
+    await writeFile(
+      path.join(dir, 'src/security/permissions.ts'),
+      'export const permissions = true;',
+    );
+
+    const risks = await detectRiskFiles(dir);
+
+    expect(risks.auth).toEqual(['src/auth/session.ts']);
+    expect(risks.security).toEqual(['src/security/permissions.ts']);
+  });
+
   test('ignores documentation and template markdown when scanning semantic risk categories', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

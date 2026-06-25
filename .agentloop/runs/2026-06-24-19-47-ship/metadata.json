@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-24-19-47-ship",
+  "command": "ship",
+  "createdAt": "2026-06-24-19-47",
+  "createdAtEpochMs": 1782323222191,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-add-context-handle-inventory.md",
+    "title": "Add context handle inventory",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-19-45-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-24-19-47-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-24-19-47-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 115
+}

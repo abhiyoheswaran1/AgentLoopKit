@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-24-20-53-verify",
+  "command": "verify",
+  "createdAt": "2026-06-24-20-53",
+  "createdAtEpochMs": 1782327204544,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-24-compact-review-context-evidence-payload.md",
+    "title": "Compact review-context evidence payload",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-24-20-52-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 203
+}

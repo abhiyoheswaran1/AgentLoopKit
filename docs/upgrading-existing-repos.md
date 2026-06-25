@@ -19,7 +19,7 @@ npx --yes agentloopkit@latest init --dry-run
 Read the output before changing files.
 
 - `doctor` checks setup health, commands, Git root, risk files, and stale agent guidance.
-- `upgrade-harness --details` prints copyable guidance for current-loop topics missing from local generated files, including `agentloop start` and `agentloop context show <handle>`.
+- `upgrade-harness --details` prints copyable guidance for current-loop topics missing from local generated files. The exact topics come from the installed CLI; this repository may document newer unreleased topics such as `agentloop context handles` before they are available in `agentloopkit@latest`.
 - `init --dry-run` shows missing generated files without writing.
 
 Human `upgrade-harness` output keeps dynamic paths on one Markdown line. JSON output keeps raw values for scripts.
@@ -88,6 +88,11 @@ npx --yes agentloopkit@latest upgrade-harness --details
 
 Copy only the guidance that matches your repo. Current guidance should mention:
 
+- `agentloop doctor`
+- `agentloop start`
+- `agentloop context handles`
+- `agentloop context show`
+- broad-read avoidance
 - `agentloop ship`
 - `agentloop prepare-pr`
 - `.agentloop/runs/`, `agentloop runs`, or `agentloop intent`

@@ -1,0 +1,15 @@
+ .agentloop/README.md                             |  2 +
+ .agentloop/loops/research.md                     | 14 +++-
+ README.md                                        |  2 +
+ docs/cli-reference.md                            |  2 +-
+ docs/context.md                                  |  4 +
+ docs/research.md                                 | 24 ++++++
+ src/core/agent-start.ts                          | 97 +++++++++++++++++++++++-
+ src/core/upgrade-harness.ts                      |  4 +-
+ src/templates/loops/research.md                  | 14 +++-
+ src/templates/root/agentloop-directory-readme.md |  2 +-
+ tests/agent-start.test.ts                        | 15 ++++
+ tests/upgrade-harness.test.ts                    | 22 ++++++
+ 12 files changed, 195 insertions(+), 7 deletions(-)
+docs/start-usefulness-demo.md | untracked
+docs/superpowers/plans/2026-06-24-agentloop-start-usefulness-proof.md | untracked

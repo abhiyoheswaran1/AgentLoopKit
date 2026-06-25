@@ -27,8 +27,21 @@ function isSemanticRiskCandidate(file: string) {
   return true;
 }
 
+function isLocalEvidenceLedgerPath(file: string) {
+  return (
+    file.startsWith('.agentflight/') ||
+    file === '.agentloop/state.json' ||
+    file.startsWith('.agentloop/handoffs/') ||
+    file.startsWith('.agentloop/reports/') ||
+    file.startsWith('.agentloop/runs/') ||
+    file.startsWith('.agentloop/tasks/')
+  );
+}
+
 function categorizeRiskFiles(cwd: string, absoluteFiles: string[]): RiskFiles {
-  const files = absoluteFiles.map((file) => relative(cwd, file));
+  const files = absoluteFiles
+    .map((file) => relative(cwd, file))
+    .filter((file) => !isLocalEvidenceLedgerPath(file));
   const semanticIncludes = (needles: string[]) =>
     files.filter(
       (file) =>
