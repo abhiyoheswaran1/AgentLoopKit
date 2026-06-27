@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "projscan-assessment",
+  "producer": {
+    "name": "projscan",
+    "version": "0.7.0"
+  },
+  "taskId": "auth-password-reset-20260626-01",
+  "intent": "Implement password reset",
+  "generatedAt": "2026-06-26T09:00:00.000Z",
+  "repository": {
+    "root": ".",
+    "branch": "main",
+    "commit": "abc1234"
+  },
+  "verdict": "caution",
+  "summary": "Password reset touches token lifecycle and user-facing auth flows.",
+  "repositoryType": "typescript-package",
+  "impactedAreas": [
+    {
+      "name": "auth",
+      "paths": ["src/auth/**", "tests/auth/**"],
+      "reason": "Password reset implementation and coverage live here."
+    }
+  ],
+  "reviewFocus": [
+    {
+      "path": "src/auth/password-reset.ts",
+      "priority": "high",
+      "reasons": ["Review token expiry and one-time-use handling."]
+    }
+  ],
+  "risks": [
+    {
+      "id": "PS-WARN-1",
+      "severity": "warning",
+      "category": "security",
+      "message": "Reset token handling is security-sensitive.",
+      "files": ["src/auth/password-reset.ts"],
+      "suggestedAction": "Review token expiry and reuse prevention."
+    },
+    {
+      "id": "PS-INFO-1",
+      "severity": "info",
+      "category": "docs",
+      "message": "User-facing auth docs may need an update.",
+      "files": ["docs/auth.md"]
+    }
+  ],
+  "suggestedChecks": [
+    {
+      "command": "pnpm test -- tests/auth/password-reset.test.ts",
+      "reason": "Covers reset token behavior.",
+      "required": true
+    },
+    {
+      "command": "pnpm lint",
+      "reason": "Keeps changed auth code lint-clean.",
+      "required": false
+    }
+  ],
+  "artifacts": [
+    {
+      "kind": "report",
+      "path": ".baseframe/evidence/auth-password-reset-20260626-01/projscan-report.md"
+    }
+  ]
+}

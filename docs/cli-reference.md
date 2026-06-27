@@ -100,6 +100,9 @@ agentloop create-task --type feature --title "Add settings page" \
 agentloop create-task --type bugfix --title "Fix release guard" \
   --verification "npm test -- tests/prepublish-check.test.ts" \
   --post-verification "npm run dogfood:strict"
+agentloop create-task \
+  --from-projscan .baseframe/evidence/auth-password-reset-20260626-01/projscan-assessment.json \
+  --acceptance "Reset tokens expire"
 ```
 
 Supported task types are `feature`, `bugfix`, `refactor`, `tests`, `test-generation`, `research`, `docs`, `release`, `security-review`, `dependency-upgrade`, and `migration`.
@@ -121,6 +124,8 @@ Task verification command list items may be written as plain Markdown list text 
 When a `--verification` command looks like a post-verification gate, `create-task` prints a warning and JSON output includes a `warnings` array. AgentLoopKit does not move commands between sections; the warning tells you when to use `--post-verification`.
 
 Use `--include-config-commands` to copy non-empty `test`, `lint`, `typecheck`, and `build` commands from `agentloop.config.json` into the contract's `Verification Commands` section. AgentLoopKit de-duplicates exact command strings and does not run those commands during task creation.
+
+Use `--from-projscan <path>` to create or update a native AgentLoopKit task from a Baseframe ProjScan assessment. AgentLoopKit validates the artifact, maps impacted areas to likely scope, maps suggested checks to verification gates, writes `.baseframe/evidence/<task-id>/agentloopkit-task.json`, and updates `.baseframe/agent-workflow.json`. ProjScan does not provide complete acceptance criteria; pass `--acceptance` values or AgentLoopKit writes an explicit unknown placeholder and keeps the Baseframe contract in `draft` status.
 
 ## Task State
 
@@ -467,6 +472,9 @@ agentloop check-gates
 agentloop check-gates --json
 agentloop check-gates --strict
 agentloop check-gates --redact-paths
+agentloop check-gates \
+  --task auth-password-reset-20260626-01 \
+  --from-agentflight .baseframe/evidence/auth-password-reset-20260626-01/agentflight-result.json
 ```
 
 `check-gates` checks review evidence without running tests. It looks for task evidence, current verification evidence, handoff evidence, task-folder hygiene, harness files, policy files, and Git context.
@@ -480,6 +488,8 @@ If the working tree has dirty files and the latest review-evidence run does not 
 If dirty files are already covered by handoff or ship evidence for the active non-terminal task, `check-gates` recommends `agentloop task done`. If covered evidence belongs to an archived or completed task, it recommends `agentloop create-task` for the next focused task.
 
 When `check-gates` recommends `agentloop create-task` while dirty non-evidence files already exist, the next-action reason includes a bounded set of repo-relative examples from Git status. AgentLoop evidence-only dirty files are excluded from those examples.
+
+Use `--task <task-id> --from-agentflight <path>` to reconcile a Baseframe AgentFlight result against `.baseframe/evidence/<task-id>/agentloopkit-task.json`. This mode matches verification commands to required gates, surfaces failed, missing, incomplete, and scope-drift evidence, and updates the JSON task contract without requiring AgentFlight for normal standalone gate checks.
 
 Warnings keep exit code `0` by default. Use `--strict` in CI when warning gates should fail.
 

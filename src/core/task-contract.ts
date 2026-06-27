@@ -21,6 +21,7 @@ export type TaskType =
 export type TaskContractInput = {
   title: string;
   type: TaskType;
+  status?: 'proposed' | 'in-progress' | 'blocked' | 'deferred' | 'review' | 'done';
   createdDate?: string;
   problemStatement?: string;
   desiredOutcome?: string;
@@ -131,7 +132,7 @@ export function generateTaskContract(input: TaskContractInput) {
 
 - Created date: ${createdDate}
 - Task type: ${input.type}
-- Status: proposed
+- Status: ${input.status ?? 'proposed'}
 
 ## Problem Statement
 ${input.problemStatement || PROBLEM_STATEMENT_PLACEHOLDER}

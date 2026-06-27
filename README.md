@@ -14,6 +14,10 @@ It gives Codex, Claude Code, Cursor, OpenCode, Gemini CLI, GitHub Copilot CLI, a
 
 Unstructured automation produces code. Agentic engineering produces auditable work.
 
+ProjScan finds the risk.
+AgentLoopKit controls the work.
+AgentFlight proves the result.
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-showcase.png" alt="AgentLoopKit workflow showing task contracts, verification reports, and handoff artifacts" width="100%">
 </p>
@@ -328,6 +332,8 @@ agentloop task archive --status done
 ```
 
 See [docs/cli-reference.md](docs/cli-reference.md) for command examples, JSON modes, and safety notes.
+
+See [Baseframe Suite Integration v1](docs/integrations/baseframe-suite-v1.md) for the local JSON handoff between ProjScan, AgentLoopKit, and AgentFlight.
 
 Maintainers can run a faster focused sanity set while iterating:
 

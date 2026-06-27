@@ -1,43 +1,40 @@
 # Release Status
 
-Last checked: June 25, 2026.
+Last checked: June 27, 2026.
 
 ## Current State
 
-- GitHub release `v0.43.0` is public.
-- npm latest is `agentloopkit@0.43.0`.
-- GHCR and MCP Registry are live for `0.43.0`.
+- GitHub release `v0.44.0` is public.
+- npm latest is `agentloopkit@0.44.0`.
+- GHCR and MCP Registry are live for `0.44.0`.
 - GitHub Marketplace listing is pending owner UI publication for the composite Action.
-- Release tag `v0.43.0` points at the published release commit.
-- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.43.0>
-- Release asset: `agentloopkit-0.43.0.tgz`
-- Release asset SHA-256: `73a3398543146ce97e391345df2a41f9b2323a08880309964ff1eaac8427455e`
-- Release commit: `22e8b89520da84bf5eaa617ec9e2ce6f9367c678`
-- Post-release smoke-fix commit: `8db2805c3ac154f8ff83bae00f47cb3f74bde846`
-- CI run for release commit: `28160014887` passed.
-- CI run for the smoke-fix commit: `28160682228` passed.
-- CLI Smoke run for release commit: `28160015187` failed because the stale-artifact smoke fixture omitted required run metadata. The product behavior was correct; the fixture was fixed in post-release smoke-fix commit `8db2805c`.
-- CLI Smoke run for the smoke-fix commit: `28160682240` passed on Linux, macOS, and Windows.
-- Publish workflow run: `28160043176` passed.
-- Docker workflow run: `28160043174` passed.
-- MCP Registry workflow run: `28160527170` passed.
+- Release tag `v0.44.0` points at the published release commit.
+- Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.44.0>
+- Release asset: `agentloopkit-0.44.0.tgz`
+- Release asset SHA-256: `992e05ab92e0d9a8959711ea37213aeafd3acee98be9303e171297d98daa5dd8`
+- Release commit: pending post-release proof.
+- CI run for release commit: pending post-release proof.
+- CLI Smoke run for release commit: pending post-release proof.
+- Publish workflow run: pending post-release proof.
+- Docker workflow run: pending post-release proof.
+- MCP Registry workflow run: pending post-release proof.
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
-GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirmed the `0.43.0` image.
+GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirmed the `0.44.0` image.
 
-The MCP Registry metadata points at npm package `agentloopkit@0.43.0`.
+The MCP Registry metadata points at npm package `agentloopkit@0.44.0`.
 
-GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 25, 2026.
+GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 27, 2026.
 
 ## Latest Release Highlights
 
-Released in `0.43.0`:
+Released in `0.44.0`:
 
-- `agentloop context handles` lists available source handles, reasons, and exact expansion commands.
-- `agentloop start` now shows a usefulness proof with estimated context avoided, broad files avoided, stale proof, scope drift, source handles, verification freshness, and the next safe command.
-- `agentloop doctor` reports the Agent Readiness Matrix for Start guidance, context handles, broad-read avoidance, MCP guidance, and installed agent instructions.
-- `agentloop guard --json --compact` returns bounded evidence-map data and handle expansion guidance for large dirty repos.
-- Review context, context packs, MCP payloads, and run-ledger lookups avoid broad evidence dumps by default and point agents to source handles.
+- `agentloopkit create-task --from-projscan` consumes Baseframe ProjScan assessment artifacts and creates native AgentLoopKit tasks from the same normalized source as the emitted JSON contract.
+- AgentLoopKit emits `.baseframe/evidence/<task-id>/agentloopkit-task.json` with scope, review-first files, acceptance criteria, verification gates, risks, and source-assessment metadata for AgentFlight.
+- `agentloopkit check-gates --task <task-id> --from-agentflight` reconciles AgentFlight verification results, missing or failed gates, incomplete proof, proof gaps, and scope drift without auto-completing the task.
+- The package exports Baseframe v1 schemas, types, `createTaskFromProjScan`, and `evaluateAgentFlightResult`.
+- Baseframe integration docs and regression fixtures cover ProjScan import, manifest preservation, AgentFlight gate mapping, standalone compatibility, and safe writes.
 
 ## Use The Current CLI
 
@@ -46,7 +43,7 @@ npm is the primary install path:
 ```bash
 npx agentloopkit init
 tmp=$(mktemp -d)
-(cd "$tmp" && npx --yes agentloopkit@0.43.0 version)
+(cd "$tmp" && npx --yes agentloopkit@0.44.0 version)
 ```
 
 GitHub release tarballs remain useful for provenance checks and rollback, but normal users should use npm or npx.
@@ -70,24 +67,23 @@ After each publish:
 
 ## Verification Evidence
 
-Local release gate for `0.43.0`:
+Local release gate for `0.44.0`:
 
-- Release-flow component commands passed on release commit `22e8b895`: prepublish check, lint, typecheck, full tests, build, public-doc hygiene, link check, dogfood, and release smoke.
-- `agentloop release-check --strict --redact-paths`: passed on release commit `22e8b895`
-- `npx --yes projscan doctor --format markdown`: A/90 with the known reviewed `prepublishOnly` advisory
-- `npm test -- tests/artifacts.test.ts`: passed after the post-release smoke-fixture fix, 37 tests
+- `npm run release-flow`: passed locally, including prepublish check, lint, typecheck, full tests, build, public-doc hygiene, link check, dogfood, and release smoke.
+- `npx --yes projscan doctor --format markdown`: A/90 with the known reviewed `prepublishOnly` advisory.
+- `agentloop verify`, strict dogfood, and strict release-check: pending final pre-publish proof.
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: latest is `0.43.0`, and the versions list contains `0.43.0`
+- `npm view agentloopkit version versions --json`: latest is `0.44.0`, and the versions list contains `0.44.0`
 - `agentloop npm-status --agentloopkit --expect-current`: passed; npm latest matches local package version
-- `npm run smoke:published -- --version 0.43.0`: passed
-- clean temporary published-package version check: `0.43.0`
-- GitHub release asset digest: `sha256:73a3398543146ce97e391345df2a41f9b2323a08880309964ff1eaac8427455e`
+- `npm run smoke:published -- --version 0.44.0`: passed
+- clean temporary published-package version check: `0.44.0`
+- GitHub release asset digest: `sha256:992e05ab92e0d9a8959711ea37213aeafd3acee98be9303e171297d98daa5dd8`
 - `agentloop release-proof --redact-paths`: passed for npm, GitHub Release, GHCR, and MCP Registry; warned for GitHub Marketplace
 - `node dist/cli/index.js release-proof --strict --only github-marketplace --redact-paths`: expected to fail while Marketplace publication remains deferred
-- GHCR image tag `0.43.0`: confirmed
-- MCP Registry metadata points at `agentloopkit@0.43.0`: confirmed
+- GHCR image tag `0.44.0`: confirmed
+- MCP Registry metadata points at `agentloopkit@0.44.0`: confirmed
 
 Latest release-status documentation and proof commands on post-release `main`:
 

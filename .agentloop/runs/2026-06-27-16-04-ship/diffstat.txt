@@ -1,0 +1,23 @@
+ CHANGELOG.md                    |  8 ++++
+ DECISIONS.md                    |  8 ++++
+ FINAL_HANDOFF.md                | 48 +++++++++++++---------
+ README.md                       |  6 +++
+ ROADMAP.md                      | 11 ++---
+ docs/check-gates.md             |  5 +++
+ docs/cli-reference.md           | 10 +++++
+ docs/npm-publishing.md          | 10 ++---
+ docs/release-status.md          | 72 +++++++++++++++-----------------
+ docs/task-contracts.md          |  4 ++
+ package.json                    |  6 ++-
+ server.json                     |  4 +-
+ src/cli/commands/check-gates.ts | 91 ++++++++++++++++++++++++++++++++++++++++-
+ src/cli/commands/create-task.ts | 81 +++++++++++++++++++++++++++++++++++-
+ src/core/task-contract.ts       |  3 +-
+ tsup.config.ts                  |  1 +
+ 16 files changed, 293 insertions(+), 75 deletions(-)
+docs/integrations/baseframe-suite-v1.md | untracked
+src/core/baseframe.ts | untracked
+src/index.ts | untracked
+test/fixtures/baseframe/agentflight-result.json | untracked
+test/fixtures/baseframe/projscan-assessment.json | untracked
+tests/baseframe.test.ts | untracked

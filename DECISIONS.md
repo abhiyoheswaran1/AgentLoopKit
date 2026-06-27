@@ -1,5 +1,13 @@
 # Decisions
 
+## 2026-06-26: Baseframe Suite Uses Local Versioned JSON Boundaries
+
+AgentLoopKit needs to participate in the Baseframe Suite workflow without merging product internals. The integration boundary is local JSON under `.baseframe/`: ProjScan writes `projscan-assessment.json`, AgentLoopKit writes `agentloopkit-task.json`, and AgentFlight writes `agentflight-result.json`.
+
+`create-task --from-projscan` validates the ProjScan v1 artifact, creates or updates the native AgentLoopKit task through the existing task contract generator, derives the machine-readable task contract from the same normalized input, and updates only AgentLoopKit's workflow-manifest section plus timestamps. If humans have not supplied acceptance criteria, the contract remains draft with an explicit unknown criterion.
+
+`check-gates --task <id> --from-agentflight <path>` is a read-side reconciliation path. It matches AgentFlight verification commands against AgentLoopKit gates, surfaces missing, failed, incomplete, proof-gap, and scope-drift evidence, and updates the JSON task contract without marking the native task complete. Standalone AgentLoopKit commands still work without ProjScan or AgentFlight, and no dependencies, versions, tags, publish flows, or external service calls changed.
+
 ## 2026-06-24: Harness Readiness Requires Start And Source Handles
 
 Existing repos can keep generated guidance that mentions review-readiness commands but does not tell software agents how to start from the current repo truth. `upgrade-harness` should audit that gap instead of adding another setup command.

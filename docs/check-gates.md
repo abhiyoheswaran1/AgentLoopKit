@@ -21,6 +21,9 @@ agentloop check-gates
 agentloop check-gates --json
 agentloop check-gates --strict
 agentloop check-gates --redact-paths
+agentloop check-gates \
+  --task auth-password-reset-20260626-01 \
+  --from-agentflight .baseframe/evidence/auth-password-reset-20260626-01/agentflight-result.json
 ```
 
 Use `--redact-paths` before pasting gate output into a public issue, PR, or CI log. It replaces the absolute Git root with `[git-root]` while preserving repo-relative AgentLoop artifact paths.
@@ -51,6 +54,8 @@ agentloop check-gates --strict --json
 Strict mode preserves each gate status in the output, but it reports overall status `fail` when any gate is `warn`.
 
 With `--json`, invalid `agentloop.config.json` files return a `CONFIG_ERROR` object.
+
+With `--task <task-id> --from-agentflight <path>`, `check-gates` reads a Baseframe AgentFlight result and reconciles it against `.baseframe/evidence/<task-id>/agentloopkit-task.json`. It updates the task contract gate statuses and surfaces missing, failed, incomplete, proof-gap, and scope-drift evidence as risks. Standalone `check-gates` does not require AgentFlight.
 
 Use `agentloop doctor` for setup health. Use `agentloop check-gates` after implementation, verification, and handoff to see whether the work has the evidence reviewers expect.
 

@@ -4,6 +4,14 @@
 
 - No unreleased changes yet.
 
+## 0.44.0
+
+- Added Baseframe Suite Integration v1 so `agentloopkit create-task --from-projscan` consumes local ProjScan assessment artifacts, validates schema and path safety, creates or updates the native AgentLoopKit task, emits `.baseframe/evidence/<task-id>/agentloopkit-task.json`, and updates `.baseframe/agent-workflow.json`.
+- Added AgentFlight result reconciliation to `agentloopkit check-gates --task <task-id> --from-agentflight`, including verification command matching, missing or failed required-gate detection, incomplete verification surfacing, proof-gap notes, and scope-drift findings without auto-completing the task.
+- Added exported Baseframe integration types and package API functions for ProjScan assessments, AgentLoopKit task contracts, AgentFlight results, task creation, and gate evaluation.
+- Updated Baseframe integration docs, README positioning, CLI reference, task-contract docs, and check-gates docs with the local JSON handoff flow.
+- Added fixtures and regression coverage for ProjScan import validation, native task and JSON contract consistency, manifest preservation, AgentFlight gate mapping, standalone compatibility, and path-traversal protection.
+
 ## 0.43.0
 
 - Added `agentloop context handles` for a source-handle inventory with availability, reasons, and expansion commands.

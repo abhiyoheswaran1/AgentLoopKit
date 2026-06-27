@@ -1,0 +1,11 @@
+ DECISIONS.md                    |  8 ++++
+ README.md                       |  6 +++
+ docs/check-gates.md             |  5 +++
+ docs/cli-reference.md           | 10 +++++
+ docs/task-contracts.md          |  4 ++
+ package.json                    |  4 +-
+ src/cli/commands/check-gates.ts | 91 ++++++++++++++++++++++++++++++++++++++++-
+ src/cli/commands/create-task.ts | 81 +++++++++++++++++++++++++++++++++++-
+ src/core/task-contract.ts       |  3 +-
+ tsup.config.ts                  |  1 +
+ 10 files changed, 208 insertions(+), 5 deletions(-)

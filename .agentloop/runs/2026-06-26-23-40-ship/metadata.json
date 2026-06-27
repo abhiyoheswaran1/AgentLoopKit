@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-26-23-40-ship",
+  "command": "ship",
+  "createdAt": "2026-06-26-23-40",
+  "createdAtEpochMs": 1782510030455,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-26-baseframe-suite-integration-v1.md",
+    "title": "Implement Baseframe Suite Integration v1",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-26-23-30-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-26-23-40-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-26-23-40-pr-summary-2.md",
+  "score": 96,
+  "changedFileCount": 23
+}

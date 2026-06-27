@@ -1,6 +1,8 @@
 import path from 'node:path';
+import { readFile } from 'node:fs/promises';
 import { Command } from 'commander';
 import prompts from 'prompts';
+import { createTaskFromProjScan } from '../../core/baseframe.js';
 import { AgentLoopConfig } from '../../core/config.js';
 import { TASK_TYPES } from '../../core/constants.js';
 import { AgentLoopError } from '../../core/errors.js';
@@ -14,7 +16,7 @@ import {
   TaskOutputPathError,
   TaskType,
 } from '../../core/task-contract.js';
-import { setActiveTask } from '../../core/task-state.js';
+import { getActiveTask, setActiveTask } from '../../core/task-state.js';
 import { loadWorkspaceForJsonCommand } from '../json-errors.js';
 
 function lines(value: string | undefined, previous: string[]) {
@@ -182,6 +184,21 @@ function dirtyWorktreeRiskNotes(warnings: CreateTaskWarning[]) {
   ];
 }
 
+const BASEFRAME_ACCEPTANCE_WARNING = {
+  code: 'BASEFRAME_ACCEPTANCE_CRITERIA_REQUIRED',
+  message:
+    'ProjScan assessments do not provide complete acceptance criteria. Add human acceptance criteria before treating this task as ready.',
+} as const;
+
+function baseframeAcceptanceWarnings(contract: Awaited<ReturnType<typeof createTaskFromProjScan>>) {
+  if (!contract.acceptanceCriteria.some((criterion) => criterion.status === 'unknown')) return [];
+  return [BASEFRAME_ACCEPTANCE_WARNING];
+}
+
+function baseframeContractPath(taskId: string) {
+  return `.baseframe/evidence/${taskId}/agentloopkit-task.json`;
+}
+
 function resolveTaskType(value: unknown) {
   if (typeof value !== 'string') return undefined;
   const type = value.trim();
@@ -310,6 +327,7 @@ export function createTaskCommand() {
     .description('Create a task contract for an agentic engineering session')
     .option('--title <title>', 'task title')
     .option('--type <type>', 'task type')
+    .option('--from-projscan <path>', 'create a Baseframe task from a ProjScan assessment')
     .option('--out <path>', 'output file path')
     .option('--problem <text>', 'problem statement')
     .option('--problem-statement <text>', 'problem statement')
@@ -319,6 +337,7 @@ export function createTaskCommand() {
     .option('--non-goal <text>', 'non-goal; repeat or use newlines', lines, [])
     .option('--assumption <text>', 'assumption; repeat or use newlines', lines, [])
     .option('--likely-file <path>', 'likely file or area; repeat or use newlines', lines, [])
+    .option('--allow <path>', 'Baseframe allowed path override; repeat or use newlines', lines, [])
     .option(
       '--forbidden-file <path>',
       'file or area not to touch; repeat or use newlines',
@@ -365,6 +384,66 @@ export function createTaskCommand() {
       const title = typeof options.title === 'string' ? options.title : undefined;
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json === true);
       if (!workspace) return;
+      const fromProjScan = stringOption(options, 'fromProjscan', 'fromProjScan');
+      if (fromProjScan) {
+        try {
+          const contract = await createTaskFromProjScan({
+            cwd: workspace.cwd,
+            config: workspace.config,
+            assessmentPath: fromProjScan,
+            title,
+            allowedPaths: listOption(options, 'allow'),
+            acceptanceCriteria: listOption(options, 'acceptance'),
+          });
+          const warnings = baseframeAcceptanceWarnings(contract);
+          const activeTask = await getActiveTask({
+            cwd: workspace.cwd,
+            config: workspace.config,
+          });
+          const nativeTaskPath = contract.nativeTaskPath
+            ? path.resolve(workspace.cwd, contract.nativeTaskPath)
+            : undefined;
+          const task = nativeTaskPath
+            ? { path: nativeTaskPath, markdown: await readFile(nativeTaskPath, 'utf8') }
+            : undefined;
+
+          if (options.json) {
+            console.log(
+              JSON.stringify(
+                {
+                  baseframeTask: contract,
+                  ...(task ? { task } : {}),
+                  activeTask,
+                  ...(warnings.length ? { warnings } : {}),
+                },
+                null,
+                2,
+              ),
+            );
+            return;
+          }
+
+          const contractPath = baseframeContractPath(contract.taskId);
+          console.log(`Baseframe task contract created: ${inlineCode(contractPath)}`);
+          if (contract.nativeTaskPath) {
+            console.log(`Native task: ${inlineCode(contract.nativeTaskPath)}`);
+          }
+          if (activeTask) {
+            console.log(`Active task set: ${inlineCode(activeTask.path)}`);
+          }
+          console.log(`AgentFlight should consume: ${inlineCode(contractPath)}`);
+          for (const warning of warnings) {
+            console.log(`Warning: ${warning.message}`);
+          }
+          return;
+        } catch (error) {
+          if (options.json && error instanceof AgentLoopError) {
+            printJsonError(error);
+            return;
+          }
+          throw error;
+        }
+      }
       const preCreateWarnings = await dirtyWorktreeWarnings(workspace.cwd);
       const input =
         title && type

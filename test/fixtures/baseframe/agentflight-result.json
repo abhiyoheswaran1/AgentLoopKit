@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "agentflight-result",
+  "producer": {
+    "name": "agentflight",
+    "version": "0.5.0"
+  },
+  "taskId": "auth-password-reset-20260626-01",
+  "generatedAt": "2026-06-26T10:00:00.000Z",
+  "readiness": "ready_for_review",
+  "changedFiles": ["src/auth/password-reset.ts", "tests/auth/password-reset.test.ts"],
+  "scopeDrift": [],
+  "verification": [
+    {
+      "command": "pnpm test -- tests/auth/password-reset.test.ts",
+      "status": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "pnpm lint",
+      "status": "passed",
+      "exitCode": 0
+    }
+  ],
+  "proofGaps": [],
+  "reviewFocus": [
+    {
+      "path": "src/auth/password-reset.ts",
+      "priority": "high",
+      "reasons": ["Review token expiry and one-time-use handling."]
+    }
+  ],
+  "artifacts": [
+    {
+      "kind": "report",
+      "path": ".baseframe/evidence/auth-password-reset-20260626-01/agentflight-report.md"
+    }
+  ]
+}
