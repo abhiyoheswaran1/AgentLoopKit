@@ -85,15 +85,15 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.44.0>
 - Release asset: `agentloopkit-0.44.0.tgz`
 - Release asset SHA-256: `992e05ab92e0d9a8959711ea37213aeafd3acee98be9303e171297d98daa5dd8`
-- Release tag: `v0.44.0` at the release commit
+- Release tag: `v0.44.0` at release commit `48de68057f43d812e7bc915431b050ff0dd0218d`
 - Post-release smoke-fix commit: `8db2805c3ac154f8ff83bae00f47cb3f74bde846`
-- CI run for the release commit: pending post-release proof
+- CI run for the release commit: `28291542013` passed
 - CI run for the smoke-fix commit: `28160682228` passed
-- CLI Smoke run for the release commit: pending post-release proof
+- CLI Smoke run for the release commit: `28291542044` passed on Linux, macOS, and Windows
 - CLI Smoke run for the smoke-fix commit: `28160682240` passed on Linux, macOS, and Windows
-- Publish workflow run: pending post-release proof
-- Docker workflow run: pending post-release proof
-- MCP Registry workflow run: pending post-release proof
+- Publish workflow run: `28291545472` passed
+- Docker workflow run: `28291545468` passed
+- MCP Registry workflow run: `28291775156` passed
 - Post-publish npm proof: npm latest is `agentloopkit@0.44.0`; `agentloop npm-status --agentloopkit --expect-current` passed
 - Published-package smoke: `npm run smoke:published -- --version 0.44.0` passed
 - GHCR proof: `agentloop release-proof --redact-paths` confirmed image tag `0.44.0`

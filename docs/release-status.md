@@ -12,12 +12,12 @@ Last checked: June 27, 2026.
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.44.0>
 - Release asset: `agentloopkit-0.44.0.tgz`
 - Release asset SHA-256: `992e05ab92e0d9a8959711ea37213aeafd3acee98be9303e171297d98daa5dd8`
-- Release commit: pending post-release proof.
-- CI run for release commit: pending post-release proof.
-- CLI Smoke run for release commit: pending post-release proof.
-- Publish workflow run: pending post-release proof.
-- Docker workflow run: pending post-release proof.
-- MCP Registry workflow run: pending post-release proof.
+- Release commit: `48de68057f43d812e7bc915431b050ff0dd0218d`
+- CI run for release commit: `28291542013` passed.
+- CLI Smoke run for release commit: `28291542044` passed on Linux, macOS, and Windows.
+- Publish workflow run: `28291545472` passed.
+- Docker workflow run: `28291545468` passed.
+- MCP Registry workflow run: `28291775156` passed.
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
 GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirmed the `0.44.0` image.
@@ -71,7 +71,9 @@ Local release gate for `0.44.0`:
 
 - `npm run release-flow`: passed locally, including prepublish check, lint, typecheck, full tests, build, public-doc hygiene, link check, dogfood, and release smoke.
 - `npx --yes projscan doctor --format markdown`: A/90 with the known reviewed `prepublishOnly` advisory.
-- `agentloop verify`, strict dogfood, and strict release-check: pending final pre-publish proof.
+- `agentloop verify --progress`: passed and wrote `.agentloop/reports/2026-06-27-15-56-verification-report.md`
+- `npm run dogfood:strict`: passed with the known stale AgentFlight session warning surfaced in output.
+- `node dist/cli/index.js release-check --strict --redact-paths`: passed before tagging on release commit `48de6805`.
 
 Post-publish checks:
 
