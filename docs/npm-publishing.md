@@ -12,17 +12,17 @@ For a compact current-state summary, see [release-status.md](release-status.md).
 
 ## Current State
 
-As of June 27, 2026:
+As of June 28, 2026:
 
-- npm latest is `agentloopkit@0.44.0`.
-- GitHub release `v0.44.0` is public with attached `agentloopkit-0.44.0.tgz`.
+- npm latest is `agentloopkit@0.45.0`.
+- GitHub release `v0.45.0` is public with attached `agentloopkit-0.45.0.tgz`.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - GitHub releases publish npm through trusted publishing.
 - GHCR and MCP Registry publishing run from GitHub release workflows after npm succeeds.
-- Release tag `v0.44.0` points at the published release commit.
+- Release tag `v0.45.0` points at the published release commit.
 - GitHub Marketplace publication remains deferred until maintainer approval for the owner-only listing step.
 
-The `0.44.0` release completed through GitHub release automation, npm trusted publishing, Docker/GHCR, and MCP Registry. The GitHub Marketplace URL still returned 404 during post-release proof.
+The `0.45.0` release completed through GitHub release automation, npm trusted publishing, Docker/GHCR, and MCP Registry. The first automatic MCP Registry workflow checked npm before `0.45.0` propagated; the manual rerun passed. The GitHub Marketplace URL still returned 404 during post-release proof.
 
 ## Release Rule
 
