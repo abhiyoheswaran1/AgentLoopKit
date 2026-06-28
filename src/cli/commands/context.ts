@@ -137,12 +137,14 @@ export function contextCommand() {
     .command('show')
     .description('Expand a local context source handle')
     .argument('<handle>', 'source handle, for example task:active or evidence-map:current')
+    .option('--since <digest>', 'omit content when the handle digest has not changed')
+    .option('--full', 'print content even when --since matches')
     .option('--json', 'print machine-readable output')
     .option(
       '--redact-paths',
       'redact local absolute paths in public output; context paths are repo-relative by default',
     )
-    .action(async (handle: string, options: { json?: boolean; redactPaths?: boolean }) => {
+    .action(async (handle: string, options: { since?: string; full?: boolean; json?: boolean; redactPaths?: boolean }) => {
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
       if (!workspace) return;
       try {
@@ -151,9 +153,11 @@ export function contextCommand() {
           config: workspace.config,
           handle,
           redactPaths: options.redactPaths === true,
+          since: options.since,
+          full: options.full === true,
         });
         if (options.json) console.log(JSON.stringify(result, null, 2));
-        else console.log(result.content);
+        else console.log(result.content ?? result.message ?? '');
       } catch (error) {
         if (printJsonErrorIfNeeded(error, options.json)) return;
         throw error;

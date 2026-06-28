@@ -60,13 +60,16 @@ After `init` and `doctor`, the shortest useful loop is:
 npx agentloopkit create-task --type bugfix --title "Fix checkout bug" --include-config-commands
 npx agentloopkit status --brief
 npx agentloopkit start --for codex --goal implement --redact-paths
+npx agentloopkit loop create --goal "Fix checkout bug" --budget-tokens 50000 --max-iterations 5
+npx agentloopkit loop tick
+npx agentloopkit ready
 npx agentloopkit verify --task-commands --progress
 npx agentloopkit ship
 npx agentloopkit prepare-pr
 npx agentloopkit task done
 ```
 
-`create-task` sets the new contract as active. `start` gives the next software agent a repo preflight with the current state, active task, next safe command, read-first source handles, risk summary, verification freshness, context-budget impact, and source handles. `verify --task-commands` runs the reviewed commands copied into the task contract. `ship` records review-readiness evidence, `prepare-pr` drafts reviewer copy, and `task done` closes the focused task. This path does not post to GitHub, publish packages, call an LLM, or run hidden commands.
+`create-task` sets the new contract as active. `start` gives the next software agent a repo preflight with the current state, active task, next safe command, read-first source handles, risk summary, verification freshness, context-budget impact, and source handles. `loop create` records a local loop contract, `loop tick` records one evidence-based iteration decision, and `ready` checks review gates without running verification. `verify --task-commands` runs the reviewed commands copied into the task contract. `ship` records review-readiness evidence, `prepare-pr` drafts reviewer copy, and `task done` closes the focused task. This path does not post to GitHub, publish packages, call an LLM, execute a coding agent, or run hidden commands.
 
 ## Existing Repos And Harness Upgrades
 
@@ -82,7 +85,7 @@ npx --yes agentloopkit@latest init --dry-run
 
 These commands inspect the published package. This repository can document unreleased guidance before the next publish; check [release status](release-status.md) before expecting `agentloopkit@latest` to include new subcommands.
 
-`upgrade-harness` reads existing `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, and `.agentloop/README.md`. It reports whether those files mention the current agent-readiness loop for the installed CLI, including Doctor, Start, source-handle expansion, broad-read avoidance, `ship`, `prepare-pr`, run ledger, file intent, `review-context`, `maintainer-check`, and upgrade guidance. It writes nothing.
+`upgrade-harness` reads existing `AGENTS.md`, `AGENTLOOP.md`, `.agentloop/harness/commands.md`, and `.agentloop/README.md`. It reports whether those files mention the current agent-readiness loop for the installed CLI, including Doctor, Start, source-handle expansion, broad-read avoidance, `ready`, `loop`, `ship`, `prepare-pr`, run ledger, file intent, `review-context`, `maintainer-check`, and upgrade guidance. It writes nothing.
 
 `init --dry-run` shows missing generated files. A non-dry `init` creates missing files and skips existing ones. AgentLoopKit does not overwrite edited harness files or merge templates automatically.
 
@@ -91,6 +94,7 @@ You can use the latest loop even if old generated docs have not been refreshed:
 ```bash
 npx --yes agentloopkit@latest create-task --type bugfix --title "Fix checkout bug"
 npx --yes agentloopkit@latest start --for generic --goal implement --redact-paths
+npx --yes agentloopkit@latest ready
 npx --yes agentloopkit@latest verify
 npx --yes agentloopkit@latest ship
 npx --yes agentloopkit@latest prepare-pr
@@ -188,6 +192,8 @@ After implementation:
 npx agentloopkit verify
 npx agentloopkit status
 npx agentloopkit next
+npx agentloopkit ready
+npx agentloopkit loop report
 npx agentloopkit ship
 npx agentloopkit prepare-pr
 npx agentloopkit maintainer-check

@@ -30,6 +30,8 @@ agentloop doctor --redact-paths
 agentloop start --for generic --goal implement --redact-paths
 agentloop context handles
 agentloop context show <handle>
+agentloop ready
+agentloop loop status
 agentloop review-context
 agentloop policy list
 agentloop policy show security
@@ -54,8 +56,10 @@ Use `npx projscan doctor --format markdown` during implementation work in this r
 
 Local policy files are repo guidance. If `agentloop policy status` reports `modified`, read the local file and follow the repo-specific rule. Do not overwrite customized policy text just to match the bundled template.
 
+Use `agentloop ready` when you need a read-only readiness gate across task, acceptance, verification, scope, and context budget. Use `agentloop loop create`, `agentloop loop tick`, `agentloop loop status`, and `agentloop loop report` when a goal needs local iteration decisions, token receipts, and stop reasons without executing a coding agent.
+
 Use `agentloop ship` as the main stop condition for meaningful code changes. It writes a ship report, records run evidence under `.agentloop/runs/`, and scores review-readiness evidence without claiming to measure code quality.
 
 Use `agentloop prepare-pr` when reviewers need PR-ready copy. Use `agentloop maintainer-check` when reviewing whether an agent-assisted change has enough task, verification, handoff or ship, and risk evidence.
 
-Use `agentloop upgrade-harness` after AgentLoopKit CLI upgrades. It reports stale local guidance, including missing Start/Context agent-readiness guidance, and writes nothing.
+Use `agentloop upgrade-harness` after AgentLoopKit CLI upgrades. It reports stale local guidance, including missing Start/Context and loop-control guidance, and writes nothing.

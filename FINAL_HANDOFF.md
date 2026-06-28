@@ -81,12 +81,12 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.44.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.44.0>
-- Release asset: `agentloopkit-0.44.0.tgz`
-- Release asset SHA-256: `992e05ab92e0d9a8959711ea37213aeafd3acee98be9303e171297d98daa5dd8`
-- Release tag: `v0.44.0` at release commit `48de68057f43d812e7bc915431b050ff0dd0218d`
-- Post-release smoke-fix commit: `8db2805c3ac154f8ff83bae00f47cb3f74bde846`
+- Current npm release: `agentloopkit@0.45.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.45.0>
+- Release asset: `agentloopkit-0.45.0.tgz`
+- Release asset SHA-256: `ff8799881c9dfdfacdaeeb3afffee78a52c525dc1d4f8ba46d4ac3679c88b65d`
+- Release tag: `v0.45.0` at the published release commit.
+- Previous post-release smoke-fix commit: `8db2805c3ac154f8ff83bae00f47cb3f74bde846`
 - CI run for the release commit: `28291542013` passed
 - CI run for the smoke-fix commit: `28160682228` passed
 - CLI Smoke run for the release commit: `28291542044` passed on Linux, macOS, and Windows
@@ -99,6 +99,17 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - GHCR proof: `agentloop release-proof --redact-paths` confirmed image tag `0.44.0`
 - MCP Registry proof: `agentloop release-proof --redact-paths` confirmed metadata for `agentloopkit@0.44.0`
 - GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 27, 2026
+
+## 0.45.0 release summary
+
+Included:
+
+- Local loop contracts with `agentloop loop create`, `loop tick`, `loop status`, and `loop report`.
+- Read-only readiness evaluation with `agentloop ready`, including task, acceptance, verification, scope, forbidden-file, and context-budget gates.
+- Token receipts that show estimated broad context, compact context, AgentLoopKit overhead, and net context reduction.
+- Context-handle read de-duplication with `agentloop context show --since <digest>` and `--full`.
+- Public exports for loop contracts, readiness evaluation, and token receipt helpers.
+- Docs, generated harness guidance, and regression coverage for low-token verifiable agent loops.
 
 ## 0.44.0 release summary
 
@@ -1395,10 +1406,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.44.0` is public.
-- npm latest is `agentloopkit@0.44.0`.
-- GHCR tags include `latest`, `0.44`, and `0.44.0`.
-- MCP Registry lists `0.44.0` as latest.
+- GitHub release `v0.45.0` is public.
+- npm latest is `agentloopkit@0.45.0`.
+- GHCR tags include `latest`, `0.45`, and `0.45.0`.
+- MCP Registry lists `0.45.0` as latest.
 - GitHub Marketplace listing is not live; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.

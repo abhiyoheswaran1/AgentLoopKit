@@ -1,0 +1,33 @@
+ .agentloop/README.md                             |  6 ++-
+ .agentloop/harness/autonomous-dogfooding.md      | 14 ++++++
+ .agentloop/harness/commands.md                   |  2 +
+ AGENTLOOP.md                                     |  2 +-
+ CHANGELOG.md                                     |  6 ++-
+ README.md                                        | 11 ++++-
+ docs/cli-reference.md                            | 33 ++++++++++++++-
+ docs/context.md                                  |  5 +++
+ docs/getting-started.md                          | 10 ++++-
+ docs/maintenance-guards.md                       |  2 +
+ package.json                                     |  2 +-
+ src/cli/commands/context.ts                      |  8 +++-
+ src/cli/index.ts                                 |  4 ++
+ src/core/completions.ts                          |  2 +
+ src/core/context-contract.ts                     | 54 +++++++++++++++++-------
+ src/core/upgrade-harness.ts                      | 11 +++++
+ src/index.ts                                     | 34 +++++++++++++++
+ src/templates/harness/commands.md                |  2 +
+ src/templates/root/AGENTLOOP.md                  |  2 +-
+ src/templates/root/AGENTS.md                     |  2 +
+ src/templates/root/agentloop-directory-readme.md |  4 +-
+ tests/cli-docs-drift.test.ts                     |  2 +
+ tests/context-contract.test.ts                   | 44 +++++++++++++++++++
+ tests/upgrade-harness.test.ts                    | 10 +++++
+ 24 files changed, 244 insertions(+), 28 deletions(-)
+docs/loop-contracts.md | untracked
+src/cli/commands/loop.ts | untracked
+src/cli/commands/ready.ts | untracked
+src/core/loop-contract.ts | untracked
+src/core/ready.ts | untracked
+src/core/token-receipt.ts | untracked
+tests/loop-contract.test.ts | untracked
+tests/ready.test.ts | untracked

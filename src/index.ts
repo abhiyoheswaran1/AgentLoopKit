@@ -11,3 +11,37 @@ export {
   type CreateTaskFromProjScanOptions,
   type EvaluateAgentFlightResultOptions,
 } from './core/baseframe.js';
+
+export {
+  createLoop,
+  tickLoop,
+  getLoopStatus,
+  getLoopReport,
+  renderLoopMarkdown,
+  renderLoopStatusMarkdown,
+  renderLoopReportMarkdown,
+  type AgentLoopLoopContractV1,
+  type LoopCadence,
+  type LoopDecision,
+  type LoopIteration,
+  type LoopPreset,
+  type LoopStatus,
+  type LoopSuggestedCommand,
+} from './core/loop-contract.js';
+
+export {
+  evaluateReady,
+  renderReadyMarkdown,
+  type ReadyGate,
+  type ReadyGateStatus,
+  type ReadyNextAction,
+  type ReadyResult,
+  type ReadyStatus,
+} from './core/ready.js';
+
+export {
+  buildTokenReceipt,
+  estimateHeuristicTokens,
+  renderTokenReceiptMarkdown,
+  type AgentLoopTokenReceipt,
+} from './core/token-receipt.js';

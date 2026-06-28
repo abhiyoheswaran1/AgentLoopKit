@@ -628,6 +628,50 @@ Revert the copy change.
     expect(result.stdout).not.toContain(dir);
   });
 
+  test('supports read de-duplication by context handle digest', async () => {
+    const dir = await createContextFixture();
+
+    const first = await execa(tsxPath, [cliPath, 'context', 'show', 'task:active', '--json'], {
+      cwd: dir,
+    });
+    const firstPayload = JSON.parse(first.stdout);
+    expect(firstPayload.contentDigest).toMatch(/^sha256:/);
+    expect(firstPayload.unchanged).toBe(false);
+    expect(firstPayload.content).toContain('# Fix auth copy');
+
+    const deduped = await execa(
+      tsxPath,
+      [cliPath, 'context', 'show', 'task:active', '--json', '--since', firstPayload.contentDigest],
+      { cwd: dir },
+    );
+    const dedupedPayload = JSON.parse(deduped.stdout);
+    expect(dedupedPayload).toMatchObject({
+      handle: 'task:active',
+      unchanged: true,
+      contentDigest: firstPayload.contentDigest,
+    });
+    expect(dedupedPayload.content).toBeUndefined();
+    expect(dedupedPayload.message).toContain('unchanged since');
+
+    const full = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'context',
+        'show',
+        'task:active',
+        '--json',
+        '--since',
+        firstPayload.contentDigest,
+        '--full',
+      ],
+      { cwd: dir },
+    );
+    const fullPayload = JSON.parse(full.stdout);
+    expect(fullPayload.unchanged).toBe(true);
+    expect(fullPayload.content).toContain('# Fix auth copy');
+  });
+
   test('refuses oversized verification handle expansion', async () => {
     const dir = await createContextFixture();
     await writeFile(

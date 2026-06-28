@@ -10,6 +10,7 @@ import { pathExists, readTextIfExists } from './file-system.js';
 
 export type HarnessTopicId =
   | 'agent-start'
+  | 'loop-control'
   | 'ship'
   | 'prepare-pr'
   | 'run-ledger'
@@ -72,6 +73,11 @@ const TOPICS: TopicDefinition[] = [
     ],
     match: 'all',
   },
+  {
+    id: 'loop-control',
+    needles: ['agentloop ready', 'agentloop loop'],
+    match: 'all',
+  },
   { id: 'ship', needles: ['agentloop ship'] },
   { id: 'prepare-pr', needles: ['agentloop prepare-pr'] },
   { id: 'run-ledger', needles: ['.agentloop/runs', 'agentloop runs', 'agentloop intent'] },
@@ -92,6 +98,11 @@ const TOPIC_SUGGESTIONS: Record<HarnessTopicId, { title: string; copyMarkdown: s
     title: 'Agent Start preflight and source handles',
     copyMarkdown:
       '- Before broad repo or file reads, run `agentloop doctor --redact-paths`, then `agentloop start --for generic --goal implement --redact-paths`; list handles with `agentloop context handles`, then expand only needed source truth with `agentloop context show <handle>` to avoid broad repo reads.',
+  },
+  'loop-control': {
+    title: 'Readiness gates and local loop contracts',
+    copyMarkdown:
+      '- Use `agentloop ready` for a read-only readiness gate, and use `agentloop loop create`, `agentloop loop tick`, `agentloop loop status`, and `agentloop loop report` to record local loop contracts without executing a coding agent.',
   },
   ship: {
     title: 'Review-readiness ship gate',

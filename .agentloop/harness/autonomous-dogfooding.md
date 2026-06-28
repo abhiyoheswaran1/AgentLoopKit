@@ -70,6 +70,20 @@ AgentFlight changed-file filters ignore generated AgentLoop evidence directories
 
 ProjScan ignores generated AgentLoop and AgentFlight evidence directories through `.projscanrc.json` so repo scans focus on source, docs, tests, config, and current task context. Keep `.agentloop/harness/`, `.agentloop/policies/`, product-panel files, backlog, research files, and current `.agentloop/tasks/` contracts visible to ProjScan.
 
+## Local Loop Contracts
+
+Use AgentLoopKit loop contracts when a task should iterate across evidence rather than one implementation pass:
+
+```bash
+agentloop loop create --preset agentloopkit-maintenance --budget-tokens 50000 --max-iterations 5
+agentloop loop tick
+agentloop loop status
+agentloop loop report
+agentloop ready
+```
+
+Loop commands record goals, token receipts, readiness decisions, and stop reasons. They do not run a coding agent or execute suggested commands. Use `agentloopkit-maintenance` for routine health, `docs-drift` for CLI and docs alignment, `release-readiness` before approved release work, and `baseframe-integration` for local artifact compatibility.
+
 ## Verification
 
 Use focused checks while editing, then record proof:

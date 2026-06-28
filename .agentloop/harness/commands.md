@@ -27,6 +27,8 @@ Rules:
 - Use `agentloop start --for generic --goal implement --redact-paths` before broad repo reads when a software agent needs the current task, evidence, risk, context budget, and source handles, and avoid broad repo reads.
 - Use `agentloop context handles` after Start when the agent needs the available source-handle list.
 - Use `agentloop context show <handle>` when the agent needs to expand exact local source truth.
+- Use `agentloop ready` when you need a read-only readiness gate across task, acceptance, verification, scope, and context budget.
+- Use `agentloop loop create`, `agentloop loop tick`, `agentloop loop status`, and `agentloop loop report` to record local loop contracts, token receipts, iteration decisions, and stop reasons without executing a coding agent.
 - If MCP tools are already configured, call `agentloop_start` before broad reads. To configure a client, use `agentloop mcp-server` as that client's stdio command.
 - Use `agentloop review-context` when an agent needs one read-only snapshot of task, gate, policy, artifact, run, and next-action state.
 - Use `agentloop artifacts` when you need a read-only inventory of local task, report, handoff, badge, CI summary, release-note, and run evidence.

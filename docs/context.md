@@ -11,6 +11,7 @@ agentloop context budget
 agentloop context handles --redact-paths
 agentloop context pack --for codex --goal continue --redact-paths
 agentloop context show <handle-from-start>
+agentloop context show <handle-from-start> --since sha256:<digest>
 ```
 
 ![AgentLoopKit Context Contract terminal demo](assets/readme/agentloopkit-context-contract.gif)
@@ -139,9 +140,13 @@ agentloop context show verification:latest
 agentloop context show run:latest
 agentloop context show evidence-map:current
 agentloop context show context-budget:current
+agentloop context show task:active --since sha256:<digest>
+agentloop context show task:active --since sha256:<digest> --full
 ```
 
 `show` expands a local source handle. Agents should read the compact pack first, then expand only the source handles they need.
+
+JSON output includes a `contentDigest` for the expanded handle. When a caller already has that digest, `--since <digest>` returns an unchanged receipt without repeating the content. Use `--full` to force content output when a caller needs a fresh copy despite an unchanged digest.
 
 ## Research Work
 

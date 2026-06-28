@@ -103,6 +103,14 @@ describe('upgrade-harness command', () => {
             'agentloop start --for generic --goal implement --redact-paths',
           ),
         }),
+        expect.objectContaining({
+          topic: 'loop-control',
+          copyMarkdown: expect.stringContaining('agentloop ready'),
+        }),
+        expect.objectContaining({
+          topic: 'loop-control',
+          copyMarkdown: expect.stringContaining('agentloop loop tick'),
+        }),
       ]),
     );
     expect(humanResult.stdout).toContain('## Copyable Guidance');
@@ -111,6 +119,8 @@ describe('upgrade-harness command', () => {
     expect(humanResult.stdout).toContain('agentloop prepare-pr');
     expect(humanResult.stdout).toContain('agentloop context handles');
     expect(humanResult.stdout).toContain('agentloop context show <handle>');
+    expect(humanResult.stdout).toContain('agentloop ready');
+    expect(humanResult.stdout).toContain('agentloop loop tick');
     await expect(readFile(path.join(dir, 'AGENTS.md'), 'utf8')).resolves.toBe(before);
   });
 

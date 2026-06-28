@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import type { AgentLoopConfig } from './config.js';
 import {
   latestMarkdownFile,
@@ -102,7 +103,10 @@ export type ContextPackInternalResult = Omit<ContextPackResult, 'evidenceMap'> &
 export type ContextShowResult = {
   handle: string;
   kind: ContextHandleKind;
-  content: string;
+  content?: string;
+  contentDigest: string;
+  unchanged: boolean;
+  message?: string;
   safety: ContextSafety;
 };
 
@@ -605,7 +609,30 @@ export async function showContextHandle(options: {
   config: AgentLoopConfig;
   handle: string;
   redactPaths?: boolean;
+  since?: string;
+  full?: boolean;
 }): Promise<ContextShowResult> {
+  const finalize = (result: { handle: string; kind: ContextHandleKind; content: string }) => {
+    const contentDigest = `sha256:${createHash('sha256').update(result.content).digest('hex')}`;
+    const unchanged = options.since === contentDigest;
+    if (unchanged && !options.full) {
+      return {
+        handle: result.handle,
+        kind: result.kind,
+        contentDigest,
+        unchanged,
+        message: `${result.handle} unchanged since ${contentDigest}. Use --full to print it anyway.`,
+        safety: SAFETY,
+      };
+    }
+    return {
+      ...result,
+      contentDigest,
+      unchanged,
+      safety: SAFETY,
+    };
+  };
+
   switch (options.handle) {
     case 'task:active': {
       const activeTaskPath = await getCurrentWorkTaskPath({
@@ -620,12 +647,11 @@ export async function showContextHandle(options: {
         config: options.config,
         taskPath: activeTaskPath,
       });
-      return {
+      return finalize({
         handle: options.handle,
         kind: 'task',
         content: redactContextContent(task.content, options),
-        safety: SAFETY,
-      };
+      });
     }
     case 'verification:latest': {
       const reportPath = await latestVerificationReportPath(options.cwd, options.config);
@@ -645,27 +671,25 @@ export async function showContextHandle(options: {
           'CONTEXT_HANDLE_EMPTY',
         );
       }
-      return {
+      return finalize({
         handle: options.handle,
         kind: 'verification',
         content: redactContextContent(report.content, options),
-        safety: SAFETY,
-      };
+      });
     }
     case 'run:latest': {
       const [latestRun] = await listRuns(options.cwd, { limit: 1, hydrateTask: false });
       if (!latestRun) {
         throw new AgentLoopError('No run is available for handle run:latest.', 'CONTEXT_HANDLE_EMPTY');
       }
-      return {
+      return finalize({
         handle: options.handle,
         kind: 'run',
         content: redactContextContent(
           `${JSON.stringify(await readRun(options.cwd, latestRun.id), null, 2)}\n`,
           options,
         ),
-        safety: SAFETY,
-      };
+      });
     }
     case 'evidence-map:current': {
       const evidenceMap = await buildEvidenceMap({
@@ -673,24 +697,22 @@ export async function showContextHandle(options: {
         config: options.config,
         taskEvidenceMode: 'current-work',
       });
-      return {
+      return finalize({
         handle: options.handle,
         kind: 'evidence-map',
         content: redactContextContent(renderEvidenceMapMarkdown(evidenceMap), options),
-        safety: SAFETY,
-      };
+      });
     }
     case 'context-budget:current': {
       const context = await buildContextBudgetContract({
         cwd: options.cwd,
         config: options.config,
       });
-      return {
+      return finalize({
         handle: options.handle,
         kind: 'context-budget',
         content: redactContextContent(context.markdown, options),
-        safety: SAFETY,
-      };
+      });
     }
     default:
       throw new AgentLoopError(

@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-28-00-58-ship",
+  "command": "ship",
+  "createdAt": "2026-06-28-00-58",
+  "createdAtEpochMs": 1782601136891,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-27-add-loop-contract-and-readiness-gates.md",
+    "title": "Add Loop Contract and readiness gates",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-28-00-39-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-28-00-58-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-28-00-58-pr-summary.md",
+  "score": 92,
+  "changedFileCount": 37
+}

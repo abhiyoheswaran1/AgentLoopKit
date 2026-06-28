@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-28-00-58-verify",
+  "command": "verify",
+  "createdAt": "2026-06-28-00-58",
+  "createdAtEpochMs": 1782601111321,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-27-add-loop-contract-and-readiness-gates.md",
+    "title": "Add Loop Contract and readiness gates",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-28-00-39-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 34
+}

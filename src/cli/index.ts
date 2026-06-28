@@ -35,6 +35,8 @@ import { explainDiffCommand } from './commands/explain-diff.js';
 import { resumePackCommand } from './commands/resume-pack.js';
 import { guardCommand } from './commands/guard.js';
 import { contextCommand } from './commands/context.js';
+import { readyCommand } from './commands/ready.js';
+import { loopCommand } from './commands/loop.js';
 import { getPackageVersion } from '../core/version.js';
 
 const program = new Command();
@@ -58,6 +60,8 @@ program.addCommand(contextCommand());
 program.addCommand(explainDiffCommand());
 program.addCommand(resumePackCommand());
 program.addCommand(guardCommand());
+program.addCommand(readyCommand());
+program.addCommand(loopCommand());
 program.addCommand(checkGatesCommand());
 program.addCommand(shipCommand());
 program.addCommand(preparePrCommand());

@@ -4,6 +4,14 @@
 
 - No unreleased changes yet.
 
+## 0.45.0
+
+- Added `agentloop loop create`, `agentloop loop tick`, `agentloop loop status`, and `agentloop loop report` for local loop contracts that record goals, budgets, stop conditions, token receipts, iteration decisions, and native task links without executing a coding agent.
+- Added `agentloop ready` for read-only review-readiness gates across task contracts, acceptance criteria, verification evidence, scope drift, forbidden files, and context-budget pressure.
+- Added token receipts and digest-aware context handle reads so agents can see AgentLoopKit overhead, estimated net context reduction, and unchanged handle receipts without repeating local evidence content.
+- Added package API exports for loop contracts, readiness evaluation, and token receipt helpers.
+- Updated README, CLI reference, Context Contract docs, and new loop-contract docs with the local loop workflow and safety boundary.
+
 ## 0.44.0
 
 - Added Baseframe Suite Integration v1 so `agentloopkit create-task --from-projscan` consumes local ProjScan assessment artifacts, validates schema and path safety, creates or updates the native AgentLoopKit task, emits `.baseframe/evidence/<task-id>/agentloopkit-task.json`, and updates `.baseframe/agent-workflow.json`.

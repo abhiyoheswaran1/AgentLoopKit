@@ -249,6 +249,8 @@ agentloop context show verification:latest
 agentloop context show run:latest
 agentloop context show evidence-map:current
 agentloop context show context-budget:current
+agentloop context show task:active --since sha256:<digest>
+agentloop context show task:active --since sha256:<digest> --full
 ```
 
 `context budget` shows local context pressure and compact-pack guidance. It estimates tokens as `ceil(character_count / 4)`: broad context is the newline-joined changed-file path list, and compact context is the compact evidence summary plus next actions. The estimate is planning guidance, not provider tokenizer output or a billing claim.
@@ -261,11 +263,40 @@ agentloop context show context-budget:current
 
 `context pack --json` and the matching MCP tool return the same compact evidence-map shape. Use `agentloop context show evidence-map:current` or `agentloop_context_show` when an agent needs the full changed-file evidence map.
 
-`context show <handle>` expands a local source handle. Supported v1 handles include `task:active`, `verification:latest`, `run:latest`, `evidence-map:current`, and `context-budget:current`.
+`context show <handle>` expands a local source handle. Supported v1 handles include `task:active`, `verification:latest`, `run:latest`, `evidence-map:current`, and `context-budget:current`. Output includes a `contentDigest` in JSON. Pass `--since <digest>` to get an unchanged receipt without repeating the content when the handle has not changed. Add `--full` when a caller needs the content even though the digest is unchanged.
 
 Context commands are read-only. They do not run verification, read changed file contents beyond local AgentLoop evidence, read `.env` contents, call an LLM, intercept prompts, proxy provider traffic, post comments, publish packages, create tags, upload files, or mutate task state.
 
 See [context.md](context.md).
+
+## Readiness And Loop Contracts
+
+```bash
+agentloop ready
+agentloop ready --json
+agentloop ready --strict
+agentloop ready --redact-paths
+
+agentloop loop create --goal "Keep AgentLoopKit release-ready"
+agentloop loop create --preset agentloopkit-maintenance --budget-tokens 50000 --max-iterations 5
+agentloop loop tick
+agentloop loop tick --id <loop-id>
+agentloop loop status
+agentloop loop report
+agentloop loop report --json --redact-paths
+```
+
+`ready` checks whether the current local work is ready for review. It evaluates the active task contract, acceptance criteria, verification evidence, scope drift, forbidden files, and context-budget pressure. Human output includes gates, next action, token receipt, and the safety boundary. JSON output keeps the same data for scripts. Use `--strict` when blocked readiness should exit non-zero.
+
+`loop create` writes a versioned local loop contract under `.agentloop/loops/<loop-id>/loop.json` and creates a normal AgentLoopKit task contract for the goal. The loop contract records the goal, cadence, budget, stop conditions, suggested commands, native task path, token receipt, and safety flags. Presets are `agentloopkit-maintenance`, `docs-drift`, `release-readiness`, and `baseframe-integration`.
+
+`loop tick` records one local iteration decision from existing evidence. It reads readiness state and a compact context pack, writes the token receipt, records source handles, and decides whether the loop should continue, stop, or be marked ready. It does not execute a coding agent or run suggested commands.
+
+`loop status` prints the current loop state, token usage, and next action. `loop report` prints a reviewable token ledger with iteration decisions and suggested commands.
+
+Loop commands are local and agent-neutral. They do not call an LLM, proxy provider traffic, run hidden commands, publish packages, create tags, or upload files.
+
+See [loop-contracts.md](loop-contracts.md).
 
 ## Guard
 

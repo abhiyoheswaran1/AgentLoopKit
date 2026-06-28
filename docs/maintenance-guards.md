@@ -28,6 +28,8 @@ README/public docs should explain what users need:
 - install with npm or npx
 - initialize a repo
 - create a task
+- start with compact context
+- record loop and readiness evidence
 - verify work
 - run `ship`
 - prepare a PR
