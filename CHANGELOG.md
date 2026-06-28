@@ -4,6 +4,11 @@
 
 - No unreleased changes yet.
 
+## 0.46.0
+
+- Added `agentloop loop run` for one guarded local runner iteration through an explicit loop `--runner-command`, with non-shell execution, blocked publish/destructive command families, bounded output, changed-file evidence, token receipts, and normal loop stop conditions.
+- Updated README, loop-contract docs, CLI reference, generated harness guidance, and dogfood guidance with guarded runner loops and richer README visuals.
+
 ## 0.45.0
 
 - Added `agentloop loop create`, `agentloop loop tick`, `agentloop loop status`, and `agentloop loop report` for local loop contracts that record goals, budgets, stop conditions, token receipts, iteration decisions, and native task links without executing a coding agent.

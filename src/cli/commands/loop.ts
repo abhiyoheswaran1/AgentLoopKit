@@ -4,6 +4,7 @@ import {
   createLoop,
   getLoopReport,
   getLoopStatus,
+  runLoop,
   tickLoop,
 } from '../../core/loop-contract.js';
 import { redactLocalRoots } from '../../core/redaction.js';
@@ -46,6 +47,9 @@ export function loopCommand() {
     .option('--cadence <cadence>', 'cadence: manual', 'manual')
     .option('--budget-tokens <count>', 'maximum estimated loop tokens', parsePositiveInteger)
     .option('--max-iterations <count>', 'maximum loop iterations', parsePositiveInteger)
+    .option('--runner-command <command>', 'explicit local runner command for loop run')
+    .option('--runner-name <name>', 'display name for the configured runner')
+    .option('--runner-timeout-ms <ms>', 'runner timeout in milliseconds', parsePositiveInteger)
     .option('--json', 'print machine-readable output')
     .option('--redact-paths', 'redact local absolute paths in public output')
     .action(
@@ -55,6 +59,9 @@ export function loopCommand() {
         cadence?: string;
         budgetTokens?: number;
         maxIterations?: number;
+        runnerCommand?: string;
+        runnerName?: string;
+        runnerTimeoutMs?: number;
         json?: boolean;
         redactPaths?: boolean;
       }) => {
@@ -69,6 +76,9 @@ export function loopCommand() {
             cadence: options.cadence,
             budgetTokens: options.budgetTokens,
             maxIterations: options.maxIterations,
+            runnerCommand: options.runnerCommand,
+            runnerName: options.runnerName,
+            runnerTimeoutMs: options.runnerTimeoutMs,
           });
           printOutput(result, result.markdown, options, workspace.cwd);
         } catch (error) {
@@ -92,6 +102,30 @@ export function loopCommand() {
           cwd: workspace.cwd,
           config: workspace.config,
           id: options.id,
+        });
+        printOutput(result, result.markdown, options, workspace.cwd);
+      } catch (error) {
+        if (printJsonErrorIfNeeded(error, options.json)) return;
+        throw error;
+      }
+    });
+
+  command
+    .command('run')
+    .description('Run one configured local runner iteration and record the loop decision')
+    .option('--id <id>', 'loop id; defaults to newest loop')
+    .option('--command <command>', 'must exactly match the configured runner command')
+    .option('--json', 'print machine-readable output')
+    .option('--redact-paths', 'redact local absolute paths in public output')
+    .action(async (options: { id?: string; command?: string; json?: boolean; redactPaths?: boolean }) => {
+      try {
+        const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+        if (!workspace) return;
+        const result = await runLoop({
+          cwd: workspace.cwd,
+          config: workspace.config,
+          id: options.id,
+          command: options.command,
         });
         printOutput(result, result.markdown, options, workspace.cwd);
       } catch (error) {

@@ -82,7 +82,21 @@ agentloop loop report
 agentloop ready
 ```
 
-Loop commands record goals, token receipts, readiness decisions, and stop reasons. They do not run a coding agent or execute suggested commands. Use `agentloopkit-maintenance` for routine health, `docs-drift` for CLI and docs alignment, `release-readiness` before approved release work, and `baseframe-integration` for local artifact compatibility.
+Use a guarded runner only when the task contract already names the command:
+
+```bash
+agentloop loop create \
+  --goal "Keep AgentLoopKit release-ready" \
+  --runner-command "npm run maintenance:check" \
+  --runner-timeout-ms 900000 \
+  --budget-tokens 50000 \
+  --max-iterations 3
+agentloop loop run
+agentloop loop status
+agentloop loop report
+```
+
+Loop commands record goals, token receipts, readiness decisions, guarded runner evidence, and stop reasons. `loop tick` reads evidence only. `loop run` executes only the configured runner command, rejects shell syntax, blocks publish and destructive command families, caps output, and still enforces iteration and token-budget limits. Use `agentloopkit-maintenance` for routine health, `docs-drift` for CLI and docs alignment, `release-readiness` before approved release work, and `baseframe-integration` for local artifact compatibility.
 
 ## Verification
 

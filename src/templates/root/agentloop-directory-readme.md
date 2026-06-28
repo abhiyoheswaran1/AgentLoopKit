@@ -52,6 +52,8 @@ agentloop artifacts
 agentloop upgrade-harness
 ```
 
+Use `agentloop loop run` only for loop contracts created with an explicit `--runner-command`. Runner loops execute the stored command with guardrails, then record changed files, output excerpts, token receipts, and the next loop decision.
+
 For MCP-capable clients with tools already configured, ask the agent to call `agentloop_start` before broad reads. To configure a client, use `agentloop mcp-server` as that client's stdio command.
 
 5. Inspect safety policies when the task touches protected areas:

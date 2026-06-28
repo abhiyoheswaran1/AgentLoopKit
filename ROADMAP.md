@@ -50,18 +50,19 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - VS Code/Open VSX extension validation gates before any editor marketplace release
 - Launch visuals generated from committed Playwright and VHS sources
 - Baseframe Suite v1 local JSON integration with ProjScan assessment import and AgentFlight gate reconciliation
+- Guarded loop runner passes with `agentloop loop run`, explicit configured runner commands, bounded output, changed-file evidence, and token receipts
 
 ## Current State
 
-- GitHub release `v0.45.0` is public.
-- npm latest is `agentloopkit@0.45.0`.
-- GHCR and MCP Registry are live for `0.45.0`.
+- GitHub release `v0.46.0` is public.
+- npm latest is `agentloopkit@0.46.0`.
+- GHCR and MCP Registry are live for `0.46.0`.
 - GitHub Marketplace listing is pending owner UI publication for the composite Action.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
-- Release tag `v0.45.0` points at the published release commit.
-- Current `main` contains release proof documentation after `v0.45.0`.
+- Release tag `v0.46.0` points at the published release commit.
+- Current `main` contains release proof documentation after `v0.46.0`.
 
 ## Near Term
 

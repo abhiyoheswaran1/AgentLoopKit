@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-28-10-26-verify",
+  "command": "verify",
+  "createdAt": "2026-06-28-10-26",
+  "createdAtEpochMs": 1782635161435,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-28-add-guarded-loop-runner.md",
+    "title": "Add guarded loop runner",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-28-10-24-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 24
+}

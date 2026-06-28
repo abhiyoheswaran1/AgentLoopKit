@@ -15,6 +15,7 @@ export {
 export {
   createLoop,
   tickLoop,
+  runLoop,
   getLoopStatus,
   getLoopReport,
   renderLoopMarkdown,
@@ -25,9 +26,15 @@ export {
   type LoopDecision,
   type LoopIteration,
   type LoopPreset,
+  type LoopRunResult,
   type LoopStatus,
   type LoopSuggestedCommand,
 } from './core/loop-contract.js';
+
+export {
+  type LoopRunnerConfig,
+  type LoopRunnerExecution,
+} from './core/loop-runner.js';
 
 export {
   evaluateReady,

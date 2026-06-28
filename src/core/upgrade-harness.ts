@@ -75,7 +75,7 @@ const TOPICS: TopicDefinition[] = [
   },
   {
     id: 'loop-control',
-    needles: ['agentloop ready', 'agentloop loop'],
+    needles: ['agentloop ready', 'agentloop loop', 'agentloop loop run'],
     match: 'all',
   },
   { id: 'ship', needles: ['agentloop ship'] },
@@ -102,7 +102,7 @@ const TOPIC_SUGGESTIONS: Record<HarnessTopicId, { title: string; copyMarkdown: s
   'loop-control': {
     title: 'Readiness gates and local loop contracts',
     copyMarkdown:
-      '- Use `agentloop ready` for a read-only readiness gate, and use `agentloop loop create`, `agentloop loop tick`, `agentloop loop status`, and `agentloop loop report` to record local loop contracts without executing a coding agent.',
+      '- Use `agentloop ready` for a read-only readiness gate, and use `agentloop loop create`, `agentloop loop tick`, `agentloop loop run`, `agentloop loop status`, and `agentloop loop report` to record local loop contracts, guarded runner passes, token receipts, and stop reasons. Use `loop run` only when the loop contract has an explicit runner command.',
   },
   ship: {
     title: 'Review-readiness ship gate',

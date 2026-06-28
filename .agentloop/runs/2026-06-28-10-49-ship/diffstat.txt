@@ -1,0 +1,22 @@
+ .agentloop/README.md                             |   2 +-
+ .agentloop/harness/autonomous-dogfooding.md      |  16 +-
+ .agentloop/harness/commands.md                   |   2 +-
+ AGENTLOOP.md                                     |   2 +-
+ AGENTS.md                                        |   2 +-
+ CHANGELOG.md                                     |   3 +-
+ README.md                                        |  35 +++-
+ docs/cli-reference.md                            |  11 +-
+ docs/getting-started.md                          |   2 +-
+ docs/loop-contracts.md                           |  39 ++++-
+ src/cli/commands/loop.ts                         |  34 ++++
+ src/core/loop-contract.ts                        | 201 ++++++++++++++++++++-
+ src/core/upgrade-harness.ts                      |   4 +-
+ src/index.ts                                     |   7 +
+ src/templates/harness/commands.md                |   2 +-
+ src/templates/root/AGENTLOOP.md                  |   2 +-
+ src/templates/root/AGENTS.md                     |   2 +-
+ src/templates/root/agentloop-directory-readme.md |   2 +
+ tests/loop-contract.test.ts                      | 213 +++++++++++++++++++++++
+ 19 files changed, 556 insertions(+), 25 deletions(-)
+.agentloop/loops/2026-06-28-10-21-dogfood-guarded-loop-runner/loop.json | untracked
+src/core/loop-runner.ts | untracked

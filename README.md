@@ -22,7 +22,7 @@ AgentFlight proves the result.
   <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-showcase.png" alt="AgentLoopKit workflow showing task contracts, verification reports, and handoff artifacts" width="100%">
 </p>
 
-The screenshots and terminal demos in this README are generated from committed sources in `docs/assets/readme/` with Playwright and VHS.
+The screenshots and terminal demos in this README are generated from committed sources in `docs/assets/readme/` with Playwright and VHS. You can regenerate them locally.
 
 ## What It Does
 
@@ -46,6 +46,12 @@ Run `init` inside an existing repository and AgentLoopKit creates:
 - `agentloop.config.json` for local command and path settings
 
 Generated `AGENTS.md` includes a specialist roster for product, CLI, template, verification, security, release, docs, compatibility, MCP, and repo-steward work. It helps future agent sessions split work without adding a background service.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-cli.gif" alt="Terminal demo showing AgentLoopKit init, task creation, verification, ship evidence, PR preparation, review context, run history, and file intent" width="100%">
+</p>
+
+The CLI demo shows the normal path: initialize a repo, create a task, run reviewed verification, score review readiness, draft PR copy, inspect review context, and trace why a file changed.
 
 ## Install
 
@@ -191,7 +197,24 @@ Use `agentloop start --for codex --goal implement --redact-paths` when a softwar
 
 `agentloop start` is the agent starting point. It keeps agents from guessing by turning task state, changed files, verification, risk, and context pressure into one compact preflight. The Context Contract sits underneath it: `context pack` explains why each item is present, names what was left out, and provides local handles for the source truth. A large changed-file list becomes a small briefing the agent can expand only when it needs detail.
 
-`agentloop loop` adds a local loop contract on top of normal task contracts. `agentloop loop create` records the goal, budget, stop conditions, suggested commands, native task path, and a token receipt. `agentloop loop tick` records one iteration decision from local evidence: continue, stop, ask for human review, or mark the loop ready when gates pass. It never runs a coding agent. Use `agentloop ready` when you need the current review-readiness gate summary without creating a loop.
+`agentloop loop` adds a local loop contract on top of normal task contracts. `agentloop loop create` records the goal, budget, stop conditions, suggested commands, native task path, and a token receipt. `agentloop loop tick` records one iteration decision from local evidence: continue, stop, ask for human review, or mark the loop ready when gates pass. Use `agentloop ready` when you need the current review-readiness gate summary without creating a loop.
+
+For a bounded autonomous pass, configure one local runner command and let AgentLoopKit record the iteration:
+
+```bash
+agentloop loop create \
+  --goal "Keep checkout work release-ready" \
+  --runner-command "node scripts/agentloop-runner.mjs" \
+  --runner-timeout-ms 600000 \
+  --budget-tokens 50000 \
+  --max-iterations 5
+
+agentloop loop run
+agentloop ready --strict
+agentloop loop report
+```
+
+`loop run` executes only the command saved in the loop contract. It uses `shell: false`, rejects shell syntax, blocks publish and destructive command families, caps runner output, records changed files, and still applies the max-iteration and token-budget stop conditions. AgentLoopKit controls the goal, budget, scope, gates, evidence, and stop decision. Your agent, script, CI job, or AgentFlight session does the implementation work.
 
 JSON and MCP context budget/pack payloads keep that boundary: they include compact evidence fields and the `evidence-map:current` handle, but they do not send the full changed-file list unless the agent expands that local handle.
 
@@ -237,6 +260,12 @@ Run the repeatable [Start usefulness demo](docs/start-usefulness-demo.md) to cre
 </p>
 
 The terminal demo is generated from committed VHS sources in this repository. It shows the intended agent workflow: check readiness with Doctor, run Start preflight, see what not to broad-scan, expand the current task handle when one exists, and verify with local evidence.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/docs/assets/readme/agentloopkit-verification.png" alt="AgentLoopKit verification report with command results, task evidence, changed files, and review gates" width="100%">
+</p>
+
+Verification reports turn local commands into review evidence. They keep command status, failure summaries, task links, changed-file context, and follow-up gates in one artifact reviewers can inspect.
 
 ## Dogfood Gate
 
@@ -298,7 +327,7 @@ agentloopkit init
 | `agentloop review-context`       | Show one read-only reviewability context snapshot                              |
 | `agentloop context`              | List handles, build context budgets and packs, and expand source truth         |
 | `agentloop ready`                | Check task, scope, verification, and context-budget readiness                  |
-| `agentloop loop`                 | Record local loop goals, token receipts, iteration decisions, and stop reasons |
+| `agentloop loop`                 | Record local loop goals, guarded runner passes, token receipts, iteration decisions, and stop reasons |
 | `agentloop guard`                | Check local drift, proof debt, and context-budget pressure                     |
 | `agentloop explain-diff`         | Explain the current diff with local task, verification, run, and risk evidence |
 | `agentloop resume-pack`          | Generate a compact local continuation brief for agents or reviewers            |

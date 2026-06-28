@@ -15,6 +15,22 @@ agentloop loop report
 agentloop ready
 ```
 
+When you want AgentLoopKit to drive one bounded implementation pass through a local runner, configure that runner when the loop is created:
+
+```bash
+agentloop loop create \
+  --goal "Keep AgentLoopKit release-ready" \
+  --runner-command "node scripts/agentloop-runner.mjs" \
+  --runner-timeout-ms 600000 \
+  --budget-tokens 50000 \
+  --max-iterations 5
+
+agentloop loop run
+agentloop loop status
+agentloop loop report
+agentloop ready --strict
+```
+
 Loop contracts are stored as JSON under `.agentloop/loops/<loop-id>/loop.json`. Each loop also creates a normal AgentLoopKit task contract under `.agentloop/tasks/`. That keeps loop work connected to the same task, scope, acceptance, verification, handoff, and ship evidence used by the rest of AgentLoopKit.
 
 ## What A Loop Records
@@ -29,9 +45,30 @@ The loop contract records:
 - readiness status for each iteration
 - source handles used for compact context
 - token receipt for the initial contract and each tick
+- configured runner command, exit code, changed files, and bounded output when `loop run` is used
 - whether the loop continued, stopped, or became ready
 
 `agentloop loop tick` does not execute the suggested commands. It reads local AgentLoopKit evidence, evaluates readiness, builds a compact context pack, records a token receipt, and decides the next loop state.
+
+`agentloop loop run` executes only the runner command stored in the loop contract. It does not accept a different command unless the override exactly matches the configured command. After the runner exits, AgentLoopKit records the exit code, bounded output, changed files, token receipt, readiness state, and next loop decision.
+
+## Runner Guardrails
+
+Runner execution is opt-in. A loop without `--runner-command` cannot run external work.
+
+AgentLoopKit applies these guardrails before each runner pass:
+
+- no shell execution; commands run with `shell: false`
+- shell metacharacters such as pipes, redirection, command substitution, and `&&` are rejected
+- shell interpreters are blocked
+- direct delete commands are blocked
+- `git add`, `git commit`, `git push`, `git reset`, `git clean`, `git checkout`, `git switch`, `git rebase`, `git merge`, `git tag`, `git stash`, and `git restore` are blocked
+- package publishing and package-version commands are blocked
+- GitHub release and Docker publish/login commands are blocked
+- runner output is capped in the loop contract
+- max-iteration and token-budget stop conditions still apply
+
+Put complex automation in a reviewed repo script, then configure the loop to run that script directly. AgentLoopKit should control the goal, budget, evidence, and stop decision. The runner should do one bounded piece of work.
 
 ## Token Receipts
 
@@ -88,6 +125,6 @@ Use `agentloopkit-maintenance` for the local self-check loop in this repository.
 
 ## Safety Boundary
 
-Loop commands do not call an LLM, run a coding agent, execute suggested commands, publish packages, create tags, push commits, upload files, read `.env` contents, or modify external services.
+Loop commands do not call an LLM, run a coding agent, execute suggested commands, publish packages, create tags, push commits, upload files, read `.env` contents, or modify external services. `loop run` executes only the configured local runner command and records the result.
 
 The contract is agent-neutral. Codex, Claude Code, Cursor, AgentFlight, a CI job, or a custom runner can consume the loop state, but AgentLoopKit owns the goal, scope, budget, gates, evidence, and stop decision.

@@ -279,8 +279,11 @@ agentloop ready --redact-paths
 
 agentloop loop create --goal "Keep AgentLoopKit release-ready"
 agentloop loop create --preset agentloopkit-maintenance --budget-tokens 50000 --max-iterations 5
+agentloop loop create --goal "Keep AgentLoopKit release-ready" --runner-command "node scripts/agentloop-runner.mjs" --runner-timeout-ms 600000
 agentloop loop tick
 agentloop loop tick --id <loop-id>
+agentloop loop run
+agentloop loop run --id <loop-id>
 agentloop loop status
 agentloop loop report
 agentloop loop report --json --redact-paths
@@ -288,13 +291,15 @@ agentloop loop report --json --redact-paths
 
 `ready` checks whether the current local work is ready for review. It evaluates the active task contract, acceptance criteria, verification evidence, scope drift, forbidden files, and context-budget pressure. Human output includes gates, next action, token receipt, and the safety boundary. JSON output keeps the same data for scripts. Use `--strict` when blocked readiness should exit non-zero.
 
-`loop create` writes a versioned local loop contract under `.agentloop/loops/<loop-id>/loop.json` and creates a normal AgentLoopKit task contract for the goal. The loop contract records the goal, cadence, budget, stop conditions, suggested commands, native task path, token receipt, and safety flags. Presets are `agentloopkit-maintenance`, `docs-drift`, `release-readiness`, and `baseframe-integration`.
+`loop create` writes a versioned local loop contract under `.agentloop/loops/<loop-id>/loop.json` and creates a normal AgentLoopKit task contract for the goal. The loop contract records the goal, cadence, budget, stop conditions, suggested commands, native task path, token receipt, and safety flags. Presets are `agentloopkit-maintenance`, `docs-drift`, `release-readiness`, and `baseframe-integration`. Add `--runner-command` only when a reviewed local command should run through `loop run`; add `--runner-timeout-ms` to bound that command.
 
 `loop tick` records one local iteration decision from existing evidence. It reads readiness state and a compact context pack, writes the token receipt, records source handles, and decides whether the loop should continue, stop, or be marked ready. It does not execute a coding agent or run suggested commands.
 
-`loop status` prints the current loop state, token usage, and next action. `loop report` prints a reviewable token ledger with iteration decisions and suggested commands.
+`loop run` executes one configured local runner iteration and records the result in the same loop contract. It runs with `shell: false`, rejects shell metacharacters, blocks publish and destructive command families, captures bounded output, records changed files after the run, evaluates readiness, and applies the same max-iteration and token-budget stop conditions. `--command` is accepted only when it exactly matches the configured runner command.
 
-Loop commands are local and agent-neutral. They do not call an LLM, proxy provider traffic, run hidden commands, publish packages, create tags, or upload files.
+`loop status` prints the current loop state, token usage, runner command, and next action. `loop report` prints a reviewable token ledger with iteration decisions, runner evidence, and suggested commands.
+
+Loop commands are local and agent-neutral. They do not call an LLM, proxy provider traffic, run hidden commands, publish packages, create tags, or upload files. `loop run` executes only the configured local runner command and records what happened.
 
 See [loop-contracts.md](loop-contracts.md).
 

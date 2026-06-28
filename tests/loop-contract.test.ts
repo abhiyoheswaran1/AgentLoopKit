@@ -192,6 +192,219 @@ describe('loop command', () => {
     });
   });
 
+  test('runs an explicitly configured runner and records command evidence', async () => {
+    const dir = await createLoopFixture();
+    await writeFile(
+      path.join(dir, 'runner.mjs'),
+      [
+        "import { writeFileSync } from 'node:fs';",
+        "writeFileSync('src/auth/copy.ts', 'export const copy = \"runner\";\\n');",
+        "console.log('runner completed');",
+        '',
+      ].join('\n'),
+    );
+    const createResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'loop',
+        'create',
+        '--goal',
+        'Runner loop',
+        '--runner-command',
+        'node runner.mjs',
+        '--runner-timeout-ms',
+        '5000',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+
+    const runResult = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'run', '--id', created.loop.id, '--json'],
+      { cwd: dir },
+    );
+    const run = JSON.parse(runResult.stdout);
+
+    expect(run.iteration.runner).toMatchObject({
+      command: 'node runner.mjs',
+      exitCode: 0,
+      status: 'passed',
+      shell: false,
+      outputExcerpt: expect.stringContaining('runner completed'),
+    });
+    expect(run.iteration.runner.changedFilesAfter).toContain('src/auth/copy.ts');
+    expect(run.loop.safety.commandsExecuted).toEqual(['node runner.mjs']);
+    expect(run.loop.iterations).toHaveLength(1);
+    expect(run.markdown).toContain('Runner: `passed`');
+  });
+
+  test('rejects loop run when no runner is configured', async () => {
+    const dir = await createLoopFixture();
+    const createResult = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'create', '--goal', 'No runner loop', '--json'],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'run', '--id', created.loop.id, '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(JSON.parse(result.stdout).error).toMatchObject({
+      code: 'LOOP_RUNNER_REQUIRED',
+    });
+  });
+
+  test('rejects unconfigured runner command overrides', async () => {
+    const dir = await createLoopFixture();
+    const createResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'loop',
+        'create',
+        '--goal',
+        'Pinned runner loop',
+        '--runner-command',
+        'node runner.mjs',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'loop',
+        'run',
+        '--id',
+        created.loop.id,
+        '--command',
+        'node other-runner.mjs',
+        '--json',
+      ],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(JSON.parse(result.stdout).error).toMatchObject({
+      code: 'LOOP_RUNNER_NOT_ALLOWED',
+    });
+  });
+
+  test('rejects unsafe runner shell syntax and protected commands', async () => {
+    const dir = await createLoopFixture();
+
+    const shellResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'loop',
+        'create',
+        '--goal',
+        'Unsafe shell loop',
+        '--runner-command',
+        'node runner.mjs && rm -rf .',
+        '--json',
+      ],
+      { cwd: dir, reject: false },
+    );
+    const publishResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'loop',
+        'create',
+        '--goal',
+        'Unsafe publish loop',
+        '--runner-command',
+        'npm publish',
+        '--json',
+      ],
+      { cwd: dir, reject: false },
+    );
+    const gitCommitResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'loop',
+        'create',
+        '--goal',
+        'Unsafe git loop',
+        '--runner-command',
+        'git commit -am change',
+        '--json',
+      ],
+      { cwd: dir, reject: false },
+    );
+
+    expect(shellResult.exitCode).toBe(1);
+    expect(JSON.parse(shellResult.stdout).error).toMatchObject({
+      code: 'LOOP_RUNNER_COMMAND_UNSAFE',
+    });
+    expect(publishResult.exitCode).toBe(1);
+    expect(JSON.parse(publishResult.stdout).error).toMatchObject({
+      code: 'LOOP_RUNNER_COMMAND_BLOCKED',
+    });
+    expect(gitCommitResult.exitCode).toBe(1);
+    expect(JSON.parse(gitCommitResult.stdout).error).toMatchObject({
+      code: 'LOOP_RUNNER_COMMAND_BLOCKED',
+    });
+  });
+
+  test('does not run configured runners after a loop reaches max iterations', async () => {
+    const dir = await createLoopFixture();
+    await writeFile(
+      path.join(dir, 'runner.mjs'),
+      [
+        "import { appendFileSync } from 'node:fs';",
+        "appendFileSync('runner-count.txt', 'run\\n');",
+        '',
+      ].join('\n'),
+    );
+    const createResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'loop',
+        'create',
+        '--goal',
+        'One run loop',
+        '--max-iterations',
+        '1',
+        '--runner-command',
+        'node runner.mjs',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+    await execa(tsxPath, [cliPath, 'loop', 'run', '--id', created.loop.id, '--json'], {
+      cwd: dir,
+    });
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'run', '--id', created.loop.id, '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(JSON.parse(result.stdout).error).toMatchObject({
+      code: 'LOOP_TERMINAL',
+    });
+    expect(await readFile(path.join(dir, 'runner-count.txt'), 'utf8')).toBe('run\n');
+  });
+
   test('stops a loop when max iterations are exhausted', async () => {
     const dir = await createLoopFixture();
     const createResult = await execa(

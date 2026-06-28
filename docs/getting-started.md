@@ -69,7 +69,7 @@ npx agentloopkit prepare-pr
 npx agentloopkit task done
 ```
 
-`create-task` sets the new contract as active. `start` gives the next software agent a repo preflight with the current state, active task, next safe command, read-first source handles, risk summary, verification freshness, context-budget impact, and source handles. `loop create` records a local loop contract, `loop tick` records one evidence-based iteration decision, and `ready` checks review gates without running verification. `verify --task-commands` runs the reviewed commands copied into the task contract. `ship` records review-readiness evidence, `prepare-pr` drafts reviewer copy, and `task done` closes the focused task. This path does not post to GitHub, publish packages, call an LLM, execute a coding agent, or run hidden commands.
+`create-task` sets the new contract as active. `start` gives the next software agent a repo preflight with the current state, active task, next safe command, read-first source handles, risk summary, verification freshness, context-budget impact, and source handles. `loop create` records a local loop contract, `loop tick` records one evidence-based iteration decision, and `loop run` records one guarded runner pass only when the loop has an explicit runner command. `ready` checks review gates without running verification. `verify --task-commands` runs the reviewed commands copied into the task contract. `ship` records review-readiness evidence, `prepare-pr` drafts reviewer copy, and `task done` closes the focused task. This path does not post to GitHub, publish packages, call an LLM, execute a coding agent, or run hidden commands.
 
 ## Existing Repos And Harness Upgrades
 

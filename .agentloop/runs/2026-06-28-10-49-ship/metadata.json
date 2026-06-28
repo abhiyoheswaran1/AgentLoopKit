@@ -1,0 +1,16 @@
+{
+  "id": "2026-06-28-10-49-ship",
+  "command": "ship",
+  "createdAt": "2026-06-28-10-49",
+  "createdAtEpochMs": 1782636563084,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-28-add-guarded-loop-runner.md",
+    "title": "Add guarded loop runner",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-28-10-24-verification-report.md",
+  "shipReportPath": ".agentloop/reports/2026-06-28-10-49-ship-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-28-10-49-pr-summary.md",
+  "score": 96,
+  "changedFileCount": 27
+}

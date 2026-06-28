@@ -8,6 +8,14 @@ import { AgentLoopError } from './errors.js';
 import { buildEvidenceMap } from './evidence-map.js';
 import { resolvesInsidePath } from './file-system.js';
 import {
+  BLOCKED_LOOP_RUNNER_COMMANDS,
+  DEFAULT_LOOP_RUNNER_OUTPUT_CHARS,
+  createRunnerConfig,
+  executeLoopRunner,
+  type LoopRunnerConfig,
+  type LoopRunnerExecution,
+} from './loop-runner.js';
+import {
   escapeMarkdownProse,
   singleLineInlineCode as inlineCode,
 } from './markdown-format.js';
@@ -45,6 +53,7 @@ export type LoopIteration = {
   nextAction: string;
   contextHandles: string[];
   tokenReceipt: AgentLoopTokenReceipt;
+  runner?: LoopRunnerExecution;
 };
 
 export type AgentLoopLoopContractV1 = {
@@ -66,7 +75,16 @@ export type AgentLoopLoopContractV1 = {
   controls: {
     agentNeutral: true;
     externalAgentExecution: false;
+    externalRunnerExecution?: boolean;
     localEvidenceOnly: true;
+  };
+  runner?: LoopRunnerConfig;
+  guardrails?: {
+    requireExplicitRunner: true;
+    shell: false;
+    rejectShellMetacharacters: true;
+    blockedCommands: string[];
+    maxOutputChars: number;
   };
   task: {
     nativeTaskPath: string;
@@ -94,6 +112,8 @@ export type LoopTickResult = {
   iteration: LoopIteration;
   markdown: string;
 };
+
+export type LoopRunResult = LoopTickResult;
 
 export type LoopStatusResult = {
   loop: AgentLoopLoopContractV1;
@@ -285,7 +305,7 @@ function renderIterations(iterations: LoopIteration[]) {
       (iteration) =>
         `- ${inlineCode(`#${iteration.index}`)} ${inlineCode(iteration.decision)} - readiness ${inlineCode(
           iteration.readinessStatus,
-        )}; net context ${inlineCode(
+        )}; runner ${inlineCode(iteration.runner?.status ?? 'not-run')}; net context ${inlineCode(
           String(iteration.tokenReceipt.estimatedNetContextReductionTokens),
         )}; next ${inlineCode(iteration.nextAction)}.`,
     )
@@ -300,8 +320,9 @@ export function renderLoopMarkdown(loop: AgentLoopLoopContractV1) {
 - Cadence: ${inlineCode(loop.cadence)}
 - Loop path: ${inlineCode(loop.path)}
 - Native task: ${inlineCode(loop.task.nativeTaskPath)}
+- Runner: ${inlineCode(loop.runner?.command ?? 'not configured')}
 
-AgentLoopKit will not execute a coding agent for this loop.
+${loop.runner ? 'AgentLoopKit will execute only the configured runner command for this loop.' : 'AgentLoopKit will not execute a coding agent for this loop.'}
 
 ## Suggested Commands
 
@@ -311,6 +332,15 @@ ${renderTokenReceiptMarkdown(loop.latestTokenReceipt)}
 ## Stop Conditions
 
 ${loop.stopConditions.map((condition) => `- ${escapeMarkdownProse(condition)}`).join('\n')}
+
+## Guardrails
+
+- Explicit runner required: ${inlineCode(String(loop.guardrails?.requireExplicitRunner ?? true))}
+- Shell execution: ${inlineCode(String(loop.guardrails?.shell ?? false))}
+- Shell metacharacters rejected: ${inlineCode(String(loop.guardrails?.rejectShellMetacharacters ?? true))}
+- Blocked command families: ${(loop.guardrails?.blockedCommands ?? BLOCKED_LOOP_RUNNER_COMMANDS)
+    .map((command) => inlineCode(command))
+    .join(', ')}
 `;
 }
 
@@ -323,6 +353,7 @@ export function renderLoopStatusMarkdown(result: Omit<LoopStatusResult, 'markdow
 - Used estimated tokens: ${inlineCode(String(result.summary.usedEstimatedTokens))}
 - Max estimated tokens: ${inlineCode(String(result.summary.maxEstimatedTokens))}
 - Next action: ${inlineCode(nextActionForLoop(result.loop))}
+- Runner: ${inlineCode(result.loop.runner?.command ?? 'not configured')}
 
 ${renderTokenReceiptMarkdown(result.loop.latestTokenReceipt)}
 `;
@@ -334,6 +365,7 @@ export function renderLoopReportMarkdown(result: Omit<LoopStatusResult, 'markdow
 - Goal: ${inlineCode(result.loop.goal)}
 - Status: ${inlineCode(result.loop.status)}
 - Native task: ${inlineCode(result.loop.task.nativeTaskPath)}
+- Runner: ${inlineCode(result.loop.runner?.command ?? 'not configured')}
 
 ## Token Ledger
 
@@ -360,6 +392,7 @@ function nextActionForLoop(loop: AgentLoopLoopContractV1) {
   if (loop.status === 'complete') return 'agentloop ship';
   if (loop.status === 'stopped') return 'review loop report';
   if (loop.status === 'blocked') return 'agentloop ready';
+  if (loop.runner) return `agentloop loop run --id ${loop.id}`;
   return `agentloop loop tick --id ${loop.id}`;
 }
 
@@ -380,6 +413,9 @@ export async function createLoop(options: {
   cadence?: string;
   budgetTokens?: number;
   maxIterations?: number;
+  runnerCommand?: string;
+  runnerName?: string;
+  runnerTimeoutMs?: number;
 }): Promise<LoopCreateResult> {
   const preset = presetFromInput(options.preset);
   const presetConfig = preset ? PRESETS[preset] : undefined;
@@ -397,6 +433,11 @@ export async function createLoop(options: {
   if (!Number.isInteger(maxIterations) || maxIterations <= 0) {
     throw new AgentLoopError('Loop max iterations must be a positive integer.', 'LOOP_ITERATIONS_INVALID');
   }
+  const runner = createRunnerConfig({
+    command: options.runnerCommand,
+    name: options.runnerName,
+    timeoutMs: options.runnerTimeoutMs,
+  });
 
   const id = `${formatTimestamp()}-${slugify(goal)}`;
   const loopPath = loopPathForId({ cwd: options.cwd, config: options.config, id });
@@ -409,13 +450,22 @@ export async function createLoop(options: {
       status: 'in-progress',
       problemStatement: `The repo needs a controlled local loop for this goal: ${goal}`,
       desiredOutcome:
-        'AgentLoopKit records loop iterations, readiness gates, and context-budget evidence without executing a coding agent.',
+        runner
+          ? 'AgentLoopKit records runner execution, loop iterations, readiness gates, and context-budget evidence while keeping the external runner bounded by local guardrails.'
+          : 'AgentLoopKit records loop iterations, readiness gates, and context-budget evidence without executing a coding agent.',
       constraints: [
         'Use compact context handles before broad reads.',
-        'Keep external agent execution outside AgentLoopKit.',
+        runner
+          ? `Run only the configured loop runner: ${runner.command}`
+          : 'Keep external agent execution outside AgentLoopKit.',
         'Record token receipts for each loop iteration.',
+        'Do not publish packages, create tags, push commits, or run destructive git operations from the loop runner.',
       ],
-      nonGoals: ['Do not auto-merge, auto-publish, or execute coding-agent commands.'],
+      nonGoals: [
+        runner
+          ? 'Do not auto-merge, auto-publish, or execute any runner command other than the configured command.'
+          : 'Do not auto-merge, auto-publish, or execute coding-agent commands.',
+      ],
       likelyFiles: [
         relativePath(options.cwd, loopPath),
         ...(presetConfig?.likelyFiles ?? ['.agentloop', 'src', 'tests', 'docs']),
@@ -423,9 +473,14 @@ export async function createLoop(options: {
       acceptanceCriteria: [
         'Loop iterations record readiness and context-budget evidence.',
         'Loop stop conditions are visible before agent work continues.',
+        ...(runner ? ['Configured runner output, exit code, and changed files are recorded per run.'] : []),
       ],
       verificationCommands: ['agentloop ready --strict'],
-      riskNotes: ['Loop suggested commands are guidance only; AgentLoopKit does not run them.'],
+      riskNotes: [
+        runner
+          ? 'Loop runner execution is opt-in, exact-command matched, non-shell, timeout bounded, and protected command families are blocked.'
+          : 'Loop suggested commands are guidance only; AgentLoopKit does not run them.',
+      ],
       rollbackNotes: `Delete ${relativePath(options.cwd, loopPath)} and close this loop task if the loop is abandoned.`,
       createdDate: formatDate(),
     },
@@ -474,7 +529,16 @@ export async function createLoop(options: {
     controls: {
       agentNeutral: true,
       externalAgentExecution: false,
+      externalRunnerExecution: Boolean(runner),
       localEvidenceOnly: true,
+    },
+    ...(runner ? { runner } : {}),
+    guardrails: {
+      requireExplicitRunner: true,
+      shell: false,
+      rejectShellMetacharacters: true,
+      blockedCommands: BLOCKED_LOOP_RUNNER_COMMANDS,
+      maxOutputChars: DEFAULT_LOOP_RUNNER_OUTPUT_CHARS,
     },
     task: {
       nativeTaskPath: relativePath(options.cwd, task.path),
@@ -604,6 +668,131 @@ export async function tickLoop(options: {
 
 - Loop: ${inlineCode(updatedLoop.id)}
 - Iteration: ${inlineCode(String(iteration.index))}
+- Decision: ${inlineCode(iteration.decision)}
+- Readiness: ${inlineCode(iteration.readinessStatus)}
+- Next action: ${inlineCode(iteration.nextAction)}
+`,
+  };
+}
+
+export async function runLoop(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  id?: string;
+  command?: string;
+}): Promise<LoopRunResult> {
+  const id = await resolveLoopId(options);
+  const loop = await readLoop({ cwd: options.cwd, config: options.config, id });
+  if (loop.status === 'complete' || loop.status === 'stopped') {
+    throw new AgentLoopError(
+      `Loop ${loop.id} is ${loop.status}; create a new loop or inspect the report.`,
+      'LOOP_TERMINAL',
+    );
+  }
+  if (loop.status === 'blocked') {
+    throw new AgentLoopError(
+      `Loop ${loop.id} is blocked; inspect the loop report before running another iteration.`,
+      'LOOP_BLOCKED',
+    );
+  }
+  if (!loop.runner) {
+    throw new AgentLoopError(
+      'Loop run requires a runner configured during loop create.',
+      'LOOP_RUNNER_REQUIRED',
+    );
+  }
+  if (options.command?.trim() && options.command.trim() !== loop.runner.command) {
+    throw new AgentLoopError(
+      'Loop run command override must exactly match the configured runner command.',
+      'LOOP_RUNNER_NOT_ALLOWED',
+    );
+  }
+
+  const runner = await executeLoopRunner({ cwd: options.cwd, runner: loop.runner });
+  const [ready, contextPack] = await Promise.all([
+    evaluateReady({ cwd: options.cwd, config: options.config }),
+    buildContextPack({
+      cwd: options.cwd,
+      config: options.config,
+      target: 'codex',
+      goal: 'continue',
+    }),
+  ]);
+  const nextIndex = loop.iterations.length + 1;
+  const tokenReceipt = buildTokenReceipt({
+    contextBudget: {
+      ...contextPack.contextBudget,
+      savingsCommand: 'agentloop context pack --for codex --goal continue --redact-paths',
+    },
+    agentLoopOutput: JSON.stringify({
+      loop: { id: loop.id, goal: loop.goal, iteration: nextIndex },
+      runner: {
+        command: runner.command,
+        status: runner.status,
+        exitCode: runner.exitCode,
+        changedFilesAfter: runner.changedFilesAfter,
+      },
+      ready: { status: ready.status, nextAction: ready.nextAction },
+    }),
+  });
+  const usedTokensAfterTick =
+    loop.budget.usedEstimatedTokens +
+    tokenReceipt.estimatedCompactContextTokens +
+    tokenReceipt.estimatedAgentLoopOverheadTokens;
+  const decision =
+    runner.status === 'passed'
+      ? decideIteration({
+          readyStatus: ready.status,
+          nextIndex,
+          usedTokensAfterTick,
+          loop,
+        })
+      : {
+          decision: 'ask-human' as const,
+          status: 'blocked' as const,
+          stopReason: `runner ${runner.status}`,
+        };
+  const iteration: LoopIteration = {
+    index: nextIndex,
+    createdAt: new Date().toISOString(),
+    readinessStatus: ready.status,
+    decision: decision.decision,
+    ...(decision.stopReason ? { stopReason: decision.stopReason } : {}),
+    nextAction:
+      runner.status === 'passed'
+        ? ready.nextAction.command
+        : 'inspect runner output before continuing the loop',
+    contextHandles: contextPack.handles.map((handle) => handle.id),
+    tokenReceipt,
+    runner,
+  };
+  const updatedLoop: AgentLoopLoopContractV1 = {
+    ...loop,
+    status: decision.status,
+    ...(decision.stopReason ? { stopReason: decision.stopReason } : {}),
+    updatedAt: iteration.createdAt,
+    budget: {
+      ...loop.budget,
+      usedEstimatedTokens: usedTokensAfterTick,
+    },
+    latestTokenReceipt: tokenReceipt,
+    iterations: [...loop.iterations, iteration],
+    safety: {
+      ...loop.safety,
+      commandsExecuted: [...loop.safety.commandsExecuted, runner.command],
+    },
+  };
+  await writeJsonAtomic(loopPathForId({ cwd: options.cwd, config: options.config, id }), updatedLoop);
+  return {
+    loop: updatedLoop,
+    iteration,
+    markdown: `# AgentLoopKit Loop Run
+
+- Loop: ${inlineCode(updatedLoop.id)}
+- Iteration: ${inlineCode(String(iteration.index))}
+- Runner: ${inlineCode(runner.status)}
+- Command: ${inlineCode(runner.command)}
+- Exit code: ${inlineCode(String(runner.exitCode))}
 - Decision: ${inlineCode(iteration.decision)}
 - Readiness: ${inlineCode(iteration.readinessStatus)}
 - Next action: ${inlineCode(iteration.nextAction)}

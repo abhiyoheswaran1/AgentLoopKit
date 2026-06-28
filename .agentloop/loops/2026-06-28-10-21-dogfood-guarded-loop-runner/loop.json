@@ -1,0 +1,235 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "agentloop-loop",
+  "id": "2026-06-28-10-21-dogfood-guarded-loop-runner",
+  "path": ".agentloop/loops/2026-06-28-10-21-dogfood-guarded-loop-runner/loop.json",
+  "goal": "Dogfood guarded loop runner",
+  "cadence": "manual",
+  "status": "complete",
+  "createdAt": "2026-06-28T08:21:44.275Z",
+  "updatedAt": "2026-06-28T08:52:05.986Z",
+  "budget": {
+    "maxEstimatedTokens": 20000,
+    "maxIterations": 2,
+    "usedEstimatedTokens": 956
+  },
+  "controls": {
+    "agentNeutral": true,
+    "externalAgentExecution": false,
+    "externalRunnerExecution": true,
+    "localEvidenceOnly": true
+  },
+  "runner": {
+    "name": "default",
+    "command": "npm run check:public-docs",
+    "timeoutMs": 300000,
+    "maxOutputChars": 8000,
+    "shell": false
+  },
+  "guardrails": {
+    "requireExplicitRunner": true,
+    "shell": false,
+    "rejectShellMetacharacters": true,
+    "blockedCommands": [
+      "shell interpreters",
+      "rm/rmdir",
+      "git add/commit/push/reset/clean/checkout/switch/rebase/merge/tag/stash/restore",
+      "npm/pnpm/yarn/bun publish/version",
+      "gh release",
+      "docker push/login"
+    ],
+    "maxOutputChars": 8000
+  },
+  "task": {
+    "nativeTaskPath": ".agentloop/tasks/2026-06-28-loop-dogfood-guarded-loop-runner.md"
+  },
+  "suggestedCommands": [
+    {
+      "command": "agentloop start --for codex --goal implement --redact-paths",
+      "reason": "Brief the next coding agent with compact source handles.",
+      "required": true
+    },
+    {
+      "command": "agentloop ready --strict",
+      "reason": "Check readiness before review or handoff.",
+      "required": true
+    }
+  ],
+  "stopConditions": [
+    "Stop when readiness gates pass.",
+    "Stop after 2 iteration(s).",
+    "Stop when estimated loop token usage reaches 20000.",
+    "Ask a human when task scope or acceptance criteria need product judgment."
+  ],
+  "iterations": [
+    {
+      "index": 1,
+      "createdAt": "2026-06-28T08:21:57.611Z",
+      "readinessStatus": "blocked",
+      "decision": "continue",
+      "nextAction": "agentloop verify --task-commands --progress",
+      "contextHandles": [
+        "task:active",
+        "evidence-map:current",
+        "context-budget:current",
+        "verification:latest",
+        "run:latest"
+      ],
+      "tokenReceipt": {
+        "heuristic": "chars-divided-by-four",
+        "estimatedBroadContextTokens": 173,
+        "estimatedCompactContextTokens": 96,
+        "estimatedAgentLoopOverheadTokens": 277,
+        "estimatedGrossContextReductionTokens": 77,
+        "estimatedNetContextReductionTokens": -200,
+        "warning": "AgentLoopKit may cost more context than it avoids for this repo state. Use compact output or narrow scope.",
+        "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+        "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+      },
+      "runner": {
+        "name": "default",
+        "command": "npm run check:public-docs",
+        "executable": "npm",
+        "args": [
+          "run",
+          "check:public-docs"
+        ],
+        "shell": false,
+        "exitCode": 0,
+        "status": "passed",
+        "durationMs": 963,
+        "outputExcerpt": "\n> agentloopkit@0.45.0 check:public-docs\n> node scripts/public-docs-hygiene.mjs\n\n# AgentLoopKit Public Docs Hygiene\nVersion: 0.45.0\nPublic docs checked: 81\nRepo harness files checked: 2\nPublic docs hygiene passed.",
+        "changedFilesAfter": [
+          ".agentloop/README.md",
+          ".agentloop/harness/autonomous-dogfooding.md",
+          ".agentloop/harness/commands.md",
+          "AGENTLOOP.md",
+          "AGENTS.md",
+          "CHANGELOG.md",
+          "README.md",
+          "docs/cli-reference.md",
+          "docs/getting-started.md",
+          "docs/loop-contracts.md",
+          "src/cli/commands/loop.ts",
+          "src/core/loop-contract.ts",
+          "src/core/upgrade-harness.ts",
+          "src/index.ts",
+          "src/templates/harness/commands.md",
+          "src/templates/root/AGENTLOOP.md",
+          "src/templates/root/AGENTS.md",
+          "src/templates/root/agentloop-directory-readme.md",
+          "tests/loop-contract.test.ts",
+          ".agentloop/loops/2026-06-28-10-21-dogfood-guarded-loop-runner/loop.json",
+          ".agentloop/tasks/2026-06-28-add-guarded-loop-runner.md",
+          ".agentloop/tasks/2026-06-28-loop-dogfood-guarded-loop-runner.md",
+          "src/core/loop-runner.ts"
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "createdAt": "2026-06-28T08:52:05.986Z",
+      "readinessStatus": "ready",
+      "decision": "ready",
+      "stopReason": "readiness gates passed",
+      "nextAction": "agentloop ship",
+      "contextHandles": [
+        "task:active",
+        "evidence-map:current",
+        "context-budget:current",
+        "verification:latest",
+        "run:latest"
+      ],
+      "tokenReceipt": {
+        "heuristic": "chars-divided-by-four",
+        "estimatedBroadContextTokens": 420,
+        "estimatedCompactContextTokens": 49,
+        "estimatedAgentLoopOverheadTokens": 534,
+        "estimatedGrossContextReductionTokens": 371,
+        "estimatedNetContextReductionTokens": -163,
+        "warning": "AgentLoopKit may cost more context than it avoids for this repo state. Use compact output or narrow scope.",
+        "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+        "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+      },
+      "runner": {
+        "name": "default",
+        "command": "npm run check:public-docs",
+        "executable": "npm",
+        "args": [
+          "run",
+          "check:public-docs"
+        ],
+        "shell": false,
+        "exitCode": 0,
+        "status": "passed",
+        "durationMs": 1152,
+        "outputExcerpt": "\n> agentloopkit@0.45.0 check:public-docs\n> node scripts/public-docs-hygiene.mjs\n\n# AgentLoopKit Public Docs Hygiene\nVersion: 0.45.0\nPublic docs checked: 81\nRepo harness files checked: 2\nPublic docs hygiene passed.",
+        "changedFilesAfter": [
+          ".agentloop/README.md",
+          ".agentloop/harness/autonomous-dogfooding.md",
+          ".agentloop/harness/commands.md",
+          "AGENTLOOP.md",
+          "AGENTS.md",
+          "CHANGELOG.md",
+          "README.md",
+          "docs/cli-reference.md",
+          "docs/getting-started.md",
+          "docs/loop-contracts.md",
+          "src/cli/commands/loop.ts",
+          "src/core/loop-contract.ts",
+          "src/core/upgrade-harness.ts",
+          "src/index.ts",
+          "src/templates/harness/commands.md",
+          "src/templates/root/AGENTLOOP.md",
+          "src/templates/root/AGENTS.md",
+          "src/templates/root/agentloop-directory-readme.md",
+          "tests/loop-contract.test.ts",
+          ".agentloop/handoffs/2026-06-28-10-49-pr-description.md",
+          ".agentloop/handoffs/2026-06-28-10-49-pr-summary.md",
+          ".agentloop/handoffs/2026-06-28-10-50-pr-summary.md",
+          ".agentloop/loops/2026-06-28-10-21-dogfood-guarded-loop-runner/loop.json",
+          ".agentloop/reports/2026-06-28-10-24-verification-report.md",
+          ".agentloop/reports/2026-06-28-10-49-ship-report.md",
+          ".agentloop/runs/2026-06-28-10-26-verify/changed-files.json",
+          ".agentloop/runs/2026-06-28-10-26-verify/metadata.json",
+          ".agentloop/runs/2026-06-28-10-26-verify/verification-report.md",
+          ".agentloop/runs/2026-06-28-10-49-ship/changed-files.json",
+          ".agentloop/runs/2026-06-28-10-49-ship/diffstat.txt",
+          ".agentloop/runs/2026-06-28-10-49-ship/metadata.json",
+          ".agentloop/runs/2026-06-28-10-49-ship/pr-summary.md",
+          ".agentloop/runs/2026-06-28-10-49-ship/score.json",
+          ".agentloop/runs/2026-06-28-10-49-ship/ship-report.md",
+          ".agentloop/runs/2026-06-28-10-50-handoff/changed-files.json",
+          ".agentloop/runs/2026-06-28-10-50-handoff/diffstat.txt",
+          ".agentloop/runs/2026-06-28-10-50-handoff/metadata.json",
+          ".agentloop/runs/2026-06-28-10-50-handoff/pr-summary.md",
+          ".agentloop/tasks/2026-06-28-add-guarded-loop-runner.md",
+          ".agentloop/tasks/archive/2026-06-28-loop-dogfood-guarded-loop-runner.md",
+          "src/core/loop-runner.ts"
+        ]
+      }
+    }
+  ],
+  "latestTokenReceipt": {
+    "heuristic": "chars-divided-by-four",
+    "estimatedBroadContextTokens": 420,
+    "estimatedCompactContextTokens": 49,
+    "estimatedAgentLoopOverheadTokens": 534,
+    "estimatedGrossContextReductionTokens": 371,
+    "estimatedNetContextReductionTokens": -163,
+    "warning": "AgentLoopKit may cost more context than it avoids for this repo state. Use compact output or narrow scope.",
+    "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+    "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+  },
+  "safety": {
+    "writesLoopContract": true,
+    "writesNativeTask": true,
+    "commandsExecuted": [
+      "npm run check:public-docs",
+      "npm run check:public-docs"
+    ],
+    "externalNetwork": false,
+    "publishes": false
+  },
+  "stopReason": "readiness gates passed"
+}
