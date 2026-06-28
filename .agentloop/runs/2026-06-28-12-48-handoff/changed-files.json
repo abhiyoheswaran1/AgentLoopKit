@@ -1,0 +1,26 @@
+[
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-28-release-agentloopkit-0-46-0.md"
+  },
+  {
+    "status": "M",
+    "path": "FINAL_HANDOFF.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/launch-checklist.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/npm-publishing.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/release-status.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-28-release-agentloopkit-0-46-0.md"
+  }
+]

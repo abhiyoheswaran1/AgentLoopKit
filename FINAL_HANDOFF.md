@@ -84,16 +84,21 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Current npm release: `agentloopkit@0.46.0`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.46.0>
 - Release asset: `agentloopkit-0.46.0.tgz`
-- Release asset SHA-256: recorded on the GitHub Release after upload.
-- Release tag: `v0.46.0` points at the published release commit.
-- Local release gate: `npm run release-flow`
-- Strict dogfood gate: `npm run dogfood:strict`
-- Release readiness gate: `agentloop release-check --strict`
-- Post-publish npm proof: run `agentloop npm-status --agentloopkit --expect-current` after workflows finish.
-- Published-package smoke: run `npm run smoke:published -- --version 0.46.0` after npm updates.
-- GHCR proof: run `agentloop release-proof --redact-paths` after the Docker workflow finishes.
-- MCP Registry proof: run `agentloop release-proof --redact-paths` after MCP Registry publishing finishes.
-- GitHub Marketplace proof: deferred until the owner UI publication step is completed and verified.
+- Release asset SHA-256: `48d9fe95b5a63bd611512a53294437579932901980c038323194874715493ff4`
+- Release tag: `v0.46.0` at release commit `37717f743f77afaad05b829528e70083c65c819c`
+- CI run for the release commit: `28319409663` passed
+- CLI Smoke run for the release commit: `28319409670` passed
+- Publish workflow run: `28319419421` passed
+- Docker workflow run: `28319419422` passed
+- MCP Registry workflow run: `28319659684` passed
+- Local release gate: `npm run release-flow` passed
+- Strict dogfood gate: `npm run dogfood:strict` passed
+- Release readiness gate: `agentloop release-check --strict` passed before tagging
+- Post-publish npm proof: npm latest is `agentloopkit@0.46.0`; `agentloop npm-status --agentloopkit --expect-current` passed
+- Published-package smoke: `npm run smoke:published -- --version 0.46.0` passed
+- GHCR proof: `agentloop release-proof --redact-paths` confirmed image tag `0.46.0`
+- MCP Registry proof: `agentloop release-proof --redact-paths` confirmed metadata for `agentloopkit@0.46.0`
+- GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 28, 2026
 
 ## 0.46.0 release summary
 

@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-28
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 Publish the guarded loop runner, README demo updates, and loop controller guardrails across the usual AgentLoopKit release channels.
