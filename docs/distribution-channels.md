@@ -8,7 +8,7 @@ This page is for maintainers planning releases. Keep the README focused on user 
 | --------------- | --------------------- | -------------------------------------------------------------------------------------------- |
 | npm / npx       | Primary channel       | `npx agentloopkit init`                                                                      |
 | GitHub Releases | Public release assets | Download `agentloopkit-<version>.tgz` from GitHub                                            |
-| GitHub Action   | Live repo action      | `uses: abhiyoheswaran1/AgentLoopKit@v<version>`                                              |
+| GitHub Action   | Live by repository ref | `uses: abhiyoheswaran1/AgentLoopKit@v<version>`                                             |
 | GitHub Marketplace | Pending owner UI publication | <https://github.com/marketplace/actions/agentloopkit>                              |
 | Docker / GHCR   | Live image            | `docker run --rm -v "$PWD:/workspace" ghcr.io/abhiyoheswaran1/agentloopkit:<version> doctor` |
 | MCP Registry    | Published metadata    | `npx --yes agentloopkit@latest mcp-server`                                                   |
@@ -49,7 +49,7 @@ Keep `command` and `agentloopkit-version` static and trusted. Do not build eithe
 
 The action does not upload artifacts or comment on pull requests. Workflow authors decide which command to run and whether to upload generated AgentLoopKit files.
 
-GitHub Marketplace publication is a release UI step, not a `gh release` or REST API flag. Before claiming the Marketplace channel is live for a release, open the GitHub release editor, ensure **Publish this Action to the GitHub Marketplace** is selected, choose the Developer Tools category, publish the release, and verify the Marketplace URL with `agentloop release-proof --only github-marketplace --strict`.
+GitHub Marketplace publication is a release UI step, not a `gh release` or REST API flag. The repository Action works through `uses: abhiyoheswaran1/AgentLoopKit@v<version>` while the Marketplace listing is pending. Before claiming the Marketplace channel is live for a release, open the GitHub release editor, ensure **Publish this Action to the GitHub Marketplace** is selected, choose the Developer Tools category, publish the release, and verify the Marketplace URL with `agentloop release-proof --only github-marketplace --strict`.
 
 ## Docker / GHCR
 

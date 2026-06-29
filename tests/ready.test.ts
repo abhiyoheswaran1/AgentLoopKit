@@ -119,6 +119,28 @@ Revert the copy change.
   return dir;
 }
 
+async function createIdleFixture() {
+  const dir = await makeTempDir();
+  tempDirs.push(dir);
+
+  await git(dir, ['init', '-q']);
+  await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
+  await git(dir, ['config', 'user.name', 'AgentLoopKit Test']);
+
+  const config = createDefaultConfig({
+    name: 'demo',
+    type: 'typescript-package',
+    packageManager: 'npm',
+    commands: { test: 'npm test' },
+  });
+  await writeJson(path.join(dir, 'agentloop.config.json'), config);
+  await mkdir(path.join(dir, '.agentloop'), { recursive: true });
+  await git(dir, ['add', '.']);
+  await git(dir, ['commit', '-m', 'Initial state']);
+
+  return dir;
+}
+
 describe('ready command', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
@@ -256,5 +278,24 @@ describe('ready command', () => {
     expect(result.stdout).toContain('AgentLoopKit overhead');
     expect(result.stdout).toContain('## Next Action');
     expect(result.stdout).not.toContain(dir);
+  });
+
+  test('does not warn about context cost when the repo is idle with no task', async () => {
+    const dir = await createIdleFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'ready', '--json'], { cwd: dir });
+    const payload = JSON.parse(result.stdout);
+
+    expect(payload.status).toBe('blocked');
+    expect(payload.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'context-budget',
+          status: 'pass',
+          message: 'No changed-file context to compact yet.',
+        }),
+      ]),
+    );
+    expect(payload.tokenReceipt.warning).toBe('No changed-file context to compact yet.');
   });
 });

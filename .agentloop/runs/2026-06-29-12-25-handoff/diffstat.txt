@@ -1,0 +1,7 @@
+ CHANGELOG.md                  |  3 ++-
+ docs/distribution-channels.md |  4 ++--
+ docs/release-proof.md         |  2 ++
+ src/core/ready.ts             |  5 ++++-
+ src/core/token-receipt.ts     | 11 +++++++----
+ tests/ready.test.ts           | 41 +++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 58 insertions(+), 8 deletions(-)

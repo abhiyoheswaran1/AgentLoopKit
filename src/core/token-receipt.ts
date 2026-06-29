@@ -30,6 +30,12 @@ export function buildTokenReceipt(input: {
   const overhead = estimateHeuristicTokens(input.agentLoopOutput);
   const grossReduction = broad - compact;
   const netReduction = grossReduction - overhead;
+  const warning =
+    broad === 0
+      ? 'No changed-file context to compact yet.'
+      : netReduction > 0
+        ? 'AgentLoopKit estimates this compact evidence path saves context for this repo state.'
+        : 'AgentLoopKit may cost more context than it avoids for this repo state. Use compact output or narrow scope.';
   return {
     heuristic: 'chars-divided-by-four',
     estimatedBroadContextTokens: broad,
@@ -37,10 +43,7 @@ export function buildTokenReceipt(input: {
     estimatedAgentLoopOverheadTokens: overhead,
     estimatedGrossContextReductionTokens: grossReduction,
     estimatedNetContextReductionTokens: netReduction,
-    warning:
-      netReduction > 0
-        ? 'AgentLoopKit estimates this compact evidence path saves context for this repo state.'
-        : 'AgentLoopKit may cost more context than it avoids for this repo state. Use compact output or narrow scope.',
+    warning,
     savingsCommand: input.contextBudget.savingsCommand,
     note: 'Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter.',
   };

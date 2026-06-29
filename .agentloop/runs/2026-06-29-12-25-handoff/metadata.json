@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-29-12-25-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-29-12-25",
+  "createdAtEpochMs": 1782728741858,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-29-polish-ready-idle-state-and-release-channel-docs.md",
+    "title": "Polish ready idle state and release-channel docs",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-29-12-21-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-29-12-25-pr-summary.md",
+  "changedFileCount": 11
+}

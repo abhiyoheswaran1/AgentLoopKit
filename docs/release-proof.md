@@ -107,6 +107,8 @@ Human Markdown keeps package metadata, channel messages, tags, commits, URLs, an
 
 `release-proof` checks public channel proof for the local package version. The GitHub Marketplace channel verifies that the Action listing URL derived from the root `action.yml` name returns a successful HTTP status. If `HEAD` differs from the version tag, the command reports that state and recommends `agentloop release-check`. That commit mismatch does not make channel proof fail by itself; it means the current checkout may contain unreleased work.
 
+The GitHub Action can still run by repository ref while Marketplace proof is missing. Treat a Marketplace warning as a listing publication gap; npm, GitHub Release, GHCR, and MCP Registry can still pass. Use `--strict --only github-marketplace` only when the owner-side listing step should block the release.
+
 For MCP Registry proof, AgentLoopKit looks for `package.json` `mcpName` or `server.json` `name`. Repositories without either field get an MCP warning while the other channels continue to report normally.
 
 When you combine `--only` with captured JSON flags, AgentLoopKit reads only the selected channel's capture file. It ignores captured files for unselected channels.

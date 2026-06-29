@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Fixed `agentloop ready` so an idle repo with no changed-file context reports a neutral context-budget receipt instead of warning that AgentLoopKit may cost more context than it saves.
+- Clarified release-channel docs so GitHub Marketplace remains an owner-side listing proof step while the repository Action stays usable by version ref.
 
 ## 0.47.0
 

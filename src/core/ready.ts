@@ -170,7 +170,10 @@ function buildReadyGates(input: {
     gate(
       'context-budget',
       'Context budget',
-      input.tokenReceipt.estimatedNetContextReductionTokens > 0 ? 'pass' : 'warn',
+      input.tokenReceipt.estimatedBroadContextTokens === 0 ||
+        input.tokenReceipt.estimatedNetContextReductionTokens > 0
+        ? 'pass'
+        : 'warn',
       input.tokenReceipt.warning,
     ),
   );
