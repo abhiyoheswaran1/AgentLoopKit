@@ -84,20 +84,20 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Current npm release: `agentloopkit@0.47.1`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.47.1>
 - Release asset: `agentloopkit-0.47.1.tgz`
-- Release asset SHA-256: recorded after GitHub Release asset upload
-- Release tag: `v0.47.1` at release commit recorded after tagging
-- CI run for the release commit: recorded after CI completes
-- CLI Smoke run for the release commit: recorded after CI completes
-- Publish workflow run: recorded after npm trusted publishing completes
-- Docker workflow run: recorded after GHCR publish completes
-- MCP Registry workflow run: recorded after MCP Registry publish completes
-- Local release gate: `npm run release-flow` passed
+- Release asset SHA-256: `1a0cdb6b1b193197d49db2402300c9443681e7b30f1899d0653f3a8499705430`
+- Release tag: `v0.47.1` at release commit `c28efc05fd9d5792d66afca64efaecb534ddf32a`
+- CI run for the release commit: `28370886339` passed
+- CLI Smoke run for the release commit: `28370886333` passed
+- Publish workflow run: `28370907414` passed
+- Docker workflow run: `28370907355` passed
+- MCP Registry workflow run: `28371454481` passed
+- Local release gate: direct release-flow component verification passed
 - Strict dogfood gate: `npm run dogfood:strict` passed
 - Release readiness gate: `agentloop release-check --strict` passed before tagging
-- Post-publish npm proof: npm latest is `agentloopkit@0.47.1`; `agentloop npm-status --agentloopkit --expect-current` recorded after publish
-- Published-package smoke: `npm run smoke:published -- --version 0.47.1` recorded after publish
-- GHCR proof: recorded after GHCR publishes image tag `0.47.1`
-- MCP Registry proof: recorded after metadata points at `agentloopkit@0.47.1`
+- Post-publish npm proof: npm latest is `agentloopkit@0.47.1`; `agentloop npm-status --agentloopkit --expect-current` passed
+- Published-package smoke: `npm run smoke:published -- --version 0.47.1` passed
+- GHCR proof: `agentloop release-proof --redact-paths` confirmed image tag `0.47.1`
+- MCP Registry proof: `agentloop release-proof --redact-paths` confirmed metadata for `agentloopkit@0.47.1`
 - GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 29, 2026
 
 ## 0.47.1 release summary

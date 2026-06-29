@@ -11,18 +11,18 @@ Last checked: June 29, 2026.
 - Release tag `v0.47.1` points at the published release commit.
 - Release URL: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.47.1>
 - Release asset: `agentloopkit-0.47.1.tgz`
-- Release asset SHA-256: recorded after GitHub Release asset upload.
-- Release commit: recorded after tagging.
-- CI run for release commit: recorded after CI completes.
-- CLI Smoke run for release commit: recorded after CI completes.
-- Publish workflow run: recorded after npm trusted publishing completes.
-- Docker workflow run: recorded after GHCR publish completes.
-- MCP Registry workflow run: recorded after MCP Registry publish completes.
+- Release asset SHA-256: `1a0cdb6b1b193197d49db2402300c9443681e7b30f1899d0653f3a8499705430`
+- Release commit: `c28efc05fd9d5792d66afca64efaecb534ddf32a`
+- CI run for release commit: `28370886339` passed.
+- CLI Smoke run for release commit: `28370886333` passed.
+- Publish workflow run: `28370907414` passed.
+- Docker workflow run: `28370907355` passed.
+- MCP Registry workflow run: `28371454481` passed.
 - npm trusted publishing: configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`
 
-GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirms the release image after publish.
+GHCR publishes `ghcr.io/abhiyoheswaran1/agentloopkit`; `agentloop release-proof --redact-paths` confirmed the `0.47.1` image.
 
-The MCP Registry metadata points at the current npm package after publish.
+The MCP Registry metadata points at npm package `agentloopkit@0.47.1`.
 
 GitHub Marketplace publication is still not live. The public listing URL <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 29, 2026.
 
@@ -66,26 +66,28 @@ After each publish:
 
 Local release gate for `0.47.1`:
 
-- `npm run maintenance:check`: passed before release metadata preparation.
+- direct release-flow component verification: passed before tagging.
 - `npm run test:unit`: passed with 222 tests.
+- `npm run test:integration`: passed.
+- direct full Vitest run: 74 files and 1002 tests passed.
 - `npm run dogfood:strict`: passed.
 - `npx --yes projscan doctor --format markdown`: A/90 with the known reviewed `prepublishOnly` advisory.
 - `agentloop verify --task-commands --only-task-commands --progress --write-run --redact-paths`: passed.
 - `agentloop check-gates --strict --redact-paths`: passed before release metadata preparation.
-- `npx --no-install tsx src/cli/index.ts release-check --strict --redact-paths`: run before tagging.
+- `npx --no-install tsx src/cli/index.ts release-check --strict --redact-paths`: passed on release commit `c28efc05`.
 - AgentFlight status: checked by dogfood.
 
 Post-publish checks:
 
-- `npm view agentloopkit version versions --json`: recorded after publish
-- `agentloop npm-status --agentloopkit --expect-current`: recorded after publish
-- `npm run smoke:published -- --version 0.47.1`: recorded after publish
-- clean temporary published-package version check: recorded after publish
-- GitHub release asset digest: recorded after asset upload
-- `agentloop release-proof --redact-paths`: recorded after release workflows finish
+- `npm view agentloopkit version versions --json`: latest is `0.47.1`, and the versions list contains `0.47.1`
+- `agentloop npm-status --agentloopkit --expect-current`: passed; npm latest matches local package version
+- `npm run smoke:published -- --version 0.47.1`: passed
+- clean temporary published-package version check: `0.47.1`
+- GitHub release asset digest: `sha256:1a0cdb6b1b193197d49db2402300c9443681e7b30f1899d0653f3a8499705430`
+- `agentloop release-proof --redact-paths`: passed for npm, GitHub Release, GHCR, and MCP Registry; warned for GitHub Marketplace
 - `node dist/cli/index.js release-proof --strict --only github-marketplace --redact-paths`: expected to fail while Marketplace publication remains deferred
-- GHCR image tag `0.47.1`: recorded after GHCR publish
-- MCP Registry metadata points at `agentloopkit@0.47.1`: recorded after MCP Registry publish
+- GHCR image tag `0.47.1`: confirmed
+- MCP Registry metadata points at `agentloopkit@0.47.1`: confirmed
 
 Latest release-status documentation and proof commands on post-release `main`:
 
