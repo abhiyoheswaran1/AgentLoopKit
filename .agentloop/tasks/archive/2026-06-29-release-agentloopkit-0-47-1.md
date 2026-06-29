@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-29
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 AgentLoopKit has a verified patch for idle ready context-budget output and release-channel docs that is not yet available in the published package.
