@@ -1,0 +1,22 @@
+[
+  {
+    "status": "D",
+    "path": ".agentloop/tasks/2026-06-29-release-agentloopkit-0-47-0.md"
+  },
+  {
+    "status": "M",
+    "path": "FINAL_HANDOFF.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/launch-checklist.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/release-status.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/archive/2026-06-29-release-agentloopkit-0-47-0.md"
+  }
+]

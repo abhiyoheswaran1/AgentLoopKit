@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-29
 - Task type: release
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The completed loop scorecard work needs a public release across the maintained channels.

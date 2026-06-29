@@ -84,13 +84,13 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Current npm release: `agentloopkit@0.47.0`
 - GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.47.0>
 - Release asset: `agentloopkit-0.47.0.tgz`
-- Release asset SHA-256: to be recorded after the GitHub release asset is published
-- Release tag: `v0.47.0` at the published release commit
-- CI run for the release commit: to be recorded after CI finishes
-- CLI Smoke run for the release commit: to be recorded after CI finishes
-- Publish workflow run: to be recorded after trusted publishing finishes
-- Docker workflow run: to be recorded after GHCR publishing finishes
-- MCP Registry workflow run: to be recorded after MCP Registry publishing finishes
+- Release asset SHA-256: `c03ebbd37836da1b3435ed2cb9958a0574e23787002ee029014773455334c4b1`
+- Release tag: `v0.47.0` at release commit `50eea4bd1501b01377e30c8892785f5bc97ab1f6`
+- CI run for the release commit: `28358638658` passed
+- CLI Smoke run for the release commit: `28358638842` passed
+- Publish workflow run: `28358724358` passed
+- Docker workflow run: `28358724229` passed
+- MCP Registry workflow run: `28359279415` passed
 - Local release gate: `npm run release-flow` passed
 - Strict dogfood gate: `npm run dogfood:strict` passed
 - Release readiness gate: `agentloop release-check --strict` passed before tagging
@@ -98,7 +98,7 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 - Published-package smoke: `npm run smoke:published -- --version 0.47.0` passed
 - GHCR proof: `agentloop release-proof --redact-paths` confirmed image tag `0.47.0`
 - MCP Registry proof: `agentloop release-proof --redact-paths` confirmed metadata for `agentloopkit@0.47.0`
-- GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 28, 2026
+- GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 29, 2026
 
 ## 0.47.0 release summary
 
