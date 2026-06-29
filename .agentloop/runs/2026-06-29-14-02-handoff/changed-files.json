@@ -1,0 +1,54 @@
+[
+  {
+    "status": "M",
+    "path": "CHANGELOG.md"
+  },
+  {
+    "status": "M",
+    "path": "FINAL_HANDOFF.md"
+  },
+  {
+    "status": "M",
+    "path": "ROADMAP.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/launch-checklist.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/npm-publishing.md"
+  },
+  {
+    "status": "M",
+    "path": "docs/release-status.md"
+  },
+  {
+    "status": "M",
+    "path": "package.json"
+  },
+  {
+    "status": "M",
+    "path": "server.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/reports/2026-06-29-13-49-verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-29-14-02-verify/changed-files.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-29-14-02-verify/metadata.json"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/runs/2026-06-29-14-02-verify/verification-report.md"
+  },
+  {
+    "status": "??",
+    "path": ".agentloop/tasks/2026-06-29-release-agentloopkit-0-47-1.md"
+  }
+]
