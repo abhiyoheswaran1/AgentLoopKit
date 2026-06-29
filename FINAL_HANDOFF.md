@@ -81,24 +81,34 @@ It is not a SaaS, IDE, AI model wrapper, cloud dashboard, or prompt collection.
 
 ## Current release
 
-- Current npm release: `agentloopkit@0.46.0`
-- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.46.0>
-- Release asset: `agentloopkit-0.46.0.tgz`
-- Release asset SHA-256: `48d9fe95b5a63bd611512a53294437579932901980c038323194874715493ff4`
-- Release tag: `v0.46.0` at release commit `37717f743f77afaad05b829528e70083c65c819c`
-- CI run for the release commit: `28319409663` passed
-- CLI Smoke run for the release commit: `28319409670` passed
-- Publish workflow run: `28319419421` passed
-- Docker workflow run: `28319419422` passed
-- MCP Registry workflow run: `28319659684` passed
+- Current npm release: `agentloopkit@0.47.0`
+- GitHub release: <https://github.com/abhiyoheswaran1/AgentLoopKit/releases/tag/v0.47.0>
+- Release asset: `agentloopkit-0.47.0.tgz`
+- Release asset SHA-256: to be recorded after the GitHub release asset is published
+- Release tag: `v0.47.0` at the published release commit
+- CI run for the release commit: to be recorded after CI finishes
+- CLI Smoke run for the release commit: to be recorded after CI finishes
+- Publish workflow run: to be recorded after trusted publishing finishes
+- Docker workflow run: to be recorded after GHCR publishing finishes
+- MCP Registry workflow run: to be recorded after MCP Registry publishing finishes
 - Local release gate: `npm run release-flow` passed
 - Strict dogfood gate: `npm run dogfood:strict` passed
 - Release readiness gate: `agentloop release-check --strict` passed before tagging
-- Post-publish npm proof: npm latest is `agentloopkit@0.46.0`; `agentloop npm-status --agentloopkit --expect-current` passed
-- Published-package smoke: `npm run smoke:published -- --version 0.46.0` passed
-- GHCR proof: `agentloop release-proof --redact-paths` confirmed image tag `0.46.0`
-- MCP Registry proof: `agentloop release-proof --redact-paths` confirmed metadata for `agentloopkit@0.46.0`
+- Post-publish npm proof: npm latest is `agentloopkit@0.47.0`; `agentloop npm-status --agentloopkit --expect-current` passed
+- Published-package smoke: `npm run smoke:published -- --version 0.47.0` passed
+- GHCR proof: `agentloop release-proof --redact-paths` confirmed image tag `0.47.0`
+- MCP Registry proof: `agentloop release-proof --redact-paths` confirmed metadata for `agentloopkit@0.47.0`
 - GitHub Marketplace proof: deferred; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof on June 28, 2026
+
+## 0.47.0 release summary
+
+Included:
+
+- Read-only `agentloop loop scorecard` decisions for controlled autonomous loop continuation.
+- Scorecard JSON and Markdown covering readiness, scope, guardrails, token budget, and context handles.
+- Manual tick guardrails that stop blocked loops from spending more iteration budget.
+- Ready-first scorecard decisions when verification and scope gates already pass.
+- Updated CLI reference, loop-contract docs, README, generated harness guidance, and dogfood guidance.
 
 ## 0.46.0 release summary
 
@@ -1417,10 +1427,10 @@ The first manual publish for `agentloopkit@0.1.0` was completed with npm browser
 
 Current publish state:
 
-- GitHub release `v0.46.0` is public.
-- npm latest is `agentloopkit@0.46.0`.
-- GHCR tags include `latest`, `0.46`, and `0.46.0`.
-- MCP Registry lists `0.46.0` as latest.
+- GitHub release `v0.47.0` is public.
+- npm latest is `agentloopkit@0.47.0`.
+- GHCR tags include `latest`, `0.47`, and `0.47.0`.
+- MCP Registry lists `0.47.0` as latest.
 - GitHub Marketplace listing is not live; <https://github.com/marketplace/actions/agentloopkit> returned 404 during post-release proof.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Releases now publish through GitHub Releases and trusted publishing.

@@ -1,0 +1,208 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "agentloop-loop",
+  "id": "2026-06-28-14-22-dogfood-autonomous-loop-scorecards-guard-fix",
+  "path": ".agentloop/loops/2026-06-28-14-22-dogfood-autonomous-loop-scorecards-guard-fix/loop.json",
+  "goal": "Dogfood autonomous loop scorecards guard fix",
+  "cadence": "manual",
+  "status": "blocked",
+  "createdAt": "2026-06-28T12:22:00.899Z",
+  "updatedAt": "2026-06-28T12:22:59.171Z",
+  "budget": {
+    "maxEstimatedTokens": 50000,
+    "maxIterations": 5,
+    "usedEstimatedTokens": 880
+  },
+  "controls": {
+    "agentNeutral": true,
+    "externalAgentExecution": false,
+    "externalRunnerExecution": false,
+    "localEvidenceOnly": true
+  },
+  "guardrails": {
+    "requireExplicitRunner": true,
+    "shell": false,
+    "rejectShellMetacharacters": true,
+    "blockedCommands": [
+      "shell interpreters",
+      "rm/rmdir",
+      "git add/commit/push/reset/clean/checkout/switch/rebase/merge/tag/stash/restore",
+      "npm/pnpm/yarn/bun publish/version",
+      "gh release",
+      "docker push/login"
+    ],
+    "maxOutputChars": 8000
+  },
+  "task": {
+    "nativeTaskPath": ".agentloop/tasks/2026-06-28-loop-dogfood-autonomous-loop-scorecards-guard-fix.md"
+  },
+  "suggestedCommands": [
+    {
+      "command": "agentloop start --for codex --goal implement --redact-paths",
+      "reason": "Brief the next coding agent with compact source handles.",
+      "required": true
+    },
+    {
+      "command": "agentloop ready --strict",
+      "reason": "Check readiness before review or handoff.",
+      "required": true
+    }
+  ],
+  "stopConditions": [
+    "Stop when readiness gates pass.",
+    "Stop after 5 iteration(s).",
+    "Stop when estimated loop token usage reaches 50000.",
+    "Ask a human when task scope or acceptance criteria need product judgment."
+  ],
+  "iterations": [
+    {
+      "index": 1,
+      "createdAt": "2026-06-28T12:22:21.453Z",
+      "readinessStatus": "blocked",
+      "decision": "ask-human",
+      "stopReason": "readiness gates need human review",
+      "nextAction": "agentloop guard --redact-paths",
+      "contextHandles": [
+        "task:active",
+        "evidence-map:current",
+        "context-budget:current",
+        "verification:latest",
+        "run:latest"
+      ],
+      "tokenReceipt": {
+        "heuristic": "chars-divided-by-four",
+        "estimatedBroadContextTokens": 231,
+        "estimatedCompactContextTokens": 100,
+        "estimatedAgentLoopOverheadTokens": 76,
+        "estimatedGrossContextReductionTokens": 131,
+        "estimatedNetContextReductionTokens": 55,
+        "warning": "AgentLoopKit estimates this compact evidence path saves context for this repo state.",
+        "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+        "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+      }
+    },
+    {
+      "index": 2,
+      "createdAt": "2026-06-28T12:22:32.239Z",
+      "readinessStatus": "blocked",
+      "decision": "ask-human",
+      "stopReason": "readiness gates need human review",
+      "nextAction": "agentloop guard --redact-paths",
+      "contextHandles": [
+        "task:active",
+        "evidence-map:current",
+        "context-budget:current",
+        "verification:latest",
+        "run:latest"
+      ],
+      "tokenReceipt": {
+        "heuristic": "chars-divided-by-four",
+        "estimatedBroadContextTokens": 231,
+        "estimatedCompactContextTokens": 100,
+        "estimatedAgentLoopOverheadTokens": 76,
+        "estimatedGrossContextReductionTokens": 131,
+        "estimatedNetContextReductionTokens": 55,
+        "warning": "AgentLoopKit estimates this compact evidence path saves context for this repo state.",
+        "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+        "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+      }
+    },
+    {
+      "index": 3,
+      "createdAt": "2026-06-28T12:22:41.761Z",
+      "readinessStatus": "blocked",
+      "decision": "ask-human",
+      "stopReason": "readiness gates need human review",
+      "nextAction": "agentloop guard --redact-paths",
+      "contextHandles": [
+        "task:active",
+        "evidence-map:current",
+        "context-budget:current",
+        "verification:latest",
+        "run:latest"
+      ],
+      "tokenReceipt": {
+        "heuristic": "chars-divided-by-four",
+        "estimatedBroadContextTokens": 231,
+        "estimatedCompactContextTokens": 100,
+        "estimatedAgentLoopOverheadTokens": 76,
+        "estimatedGrossContextReductionTokens": 131,
+        "estimatedNetContextReductionTokens": 55,
+        "warning": "AgentLoopKit estimates this compact evidence path saves context for this repo state.",
+        "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+        "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+      }
+    },
+    {
+      "index": 4,
+      "createdAt": "2026-06-28T12:22:50.426Z",
+      "readinessStatus": "blocked",
+      "decision": "ask-human",
+      "stopReason": "readiness gates need human review",
+      "nextAction": "agentloop guard --redact-paths",
+      "contextHandles": [
+        "task:active",
+        "evidence-map:current",
+        "context-budget:current",
+        "verification:latest",
+        "run:latest"
+      ],
+      "tokenReceipt": {
+        "heuristic": "chars-divided-by-four",
+        "estimatedBroadContextTokens": 231,
+        "estimatedCompactContextTokens": 100,
+        "estimatedAgentLoopOverheadTokens": 76,
+        "estimatedGrossContextReductionTokens": 131,
+        "estimatedNetContextReductionTokens": 55,
+        "warning": "AgentLoopKit estimates this compact evidence path saves context for this repo state.",
+        "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+        "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+      }
+    },
+    {
+      "index": 5,
+      "createdAt": "2026-06-28T12:22:59.171Z",
+      "readinessStatus": "blocked",
+      "decision": "ask-human",
+      "stopReason": "readiness gates need human review",
+      "nextAction": "agentloop guard --redact-paths",
+      "contextHandles": [
+        "task:active",
+        "evidence-map:current",
+        "context-budget:current",
+        "verification:latest",
+        "run:latest"
+      ],
+      "tokenReceipt": {
+        "heuristic": "chars-divided-by-four",
+        "estimatedBroadContextTokens": 231,
+        "estimatedCompactContextTokens": 100,
+        "estimatedAgentLoopOverheadTokens": 76,
+        "estimatedGrossContextReductionTokens": 131,
+        "estimatedNetContextReductionTokens": 55,
+        "warning": "AgentLoopKit estimates this compact evidence path saves context for this repo state.",
+        "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+        "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+      }
+    }
+  ],
+  "latestTokenReceipt": {
+    "heuristic": "chars-divided-by-four",
+    "estimatedBroadContextTokens": 231,
+    "estimatedCompactContextTokens": 100,
+    "estimatedAgentLoopOverheadTokens": 76,
+    "estimatedGrossContextReductionTokens": 131,
+    "estimatedNetContextReductionTokens": 55,
+    "warning": "AgentLoopKit estimates this compact evidence path saves context for this repo state.",
+    "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+    "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+  },
+  "safety": {
+    "writesLoopContract": true,
+    "writesNativeTask": true,
+    "commandsExecuted": [],
+    "externalNetwork": false,
+    "publishes": false
+  },
+  "stopReason": "readiness gates need human review"
+}

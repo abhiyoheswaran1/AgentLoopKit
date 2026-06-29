@@ -1,0 +1,33 @@
+ .agentloop/README.md                             |   2 +-
+ .agentloop/harness/commands.md                   |   2 +-
+ AGENTLOOP.md                                     |   2 +-
+ AGENTS.md                                        |   2 +-
+ CHANGELOG.md                                     |   9 +
+ DECISIONS.md                                     |  10 +
+ FINAL_HANDOFF.md                                 |  46 +--
+ README.md                                        |  10 +-
+ ROADMAP.md                                       |  11 +-
+ docs/cli-reference.md                            |   6 +-
+ docs/loop-contracts.md                           |   7 +-
+ docs/npm-publishing.md                           |  10 +-
+ docs/release-status.md                           |  72 ++---
+ package.json                                     |   2 +-
+ server.json                                      |   4 +-
+ src/cli/commands/loop.ts                         |  23 ++
+ src/core/evidence-map.ts                         |   4 +-
+ src/core/loop-contract.ts                        | 385 ++++++++++++++++++++++-
+ src/core/upgrade-harness.ts                      |   4 +-
+ src/index.ts                                     |   5 +
+ src/templates/harness/commands.md                |   2 +-
+ src/templates/root/AGENTLOOP.md                  |   2 +-
+ src/templates/root/AGENTS.md                     |   2 +-
+ src/templates/root/agentloop-directory-readme.md |   3 +-
+ tests/evidence-map.test.ts                       |  40 +++
+ tests/loop-contract.test.ts                      | 286 ++++++++++++++++-
+ tests/upgrade-harness.test.ts                    |   5 +
+ 27 files changed, 858 insertions(+), 98 deletions(-)
+.agentloop/loops/2026-06-28-14-05-dogfood-autonomous-loop-scorecards/loop.json | untracked
+.agentloop/loops/2026-06-28-14-22-dogfood-autonomous-loop-scorecards-guard-fix/loop.json | untracked
+.agentloop/loops/2026-06-28-14-25-dogfood-autonomous-loop-scorecards-final/loop.json | untracked
+docs/superpowers/plans/2026-06-28-loop-scorecard.md | untracked
+docs/superpowers/specs/2026-06-28-loop-scorecard-design.md | untracked

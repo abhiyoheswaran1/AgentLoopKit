@@ -5,6 +5,7 @@ import {
   getLoopReport,
   getLoopStatus,
   runLoop,
+  scoreLoop,
   tickLoop,
 } from '../../core/loop-contract.js';
 import { redactLocalRoots } from '../../core/redaction.js';
@@ -126,6 +127,28 @@ export function loopCommand() {
           config: workspace.config,
           id: options.id,
           command: options.command,
+        });
+        printOutput(result, result.markdown, options, workspace.cwd);
+      } catch (error) {
+        if (printJsonErrorIfNeeded(error, options.json)) return;
+        throw error;
+      }
+    });
+
+  command
+    .command('scorecard')
+    .description('Score whether a loop can continue, should stop, or needs human review')
+    .option('--id <id>', 'loop id; defaults to newest loop')
+    .option('--json', 'print machine-readable output')
+    .option('--redact-paths', 'redact local absolute paths in public output')
+    .action(async (options: { id?: string; json?: boolean; redactPaths?: boolean }) => {
+      try {
+        const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+        if (!workspace) return;
+        const result = await scoreLoop({
+          cwd: workspace.cwd,
+          config: workspace.config,
+          id: options.id,
         });
         printOutput(result, result.markdown, options, workspace.cwd);
       } catch (error) {

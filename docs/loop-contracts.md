@@ -10,6 +10,7 @@ agentloop loop create \
   --max-iterations 5
 
 agentloop loop tick
+agentloop loop scorecard
 agentloop loop status
 agentloop loop report
 agentloop ready
@@ -26,6 +27,7 @@ agentloop loop create \
   --max-iterations 5
 
 agentloop loop run
+agentloop loop scorecard
 agentloop loop status
 agentloop loop report
 agentloop ready --strict
@@ -47,10 +49,13 @@ The loop contract records:
 - token receipt for the initial contract and each tick
 - configured runner command, exit code, changed files, and bounded output when `loop run` is used
 - whether the loop continued, stopped, or became ready
+- read-only scorecard decisions before the next autonomous pass
 
-`agentloop loop tick` does not execute the suggested commands. It reads local AgentLoopKit evidence, evaluates readiness, builds a compact context pack, records a token receipt, and decides the next loop state.
+`agentloop loop tick` does not execute the suggested commands. It reads local AgentLoopKit evidence, evaluates readiness, builds a compact context pack, records a token receipt, and decides the next loop state. When a loop is already blocked for human review, the next tick exits with `LOOP_BLOCKED` instead of recording another iteration.
 
 `agentloop loop run` executes only the runner command stored in the loop contract. It does not accept a different command unless the override exactly matches the configured command. After the runner exits, AgentLoopKit records the exit code, bounded output, changed files, token receipt, readiness state, and next loop decision.
+
+`agentloop loop scorecard` is the read-only pre-flight gate. It reads the loop contract, readiness state, context pack, token budget, iteration budget, runner guardrails, and scope evidence, then returns `continue`, `ask-human`, `stop`, or `ready`. Use `--json` when an agent or script needs the decision without parsing prose. The command does not execute the runner, run verification, mutate task state, or publish anything.
 
 ## Runner Guardrails
 

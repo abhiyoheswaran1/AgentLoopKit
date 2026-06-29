@@ -4,6 +4,15 @@
 
 - No unreleased changes yet.
 
+## 0.47.0
+
+- Added `agentloop loop scorecard` for a read-only autonomous-loop pre-flight decision with `continue`, `ask-human`, `stop`, and `ready` outcomes, ranked reasons, token-budget signals, runner guardrails, context handles, readiness state, and scope evidence.
+- Exported loop scorecard API types and helpers for package consumers.
+- Fixed blocked loops so `agentloop loop tick` now refuses another iteration after human-review gates block the loop.
+- Fixed scorecard decisions so passing readiness gates report `ready` before iteration exhaustion stops another pass.
+- Fixed generic loop task default scope so root public docs and repo guidance files are covered during loop scorecard scope checks.
+- Updated loop docs, CLI reference, README, generated harness guidance, and local repo guidance with the scorecard workflow.
+
 ## 0.46.0
 
 - Added `agentloop loop run` for one guarded local runner iteration through an explicit loop `--runner-command`, with non-shell execution, blocked publish/destructive command families, bounded output, changed-file evidence, token receipts, and normal loop stop conditions.

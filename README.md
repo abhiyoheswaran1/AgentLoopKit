@@ -141,6 +141,7 @@ agentloop status --brief
 agentloop start --for codex --goal implement --redact-paths
 agentloop loop create --goal "Keep checkout work release-ready" --budget-tokens 50000 --max-iterations 5
 agentloop loop tick
+agentloop loop scorecard
 agentloop ready
 agentloop verify --task-commands --progress
 agentloop ship
@@ -148,7 +149,7 @@ agentloop prepare-pr
 agentloop task done
 ```
 
-That sequence creates a task contract, checks the repo setup, gives the next software agent a compact start briefing, records a local loop contract with token receipts, checks readiness gates, runs only reviewed verification commands, records review-readiness evidence, drafts PR copy, and closes the active task. It does not post to GitHub, publish packages, call an LLM, execute a coding agent, or run hidden commands.
+That sequence creates a task contract, checks the repo setup, gives the next software agent a compact start briefing, records a local loop contract with token receipts, scores whether another loop pass should continue, checks readiness gates, runs only reviewed verification commands, records review-readiness evidence, drafts PR copy, and closes the active task. It does not post to GitHub, publish packages, call an LLM, execute a coding agent, or run hidden commands.
 
 ### Make Your Agent Start Here
 
@@ -197,7 +198,7 @@ Use `agentloop start --for codex --goal implement --redact-paths` when a softwar
 
 `agentloop start` is the agent starting point. It keeps agents from guessing by turning task state, changed files, verification, risk, and context pressure into one compact preflight. The Context Contract sits underneath it: `context pack` explains why each item is present, names what was left out, and provides local handles for the source truth. A large changed-file list becomes a small briefing the agent can expand only when it needs detail.
 
-`agentloop loop` adds a local loop contract on top of normal task contracts. `agentloop loop create` records the goal, budget, stop conditions, suggested commands, native task path, and a token receipt. `agentloop loop tick` records one iteration decision from local evidence: continue, stop, ask for human review, or mark the loop ready when gates pass. Use `agentloop ready` when you need the current review-readiness gate summary without creating a loop.
+`agentloop loop` adds a local loop contract on top of normal task contracts. `agentloop loop create` records the goal, budget, stop conditions, suggested commands, native task path, and a token receipt. `agentloop loop tick` records one iteration decision from local evidence: continue, stop, ask for human review, or mark the loop ready when gates pass. Once a loop asks for human review, AgentLoopKit rejects another tick until someone reviews the loop report and resolves the blocking evidence. Use `agentloop ready` when you need the current review-readiness gate summary without creating a loop.
 
 For a bounded autonomous pass, configure one local runner command and let AgentLoopKit record the iteration:
 
@@ -210,9 +211,12 @@ agentloop loop create \
   --max-iterations 5
 
 agentloop loop run
+agentloop loop scorecard
 agentloop ready --strict
 agentloop loop report
 ```
+
+`loop scorecard` is the pre-flight gate before another autonomous pass. It reads the loop contract, readiness state, context pack, token budget, iteration budget, runner guardrails, and scope evidence, then returns `continue`, `ask-human`, `stop`, or `ready`. It does not execute the runner or run verification.
 
 `loop run` executes only the command saved in the loop contract. It uses `shell: false`, rejects shell syntax, blocks publish and destructive command families, caps runner output, records changed files, and still applies the max-iteration and token-budget stop conditions. AgentLoopKit controls the goal, budget, scope, gates, evidence, and stop decision. Your agent, script, CI job, or AgentFlight session does the implementation work.
 
@@ -327,7 +331,7 @@ agentloopkit init
 | `agentloop review-context`       | Show one read-only reviewability context snapshot                              |
 | `agentloop context`              | List handles, build context budgets and packs, and expand source truth         |
 | `agentloop ready`                | Check task, scope, verification, and context-budget readiness                  |
-| `agentloop loop`                 | Record local loop goals, guarded runner passes, token receipts, iteration decisions, and stop reasons |
+| `agentloop loop`                 | Record local loop goals, guarded runner passes, scorecards, token receipts, iteration decisions, and stop reasons |
 | `agentloop guard`                | Check local drift, proof debt, and context-budget pressure                     |
 | `agentloop explain-diff`         | Explain the current diff with local task, verification, run, and risk evidence |
 | `agentloop resume-pack`          | Generate a compact local continuation brief for agents or reviewers            |

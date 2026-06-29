@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-28-15-31-handoff",
+  "command": "handoff",
+  "createdAt": "2026-06-28-15-31",
+  "createdAtEpochMs": 1782653511422,
+  "task": {
+    "path": ".agentloop/tasks/archive/2026-06-28-add-autonomous-loop-scorecards.md",
+    "title": "Add autonomous loop scorecards",
+    "status": "done"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-28-15-27-verification-report.md",
+  "handoffPath": ".agentloop/handoffs/2026-06-28-15-31-pr-summary.md",
+  "changedFileCount": 47
+}

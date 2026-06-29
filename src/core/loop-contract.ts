@@ -115,6 +115,66 @@ export type LoopTickResult = {
 
 export type LoopRunResult = LoopTickResult;
 
+export type LoopScorecardDecision = 'continue' | 'ask-human' | 'stop' | 'ready';
+
+export type LoopScorecardReason = {
+  code: string;
+  severity: 'info' | 'warning' | 'blocking';
+  message: string;
+};
+
+export type LoopScorecardResult = {
+  decision: LoopScorecardDecision;
+  reasons: LoopScorecardReason[];
+  loop: {
+    id: string;
+    status: LoopStatus;
+    iterations: number;
+    maxIterations: number;
+    runnerConfigured: boolean;
+    nextAction: string;
+  };
+  readiness: {
+    status: ReadyStatus;
+    nextAction: string;
+  };
+  tokenBudget: {
+    maxEstimatedTokens: number;
+    usedEstimatedTokens: number;
+    remainingEstimatedTokens: number;
+    latestNetContextReductionTokens: number;
+    latestAgentLoopOverheadTokens: number;
+  };
+  guardrails: {
+    explicitRunnerRequired: boolean;
+    shell: false;
+    rejectShellMetacharacters: boolean;
+    blockedCommands: string[];
+    maxOutputChars: number;
+    runnerCommand?: string;
+  };
+  context: {
+    handles: string[];
+    reviewability: string;
+    changedFiles: number;
+    nonEvidenceChangedFiles: number;
+    unexplainedChangedFiles: number;
+    forbiddenChangedFiles: number;
+    verificationFreshness: string;
+  };
+  markdown: string;
+  safety: {
+    readOnly: true;
+    localEvidenceOnly: true;
+    localGitStatus: true;
+    runnerExecuted: false;
+    verificationCommandsRun: false;
+    projectCommandsRun: false;
+    externalNetwork: false;
+    publishes: false;
+  };
+};
+
 export type LoopStatusResult = {
   loop: AgentLoopLoopContractV1;
   summary: {
@@ -129,6 +189,17 @@ export type LoopStatusResult = {
 const LOOP_ID_PATTERN = /^[a-z0-9][a-z0-9-]*$/;
 const DEFAULT_MAX_TOKENS = 50_000;
 const DEFAULT_MAX_ITERATIONS = 5;
+const DEFAULT_LOOP_LIKELY_FILES = [
+  '.agentloop',
+  'src',
+  'tests',
+  'docs',
+  'README.md',
+  'CHANGELOG.md',
+  'AGENTS.md',
+  'AGENTLOOP.md',
+  'DECISIONS.md',
+];
 
 const PRESETS: Record<
   LoopPreset,
@@ -388,6 +459,71 @@ ${renderSuggestedCommands(result.loop.suggestedCommands)}
 `;
 }
 
+function renderScorecardReasons(reasons: LoopScorecardReason[]) {
+  if (!reasons.length) return '- No scorecard reasons recorded.';
+  return reasons
+    .map(
+      (reason) =>
+        `- ${inlineCode(reason.severity)} ${inlineCode(reason.code)} - ${escapeMarkdownProse(
+          reason.message,
+        )}`,
+    )
+    .join('\n');
+}
+
+export function renderLoopScorecardMarkdown(result: Omit<LoopScorecardResult, 'markdown'>) {
+  return `# AgentLoopKit Loop Scorecard
+
+- Decision: ${inlineCode(result.decision)}
+- Loop: ${inlineCode(result.loop.id)}
+- Status: ${inlineCode(result.loop.status)}
+- Iterations: ${inlineCode(String(result.loop.iterations))}/${inlineCode(
+    String(result.loop.maxIterations),
+  )}
+- Runner configured: ${inlineCode(String(result.loop.runnerConfigured))}
+- Readiness: ${inlineCode(result.readiness.status)}
+- Next action: ${inlineCode(result.loop.nextAction)}
+
+## Reasons
+
+${renderScorecardReasons(result.reasons)}
+
+## Token Budget
+
+- Used estimated tokens: ${inlineCode(String(result.tokenBudget.usedEstimatedTokens))}
+- Remaining estimated tokens: ${inlineCode(String(result.tokenBudget.remainingEstimatedTokens))}
+- Max estimated tokens: ${inlineCode(String(result.tokenBudget.maxEstimatedTokens))}
+- Latest net context reduction: ${inlineCode(
+    String(result.tokenBudget.latestNetContextReductionTokens),
+  )}
+- Latest AgentLoopKit overhead: ${inlineCode(String(result.tokenBudget.latestAgentLoopOverheadTokens))}
+
+## Context
+
+- Handles: ${result.context.handles.length ? result.context.handles.map(inlineCode).join(', ') : 'none'}
+- Reviewability: ${inlineCode(result.context.reviewability)}
+- Changed files: ${inlineCode(String(result.context.changedFiles))}
+- Non-evidence changed files: ${inlineCode(String(result.context.nonEvidenceChangedFiles))}
+- Unexplained changed files: ${inlineCode(String(result.context.unexplainedChangedFiles))}
+- Forbidden changed files: ${inlineCode(String(result.context.forbiddenChangedFiles))}
+- Verification freshness: ${inlineCode(result.context.verificationFreshness)}
+
+## Guardrails
+
+- Explicit runner required: ${inlineCode(String(result.guardrails.explicitRunnerRequired))}
+- Shell execution: ${inlineCode(String(result.guardrails.shell))}
+- Shell metacharacters rejected: ${inlineCode(String(result.guardrails.rejectShellMetacharacters))}
+- Runner command: ${inlineCode(result.guardrails.runnerCommand ?? 'not configured')}
+
+## Safety
+
+- Read-only: ${inlineCode(String(result.safety.readOnly))}
+- Runner executed: ${inlineCode(String(result.safety.runnerExecuted))}
+- Verification commands run: ${inlineCode(String(result.safety.verificationCommandsRun))}
+- Project commands run: ${inlineCode(String(result.safety.projectCommandsRun))}
+`;
+}
+
 function nextActionForLoop(loop: AgentLoopLoopContractV1) {
   if (loop.status === 'complete') return 'agentloop ship';
   if (loop.status === 'stopped') return 'review loop report';
@@ -403,6 +539,204 @@ function stopConditions(maxIterations: number, maxEstimatedTokens: number) {
     `Stop when estimated loop token usage reaches ${maxEstimatedTokens}.`,
     'Ask a human when task scope or acceptance criteria need product judgment.',
   ];
+}
+
+function scorecardReasons(input: {
+  loop: AgentLoopLoopContractV1;
+  ready: Awaited<ReturnType<typeof evaluateReady>>;
+  remainingEstimatedTokens: number;
+}) {
+  const reasons: LoopScorecardReason[] = [];
+  const remainingIterations = input.loop.budget.maxIterations - input.loop.iterations.length;
+  const blockingReadyGates = input.ready.gates.filter((gate) => gate.status === 'fail');
+
+  if (input.loop.status === 'complete') {
+    reasons.push({
+      code: 'loop-complete',
+      severity: 'info',
+      message: 'The loop is already complete.',
+    });
+  }
+  if (input.loop.status === 'stopped') {
+    reasons.push({
+      code: 'loop-stopped',
+      severity: 'blocking',
+      message: input.loop.stopReason ?? 'The loop is stopped.',
+    });
+  }
+  if (input.loop.status === 'blocked') {
+    reasons.push({
+      code: 'loop-blocked',
+      severity: 'blocking',
+      message: input.loop.stopReason ?? 'The loop is blocked and needs inspection.',
+    });
+  }
+  if (remainingIterations <= 0) {
+    reasons.push({
+      code: 'iteration-budget-exhausted',
+      severity: 'blocking',
+      message: 'The loop has no iterations remaining.',
+    });
+  } else {
+    reasons.push({
+      code: 'iteration-budget-available',
+      severity: 'info',
+      message: `${remainingIterations} loop iteration(s) remain.`,
+    });
+  }
+  if (input.remainingEstimatedTokens <= 0) {
+    reasons.push({
+      code: 'token-budget-exhausted',
+      severity: 'blocking',
+      message: 'The estimated loop token budget is exhausted.',
+    });
+  } else {
+    reasons.push({
+      code: 'token-budget-available',
+      severity: 'info',
+      message: `${input.remainingEstimatedTokens} estimated token(s) remain.`,
+    });
+  }
+  for (const gate of blockingReadyGates) {
+    const severity =
+      gate.id === 'verification' && /No verification report was found|stale/i.test(gate.message)
+        ? 'warning'
+        : 'blocking';
+    reasons.push({
+      code: `ready-${gate.id}`,
+      severity,
+      message: gate.message,
+    });
+  }
+  if (input.ready.status === 'ready') {
+    reasons.push({
+      code: 'ready-gates-passed',
+      severity: 'info',
+      message: 'Readiness gates passed.',
+    });
+  }
+  if (input.loop.runner) {
+    reasons.push({
+      code: 'runner-configured',
+      severity: 'info',
+      message: 'A guarded runner is configured for this loop.',
+    });
+  } else {
+    reasons.push({
+      code: 'manual-loop',
+      severity: 'info',
+      message: 'No runner is configured; the loop can record manual ticks only.',
+    });
+  }
+
+  return reasons.sort((left, right) => {
+    const rank = { blocking: 0, warning: 1, info: 2 };
+    return rank[left.severity] - rank[right.severity];
+  });
+}
+
+function scorecardDecision(input: {
+  loop: AgentLoopLoopContractV1;
+  ready: Awaited<ReturnType<typeof evaluateReady>>;
+  reasons: LoopScorecardReason[];
+}) {
+  if (input.loop.status === 'complete') return 'ready' satisfies LoopScorecardDecision;
+  if (input.loop.status === 'stopped') return 'stop' satisfies LoopScorecardDecision;
+  if (input.loop.status === 'blocked') return 'ask-human' satisfies LoopScorecardDecision;
+  if (input.ready.status === 'ready') return 'ready' satisfies LoopScorecardDecision;
+  if (input.reasons.some((reason) => reason.code === 'iteration-budget-exhausted')) {
+    return 'stop' satisfies LoopScorecardDecision;
+  }
+  if (input.reasons.some((reason) => reason.code === 'token-budget-exhausted')) {
+    return 'stop' satisfies LoopScorecardDecision;
+  }
+  if (
+    input.reasons.some(
+      (reason) => reason.severity === 'blocking' && reason.code !== 'ready-verification',
+    )
+  ) {
+    return 'ask-human' satisfies LoopScorecardDecision;
+  }
+  return 'continue' satisfies LoopScorecardDecision;
+}
+
+export async function scoreLoop(options: {
+  cwd: string;
+  config: AgentLoopConfig;
+  id?: string;
+}): Promise<LoopScorecardResult> {
+  const id = await resolveLoopId(options);
+  const loop = await readLoop({ cwd: options.cwd, config: options.config, id });
+  const [ready, contextPack] = await Promise.all([
+    evaluateReady({ cwd: options.cwd, config: options.config }),
+    buildContextPack({
+      cwd: options.cwd,
+      config: options.config,
+      target: 'codex',
+      goal: 'continue',
+    }),
+  ]);
+  const remainingEstimatedTokens = Math.max(
+    0,
+    loop.budget.maxEstimatedTokens - loop.budget.usedEstimatedTokens,
+  );
+  const reasons = scorecardReasons({ loop, ready, remainingEstimatedTokens });
+  const decision = scorecardDecision({ loop, ready, reasons });
+  const withoutMarkdown = {
+    decision,
+    reasons,
+    loop: {
+      id: loop.id,
+      status: loop.status,
+      iterations: loop.iterations.length,
+      maxIterations: loop.budget.maxIterations,
+      runnerConfigured: Boolean(loop.runner),
+      nextAction: nextActionForLoop(loop),
+    },
+    readiness: {
+      status: ready.status,
+      nextAction: ready.nextAction.command,
+    },
+    tokenBudget: {
+      maxEstimatedTokens: loop.budget.maxEstimatedTokens,
+      usedEstimatedTokens: loop.budget.usedEstimatedTokens,
+      remainingEstimatedTokens,
+      latestNetContextReductionTokens: loop.latestTokenReceipt.estimatedNetContextReductionTokens,
+      latestAgentLoopOverheadTokens: loop.latestTokenReceipt.estimatedAgentLoopOverheadTokens,
+    },
+    guardrails: {
+      explicitRunnerRequired: loop.guardrails?.requireExplicitRunner ?? true,
+      shell: false as const,
+      rejectShellMetacharacters: loop.guardrails?.rejectShellMetacharacters ?? true,
+      blockedCommands: loop.guardrails?.blockedCommands ?? BLOCKED_LOOP_RUNNER_COMMANDS,
+      maxOutputChars: loop.guardrails?.maxOutputChars ?? DEFAULT_LOOP_RUNNER_OUTPUT_CHARS,
+      ...(loop.runner ? { runnerCommand: loop.runner.command } : {}),
+    },
+    context: {
+      handles: contextPack.handles.map((handle) => handle.id),
+      reviewability: contextPack.evidenceMap.summary.reviewability,
+      changedFiles: contextPack.evidenceMap.summary.changedFileCount,
+      nonEvidenceChangedFiles: contextPack.evidenceMap.summary.nonEvidenceChangedFileCount,
+      unexplainedChangedFiles: contextPack.evidenceMap.coverage.unexplainedFileCount,
+      forbiddenChangedFiles: contextPack.evidenceMap.coverage.forbiddenFileCount,
+      verificationFreshness: contextPack.evidenceMap.verification.label,
+    },
+    safety: {
+      readOnly: true,
+      localEvidenceOnly: true,
+      localGitStatus: true,
+      runnerExecuted: false,
+      verificationCommandsRun: false,
+      projectCommandsRun: false,
+      externalNetwork: false,
+      publishes: false,
+    },
+  } satisfies Omit<LoopScorecardResult, 'markdown'>;
+
+  return {
+    ...withoutMarkdown,
+    markdown: renderLoopScorecardMarkdown(withoutMarkdown),
+  };
 }
 
 export async function createLoop(options: {
@@ -468,7 +802,7 @@ export async function createLoop(options: {
       ],
       likelyFiles: [
         relativePath(options.cwd, loopPath),
-        ...(presetConfig?.likelyFiles ?? ['.agentloop', 'src', 'tests', 'docs']),
+        ...(presetConfig?.likelyFiles ?? DEFAULT_LOOP_LIKELY_FILES),
       ],
       acceptanceCriteria: [
         'Loop iterations record readiness and context-budget evidence.',
@@ -562,17 +896,32 @@ export async function createLoop(options: {
   };
 }
 
+function readinessNeedsHumanReview(ready: Awaited<ReturnType<typeof evaluateReady>>) {
+  const humanGateIds = new Set(['task-contract', 'acceptance-criteria', 'scope-drift', 'forbidden-files']);
+  if (ready.gates.some((gate) => gate.status === 'fail' && humanGateIds.has(gate.id))) {
+    return true;
+  }
+  return ready.evidenceMap.verification.label === 'failed' || ready.evidenceMap.verification.label === 'unknown';
+}
+
 function decideIteration(input: {
-  readyStatus: ReadyStatus;
+  ready: Awaited<ReturnType<typeof evaluateReady>>;
   nextIndex: number;
   usedTokensAfterTick: number;
   loop: AgentLoopLoopContractV1;
 }): { decision: LoopDecision; status: LoopStatus; stopReason?: string } {
-  if (input.readyStatus === 'ready') {
+  if (input.ready.status === 'ready') {
     return {
       decision: 'ready',
       status: 'complete',
       stopReason: 'readiness gates passed',
+    };
+  }
+  if (readinessNeedsHumanReview(input.ready)) {
+    return {
+      decision: 'ask-human',
+      status: 'blocked',
+      stopReason: 'readiness gates need human review',
     };
   }
   if (input.nextIndex >= input.loop.budget.maxIterations) {
@@ -595,6 +944,22 @@ function decideIteration(input: {
   };
 }
 
+function nextActionForIterationDecision(input: {
+  ready: Awaited<ReturnType<typeof evaluateReady>>;
+  decision: LoopDecision;
+}) {
+  if (input.decision !== 'ask-human') return input.ready.nextAction.command;
+  const failedGateIds = new Set(
+    input.ready.gates.filter((gate) => gate.status === 'fail').map((gate) => gate.id),
+  );
+  if (failedGateIds.has('task-contract')) return 'agentloop create-task';
+  if (failedGateIds.has('acceptance-criteria')) return 'agentloop task doctor';
+  if (failedGateIds.has('scope-drift') || failedGateIds.has('forbidden-files')) {
+    return 'agentloop guard --redact-paths';
+  }
+  return input.ready.nextAction.command;
+}
+
 export async function tickLoop(options: {
   cwd: string;
   config: AgentLoopConfig;
@@ -606,6 +971,12 @@ export async function tickLoop(options: {
     throw new AgentLoopError(
       `Loop ${loop.id} is ${loop.status}; create a new loop or inspect the report.`,
       'LOOP_TERMINAL',
+    );
+  }
+  if (loop.status === 'blocked') {
+    throw new AgentLoopError(
+      `Loop ${loop.id} is blocked; inspect the loop report before recording another iteration.`,
+      'LOOP_BLOCKED',
     );
   }
   const [ready, contextPack] = await Promise.all([
@@ -633,7 +1004,7 @@ export async function tickLoop(options: {
     tokenReceipt.estimatedCompactContextTokens +
     tokenReceipt.estimatedAgentLoopOverheadTokens;
   const decision = decideIteration({
-    readyStatus: ready.status,
+    ready,
     nextIndex,
     usedTokensAfterTick,
     loop,
@@ -644,7 +1015,7 @@ export async function tickLoop(options: {
     readinessStatus: ready.status,
     decision: decision.decision,
     ...(decision.stopReason ? { stopReason: decision.stopReason } : {}),
-    nextAction: ready.nextAction.command,
+    nextAction: nextActionForIterationDecision({ ready, decision: decision.decision }),
     contextHandles: contextPack.handles.map((handle) => handle.id),
     tokenReceipt,
   };
@@ -742,7 +1113,7 @@ export async function runLoop(options: {
   const decision =
     runner.status === 'passed'
       ? decideIteration({
-          readyStatus: ready.status,
+          ready,
           nextIndex,
           usedTokensAfterTick,
           loop,
@@ -760,7 +1131,7 @@ export async function runLoop(options: {
     ...(decision.stopReason ? { stopReason: decision.stopReason } : {}),
     nextAction:
       runner.status === 'passed'
-        ? ready.nextAction.command
+        ? nextActionForIterationDecision({ ready, decision: decision.decision })
         : 'inspect runner output before continuing the loop',
     contextHandles: contextPack.handles.map((handle) => handle.id),
     tokenReceipt,

@@ -105,6 +105,11 @@ describe('loop command', () => {
     expect(storedLoop.goal).toBe('Keep AgentLoopKit release-ready');
     expect(storedLoop.iterations).toEqual([]);
     expect(taskMarkdown).toContain('# Loop: Keep AgentLoopKit release-ready');
+    expect(taskMarkdown).toContain('- README.md');
+    expect(taskMarkdown).toContain('- CHANGELOG.md');
+    expect(taskMarkdown).toContain('- AGENTS.md');
+    expect(taskMarkdown).toContain('- AGENTLOOP.md');
+    expect(taskMarkdown).toContain('- DECISIONS.md');
     expect(taskMarkdown).toContain('Loop iterations record readiness and context-budget evidence.');
     expect(payload.markdown).toContain('AgentLoopKit will not execute a coding agent for this loop.');
   });
@@ -192,10 +197,63 @@ describe('loop command', () => {
     });
   });
 
+  test('blocks loop ticks when readiness gates need human scope review', async () => {
+    const dir = await createLoopFixture();
+    const createResult = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'create', '--goal', 'Narrow scope tick', '--json'],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+    await writeFile(path.join(dir, 'package.json'), '{"name":"drift"}\n');
+
+    const tickResult = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'tick', '--id', created.loop.id, '--json'],
+      { cwd: dir },
+    );
+    const tick = JSON.parse(tickResult.stdout);
+
+    expect(tick.iteration).toMatchObject({
+      index: 1,
+      decision: 'ask-human',
+      readinessStatus: 'blocked',
+      stopReason: 'readiness gates need human review',
+      nextAction: 'agentloop guard --redact-paths',
+    });
+    expect(tick.loop.status).toBe('blocked');
+    expect(tick.loop.stopReason).toBe('readiness gates need human review');
+  });
+
+  test('rejects ticks while a loop is blocked for human review', async () => {
+    const dir = await createLoopFixture();
+    const createResult = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'create', '--goal', 'Blocked loop tick', '--json'],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+    await writeFile(path.join(dir, 'package.json'), '{"name":"drift"}\n');
+    await execa(tsxPath, [cliPath, 'loop', 'tick', '--id', created.loop.id, '--json'], {
+      cwd: dir,
+    });
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'tick', '--id', created.loop.id, '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(JSON.parse(result.stdout).error).toMatchObject({
+      code: 'LOOP_BLOCKED',
+    });
+  });
+
   test('runs an explicitly configured runner and records command evidence', async () => {
     const dir = await createLoopFixture();
     await writeFile(
-      path.join(dir, 'runner.mjs'),
+      path.join(dir, 'src/runner.mjs'),
       [
         "import { writeFileSync } from 'node:fs';",
         "writeFileSync('src/auth/copy.ts', 'export const copy = \"runner\";\\n');",
@@ -212,7 +270,7 @@ describe('loop command', () => {
         '--goal',
         'Runner loop',
         '--runner-command',
-        'node runner.mjs',
+        'node src/runner.mjs',
         '--runner-timeout-ms',
         '5000',
         '--json',
@@ -229,14 +287,14 @@ describe('loop command', () => {
     const run = JSON.parse(runResult.stdout);
 
     expect(run.iteration.runner).toMatchObject({
-      command: 'node runner.mjs',
+      command: 'node src/runner.mjs',
       exitCode: 0,
       status: 'passed',
       shell: false,
       outputExcerpt: expect.stringContaining('runner completed'),
     });
     expect(run.iteration.runner.changedFilesAfter).toContain('src/auth/copy.ts');
-    expect(run.loop.safety.commandsExecuted).toEqual(['node runner.mjs']);
+    expect(run.loop.safety.commandsExecuted).toEqual(['node src/runner.mjs']);
     expect(run.loop.iterations).toHaveLength(1);
     expect(run.markdown).toContain('Runner: `passed`');
   });
@@ -364,10 +422,10 @@ describe('loop command', () => {
   test('does not run configured runners after a loop reaches max iterations', async () => {
     const dir = await createLoopFixture();
     await writeFile(
-      path.join(dir, 'runner.mjs'),
+      path.join(dir, 'src/runner.mjs'),
       [
         "import { appendFileSync } from 'node:fs';",
-        "appendFileSync('runner-count.txt', 'run\\n');",
+        "appendFileSync('src/runner-count.txt', 'run\\n');",
         '',
       ].join('\n'),
     );
@@ -382,7 +440,7 @@ describe('loop command', () => {
         '--max-iterations',
         '1',
         '--runner-command',
-        'node runner.mjs',
+        'node src/runner.mjs',
         '--json',
       ],
       { cwd: dir },
@@ -402,7 +460,7 @@ describe('loop command', () => {
     expect(JSON.parse(result.stdout).error).toMatchObject({
       code: 'LOOP_TERMINAL',
     });
-    expect(await readFile(path.join(dir, 'runner-count.txt'), 'utf8')).toBe('run\n');
+    expect(await readFile(path.join(dir, 'src/runner-count.txt'), 'utf8')).toBe('run\n');
   });
 
   test('stops a loop when max iterations are exhausted', async () => {
@@ -466,6 +524,218 @@ describe('loop command', () => {
     expect(JSON.parse(result.stdout).error).toMatchObject({
       code: 'LOOP_TERMINAL',
     });
+  });
+
+  test('prints a loop scorecard with autonomous continuation signals', async () => {
+    const dir = await createLoopFixture();
+    const createResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'loop',
+        'create',
+        '--goal',
+        'Score autonomous loop',
+        '--runner-command',
+        'node src/runner.mjs',
+        '--budget-tokens',
+        '9000',
+        '--max-iterations',
+        '5',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+    await writeFile(path.join(dir, 'src/auth/copy.ts'), 'export const copy = "changed";\n');
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'scorecard', '--id', created.loop.id, '--json'],
+      { cwd: dir },
+    );
+    const scorecard = JSON.parse(result.stdout);
+
+    expect(scorecard.decision).toBe('continue');
+    expect(scorecard.loop).toMatchObject({
+      id: created.loop.id,
+      status: 'active',
+      iterations: 0,
+      maxIterations: 5,
+      runnerConfigured: true,
+    });
+    expect(scorecard.readiness).toMatchObject({
+      status: 'blocked',
+      nextAction: expect.any(String),
+    });
+    expect(scorecard.tokenBudget).toMatchObject({
+      maxEstimatedTokens: 9000,
+      usedEstimatedTokens: 0,
+      remainingEstimatedTokens: 9000,
+      latestNetContextReductionTokens: expect.any(Number),
+    });
+    expect(scorecard.guardrails).toMatchObject({
+      explicitRunnerRequired: true,
+      shell: false,
+      rejectShellMetacharacters: true,
+      runnerCommand: 'node src/runner.mjs',
+    });
+    expect(scorecard.context).toMatchObject({
+      handles: expect.arrayContaining(['task:active', 'evidence-map:current']),
+      reviewability: expect.any(String),
+      unexplainedChangedFiles: expect.any(Number),
+      verificationFreshness: expect.any(String),
+    });
+    expect(scorecard.reasons.length).toBeGreaterThan(0);
+    expect(scorecard.safety).toMatchObject({
+      readOnly: true,
+      runnerExecuted: false,
+      verificationCommandsRun: false,
+      projectCommandsRun: false,
+    });
+  });
+
+  test('reports ready before iteration exhaustion when gates already pass', async () => {
+    const dir = await createLoopFixture();
+    const createResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'loop',
+        'create',
+        '--goal',
+        'Ready exhausted loop',
+        '--max-iterations',
+        '1',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+    await writeFile(path.join(dir, 'src/auth/copy.ts'), 'export const copy = "ready";\n');
+
+    const runId = '2026-06-28-12-00-verify';
+    await mkdir(path.join(dir, '.agentloop/runs', runId), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-28-12-00-verification-report.md'),
+      '# Verification Report\n\n- Overall status: pass\n',
+    );
+    await writeJson(path.join(dir, '.agentloop/runs', runId, 'metadata.json'), {
+      id: runId,
+      command: 'verify',
+      createdAt: '2026-06-28-12-00',
+      createdAtEpochMs: Date.parse('2026-06-28T12:00:00Z'),
+      task: {
+        path: created.loop.task.nativeTaskPath,
+        title: 'Loop: Ready exhausted loop',
+        status: 'in-progress',
+      },
+      verificationReportPath: '.agentloop/reports/2026-06-28-12-00-verification-report.md',
+      overallStatus: 'pass',
+      changedFileCount: 1,
+    });
+    await writeJson(path.join(dir, '.agentloop/runs', runId, 'changed-files.json'), [
+      { status: 'M', path: 'src/auth/copy.ts' },
+    ]);
+
+    const loopPath = path.join(dir, created.loop.path);
+    const loop = JSON.parse(await readFile(loopPath, 'utf8'));
+    loop.iterations = [
+      {
+        index: 1,
+        createdAt: '2026-06-28T12:01:00.000Z',
+        readinessStatus: 'blocked',
+        decision: 'continue',
+        nextAction: 'agentloop ready --strict',
+        contextHandles: [],
+        tokenReceipt: loop.latestTokenReceipt,
+      },
+    ];
+    await writeJson(loopPath, loop);
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'scorecard', '--id', created.loop.id, '--json'],
+      { cwd: dir },
+    );
+    const scorecard = JSON.parse(result.stdout);
+
+    expect(scorecard.decision).toBe('ready');
+    expect(scorecard.readiness.status).toBe('ready');
+    expect(scorecard.reasons).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: 'ready-gates-passed' }),
+        expect.objectContaining({ code: 'iteration-budget-exhausted' }),
+      ]),
+    );
+  });
+
+  test('keeps scorecard read-only by not executing configured runners', async () => {
+    const dir = await createLoopFixture();
+    await writeFile(
+      path.join(dir, 'src/runner.mjs'),
+      [
+        "import { writeFileSync } from 'node:fs';",
+        "writeFileSync('runner-proof.txt', 'runner executed\\n');",
+        '',
+      ].join('\n'),
+    );
+    const createResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'loop',
+        'create',
+        '--goal',
+        'Read-only scorecard',
+        '--runner-command',
+        'node src/runner.mjs',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'scorecard', '--id', created.loop.id, '--redact-paths'],
+      { cwd: dir },
+    );
+
+    expect(result.stdout).toContain('# AgentLoopKit Loop Scorecard');
+    expect(result.stdout).toContain('- Runner executed: `false`');
+    await expect(readFile(path.join(dir, 'runner-proof.txt'), 'utf8')).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
+  });
+
+  test('routes scope drift to human review before another loop iteration', async () => {
+    const dir = await createLoopFixture();
+    const createResult = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'create', '--goal', 'Narrow docs loop', '--json'],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+    await writeFile(path.join(dir, 'package.json'), '{"name":"drift"}\n');
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'scorecard', '--id', created.loop.id, '--json'],
+      { cwd: dir },
+    );
+    const scorecard = JSON.parse(result.stdout);
+
+    expect(scorecard.decision).toBe('ask-human');
+    expect(scorecard.reasons).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: 'ready-scope-drift',
+          severity: 'blocking',
+        }),
+      ]),
+    );
+    expect(scorecard.context.unexplainedChangedFiles).toBeGreaterThan(0);
   });
 
   test('prints a loop report with token ledger and next action', async () => {

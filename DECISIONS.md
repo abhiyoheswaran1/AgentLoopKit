@@ -1,5 +1,15 @@
 # Decisions
 
+## 2026-06-28: Loop Scorecards Gate Autonomous Continuation
+
+AgentLoopKit can create loop contracts and run a guarded local runner, but users need a deterministic pre-flight decision before another autonomous pass. The loop controller should say whether to continue, ask a human, stop, or move to review, using the same local evidence as the rest of AgentLoopKit.
+
+`agentloop loop scorecard` reads the loop contract, readiness gates, compact context pack, token budget, iteration budget, runner guardrails, and scope evidence. It returns ranked reasons and machine-readable signals for agents and scripts. The package API exposes `scoreLoop` and scorecard types alongside the existing loop APIs.
+
+The command stays read-only. It does not execute runners, run verification commands, mutate task state, publish packages, create tags, push commits, upload files, call an LLM, proxy provider traffic, or read `.env` contents.
+
+Blocked loops reject both `loop run` and `loop tick`. A human-review stop is a control-plane state, not another iteration opportunity, so AgentLoopKit should preserve the stop reason and budget until a maintainer reviews the report and changes the underlying evidence.
+
 ## 2026-06-26: Baseframe Suite Uses Local Versioned JSON Boundaries
 
 AgentLoopKit needs to participate in the Baseframe Suite workflow without merging product internals. The integration boundary is local JSON under `.baseframe/`: ProjScan writes `projscan-assessment.json`, AgentLoopKit writes `agentloopkit-task.json`, and AgentFlight writes `agentflight-result.json`.

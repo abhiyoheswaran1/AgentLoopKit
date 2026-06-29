@@ -284,6 +284,8 @@ agentloop loop tick
 agentloop loop tick --id <loop-id>
 agentloop loop run
 agentloop loop run --id <loop-id>
+agentloop loop scorecard
+agentloop loop scorecard --id <loop-id> --json --redact-paths
 agentloop loop status
 agentloop loop report
 agentloop loop report --json --redact-paths
@@ -293,9 +295,11 @@ agentloop loop report --json --redact-paths
 
 `loop create` writes a versioned local loop contract under `.agentloop/loops/<loop-id>/loop.json` and creates a normal AgentLoopKit task contract for the goal. The loop contract records the goal, cadence, budget, stop conditions, suggested commands, native task path, token receipt, and safety flags. Presets are `agentloopkit-maintenance`, `docs-drift`, `release-readiness`, and `baseframe-integration`. Add `--runner-command` only when a reviewed local command should run through `loop run`; add `--runner-timeout-ms` to bound that command.
 
-`loop tick` records one local iteration decision from existing evidence. It reads readiness state and a compact context pack, writes the token receipt, records source handles, and decides whether the loop should continue, stop, or be marked ready. It does not execute a coding agent or run suggested commands.
+`loop tick` records one local iteration decision from existing evidence. It reads readiness state and a compact context pack, writes the token receipt, records source handles, and decides whether the loop should continue, ask for human review, stop, or be marked ready. If the loop is already blocked for human review, the next tick exits with `LOOP_BLOCKED` instead of spending more budget. It does not execute a coding agent or run suggested commands.
 
 `loop run` executes one configured local runner iteration and records the result in the same loop contract. It runs with `shell: false`, rejects shell metacharacters, blocks publish and destructive command families, captures bounded output, records changed files after the run, evaluates readiness, and applies the same max-iteration and token-budget stop conditions. `--command` is accepted only when it exactly matches the configured runner command.
+
+`loop scorecard` reads the current loop contract, readiness gates, compact context pack, token budget, iteration budget, runner guardrails, and scope evidence. It returns `continue`, `ask-human`, `stop`, or `ready`, plus ranked reasons and machine-readable signals. It is read-only: it does not execute the runner, run verification, mutate task state, or publish anything.
 
 `loop status` prints the current loop state, token usage, runner command, and next action. `loop report` prints a reviewable token ledger with iteration decisions, runner evidence, and suggested commands.
 

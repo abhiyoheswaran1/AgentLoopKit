@@ -186,6 +186,46 @@ describe('evidence map', () => {
     );
   });
 
+  test('treats dot-directory task scope as a directory pattern', async () => {
+    const { dir, config, taskPath } = await createEvidenceMapFixture();
+    await writeFile(
+      taskPath,
+      `# Update local harness
+
+- Created date: 2026-06-11
+- Task type: feature
+- Status: in-progress
+
+## Problem Statement
+Local harness guidance needs an update.
+
+## Desired Outcome
+Harness changes are covered by task scope.
+
+## Likely Files or Areas
+- .agentloop
+
+## Acceptance Criteria
+- Harness guidance is updated.
+
+## Verification Commands
+- npm test
+
+## Rollback Notes
+Revert the harness guidance.
+`,
+    );
+    await mkdir(path.join(dir, '.agentloop/harness'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/harness/commands.md'), '# Commands\n');
+
+    const map = await buildEvidenceMap({ cwd: dir, config });
+
+    expect(map.files.find((file) => file.path === '.agentloop/harness/commands.md')).toMatchObject({
+      coveredByTask: true,
+      unexplained: false,
+    });
+  });
+
   test('classifies active task and state files as AgentLoop evidence for custom task paths', async () => {
     const { dir, config } = await createEvidenceMapFixture();
     const customTaskPath = path.join(dir, '.agentloop/tasks/app-trial.md');

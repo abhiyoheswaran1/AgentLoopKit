@@ -108,6 +108,7 @@ type RecentRunCoverage = {
 
 const DEFAULT_RECENT_RUN_LIMIT = 10;
 const EXAMPLE_LIMIT = 5;
+const DOT_DIRECTORY_PATTERNS = new Set(['.agentloop', '.github', '.vscode', '.cursor', '.claude']);
 const CLAIMS = [
   'Evidence coverage is path-based local AgentLoopKit evidence, not proof of code correctness.',
   'The evidence map does not read changed file contents, call external APIs, publish, tag, or upload artifacts.',
@@ -161,9 +162,10 @@ function meaningfulSectionItems(markdown: string, heading: string) {
 function toPathPatterns(values: string[]): PathPattern[] {
   return values.map((value) => {
     const normalized = normalizePath(value).replace(/\/+$/, '');
+    const basename = path.posix.basename(normalized);
     return {
       value: normalized,
-      kind: value.endsWith('/') || !/\.[^/]+$/.test(path.posix.basename(normalized))
+      kind: value.endsWith('/') || DOT_DIRECTORY_PATTERNS.has(normalized) || !/\.[^/]+$/.test(basename)
         ? 'directory'
         : 'file',
     };

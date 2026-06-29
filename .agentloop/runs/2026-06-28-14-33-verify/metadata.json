@@ -1,0 +1,14 @@
+{
+  "id": "2026-06-28-14-33-verify",
+  "command": "verify",
+  "createdAt": "2026-06-28-14-33",
+  "createdAtEpochMs": 1782650018876,
+  "task": {
+    "path": ".agentloop/tasks/2026-06-28-add-autonomous-loop-scorecards.md",
+    "title": "Add autonomous loop scorecards",
+    "status": "in-progress"
+  },
+  "verificationReportPath": ".agentloop/reports/2026-06-28-14-31-verification-report.md",
+  "overallStatus": "pass",
+  "changedFileCount": 30
+}

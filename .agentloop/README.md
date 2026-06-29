@@ -56,7 +56,7 @@ Use `npx projscan doctor --format markdown` during implementation work in this r
 
 Local policy files are repo guidance. If `agentloop policy status` reports `modified`, read the local file and follow the repo-specific rule. Do not overwrite customized policy text just to match the bundled template.
 
-Use `agentloop ready` when you need a read-only readiness gate across task, acceptance, verification, scope, and context budget. Use `agentloop loop create`, `agentloop loop tick`, `agentloop loop run`, `agentloop loop status`, and `agentloop loop report` when a goal needs local iteration decisions, guarded runner passes, token receipts, and stop reasons. Use `loop run` only when the loop contract has an explicit runner command.
+Use `agentloop ready` when you need a read-only readiness gate across task, acceptance, verification, scope, and context budget. Use `agentloop loop create`, `agentloop loop tick`, `agentloop loop run`, `agentloop loop scorecard`, `agentloop loop status`, and `agentloop loop report` when a goal needs local iteration decisions, guarded runner passes, pre-flight decisions, token receipts, and stop reasons. Use `loop run` only when the loop contract has an explicit runner command.
 
 Use `agentloop ship` as the main stop condition for meaningful code changes. It writes a ship report, records run evidence under `.agentloop/runs/`, and scores review-readiness evidence without claiming to measure code quality.
 

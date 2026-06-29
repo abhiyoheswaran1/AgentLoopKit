@@ -1,0 +1,204 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "agentloop-loop",
+  "id": "2026-06-28-14-25-dogfood-autonomous-loop-scorecards-final",
+  "path": ".agentloop/loops/2026-06-28-14-25-dogfood-autonomous-loop-scorecards-final/loop.json",
+  "goal": "Dogfood autonomous loop scorecards final",
+  "cadence": "manual",
+  "status": "stopped",
+  "createdAt": "2026-06-28T12:25:58.024Z",
+  "updatedAt": "2026-06-28T12:26:48.818Z",
+  "budget": {
+    "maxEstimatedTokens": 50000,
+    "maxIterations": 5,
+    "usedEstimatedTokens": 655
+  },
+  "controls": {
+    "agentNeutral": true,
+    "externalAgentExecution": false,
+    "externalRunnerExecution": false,
+    "localEvidenceOnly": true
+  },
+  "guardrails": {
+    "requireExplicitRunner": true,
+    "shell": false,
+    "rejectShellMetacharacters": true,
+    "blockedCommands": [
+      "shell interpreters",
+      "rm/rmdir",
+      "git add/commit/push/reset/clean/checkout/switch/rebase/merge/tag/stash/restore",
+      "npm/pnpm/yarn/bun publish/version",
+      "gh release",
+      "docker push/login"
+    ],
+    "maxOutputChars": 8000
+  },
+  "task": {
+    "nativeTaskPath": ".agentloop/tasks/2026-06-28-loop-dogfood-autonomous-loop-scorecards-final.md"
+  },
+  "suggestedCommands": [
+    {
+      "command": "agentloop start --for codex --goal implement --redact-paths",
+      "reason": "Brief the next coding agent with compact source handles.",
+      "required": true
+    },
+    {
+      "command": "agentloop ready --strict",
+      "reason": "Check readiness before review or handoff.",
+      "required": true
+    }
+  ],
+  "stopConditions": [
+    "Stop when readiness gates pass.",
+    "Stop after 5 iteration(s).",
+    "Stop when estimated loop token usage reaches 50000.",
+    "Ask a human when task scope or acceptance criteria need product judgment."
+  ],
+  "iterations": [
+    {
+      "index": 1,
+      "createdAt": "2026-06-28T12:26:17.634Z",
+      "readinessStatus": "blocked",
+      "decision": "continue",
+      "nextAction": "agentloop verify --task-commands --progress",
+      "contextHandles": [
+        "task:active",
+        "evidence-map:current",
+        "context-budget:current",
+        "verification:latest",
+        "run:latest"
+      ],
+      "tokenReceipt": {
+        "heuristic": "chars-divided-by-four",
+        "estimatedBroadContextTokens": 284,
+        "estimatedCompactContextTokens": 57,
+        "estimatedAgentLoopOverheadTokens": 74,
+        "estimatedGrossContextReductionTokens": 227,
+        "estimatedNetContextReductionTokens": 153,
+        "warning": "AgentLoopKit estimates this compact evidence path saves context for this repo state.",
+        "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+        "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+      }
+    },
+    {
+      "index": 2,
+      "createdAt": "2026-06-28T12:26:25.379Z",
+      "readinessStatus": "blocked",
+      "decision": "continue",
+      "nextAction": "agentloop verify --task-commands --progress",
+      "contextHandles": [
+        "task:active",
+        "evidence-map:current",
+        "context-budget:current",
+        "verification:latest",
+        "run:latest"
+      ],
+      "tokenReceipt": {
+        "heuristic": "chars-divided-by-four",
+        "estimatedBroadContextTokens": 284,
+        "estimatedCompactContextTokens": 57,
+        "estimatedAgentLoopOverheadTokens": 74,
+        "estimatedGrossContextReductionTokens": 227,
+        "estimatedNetContextReductionTokens": 153,
+        "warning": "AgentLoopKit estimates this compact evidence path saves context for this repo state.",
+        "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+        "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+      }
+    },
+    {
+      "index": 3,
+      "createdAt": "2026-06-28T12:26:32.522Z",
+      "readinessStatus": "blocked",
+      "decision": "continue",
+      "nextAction": "agentloop verify --task-commands --progress",
+      "contextHandles": [
+        "task:active",
+        "evidence-map:current",
+        "context-budget:current",
+        "verification:latest",
+        "run:latest"
+      ],
+      "tokenReceipt": {
+        "heuristic": "chars-divided-by-four",
+        "estimatedBroadContextTokens": 284,
+        "estimatedCompactContextTokens": 57,
+        "estimatedAgentLoopOverheadTokens": 74,
+        "estimatedGrossContextReductionTokens": 227,
+        "estimatedNetContextReductionTokens": 153,
+        "warning": "AgentLoopKit estimates this compact evidence path saves context for this repo state.",
+        "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+        "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+      }
+    },
+    {
+      "index": 4,
+      "createdAt": "2026-06-28T12:26:40.372Z",
+      "readinessStatus": "blocked",
+      "decision": "continue",
+      "nextAction": "agentloop verify --task-commands --progress",
+      "contextHandles": [
+        "task:active",
+        "evidence-map:current",
+        "context-budget:current",
+        "verification:latest",
+        "run:latest"
+      ],
+      "tokenReceipt": {
+        "heuristic": "chars-divided-by-four",
+        "estimatedBroadContextTokens": 284,
+        "estimatedCompactContextTokens": 57,
+        "estimatedAgentLoopOverheadTokens": 74,
+        "estimatedGrossContextReductionTokens": 227,
+        "estimatedNetContextReductionTokens": 153,
+        "warning": "AgentLoopKit estimates this compact evidence path saves context for this repo state.",
+        "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+        "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+      }
+    },
+    {
+      "index": 5,
+      "createdAt": "2026-06-28T12:26:48.818Z",
+      "readinessStatus": "blocked",
+      "decision": "stop",
+      "stopReason": "maximum iteration count reached",
+      "nextAction": "agentloop verify --task-commands --progress",
+      "contextHandles": [
+        "task:active",
+        "evidence-map:current",
+        "context-budget:current",
+        "verification:latest",
+        "run:latest"
+      ],
+      "tokenReceipt": {
+        "heuristic": "chars-divided-by-four",
+        "estimatedBroadContextTokens": 284,
+        "estimatedCompactContextTokens": 57,
+        "estimatedAgentLoopOverheadTokens": 74,
+        "estimatedGrossContextReductionTokens": 227,
+        "estimatedNetContextReductionTokens": 153,
+        "warning": "AgentLoopKit estimates this compact evidence path saves context for this repo state.",
+        "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+        "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+      }
+    }
+  ],
+  "latestTokenReceipt": {
+    "heuristic": "chars-divided-by-four",
+    "estimatedBroadContextTokens": 284,
+    "estimatedCompactContextTokens": 57,
+    "estimatedAgentLoopOverheadTokens": 74,
+    "estimatedGrossContextReductionTokens": 227,
+    "estimatedNetContextReductionTokens": 153,
+    "warning": "AgentLoopKit estimates this compact evidence path saves context for this repo state.",
+    "savingsCommand": "agentloop context pack --for codex --goal continue --redact-paths",
+    "note": "Token estimates use a transparent character-count heuristic, not a provider tokenizer or billing meter."
+  },
+  "safety": {
+    "writesLoopContract": true,
+    "writesNativeTask": true,
+    "commandsExecuted": [],
+    "externalNetwork": false,
+    "publishes": false
+  },
+  "stopReason": "maximum iteration count reached"
+}
