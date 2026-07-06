@@ -58,7 +58,7 @@ This release must be built with our own product. Per `.agentloop/harness/autonom
    ```bash
    npx --yes agentflight@latest status
    npx --yes agentflight@latest report
-   npx --no-install tsx src/cli/index.ts check-gates --task <task-id> --from-agentflight
+   npx --no-install tsx src/cli/index.ts check-gates --baseframe-task-id <task-id> --from-agentflight
    ```
 
 6. **Confirm review-readiness, then commit** (the commit shown in each task's final step):

@@ -73,7 +73,7 @@ After AgentFlight writes its result artifact, reconcile required gates with:
 
 ```bash
 agentloopkit check-gates \
-  --task auth-password-reset-20260626-01 \
+  --baseframe-task-id auth-password-reset-20260626-01 \
   --from-agentflight .baseframe/evidence/auth-password-reset-20260626-01/agentflight-result.json
 ```
 
