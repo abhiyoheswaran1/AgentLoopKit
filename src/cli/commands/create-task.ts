@@ -8,6 +8,7 @@ import { TASK_TYPES } from '../../core/constants.js';
 import { AgentLoopError } from '../../core/errors.js';
 import { pathExists } from '../../core/file-system.js';
 import { filterNonAgentLoopEvidenceFiles, getGitStatus, parseGitStatus } from '../../core/git.js';
+import { analyzeContract, renderSoftSpotsText } from '../../core/harden.js';
 import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { findLikelyPostVerificationGates } from '../../core/post-verification-gates.js';
 import { redactLocalRoots } from '../../core/redaction.js';
@@ -367,6 +368,7 @@ export function createTaskCommand() {
     .option('--rollback <text>', 'rollback notes')
     .option('--json', 'print machine-readable output')
     .option('--redact-paths', 'redact local absolute paths in public output')
+    .option('--harden', 'Report unresolved contract soft spots after creating the task.')
     .addHelpText('after', supportedTaskTypesHelp())
     .action(async (options: Record<string, unknown>) => {
       let type: TaskType | undefined;
@@ -534,6 +536,13 @@ export function createTaskCommand() {
       }
       for (const warning of warnings) {
         printHumanWarning(warning);
+      }
+      if (options.harden === true) {
+        const softSpots = analyzeContract(result.markdown);
+        console.log(renderSoftSpotsText(softSpots));
+        console.log(
+          'Run `agentloop harden --resolve <id> --answer "..."` to resolve them.',
+        );
       }
     });
 }

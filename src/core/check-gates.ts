@@ -14,6 +14,7 @@ import {
   parseGitStatus,
 } from './git.js';
 import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
+import { analyzeContract } from './harden.js';
 import { inlineCode } from './markdown-format.js';
 import { listRuns, RunSummary } from './runs.js';
 import { getActiveTask, inspectTaskDirectory } from './task-state.js';
@@ -315,6 +316,18 @@ export async function checkGates(options: {
         'pass',
         extractHeading(taskMarkdown, path.basename(taskPath, '.md')),
         relativePath(options.cwd, taskPath),
+      ),
+    );
+    const softSpots = analyzeContract(taskMarkdown);
+    const blockingCount = softSpots.filter((s) => s.severity === 'blocking').length;
+    gates.push(
+      gate(
+        'contract-hardening',
+        'Contract hardening',
+        blockingCount > 0 ? 'warn' : 'pass',
+        blockingCount > 0
+          ? `${blockingCount} blocking soft spot(s) unresolved. Run \`agentloop harden\` to resolve them before implementation.`
+          : 'Task contract has no blocking soft spots.',
       ),
     );
   } else {

@@ -280,6 +280,27 @@ describe('ready command', () => {
     expect(result.stdout).not.toContain(dir);
   });
 
+  test('surfaces a contract-hardening warning for unresolved blocking soft spots', async () => {
+    const dir = await createReadyFixture();
+
+    const result = await execa(tsxPath, [cliPath, 'ready', '--json'], { cwd: dir });
+    const payload = JSON.parse(result.stdout);
+
+    // The fixture's acceptance criterion ("Auth copy is clearer.") has no checkable
+    // predicate, which analyzeContract flags as a blocking soft spot. Ready surfaces
+    // it as a warn-only gate (ready only escalates status on `fail`, by design).
+    expect(payload.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'contract-hardening',
+          status: 'warn',
+          message: expect.stringMatching(/soft spot/i),
+        }),
+      ]),
+    );
+    expect(payload.status).toBe('ready');
+  });
+
   test('does not warn about context cost when the repo is idle with no task', async () => {
     const dir = await createIdleFixture();
 

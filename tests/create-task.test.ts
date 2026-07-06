@@ -328,6 +328,63 @@ describe('create-task command', () => {
     expect(result.stdout).toContain(`Active task set: ${inlineCode(taskPath)}`);
   });
 
+  test('--harden reports unresolved contract soft spots after creating the task', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Harden hint fixture',
+        '--type',
+        'feature',
+        '--out',
+        '.agentloop/tasks/harden-hint.md',
+        '--harden',
+      ],
+      { cwd: dir },
+    );
+
+    expect(result.stdout).toContain('Task contract created:');
+    expect(result.stdout).toMatch(/soft spot/i);
+    expect(result.stdout).toMatch(/blocking/i);
+    expect(result.stdout).toContain('agentloop harden --resolve');
+  });
+
+  test('does not print soft-spot output without --harden', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'No harden flag fixture',
+        '--type',
+        'feature',
+        '--out',
+        '.agentloop/tasks/no-harden-hint.md',
+      ],
+      { cwd: dir },
+    );
+
+    expect(result.stdout).toContain('Task contract created:');
+    expect(result.stdout).not.toMatch(/soft spot/i);
+  });
+
   test('--redact-paths redacts the absolute task path in human output', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

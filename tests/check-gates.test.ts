@@ -54,7 +54,7 @@ describe('check-gates command', () => {
     await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
-      '# Demo task\n\n- Status: in-progress\n',
+      '# Demo task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- node_modules/\n',
     );
     await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
     await writeFile(
@@ -80,6 +80,7 @@ describe('check-gates command', () => {
     expect(output.gates).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'task-contract', status: 'pass' }),
+        expect.objectContaining({ id: 'contract-hardening', status: 'pass' }),
         expect.objectContaining({ id: 'verification-report', status: 'pass' }),
         expect.objectContaining({ id: 'handoff-summary', status: 'pass' }),
         expect.objectContaining({
@@ -157,7 +158,7 @@ describe('check-gates command', () => {
     await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
     await writeFile(
       path.join(dir, '.agentloop/tasks/archive/2026-06-12-demo.md'),
-      '# Demo task\n\n- Status: done\n',
+      '# Demo task\n\n- Status: done\n\n## Files or Areas Not to Touch\n- node_modules/\n',
     );
     await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
     await writeFile(
@@ -222,7 +223,7 @@ describe('check-gates command', () => {
     await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
     await writeFile(
       path.join(dir, '.agentloop/tasks/archive/2026-06-13-docs-hygiene.md'),
-      '# Docs hygiene\n\n- Status: done\n',
+      '# Docs hygiene\n\n- Status: done\n\n## Files or Areas Not to Touch\n- node_modules/\n',
     );
     await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
     await writeFile(
@@ -328,7 +329,7 @@ describe('check-gates command', () => {
     await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
     await writeFile(
       path.join(dir, '.agentloop/tasks/archive/2026-06-13-docs-hygiene.md'),
-      '# Docs hygiene\n\n- Status: done\n',
+      '# Docs hygiene\n\n- Status: done\n\n## Files or Areas Not to Touch\n- node_modules/\n',
     );
     await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
     await writeFile(
@@ -381,7 +382,7 @@ describe('check-gates command', () => {
     await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-13-docs-hygiene.md'),
-      '# Docs hygiene\n\n- Status: in-progress\n',
+      '# Docs hygiene\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- node_modules/\n',
     );
     await writeJson(path.join(dir, '.agentloop/state.json'), {
       version: 1,
@@ -446,7 +447,7 @@ describe('check-gates command', () => {
     await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-13-real-task.md'),
-      '# Real task\n\n- Status: in-progress\n',
+      '# Real task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- node_modules/\n',
     );
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-13-real-task-2.md'),
@@ -516,7 +517,7 @@ describe('check-gates command', () => {
     await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
     await writeFile(
       path.join(dir, '.agentloop/tasks/archive/2026-06-13-ship-flow.md'),
-      '# Ship flow\n\n- Status: done\n',
+      '# Ship flow\n\n- Status: done\n\n## Files or Areas Not to Touch\n- node_modules/\n',
     );
     await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
     await writeFile(
@@ -1050,7 +1051,7 @@ describe('check-gates command', () => {
       const dir = await createInitializedRepo();
       await writeFile(
         path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
-        '# Demo task\n\n- Status: in-progress\n',
+        '# Demo task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- node_modules/\n',
       );
       await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
       await writeFile(
@@ -1122,4 +1123,49 @@ describe('check-gates command', () => {
     },
     CLI_CHECK_GATES_TEST_TIMEOUT_MS,
   );
+
+  test('warns on unresolved contract soft spots without failing by default, and fails under --strict', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-soft-spots.md'),
+      '# Soft spots task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- None recorded yet.\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+    await commitAll(dir);
+
+    const defaultResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const strictResult = await execa(tsxPath, [cliPath, 'check-gates', '--strict', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(defaultResult.exitCode).toBe(0);
+    const defaultOutput = JSON.parse(defaultResult.stdout);
+    expect(defaultOutput.overallStatus).toBe('warn');
+    expect(defaultOutput.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'contract-hardening',
+          status: 'warn',
+          message: expect.stringMatching(/soft spot/i),
+        }),
+      ]),
+    );
+
+    expect(strictResult.exitCode).toBe(1);
+    const strictOutput = JSON.parse(strictResult.stdout);
+    expect(strictOutput.overallStatus).toBe('fail');
+  });
 });

@@ -73,14 +73,17 @@ Users land on the intended destination after a successful login.
 - Keep the auth callback API unchanged.
 
 ## Non-Goals
-- Do not redesign the login UI.
+- Do not redesign the sign-in screen.
 
 ## Likely Files or Areas
 - src/auth
 
+## Files or Areas Not to Touch
+- node_modules/
+
 ## Acceptance Criteria
-- Password-reset login redirects to the requested page.
-- Existing login redirect tests still pass.
+- Password-reset login redirects to the requested page (see \`npm test -- auth\`).
+- Existing login redirect tests still pass via \`npm test -- auth\`.
 
 ## Verification Commands
 - npm test -- auth

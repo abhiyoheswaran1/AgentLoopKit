@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import type { AgentLoopConfig } from './config.js';
 import { buildContextBudget } from './context-budget.js';
 import { getCurrentWorkTaskPath } from './evidence.js';
+import { analyzeContract } from './harden.js';
 import {
   buildEvidenceMap,
   compactEvidenceMap,
@@ -30,7 +31,8 @@ export type ReadyGate = {
     | 'verification'
     | 'scope-drift'
     | 'forbidden-files'
-    | 'context-budget';
+    | 'context-budget'
+    | 'contract-hardening';
   name: string;
   status: ReadyGateStatus;
   message: string;
@@ -137,6 +139,21 @@ function buildReadyGates(input: {
       : gate('task-contract', 'Task contract', 'fail', 'No current task contract found.'),
   );
   gates.push(acceptanceGate({ taskPath, taskMarkdown: input.taskMarkdown }));
+  if (input.taskMarkdown !== undefined) {
+    const softSpots = analyzeContract(input.taskMarkdown);
+    const blockingCount = softSpots.filter((s) => s.severity === 'blocking').length;
+    gates.push(
+      gate(
+        'contract-hardening',
+        'Contract hardening',
+        blockingCount > 0 ? 'warn' : 'pass',
+        blockingCount > 0
+          ? `${blockingCount} blocking soft spot(s) unresolved. Run \`agentloop harden\`.`
+          : 'Task contract has no blocking soft spots.',
+        taskPath,
+      ),
+    );
+  }
   gates.push(
     gate(
       'verification',
