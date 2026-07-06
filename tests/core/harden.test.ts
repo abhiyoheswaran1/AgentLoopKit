@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { analyzeContract, makeSoftSpotId } from '../../src/core/harden.js';
+import { analyzeContract, makeSoftSpotId, hasBlockingSoftSpots, toHardenJson, renderSoftSpotsText } from '../../src/core/harden.js';
 
 describe('harden engine skeleton', () => {
   it('builds deterministic ids', () => {
@@ -64,5 +64,23 @@ describe('contradiction rule', () => {
       '## Acceptance Criteria', '- New authentication flow works',
     ].join('\n');
     expect(analyzeContract(md).some((s) => s.type === 'contradiction' && s.severity === 'blocking')).toBe(true);
+  });
+});
+
+describe('rendering and blocking summary', () => {
+  it('summarises blocking vs advisory counts', () => {
+    const md = ['- Task type: feature', '## Assumptions', '- None recorded yet.',
+      '## Files or Areas Not to Touch', '- None recorded yet.'].join('\n');
+    const spots = analyzeContract(md);
+    expect(hasBlockingSoftSpots(spots)).toBe(true);
+    const json = toHardenJson(spots);
+    expect(json.blocking).toBeGreaterThanOrEqual(1);
+    expect(json.advisory).toBeGreaterThanOrEqual(1);
+    expect(renderSoftSpotsText(spots)).toContain('blocking');
+  });
+
+  it('renders a clean report when there are no soft spots', () => {
+    expect(renderSoftSpotsText([])).toContain('No soft spots');
+    expect(hasBlockingSoftSpots([])).toBe(false);
   });
 });
