@@ -2,6 +2,8 @@
 
 AgentLoopKit is local-first and npm-distributed. The open-source core stays focused on repo-level task contracts, verification evidence, safety policies, and reviewer handoffs.
 
+Starting at 1.0, the shipped surface is a committed public contract under SemVer, enforced by contract-lock tests (`contract:check`). See `docs/stability.md` and `docs/versioning.md`.
+
 See `docs/distribution-channels.md` for the staged release-channel plan beyond npm and GitHub Releases.
 
 ## Shipped
@@ -52,18 +54,19 @@ See `docs/distribution-channels.md` for the staged release-channel plan beyond n
 - Baseframe Suite v1 local JSON integration with ProjScan assessment import and AgentFlight gate reconciliation
 - Guarded loop runner passes with `agentloop loop run`, explicit configured runner commands, bounded output, changed-file evidence, and token receipts
 - Read-only loop scorecards with `agentloop loop scorecard` for continuation, human-review, stop, and ready decisions
+- 1.0 stability contract: the full command surface committed as a public SemVer contract, with contract-lock tests (`contract:check`), a pre-freeze consistency audit, a versioning/deprecation/experimental policy, and a guaranteed 0.x to 1.0 upgrade path
 
 ## Current State
 
-- GitHub release `v0.47.1` is public.
-- npm latest is `agentloopkit@0.47.1`.
-- GHCR and MCP Registry are live for `0.47.1`.
+- GitHub release `v1.0.0` is public.
+- npm latest is `agentloopkit@1.0.0`.
+- GHCR and MCP Registry are live for `1.0.0`.
 - GitHub Marketplace listing is pending owner UI publication for the composite Action.
 - npm trusted publishing is configured for `abhiyoheswaran1/AgentLoopKit` and `.github/workflows/publish.yml`.
 - Future releases should publish through GitHub Releases and the trusted-publishing workflow.
 - Do not publish older release numbers from current `main`; use matching release tags or tarballs if an old line must be reproduced.
-- Release tag `v0.47.1` points at the published release commit.
-- Current `main` contains release proof documentation after `v0.47.1`.
+- Release tag `v1.0.0` points at the published release commit.
+- Current `main` contains release proof documentation after `v1.0.0`.
 
 ## Near Term
 

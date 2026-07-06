@@ -4,6 +4,15 @@
 
 - No unreleased changes yet.
 
+## 1.0.0
+
+- Committed the entire shipped surface as a stable public contract across six axes: CLI commands and flags, `agentloop.config.json` config schema, MCP tool surface, `--json` output shapes, exit codes, and the generated harness format plus package API. See `docs/stability.md`.
+- Added contract-lock tests enforced by a new `contract:check` script wired into `release-flow`: snapshot locks for every command's `--help`, the config JSON schema, the MCP tool definitions, and the `--json` output shape of 36 of 37 `--json`-capable stable commands (only `show-run` is deferred, as it needs a runtime run id).
+- Ran a pre-freeze consistency audit (`docs/1.0-consistency-audit.md`) and fixed the surface before freezing: `github import --json` and `release-proof --json` now emit the standard JSON error envelope on failure; `init` and `create-task` gained `--redact-paths` and no longer leak absolute paths (including `init`'s created/updated/skipped path arrays); `upgrade-harness --redact-paths` now uses the shared `[git-root]` placeholder; `check-gates`'s Baseframe task flag was renamed from `--task` to `--baseframe-task-id` to end a flag collision; and the singular next-action JSON field was unified to `nextAction: { command, reason }` across `next`, `start`, `status`, `check-gates`, `ready`, and the `agentloop_next` MCP tool (`guard.nextActions[]` stays a distinct plural field).
+- Published `docs/versioning.md`: the SemVer promise (no breaking change to any committed surface within 1.x), the deprecation policy (minimum one-minor window, `DEPRECATED` warnings to stderr, no removals before 2.0), and the experimental-tier convention that lets 1.x add new capabilities without freezing them until they are promoted.
+- Documented the frozen JSON field conventions and exit-code semantics in `docs/stability.md`, including the deliberately-preserved `status`/`overallStatus` aggregate-verdict split (`overallStatus` is load-bearing across the persisted run/verification data model, so it is not renamed).
+- Guaranteed the 0.x to 1.0 upgrade path with an `upgrade-harness` template-version matrix, and added a README stability section pointing to the contract and versioning guarantees.
+
 ## 0.47.1
 
 - Fixed `agentloop ready` so an idle repo with no changed-file context reports a neutral context-budget receipt instead of warning that AgentLoopKit may cost more context than it saves.

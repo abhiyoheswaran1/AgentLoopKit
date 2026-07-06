@@ -34,12 +34,13 @@ These conventions are part of the frozen JSON contract (axis 4).
   `ready`). `guard` exposes `nextActions: [ { command, reason }, ... ]` — a
   genuinely plural list, a distinct field, not the singular form.
 - **Aggregate verdict.** The top-level pass/warn/fail verdict is named
-  `status` on `ready`, `guard`, `maintainer-check`, and `start`, and
-  `overallStatus` on `check-gates`, `doctor`, `release-check`,
-  `release-proof`, and `ci-summary`. This split is frozen for 1.x: the
-  `overallStatus` name is load-bearing across the persisted run/verification
-  data model, so it is not renamed. A generic client should read the field
-  named for the command it is calling.
+  `status` on `ready`, `guard`, `maintainer-check`, `start`,
+  `upgrade-harness`, and `npm-status`, and `overallStatus` on `verify`,
+  `check-gates`, `doctor`, `release-check`, `release-proof`, and
+  `ci-summary`. This split is frozen for 1.x: the `overallStatus` name is
+  load-bearing across the persisted run/verification data model, so it is not
+  renamed. Always read the field named for the specific command you are
+  calling rather than assuming one name across commands.
 - **Error envelope.** Every `--json`-capable command emits errors as
   `{ error: { code, message, ...details } }` on failure.
 
