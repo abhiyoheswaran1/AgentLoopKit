@@ -96,7 +96,7 @@ export type AgentStartBroadScanGuidance = {
   message: string;
 };
 
-export type AgentStartNextCommand = {
+export type AgentStartNextAction = {
   command: string;
   reason: string;
 };
@@ -135,7 +135,7 @@ export type AgentStartResult = {
   riskSummary: AgentStartRiskSummary;
   usefulnessProof: AgentStartUsefulnessProof;
   impact: AgentStartImpact;
-  nextCommand: AgentStartNextCommand;
+  nextAction: AgentStartNextAction;
   sourceHandles: ContextHandle[];
   markdown: string;
   safety: ContextPackInternalResult['safety'];
@@ -388,7 +388,7 @@ function buildUsefulnessProof(input: {
   preflight: AgentStartPreflight;
   impact: AgentStartImpact;
   sourceHandles: ContextHandle[];
-  nextCommand: AgentStartNextCommand;
+  nextAction: AgentStartNextAction;
 }): AgentStartUsefulnessProof {
   const sourceHandlesAvailable = input.sourceHandles.map((handle) => handle.id);
   return {
@@ -405,7 +405,7 @@ function buildUsefulnessProof(input: {
     scopeDriftCaught: input.impact.scopeDriftFileCount > 0,
     verificationFreshness: input.impact.verificationFreshness,
     sourceHandlesAvailable,
-    nextSafeCommand: input.nextCommand.command,
+    nextSafeCommand: input.nextAction.command,
   };
 }
 
@@ -515,7 +515,7 @@ function buildBroadScanGuidance(impact: AgentStartImpact): AgentStartBroadScanGu
   };
 }
 
-function nextCommand(map: EvidenceMap): AgentStartNextCommand {
+function nextAction(map: EvidenceMap): AgentStartNextAction {
   const [action] = map.nextActions;
   return action ?? {
     command: 'agentloop status',
@@ -614,7 +614,7 @@ ${renderUsefulnessProof(input.usefulnessProof)}
 
 ## Next Safe Command
 
-- ${inlineCode(input.nextCommand.command)} - ${escapeMarkdownProse(input.nextCommand.reason)}
+- ${inlineCode(input.nextAction.command)} - ${escapeMarkdownProse(input.nextAction.reason)}
 
 ## Read First
 
@@ -692,7 +692,7 @@ export async function buildAgentStart(options: {
     risks,
   });
   const impact = buildImpact(contextPack);
-  const resolvedNextCommand = nextCommand(contextPack.evidenceMap);
+  const resolvedNextAction = nextAction(contextPack.evidenceMap);
   const withoutMarkdown = {
     target: options.target,
     goal: options.goal,
@@ -707,10 +707,10 @@ export async function buildAgentStart(options: {
       preflight,
       impact,
       sourceHandles: contextPack.handles,
-      nextCommand: resolvedNextCommand,
+      nextAction: resolvedNextAction,
     }),
     impact,
-    nextCommand: resolvedNextCommand,
+    nextAction: resolvedNextAction,
     sourceHandles: contextPack.handles,
     safety: contextPack.safety,
   };

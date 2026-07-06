@@ -345,7 +345,7 @@ Revert the copy change.
     expect(payload.risk.some((item: { code: string }) => item.code === 'verification-missing')).toBe(
       true,
     );
-    expect(payload.nextCommand.command).toBe('agentloop verify --task-commands --progress');
+    expect(payload.nextAction.command).toBe('agentloop verify --task-commands --progress');
   });
 
   test('routes missing task state before implementation', async () => {
@@ -363,7 +363,7 @@ Revert the copy change.
       task: null,
     });
     expect(payload.riskSummary.blockers).toBeGreaterThanOrEqual(1);
-    expect(payload.nextCommand.command).toContain('agentloop');
+    expect(payload.nextAction.command).toContain('agentloop');
   });
 
   test('does not treat archived latest-run task evidence as active work', async () => {
@@ -380,7 +380,7 @@ Revert the copy change.
       state: 'needs-task',
       task: null,
     });
-    expect(payload.nextCommand.command).not.toBe('agentloop ship');
+    expect(payload.nextAction.command).not.toBe('agentloop ship');
     expect(payload.readFirst.some((route: { handle: string }) => route.handle === 'task:active')).toBe(
       false,
     );

@@ -101,8 +101,8 @@ describe('next command', () => {
 
     expect(result.exitCode).toBe(0);
     const next = JSON.parse(result.stdout);
-    expect(next.command).toBe('agentloop handoff');
-    expect(next.reason).toContain('verification evidence');
+    expect(next.nextAction.command).toBe('agentloop handoff');
+    expect(next.nextAction.reason).toContain('verification evidence');
     expect(next.activeTask.title).toBe('Add settings');
     expect(next.latestTask).toBeNull();
     expect(next.latestReport.overallStatus).toBe('pass');
@@ -139,7 +139,7 @@ describe('next command', () => {
       path: '.agentloop/loops/feature.md',
     });
     expect(humanResult.stdout).toContain('- Loop guidance: `.agentloop/loops/feature.md`');
-    expect(next.command).toBe('agentloop verify');
+    expect(next.nextAction.command).toBe('agentloop verify');
   });
 
   test('shows loop guidance for the selected latest open task', async () => {
@@ -158,7 +158,7 @@ describe('next command', () => {
     ]);
 
     const next = JSON.parse(jsonResult.stdout);
-    expect(next.command).toBe('agentloop task set .agentloop/tasks/2026-06-21-feature-task.md');
+    expect(next.nextAction.command).toBe('agentloop task set .agentloop/tasks/2026-06-21-feature-task.md');
     expect(next.loopGuidance).toEqual({
       taskType: 'feature',
       path: '.agentloop/loops/feature.md',
@@ -255,7 +255,7 @@ describe('next command', () => {
     expect(jsonResult.exitCode).toBe(0);
     expect(humanResult.stdout).not.toContain(await realpath(dir));
     expect(jsonResult.stdout).not.toContain(await realpath(dir));
-    expect(JSON.parse(jsonResult.stdout).command).toBe('agentloop create-task');
+    expect(JSON.parse(jsonResult.stdout).nextAction.command).toBe('agentloop create-task');
   });
 
   test('prints a concise human next action when no task exists', async () => {
@@ -303,8 +303,8 @@ describe('next command', () => {
 
     expect(jsonResult.exitCode).toBe(0);
     const next = JSON.parse(jsonResult.stdout);
-    expect(next.command).toBe('agentloop task doctor');
-    expect(next.reason).toContain('active task pointer is stale');
+    expect(next.nextAction.command).toBe('agentloop task doctor');
+    expect(next.nextAction.reason).toContain('active task pointer is stale');
     expect(next.activeTask).toBeNull();
     expect(markdownResult.stdout).toContain('Run `agentloop task doctor`.');
     expect(markdownResult.stdout).toContain(
@@ -377,8 +377,8 @@ Document how to revert or disable this change.
     expect(jsonResult.exitCode).toBe(0);
     expect(markdownResult.exitCode).toBe(0);
     const next = JSON.parse(jsonResult.stdout);
-    expect(next.command).toBe('agentloop task doctor');
-    expect(next.reason).toBe(
+    expect(next.nextAction.command).toBe('agentloop task doctor');
+    expect(next.nextAction.reason).toBe(
       'Active task still has placeholder guidance in review-critical sections. Replace it before verification or handoff evidence.',
     );
     expect(next.activeTask.path).toBe(taskPath);
@@ -474,7 +474,7 @@ Document how to revert or disable this change.
       status: 'in-progress',
       path: '.agentloop/tasks/2026-06-10-active\n- [x] injected.md',
     });
-    expect(next.command).toBe('agentloop verify');
+    expect(next.nextAction.command).toBe('agentloop verify');
   });
 
   test('points back to verification when the latest report failed', async () => {
@@ -505,8 +505,8 @@ Document how to revert or disable this change.
 
     expect(result.exitCode).toBe(0);
     const next = JSON.parse(result.stdout);
-    expect(next.command).toBe('agentloop verify');
-    expect(next.reason).toContain('failed');
+    expect(next.nextAction.command).toBe('agentloop verify');
+    expect(next.nextAction.reason).toContain('failed');
     expect(next.activeTask.title).toBe('Fix login');
     expect(next.latestTask).toBeNull();
     expect(next.latestReport.overallStatus).toBe('fail');
@@ -540,8 +540,8 @@ Document how to revert or disable this change.
     const next = JSON.parse(result.stdout);
     expect(next.activeTask.status).toBe('review');
     expect(next.latestReport.overallStatus).toBe('pass');
-    expect(next.command).toBe('agentloop task done');
-    expect(next.reason).toContain('active task is in review');
+    expect(next.nextAction.command).toBe('agentloop task done');
+    expect(next.nextAction.reason).toContain('active task is in review');
   });
 
   test('does not treat an older verification report as evidence for the active task', async () => {
@@ -574,8 +574,8 @@ Document how to revert or disable this change.
     expect(next.activeTask.title).toBe('Current task');
     expect(next.latestTask).toBeNull();
     expect(next.latestReport).toBeNull();
-    expect(next.command).toBe('agentloop verify');
-    expect(next.reason).toContain('no verification report');
+    expect(next.nextAction.command).toBe('agentloop verify');
+    expect(next.nextAction.reason).toContain('no verification report');
   });
 
   test('ignores an unpinned done task when choosing the next action', async () => {
@@ -623,9 +623,9 @@ Document how to revert or disable this change.
     expect(next.latestTask).toBeNull();
     expect(next.latestReport.overallStatus).toBe('pass');
     expect(next.latestPreviousReport).toBeUndefined();
-    expect(next.command).toBe('agentloop create-task');
-    expect(next.reason).toContain('1 existing dirty non-evidence file');
-    expect(next.reason).toContain('Examples: `changed.txt`.');
+    expect(next.nextAction.command).toBe('agentloop create-task');
+    expect(next.nextAction.reason).toContain('1 existing dirty non-evidence file');
+    expect(next.nextAction.reason).toContain('Examples: `changed.txt`.');
     expect(humanResult.stdout).toContain('Examples: `changed.txt`.');
     expect(humanResult.stdout).toContain(
       '- Latest previous verification: `pass` - `.agentloop/reports/2026-06-10-08-00-verification-report.md`',
@@ -652,8 +652,8 @@ Document how to revert or disable this change.
     const next = JSON.parse(result.stdout);
     expect(next.activeTask).toBeNull();
     expect(next.latestTask.title).toBe('Open task');
-    expect(next.command).toBe('agentloop task set .agentloop/tasks/2026-06-10-open-task.md');
-    expect(next.reason).toContain('No active task is pinned');
+    expect(next.nextAction.command).toBe('agentloop task set .agentloop/tasks/2026-06-10-open-task.md');
+    expect(next.nextAction.reason).toContain('No active task is pinned');
     expect(await exists(path.join(dir, '.agentloop/state.json'))).toBe(false);
   });
 
@@ -698,8 +698,8 @@ Document how to revert or disable this change.
         status: 'deferred',
       },
     ]);
-    expect(next.command).toBe('none');
-    expect(next.reason).toContain('1 deferred task contract is parked, and the repo is clean');
+    expect(next.nextAction.command).toBe('none');
+    expect(next.nextAction.reason).toContain('1 deferred task contract is parked, and the repo is clean');
   });
 
   test('prints no required command when only deferred tasks are parked in a clean repo', async () => {
@@ -780,9 +780,9 @@ Document how to revert or disable this change.
     expect(jsonResult.exitCode).toBe(0);
     expect(humanResult.exitCode).toBe(0);
     const next = JSON.parse(jsonResult.stdout);
-    expect(next.command).toBe('none');
-    expect(next.reason).toContain('deferred release-channel task contracts');
-    expect(next.reason).toContain('maintainer approval');
+    expect(next.nextAction.command).toBe('none');
+    expect(next.nextAction.reason).toContain('deferred release-channel task contracts');
+    expect(next.nextAction.reason).toContain('maintainer approval');
     expect(humanResult.stdout).toContain('No command required.');
     expect(humanResult.stdout).toContain('maintainer approval');
   });
@@ -847,8 +847,8 @@ Document how to revert or disable this change.
         source: 'agentflight-placeholder',
       },
     ]);
-    expect(next.command).toBe('none');
-    expect(next.reason).toContain('1 deferred task contract is parked, and the repo is clean');
+    expect(next.nextAction.command).toBe('none');
+    expect(next.nextAction.reason).toContain('1 deferred task contract is parked, and the repo is clean');
     expect(humanResult.stdout).toContain('Deferred tasks: 1 parked - `Deferred task`');
     expect(humanResult.stdout).toContain(
       'AgentFlight placeholders: 1 preserved - `Separate AgentFlight placeholders from roadmap task counts`',
@@ -913,7 +913,7 @@ Document how to revert or disable this change.
         },
       ]),
     );
-    expect(next.command).toBe('agentloop task set .agentloop/tasks/2026-06-16-real-task.md');
+    expect(next.nextAction.command).toBe('agentloop task set .agentloop/tasks/2026-06-16-real-task.md');
     expect(humanResult.stdout).toContain('- Active task: none');
     expect(humanResult.stdout).toContain('- Latest open task: `Real task` (`proposed`)');
   });
@@ -999,8 +999,8 @@ Document how to revert or disable this change.
       status: 'in-progress',
     });
     expect(next.workingTree.dirty).toBe(true);
-    expect(next.command).toBe('agentloop task done');
-    expect(next.reason).toContain('handoff evidence cover the current dirty files');
+    expect(next.nextAction.command).toBe('agentloop task done');
+    expect(next.nextAction.reason).toContain('handoff evidence cover the current dirty files');
   });
 
   test('recommends archiving a pinned done task', async () => {
@@ -1031,7 +1031,7 @@ Document how to revert or disable this change.
     expect(next.activeTask.status).toBe('done');
     expect(next.latestTask).toBeNull();
     expect(next.latestReport.overallStatus).toBe('pass');
-    expect(next.command).toBe(
+    expect(next.nextAction.command).toBe(
       'agentloop task archive .agentloop/tasks/2026-06-10-complete-task.md',
     );
   });

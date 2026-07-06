@@ -6,8 +6,10 @@ import { AgentLoopStatusResult, getAgentLoopStatus } from '../../core/status.js'
 import { printAgentLoopJsonError } from '../json-errors.js';
 
 type NextActionResult = {
-  command: string;
-  reason: string;
+  nextAction: {
+    command: string;
+    reason: string;
+  };
   activeTask: AgentLoopStatusResult['activeTask'] | null;
   staleTaskState?: AgentLoopStatusResult['staleTaskState'];
   latestTask: AgentLoopStatusResult['latestTask'] | null;
@@ -71,8 +73,10 @@ function formatAgentFlightPlaceholderTasks(
 
 function toNextActionResult(status: AgentLoopStatusResult): NextActionResult {
   return {
-    command: status.nextAction.command,
-    reason: status.nextAction.reason,
+    nextAction: {
+      command: status.nextAction.command,
+      reason: status.nextAction.reason,
+    },
     activeTask: status.activeTask ?? null,
     ...(status.staleTaskState ? { staleTaskState: status.staleTaskState } : {}),
     latestTask: status.latestTask ?? null,
@@ -100,14 +104,14 @@ function renderNextAction(result: NextActionResult) {
   const loopGuidance = result.loopGuidance
     ? `- Loop guidance: ${singleLineInlineCode(result.loopGuidance.path)}\n`
     : '';
-  const nextAction =
-    result.command === 'none'
-      ? `No command required.\n\n${result.reason}`
-      : `Run ${singleLineInlineCode(result.command)}.\n\n${result.reason}`;
+  const nextActionText =
+    result.nextAction.command === 'none'
+      ? `No command required.\n\n${result.nextAction.reason}`
+      : `Run ${singleLineInlineCode(result.nextAction.command)}.\n\n${result.nextAction.reason}`;
 
   return `# AgentLoopKit Next Action
 
-${nextAction}
+${nextActionText}
 
 - Active task: ${formatActiveTask(result)}
 - Latest open task: ${formatTask(result.latestTask)}

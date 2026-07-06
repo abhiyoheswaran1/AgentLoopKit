@@ -22,7 +22,9 @@ type StatusPayload = {
 };
 
 type NextPayload = {
-  command: string;
+  nextAction: {
+    command: string;
+  };
 };
 
 type TaskPayload = {
@@ -481,7 +483,7 @@ describe('mcp tools', () => {
     expect(statusPayload.git.root).toBe('[git-root]');
     expect(JSON.stringify(statusPayload)).not.toContain(dir);
     expect(statusPayload.nextAction.command).toBe('agentloop handoff');
-    expect(nextPayload.command).toBe('agentloop handoff');
+    expect(nextPayload.nextAction.command).toBe('agentloop handoff');
     expect(tasksPayload.tasks[0]).toMatchObject({ title: 'Add API route', active: true });
     expect(activeTaskPayload.task).toMatchObject({ title: 'Add API route' });
     expect(activeTaskPayload.task.content).toContain('Route returns JSON');

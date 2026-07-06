@@ -169,7 +169,6 @@ exports[`JSON output shape contract > --json shape for "next" is locked 1`] = `
 {
   "activeTask": "null",
   "agentFlightPlaceholderTasks": [],
-  "command": "string",
   "commands": {
     "configured": [],
     "missing": [
@@ -179,7 +178,10 @@ exports[`JSON output shape contract > --json shape for "next" is locked 1`] = `
   "deferredTasks": [],
   "latestReport": "null",
   "latestTask": "null",
-  "reason": "string",
+  "nextAction": {
+    "command": "string",
+    "reason": "string",
+  },
   "workingTree": {
     "agentLoopEvidenceChangedFileCount": "number",
     "changedFileCount": "number",
@@ -469,7 +471,7 @@ exports[`JSON output shape contract > --json shape for "start" is locked 1`] = `
     "verificationFreshness": "string",
   },
   "markdown": "string",
-  "nextCommand": {
+  "nextAction": {
     "command": "string",
     "reason": "string",
   },

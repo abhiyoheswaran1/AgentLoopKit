@@ -571,7 +571,7 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
     }
     case 'agentloop_next': {
       const status = await getAgentLoopStatus({ cwd: options.cwd, config });
-      return textResult(status.nextAction);
+      return textResult({ nextAction: status.nextAction });
     }
     case 'agentloop_list_tasks': {
       return textResult({ tasks: await listTasks({ cwd: options.cwd, config }) });
