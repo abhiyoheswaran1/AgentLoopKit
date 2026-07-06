@@ -3,51 +3,10 @@ import path from 'node:path';
 import { execa } from 'execa';
 import { describe, expect, test } from 'vitest';
 import { renderCompletionScript } from '../src/core/completions.js';
+import { STABLE_COMMANDS as publicCommands } from '../src/core/stable-surface.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
 const tsxPath = path.resolve('node_modules/.bin/tsx');
-
-const publicCommands = [
-  'init',
-  'doctor',
-  'create-task',
-  'verify',
-  'summarize',
-  'handoff',
-  'status',
-  'next',
-  'start',
-  'review-context',
-  'context',
-  'ready',
-  'loop',
-  'guard',
-  'check-gates',
-  'ship',
-  'prepare-pr',
-  'runs',
-  'show-run',
-  'intent',
-  'maintainer-check',
-  'report',
-  'badge',
-  'artifacts',
-  'upgrade-harness',
-  'ci-summary',
-  'release-notes',
-  'release-check',
-  'release-proof',
-  'npm-status',
-  'mcp-server',
-  'schemastore',
-  'github',
-  'policy',
-  'task',
-  'install-agent',
-  'list-templates',
-  'completion',
-  'version',
-] as const;
 
 describe('CLI docs drift', () => {
   test('public command surface is reflected in help, README, CLI reference, and completions', async () => {
