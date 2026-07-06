@@ -1,3 +1,4 @@
+import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { execa } from 'execa';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
@@ -73,6 +74,22 @@ beforeAll(async () => {
     url: 'https://example.invalid/issues/1',
     body: 'test body',
   });
+
+  // Deterministic task-contract fixture for `harden`'s --json shape lock.
+  // Includes at least one blocking soft spot (an empty "Files or Areas Not
+  // to Touch" section triggers the `unbounded-scope` soft spot) so the
+  // locked shape includes a populated `softSpots[]` element rather than
+  // locking in an empty-array shape.
+  await writeFile(
+    path.join(repo, 'harden-fixture.md'),
+    [
+      '# Contract lock fixture',
+      '- Task type: feature',
+      '## Files or Areas Not to Touch',
+      '- None recorded yet.',
+      '',
+    ].join('\n'),
+  );
 });
 
 afterAll(async () => {

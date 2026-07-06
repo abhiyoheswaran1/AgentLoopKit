@@ -200,6 +200,8 @@ Use `agentloop start --for codex --goal implement --redact-paths` when a softwar
 
 `agentloop loop` adds a local loop contract on top of normal task contracts. `agentloop loop create` records the goal, budget, stop conditions, suggested commands, native task path, and a token receipt. `agentloop loop tick` records one iteration decision from local evidence: continue, stop, ask for human review, or mark the loop ready when gates pass. Once a loop asks for human review, AgentLoopKit rejects another tick until someone reviews the loop report and resolves the blocking evidence. Use `agentloop ready` when you need the current review-readiness gate summary without creating a loop.
 
+Use `agentloop harden [task]` before work starts to interrogate a task contract for unresolved soft spots — placeholder text, unbounded scope, unstated assumptions, untestable acceptance criteria, and contradictions between Acceptance Criteria and Non-Goals. It defaults to the active task and exits non-zero when a blocking soft spot remains. Resolve one with `agentloop harden --resolve <id> --answer "..."`, which records the answer in the contract's Hardening Log. `agentloop create-task --harden` runs the same check right after creating a contract.
+
 For a bounded autonomous pass, configure one local runner command and let AgentLoopKit record the iteration:
 
 ```bash
@@ -331,6 +333,7 @@ agentloopkit init
 | `agentloop review-context`       | Show one read-only reviewability context snapshot                              |
 | `agentloop context`              | List handles, build context budgets and packs, and expand source truth         |
 | `agentloop ready`                | Check task, scope, verification, and context-budget readiness                  |
+| `agentloop harden`               | Interrogate a task contract for unresolved soft spots before work starts        |
 | `agentloop loop`                 | Record local loop goals, guarded runner passes, scorecards, token receipts, iteration decisions, and stop reasons |
 | `agentloop guard`                | Check local drift, proof debt, and context-budget pressure                     |
 | `agentloop explain-diff`         | Explain the current diff with local task, verification, run, and risk evidence |

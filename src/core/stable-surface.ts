@@ -1,6 +1,6 @@
 export const STABLE_COMMANDS = [
   'init', 'doctor', 'create-task', 'verify', 'summarize', 'handoff',
-  'status', 'next', 'start', 'review-context', 'context', 'ready', 'loop',
+  'status', 'next', 'start', 'review-context', 'context', 'ready', 'harden', 'loop',
   'guard', 'check-gates', 'ship', 'prepare-pr', 'runs', 'show-run', 'intent',
   'maintainer-check', 'report', 'badge', 'artifacts', 'upgrade-harness',
   'ci-summary', 'release-notes', 'release-check', 'release-proof', 'npm-status',
@@ -32,6 +32,7 @@ export const JSON_COMMANDS = [
   'init',
   'doctor',
   'create-task --type feature --title contract-lock-fixture',
+  'harden harden-fixture.md',
   'task list', 'task doctor', 'task current',
   'policy list', 'policy status', 'policy packs',
   'context budget', 'context handles', 'context pack',

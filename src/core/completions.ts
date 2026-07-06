@@ -22,6 +22,7 @@ const topLevelCommands = [
   ['review-context', 'Show one reviewability context snapshot'],
   ['context', 'Measure and package local context for software agents'],
   ['ready', 'Check whether local agent work is ready for review'],
+  ['harden', 'Interrogate a task contract for unresolved soft spots before work starts'],
   ['loop', 'Create and inspect local low-token agent loop contracts'],
   ['guard', 'Check local drift, proof debt, and context-budget pressure'],
   ['check-gates', 'Check review gate evidence'],

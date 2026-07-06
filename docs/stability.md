@@ -72,6 +72,7 @@ behavior does not change without a major version bump.
 | `agentloop review-context` | Show one read-only reviewability context snapshot. |
 | `agentloop context` | List handles, build context budgets and packs, and expand source truth. |
 | `agentloop ready` | Check task, scope, verification, and context-budget readiness. |
+| `agentloop harden` | Interrogate a task contract for unresolved soft spots before work starts. |
 | `agentloop loop` | Record local loop goals, guarded runner passes, scorecards, token receipts, iteration decisions, and stop reasons. |
 | `agentloop guard` | Check local drift, proof debt, and context-budget pressure. |
 | `agentloop check-gates` | Check review evidence without running tests. |

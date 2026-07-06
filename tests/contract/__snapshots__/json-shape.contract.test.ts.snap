@@ -539,6 +539,22 @@ exports[`JSON output shape contract > --json shape for "handoff" is locked 1`] =
 }
 `;
 
+exports[`JSON output shape contract > --json shape for "harden harden-fixture.md" is locked 1`] = `
+{
+  "advisory": "number",
+  "blocking": "number",
+  "softSpots": [
+    {
+      "id": "string",
+      "question": "string",
+      "section": "string",
+      "severity": "string",
+      "type": "string",
+    },
+  ],
+}
+`;
+
 exports[`JSON output shape contract > --json shape for "init" is locked 1`] = `
 {
   "commands": {

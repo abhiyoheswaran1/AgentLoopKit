@@ -135,6 +135,8 @@ Options:
   --rollback <text>              rollback notes
   --json                         print machine-readable output
   --redact-paths                 redact local absolute paths in public output
+  --harden                       Report unresolved contract soft spots after
+                                 creating the task.
   -h, --help                     display help for command
 
 Supported task types:
@@ -221,6 +223,22 @@ Options:
   --json                 print JSON output
   --redact-paths         redact local absolute paths in public output
   -h, --help             display help for command"
+`;
+
+exports[`CLI help contract > help for "harden" is locked 1`] = `
+"Usage: agentloop harden [options] [task]
+
+Interrogate a task contract for unresolved soft spots before work starts.
+
+Arguments:
+  task             path to the task contract; defaults to the active task
+
+Options:
+  --json           print machine-readable output
+  --resolve <id>   soft-spot id to resolve (repeatable) (default: [])
+  --answer <text>  resolution text (repeatable, paired with --resolve) (default:
+                   [])
+  -h, --help       display help for command"
 `;
 
 exports[`CLI help contract > help for "init" is locked 1`] = `
