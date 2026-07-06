@@ -10,6 +10,7 @@ import { pathExists } from '../../core/file-system.js';
 import { filterNonAgentLoopEvidenceFiles, getGitStatus, parseGitStatus } from '../../core/git.js';
 import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import { findLikelyPostVerificationGates } from '../../core/post-verification-gates.js';
+import { redactLocalRoots } from '../../core/redaction.js';
 import {
   createTaskContractFile,
   findPlaceholderTaskSections,
@@ -229,6 +230,10 @@ async function loopGuidanceForTaskType(options: {
   return { taskType: options.taskType, path: loopPath };
 }
 
+function redactPathValue(value: string, cwd: string, redactPaths: boolean) {
+  return redactPaths ? redactLocalRoots(value, [cwd]) : value;
+}
+
 function printJsonError(error: AgentLoopError, details: Record<string, unknown> = {}) {
   console.log(
     JSON.stringify(
@@ -361,6 +366,7 @@ export function createTaskCommand() {
     .option('--risk-note <text>', 'risk note; repeat or use newlines', lines, [])
     .option('--rollback <text>', 'rollback notes')
     .option('--json', 'print machine-readable output')
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .addHelpText('after', supportedTaskTypesHelp())
     .action(async (options: Record<string, unknown>) => {
       let type: TaskType | undefined;
@@ -384,6 +390,7 @@ export function createTaskCommand() {
       const title = typeof options.title === 'string' ? options.title : undefined;
       const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json === true);
       if (!workspace) return;
+      const redactPaths = options.redactPaths === true;
       const fromProjScan = stringOption(options, 'fromProjscan', 'fromProjScan');
       if (fromProjScan) {
         try {
@@ -404,7 +411,10 @@ export function createTaskCommand() {
             ? path.resolve(workspace.cwd, contract.nativeTaskPath)
             : undefined;
           const task = nativeTaskPath
-            ? { path: nativeTaskPath, markdown: await readFile(nativeTaskPath, 'utf8') }
+            ? {
+                path: redactPathValue(nativeTaskPath, workspace.cwd, redactPaths),
+                markdown: await readFile(nativeTaskPath, 'utf8'),
+              }
             : undefined;
 
           if (options.json) {
@@ -501,11 +511,12 @@ export function createTaskCommand() {
         config: workspace.config,
         taskType: input.type,
       });
+      const displayTaskPath = redactPathValue(result.path, workspace.cwd, redactPaths);
       if (options.json) {
         console.log(
           JSON.stringify(
             {
-              task: result,
+              task: { ...result, path: displayTaskPath },
               activeTask,
               ...(loopGuidance ? { loopGuidance } : {}),
               ...(warnings.length ? { warnings } : {}),
@@ -516,7 +527,7 @@ export function createTaskCommand() {
         );
         return;
       }
-      console.log(`Task contract created: ${inlineCode(result.path)}`);
+      console.log(`Task contract created: ${inlineCode(displayTaskPath)}`);
       console.log(`Active task set: ${inlineCode(activeTask.path)}`);
       if (loopGuidance) {
         console.log(`Loop guidance: ${inlineCode(loopGuidance.path)}`);

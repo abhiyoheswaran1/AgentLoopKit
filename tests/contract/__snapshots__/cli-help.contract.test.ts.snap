@@ -133,6 +133,7 @@ Options:
   --risk-note <text>             risk note; repeat or use newlines (default: [])
   --rollback <text>              rollback notes
   --json                         print machine-readable output
+  --redact-paths                 redact local absolute paths in public output
   -h, --help                     display help for command
 
 Supported task types:

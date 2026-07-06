@@ -328,6 +328,68 @@ describe('create-task command', () => {
     expect(result.stdout).toContain(`Active task set: ${inlineCode(taskPath)}`);
   });
 
+  test('--redact-paths redacts the absolute task path in human output', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+    const resolvedDir = await realpath(dir);
+    const taskPath = '.agentloop/tasks/redact-human.md';
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Redacted output path',
+        '--type',
+        'docs',
+        '--out',
+        taskPath,
+        '--redact-paths',
+      ],
+      { cwd: dir },
+    );
+
+    expect(result.stdout).toContain(`Task contract created: ${inlineCode('[git-root]/' + taskPath)}`);
+    expect(result.stdout).not.toContain(resolvedDir);
+  });
+
+  test('--redact-paths redacts the absolute task path in JSON output', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(
+      path.join(dir, 'agentloop.config.json'),
+      createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' }),
+    );
+    const resolvedDir = await realpath(dir);
+    const taskPath = '.agentloop/tasks/redact-json.md';
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--title',
+        'Redacted JSON output path',
+        '--type',
+        'docs',
+        '--out',
+        taskPath,
+        '--redact-paths',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+
+    const output = JSON.parse(result.stdout);
+    expect(output.task.path).toBe(`[git-root]/${taskPath}`);
+    expect(result.stdout).not.toContain(resolvedDir);
+  });
+
   test('prints created task paths containing line breaks on one Markdown line', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
