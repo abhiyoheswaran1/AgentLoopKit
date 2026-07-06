@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-23
 - Task type: feature
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 AgentFlight session task: Build AgentLoop Start context router and impact ledger

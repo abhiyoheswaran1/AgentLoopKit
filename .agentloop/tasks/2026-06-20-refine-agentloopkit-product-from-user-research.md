@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-20
 - Task type: feature
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 AgentFlight session task: Refine AgentLoopKit product from user research

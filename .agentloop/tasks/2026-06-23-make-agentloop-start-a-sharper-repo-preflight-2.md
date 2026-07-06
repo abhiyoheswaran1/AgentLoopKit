@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-23
 - Task type: feature
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 AgentFlight session task: Make AgentLoop Start a sharper repo preflight

@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-21
 - Task type: feature
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 AgentFlight session task: Continue AgentLoopKit non-release improvement cycle

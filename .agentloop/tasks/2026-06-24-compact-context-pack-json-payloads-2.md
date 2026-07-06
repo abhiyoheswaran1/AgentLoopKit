@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-24
 - Task type: feature
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 AgentFlight session task: Compact context pack JSON payloads

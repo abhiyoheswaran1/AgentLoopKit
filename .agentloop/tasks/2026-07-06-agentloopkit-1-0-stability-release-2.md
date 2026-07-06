@@ -1,17 +1,17 @@
-# Bound MCP handoff listing work
+# AgentLoopKit 1.0 stability release
 
-- Created date: 2026-06-24
+- Created date: 2026-07-06
 - Task type: feature
-- Status: deferred
+- Status: proposed
 
 ## Problem Statement
-AgentFlight session task: Bound MCP handoff listing work
+The full command surface is uncommitted 0.x, so teams cannot safely build CI or shared agent workflows on it
 
 ## Desired Outcome
-Task is implemented with local verification evidence.
+The documented surface is a committed, CI-enforced public contract with SemVer guarantees, a consistency audit, an experimental escape hatch, and a guaranteed 0.x to 1.0 upgrade path
 
 ## Constraints
-- Keep changes scoped and do not claim completion without proof.
+- None recorded yet.
 
 ## Non-Goals
 - None recorded yet.
@@ -40,7 +40,7 @@ Task is implemented with local verification evidence.
 - Record any architecture decision in DECISIONS.md.
 
 ## Risk Notes
-- Pre-existing dirty non-evidence files before task creation: 66 total; examples: `.agentloop/README.md`, `.agentloop/agents/claude-code.md`, `.agentloop/agents/codex.md`, `.agentloop/agents/cursor.md`, `.agentloop/agents/gemini-cli.md`. Confirm they belong to this task before implementation.
+- Re-check protected areas before changing migrations, auth, secrets, billing, deployment, or public APIs.
 
 ## Rollback Notes
 Document how to revert or disable this change.

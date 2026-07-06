@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-22
 - Task type: feature
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 AgentFlight session task: Stabilize unreleased AgentLoopKit batch and run real-repo trials

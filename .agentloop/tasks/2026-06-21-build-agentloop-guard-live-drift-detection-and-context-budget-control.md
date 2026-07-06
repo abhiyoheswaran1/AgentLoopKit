@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-21
 - Task type: feature
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 AgentFlight session task: Build AgentLoop Guard live drift detection and context budget control

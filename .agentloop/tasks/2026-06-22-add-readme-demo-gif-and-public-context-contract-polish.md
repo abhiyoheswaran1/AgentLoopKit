@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-22
 - Task type: feature
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 AgentFlight session task: Add README demo GIF and public Context Contract polish

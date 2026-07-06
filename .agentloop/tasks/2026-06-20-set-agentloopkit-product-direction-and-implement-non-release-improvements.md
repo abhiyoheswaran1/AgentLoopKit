@@ -2,7 +2,7 @@
 
 - Created date: 2026-06-20
 - Task type: feature
-- Status: proposed
+- Status: deferred
 
 ## Problem Statement
 AgentFlight session task: Set AgentLoopKit product direction and implement non-release improvements
