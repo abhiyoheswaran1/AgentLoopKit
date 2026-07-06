@@ -1,0 +1,735 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`CLI help contract > help for "artifacts" is locked 1`] = `
+"Usage: agentloop artifacts [options]
+
+Show local AgentLoop evidence artifacts without writing files
+
+Options:
+  --type <type>    filter by artifact type (task, verification, handoff,
+                   ship-report, html-report, badge, ci-summary, release-notes,
+                   run)
+  --latest         print only the latest matching artifact(s)
+  --stale          preview stale evidence candidates without deleting files
+  --limit <count>  limit stale preview candidate output
+  --json           print machine-readable output
+  --redact-paths   accept common public-output redaction flag; artifact paths
+                   are already repo-relative
+  -h, --help       display help for command"
+`;
+
+exports[`CLI help contract > help for "badge" is locked 1`] = `
+"Usage: agentloop badge [options]
+
+Generate a local SVG evidence badge
+
+Options:
+  --source <source>  badge source: verification or gates (default:
+                     "verification")
+  --out <path>       output SVG path
+  --strict           use strict gate status when source is gates
+  --json             print machine-readable output
+  --redact-paths     redact local absolute paths in public output
+  -h, --help         display help for command"
+`;
+
+exports[`CLI help contract > help for "check-gates" is locked 1`] = `
+"Usage: agentloop check-gates [options]
+
+Check whether task, verification, handoff, harness, policy, and git gates pass
+
+Options:
+  --json                     print machine-readable output
+  --strict                   treat warning gates as failures
+  --redact-paths             redact local absolute paths in public output
+  --task <task-id>           Baseframe task ID when reconciling AgentFlight
+                             results
+  --from-agentflight <path>  reconcile gates from an AgentFlight result artifact
+  -h, --help                 display help for command"
+`;
+
+exports[`CLI help contract > help for "ci-summary" is locked 1`] = `
+"Usage: agentloop ci-summary [options]
+
+Summarize CI context and AgentLoop evidence
+
+Options:
+  --write         write summary to .agentloop/reports
+  --out <path>    output Markdown path when using --write
+  --json          print machine-readable output
+  --redact-paths  redact local absolute paths in public output and written
+                  summary
+  -h, --help      display help for command"
+`;
+
+exports[`CLI help contract > help for "completion" is locked 1`] = `
+"Usage: agentloop completion [options] <shell>
+
+Print shell completion scripts
+
+Arguments:
+  shell       one of: bash, zsh, fish, powershell, pwsh
+
+Options:
+  -h, --help  display help for command"
+`;
+
+exports[`CLI help contract > help for "context" is locked 1`] = `
+"Usage: agentloop context [options] [command]
+
+Measure and package local AgentLoopKit context for software agents
+
+Options:
+  -h, --help               display help for command
+
+Commands:
+  budget [options]         Show local context pressure and compact-pack savings
+                           guidance
+  handles [options]        List local context source handles with availability
+                           and expansion commands
+  pack [options]           Build an auditable context pack with receipts and
+                           source handles
+  show [options] <handle>  Expand a local context source handle
+  help [command]           display help for command"
+`;
+
+exports[`CLI help contract > help for "create-task" is locked 1`] = `
+"Usage: agentloop create-task [options]
+
+Create a task contract for an agentic engineering session
+
+Options:
+  --title <title>                task title
+  --type <type>                  task type
+  --from-projscan <path>         create a Baseframe task from a ProjScan
+                                 assessment
+  --out <path>                   output file path
+  --problem <text>               problem statement
+  --problem-statement <text>     problem statement
+  --outcome <text>               desired outcome
+  --desired-outcome <text>       desired outcome
+  --constraint <text>            constraint; repeat or use newlines (default:
+                                 [])
+  --non-goal <text>              non-goal; repeat or use newlines (default: [])
+  --assumption <text>            assumption; repeat or use newlines (default:
+                                 [])
+  --likely-file <path>           likely file or area; repeat or use newlines
+                                 (default: [])
+  --allow <path>                 Baseframe allowed path override; repeat or use
+                                 newlines (default: [])
+  --forbidden-file <path>        file or area not to touch; repeat or use
+                                 newlines (default: [])
+  --acceptance <text>            acceptance criterion; repeat or use newlines
+                                 (default: [])
+  --verify-command <command>     verification command; repeat or use newlines
+                                 (default: [])
+  --verification <command>       verification command; repeat or use newlines
+                                 (default: [])
+  --include-config-commands      copy configured test, lint, typecheck, and
+                                 build commands into the task contract
+  --post-verification <command>  post-verification gate; repeat or use newlines
+                                 (default: [])
+  --risk <text>                  risk note; repeat or use newlines (default: [])
+  --risk-note <text>             risk note; repeat or use newlines (default: [])
+  --rollback <text>              rollback notes
+  --json                         print machine-readable output
+  -h, --help                     display help for command
+
+Supported task types:
+  - feature
+  - bugfix
+  - refactor
+  - tests
+  - test-generation
+  - research
+  - docs
+  - release
+  - security-review
+  - dependency-upgrade
+  - migration
+"
+`;
+
+exports[`CLI help contract > help for "doctor" is locked 1`] = `
+"Usage: agentloop doctor [options]
+
+Check whether this repo is ready for agentic engineering
+
+Options:
+  --json                            print machine-readable output
+  --strict                          treat warnings as failures
+  --advisory                        print diagnostics without failing the
+                                    process
+  --redact-paths                    redact local absolute paths in public output
+  --risk-scan-max-depth <number>    limit how deep doctor scans for
+                                    risk-sensitive files
+  --risk-scan-max-entries <number>  limit how many filesystem entries doctor
+                                    scans for risk-sensitive files
+  -h, --help                        display help for command"
+`;
+
+exports[`CLI help contract > help for "github" is locked 1`] = `
+"Usage: agentloop github [options] [command]
+
+Import explicit local GitHub issue or PR metadata
+
+Options:
+  -h, --help        display help for command
+
+Commands:
+  import [options]  Import GitHub issue or PR metadata from local JSON files
+  help [command]    display help for command"
+`;
+
+exports[`CLI help contract > help for "guard" is locked 1`] = `
+"Usage: agentloop guard [options]
+
+Check local drift, proof debt, and context-budget pressure
+
+Options:
+  --strict                  exit non-zero when Guard status is warn or fail
+  --watch                   repeat Guard snapshots until interrupted or max
+                            iterations is reached
+  --interval-ms <ms>        watch interval in milliseconds (default: "2000")
+  --max-iterations <count>  maximum watch iterations before exiting
+  --write-report            write a local Markdown Guard report
+  --out <path>              Guard report output path; requires --write-report
+  --baseline <path>         compare current changed files with a Guard baseline
+  --write-baseline <path>   write current changed files to a Guard baseline JSON
+                            file
+  --json                    print machine-readable output
+  --compact                 with --json, omit full changed-file evidence and
+                            include an expandable handle
+  --redact-paths            redact local absolute paths in public output
+  -h, --help                display help for command"
+`;
+
+exports[`CLI help contract > help for "handoff" is locked 1`] = `
+"Usage: agentloop handoff [options]
+
+Generate and write a deterministic reviewer handoff
+
+Options:
+  --task <path>          task contract path
+  --report <path>        verification report path
+  --verification <path>  alias for --report
+  --format <format>      markdown or json (default: "markdown")
+  --no-write             print handoff without writing a file
+  --write-run            write a local run ledger entry under .agentloop/runs
+  --json                 print JSON output
+  --redact-paths         redact local absolute paths in public output
+  -h, --help             display help for command"
+`;
+
+exports[`CLI help contract > help for "init" is locked 1`] = `
+"Usage: agentloop init [options]
+
+Initialize AgentLoopKit in the current repository
+
+Options:
+  --dry-run     show planned changes without writing files
+  --json        print machine-readable output
+  --force       allow initialization when the current directory is your home
+                directory
+  --local-only  keep generated AgentLoopKit files out of git by updating this
+                repo clone .git/info/exclude
+  -h, --help    display help for command"
+`;
+
+exports[`CLI help contract > help for "install-agent" is locked 1`] = `
+"Usage: agentloop install-agent [options] <agent>
+
+Install agent-specific instruction files
+
+Arguments:
+  agent           one of: codex, claude-code, cursor, opencode, gemini-cli,
+                  github-copilot-cli, generic, all
+
+Options:
+  --json          print machine-readable output
+  --redact-paths  redact local absolute paths in public output
+  -h, --help      display help for command"
+`;
+
+exports[`CLI help contract > help for "intent" is locked 1`] = `
+"Usage: agentloop intent [options] <file>
+
+Show which local AgentLoopKit runs touched a file
+
+Arguments:
+  file                   repo-relative file path
+
+Options:
+  --scan-limit <count>   inspect at most this many newest run entries (default:
+                         50)
+  --match-limit <count>  return at most this many matching run entries (default:
+                         10)
+  --json                 print machine-readable output
+  --redact-paths         accept common public-output redaction flag; run ledger
+                         paths are already display-safe
+  -h, --help             display help for command"
+`;
+
+exports[`CLI help contract > help for "list-templates" is locked 1`] = `
+"Usage: agentloop list-templates [options]
+
+List available AgentLoopKit templates
+
+Options:
+  --json      print machine-readable output
+  -h, --help  display help for command"
+`;
+
+exports[`CLI help contract > help for "loop" is locked 1`] = `
+"Usage: agentloop loop [options] [command]
+
+Create and inspect local low-token agent loop contracts
+
+Options:
+  -h, --help           display help for command
+
+Commands:
+  create [options]     Create a local loop contract and native AgentLoop task
+  tick [options]       Record one local loop iteration decision without running
+                       an external agent
+  run [options]        Run one configured local runner iteration and record the
+                       loop decision
+  scorecard [options]  Score whether a loop can continue, should stop, or needs
+                       human review
+  status [options]     Show loop state, token usage, and next action
+  report [options]     Show a reviewable loop report with token ledger and
+                       iteration decisions
+  help [command]       display help for command"
+`;
+
+exports[`CLI help contract > help for "maintainer-check" is locked 1`] = `
+"Usage: agentloop maintainer-check [options]
+
+Check whether an agent-assisted PR is ready for maintainer review
+
+Options:
+  --json          print machine-readable output
+  --redact-paths  redact local absolute paths in public output
+  -h, --help      display help for command"
+`;
+
+exports[`CLI help contract > help for "mcp-server" is locked 1`] = `
+"Usage: agentloop mcp-server [options]
+
+Start the read-only AgentLoopKit MCP stdio server
+
+Options:
+  -h, --help  display help for command"
+`;
+
+exports[`CLI help contract > help for "next" is locked 1`] = `
+"Usage: agentloop next [options]
+
+Show the next recommended loop action
+
+Options:
+  --json          print machine-readable output
+  --redact-paths  redact local absolute paths in public output
+  -h, --help      display help for command"
+`;
+
+exports[`CLI help contract > help for "npm-status" is locked 1`] = `
+"Usage: agentloop npm-status [options]
+
+Check npm registry catch-up status
+
+Options:
+  --agentloopkit             check the published agentloopkit package from any
+                             directory
+  --package-name <name>      package name; defaults to package.json name
+  --local-version <version>  local version; defaults to package.json version
+  --registry-json <path>     read captured \`npm view <package> version versions
+                             --json\` output instead of running npm
+  --timeout-ms <ms>          npm view timeout in milliseconds (default: "15000")
+  --expect-current           exit 1 unless npm latest matches the local version
+  --json                     print machine-readable output
+  -h, --help                 display help for command"
+`;
+
+exports[`CLI help contract > help for "policy" is locked 1`] = `
+"Usage: agentloop policy [options] [command]
+
+List or inspect local AgentLoopKit policies
+
+Options:
+  -h, --help               display help for command
+
+Commands:
+  list [options]           List local policies under .agentloop/policies
+  status [options]         Show local policy template status
+  packs [options]          List bundled and configured organization policy packs
+  pack                     Inspect or apply an AgentLoopKit policy pack
+  show [options] <policy>  Show a local policy
+  help [command]           display help for command"
+`;
+
+exports[`CLI help contract > help for "prepare-pr" is locked 1`] = `
+"Usage: agentloop prepare-pr [options]
+
+Generate a PR description from local AgentLoopKit evidence
+
+Options:
+  --write           write PR body to .agentloop/handoffs
+  --json            print machine-readable output
+  --stdout          print the PR body to stdout
+  --github-comment  include or print GitHub PR comment markdown
+  --redact-paths    redact local absolute paths in public output
+  -h, --help        display help for command"
+`;
+
+exports[`CLI help contract > help for "ready" is locked 1`] = `
+"Usage: agentloop ready [options]
+
+Check whether local agent work is ready for review
+
+Options:
+  --strict        exit non-zero when readiness is blocked
+  --json          print machine-readable output
+  --redact-paths  redact local absolute paths in public output
+  -h, --help      display help for command"
+`;
+
+exports[`CLI help contract > help for "release-check" is locked 1`] = `
+"Usage: agentloop release-check [options]
+
+Check local release readiness without publishing
+
+Options:
+  --json          print machine-readable output
+  --strict        treat warning checks as failures
+  --redact-paths  redact local absolute paths in public output
+  -h, --help      display help for command"
+`;
+
+exports[`CLI help contract > help for "release-notes" is locked 1`] = `
+"Usage: agentloop release-notes [options]
+
+Generate deterministic release notes
+
+Options:
+  --from <ref>                 git ref to compare from
+  --to <ref>                   git ref to compare to (default: "HEAD")
+  --release-version <version>  release version; defaults to package.json version
+  --public                     print concise public-facing release notes
+  --write                      write notes to .agentloop/handoffs
+  --out <path>                 output Markdown path when using --write
+  --json                       print machine-readable output
+  --redact-paths               redact local absolute paths in public output and
+                               written notes
+  -h, --help                   display help for command"
+`;
+
+exports[`CLI help contract > help for "release-proof" is locked 1`] = `
+"Usage: agentloop release-proof [options]
+
+Check post-release evidence across public release channels
+
+Options:
+  --json                            print machine-readable output
+  --strict                          treat warning checks as failures
+  --redact-paths                    accepted for output consistency; release
+                                    proof prints no local roots
+  --only <channel>                  check one channel only (npm, github-release,
+                                    github-marketplace, ghcr, mcp-registry)
+  --timeout-ms <ms>                 public metadata check timeout in
+                                    milliseconds (default: "15000")
+  --npm-registry-json <path>        read captured \`npm view <package> version
+                                    versions --json\` output instead of running
+                                    npm
+  --github-release-json <path>      read captured GitHub release JSON
+  --github-marketplace-json <path>  read captured GitHub Marketplace JSON
+  --ghcr-tags-json <path>           read captured GHCR tag-list JSON
+  --mcp-registry-json <path>        read captured MCP Registry server JSON
+  -h, --help                        display help for command"
+`;
+
+exports[`CLI help contract > help for "report" is locked 1`] = `
+"Usage: agentloop report [options]
+
+Generate a local static HTML evidence report
+
+Options:
+  --task <path>          task contract path
+  --report <path>        verification report path
+  --verification <path>  alias for --report
+  --handoff <path>       handoff summary path
+  --out <path>           output HTML path
+  --json                 print machine-readable output
+  --redact-paths         redact local absolute paths in public output
+  -h, --help             display help for command"
+`;
+
+exports[`CLI help contract > help for "review-context" is locked 1`] = `
+"Usage: agentloop review-context [options]
+
+Show one read-only reviewability context snapshot
+
+Options:
+  --json          print machine-readable output
+  --redact-paths  redact local absolute paths in public output
+  -h, --help      display help for command"
+`;
+
+exports[`CLI help contract > help for "runs" is locked 1`] = `
+"Usage: agentloop runs [options]
+
+List local AgentLoopKit run ledger entries
+
+Options:
+  --limit <count>  show only the newest count run entries
+  --latest         show only the newest run entry
+  --json           print machine-readable output
+  --redact-paths   accept common public-output redaction flag; run ledger paths
+                   are already display-safe
+  -h, --help       display help for command"
+`;
+
+exports[`CLI help contract > help for "schemastore" is locked 1`] = `
+"Usage: agentloop schemastore [options]
+
+Print the SchemaStore catalog entry for agentloop.config.json
+
+Options:
+  --json          print machine-readable output
+  --redact-paths  accept common public-output redaction flag; SchemaStore
+                  catalog values are not local paths
+  -h, --help      display help for command"
+`;
+
+exports[`CLI help contract > help for "ship" is locked 1`] = `
+"Usage: agentloop ship [options]
+
+Run the local review-readiness flow for agent-assisted changes
+
+Options:
+  --json             print machine-readable output
+  --run-verify       run verification before scoring instead of reusing current
+                     evidence
+  --task-commands    when using --run-verify, also run verification commands
+                     from the task contract
+  --timeout-ms <ms>  per-command verification timeout in milliseconds
+  --strict-gates     treat warning gates as readiness gate failures
+  --github-comment   include or print GitHub PR comment markdown
+  --redact-paths     redact local absolute paths in public output
+  -h, --help         display help for command"
+`;
+
+exports[`CLI help contract > help for "show-run" is locked 1`] = `
+"Usage: agentloop show-run [options] <id>
+
+Show a local AgentLoopKit run ledger entry
+
+Arguments:
+  id              run id
+
+Options:
+  --json          print machine-readable output
+  --redact-paths  accept common public-output redaction flag; run ledger paths
+                  are already display-safe
+  -h, --help      display help for command"
+`;
+
+exports[`CLI help contract > help for "start" is locked 1`] = `
+"Usage: agentloop start [options]
+
+Brief a software agent with current task, evidence, risk, and context routing
+
+Options:
+  --for <target>  target reader: codex, claude, cursor, generic, or human
+                  (default: "generic")
+  --goal <goal>   goal: implement, continue, review, debug, handoff, or research
+                  (default: "implement")
+  --json          print machine-readable output
+  --redact-paths  redact local absolute paths in public output; start output
+                  uses repo-relative paths by default
+  -h, --help      display help for command"
+`;
+
+exports[`CLI help contract > help for "status" is locked 1`] = `
+"Usage: agentloop status [options]
+
+Show active task, latest verification, dirty files, and next action
+
+Options:
+  --json          print machine-readable output
+  --brief         print compact human output; with --json, compact
+                  machine-readable output
+  --redact-paths  redact local absolute paths in public output
+  -h, --help      display help for command"
+`;
+
+exports[`CLI help contract > help for "summarize" is locked 1`] = `
+"Usage: agentloop summarize [options]
+
+Generate a deterministic PR/reviewer summary
+
+Options:
+  --task <path>          task contract path
+  --report <path>        verification report path
+  --verification <path>  alias for --report
+  --format <format>      markdown or json (default: "markdown")
+  --write                write summary to .agentloop/handoffs
+  --write-run            write a local run ledger entry under .agentloop/runs
+  --json                 print JSON output
+  --redact-paths         redact local absolute paths in public output
+  -h, --help             display help for command"
+`;
+
+exports[`CLI help contract > help for "task" is locked 1`] = `
+"Usage: agentloop task [options] [command]
+
+List, inspect, update, complete, or archive task contracts
+
+Options:
+  -h, --help                        display help for command
+
+Commands:
+  list [options]                    List task contracts
+  show [options] <path>             Show a task contract
+  set [options] <path>              Set the active task contract
+  status [options] <path> <status>  Update a task contract status
+  done [options] [path]             Mark a task contract done
+  archive [options] [path]          Archive a task contract
+  doctor [options]                  Check task folder hygiene
+  current [options]                 Print the active task contract
+  clear [options]                   Clear the active task pointer
+  help [command]                    display help for command"
+`;
+
+exports[`CLI help contract > help for "upgrade-harness" is locked 1`] = `
+"Usage: agentloop upgrade-harness [options]
+
+Inspect existing AgentLoopKit harness guidance for upgrade gaps
+
+Options:
+  --dry-run       make the read-only behavior explicit
+  --details       include copyable current-loop guidance for stale harness files
+  --suggestions   alias for --details
+  --json          print machine-readable output
+  --redact-paths  replace the absolute AgentLoop root with [agentloop-root]
+  -h, --help      display help for command"
+`;
+
+exports[`CLI help contract > help for "verify" is locked 1`] = `
+"Usage: agentloop verify [options]
+
+Run configured verification commands and write a report
+
+Options:
+  --task <path>              task contract path for humans to cross-reference
+  --task-commands            also run verification commands listed in the task
+                             contract
+  --post-verification-gates  run task Post-Verification Gates after writing the
+                             verification report
+  --only-task-commands       run only task contract verification commands;
+                             requires --task and --task-commands
+  --json                     print machine-readable output
+  --no-build                 skip build command
+  --no-test                  skip test command
+  --no-lint                  skip lint command
+  --no-typecheck             skip typecheck command
+  --command <command>        custom command to run (default: [])
+  --timeout-ms <ms>          per-command timeout in milliseconds
+  --progress                 print bounded per-command progress in human output
+  --write-run                write a local run ledger entry under
+                             .agentloop/runs
+  --redact-paths             redact local absolute paths in public output and
+                             written reports
+  -h, --help                 display help for command"
+`;
+
+exports[`CLI help contract > help for "version" is locked 1`] = `
+"Usage: agentloop version [options]
+
+Print CLI version
+
+Options:
+  --json      print machine-readable output
+  -h, --help  display help for command"
+`;
+
+exports[`CLI help contract > top-level --help is locked 1`] = `
+"Usage: agentloop [options] [command]
+
+A drop-in engineering loop for software agents.
+
+Options:
+  -V, --version                    print CLI version
+  -h, --help                       display help for command
+
+Commands:
+  init [options]                   Initialize AgentLoopKit in the current
+                                   repository
+  doctor [options]                 Check whether this repo is ready for agentic
+                                   engineering
+  create-task [options]            Create a task contract for an agentic
+                                   engineering session
+  verify [options]                 Run configured verification commands and
+                                   write a report
+  summarize [options]              Generate a deterministic PR/reviewer summary
+  handoff [options]                Generate and write a deterministic reviewer
+                                   handoff
+  status [options]                 Show active task, latest verification, dirty
+                                   files, and next action
+  next [options]                   Show the next recommended loop action
+  start [options]                  Brief a software agent with current task,
+                                   evidence, risk, and context routing
+  review-context [options]         Show one read-only reviewability context
+                                   snapshot
+  context                          Measure and package local AgentLoopKit
+                                   context for software agents
+  explain-diff [options]           Explain the current diff using local
+                                   AgentLoopKit evidence
+  resume-pack [options]            Generate a compact continuation brief from
+                                   local AgentLoopKit evidence
+  guard [options]                  Check local drift, proof debt, and
+                                   context-budget pressure
+  ready [options]                  Check whether local agent work is ready for
+                                   review
+  loop                             Create and inspect local low-token agent loop
+                                   contracts
+  check-gates [options]            Check whether task, verification, handoff,
+                                   harness, policy, and git gates pass
+  ship [options]                   Run the local review-readiness flow for
+                                   agent-assisted changes
+  prepare-pr [options]             Generate a PR description from local
+                                   AgentLoopKit evidence
+  runs [options]                   List local AgentLoopKit run ledger entries
+  show-run [options] <id>          Show a local AgentLoopKit run ledger entry
+  intent [options] <file>          Show which local AgentLoopKit runs touched a
+                                   file
+  maintainer-check [options]       Check whether an agent-assisted PR is ready
+                                   for maintainer review
+  report [options]                 Generate a local static HTML evidence report
+  badge [options]                  Generate a local SVG evidence badge
+  artifacts [options]              Show local AgentLoop evidence artifacts
+                                   without writing files
+  upgrade-harness [options]        Inspect existing AgentLoopKit harness
+                                   guidance for upgrade gaps
+  schemastore [options]            Print the SchemaStore catalog entry for
+                                   agentloop.config.json
+  github                           Import explicit local GitHub issue or PR
+                                   metadata
+  ci-summary [options]             Summarize CI context and AgentLoop evidence
+  release-notes [options]          Generate deterministic release notes
+  release-check [options]          Check local release readiness without
+                                   publishing
+  release-proof [options]          Check post-release evidence across public
+                                   release channels
+  npm-status [options]             Check npm registry catch-up status
+  mcp-server                       Start the read-only AgentLoopKit MCP stdio
+                                   server
+  policy                           List or inspect local AgentLoopKit policies
+  task                             List, inspect, update, complete, or archive
+                                   task contracts
+  install-agent [options] <agent>  Install agent-specific instruction files
+  list-templates [options]         List available AgentLoopKit templates
+  completion <shell>               Print shell completion scripts
+  version [options]                Print CLI version
+  help [command]                   display help for command"
+`;
