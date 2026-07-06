@@ -7,6 +7,8 @@ import {
   type ReleaseProofChannelId,
 } from '../../core/release-proof.js';
 import { resolveAgentLoopWorkspaceCwd } from '../../core/config.js';
+import { AgentLoopError } from '../../core/errors.js';
+import { printAgentLoopJsonError } from '../json-errors.js';
 
 type ReleaseProofCapture =
   | 'npm-registry'
@@ -269,17 +271,26 @@ export function releaseProofCommand() {
           throw error;
         }
 
-        const result = await checkReleaseProof({
-          cwd: await resolveAgentLoopWorkspaceCwd(process.cwd()),
-          strict: options.strict,
-          only,
-          timeoutMs,
-          npmRegistryJson,
-          githubReleaseJson,
-          githubMarketplaceJson,
-          ghcrTagsJson,
-          mcpRegistryJson,
-        });
+        let result: Awaited<ReturnType<typeof checkReleaseProof>>;
+        try {
+          result = await checkReleaseProof({
+            cwd: await resolveAgentLoopWorkspaceCwd(process.cwd()),
+            strict: options.strict,
+            only,
+            timeoutMs,
+            npmRegistryJson,
+            githubReleaseJson,
+            githubMarketplaceJson,
+            ghcrTagsJson,
+            mcpRegistryJson,
+          });
+        } catch (error) {
+          if (options.json && error instanceof AgentLoopError) {
+            printAgentLoopJsonError(error);
+            return;
+          }
+          throw error;
+        }
 
         if (options.json) {
           console.log(JSON.stringify(result, null, 2));

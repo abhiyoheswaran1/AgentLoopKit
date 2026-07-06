@@ -457,6 +457,33 @@ describe('release proof', () => {
     });
   });
 
+  test('CLI emits a JSON error envelope instead of crashing on an invalid npm package name', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await git(dir, ['init', '-q']);
+    await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
+    await git(dir, ['config', 'user.name', 'AgentLoopKit Test']);
+    await writeJson(path.join(dir, 'package.json'), {
+      name: 'Invalid Package Name',
+      version: '1.2.3',
+    });
+    await writeFile(path.join(dir, 'README.md'), '# Release proof fixture\n');
+    await git(dir, ['add', '.']);
+    await git(dir, ['commit', '-m', 'Prepare release proof fixture']);
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'release-proof', '--json', '--only', 'npm'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).not.toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.error).toBeDefined();
+    expect(output.error.code).toBe('NPM_PACKAGE_NAME_INVALID');
+    expect(typeof output.error.message).toBe('string');
+  });
+
   test('CLI prints JSON warning instead of crashing when MCP metadata is absent', async () => {
     const dir = await createReleaseProofRepo('1.2.3', { mcpServer: false });
     const paths = await writeFixtureFiles(dir);
