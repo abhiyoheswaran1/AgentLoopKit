@@ -32,6 +32,14 @@ export function makeSoftSpotId(type: SoftSpotType, section: string, ordinal: num
 const ASSUMPTION_SENSITIVE_TYPES: TaskType[] = ['feature', 'refactor', 'migration', 'dependency-upgrade'];
 const EMPTY_MARKERS = new Set(['none recorded yet.', 'none.', '']);
 
+const STOPWORDS = new Set([
+  'the', 'and', 'for', 'with', 'this', 'that', 'from', 'into', 'when', 'must',
+  'works', 'work', 'new', 'add', 'adds', 'change', 'changes', 'flow', 'well', 'feature',
+]);
+
+// A line is "verifiable" if it references a command, path, number/comparison, or a proof verb.
+const PROOF_HINTS = /`[^`]+`|\bnpm\b|\bnpx\b|\.(ts|js|md|json)\b|\/|\d|passes|returns|exit|output|snapshot|matches|equals|>=|<=|<|>/i;
+
 function readTaskType(markdown: string): TaskType | undefined {
   const match = markdown.match(/^- Task type:\s*(.+)$/m);
   return match ? (match[1].trim() as TaskType) : undefined;
@@ -78,11 +86,61 @@ function unstatedAssumptionRule(markdown: string): SoftSpot[] {
   }];
 }
 
+function significantTokens(line: string): Set<string> {
+  return new Set(
+    line.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/)
+      .filter((w) => w.length > 3 && !STOPWORDS.has(w)),
+  );
+}
+
+function acceptanceLines(markdown: string): string[] {
+  return extractMarkdownSectionLines(markdown, 'Acceptance Criteria')
+    .map((l) => l.replace(/^-\s*/, '').trim())
+    .filter(Boolean)
+    .filter((l) => l.toLowerCase() !== 'add acceptance criteria before implementation starts.');
+}
+
+function untestableAcceptanceRule(markdown: string): SoftSpot[] {
+  return acceptanceLines(markdown)
+    .map((line, i) => ({ line, i }))
+    .filter(({ line }) => !PROOF_HINTS.test(line))
+    .map(({ line, i }) => ({
+      id: makeSoftSpotId('untestable-acceptance', 'Acceptance Criteria', i),
+      type: 'untestable-acceptance' as const,
+      section: 'Acceptance Criteria',
+      question: `"${line}" has no checkable predicate — what command or observable output proves it?`,
+      severity: 'blocking' as const,
+    }));
+}
+
+function contradictionRule(markdown: string): SoftSpot[] {
+  const nonGoalTokens = extractMarkdownSectionLines(markdown, 'Non-Goals')
+    .flatMap((l) => [...significantTokens(l)]);
+  const nonGoalSet = new Set(nonGoalTokens);
+  if (nonGoalSet.size === 0) return [];
+  const spots: SoftSpot[] = [];
+  acceptanceLines(markdown).forEach((line, i) => {
+    const shared = [...significantTokens(line)].find((t) => nonGoalSet.has(t));
+    if (shared) {
+      spots.push({
+        id: makeSoftSpotId('contradiction', 'Acceptance Criteria', i),
+        type: 'contradiction',
+        section: 'Acceptance Criteria',
+        question: `Acceptance criterion "${line}" overlaps Non-Goals on "${shared}" — which one wins?`,
+        severity: 'blocking',
+      });
+    }
+  });
+  return spots;
+}
+
 // Detection rules are added in later tasks and pushed in this fixed order.
 export function analyzeContract(markdown: string): SoftSpot[] {
   return [
     ...placeholderRule(markdown),
     ...unboundedScopeRule(markdown),
     ...unstatedAssumptionRule(markdown),
+    ...untestableAcceptanceRule(markdown),
+    ...contradictionRule(markdown),
   ];
 }

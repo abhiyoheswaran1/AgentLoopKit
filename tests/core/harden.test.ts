@@ -39,3 +39,25 @@ describe('unstated-assumption rule', () => {
     expect(spots.some((s) => s.type === 'unstated-assumption' && s.severity === 'advisory')).toBe(true);
   });
 });
+
+describe('untestable-acceptance rule', () => {
+  it('flags an acceptance line with no verifiable predicate', () => {
+    const md = ['## Acceptance Criteria', '- The feature works well'].join('\n');
+    expect(analyzeContract(md).some((s) => s.type === 'untestable-acceptance')).toBe(true);
+  });
+
+  it('does not flag an acceptance line that names a command', () => {
+    const md = ['## Acceptance Criteria', '- `npm test` passes'].join('\n');
+    expect(analyzeContract(md).some((s) => s.type === 'untestable-acceptance')).toBe(false);
+  });
+});
+
+describe('contradiction rule', () => {
+  it('flags a contradiction between acceptance and non-goals', () => {
+    const md = [
+      '## Non-Goals', '- No authentication changes',
+      '## Acceptance Criteria', '- New authentication flow works',
+    ].join('\n');
+    expect(analyzeContract(md).some((s) => s.type === 'contradiction' && s.severity === 'blocking')).toBe(true);
+  });
+});
