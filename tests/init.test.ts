@@ -402,6 +402,33 @@ describe('init', () => {
     expect(result.stdout).not.toContain(await realpath(dir));
   });
 
+  test('--redact-paths redacts created/updated/skipped path arrays in JSON output', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo-redact-arrays' });
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'init', '--dry-run', '--json', '--redact-paths'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    const realDir = await realpath(dir);
+    expect(output.created.length).toBeGreaterThan(0);
+    for (const entries of [output.created, output.updated, output.skipped]) {
+      for (const entry of entries) {
+        expect(entry).not.toContain(realDir);
+        expect(entry).not.toMatch(/^\/(Users|home|private)\b/);
+      }
+    }
+    expect(
+      output.created.some((file: string) => file.startsWith('[git-root]/')),
+    ).toBe(true);
+  });
+
   test('rejects init when AGENTS.md resolves outside the repo', async () => {
     const dir = await makeTempDir();
     const outsideDir = await makeTempDir();

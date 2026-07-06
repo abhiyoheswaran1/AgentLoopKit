@@ -72,6 +72,9 @@ export function initCommand() {
           redactPaths ? redactLocalRoots(value, redactionRoots) : value;
         const targetDirectory = redact(result.targetDirectory);
         const gitRoot = result.git.root ? redact(result.git.root) : result.git.root;
+        const created = result.created.map(redact);
+        const updated = result.updated.map(redact);
+        const skipped = result.skipped.map(redact);
         if (options.json) {
           logger.info(
             JSON.stringify(
@@ -79,6 +82,9 @@ export function initCommand() {
                 ...result,
                 targetDirectory,
                 git: { ...result.git, root: gitRoot },
+                created,
+                updated,
+                skipped,
               },
               null,
               2,
