@@ -2,12 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execFileSync } from 'node:child_process';
+import { execa } from 'execa';
 import { createDefaultConfig } from '../../src/core/config.js';
 
-const cliPath = path.resolve('dist/cli/index.js');
+const cliPath = path.resolve('src/cli/index.ts');
+const tsxPath = path.resolve('node_modules/.bin/tsx');
 
-// Integration-style: exercise the built CLI against a temp contract.
+// Integration-style: exercise the CLI (via tsx against source) against a temp contract.
 describe('agentloop harden', () => {
   it('exits non-zero and reports blocking soft spots', async () => {
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'harden-'));
@@ -21,18 +22,9 @@ describe('agentloop harden', () => {
         '- None recorded yet.',
       ].join('\n'),
     );
-    let code: number;
-    let out: string;
-    try {
-      out = execFileSync('node', [cliPath, 'harden', contract], { encoding: 'utf8' });
-      code = 0;
-    } catch (e: unknown) {
-      const error = e as { status: number; stdout: string; stderr: string };
-      code = error.status;
-      out = `${error.stdout}${error.stderr}`;
-    }
-    expect(code).toBe(1);
-    expect(out).toContain('blocking');
+    const result = await execa(tsxPath, [cliPath, 'harden', contract], { reject: false });
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout + result.stderr).toContain('blocking');
   });
 
   it('applies a resolution and clears the blocking soft spot', async () => {
@@ -47,8 +39,8 @@ describe('agentloop harden', () => {
         '- None recorded yet.',
       ].join('\n'),
     );
-    const out = execFileSync(
-      'node',
+    const result = await execa(
+      tsxPath,
       [
         cliPath,
         'harden',
@@ -58,9 +50,9 @@ describe('agentloop harden', () => {
         '--answer',
         'src/legacy',
       ],
-      { encoding: 'utf8' },
+      { reject: false },
     );
-    expect(out).toContain('hardened');
+    expect(result.stdout).toContain('hardened');
     const updated = await fs.readFile(contract, 'utf8');
     expect(updated).toContain('src/legacy');
     expect(updated).toContain('Hardening Log');
@@ -71,17 +63,8 @@ describe('agentloop harden', () => {
     const config = createDefaultConfig({ name: 'demo', type: 'typescript-package' });
     await fs.mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
     await fs.writeFile(path.join(dir, 'agentloop.config.json'), JSON.stringify(config, null, 2));
-    let code: number;
-    let out: string;
-    try {
-      out = execFileSync('node', [cliPath, 'harden'], { encoding: 'utf8', cwd: dir });
-      code = 0;
-    } catch (e: unknown) {
-      const error = e as { status: number; stdout: string; stderr: string };
-      code = error.status;
-      out = `${error.stdout}${error.stderr}`;
-    }
-    expect(code).not.toBe(0);
-    expect(out).toContain('No task specified');
+    const result = await execa(tsxPath, [cliPath, 'harden'], { cwd: dir, reject: false });
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout + result.stderr).toContain('No task specified');
   });
 });

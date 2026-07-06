@@ -51,36 +51,41 @@ export function hardenCommand() {
       (v: string, acc: string[]) => [...acc, v],
       [] as string[],
     )
-    .action(async (task: string | undefined, options: Record<string, unknown>) => {
-      const resolved = await resolveContractPath(task, { json: options.json === true });
-      if (!resolved) return;
-      const { contractPath } = resolved;
+    .action(
+      async (
+        task: string | undefined,
+        options: { json?: boolean; resolve?: string[]; answer?: string[] },
+      ) => {
+        const resolved = await resolveContractPath(task, { json: options.json === true });
+        if (!resolved) return;
+        const { contractPath } = resolved;
 
-      let markdown = await readFile(contractPath, 'utf8');
+        let markdown = await readFile(contractPath, 'utf8');
 
-      const ids = (options.resolve as string[]) ?? [];
-      const answers = (options.answer as string[]) ?? [];
-      if (ids.length !== answers.length) {
-        throw new AgentLoopError(
-          'Each --resolve <id> needs a matching --answer <text>.',
-          'HARDEN_RESOLVE_MISMATCH',
-        );
-      }
-      for (let i = 0; i < ids.length; i += 1) {
-        markdown = applyResolution(markdown, ids[i], answers[i]);
-      }
-      if (ids.length > 0) {
-        await writeTextFile(contractPath, markdown);
-      }
+        const ids = options.resolve ?? [];
+        const answers = options.answer ?? [];
+        if (ids.length !== answers.length) {
+          throw new AgentLoopError(
+            'Each --resolve <id> needs a matching --answer <text>.',
+            'HARDEN_RESOLVE_MISMATCH',
+          );
+        }
+        for (let i = 0; i < ids.length; i += 1) {
+          markdown = applyResolution(markdown, ids[i], answers[i]);
+        }
+        if (ids.length > 0) {
+          await writeTextFile(contractPath, markdown);
+        }
 
-      const spots = analyzeContract(markdown);
-      if (options.json) {
-        console.log(JSON.stringify(toHardenJson(spots), null, 2));
-      } else {
-        console.log(renderSoftSpotsText(spots));
-      }
-      if (hasBlockingSoftSpots(spots)) {
-        process.exitCode = 1;
-      }
-    });
+        const spots = analyzeContract(markdown);
+        if (options.json) {
+          console.log(JSON.stringify(toHardenJson(spots), null, 2));
+        } else {
+          console.log(renderSoftSpotsText(spots));
+        }
+        if (hasBlockingSoftSpots(spots)) {
+          process.exitCode = 1;
+        }
+      },
+    );
 }
