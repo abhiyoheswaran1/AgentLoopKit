@@ -1,6 +1,6 @@
 import { AgentLoopError } from './errors.js';
 import { analyzeContract, type SoftSpot } from './harden.js';
-import { REVIEW_CRITICAL_TASK_PLACEHOLDERS } from './task-contract.js';
+import { REVIEW_CRITICAL_TASK_PLACEHOLDERS, normalizeTaskSectionLine } from './task-contract.js';
 
 const EMPTY_LINE = /^-\s*(none recorded yet\.|none\.|add acceptance criteria before implementation starts\.)?\s*$/i;
 const ACCEPTANCE_PLACEHOLDER = 'add acceptance criteria before implementation starts.';
@@ -85,8 +85,7 @@ function replacePlaceholderLine(markdown: string, section: string, clean: string
     const trimmed = lines[i].trim();
     if (!trimmed) continue;
     const hadDash = /^-\s*/.test(trimmed);
-    const stripped = trimmed.replace(/^-\s*/, '').trim();
-    if (trimmed === placeholder || stripped === placeholder) {
+    if (normalizeTaskSectionLine(trimmed) === placeholder) {
       lines[i] = hadDash ? `- ${clean}` : clean;
       return lines.join('\n');
     }

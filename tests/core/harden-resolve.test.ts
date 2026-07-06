@@ -169,3 +169,28 @@ describe('batched sequential placeholder resolution (FIX 2 — stable ids)', () 
     expect(analyzeContract(afterSecond).some((s) => s.type === 'placeholder')).toBe(false);
   });
 });
+
+describe('placeholder resolution with non-canonical spacing (FIX A)', () => {
+  it('detects and resolves a placeholder line with extra internal spaces', () => {
+    // A placeholder with double space (non-canonical) should still be detected
+    // and resolvable, because findPlaceholderTaskSections normalizes spacing.
+    const markdown = [
+      '## Problem Statement',
+      'Describe the problem this task  should solve.',
+      '## Files or Areas Not to Touch',
+      '- src/legacy',
+    ].join('\n');
+
+    const spots = analyzeContract(markdown);
+    const placeholder = spots.find((s) => s.type === 'placeholder');
+    expect(placeholder, 'expected to detect placeholder with extra spacing').toBeDefined();
+
+    // applyResolution should succeed without throwing
+    const result = applyResolution(markdown, placeholder!.id, 'A problem statement.');
+    expect(result).toContain('A problem statement.');
+    expect(result).not.toContain('should  solve');
+
+    // After resolution, no placeholder spot should remain
+    expect(analyzeContract(result).some((s) => s.type === 'placeholder')).toBe(false);
+  });
+});

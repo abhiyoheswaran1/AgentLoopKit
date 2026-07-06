@@ -67,4 +67,11 @@ describe('agentloop harden', () => {
     expect(result.exitCode).not.toBe(0);
     expect(result.stdout + result.stderr).toContain('No task specified');
   });
+
+  it('errors with HARDEN_CONTRACT_NOT_FOUND when contract path does not exist', async () => {
+    const nonExistentPath = path.join(os.tmpdir(), `harden-nonexistent-${Date.now()}.md`);
+    const result = await execa(tsxPath, [cliPath, 'harden', nonExistentPath], { reject: false });
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stdout + result.stderr).toContain('not found');
+  });
 });

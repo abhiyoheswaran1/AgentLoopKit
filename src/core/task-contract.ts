@@ -106,7 +106,7 @@ export function extractMarkdownSectionLines(markdown: string, heading: string) {
   return sectionLines.map((line) => line.trim()).filter(Boolean);
 }
 
-function normalizeTaskSectionLine(line: string) {
+export function normalizeTaskSectionLine(line: string) {
   return line
     .replace(/^\s*-\s+/, '')
     .replace(/\s+/g, ' ')
