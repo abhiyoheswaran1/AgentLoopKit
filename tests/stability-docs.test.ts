@@ -35,4 +35,10 @@ describe('stability docs', () => {
     expect(doc.toLowerCase()).toContain('deprecat');
     expect(doc.toLowerCase()).toContain('experimental');
   });
+
+  test('README links the stability and versioning guarantees', async () => {
+    const readme = await readFile('README.md', 'utf8');
+    expect(readme).toContain('docs/stability.md');
+    expect(readme).toContain('docs/versioning.md');
+  });
 });

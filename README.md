@@ -504,6 +504,21 @@ Superpowers is a broader agent methodology and skills system. AgentLoopKit focus
 
 They can be complementary. You can use AgentLoopKit alongside Superpowers. AgentLoopKit has no affiliation with Superpowers.
 
+## Stability
+
+Starting at 1.0, AgentLoopKit's shipped surface — CLI commands and flags,
+`agentloop.config.json`, the MCP tool surface, `--json` output shapes, exit
+codes, and the generated harness format — is a committed public contract
+under [SemVer](https://semver.org/). Build CI, an agent workflow, or an
+integration on it: a 1.x release will not break you.
+
+See [`docs/stability.md`](docs/stability.md) for the full contract and
+command reference, and [`docs/versioning.md`](docs/versioning.md) for the
+SemVer promise, deprecation policy, and experimental-tier rules.
+
+Upgrading from a pre-1.0 install? Run `agentloop upgrade-harness` to check
+your generated files against the current format.
+
 ## Contributing
 
 Contributor setup:
