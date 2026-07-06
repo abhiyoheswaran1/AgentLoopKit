@@ -50,6 +50,11 @@ describe('untestable-acceptance rule', () => {
     const md = ['## Acceptance Criteria', '- `npm test` passes'].join('\n');
     expect(analyzeContract(md).some((s) => s.type === 'untestable-acceptance')).toBe(false);
   });
+
+  it('flags a vague acceptance line that only substring-matches a proof verb', () => {
+    const md = ['## Acceptance Criteria', '- The design surpasses expectations'].join('\n');
+    expect(analyzeContract(md).some((s) => s.type === 'untestable-acceptance')).toBe(true);
+  });
 });
 
 describe('contradiction rule', () => {

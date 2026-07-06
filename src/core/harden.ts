@@ -38,7 +38,7 @@ const STOPWORDS = new Set([
 ]);
 
 // A line is "verifiable" if it references a command, path, number/comparison, or a proof verb.
-const PROOF_HINTS = /`[^`]+`|\bnpm\b|\bnpx\b|\.(ts|js|md|json)\b|\/|\d|passes|returns|exit|output|snapshot|matches|equals|>=|<=|<|>/i;
+const PROOF_HINTS = /`[^`]+`|\bnpm\b|\bnpx\b|\.(ts|js|md|json)\b|\d|\b(?:passes|returns|exit|output|snapshot|matches|equals)\b|>=|<=|<|>/i;
 
 function readTaskType(markdown: string): TaskType | undefined {
   const match = markdown.match(/^- Task type:\s*(.+)$/m);
