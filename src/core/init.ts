@@ -399,6 +399,14 @@ export async function initializeAgentLoop(options: {
   );
   await writeGeneratedFile(
     cwd,
+    repoPath(AGENTLOOP_DIR, 'harden-playbook.md'),
+    AGENTLOOP_DIR,
+    '.md',
+    await readTemplate('root/harden-playbook.md', values),
+    result,
+  );
+  await writeGeneratedFile(
+    cwd,
     AGENTLOOP_MANIFEST_FILE,
     AGENTLOOP_DIR,
     '.json',

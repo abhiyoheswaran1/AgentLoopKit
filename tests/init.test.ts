@@ -86,6 +86,20 @@ describe('init', () => {
     );
   });
 
+  test('generates the harden playbook', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo', scripts: { test: 'vitest' } });
+
+    const result = await initializeAgentLoop({ cwd: dir });
+
+    expect(result.created.some((file) => file.endsWith('.agentloop/harden-playbook.md'))).toBe(
+      true,
+    );
+    const playbook = await readFile(path.join(dir, '.agentloop/harden-playbook.md'), 'utf8');
+    expect(playbook.toLowerCase()).toContain('soft spot');
+  });
+
   test('generated onboarding includes a risk-aware first task example', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
