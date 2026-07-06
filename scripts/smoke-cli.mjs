@@ -1135,7 +1135,7 @@ async function smokeCli({ keep = false } = {}) {
     );
     assert(redactedHarnessUpgrade.writesFiles === false, 'upgrade-harness should be read-only.');
     assert(
-      redactedHarnessUpgrade.targetDirectory === '[agentloop-root]',
+      redactedHarnessUpgrade.targetDirectory === '[git-root]',
       'upgrade-harness did not redact the target directory.',
     );
     console.log('Harness upgrade smoke passed.');

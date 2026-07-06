@@ -611,7 +611,7 @@ Options:
   --details       include copyable current-loop guidance for stale harness files
   --suggestions   alias for --details
   --json          print machine-readable output
-  --redact-paths  replace the absolute AgentLoop root with [agentloop-root]
+  --redact-paths  redact local absolute paths in public output
   -h, --help      display help for command"
 `;
 

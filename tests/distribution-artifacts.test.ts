@@ -167,7 +167,7 @@ describe('distribution artifacts', () => {
     expect(smokeScript).toContain('const redactedHarnessUpgrade = parseJson(');
     expect(smokeScript).toContain("redactedHarnessUpgrade.status === 'pass'");
     expect(smokeScript).toContain('redactedHarnessUpgrade.writesFiles === false');
-    expect(smokeScript).toContain("redactedHarnessUpgrade.targetDirectory === '[agentloop-root]'");
+    expect(smokeScript).toContain("redactedHarnessUpgrade.targetDirectory === '[git-root]'");
     expect(smokeScript).toContain('Harness upgrade smoke passed.');
   });
 

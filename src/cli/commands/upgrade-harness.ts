@@ -2,16 +2,17 @@ import { Command } from 'commander';
 import { inspectHarnessUpgrade } from '../../core/upgrade-harness.js';
 import type { HarnessUpgradeReport } from '../../core/upgrade-harness.js';
 import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
+import { redactLocalRoots } from '../../core/redaction.js';
 import { loadWorkspaceForJsonCommand } from '../json-errors.js';
 
 function formatTopics(topics: string[]) {
   return topics.length ? topics.map((topic) => inlineCode(topic)).join(', ') : 'none';
 }
 
-function redactReportPaths(report: HarnessUpgradeReport): HarnessUpgradeReport {
+function redactReportPaths(report: HarnessUpgradeReport, cwd: string): HarnessUpgradeReport {
   return {
     ...report,
-    targetDirectory: '[agentloop-root]',
+    targetDirectory: redactLocalRoots(report.targetDirectory, [cwd]),
   };
 }
 
@@ -82,7 +83,7 @@ export function upgradeHarnessCommand() {
     .option('--details', 'include copyable current-loop guidance for stale harness files')
     .option('--suggestions', 'alias for --details')
     .option('--json', 'print machine-readable output')
-    .option('--redact-paths', 'replace the absolute AgentLoop root with [agentloop-root]')
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .action(
       async (options: {
         dryRun?: boolean;
@@ -97,7 +98,9 @@ export function upgradeHarnessCommand() {
           cwd: workspace.cwd,
           dryRun: options.dryRun,
         });
-        const report = options.redactPaths ? redactReportPaths(rawReport) : rawReport;
+        const report = options.redactPaths
+          ? redactReportPaths(rawReport, workspace.cwd)
+          : rawReport;
         if (options.json) {
           console.log(JSON.stringify(report, null, 2));
           return;

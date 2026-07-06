@@ -273,7 +273,7 @@ describe('upgrade-harness command', () => {
     });
 
     const output = JSON.parse(result.stdout);
-    expect(output.targetDirectory).toBe('[agentloop-root]');
+    expect(output.targetDirectory).toBe('[git-root]');
     expect(result.stdout).not.toContain(dir);
   });
 
