@@ -29,6 +29,20 @@ const KNOWN_NON_JSON: string[] = ['show-run'];
 // locked nor deferred — there is no `--json` surface to account for.
 const NOT_JSON_CAPABLE_STABLE_COMMANDS = ['mcp-server', 'completion'];
 
+// Some commands embed CI context in their `--json` output when CI-detection
+// environment variables are present (e.g. `ci-summary`'s `ci` block and
+// `verify --write-run`'s run-ledger entry gain commit/ref/runUrl fields under
+// GitHub Actions). That makes the locked shape environment-dependent: a
+// snapshot generated on a laptop fails when the same test runs inside CI (this
+// is exactly what broke the 1.0.0 publish). Run every shape-lock subprocess
+// with CI-detection variables stripped so the shape is deterministic wherever
+// the suite runs — locally and in CI alike. Keep this list in sync with
+// `detectCiContext` in src/core/verification.ts.
+const CI_ENV_PATTERN = /^(?:CI|CONTINUOUS_INTEGRATION|GITLAB_CI)$|^(?:GITHUB_|BUILDKITE|RUNNER_)/;
+const CI_FREE_ENV = Object.fromEntries(
+  Object.entries(process.env).filter(([key]) => !CI_ENV_PATTERN.test(key)),
+) as Record<string, string>;
+
 let repo: string;
 
 beforeAll(async () => {
@@ -75,12 +89,19 @@ async function runJsonCommand(argv: string[]) {
   const withRedactPaths = await execa(tsxPath, [cliPath, ...argv, '--json', '--redact-paths'], {
     cwd: repo,
     reject: false,
+    env: CI_FREE_ENV,
+    extendEnv: false,
   });
   if (
     withRedactPaths.exitCode !== 0 &&
     /unknown option '--redact-paths'/.test(withRedactPaths.stderr ?? '')
   ) {
-    return execa(tsxPath, [cliPath, ...argv, '--json'], { cwd: repo, reject: false });
+    return execa(tsxPath, [cliPath, ...argv, '--json'], {
+      cwd: repo,
+      reject: false,
+      env: CI_FREE_ENV,
+      extendEnv: false,
+    });
   }
   return withRedactPaths;
 }
