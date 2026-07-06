@@ -112,7 +112,7 @@ Expected: FAIL — cannot find module `harden.js`.
 
 ```ts
 // src/core/harden.ts
-import { extractMarkdownSectionLines } from './task-contract.js';
+// (imports from ./task-contract.js are added in Task 3 when the rules need them)
 
 export type SoftSpotType =
   | 'placeholder'
@@ -142,7 +142,6 @@ export function makeSoftSpotId(type: SoftSpotType, section: string, ordinal: num
 // Detection rules are added in later tasks and pushed in this fixed order.
 export function analyzeContract(markdown: string): SoftSpot[] {
   const spots: SoftSpot[] = [];
-  void extractMarkdownSectionLines; // used by rules added in later tasks
   return spots;
 }
 ```
