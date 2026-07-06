@@ -16,3 +16,26 @@ describe('harden engine skeleton', () => {
     expect(analyzeContract(md)).toEqual([]);
   });
 });
+
+describe('placeholder rule', () => {
+  it('emits a placeholder spot per unresolved review-critical section', () => {
+    const md = ['## Acceptance Criteria', '- Add acceptance criteria before implementation starts.'].join('\n');
+    expect(analyzeContract(md).some((s) => s.type === 'placeholder')).toBe(true);
+  });
+});
+
+describe('unbounded-scope rule', () => {
+  it('flags empty Files-Not-To-Touch as blocking unbounded-scope', () => {
+    const md = ['## Files or Areas Not to Touch', '- None recorded yet.'].join('\n');
+    const spots = analyzeContract(md);
+    expect(spots.some((s) => s.type === 'unbounded-scope' && s.severity === 'blocking')).toBe(true);
+  });
+});
+
+describe('unstated-assumption rule', () => {
+  it('flags empty Assumptions as advisory for a feature task', () => {
+    const md = ['- Task type: feature', '## Assumptions', '- None recorded yet.'].join('\n');
+    const spots = analyzeContract(md);
+    expect(spots.some((s) => s.type === 'unstated-assumption' && s.severity === 'advisory')).toBe(true);
+  });
+});
