@@ -28,4 +28,11 @@ describe('stability docs', () => {
     const audit = await readFile('docs/1.0-consistency-audit.md', 'utf8');
     expect(audit).toMatch(/fix-before-1\.0|accept-as-is|defer-to-experimental/);
   });
+
+  test('versioning.md states the SemVer, deprecation, and experimental policy', async () => {
+    const doc = await readFile('docs/versioning.md', 'utf8');
+    expect(doc.toLowerCase()).toContain('semver');
+    expect(doc.toLowerCase()).toContain('deprecat');
+    expect(doc.toLowerCase()).toContain('experimental');
+  });
 });
