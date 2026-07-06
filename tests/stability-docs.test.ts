@@ -23,4 +23,9 @@ describe('stability docs', () => {
       expect(doc.toLowerCase()).toContain(axis.toLowerCase());
     }
   });
+
+  test('consistency audit exists and is triaged', async () => {
+    const audit = await readFile('docs/1.0-consistency-audit.md', 'utf8');
+    expect(audit).toMatch(/fix-before-1\.0|accept-as-is|defer-to-experimental/);
+  });
 });
