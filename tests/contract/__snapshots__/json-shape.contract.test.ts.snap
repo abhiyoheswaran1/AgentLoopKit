@@ -1,0 +1,585 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`JSON output shape contract > --json shape for "artifacts" is locked 1`] = `
+{
+  "badges": {
+    "count": "number",
+    "latest": "null",
+  },
+  "ciSummaries": {
+    "count": "number",
+    "latest": "null",
+  },
+  "handoffs": {
+    "count": "number",
+    "latest": "null",
+  },
+  "htmlReports": {
+    "count": "number",
+    "latest": "null",
+  },
+  "releaseNotes": {
+    "count": "number",
+    "latest": "null",
+  },
+  "runs": {
+    "count": "number",
+    "latest": "null",
+  },
+  "shipReports": {
+    "count": "number",
+    "latest": "null",
+  },
+  "tasks": {
+    "byStatus": {},
+    "count": "number",
+    "latest": "null",
+  },
+  "verificationReports": {
+    "count": "number",
+    "latest": "null",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "check-gates" is locked 1`] = `
+{
+  "gates": [
+    {
+      "id": "string",
+      "message": "string",
+      "name": "string",
+      "status": "string",
+    },
+  ],
+  "git": {
+    "agentLoopEvidenceChangedFileCount": "number",
+    "branch": "string",
+    "changedFileCount": "number",
+    "commit": "string",
+    "isRepository": "boolean",
+    "nonEvidenceChangedFileCount": "number",
+    "root": "string",
+    "targetIsRoot": "boolean",
+  },
+  "markdown": "string",
+  "nextAction": {
+    "command": "string",
+    "reason": "string",
+  },
+  "overallStatus": "string",
+  "strict": "boolean",
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "guard" is locked 1`] = `
+{
+  "claims": [
+    "string",
+  ],
+  "contextBudget": {
+    "changedFileCount": "number",
+    "estimatedFileListTokens": "number",
+    "estimatedResumePackTokens": "number",
+    "heuristic": "string",
+    "nonEvidenceChangedFileCount": "number",
+    "note": "string",
+    "savingsCommand": "string",
+  },
+  "evidenceMap": {
+    "claims": [
+      "string",
+    ],
+    "coverage": {
+      "coveredFileCount": "number",
+      "forbiddenFileCount": "number",
+      "unexplainedExamples": [
+        "string",
+      ],
+      "unexplainedFileCount": "number",
+    },
+    "files": [
+      {
+        "agentLoopEvidence": "boolean",
+        "area": "string",
+        "coveredByRun": "boolean",
+        "coveredByTask": "boolean",
+        "explanation": "string",
+        "forbiddenByTask": "boolean",
+        "path": "string",
+        "riskSensitive": "boolean",
+        "status": "string",
+        "unexplained": "boolean",
+      },
+    ],
+    "nextActions": [
+      {
+        "command": "string",
+        "reason": "string",
+      },
+    ],
+    "risk": {
+      "riskSensitiveExamples": [
+        "string",
+      ],
+      "riskSensitiveFileCount": "number",
+    },
+    "summary": {
+      "agentLoopEvidenceChangedFileCount": "number",
+      "changedFileCount": "number",
+      "nonEvidenceChangedFileCount": "number",
+      "reviewability": "string",
+    },
+    "task": "null",
+    "verification": {
+      "fresh": "boolean",
+      "label": "string",
+      "status": "string",
+    },
+  },
+  "findings": [
+    {
+      "id": "string",
+      "message": "string",
+      "nextAction": "string",
+      "severity": "string",
+    },
+  ],
+  "mode": "string",
+  "nextActions": [
+    {
+      "command": "string",
+      "reason": "string",
+    },
+  ],
+  "safety": {
+    "externalNetwork": "boolean",
+    "localEvidenceOnly": "boolean",
+    "readOnlyByDefault": "boolean",
+    "readsChangedFileContents": "boolean",
+    "runsVerification": "boolean",
+    "writesFiles": "boolean",
+  },
+  "status": "string",
+  "strict": "boolean",
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "next" is locked 1`] = `
+{
+  "activeTask": "null",
+  "agentFlightPlaceholderTasks": [],
+  "command": "string",
+  "commands": {
+    "configured": [],
+    "missing": [
+      "string",
+    ],
+  },
+  "deferredTasks": [],
+  "latestReport": "null",
+  "latestTask": "null",
+  "reason": "string",
+  "workingTree": {
+    "agentLoopEvidenceChangedFileCount": "number",
+    "changedFileCount": "number",
+    "dirty": "boolean",
+    "nonEvidenceChangedFileCount": "number",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "ready" is locked 1`] = `
+{
+  "evidenceMap": {
+    "claims": [
+      "string",
+    ],
+    "coverage": {
+      "coveredFileCount": "number",
+      "forbiddenFileCount": "number",
+      "unexplainedExamples": [
+        "string",
+      ],
+      "unexplainedFileCount": "number",
+    },
+    "fileList": {
+      "changedFileCount": "number",
+      "command": "string",
+      "handle": "string",
+      "omitted": "boolean",
+      "reason": "string",
+    },
+    "nextActions": [
+      {
+        "command": "string",
+        "reason": "string",
+      },
+    ],
+    "risk": {
+      "riskSensitiveExamples": [
+        "string",
+      ],
+      "riskSensitiveFileCount": "number",
+    },
+    "summary": {
+      "agentLoopEvidenceChangedFileCount": "number",
+      "changedFileCount": "number",
+      "nonEvidenceChangedFileCount": "number",
+      "reviewability": "string",
+    },
+    "task": "null",
+    "verification": {
+      "fresh": "boolean",
+      "label": "string",
+      "status": "string",
+    },
+  },
+  "gates": [
+    {
+      "id": "string",
+      "message": "string",
+      "name": "string",
+      "status": "string",
+    },
+  ],
+  "markdown": "string",
+  "nextAction": {
+    "command": "string",
+    "reason": "string",
+  },
+  "safety": {
+    "executesExternalAgents": "boolean",
+    "localEvidenceOnly": "boolean",
+    "localGitStatus": "boolean",
+    "readOnly": "boolean",
+    "runsVerification": "boolean",
+  },
+  "status": "string",
+  "tokenReceipt": {
+    "estimatedAgentLoopOverheadTokens": "number",
+    "estimatedBroadContextTokens": "number",
+    "estimatedCompactContextTokens": "number",
+    "estimatedGrossContextReductionTokens": "number",
+    "estimatedNetContextReductionTokens": "number",
+    "heuristic": "string",
+    "note": "string",
+    "savingsCommand": "string",
+    "warning": "string",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "review-context" is locked 1`] = `
+{
+  "artifacts": {
+    "badges": {
+      "count": "number",
+      "latest": "null",
+    },
+    "ciSummaries": {
+      "count": "number",
+      "latest": "null",
+    },
+    "handoffs": {
+      "count": "number",
+      "latest": "null",
+    },
+    "htmlReports": {
+      "count": "number",
+      "latest": "null",
+    },
+    "releaseNotes": {
+      "count": "number",
+      "latest": "null",
+    },
+    "runs": {
+      "count": "number",
+      "latest": "null",
+    },
+    "shipReports": {
+      "count": "number",
+      "latest": "null",
+    },
+    "tasks": {
+      "byStatus": {},
+      "count": "number",
+      "latest": "null",
+    },
+    "verificationReports": {
+      "count": "number",
+      "latest": "null",
+    },
+  },
+  "contextBudget": {
+    "changedFileCount": "number",
+    "estimatedFileListTokens": "number",
+    "estimatedResumePackTokens": "number",
+    "heuristic": "string",
+    "nonEvidenceChangedFileCount": "number",
+    "note": "string",
+    "savingsCommand": "string",
+  },
+  "evidenceMap": {
+    "claims": [
+      "string",
+    ],
+    "coverage": {
+      "coveredFileCount": "number",
+      "forbiddenFileCount": "number",
+      "unexplainedExamples": [
+        "string",
+      ],
+      "unexplainedFileCount": "number",
+    },
+    "fileList": {
+      "changedFileCount": "number",
+      "command": "string",
+      "handle": "string",
+      "omitted": "boolean",
+      "reason": "string",
+    },
+    "nextActions": [
+      {
+        "command": "string",
+        "reason": "string",
+      },
+    ],
+    "risk": {
+      "riskSensitiveExamples": [
+        "string",
+      ],
+      "riskSensitiveFileCount": "number",
+    },
+    "summary": {
+      "agentLoopEvidenceChangedFileCount": "number",
+      "changedFileCount": "number",
+      "nonEvidenceChangedFileCount": "number",
+      "reviewability": "string",
+    },
+    "task": "null",
+    "verification": {
+      "fresh": "boolean",
+      "label": "string",
+      "status": "string",
+    },
+  },
+  "gates": {
+    "gates": [
+      {
+        "id": "string",
+        "message": "string",
+        "name": "string",
+        "status": "string",
+      },
+    ],
+    "nextAction": {
+      "command": "string",
+      "reason": "string",
+    },
+    "overallStatus": "string",
+    "strict": "boolean",
+  },
+  "githubMetadata": {
+    "path": "string",
+    "status": "string",
+  },
+  "latestShip": "null",
+  "policies": {
+    "policies": [
+      {
+        "name": "string",
+        "path": "string",
+        "status": "string",
+        "templatePath": "string",
+        "title": "string",
+      },
+    ],
+    "summary": {
+      "current": "number",
+      "extra": "number",
+      "missing": "number",
+      "modified": "number",
+    },
+  },
+  "recentRuns": [],
+  "safety": {
+    "includesMarkdownContent": "boolean",
+    "localGitStatus": "boolean",
+    "projectCommandsRun": "boolean",
+    "readOnly": "boolean",
+    "verificationCommandsRun": "boolean",
+  },
+  "status": {
+    "activeTask": "null",
+    "activeTaskRiskNotes": "null",
+    "latestTask": "null",
+    "latestVerification": "null",
+    "nextAction": {
+      "command": "string",
+      "reason": "string",
+    },
+    "project": {
+      "name": "string",
+      "packageManager": "string",
+      "type": "string",
+    },
+    "workingTree": {
+      "agentLoopEvidenceChangedFileCount": "number",
+      "changedFileCount": "number",
+      "changedFileExampleLimit": "number",
+      "changedFileExamples": [
+        {
+          "path": "string",
+          "status": "string",
+        },
+      ],
+      "changedFilesOmitted": "boolean",
+      "dirty": "boolean",
+      "nonEvidenceChangedFileCount": "number",
+    },
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "start" is locked 1`] = `
+{
+  "doNotBroadScan": {
+    "changedFileCount": "number",
+    "estimatedBroadContextTokens": "number",
+    "estimatedCompactBriefTokens": "number",
+    "estimatedContextAvoidedTokens": "number",
+    "estimatedContextReductionPercent": "number",
+    "message": "string",
+    "nonEvidenceChangedFileCount": "number",
+  },
+  "goal": "string",
+  "impact": {
+    "broadChangedFileCount": "number",
+    "broadNonEvidenceFileCount": "number",
+    "estimatedBroadContextTokens": "number",
+    "estimatedCompactBriefTokens": "number",
+    "estimatedContextAvoidedTokens": "number",
+    "estimatedContextReductionPercent": "number",
+    "reviewReadinessDelta": "string",
+    "reviewability": "string",
+    "scopeDriftFileCount": "number",
+    "staleEvidenceCaught": "boolean",
+    "summary": "string",
+    "verificationFreshness": "string",
+  },
+  "markdown": "string",
+  "nextCommand": {
+    "command": "string",
+    "reason": "string",
+  },
+  "preflight": {
+    "headline": "string",
+    "reason": "string",
+    "state": "string",
+    "task": "null",
+  },
+  "readFirst": [
+    {
+      "command": "string",
+      "handle": "string",
+      "priority": "number",
+      "reason": "string",
+    },
+  ],
+  "risk": [
+    {
+      "code": "string",
+      "examples": [],
+      "handles": [],
+      "message": "string",
+      "severity": "string",
+    },
+  ],
+  "riskSummary": {
+    "blockers": "number",
+    "topRisks": [
+      "string",
+    ],
+    "warnings": "number",
+  },
+  "safety": {
+    "localEvidenceOnly": "boolean",
+    "localGitStatus": "boolean",
+    "projectCommandsRun": "boolean",
+    "readOnly": "boolean",
+    "verificationCommandsRun": "boolean",
+  },
+  "sourceHandles": [
+    {
+      "command": "string",
+      "id": "string",
+      "kind": "string",
+      "label": "string",
+      "reason": "string",
+    },
+  ],
+  "status": "string",
+  "summary": "string",
+  "target": "string",
+  "usefulnessProof": {
+    "broadChangedFilesAvoided": "number",
+    "contextAvoidedTokens": "number",
+    "contextReductionPercent": "number",
+    "nextSafeCommand": "string",
+    "preflightState": "string",
+    "scopeDriftCaught": "boolean",
+    "sourceHandlesAvailable": [
+      "string",
+    ],
+    "staleProofCaught": "boolean",
+    "summary": "string",
+    "verificationFreshness": "string",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "status" is locked 1`] = `
+{
+  "activeTask": "null",
+  "agentFlightPlaceholderTasks": [],
+  "brief": "string",
+  "commands": {
+    "configured": [],
+    "missing": [
+      "string",
+    ],
+  },
+  "deferredTasks": [],
+  "git": {
+    "branch": "string",
+    "commit": "string",
+    "isRepository": "boolean",
+    "root": "string",
+    "targetIsRoot": "boolean",
+  },
+  "latestTask": "null",
+  "markdown": "string",
+  "nextAction": {
+    "command": "string",
+    "reason": "string",
+  },
+  "project": {
+    "name": "string",
+    "packageManager": "string",
+    "type": "string",
+  },
+  "workingTree": {
+    "agentLoopEvidenceChangedFileCount": "number",
+    "changedFileCount": "number",
+    "changedFiles": [
+      {
+        "path": "string",
+        "status": "string",
+      },
+    ],
+    "dirty": "boolean",
+    "nonEvidenceChangedFileCount": "number",
+  },
+}
+`;
