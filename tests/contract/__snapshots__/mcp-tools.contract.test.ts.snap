@@ -1,0 +1,356 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`MCP tool contract > MCP tool definitions are locked 1`] = `
+[
+  {
+    "description": "Read AgentLoopKit status, active task, latest verification, git state, and next action.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object",
+    },
+    "name": "agentloop_status",
+  },
+  {
+    "description": "Read only the next recommended AgentLoopKit action and reason.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object",
+    },
+    "name": "agentloop_next",
+  },
+  {
+    "description": "List local task contracts under the configured AgentLoopKit task directory.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object",
+    },
+    "name": "agentloop_list_tasks",
+  },
+  {
+    "description": "Read the active task contract content when one is pinned.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object",
+    },
+    "name": "agentloop_show_active_task",
+  },
+  {
+    "description": "List local AgentLoopKit safety policy files.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object",
+    },
+    "name": "agentloop_list_policies",
+  },
+  {
+    "description": "Read one local AgentLoopKit policy by policy name.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "policyName": {
+          "description": "Policy name, for example "security" or "security-policy.md".",
+          "type": "string",
+        },
+      },
+      "required": [
+        "policyName",
+      ],
+      "type": "object",
+    },
+    "name": "agentloop_read_policy",
+  },
+  {
+    "description": "Read local AgentLoopKit policy template status, including current, modified, missing, and extra policies.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object",
+    },
+    "name": "agentloop_policy_status",
+  },
+  {
+    "description": "Read the latest local verification report metadata and Markdown content.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object",
+    },
+    "name": "agentloop_latest_verification_report",
+  },
+  {
+    "description": "Read the latest local ship report metadata and Markdown content.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object",
+    },
+    "name": "agentloop_latest_ship_report",
+  },
+  {
+    "description": "List recent local AgentLoopKit run ledger entries.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "limit": {
+          "description": "Maximum run entries to return. Defaults to 20.",
+          "maximum": 50,
+          "minimum": 1,
+          "type": "number",
+        },
+      },
+      "type": "object",
+    },
+    "name": "agentloop_list_runs",
+  },
+  {
+    "description": "Read one local AgentLoopKit run ledger entry by run id.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Run id, for example "2026-06-10-12-32-ship".",
+          "type": "string",
+        },
+      },
+      "required": [
+        "id",
+      ],
+      "type": "object",
+    },
+    "name": "agentloop_show_run",
+  },
+  {
+    "description": "Read local run ledger matches for one repo-relative file path.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "description": "Repo-relative file path, for example "src/auth/callback.ts".",
+          "type": "string",
+        },
+        "matchLimit": {
+          "description": "Maximum matching run entries to return. Defaults to 10.",
+          "maximum": 50,
+          "minimum": 1,
+          "type": "number",
+        },
+        "scanLimit": {
+          "description": "Maximum newest run entries to inspect. Defaults to 50.",
+          "maximum": 500,
+          "minimum": 1,
+          "type": "number",
+        },
+      },
+      "required": [
+        "file",
+      ],
+      "type": "object",
+    },
+    "name": "agentloop_file_intent",
+  },
+  {
+    "description": "Read local maintainer reviewability checks for agent-assisted changes.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object",
+    },
+    "name": "agentloop_maintainer_check",
+  },
+  {
+    "description": "Read local review gate status for task, verification, handoff, harness, policy, and git evidence.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "strict": {
+          "description": "Treat warning gates as failures. Defaults to false.",
+          "type": "boolean",
+        },
+      },
+      "type": "object",
+    },
+    "name": "agentloop_check_gates",
+  },
+  {
+    "description": "Read local AgentLoopKit artifact inventory metadata without artifact contents.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "latest": {
+          "description": "Return only latest matching artifacts. Defaults to false.",
+          "type": "boolean",
+        },
+        "type": {
+          "description": "Optional artifact type filter.",
+          "enum": [
+            "task",
+            "verification",
+            "handoff",
+            "ship-report",
+            "html-report",
+            "badge",
+            "ci-summary",
+            "release-notes",
+            "run",
+          ],
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+    "name": "agentloop_artifacts",
+  },
+  {
+    "description": "Read one local reviewability snapshot for agents, without running commands or returning artifact bodies.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object",
+    },
+    "name": "agentloop_review_context",
+  },
+  {
+    "description": "Read a compact software-agent start briefing with task, evidence, risk, context routing, and impact metrics.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "goal": {
+          "description": "Start briefing goal. Defaults to implement.",
+          "enum": [
+            "implement",
+            "continue",
+            "review",
+            "debug",
+            "handoff",
+            "research",
+          ],
+          "type": "string",
+        },
+        "target": {
+          "description": "Target reader. Defaults to generic.",
+          "enum": [
+            "codex",
+            "claude",
+            "cursor",
+            "generic",
+            "human",
+          ],
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+    "name": "agentloop_start",
+  },
+  {
+    "description": "Read local context pressure and compact-pack savings guidance without running commands.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "redactPaths": {
+          "description": "Redact the local AgentLoop root from returned budget payloads.",
+          "type": "boolean",
+        },
+      },
+      "type": "object",
+    },
+    "name": "agentloop_context_budget",
+  },
+  {
+    "description": "List local context source handles with availability, reasons, and expansion commands.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object",
+    },
+    "name": "agentloop_context_handles",
+  },
+  {
+    "description": "Read an auditable local context pack with receipts, context-budget estimates, and source handles.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "goal": {
+          "description": "Context pack goal. Defaults to continue.",
+          "enum": [
+            "continue",
+            "review",
+            "debug",
+            "handoff",
+            "research",
+          ],
+          "type": "string",
+        },
+        "redactPaths": {
+          "description": "Redact the local AgentLoop root from returned context pack payloads.",
+          "type": "boolean",
+        },
+        "target": {
+          "description": "Target reader. Defaults to generic.",
+          "enum": [
+            "codex",
+            "claude",
+            "cursor",
+            "generic",
+            "human",
+          ],
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+    "name": "agentloop_context_pack",
+  },
+  {
+    "description": "Expand one local context source handle, such as task:active or evidence-map:current.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "handle": {
+          "description": "Source handle to expand.",
+          "type": "string",
+        },
+        "redactPaths": {
+          "description": "Redact the local AgentLoop root from returned handle content.",
+          "type": "boolean",
+        },
+      },
+      "required": [
+        "handle",
+      ],
+      "type": "object",
+    },
+    "name": "agentloop_context_show",
+  },
+  {
+    "description": "List recent local reviewer handoff summaries.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "limit": {
+          "description": "Maximum handoff summaries to return. Defaults to 20.",
+          "maximum": 50,
+          "minimum": 1,
+          "type": "number",
+        },
+      },
+      "type": "object",
+    },
+    "name": "agentloop_list_handoffs",
+  },
+  {
+    "description": "Read the latest local reviewer handoff summary Markdown content.",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object",
+    },
+    "name": "agentloop_latest_handoff",
+  },
+]
+`;

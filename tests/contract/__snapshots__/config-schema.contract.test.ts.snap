@@ -1,0 +1,219 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`config schema contract > agentloop.config.schema.json is locked 1`] = `
+{
+  "$id": "https://raw.githubusercontent.com/abhiyoheswaran1/AgentLoopKit/main/schema/agentloop.config.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+    },
+    "commands": {
+      "additionalProperties": false,
+      "properties": {
+        "build": {
+          "type": "string",
+        },
+        "format": {
+          "type": "string",
+        },
+        "lint": {
+          "type": "string",
+        },
+        "test": {
+          "type": "string",
+        },
+        "typecheck": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "test",
+        "lint",
+        "typecheck",
+        "build",
+        "format",
+      ],
+      "type": "object",
+    },
+    "paths": {
+      "additionalProperties": false,
+      "properties": {
+        "agentloopDir": {
+          "description": "A non-empty repo-relative path; absolute or Windows drive-qualified paths, parent traversal segments, and null bytes are rejected.",
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$",
+          "type": "string",
+        },
+        "handoffsDir": {
+          "description": "A non-empty repo-relative path; absolute or Windows drive-qualified paths, parent traversal segments, and null bytes are rejected.",
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$",
+          "type": "string",
+        },
+        "reportsDir": {
+          "description": "A non-empty repo-relative path; absolute or Windows drive-qualified paths, parent traversal segments, and null bytes are rejected.",
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$",
+          "type": "string",
+        },
+        "root": {
+          "description": "A non-empty repo-relative path; absolute or Windows drive-qualified paths, parent traversal segments, and null bytes are rejected.",
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$",
+          "type": "string",
+        },
+        "tasksDir": {
+          "description": "A non-empty repo-relative path; absolute or Windows drive-qualified paths, parent traversal segments, and null bytes are rejected.",
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$",
+          "type": "string",
+        },
+      },
+      "required": [
+        "root",
+        "agentloopDir",
+        "tasksDir",
+        "reportsDir",
+        "handoffsDir",
+      ],
+      "type": "object",
+    },
+    "policies": {
+      "additionalProperties": false,
+      "default": {
+        "packs": [],
+      },
+      "description": "Optional local organization policy packs. Paths must be repo-relative and are read only when policy-pack commands run.",
+      "properties": {
+        "packs": {
+          "default": [],
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "minLength": 1,
+                "type": "string",
+              },
+              "path": {
+                "description": "A non-empty repo-relative path; absolute or Windows drive-qualified paths, parent traversal segments, and null bytes are rejected.",
+                "pattern": "^(?!/)(?![A-Za-z]:)(?!\\\\)(?!.*(^|[\\\\/])\\.\\.([\\\\/]|$))[^\\u0000]+$",
+                "type": "string",
+              },
+            },
+            "required": [
+              "name",
+            ],
+            "type": "object",
+          },
+          "type": "array",
+        },
+      },
+      "required": [
+        "packs",
+      ],
+      "type": "object",
+    },
+    "project": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+        },
+        "packageManager": {
+          "enum": [
+            "pnpm",
+            "npm",
+            "yarn",
+            "bun",
+          ],
+          "type": "string",
+        },
+        "type": {
+          "enum": [
+            "nextjs",
+            "react-vite",
+            "node",
+            "typescript-package",
+            "python",
+            "docs-only",
+            "generic",
+          ],
+          "type": "string",
+        },
+      },
+      "required": [
+        "name",
+        "type",
+        "packageManager",
+      ],
+      "type": "object",
+    },
+    "safety": {
+      "additionalProperties": false,
+      "properties": {
+        "protectEnvFiles": {
+          "type": "boolean",
+        },
+        "protectLockfiles": {
+          "type": "boolean",
+        },
+        "protectMigrations": {
+          "type": "boolean",
+        },
+        "requireCleanWorkingTree": {
+          "type": "boolean",
+        },
+        "warnOnDirtyWorkingTree": {
+          "type": "boolean",
+        },
+      },
+      "required": [
+        "requireCleanWorkingTree",
+        "warnOnDirtyWorkingTree",
+        "protectEnvFiles",
+        "protectMigrations",
+        "protectLockfiles",
+      ],
+      "type": "object",
+    },
+    "summary": {
+      "additionalProperties": false,
+      "properties": {
+        "includeChangedFiles": {
+          "type": "boolean",
+        },
+        "includeDiffStats": {
+          "type": "boolean",
+        },
+        "includeRisks": {
+          "type": "boolean",
+        },
+        "includeRollback": {
+          "type": "boolean",
+        },
+        "includeVerification": {
+          "type": "boolean",
+        },
+      },
+      "required": [
+        "includeDiffStats",
+        "includeChangedFiles",
+        "includeVerification",
+        "includeRisks",
+        "includeRollback",
+      ],
+      "type": "object",
+    },
+    "version": {
+      "const": 1,
+    },
+  },
+  "required": [
+    "version",
+    "project",
+    "paths",
+    "commands",
+    "safety",
+    "summary",
+  ],
+  "title": "AgentLoopKit Configuration",
+  "type": "object",
+}
+`;
