@@ -52,6 +52,11 @@ for all failures and does not use exit code `2`. Checker commands (`doctor`,
 `ship`) exit `1` on a failing verdict; `guard` and `ready` are advisory by
 default and exit non-zero only under `--strict`.
 
+As of this release, `check-gates --strict` and the hardening gate FAIL on a
+contract whose `Files or Areas Not to Touch` section is still unfilled
+(`None recorded yet.`), because an empty forbidden-scope list is now a blocking
+soft spot. This is intended behavior; run `agentloop harden` to resolve it.
+
 ## Stable command reference
 
 Every row below is a stable, frozen command. Its committed behavior is the

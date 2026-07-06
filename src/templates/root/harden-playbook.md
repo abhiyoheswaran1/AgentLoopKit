@@ -15,4 +15,4 @@ This is interrogation, not agreement. Push back. Advisory soft spots may remain 
 
 ## Why it pays off
 
-Resolved scope (Non-Goals, Files or Areas Not to Touch) is enforced later: `agentloop guard` flags a diff that touches forbidden scope. Hardening the contract now turns front-of-loop alignment into evidence the loop checks against.
+Resolved scope (Files or Areas Not to Touch) is enforced later: `agentloop guard` flags a diff that touches forbidden scope. Hardening the contract now turns front-of-loop alignment into evidence the loop checks against.

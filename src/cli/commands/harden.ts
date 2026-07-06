@@ -60,7 +60,15 @@ export function hardenCommand() {
         if (!resolved) return;
         const { contractPath } = resolved;
 
-        let markdown = await readFile(contractPath, 'utf8');
+        let markdown: string;
+        try {
+          markdown = await readFile(contractPath, 'utf8');
+        } catch {
+          throw new AgentLoopError(
+            `Task contract not found: ${contractPath}`,
+            'HARDEN_CONTRACT_NOT_FOUND',
+          );
+        }
 
         const ids = options.resolve ?? [];
         const answers = options.answer ?? [];

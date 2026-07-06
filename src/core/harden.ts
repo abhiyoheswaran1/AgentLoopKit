@@ -52,8 +52,8 @@ function isEmptySection(markdown: string, heading: string): boolean {
 }
 
 function placeholderRule(markdown: string): SoftSpot[] {
-  return findPlaceholderTaskSections(markdown).map((heading, i) => ({
-    id: makeSoftSpotId('placeholder', heading, i),
+  return findPlaceholderTaskSections(markdown).map((heading) => ({
+    id: makeSoftSpotId('placeholder', heading, 0),
     type: 'placeholder',
     section: heading,
     question: `"${heading}" still holds its template placeholder — fill it in with real content.`,
@@ -115,6 +115,7 @@ function untestableAcceptanceRule(markdown: string): SoftSpot[] {
 
 function contradictionRule(markdown: string): SoftSpot[] {
   const nonGoalTokens = extractMarkdownSectionLines(markdown, 'Non-Goals')
+    .filter((l) => !EMPTY_MARKERS.has(l.replace(/^-\s*/, '').trim().toLowerCase()))
     .flatMap((l) => [...significantTokens(l)]);
   const nonGoalSet = new Set(nonGoalTokens);
   if (nonGoalSet.size === 0) return [];
