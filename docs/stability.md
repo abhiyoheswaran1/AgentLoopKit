@@ -25,6 +25,32 @@ event.
    generated files (`AGENTS.md`, `AGENTLOOP.md`, `.agentloop/`) and the public
    package API exports (`dist/index.js` / `dist/index.d.ts`).
 
+## JSON field conventions
+
+These conventions are part of the frozen JSON contract (axis 4).
+
+- **Next action.** A command that recommends a single next step exposes it as
+  `nextAction: { command, reason }` (`status`, `next`, `start`, `check-gates`,
+  `ready`). `guard` exposes `nextActions: [ { command, reason }, ... ]` — a
+  genuinely plural list, a distinct field, not the singular form.
+- **Aggregate verdict.** The top-level pass/warn/fail verdict is named
+  `status` on `ready`, `guard`, `maintainer-check`, and `start`, and
+  `overallStatus` on `check-gates`, `doctor`, `release-check`,
+  `release-proof`, and `ci-summary`. This split is frozen for 1.x: the
+  `overallStatus` name is load-bearing across the persisted run/verification
+  data model, so it is not renamed. A generic client should read the field
+  named for the command it is calling.
+- **Error envelope.** Every `--json`-capable command emits errors as
+  `{ error: { code, message, ...details } }` on failure.
+
+## Exit codes
+
+`0` means success. Any non-zero exit means failure; AgentLoopKit uses `1`
+for all failures and does not use exit code `2`. Checker commands (`doctor`,
+`verify`, `check-gates`, `release-check`, `release-proof`, `maintainer-check`,
+`ship`) exit `1` on a failing verdict; `guard` and `ready` are advisory by
+default and exit non-zero only under `--strict`.
+
 ## Stable command reference
 
 Every row below is a stable, frozen command. Its committed behavior is the
