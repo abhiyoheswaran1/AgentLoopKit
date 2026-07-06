@@ -92,7 +92,7 @@ function list(values: string[] | undefined, fallback = 'None recorded yet.') {
   return clean.map((value) => `- ${value}`).join('\n');
 }
 
-function extractMarkdownSectionLines(markdown: string, heading: string) {
+export function extractMarkdownSectionLines(markdown: string, heading: string) {
   const lines = markdown.split('\n');
   const headingIndex = lines.findIndex((line) => line.trim() === `## ${heading}`);
   if (headingIndex === -1) return [];
