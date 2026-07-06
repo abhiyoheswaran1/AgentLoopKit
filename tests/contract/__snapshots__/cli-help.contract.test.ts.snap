@@ -39,13 +39,14 @@ exports[`CLI help contract > help for "check-gates" is locked 1`] = `
 Check whether task, verification, handoff, harness, policy, and git gates pass
 
 Options:
-  --json                     print machine-readable output
-  --strict                   treat warning gates as failures
-  --redact-paths             redact local absolute paths in public output
-  --task <task-id>           Baseframe task ID when reconciling AgentFlight
-                             results
-  --from-agentflight <path>  reconcile gates from an AgentFlight result artifact
-  -h, --help                 display help for command"
+  --json                         print machine-readable output
+  --strict                       treat warning gates as failures
+  --redact-paths                 redact local absolute paths in public output
+  --baseframe-task-id <task-id>  Baseframe task ID when reconciling AgentFlight
+                                 results
+  --from-agentflight <path>      reconcile gates from an AgentFlight result
+                                 artifact
+  -h, --help                     display help for command"
 `;
 
 exports[`CLI help contract > help for "ci-summary" is locked 1`] = `

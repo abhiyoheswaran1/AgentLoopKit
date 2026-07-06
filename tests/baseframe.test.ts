@@ -502,7 +502,15 @@ describe('Baseframe Suite Integration v1', () => {
 
     const baseframeResult = await execa(
       tsxPath,
-      [cliPath, 'check-gates', '--task', taskId, '--from-agentflight', resultPath, '--json'],
+      [
+        cliPath,
+        'check-gates',
+        '--baseframe-task-id',
+        taskId,
+        '--from-agentflight',
+        resultPath,
+        '--json',
+      ],
       { cwd: dir },
     );
     expect(JSON.parse(baseframeResult.stdout)).toMatchObject({
@@ -524,5 +532,36 @@ describe('Baseframe Suite Integration v1', () => {
     const standalone = JSON.parse(standaloneResult.stdout);
     expect(standalone).toHaveProperty('gates');
     expect(standalone).not.toHaveProperty('updatedContract');
+  });
+
+  test('check-gates no longer accepts --task for AgentFlight reconciliation', async () => {
+    const dir = await createBaseframeRepo();
+    const assessment = await readFixture<ProjScanAssessmentV1>(projscanFixturePath);
+    const assessmentPath = await writeAssessment(dir, assessment);
+    await execa(
+      tsxPath,
+      [
+        cliPath,
+        'create-task',
+        '--from-projscan',
+        assessmentPath,
+        '--acceptance',
+        'Reset tokens expire',
+      ],
+      { cwd: dir },
+    );
+    const resultPath = await writeAgentFlightResult(
+      dir,
+      await readFixture<AgentFlightResultV1>(agentflightFixturePath),
+    );
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'check-gates', '--task', taskId, '--from-agentflight', resultPath, '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).not.toBe(0);
+    expect(result.stderr).toContain('--task');
   });
 });

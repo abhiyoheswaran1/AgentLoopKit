@@ -54,13 +54,16 @@ export function checkGatesCommand() {
     .option('--json', 'print machine-readable output')
     .option('--strict', 'treat warning gates as failures')
     .option('--redact-paths', 'redact local absolute paths in public output')
-    .option('--task <task-id>', 'Baseframe task ID when reconciling AgentFlight results')
+    .option(
+      '--baseframe-task-id <task-id>',
+      'Baseframe task ID when reconciling AgentFlight results',
+    )
     .option('--from-agentflight <path>', 'reconcile gates from an AgentFlight result artifact')
     .action(async (options: {
       json?: boolean;
       strict?: boolean;
       redactPaths?: boolean;
-      task?: string;
+      baseframeTaskId?: string;
       fromAgentflight?: string;
       fromAgentFlight?: string;
     }) => {
@@ -76,9 +79,9 @@ export function checkGatesCommand() {
       }
       const fromAgentFlight = options.fromAgentflight ?? options.fromAgentFlight;
       if (fromAgentFlight) {
-        if (!options.task) {
+        if (!options.baseframeTaskId) {
           const error = new AgentLoopError(
-            '--task is required with --from-agentflight.',
+            '--baseframe-task-id is required with --from-agentflight.',
             'BASEFRAME_TASK_ID_REQUIRED',
           );
           if (options.json) {
@@ -90,7 +93,7 @@ export function checkGatesCommand() {
         try {
           const result = await evaluateAgentFlightResult({
             cwd: workspace.cwd,
-            taskId: options.task,
+            taskId: options.baseframeTaskId,
             resultPath: fromAgentFlight,
           });
           if (options.json) {

@@ -513,7 +513,7 @@ agentloop check-gates --json
 agentloop check-gates --strict
 agentloop check-gates --redact-paths
 agentloop check-gates \
-  --task auth-password-reset-20260626-01 \
+  --baseframe-task-id auth-password-reset-20260626-01 \
   --from-agentflight .baseframe/evidence/auth-password-reset-20260626-01/agentflight-result.json
 ```
 
@@ -529,7 +529,7 @@ If dirty files are already covered by handoff or ship evidence for the active no
 
 When `check-gates` recommends `agentloop create-task` while dirty non-evidence files already exist, the next-action reason includes a bounded set of repo-relative examples from Git status. AgentLoop evidence-only dirty files are excluded from those examples.
 
-Use `--task <task-id> --from-agentflight <path>` to reconcile a Baseframe AgentFlight result against `.baseframe/evidence/<task-id>/agentloopkit-task.json`. This mode matches verification commands to required gates, surfaces failed, missing, incomplete, and scope-drift evidence, and updates the JSON task contract without requiring AgentFlight for normal standalone gate checks.
+Use `--baseframe-task-id <task-id> --from-agentflight <path>` to reconcile a Baseframe AgentFlight result against `.baseframe/evidence/<task-id>/agentloopkit-task.json`. This mode matches verification commands to required gates, surfaces failed, missing, incomplete, and scope-drift evidence, and updates the JSON task contract without requiring AgentFlight for normal standalone gate checks.
 
 Warnings keep exit code `0` by default. Use `--strict` in CI when warning gates should fail.
 
