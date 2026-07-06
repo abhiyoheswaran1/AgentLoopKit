@@ -324,6 +324,30 @@ describe('GitHub metadata import', () => {
     expect(JSON.parse(redactedJsonResult.stdout)).toEqual(JSON.parse(jsonResult.stdout));
   });
 
+  test('emits a JSON error envelope when github import fails with --json', async () => {
+    const { dir } = await createGithubFixture();
+
+    const result = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'github',
+        'import',
+        '--issue-json',
+        '/tmp/does-not-exist-xyz.json',
+        '--dry-run',
+        '--json',
+      ],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).not.toBe(0);
+    const parsed = JSON.parse(result.stdout);
+    expect(parsed).toHaveProperty('error');
+    expect(parsed.error).toHaveProperty('code');
+    expect(parsed.error).toHaveProperty('message');
+  });
+
   test('keeps imported titles and output paths on one line in human output while preserving JSON values', async () => {
     const { dir } = await createGithubFixture();
     await writeJson(path.join(dir, 'issue-newline.json'), {

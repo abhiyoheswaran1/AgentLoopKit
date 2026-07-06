@@ -1,7 +1,8 @@
 import { Command } from 'commander';
 import { importGithubMetadata } from '../../core/github-metadata.js';
+import { AgentLoopError } from '../../core/errors.js';
 import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
-import { loadWorkspaceForJsonCommand } from '../json-errors.js';
+import { loadWorkspaceForJsonCommand, printAgentLoopJsonError } from '../json-errors.js';
 
 function printImport(
   result: Awaited<ReturnType<typeof importGithubMetadata>>,
@@ -64,14 +65,23 @@ export function githubCommand() {
       }) => {
         const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
         if (!workspace) return;
-        const result = await importGithubMetadata({
-          cwd: workspace.cwd,
-          config: workspace.config,
-          issueJsonPath: options.issueJson,
-          prJsonPath: options.prJson,
-          outputPath: options.output,
-          dryRun: options.dryRun,
-        });
+        let result: Awaited<ReturnType<typeof importGithubMetadata>>;
+        try {
+          result = await importGithubMetadata({
+            cwd: workspace.cwd,
+            config: workspace.config,
+            issueJsonPath: options.issueJson,
+            prJsonPath: options.prJson,
+            outputPath: options.output,
+            dryRun: options.dryRun,
+          });
+        } catch (error) {
+          if (options.json && error instanceof AgentLoopError) {
+            printAgentLoopJsonError(error);
+            return;
+          }
+          throw error;
+        }
         printImport(result, options);
       },
     );
