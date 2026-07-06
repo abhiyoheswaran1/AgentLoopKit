@@ -694,6 +694,8 @@ Commands:
                                    context-budget pressure
   ready [options]                  Check whether local agent work is ready for
                                    review
+  harden [options] [task]          Interrogate a task contract for unresolved
+                                   soft spots before work starts.
   loop                             Create and inspect local low-token agent loop
                                    contracts
   check-gates [options]            Check whether task, verification, handoff,
