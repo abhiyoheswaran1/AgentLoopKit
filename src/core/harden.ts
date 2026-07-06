@@ -159,14 +159,12 @@ export function toHardenJson(spots: SoftSpot[]) {
 
 export function renderSoftSpotsText(spots: SoftSpot[]): string {
   if (spots.length === 0) return 'No soft spots — this contract is hardened.';
-  const group = (sev: SoftSpotSeverity) =>
-    spots.filter((s) => s.severity === sev)
-      .map((s) => `  [${s.id}] ${s.question}`)
-      .join('\n');
+  const group = (arr: SoftSpot[]) =>
+    arr.map((s) => `  [${s.id}] ${s.question}`).join('\n');
   const blocking = spots.filter((s) => s.severity === 'blocking');
   const advisory = spots.filter((s) => s.severity === 'advisory');
   const parts: string[] = [];
-  if (blocking.length) parts.push(`${blocking.length} blocking soft spot(s):\n${group('blocking')}`);
-  if (advisory.length) parts.push(`${advisory.length} advisory soft spot(s):\n${group('advisory')}`);
+  if (blocking.length) parts.push(`${blocking.length} blocking soft spot(s):\n${group(blocking)}`);
+  if (advisory.length) parts.push(`${advisory.length} advisory soft spot(s):\n${group(advisory)}`);
   return parts.join('\n\n');
 }
