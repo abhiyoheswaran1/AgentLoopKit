@@ -366,6 +366,42 @@ describe('init', () => {
     });
   });
 
+  test('--redact-paths redacts the absolute target directory and git root in JSON output', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo-redact' });
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'init', '--dry-run', '--json', '--redact-paths'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.targetDirectory).toBe('[git-root]');
+    expect(output.git.root).toBe('[git-root]');
+  });
+
+  test('--redact-paths redacts the absolute target directory and git root in human output', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo-redact-human' });
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'init', '--dry-run', '--redact-paths'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('Target: [git-root]');
+    expect(result.stdout).toContain('Git root: [git-root]');
+    expect(result.stdout).not.toContain(await realpath(dir));
+  });
+
   test('rejects init when AGENTS.md resolves outside the repo', async () => {
     const dir = await makeTempDir();
     const outsideDir = await makeTempDir();

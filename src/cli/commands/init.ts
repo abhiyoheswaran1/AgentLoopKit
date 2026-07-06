@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { OutputPathError } from '../../core/artifacts.js';
 import { InitSetupError, initializeAgentLoop } from '../../core/init.js';
 import { consoleLogger as logger } from '../../core/logger.js';
+import { redactLocalRoots } from '../../core/redaction.js';
 import { printOutputPathJsonError } from '../json-errors.js';
 
 function formatList(values: string[]) {
@@ -37,8 +38,15 @@ export function initCommand() {
       '--local-only',
       'keep generated AgentLoopKit files out of git by updating this repo clone .git/info/exclude',
     )
+    .option('--redact-paths', 'redact local absolute paths in public output')
     .action(
-      async (options: { dryRun?: boolean; json?: boolean; force?: boolean; localOnly?: boolean }) => {
+      async (options: {
+        dryRun?: boolean;
+        json?: boolean;
+        force?: boolean;
+        localOnly?: boolean;
+        redactPaths?: boolean;
+      }) => {
         let result: Awaited<ReturnType<typeof initializeAgentLoop>>;
         try {
           result = await initializeAgentLoop({
@@ -58,20 +66,36 @@ export function initCommand() {
           }
           throw error;
         }
+        const redactPaths = options.redactPaths === true;
+        const redactionRoots = [result.targetDirectory, result.git.root].filter(Boolean);
+        const redact = (value: string) =>
+          redactPaths ? redactLocalRoots(value, redactionRoots) : value;
+        const targetDirectory = redact(result.targetDirectory);
+        const gitRoot = result.git.root ? redact(result.git.root) : result.git.root;
         if (options.json) {
-          logger.info(JSON.stringify(result, null, 2));
+          logger.info(
+            JSON.stringify(
+              {
+                ...result,
+                targetDirectory,
+                git: { ...result.git, root: gitRoot },
+              },
+              null,
+              2,
+            ),
+          );
           return;
         }
         logger.info(
           options.dryRun ? 'AgentLoopKit init dry run complete.' : 'AgentLoopKit initialized.',
         );
-        logger.info(`Target: ${result.targetDirectory}`);
+        logger.info(`Target: ${targetDirectory}`);
         logger.info(
           `Project: ${result.project.name || 'unnamed'} (${result.project.type}, ${result.project.packageManager})`,
         );
         logger.info(`Git: ${result.git.isRepository ? 'detected' : 'not detected'}`);
         if (result.git.isRepository) {
-          logger.info(`Git root: ${result.git.root}`);
+          logger.info(`Git root: ${gitRoot}`);
           logger.info(`Git target: ${result.git.targetIsRoot ? 'root directory' : 'subdirectory'}`);
           if (!result.git.targetIsRoot) {
             logger.info(

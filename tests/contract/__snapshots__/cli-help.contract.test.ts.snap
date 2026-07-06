@@ -227,13 +227,14 @@ exports[`CLI help contract > help for "init" is locked 1`] = `
 Initialize AgentLoopKit in the current repository
 
 Options:
-  --dry-run     show planned changes without writing files
-  --json        print machine-readable output
-  --force       allow initialization when the current directory is your home
-                directory
-  --local-only  keep generated AgentLoopKit files out of git by updating this
-                repo clone .git/info/exclude
-  -h, --help    display help for command"
+  --dry-run       show planned changes without writing files
+  --json          print machine-readable output
+  --force         allow initialization when the current directory is your home
+                  directory
+  --local-only    keep generated AgentLoopKit files out of git by updating this
+                  repo clone .git/info/exclude
+  --redact-paths  redact local absolute paths in public output
+  -h, --help      display help for command"
 `;
 
 exports[`CLI help contract > help for "install-agent" is locked 1`] = `
