@@ -42,6 +42,17 @@ exports[`JSON output shape contract > --json shape for "artifacts" is locked 1`]
 }
 `;
 
+exports[`JSON output shape contract > --json shape for "badge" is locked 1`] = `
+{
+  "label": "string",
+  "message": "string",
+  "outPath": "string",
+  "source": "string",
+  "sourcePath": "string",
+  "status": "string",
+}
+`;
+
 exports[`JSON output shape contract > --json shape for "check-gates" is locked 1`] = `
 {
   "gates": [
@@ -69,6 +80,353 @@ exports[`JSON output shape contract > --json shape for "check-gates" is locked 1
   },
   "overallStatus": "string",
   "strict": "boolean",
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "ci-summary" is locked 1`] = `
+{
+  "ci": {
+    "provider": "string",
+    "providerName": "string",
+  },
+  "evidence": {
+    "handoff": {
+      "path": "string",
+      "title": "string",
+    },
+    "task": {
+      "path": "string",
+      "status": "string",
+      "title": "string",
+    },
+    "verification": {
+      "overallStatus": "string",
+      "path": "string",
+      "title": "string",
+    },
+  },
+  "gates": {
+    "gates": [
+      {
+        "id": "string",
+        "message": "string",
+        "name": "string",
+        "path": "string",
+        "status": "string",
+      },
+    ],
+    "overallStatus": "string",
+  },
+  "markdown": "string",
+  "nextAction": {
+    "command": "string",
+    "reason": "string",
+  },
+  "timestamp": "string",
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "context budget" is locked 1`] = `
+{
+  "contextBudget": {
+    "changedFileCount": "number",
+    "estimatedFileListTokens": "number",
+    "estimatedResumePackTokens": "number",
+    "heuristic": "string",
+    "nonEvidenceChangedFileCount": "number",
+    "note": "string",
+    "savingsCommand": "string",
+  },
+  "evidenceMap": {
+    "claims": [
+      "string",
+    ],
+    "coverage": {
+      "coveredFileCount": "number",
+      "forbiddenFileCount": "number",
+      "unexplainedExamples": [
+        "string",
+      ],
+      "unexplainedFileCount": "number",
+    },
+    "fileList": {
+      "changedFileCount": "number",
+      "command": "string",
+      "handle": "string",
+      "omitted": "boolean",
+      "reason": "string",
+    },
+    "nextActions": [
+      {
+        "command": "string",
+        "reason": "string",
+      },
+    ],
+    "risk": {
+      "riskSensitiveExamples": [
+        "string",
+      ],
+      "riskSensitiveFileCount": "number",
+    },
+    "summary": {
+      "agentLoopEvidenceChangedFileCount": "number",
+      "changedFileCount": "number",
+      "nonEvidenceChangedFileCount": "number",
+      "reviewability": "string",
+    },
+    "task": {
+      "path": "string",
+      "status": "string",
+      "title": "string",
+    },
+    "verification": {
+      "fresh": "boolean",
+      "label": "string",
+      "status": "string",
+    },
+  },
+  "markdown": "string",
+  "safety": {
+    "localEvidenceOnly": "boolean",
+    "localGitStatus": "boolean",
+    "projectCommandsRun": "boolean",
+    "readOnly": "boolean",
+    "verificationCommandsRun": "boolean",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "context handles" is locked 1`] = `
+{
+  "handles": [
+    {
+      "available": "boolean",
+      "command": "string",
+      "id": "string",
+      "kind": "string",
+      "label": "string",
+      "reason": "string",
+      "sourcePath": "string",
+    },
+  ],
+  "markdown": "string",
+  "safety": {
+    "localEvidenceOnly": "boolean",
+    "localGitStatus": "boolean",
+    "projectCommandsRun": "boolean",
+    "readOnly": "boolean",
+    "verificationCommandsRun": "boolean",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "context pack" is locked 1`] = `
+{
+  "contextBudget": {
+    "changedFileCount": "number",
+    "estimatedFileListTokens": "number",
+    "estimatedResumePackTokens": "number",
+    "heuristic": "string",
+    "nonEvidenceChangedFileCount": "number",
+    "note": "string",
+    "savingsCommand": "string",
+  },
+  "evidenceMap": {
+    "claims": [
+      "string",
+    ],
+    "coverage": {
+      "coveredFileCount": "number",
+      "forbiddenFileCount": "number",
+      "unexplainedExamples": [
+        "string",
+      ],
+      "unexplainedFileCount": "number",
+    },
+    "fileList": {
+      "changedFileCount": "number",
+      "command": "string",
+      "handle": "string",
+      "omitted": "boolean",
+      "reason": "string",
+    },
+    "nextActions": [
+      {
+        "command": "string",
+        "reason": "string",
+      },
+    ],
+    "risk": {
+      "riskSensitiveExamples": [
+        "string",
+      ],
+      "riskSensitiveFileCount": "number",
+    },
+    "summary": {
+      "agentLoopEvidenceChangedFileCount": "number",
+      "changedFileCount": "number",
+      "nonEvidenceChangedFileCount": "number",
+      "reviewability": "string",
+    },
+    "task": {
+      "path": "string",
+      "status": "string",
+      "title": "string",
+    },
+    "verification": {
+      "fresh": "boolean",
+      "label": "string",
+      "status": "string",
+    },
+  },
+  "goal": "string",
+  "guidance": "string",
+  "handles": [
+    {
+      "command": "string",
+      "id": "string",
+      "kind": "string",
+      "label": "string",
+      "reason": "string",
+      "sourcePath": "string",
+    },
+  ],
+  "markdown": "string",
+  "receipt": {
+    "included": [
+      {
+        "handles": [
+          "string",
+        ],
+        "reason": "string",
+        "section": "string",
+      },
+    ],
+    "omitted": [
+      {
+        "handles": [],
+        "reason": "string",
+        "section": "string",
+      },
+    ],
+  },
+  "safety": {
+    "localEvidenceOnly": "boolean",
+    "localGitStatus": "boolean",
+    "projectCommandsRun": "boolean",
+    "readOnly": "boolean",
+    "verificationCommandsRun": "boolean",
+  },
+  "target": "string",
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "create-task --type feature --title contract-lock-fixture" is locked 1`] = `
+{
+  "activeTask": {
+    "path": "string",
+    "status": "string",
+    "title": "string",
+  },
+  "loopGuidance": {
+    "path": "string",
+    "taskType": "string",
+  },
+  "task": {
+    "markdown": "string",
+    "path": "string",
+  },
+  "warnings": [
+    {
+      "code": "string",
+      "examples": [
+        "string",
+      ],
+      "fileCount": "number",
+      "message": "string",
+      "suggestion": "string",
+    },
+  ],
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "doctor" is locked 1`] = `
+{
+  "advisory": "boolean",
+  "agentReadiness": {
+    "matrix": [
+      {
+        "id": "string",
+        "label": "string",
+        "message": "string",
+        "required": "boolean",
+        "source": "string",
+        "status": "string",
+      },
+    ],
+    "required": {
+      "broadReadAvoidance": "boolean",
+      "contextHandles": "boolean",
+      "doctorPreflight": "boolean",
+      "mcpGuidance": "boolean",
+      "startPreflight": "boolean",
+    },
+    "status": "string",
+  },
+  "checks": [
+    {
+      "message": "string",
+      "name": "string",
+      "status": "string",
+    },
+  ],
+  "git": {
+    "isRepository": "boolean",
+    "root": "string",
+    "targetIsRoot": "boolean",
+  },
+  "markdown": "string",
+  "nextActions": [
+    {
+      "command": "string",
+      "id": "string",
+      "reason": "string",
+    },
+  ],
+  "overallStatus": "string",
+  "serious": [],
+  "strict": "boolean",
+  "warnings": [
+    {
+      "message": "string",
+      "name": "string",
+      "status": "string",
+    },
+  ],
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "github import --issue-json github-issue-fixture.json --dry-run" is locked 1`] = `
+{
+  "dryRun": "boolean",
+  "issue": {
+    "author": "string",
+    "bodyExcerpt": "string",
+    "labels": [],
+    "number": "number",
+    "state": "string",
+    "title": "string",
+    "url": "string",
+  },
+  "outputPath": "string",
+  "safety": {
+    "callsGithubApi": "boolean",
+    "readsEnvFiles": "boolean",
+    "readsOnlyExplicitJson": "boolean",
+    "readsTokens": "boolean",
+  },
+  "status": "string",
+  "writesFiles": "boolean",
 }
 `;
 
@@ -165,6 +523,347 @@ exports[`JSON output shape contract > --json shape for "guard" is locked 1`] = `
 }
 `;
 
+exports[`JSON output shape contract > --json shape for "handoff" is locked 1`] = `
+{
+  "changedFiles": [
+    {
+      "path": "string",
+      "status": "string",
+    },
+  ],
+  "diffStat": "string",
+  "markdown": "string",
+  "outPath": "string",
+  "reportPath": "string",
+  "taskPath": "string",
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "init" is locked 1`] = `
+{
+  "commands": {
+    "configured": [],
+    "missing": [
+      "string",
+    ],
+  },
+  "created": [],
+  "dryRun": "boolean",
+  "git": {
+    "isRepository": "boolean",
+    "root": "string",
+    "targetIsRoot": "boolean",
+  },
+  "project": {
+    "name": "string",
+    "packageManager": "string",
+    "type": "string",
+  },
+  "skipped": [
+    "string",
+  ],
+  "targetDirectory": "string",
+  "updated": [],
+  "warnings": [],
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "install-agent claude-code" is locked 1`] = `
+{
+  "agent": {
+    "agentFilePath": "string",
+    "agentFileStatus": "string",
+    "agentsMdStatus": "string",
+    "agentsPath": "string",
+    "name": "string",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "intent AGENTS.md" is locked 1`] = `
+{
+  "file": "string",
+  "runs": [],
+  "search": {
+    "inspectedRunCount": "number",
+    "matchLimit": "number",
+    "scanLimit": "number",
+    "stoppedAfterMatches": "boolean",
+    "totalRunCount": "number",
+    "truncated": "boolean",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "list-templates" is locked 1`] = `
+{
+  "templates": {
+    "agents": [
+      "string",
+    ],
+    "gates": [
+      "string",
+    ],
+    "handoffs": [
+      "string",
+    ],
+    "harness": [
+      "string",
+    ],
+    "loops": [
+      "string",
+    ],
+    "policies": [
+      "string",
+    ],
+    "policy-packs": [],
+    "root": [
+      "string",
+    ],
+    "tasks": [
+      "string",
+    ],
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "loop create --goal contract-lock-fixture --preset agentloopkit-maintenance" is locked 1`] = `
+{
+  "loop": {
+    "budget": {
+      "maxEstimatedTokens": "number",
+      "maxIterations": "number",
+      "usedEstimatedTokens": "number",
+    },
+    "cadence": "string",
+    "controls": {
+      "agentNeutral": "boolean",
+      "externalAgentExecution": "boolean",
+      "externalRunnerExecution": "boolean",
+      "localEvidenceOnly": "boolean",
+    },
+    "createdAt": "string",
+    "goal": "string",
+    "guardrails": {
+      "blockedCommands": [
+        "string",
+      ],
+      "maxOutputChars": "number",
+      "rejectShellMetacharacters": "boolean",
+      "requireExplicitRunner": "boolean",
+      "shell": "boolean",
+    },
+    "id": "string",
+    "iterations": [],
+    "kind": "string",
+    "latestTokenReceipt": {
+      "estimatedAgentLoopOverheadTokens": "number",
+      "estimatedBroadContextTokens": "number",
+      "estimatedCompactContextTokens": "number",
+      "estimatedGrossContextReductionTokens": "number",
+      "estimatedNetContextReductionTokens": "number",
+      "heuristic": "string",
+      "note": "string",
+      "savingsCommand": "string",
+      "warning": "string",
+    },
+    "path": "string",
+    "safety": {
+      "commandsExecuted": [],
+      "externalNetwork": "boolean",
+      "publishes": "boolean",
+      "writesLoopContract": "boolean",
+      "writesNativeTask": "boolean",
+    },
+    "schemaVersion": "string",
+    "status": "string",
+    "stopConditions": [
+      "string",
+    ],
+    "suggestedCommands": [
+      {
+        "command": "string",
+        "reason": "string",
+        "required": "boolean",
+      },
+    ],
+    "task": {
+      "nativeTaskPath": "string",
+    },
+    "updatedAt": "string",
+  },
+  "markdown": "string",
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "loop report" is locked 1`] = `
+{
+  "loop": {
+    "budget": {
+      "maxEstimatedTokens": "number",
+      "maxIterations": "number",
+      "usedEstimatedTokens": "number",
+    },
+    "cadence": "string",
+    "controls": {
+      "agentNeutral": "boolean",
+      "externalAgentExecution": "boolean",
+      "externalRunnerExecution": "boolean",
+      "localEvidenceOnly": "boolean",
+    },
+    "createdAt": "string",
+    "goal": "string",
+    "guardrails": {
+      "blockedCommands": [
+        "string",
+      ],
+      "maxOutputChars": "number",
+      "rejectShellMetacharacters": "boolean",
+      "requireExplicitRunner": "boolean",
+      "shell": "boolean",
+    },
+    "id": "string",
+    "iterations": [],
+    "kind": "string",
+    "latestTokenReceipt": {
+      "estimatedAgentLoopOverheadTokens": "number",
+      "estimatedBroadContextTokens": "number",
+      "estimatedCompactContextTokens": "number",
+      "estimatedGrossContextReductionTokens": "number",
+      "estimatedNetContextReductionTokens": "number",
+      "heuristic": "string",
+      "note": "string",
+      "savingsCommand": "string",
+      "warning": "string",
+    },
+    "path": "string",
+    "safety": {
+      "commandsExecuted": [],
+      "externalNetwork": "boolean",
+      "publishes": "boolean",
+      "writesLoopContract": "boolean",
+      "writesNativeTask": "boolean",
+    },
+    "schemaVersion": "string",
+    "status": "string",
+    "stopConditions": [
+      "string",
+    ],
+    "suggestedCommands": [
+      {
+        "command": "string",
+        "reason": "string",
+        "required": "boolean",
+      },
+    ],
+    "task": {
+      "nativeTaskPath": "string",
+    },
+    "updatedAt": "string",
+  },
+  "markdown": "string",
+  "summary": {
+    "iterations": "number",
+    "maxEstimatedTokens": "number",
+    "status": "string",
+    "usedEstimatedTokens": "number",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "loop status" is locked 1`] = `
+{
+  "loop": {
+    "budget": {
+      "maxEstimatedTokens": "number",
+      "maxIterations": "number",
+      "usedEstimatedTokens": "number",
+    },
+    "cadence": "string",
+    "controls": {
+      "agentNeutral": "boolean",
+      "externalAgentExecution": "boolean",
+      "externalRunnerExecution": "boolean",
+      "localEvidenceOnly": "boolean",
+    },
+    "createdAt": "string",
+    "goal": "string",
+    "guardrails": {
+      "blockedCommands": [
+        "string",
+      ],
+      "maxOutputChars": "number",
+      "rejectShellMetacharacters": "boolean",
+      "requireExplicitRunner": "boolean",
+      "shell": "boolean",
+    },
+    "id": "string",
+    "iterations": [],
+    "kind": "string",
+    "latestTokenReceipt": {
+      "estimatedAgentLoopOverheadTokens": "number",
+      "estimatedBroadContextTokens": "number",
+      "estimatedCompactContextTokens": "number",
+      "estimatedGrossContextReductionTokens": "number",
+      "estimatedNetContextReductionTokens": "number",
+      "heuristic": "string",
+      "note": "string",
+      "savingsCommand": "string",
+      "warning": "string",
+    },
+    "path": "string",
+    "safety": {
+      "commandsExecuted": [],
+      "externalNetwork": "boolean",
+      "publishes": "boolean",
+      "writesLoopContract": "boolean",
+      "writesNativeTask": "boolean",
+    },
+    "schemaVersion": "string",
+    "status": "string",
+    "stopConditions": [
+      "string",
+    ],
+    "suggestedCommands": [
+      {
+        "command": "string",
+        "reason": "string",
+        "required": "boolean",
+      },
+    ],
+    "task": {
+      "nativeTaskPath": "string",
+    },
+    "updatedAt": "string",
+  },
+  "markdown": "string",
+  "summary": {
+    "iterations": "number",
+    "maxEstimatedTokens": "number",
+    "status": "string",
+    "usedEstimatedTokens": "number",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "maintainer-check" is locked 1`] = `
+{
+  "checks": [
+    {
+      "id": "string",
+      "message": "string",
+      "path": "string",
+      "status": "string",
+    },
+  ],
+  "maintainerChecklist": [
+    "string",
+  ],
+  "status": "string",
+  "suggestedContributorRequest": "string",
+}
+`;
+
 exports[`JSON output shape contract > --json shape for "next" is locked 1`] = `
 {
   "activeTask": "null",
@@ -188,6 +887,191 @@ exports[`JSON output shape contract > --json shape for "next" is locked 1`] = `
     "dirty": "boolean",
     "nonEvidenceChangedFileCount": "number",
   },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "npm-status --package-name agentloopkit-fixture --local-version 1.0.0 --registry-json npm-registry-fixture.json" is locked 1`] = `
+{
+  "localVersion": "string",
+  "markdown": "string",
+  "packageName": "string",
+  "recommendation": "string",
+  "registry": {
+    "hasLocalVersion": "boolean",
+    "latest": "string",
+    "versions": [
+      "string",
+    ],
+  },
+  "safety": {
+    "does": [
+      "string",
+    ],
+    "doesNot": [
+      "string",
+    ],
+  },
+  "source": {
+    "command": "string",
+    "exitCode": "number",
+  },
+  "status": "string",
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "policy list" is locked 1`] = `
+{
+  "policies": [
+    {
+      "name": "string",
+      "path": "string",
+      "title": "string",
+    },
+  ],
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "policy packs" is locked 1`] = `
+{
+  "packs": [
+    {
+      "description": "string",
+      "name": "string",
+      "path": "string",
+      "policyCount": "number",
+      "source": "string",
+      "title": "string",
+    },
+  ],
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "policy status" is locked 1`] = `
+{
+  "policies": [
+    {
+      "name": "string",
+      "path": "string",
+      "status": "string",
+      "templatePath": "string",
+      "title": "string",
+    },
+  ],
+  "summary": {
+    "current": "number",
+    "extra": "number",
+    "missing": "number",
+    "modified": "number",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "prepare-pr" is locked 1`] = `
+{
+  "body": "string",
+  "changedFiles": [
+    {
+      "path": "string",
+      "status": "string",
+    },
+  ],
+  "evidenceMap": {
+    "claims": [
+      "string",
+    ],
+    "coverage": {
+      "coveredFileCount": "number",
+      "forbiddenFileCount": "number",
+      "unexplainedExamples": [],
+      "unexplainedFileCount": "number",
+    },
+    "files": [
+      {
+        "agentLoopEvidence": "boolean",
+        "area": "string",
+        "coveredByRun": "boolean",
+        "coveredByTask": "boolean",
+        "explanation": "string",
+        "forbiddenByTask": "boolean",
+        "path": "string",
+        "riskSensitive": "boolean",
+        "runCoverage": {
+          "command": "string",
+          "id": "string",
+          "taskTitle": "string",
+        },
+        "status": "string",
+        "unexplained": "boolean",
+      },
+    ],
+    "nextActions": [
+      {
+        "command": "string",
+        "reason": "string",
+      },
+    ],
+    "risk": {
+      "riskSensitiveExamples": [
+        "string",
+      ],
+      "riskSensitiveFileCount": "number",
+    },
+    "summary": {
+      "agentLoopEvidenceChangedFileCount": "number",
+      "changedFileCount": "number",
+      "nonEvidenceChangedFileCount": "number",
+      "reviewability": "string",
+    },
+    "task": {
+      "path": "string",
+      "status": "string",
+      "title": "string",
+    },
+    "verification": {
+      "fresh": "boolean",
+      "label": "string",
+      "path": "string",
+      "status": "string",
+    },
+  },
+  "githubMetadata": {
+    "path": "string",
+    "status": "string",
+  },
+  "handoffPath": "string",
+  "readiness": {
+    "blockers": [
+      "string",
+    ],
+    "claims": [
+      "string",
+    ],
+    "dimensions": [
+      {
+        "id": "string",
+        "label": "string",
+        "reason": "string",
+        "score": "number",
+        "weight": "number",
+      },
+    ],
+    "recommendedNextActions": [
+      "string",
+    ],
+    "strengths": [
+      "string",
+    ],
+    "totalScore": "number",
+    "warnings": [
+      "string",
+    ],
+  },
+  "shipEvidence": {
+    "runId": "string",
+    "source": "string",
+  },
+  "shipReportPath": "string",
+  "titleSuggestion": "string",
 }
 `;
 
@@ -268,6 +1152,178 @@ exports[`JSON output shape contract > --json shape for "ready" is locked 1`] = `
     "note": "string",
     "savingsCommand": "string",
     "warning": "string",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "release-check" is locked 1`] = `
+{
+  "checks": [
+    {
+      "id": "string",
+      "message": "string",
+      "name": "string",
+      "path": "string",
+      "status": "string",
+    },
+  ],
+  "git": {
+    "agentLoopEvidenceChangedFileCount": "number",
+    "branch": "string",
+    "changedFileCount": "number",
+    "commit": "string",
+    "isRepository": "boolean",
+    "nonEvidenceChangedFileCount": "number",
+    "root": "string",
+    "targetIsRoot": "boolean",
+  },
+  "markdown": "string",
+  "nextAction": {
+    "command": "string",
+    "reason": "string",
+  },
+  "overallStatus": "string",
+  "package": {
+    "name": "string",
+    "version": "string",
+  },
+  "releaseDelta": {
+    "changedFileCount": "number",
+    "changedFiles": [],
+    "commitCount": "number",
+    "packageImpactingChangedFileCount": "number",
+    "packageImpactingChangedFiles": [],
+    "recommendation": "string",
+    "tag": "string",
+    "tagExists": "boolean",
+  },
+  "safety": {
+    "does": [
+      "string",
+    ],
+    "doesNot": [
+      "string",
+    ],
+  },
+  "strict": "boolean",
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "release-notes" is locked 1`] = `
+{
+  "branch": "string",
+  "changedFiles": [],
+  "changelogSection": "string",
+  "commit": "string",
+  "commits": [],
+  "evidence": {
+    "task": {
+      "path": "string",
+      "status": "string",
+      "title": "string",
+    },
+    "verification": {
+      "overallStatus": "string",
+      "path": "string",
+    },
+  },
+  "format": "string",
+  "gitRange": {
+    "fallbackReason": "string",
+    "label": "string",
+    "to": "string",
+  },
+  "markdown": "string",
+  "packageName": "string",
+  "timestamp": "string",
+  "version": "string",
+  "workingTree": {
+    "clean": "boolean",
+    "files": [
+      "string",
+    ],
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "release-proof --only github-release --github-release-json github-release-fixture.json" is locked 1`] = `
+{
+  "channels": [
+    {
+      "id": "string",
+      "message": "string",
+      "name": "string",
+      "status": "string",
+      "url": "string",
+    },
+  ],
+  "checkedChannels": [
+    "string",
+  ],
+  "git": {
+    "commit": "string",
+    "headMatchesTag": "boolean",
+    "tag": "string",
+    "tagCommit": "string",
+    "tagExists": "boolean",
+  },
+  "markdown": "string",
+  "nextAction": {
+    "command": "string",
+    "reason": "string",
+  },
+  "overallStatus": "string",
+  "package": {
+    "name": "string",
+    "version": "string",
+  },
+  "safety": {
+    "does": [
+      "string",
+    ],
+    "doesNot": [
+      "string",
+    ],
+  },
+  "sources": {
+    "ghcr": {
+      "command": "string",
+      "exitCode": "number",
+    },
+    "githubMarketplace": {
+      "command": "string",
+      "exitCode": "number",
+    },
+    "githubRelease": {
+      "command": "string",
+      "exitCode": "number",
+    },
+    "mcpRegistry": {
+      "command": "string",
+      "exitCode": "number",
+    },
+    "npm": {
+      "command": "string",
+      "exitCode": "number",
+    },
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "report" is locked 1`] = `
+{
+  "metadata": {
+    "changedFileCount": "number",
+    "repoName": "string",
+    "taskTitle": "string",
+    "timestamp": "string",
+    "verificationStatus": "string",
+  },
+  "outPath": "string",
+  "sourcePaths": {
+    "handoff": "string",
+    "task": "string",
+    "verification": "string",
   },
 }
 `;
@@ -444,6 +1500,190 @@ exports[`JSON output shape contract > --json shape for "review-context" is locke
 }
 `;
 
+exports[`JSON output shape contract > --json shape for "runs" is locked 1`] = `
+{
+  "runs": [],
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "schemastore" is locked 1`] = `
+{
+  "entry": {
+    "description": "string",
+    "fileMatch": [
+      "string",
+    ],
+    "name": "string",
+    "url": "string",
+  },
+  "safety": {
+    "callsNetwork": "boolean",
+    "writesFiles": "boolean",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "ship" is locked 1`] = `
+{
+  "changedFiles": [
+    {
+      "path": "string",
+      "status": "string",
+    },
+  ],
+  "diffStat": "string",
+  "evidenceMap": {
+    "claims": [
+      "string",
+    ],
+    "coverage": {
+      "coveredFileCount": "number",
+      "forbiddenFileCount": "number",
+      "unexplainedExamples": [],
+      "unexplainedFileCount": "number",
+    },
+    "files": [
+      {
+        "agentLoopEvidence": "boolean",
+        "area": "string",
+        "coveredByRun": "boolean",
+        "coveredByTask": "boolean",
+        "explanation": "string",
+        "forbiddenByTask": "boolean",
+        "path": "string",
+        "riskSensitive": "boolean",
+        "runCoverage": {
+          "command": "string",
+          "id": "string",
+          "taskTitle": "string",
+        },
+        "status": "string",
+        "unexplained": "boolean",
+      },
+    ],
+    "nextActions": [
+      {
+        "command": "string",
+        "reason": "string",
+      },
+    ],
+    "risk": {
+      "riskSensitiveExamples": [
+        "string",
+      ],
+      "riskSensitiveFileCount": "number",
+    },
+    "summary": {
+      "agentLoopEvidenceChangedFileCount": "number",
+      "changedFileCount": "number",
+      "nonEvidenceChangedFileCount": "number",
+      "reviewability": "string",
+    },
+    "task": {
+      "path": "string",
+      "status": "string",
+      "title": "string",
+    },
+    "verification": {
+      "fresh": "boolean",
+      "label": "string",
+      "path": "string",
+      "status": "string",
+    },
+  },
+  "gates": {
+    "gates": [
+      {
+        "id": "string",
+        "message": "string",
+        "name": "string",
+        "path": "string",
+        "status": "string",
+      },
+    ],
+    "git": {
+      "agentLoopEvidenceChangedFileCount": "number",
+      "branch": "string",
+      "changedFileCount": "number",
+      "commit": "string",
+      "isRepository": "boolean",
+      "nonEvidenceChangedFileCount": "number",
+      "root": "string",
+      "targetIsRoot": "boolean",
+    },
+    "markdown": "string",
+    "nextAction": {
+      "command": "string",
+      "reason": "string",
+    },
+    "overallStatus": "string",
+    "strict": "boolean",
+  },
+  "handoffPath": "string",
+  "markdown": "string",
+  "readiness": {
+    "blockers": [
+      "string",
+    ],
+    "claims": [
+      "string",
+    ],
+    "dimensions": [
+      {
+        "id": "string",
+        "label": "string",
+        "reason": "string",
+        "score": "number",
+        "weight": "number",
+      },
+    ],
+    "recommendedNextActions": [
+      "string",
+    ],
+    "strengths": [
+      "string",
+    ],
+    "totalScore": "number",
+    "warnings": [
+      "string",
+    ],
+  },
+  "run": {
+    "id": "string",
+    "metadata": {
+      "changedFileCount": "number",
+      "command": "string",
+      "createdAt": "string",
+      "createdAtEpochMs": "number",
+      "handoffPath": "string",
+      "id": "string",
+      "score": "number",
+      "shipReportPath": "string",
+      "task": {
+        "path": "string",
+        "status": "string",
+        "title": "string",
+      },
+      "verificationReportPath": "string",
+    },
+    "path": "string",
+  },
+  "shipReportPath": "string",
+  "task": {
+    "path": "string",
+    "status": "string",
+    "title": "string",
+  },
+  "timestamp": "string",
+  "verification": {
+    "fresh": "boolean",
+    "path": "string",
+    "status": "string",
+  },
+  "verificationReportPath": "string",
+}
+`;
+
 exports[`JSON output shape contract > --json shape for "start" is locked 1`] = `
 {
   "doNotBroadScan": {
@@ -583,5 +1823,163 @@ exports[`JSON output shape contract > --json shape for "status" is locked 1`] = 
     "dirty": "boolean",
     "nonEvidenceChangedFileCount": "number",
   },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "summarize" is locked 1`] = `
+{
+  "changedFiles": [
+    {
+      "path": "string",
+      "status": "string",
+    },
+  ],
+  "diffStat": "string",
+  "markdown": "string",
+  "outPath": "string",
+  "reportPath": "string",
+  "taskPath": "string",
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "task current" is locked 1`] = `
+{
+  "activeTask": {
+    "path": "string",
+    "status": "string",
+    "title": "string",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "task doctor" is locked 1`] = `
+{
+  "taskDoctor": {
+    "counts": {
+      "checked": "number",
+      "diagnostics": "number",
+      "missingStatuses": "number",
+      "terminalTasks": "number",
+      "unsupportedStatuses": "number",
+    },
+    "diagnostics": [
+      {
+        "id": "string",
+        "message": "string",
+        "path": "string",
+        "recommendation": "string",
+        "sections": [
+          "string",
+        ],
+        "severity": "string",
+        "status": "string",
+        "title": "string",
+      },
+    ],
+    "overallStatus": "string",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "task list" is locked 1`] = `
+{
+  "agentFlightPlaceholders": [],
+  "taskContracts": [
+    {
+      "active": "boolean",
+      "modifiedAt": "string",
+      "path": "string",
+      "status": "string",
+      "title": "string",
+    },
+  ],
+  "tasks": [
+    {
+      "active": "boolean",
+      "modifiedAt": "string",
+      "path": "string",
+      "status": "string",
+      "title": "string",
+    },
+  ],
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "upgrade-harness" is locked 1`] = `
+{
+  "dryRun": "boolean",
+  "files": [
+    {
+      "exists": "boolean",
+      "missingTopics": [],
+      "path": "string",
+      "presentTopics": [
+        "string",
+      ],
+      "status": "string",
+    },
+  ],
+  "manifest": {
+    "currentTemplateVersion": "number",
+    "exists": "boolean",
+    "path": "string",
+    "status": "string",
+    "templateVersion": "number",
+  },
+  "nextSteps": [
+    "string",
+  ],
+  "status": "string",
+  "suggestions": [],
+  "targetDirectory": "string",
+  "writesFiles": "boolean",
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "verify --write-run" is locked 1`] = `
+{
+  "commands": [],
+  "markdown": "string",
+  "notRun": [
+    "string",
+  ],
+  "overallStatus": "string",
+  "postVerificationGates": {
+    "commands": [],
+    "foundCount": "number",
+    "requested": "boolean",
+    "results": [],
+  },
+  "reportPath": "string",
+  "run": {
+    "id": "string",
+    "metadata": {
+      "changedFileCount": "number",
+      "command": "string",
+      "createdAt": "string",
+      "createdAtEpochMs": "number",
+      "id": "string",
+      "overallStatus": "string",
+      "task": {
+        "path": "string",
+        "status": "string",
+        "title": "string",
+      },
+      "verificationReportPath": "string",
+    },
+    "path": "string",
+  },
+  "skippedDuplicateCommands": [],
+  "taskCommands": {
+    "commands": [],
+    "foundCount": "number",
+    "requested": "boolean",
+  },
+}
+`;
+
+exports[`JSON output shape contract > --json shape for "version" is locked 1`] = `
+{
+  "version": "string",
 }
 `;

@@ -15,8 +15,12 @@ describe('stable surface', () => {
   });
 
   test('JSON_COMMANDS is a subset of STABLE_COMMANDS', () => {
+    // Entries may be multi-word (e.g. "task list", "npm-status --package-name
+    // ..."); only the leading command token needs to resolve to a stable
+    // command, since `--json` on a command group lives on its subcommands.
     for (const command of JSON_COMMANDS) {
-      expect(STABLE_COMMANDS).toContain(command);
+      const [leadingCommand] = command.split(' ');
+      expect(STABLE_COMMANDS).toContain(leadingCommand);
     }
   });
 });
