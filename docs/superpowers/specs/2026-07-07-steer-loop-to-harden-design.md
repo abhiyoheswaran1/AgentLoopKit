@@ -23,7 +23,11 @@ When the active task contract has blocking soft spots, `agentloop next`, `start`
 
 ## Architecture
 
-Single integration point. `nextActions()` in `src/core/evidence-map.ts` builds the ordered recommendation array that `nextAction(map)` (= `map.nextActions[0]`) exposes to `next`, `start`, `status`, and the MCP `nextAction` field.
+> **Correction (discovered during implementation):** there is not one shared next-action source, there are **two**. `evidence-map.ts` `nextActions()` feeds **`start`** only. `next`, `status`, and the MCP `nextAction` tool derive their recommendation from a *separate* function, `chooseNextAction()` in `src/core/status.ts` (via `getAgentLoopStatus`). Both must be wired. `status.ts` already has a placeholder→`agentloop task doctor` recommendation (a pre-`harden` stopgap); that slot is **upgraded** to a blocking-soft-spots→`agentloop harden` recommendation. This changes existing behavior: a placeholder contract now recommends `agentloop harden` instead of `agentloop task doctor` (the intended upgrade — `harden` is the purpose-built tool and soft spots are a superset of review-critical placeholders).
+
+### Source 1 — `evidence-map.ts` (feeds `start`)
+
+`nextActions()` in `src/core/evidence-map.ts` builds the ordered recommendation array that `nextAction(map)` (= `map.nextActions[0]`) exposes to `start` (agent-start).
 
 Add one new action inside `nextActions()`:
 
@@ -32,6 +36,16 @@ Add one new action inside `nextActions()`:
 - **Action:** `{ command: 'agentloop harden', reason: '<N> blocking soft spot(s) in the task contract — harden it before implementing or verifying.' }` where `<N>` is the blocking count.
 
 To keep `nextActions()` operating on primitives, `buildEvidenceMap` performs the detection: it runs `analyzeContract(taskMarkdown)` (imported from `./harden.js`) on the active task's markdown, counts blocking soft spots via `hasBlockingSoftSpots`/severity filter, and passes a single new `blockingSoftSpotCount: number` field into `nextActions()`. `nextActions()` pushes the harden action when `input.blockingSoftSpotCount > 0`. `buildEvidenceMap` already loads the active task; if its markdown is unavailable/unreadable, the count is `0` and the harden action is omitted — the evidence map never fails because of this (fail-safe).
+
+### Source 2 — `status.ts` `chooseNextAction()` (feeds `next`, `status`, MCP)
+
+`chooseNextAction()` is a sequential if-chain returning a single `{ command, reason }`. It currently takes `activeTaskHasReviewCriticalPlaceholders: boolean` and, when true, returns `{ command: 'agentloop task doctor', ... }` in a slot positioned after the "task done/archive" checks and **before** the verification checks (precedence already correct).
+
+Upgrade this: replace the `activeTaskHasReviewCriticalPlaceholders` input with `activeTaskBlockingSoftSpotCount: number` (computed by the caller via `analyzeContract(activeTask.content)` where the placeholder boolean is currently derived), and change the recommendation in that same slot to:
+
+`{ command: 'agentloop harden', reason: '<N> blocking soft spot(s) in the task contract — harden it before implementing or verifying.' }` when the count is > 0.
+
+The `task doctor` placeholder recommendation is removed (superseded by `harden`). The existing status test that asserts `task doctor` for a placeholder contract is updated to assert `agentloop harden`.
 
 ## Behavior
 

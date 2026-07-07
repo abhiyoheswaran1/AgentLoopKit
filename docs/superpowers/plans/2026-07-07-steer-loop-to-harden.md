@@ -151,52 +151,64 @@ git commit -m "feat: recommend agentloop harden as next action for thin contract
 
 ---
 
-### Task 2: Surface-coverage tests and final verification
+### Task 2: Wire `status.ts` `chooseNextAction` to recommend harden, and cover all surfaces
+
+**Discovered during Task 2's surface tests:** `next`/`status`/MCP do NOT consume the `evidence-map` next-action source wired in Task 1 — only `start` does. They derive `nextAction` from `chooseNextAction()` in `src/core/status.ts`, which currently recommends `agentloop task doctor` for placeholder contracts. This task upgrades that slot to recommend `agentloop harden` on blocking soft spots (user-approved behavior change), which is what makes the `next`/MCP surface tests pass.
 
 **Files:**
-- Test: `tests/next.test.ts`, `tests/agent-start.test.ts` (or `tests/status.test.ts`) — add explicit end-to-end coverage; and `tests/mcp-tools.test.ts` for the MCP `nextAction`
-- No source changes expected
+- Modify: `src/core/status.ts` — `chooseNextAction()` (~line 262, the `activeTaskHasReviewCriticalPlaceholders` slot at ~line 354) and its caller where `activeTaskHasReviewCriticalPlaceholders` is computed (~line 145)
+- Test: `tests/status.test.ts` (migrate the existing placeholder→task-doctor assertion to harden), and the surface tests in `tests/next.test.ts`, `tests/agent-start.test.ts`, `tests/mcp-tools.test.ts` (already written, must pass)
 
 **Interfaces:**
-- Consumes: the behavior from Task 1 (`map.nextActions[0]` is `agentloop harden` for a thin active contract).
+- Consumes: `analyzeContract` from `./harden.js`; the active task's markdown `content`.
+- Produces: `chooseNextAction()` recommends `{ command: 'agentloop harden', reason: '<N> blocking soft spot(s) in the task contract — harden it before implementing or verifying.' }` when the active task has blocking soft spots, in the slot before the verification checks.
 
-- [ ] **Step 1: Write failing surface-coverage tests**
+- [ ] **Step 1: Migrate the existing status test to expect harden**
 
-Prove the recommendation actually propagates to the agent-facing surfaces (not just `buildEvidenceMap`). Add a test in `tests/next.test.ts` following that file's existing CLI-invocation pattern (`execa(tsxPath, [cliPath, 'next', ...])` in a fixture repo with a thin active contract):
+Find the test in `tests/status.test.ts` that asserts `chooseNextAction`/`getAgentLoopStatus` recommends `agentloop task doctor` for a contract with review-critical placeholders. Change its expectation to `agentloop harden` (that is the new correct behavior). Run it to confirm it now FAILS (still returns `task doctor`).
+
+- [ ] **Step 2: Wire `status.ts`**
+
+Import `analyzeContract` from `./harden.js` (explicit `.js`). Where the caller currently computes `activeTaskHasReviewCriticalPlaceholders` (~line 145, from task-doctor diagnostics), instead compute `activeTaskBlockingSoftSpotCount` from the active task's markdown: `analyzeContract(activeTask.content).filter((s) => s.severity === 'blocking').length` (guard for a missing/unreadable content → 0). Thread that number into `chooseNextAction` as `activeTaskBlockingSoftSpotCount: number`, replacing the `activeTaskHasReviewCriticalPlaceholders` param. In the slot at ~line 354, replace the `task doctor` return with:
 
 ```ts
-test('next recommends harden for a thin active contract', async () => {
-  // Arrange: fixture repo + active contract with "## Files or Areas Not to Touch\n- None recorded yet."
-  const result = await execa(tsxPath, [cliPath, 'next'], { cwd: dir, reject: false });
-  expect(result.stdout).toContain('agentloop harden');
-});
+  if (input.activeTaskBlockingSoftSpotCount > 0) {
+    return {
+      command: 'agentloop harden',
+      reason: `${input.activeTaskBlockingSoftSpotCount} blocking soft spot(s) in the task contract — harden it before implementing or verifying.`,
+    };
+  }
 ```
 
-Add an equivalent assertion for `start` (in `tests/agent-start.test.ts`) and for the MCP `nextAction` field (in `tests/mcp-tools.test.ts`, following that file's pattern for reading the `agentloop_next`/status tool output — assert the `nextAction.command` is `agentloop harden` for the thin-contract fixture).
+Keep the slot's POSITION (after the done/archive checks, before the `!input.latestReport` verify check) so precedence is preserved.
 
-- [ ] **Step 2: Run the tests to verify they fail or pass**
+- [ ] **Step 3: Run the migrated status test + the surface tests**
 
-Run: `npx vitest run tests/next.test.ts tests/agent-start.test.ts tests/mcp-tools.test.ts -t harden`
-Expected: These should PASS immediately if Task 1 wired the shared source correctly (they consume `map.nextActions[0]`). If any FAILS, that surface does not consume the shared evidence-map next-action source — STOP and report it, because the spec's architecture assumption (single source feeds all surfaces) would be wrong for that surface and needs a design decision, not a silent workaround.
+Run: `npx vitest run tests/status.test.ts tests/next.test.ts tests/agent-start.test.ts tests/mcp-tools.test.ts`
+Expected: PASS — the status test now returns `agentloop harden`, and the `next`/`start`/MCP surface tests all assert `agentloop harden` for a thin contract.
 
-- [ ] **Step 3: Full verification**
+- [ ] **Step 4: Migrate any other fixtures that now recommend harden**
 
-Run, expecting all green:
+Run the full suite SEQUENTIALLY (this machine OOM-kills parallel vitest): `npx vitest run --no-file-parallelism`. For any other test that breaks because a thin fixture contract now recommends `harden`, harden the fixture (preserve intent) or update the expectation to `harden` if the test is specifically about a thin contract. Never weaken an assertion.
+
+- [ ] **Step 5: Full verification**
+
+Run, expecting all green (full suite SEQUENTIAL to avoid OOM):
 
 ```bash
 npm run typecheck
 npm run lint
-npm test
+npx vitest run --no-file-parallelism
 npm run contract:check
 ```
 
-`contract:check` should stay green: the `--json` shape lock reduces arrays to first-element shape and the `nextAction` object shape (`{ command, reason }`) is unchanged, so adding a new possible command/reason value does not drift the shape.
+`contract:check` stays green: the `nextAction` object shape (`{ command, reason }`) is unchanged; only a possible command/reason value changes, which the shape lock does not capture.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add tests/next.test.ts tests/agent-start.test.ts tests/mcp-tools.test.ts
-git commit -m "test: cover harden next-action across next, start, and MCP surfaces"
+git add src/core/status.ts tests/status.test.ts tests/next.test.ts tests/agent-start.test.ts tests/mcp-tools.test.ts
+git commit -m "feat: recommend harden (not task doctor) for thin contracts in next/status/MCP"
 ```
 
 ---
