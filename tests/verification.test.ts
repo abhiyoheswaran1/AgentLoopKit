@@ -68,6 +68,32 @@ describe('verification', () => {
     expect(result.markdown).toContain('ok');
   });
 
+  test('verification report records a verified-state fingerprint', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"ok\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-09-12-30',
+      nowIso: '2026-06-09T12:30:00.000Z',
+    });
+
+    expect(result.markdown).toMatch(/^- Verified-state fingerprint: `[a-f0-9]{64}`$/m);
+  });
+
   test('keeps same-minute verification reports instead of overwriting them', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

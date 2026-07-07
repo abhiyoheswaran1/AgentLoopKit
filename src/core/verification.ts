@@ -5,6 +5,7 @@ import { AgentLoopConfig } from './config.js';
 import { resolveUniqueOutputArtifactPath } from './artifacts.js';
 import { formatTimestamp } from './dates.js';
 import { getGitBranch, getGitCommit, getGitStatus } from './git.js';
+import { computeVerifiedStateFingerprint } from './verified-state.js';
 import { isInsidePath, normalizeExistingAncestor, writeTextFile } from './file-system.js';
 import { fencedCodeBlock, inlineCode } from './markdown-format.js';
 import { redactLocalRoots } from './redaction.js';
@@ -644,6 +645,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
   const branch = await getGitBranch(options.cwd);
   const commit = await getGitCommit(options.cwd);
   const status = await getGitStatus(options.cwd);
+  const verifiedStateFingerprint = await computeVerifiedStateFingerprint({ cwd: options.cwd });
   const taskContext = await renderTaskContext(options.cwd, options.config, options.taskPath);
   const workingTreeStatus = status.trim() ? 'dirty' : 'clean or unavailable';
   const renderMarkdown = (renderOptions: {
@@ -660,6 +662,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
 - Repo: ${inlineCode(path.basename(options.cwd))}
 - Git branch: ${inlineCode(branch || 'not available')}
 - Git commit: ${inlineCode(commit || 'not available')}
+- Verified-state fingerprint: ${inlineCode(verifiedStateFingerprint)}
 - Working tree: ${inlineCode(workingTreeStatus)}
 - Overall status: ${renderOptions.overallStatus}
 
