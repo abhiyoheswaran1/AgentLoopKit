@@ -40,6 +40,9 @@ Test task.
 
 ## Desired Outcome
 Test task is handled.
+
+## Files or Areas Not to Touch
+- tests/fixtures
 `;
 }
 
@@ -79,7 +82,7 @@ describe('next command', () => {
     await writeFile(path.join(dir, 'changed.txt'), 'pending change\n');
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-10-add-settings.md'),
-      '# Add settings\n\n- Status: in-progress\n',
+      '# Add settings\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- tests/fixtures\n',
     );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
@@ -312,7 +315,7 @@ describe('next command', () => {
     );
   });
 
-  test('recommends task doctor when the active task still has placeholder sections', async () => {
+  test('recommends harden when the active task still has placeholder sections', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await execa('git', ['init', '-q'], { cwd: dir });
@@ -377,15 +380,11 @@ Document how to revert or disable this change.
     expect(jsonResult.exitCode).toBe(0);
     expect(markdownResult.exitCode).toBe(0);
     const next = JSON.parse(jsonResult.stdout);
-    expect(next.nextAction.command).toBe('agentloop task doctor');
-    expect(next.nextAction.reason).toBe(
-      'Active task still has placeholder guidance in review-critical sections. Replace it before verification or handoff evidence.',
-    );
+    expect(next.nextAction.command).toBe('agentloop harden');
+    expect(next.nextAction.reason).toMatch(/blocking soft spot/i);
     expect(next.activeTask.path).toBe(taskPath);
-    expect(markdownResult.stdout).toContain('Run `agentloop task doctor`.');
-    expect(markdownResult.stdout).toContain(
-      'Active task still has placeholder guidance in review-critical sections.',
-    );
+    expect(markdownResult.stdout).toContain('Run `agentloop harden`.');
+    expect(markdownResult.stdout).toContain('blocking soft spot');
   });
 
   test('renders next markdown values with safe inline code when task data contains backticks', async () => {
@@ -396,7 +395,7 @@ Document how to revert or disable this change.
     await writeFile(path.join(dir, 'changed.txt'), 'pending change\n');
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-10-active`task.md'),
-      '# Active `task`\n\n- Status: review`ready\n',
+      '# Active `task`\n\n- Status: review`ready\n\n## Files or Areas Not to Touch\n- tests/fixtures\n',
     );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
@@ -443,7 +442,7 @@ Document how to revert or disable this change.
     await writeFile(path.join(dir, 'changed.txt'), 'pending change\n');
     await writeFile(
       path.join(dir, taskPath),
-      'No heading, so next falls back to the filename.\n\n- Status: in-progress\n',
+      'No heading, so next falls back to the filename.\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- tests/fixtures\n',
     );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
@@ -483,7 +482,7 @@ Document how to revert or disable this change.
     await initializeAgentLoop({ cwd: dir });
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-10-fix-login.md'),
-      '# Fix login\n\n- Status: review\n',
+      '# Fix login\n\n- Status: review\n\n## Files or Areas Not to Touch\n- tests/fixtures\n',
     );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
@@ -517,7 +516,10 @@ Document how to revert or disable this change.
     tempDirs.push(dir);
     await initializeAgentLoop({ cwd: dir });
     const taskPath = '.agentloop/tasks/2026-06-10-review-login.md';
-    await writeFile(path.join(dir, taskPath), '# Review login\n\n- Status: review\n');
+    await writeFile(
+      path.join(dir, taskPath),
+      '# Review login\n\n- Status: review\n\n## Files or Areas Not to Touch\n- tests/fixtures\n',
+    );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
       JSON.stringify({
@@ -553,7 +555,10 @@ Document how to revert or disable this change.
     const reportPath = path.join(dir, '.agentloop/reports/2026-06-10-08-00-verification-report.md');
     await mkdir(path.dirname(reportPath), { recursive: true });
     await writeFile(reportPath, '# Verification Report\n\nOverall status: pass\n');
-    await writeFile(taskPath, '# Current task\n\n- Status: in-progress\n');
+    await writeFile(
+      taskPath,
+      '# Current task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- tests/fixtures\n',
+    );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
       JSON.stringify({
@@ -928,7 +933,10 @@ Document how to revert or disable this change.
     await execa('git', ['init', '-q'], { cwd: dir });
     await initializeAgentLoop({ cwd: dir });
     await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
-    await writeFile(path.join(dir, taskPath), '# Active handoff\n\n- Status: in-progress\n');
+    await writeFile(
+      path.join(dir, taskPath),
+      '# Active handoff\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- tests/fixtures\n',
+    );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
       JSON.stringify({ version: 1, activeTaskPath: taskPath }),
@@ -1001,6 +1009,64 @@ Document how to revert or disable this change.
     expect(next.workingTree.dirty).toBe(true);
     expect(next.nextAction.command).toBe('agentloop task done');
     expect(next.nextAction.reason).toContain('handoff evidence cover the current dirty files');
+  });
+
+  test('recommends harden for a thin active contract', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    const taskPath = '.agentloop/tasks/2026-06-11-fix-login.md';
+    await writeFile(
+      path.join(dir, taskPath),
+      `# Fix login redirect bug
+
+- Created date: 2026-06-11
+- Task type: bugfix
+- Status: in-progress
+
+## Problem Statement
+Login redirects users to the wrong page after password reset.
+
+## Desired Outcome
+Users land on the intended destination after a successful login.
+
+## Likely Files or Areas
+- src/auth
+- tests/auth/callback.test.ts
+
+## Files or Areas Not to Touch
+- None recorded yet.
+
+## Acceptance Criteria
+- \`npm test -- auth\` passes.
+
+## Verification Commands
+- npm test -- auth
+
+## Risk Notes
+- Auth flow touched; review redirect edge cases.
+
+## Rollback Notes
+Revert the auth callback change.
+`,
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/state.json'),
+      JSON.stringify({ version: 1, activeTaskPath: taskPath }),
+    );
+
+    const [jsonResult, humanResult] = await Promise.all([
+      execa(tsxPath, [cliPath, 'next', '--json'], { cwd: dir, reject: false }),
+      execa(tsxPath, [cliPath, 'next'], { cwd: dir, reject: false }),
+    ]);
+
+    expect(jsonResult.exitCode).toBe(0);
+    expect(humanResult.exitCode).toBe(0);
+    const next = JSON.parse(jsonResult.stdout);
+    expect(next.nextAction.command).toBe('agentloop harden');
+    expect(next.nextAction.reason).toMatch(/blocking soft spot/i);
+    expect(humanResult.stdout).toContain('agentloop harden');
   });
 
   test('recommends archiving a pinned done task', async () => {

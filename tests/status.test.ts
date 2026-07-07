@@ -40,6 +40,9 @@ Test task.
 
 ## Desired Outcome
 Test task is handled.
+
+## Files or Areas Not to Touch
+- tests/fixtures
 `;
 }
 
@@ -145,7 +148,7 @@ describe('status command', () => {
     await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-09-current-task.md'),
-      '# Current task\n\n- Status: in-progress\n',
+      '# Current task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- tests/fixtures\n',
     );
     await writeJson(path.join(dir, '.agentloop/state.json'), {
       version: 1,
@@ -282,7 +285,7 @@ describe('status command', () => {
     expect(humanResult.stdout).toContain('- Git target: `root directory`');
   });
 
-  test('routes active task placeholder contracts to task doctor before handoff', async () => {
+  test('routes active task placeholder contracts to harden before handoff', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await execa('git', ['init', '-q'], { cwd: dir });
@@ -344,15 +347,10 @@ Document how to revert or disable this change.
     expect(jsonResult.exitCode).toBe(0);
     expect(humanResult.exitCode).toBe(0);
     const status = JSON.parse(jsonResult.stdout);
-    expect(status.nextAction).toEqual({
-      command: 'agentloop task doctor',
-      reason:
-        'Active task still has placeholder guidance in review-critical sections. Replace it before verification or handoff evidence.',
-    });
-    expect(humanResult.stdout).toContain('Run `agentloop task doctor`.');
-    expect(humanResult.stdout).toContain(
-      'Active task still has placeholder guidance in review-critical sections.',
-    );
+    expect(status.nextAction.command).toBe('agentloop harden');
+    expect(status.nextAction.reason).toMatch(/blocking soft spot/i);
+    expect(humanResult.stdout).toContain('Run `agentloop harden`.');
+    expect(humanResult.stdout).toContain('blocking soft spot');
   });
 
   test('discovers parent AgentLoop config when run from a nested directory', async () => {
@@ -766,7 +764,7 @@ Document how to revert or disable this change.
     await writeFile(path.join(dir, 'changed.txt'), 'pending change\n');
     await writeFile(
       path.join(dir, taskPath),
-      'No heading, so status falls back to the filename.\n\n- Status: in-progress\n',
+      'No heading, so status falls back to the filename.\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- tests/fixtures\n',
     );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
@@ -806,7 +804,10 @@ Document how to revert or disable this change.
     await execa('git', ['init', '-q'], { cwd: dir });
     await initializeAgentLoop({ cwd: dir });
     const taskPath = path.join(dir, '.agentloop/tasks/2026-06-09-ship-brief-status.md');
-    await writeFile(taskPath, '# Ship brief status\n\n- Status: in progress\n');
+    await writeFile(
+      taskPath,
+      '# Ship brief status\n\n- Status: in progress\n\n## Files or Areas Not to Touch\n- tests/fixtures\n',
+    );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
       JSON.stringify({
@@ -952,7 +953,10 @@ Document how to revert or disable this change.
     tempDirs.push(dir);
     await initializeAgentLoop({ cwd: dir });
     const taskPath = '.agentloop/tasks/2026-06-09-review-login.md';
-    await writeFile(path.join(dir, taskPath), '# Review login\n\n- Status: review\n');
+    await writeFile(
+      path.join(dir, taskPath),
+      '# Review login\n\n- Status: review\n\n## Files or Areas Not to Touch\n- tests/fixtures\n',
+    );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
       JSON.stringify({
@@ -1615,7 +1619,10 @@ Document how to revert or disable this change.
     await execa('git', ['init', '-q'], { cwd: dir });
     await initializeAgentLoop({ cwd: dir });
     await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
-    await writeFile(path.join(dir, taskPath), '# Active handoff\n\n- Status: in-progress\n');
+    await writeFile(
+      path.join(dir, taskPath),
+      '# Active handoff\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- tests/fixtures\n',
+    );
     await writeFile(
       path.join(dir, '.agentloop/state.json'),
       JSON.stringify({ version: 1, activeTaskPath: taskPath }),

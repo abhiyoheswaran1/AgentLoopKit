@@ -12,6 +12,7 @@ import {
   GitFileStatus,
 } from './git.js';
 import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
+import { analyzeContract } from './harden.js';
 import { latestMarkdownFile } from './artifacts.js';
 import { prSummaryPattern, verificationReportPattern } from './artifacts.js';
 import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
@@ -135,15 +136,17 @@ function pickStaleTaskStateDiagnostic(diagnostics: TaskDoctorDiagnostic[]) {
   };
 }
 
-function hasActiveTaskPlaceholderDiagnostic(
-  diagnostics: TaskDoctorDiagnostic[],
+async function countActiveTaskBlockingSoftSpots(
+  cwd: string,
   activeTask: StatusTask | null,
-) {
-  if (!activeTask) return false;
-  return diagnostics.some(
-    (diagnostic) =>
-      diagnostic.id === 'placeholder-task-section' && diagnostic.path === activeTask.path,
-  );
+): Promise<number> {
+  if (!activeTask) return 0;
+  try {
+    const markdown = await readFile(path.resolve(cwd, activeTask.path), 'utf8');
+    return analyzeContract(markdown).filter((spot) => spot.severity === 'blocking').length;
+  } catch {
+    return 0;
+  }
 }
 
 function extractHeading(markdown: string, fallback: string) {
@@ -271,7 +274,7 @@ function chooseNextAction(input: {
   nonEvidenceChangedFileCount: number;
   dirtyNonEvidenceFileExamples: string[];
   dirtyCoveredByLatestHandoffRun: boolean;
-  activeTaskHasReviewCriticalPlaceholders: boolean;
+  activeTaskBlockingSoftSpotCount: number;
 }) {
   const withDirtyCreateTaskGuidance = (reason: string) => {
     if (input.nonEvidenceChangedFileCount === 0) return reason;
@@ -351,11 +354,10 @@ function chooseNextAction(input: {
         'The active task is done. Archive it to clear the active pointer before starting the next task.',
     };
   }
-  if (input.activeTaskHasReviewCriticalPlaceholders) {
+  if (input.activeTaskBlockingSoftSpotCount > 0) {
     return {
-      command: 'agentloop task doctor',
-      reason:
-        'Active task still has placeholder guidance in review-critical sections. Replace it before verification or handoff evidence.',
+      command: 'agentloop harden',
+      reason: `${input.activeTaskBlockingSoftSpotCount} blocking soft spot(s) in the task contract — harden it before implementing or verifying.`,
     };
   }
   if (!input.latestReport) {
@@ -699,6 +701,10 @@ export async function getAgentLoopStatus(options: {
   );
   const configured = DEFAULT_COMMAND_KEYS.filter((key) => options.config.commands[key]);
   const missing = DEFAULT_COMMAND_KEYS.filter((key) => !options.config.commands[key]);
+  const activeTaskBlockingSoftSpotCount = await countActiveTaskBlockingSoftSpots(
+    options.cwd,
+    activeTask,
+  );
   const nextAction = chooseNextAction({
     activeTask,
     staleTaskState,
@@ -711,10 +717,7 @@ export async function getAgentLoopStatus(options: {
     nonEvidenceChangedFileCount,
     dirtyNonEvidenceFileExamples,
     dirtyCoveredByLatestHandoffRun: latestHandoffRunCoversDirtyFiles,
-    activeTaskHasReviewCriticalPlaceholders: hasActiveTaskPlaceholderDiagnostic(
-      taskDoctorDiagnostics,
-      activeTask,
-    ),
+    activeTaskBlockingSoftSpotCount,
   });
   const withoutMarkdown = {
     project: options.config.project,

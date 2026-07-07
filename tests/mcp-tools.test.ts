@@ -282,6 +282,7 @@ async function createInitializedRepo() {
       problemStatement: 'The API route is missing.',
       desiredOutcome: 'The API route returns JSON for callers.',
       likelyFiles: ['src/routes/api.ts'],
+      forbiddenFiles: ['tests/fixtures'],
       acceptanceCriteria: ['Route returns JSON'],
       verificationCommands: ['npm test'],
       rollbackNotes: 'Revert the route implementation.',
@@ -374,6 +375,41 @@ describe('mcp tools', () => {
       'agentloop_list_handoffs',
       'agentloop_latest_handoff',
     ]);
+  });
+
+  test('recommends harden as the next action for a thin active contract', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify({ name: 'demo', scripts: { test: 'vitest' } }, null, 2),
+    );
+    await initializeAgentLoop({ cwd: dir });
+    const config = await loadAgentLoopConfig(dir);
+    const task = await createTaskContractFile({
+      cwd: dir,
+      config,
+      input: {
+        title: 'Add API route',
+        type: 'feature',
+        problemStatement: 'The API route is missing.',
+        desiredOutcome: 'The API route returns JSON for callers.',
+        likelyFiles: ['src/routes/api.ts'],
+        acceptanceCriteria: ['Route returns JSON'],
+        verificationCommands: ['npm test'],
+        rollbackNotes: 'Revert the route implementation.',
+      },
+    });
+    await setActiveTask({ cwd: dir, config, taskPath: task.path });
+
+    const status = await callMcpTool({ cwd: dir, name: 'agentloop_status' });
+    const next = await callMcpTool({ cwd: dir, name: 'agentloop_next' });
+
+    const statusPayload = status.payload as StatusPayload;
+    const nextPayload = next.payload as NextPayload;
+    expect(statusPayload.nextAction.command).toBe('agentloop harden');
+    expect(nextPayload.nextAction.command).toBe('agentloop harden');
   });
 
   test('returns status, task, policy, report, and handoff data without running commands', async () => {

@@ -366,6 +366,51 @@ Revert the copy change.
     expect(payload.nextAction.command).toContain('agentloop');
   });
 
+  test('recommends harden for a thin active contract', async () => {
+    const dir = await createStartFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-23-fix-auth-copy.md'),
+      `# Fix auth copy
+
+- Created date: 2026-06-23
+- Task type: bugfix
+- Status: in-progress
+
+## Problem Statement
+Auth copy is unclear.
+
+## Desired Outcome
+Users understand the auth redirect.
+
+## Likely Files or Areas
+- src/auth
+
+## Files or Areas Not to Touch
+- None recorded yet.
+
+## Acceptance Criteria
+- \`npm test -- auth\` passes.
+
+## Verification Commands
+- npm test -- auth
+
+## Rollback Notes
+Revert the copy change.
+`,
+    );
+
+    const [jsonResult, humanResult] = await Promise.all([
+      execa(tsxPath, [cliPath, 'start', '--for', 'codex', '--goal', 'implement', '--json'], {
+        cwd: dir,
+      }),
+      execa(tsxPath, [cliPath, 'start', '--for', 'codex', '--goal', 'implement'], { cwd: dir }),
+    ]);
+    const payload = JSON.parse(jsonResult.stdout);
+
+    expect(payload.nextAction.command).toBe('agentloop harden');
+    expect(humanResult.stdout).toContain('agentloop harden');
+  });
+
   test('does not treat archived latest-run task evidence as active work', async () => {
     const dir = await createArchivedStartFixture();
 
