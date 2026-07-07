@@ -55,7 +55,7 @@ Users understand the auth redirect.
 - docs/private.md
 
 ## Acceptance Criteria
-- Auth copy is clearer.
+- \`npm test -- auth\` passes.
 
 ## Verification Commands
 - npm test -- auth

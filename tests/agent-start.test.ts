@@ -63,7 +63,7 @@ Users understand the auth redirect.
 - src/billing
 
 ## Acceptance Criteria
-- Auth copy is clearer.
+- \`npm test -- auth\` passes.
 
 ## Verification Commands
 - npm test -- auth
@@ -246,7 +246,7 @@ Users understand the auth redirect.
 - src/billing
 
 ## Acceptance Criteria
-- Auth copy is clearer.
+- \`npm test -- auth\` passes.
 
 ## Verification Commands
 - npm test -- auth

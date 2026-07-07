@@ -60,7 +60,7 @@ Users land on the intended destination after a successful login.
 - docs/private.md
 
 ## Acceptance Criteria
-- Password-reset login redirects to the requested page.
+- \`npm test -- auth\` passes.
 
 ## Verification Commands
 - npm test -- auth
@@ -318,5 +318,56 @@ Remove the trial task.
 
     const changedFileContents = await readFile(path.join(dir, 'docs/private.md'), 'utf8');
     expect(changedFileContents).toBe('private new docs\n');
+  });
+
+  test('recommends harden first when the active contract has blocking soft spots', async () => {
+    const { dir, config, taskPath } = await createEvidenceMapFixture({ report: false });
+    await writeFile(
+      taskPath,
+      `# Fix login redirect bug
+
+- Created date: 2026-06-11
+- Task type: bugfix
+- Status: in-progress
+
+## Problem Statement
+Login redirects users to the wrong page after password reset.
+
+## Desired Outcome
+Users land on the intended destination after a successful login.
+
+## Likely Files or Areas
+- src/auth
+- tests/auth/callback.test.ts
+
+## Files or Areas Not to Touch
+- None recorded yet.
+
+## Acceptance Criteria
+- \`npm test -- auth\` passes.
+
+## Verification Commands
+- npm test -- auth
+
+## Risk Notes
+- Auth flow touched; review redirect edge cases.
+
+## Rollback Notes
+Revert the auth callback change.
+`,
+    );
+
+    const map = await buildEvidenceMap({ cwd: dir, config });
+
+    expect(map.nextActions[0].command).toBe('agentloop harden');
+    expect(map.nextActions[0].reason).toMatch(/blocking soft spot/i);
+  });
+
+  test('does not recommend harden when the active contract has no blocking soft spots', async () => {
+    const { dir, config } = await createEvidenceMapFixture();
+
+    const map = await buildEvidenceMap({ cwd: dir, config });
+
+    expect(map.nextActions.some((a) => a.command === 'agentloop harden')).toBe(false);
   });
 });

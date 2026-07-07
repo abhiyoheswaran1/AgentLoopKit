@@ -8,6 +8,7 @@ import {
   resolveCurrentWorkTaskVerificationEvidence,
 } from './evidence.js';
 import { getGitStatus, parseGitStatus, type GitFileStatus } from './git.js';
+import { analyzeContract } from './harden.js';
 import {
   escapeMarkdownProse,
   singleLineInlineCode as inlineCode,
@@ -335,12 +336,19 @@ function nextActions(input: {
   verification: EvidenceMapVerification;
   unexplainedCount: number;
   forbiddenCount: number;
+  blockingSoftSpotCount: number;
 }) {
   const actions: EvidenceMapNextAction[] = [];
   if (!input.task) {
     actions.push({
       command: 'agentloop create-task',
       reason: 'No current task contract was found for the changed files.',
+    });
+  }
+  if (input.task && input.blockingSoftSpotCount > 0) {
+    actions.push({
+      command: 'agentloop harden',
+      reason: `${input.blockingSoftSpotCount} blocking soft spot(s) in the task contract — harden it before implementing or verifying.`,
     });
   }
   if (input.verification.status === 'missing') {
@@ -492,6 +500,9 @@ export async function buildEvidenceMap(options: {
       verification,
       unexplainedCount: unexplainedFiles.length,
       forbiddenCount: forbiddenFiles.length,
+      blockingSoftSpotCount: task
+        ? analyzeContract(task.content).filter((spot) => spot.severity === 'blocking').length
+        : 0,
     }),
     claims: CLAIMS,
   };
