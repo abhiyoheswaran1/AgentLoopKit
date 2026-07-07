@@ -5,6 +5,7 @@ import { latestMarkdownFile, verificationReportPattern } from './artifacts.js';
 import { getActiveTaskPath, getFallbackTaskPath, readTaskMetadata } from './task-state.js';
 import { pathExists, resolvesInsidePath } from './file-system.js';
 import { listRuns } from './runs.js';
+import { computeVerifiedStateFingerprint } from './verified-state.js';
 
 export type CurrentVerificationEvidence = {
   currentReportPath?: string;
@@ -24,6 +25,8 @@ const STALE_VERIFICATION_MESSAGE =
   'Latest verification report predates the current task. Rerun verification.';
 const PREVIOUS_VERIFICATION_MESSAGE =
   'Latest verification report has no current task. Treat it as previous evidence until a task is created or pinned.';
+const FINGERPRINT_MISMATCH_MESSAGE =
+  'The working tree changed since verification; the verified-state fingerprint no longer matches. Rerun verification.';
 const CURRENT_WORK_TASK_STATUSES = new Set(['proposed', 'in-progress', 'blocked', 'review']);
 
 function relativePath(cwd: string, filePath: string) {
@@ -32,6 +35,10 @@ function relativePath(cwd: string, filePath: string) {
 
 function extractTaskStatus(markdown: string) {
   return markdown.match(/^- Status:\s*(.+)$/im)?.[1]?.trim() || 'unknown';
+}
+
+function extractVerifiedStateFingerprint(markdown: string): string | undefined {
+  return markdown.match(/^- Verified-state fingerprint: `([a-f0-9]{64})`$/m)?.[1];
 }
 
 function isPostVerificationTaskStatus(status: string) {
@@ -137,11 +144,27 @@ export async function resolveCurrentVerificationEvidence(options: {
     };
   }
 
-  const [taskStat, reportStat, taskMarkdown] = await Promise.all([
+  const [taskStat, reportStat, taskMarkdown, reportMarkdown] = await Promise.all([
     stat(options.taskPath),
     stat(options.reportPath),
     readFile(options.taskPath, 'utf8'),
+    readFile(options.reportPath, 'utf8'),
   ]);
+
+  const recordedFingerprint = extractVerifiedStateFingerprint(reportMarkdown);
+  if (recordedFingerprint) {
+    const currentFingerprint = await computeVerifiedStateFingerprint({ cwd: options.cwd });
+    if (currentFingerprint !== recordedFingerprint) {
+      return {
+        latestReportPath: options.reportPath,
+        staleReport: {
+          path: options.reportPath,
+          relativePath: relativePath(options.cwd, options.reportPath),
+          message: FINGERPRINT_MISMATCH_MESSAGE,
+        },
+      };
+    }
+  }
 
   if (
     reportStat.mtimeMs < taskStat.mtimeMs &&

@@ -3,6 +3,8 @@ import { mkdir, realpath, rm, symlink, utimes, writeFile } from 'node:fs/promise
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
+import { loadAgentLoopConfig } from '../src/core/config.js';
+import { runVerification } from '../src/core/verification.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -1123,6 +1125,63 @@ describe('check-gates command', () => {
     },
     CLI_CHECK_GATES_TEST_TIMEOUT_MS,
   );
+
+  test('flips the verification-report gate from fresh to stale when the tree changes after a real verify (content-addressed freshness)', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
+    const taskPath = path.join(dir, '.agentloop/tasks/2026-06-20-fingerprint-demo.md');
+    await writeFile(taskPath, '# Fingerprint demo\n\n- Status: in-progress\n');
+    await commitAll(dir, 'baseline');
+
+    const baseConfig = await loadAgentLoopConfig(dir);
+    const config = {
+      ...baseConfig,
+      commands: { ...baseConfig.commands, test: 'node -e "console.log(\'ok\')"' },
+    };
+    await writeJson(path.join(dir, 'agentloop.config.json'), config);
+    await commitAll(dir, 'configure passing test command');
+
+    const verifyResult = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-20-12-00',
+      nowIso: '2026-06-20T12:00:00.000Z',
+    });
+    expect(verifyResult.markdown).toMatch(/^- Verified-state fingerprint: `[a-f0-9]{64}`$/m);
+    // Commit the report itself so the tree is clean again and matches the
+    // fingerprint recorded inside the report (computed before the report
+    // file existed on disk).
+    await commitAll(dir, 'verification report');
+
+    const freshResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const freshOutput = JSON.parse(freshResult.stdout);
+    expect(freshOutput.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'verification-report', status: 'pass' }),
+      ]),
+    );
+
+    // Mutate a tracked file after verification without rerunning verify.
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 2;\n');
+
+    const staleResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const staleOutput = JSON.parse(staleResult.stdout);
+    expect(staleOutput.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'verification-report',
+          status: 'fail',
+          message: expect.stringMatching(/fingerprint/i),
+        }),
+      ]),
+    );
+  });
 
   test('warns on unresolved contract soft spots without failing by default, and fails under --strict', async () => {
     const dir = await createInitializedRepo();
