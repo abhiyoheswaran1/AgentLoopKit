@@ -268,6 +268,8 @@ export async function createShipReport(options: {
         cwd: options.cwd,
         taskPath: evidence.taskPath,
         reportPath: verification.reportPath,
+        reportsDir: options.config.paths.reportsDir,
+        handoffsDir: options.config.paths.handoffsDir,
       })),
     };
   } else if (!verificationReportPath && evidence.latestReportPath) {

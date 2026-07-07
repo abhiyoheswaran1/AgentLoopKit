@@ -645,7 +645,11 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
   const branch = await getGitBranch(options.cwd);
   const commit = await getGitCommit(options.cwd);
   const status = await getGitStatus(options.cwd);
-  const verifiedStateFingerprint = await computeVerifiedStateFingerprint({ cwd: options.cwd });
+  const verifiedStateFingerprint = await computeVerifiedStateFingerprint({
+    cwd: options.cwd,
+    reportsDir: options.config.paths.reportsDir,
+    handoffsDir: options.config.paths.handoffsDir,
+  });
   const taskContext = await renderTaskContext(options.cwd, options.config, options.taskPath);
   const workingTreeStatus = status.trim() ? 'dirty' : 'clean or unavailable';
   const renderMarkdown = (renderOptions: {

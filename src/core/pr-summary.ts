@@ -185,6 +185,8 @@ export async function summarizeRepository(options: {
           cwd: options.cwd,
           config: options.config,
         }),
+        reportsDir: options.config.paths.reportsDir,
+        handoffsDir: options.config.paths.handoffsDir,
       })
     ).currentReportPath;
   const taskMarkdown =

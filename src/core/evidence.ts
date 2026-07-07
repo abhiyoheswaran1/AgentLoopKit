@@ -125,6 +125,8 @@ export async function resolveCurrentVerificationEvidence(options: {
   taskPath?: string;
   reportPath?: string;
   previousWhenNoTask?: boolean;
+  reportsDir?: string;
+  handoffsDir?: string;
 }): Promise<CurrentVerificationEvidence> {
   if (!options.reportPath) return {};
   if (!options.taskPath) {
@@ -153,7 +155,11 @@ export async function resolveCurrentVerificationEvidence(options: {
 
   const recordedFingerprint = extractVerifiedStateFingerprint(reportMarkdown);
   if (recordedFingerprint) {
-    const currentFingerprint = await computeVerifiedStateFingerprint({ cwd: options.cwd });
+    const currentFingerprint = await computeVerifiedStateFingerprint({
+      cwd: options.cwd,
+      reportsDir: options.reportsDir,
+      handoffsDir: options.handoffsDir,
+    });
     if (currentFingerprint !== recordedFingerprint) {
       return {
         latestReportPath: options.reportPath,
@@ -198,6 +204,8 @@ export async function resolveCurrentTaskVerificationEvidence(options: {
       cwd: options.cwd,
       taskPath,
       reportPath,
+      reportsDir: options.config.paths.reportsDir,
+      handoffsDir: options.config.paths.handoffsDir,
     })),
   };
 }
@@ -215,6 +223,8 @@ export async function resolveCurrentWorkTaskVerificationEvidence(options: {
       taskPath,
       reportPath,
       previousWhenNoTask: true,
+      reportsDir: options.config.paths.reportsDir,
+      handoffsDir: options.config.paths.handoffsDir,
     })),
   };
 }
@@ -231,6 +241,8 @@ export async function resolveCurrentOrLatestRunTaskVerificationEvidence(options:
       cwd: options.cwd,
       taskPath,
       reportPath,
+      reportsDir: options.config.paths.reportsDir,
+      handoffsDir: options.config.paths.handoffsDir,
     })),
   };
 }

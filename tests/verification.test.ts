@@ -5,6 +5,7 @@ import { makeTempDir, removeTempDir } from './helpers.js';
 import { createDefaultConfig } from '../src/core/config.js';
 import { inlineCode } from '../src/core/markdown-format.js';
 import { runVerification } from '../src/core/verification.js';
+import { resolveCurrentTaskVerificationEvidence } from '../src/core/evidence.js';
 import { execa } from 'execa';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -92,6 +93,131 @@ describe('verification', () => {
     });
 
     expect(result.markdown).toMatch(/^- Verified-state fingerprint: `[a-f0-9]{64}`$/m);
+  });
+
+  test('a configured (non-default) reportsDir/handoffsDir does not self-invalidate verification freshness', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await execa('git', ['config', 'user.email', 'agentloopkit@example.com'], { cwd: dir });
+    await execa('git', ['config', 'user.name', 'AgentLoopKit Test'], { cwd: dir });
+
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"ok\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+    // Custom (non-default) evidence dirs — the record and check sites must
+    // both exclude these exact paths, or the report write itself would
+    // instantly stale the verification it just recorded.
+    config.paths.reportsDir = 'custom-reports';
+    config.paths.handoffsDir = 'custom-handoffs';
+
+    await mkdir(path.join(dir, 'src'), { recursive: true });
+    await writeFile(path.join(dir, 'src/app.ts'), 'export const app = 1;\n');
+
+    const taskPath = path.join(dir, config.paths.tasksDir, '2026-06-11-demo.md');
+    await mkdir(path.dirname(taskPath), { recursive: true });
+    await writeFile(
+      taskPath,
+      [
+        '# Demo task',
+        '',
+        '- Created date: 2026-06-11',
+        '- Task type: bugfix',
+        '- Status: in-progress',
+        '',
+        '## Problem Statement',
+        'Demo task for configured-evidence-dir freshness test.',
+        '',
+        '## Desired Outcome',
+        'Freshness is unaffected by writes into the configured reportsDir.',
+        '',
+      ].join('\n'),
+    );
+
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa('git', ['commit', '-q', '-m', 'init'], { cwd: dir });
+
+    const verification = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-09-12-30',
+      nowIso: '2026-06-09T12:30:00.000Z',
+    });
+    expect(verification.reportPath).toContain('custom-reports');
+
+    const evidence = await resolveCurrentTaskVerificationEvidence({ cwd: dir, config });
+    expect(evidence.currentReportPath).toBe(verification.reportPath);
+    expect(evidence.staleReport).toBeUndefined();
+  });
+
+  test('the default reportsDir/handoffsDir configuration still does not self-invalidate freshness', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await execa('git', ['config', 'user.email', 'agentloopkit@example.com'], { cwd: dir });
+    await execa('git', ['config', 'user.name', 'AgentLoopKit Test'], { cwd: dir });
+
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"ok\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    await mkdir(path.join(dir, 'src'), { recursive: true });
+    await writeFile(path.join(dir, 'src/app.ts'), 'export const app = 1;\n');
+
+    const taskPath = path.join(dir, config.paths.tasksDir, '2026-06-11-demo.md');
+    await mkdir(path.dirname(taskPath), { recursive: true });
+    await writeFile(
+      taskPath,
+      [
+        '# Demo task',
+        '',
+        '- Created date: 2026-06-11',
+        '- Task type: bugfix',
+        '- Status: in-progress',
+        '',
+        '## Problem Statement',
+        'Demo task for default-evidence-dir freshness test.',
+        '',
+        '## Desired Outcome',
+        'Freshness is unaffected by writes into the default reportsDir.',
+        '',
+      ].join('\n'),
+    );
+
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa('git', ['commit', '-q', '-m', 'init'], { cwd: dir });
+
+    const verification = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-09-12-30',
+      nowIso: '2026-06-09T12:30:00.000Z',
+    });
+    expect(verification.reportPath).toContain('.agentloop/reports');
+
+    const evidence = await resolveCurrentTaskVerificationEvidence({ cwd: dir, config });
+    expect(evidence.currentReportPath).toBe(verification.reportPath);
+    expect(evidence.staleReport).toBeUndefined();
   });
 
   test('keeps same-minute verification reports instead of overwriting them', async () => {
