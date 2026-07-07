@@ -12,7 +12,7 @@ import {
   GitFileStatus,
 } from './git.js';
 import { isAgentLoopEvidenceFile } from './agentloop-evidence.js';
-import { analyzeContract } from './harden.js';
+import { analyzeContract, hardenNextAction } from './harden.js';
 import { latestMarkdownFile } from './artifacts.js';
 import { prSummaryPattern, verificationReportPattern } from './artifacts.js';
 import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
@@ -355,10 +355,7 @@ function chooseNextAction(input: {
     };
   }
   if (input.activeTaskBlockingSoftSpotCount > 0) {
-    return {
-      command: 'agentloop harden',
-      reason: `${input.activeTaskBlockingSoftSpotCount} blocking soft spot(s) in the task contract — harden it before implementing or verifying.`,
-    };
+    return hardenNextAction(input.activeTaskBlockingSoftSpotCount);
   }
   if (!input.latestReport) {
     return {

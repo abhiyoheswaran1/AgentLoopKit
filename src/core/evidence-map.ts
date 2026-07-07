@@ -8,7 +8,7 @@ import {
   resolveCurrentWorkTaskVerificationEvidence,
 } from './evidence.js';
 import { getGitStatus, parseGitStatus, type GitFileStatus } from './git.js';
-import { analyzeContract } from './harden.js';
+import { analyzeContract, hardenNextAction } from './harden.js';
 import {
   escapeMarkdownProse,
   singleLineInlineCode as inlineCode,
@@ -346,10 +346,7 @@ function nextActions(input: {
     });
   }
   if (input.task && input.blockingSoftSpotCount > 0) {
-    actions.push({
-      command: 'agentloop harden',
-      reason: `${input.blockingSoftSpotCount} blocking soft spot(s) in the task contract — harden it before implementing or verifying.`,
-    });
+    actions.push(hardenNextAction(input.blockingSoftSpotCount));
   }
   if (input.verification.status === 'missing') {
     actions.push({

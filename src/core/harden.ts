@@ -150,6 +150,13 @@ export function hasBlockingSoftSpots(spots: SoftSpot[]): boolean {
   return spots.some((s) => s.severity === 'blocking');
 }
 
+export function hardenNextAction(blockingCount: number): { command: string; reason: string } {
+  return {
+    command: 'agentloop harden',
+    reason: `${blockingCount} blocking soft spot(s) in the task contract — harden it before implementing or verifying.`,
+  };
+}
+
 export function toHardenJson(spots: SoftSpot[]) {
   return {
     blocking: spots.filter((s) => s.severity === 'blocking').length,
