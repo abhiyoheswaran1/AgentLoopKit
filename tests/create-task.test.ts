@@ -328,7 +328,7 @@ describe('create-task command', () => {
     expect(result.stdout).toContain(`Active task set: ${inlineCode(taskPath)}`);
   });
 
-  test('--harden reports unresolved contract soft spots after creating the task', async () => {
+  test('reports contract soft spots by default for a thin contract', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await writeJson(
@@ -347,7 +347,6 @@ describe('create-task command', () => {
         'feature',
         '--out',
         '.agentloop/tasks/harden-hint.md',
-        '--harden',
       ],
       { cwd: dir },
     );
@@ -358,7 +357,7 @@ describe('create-task command', () => {
     expect(result.stdout).toContain('agentloop harden --resolve');
   });
 
-  test('does not print soft-spot output without --harden', async () => {
+  test('does not print the soft-spot report in --json mode', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);
     await writeJson(
@@ -377,11 +376,12 @@ describe('create-task command', () => {
         'feature',
         '--out',
         '.agentloop/tasks/no-harden-hint.md',
+        '--json',
       ],
       { cwd: dir },
     );
 
-    expect(result.stdout).toContain('Task contract created:');
+    expect(() => JSON.parse(result.stdout)).not.toThrow();
     expect(result.stdout).not.toMatch(/soft spot/i);
   });
 

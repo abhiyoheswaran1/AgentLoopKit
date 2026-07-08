@@ -368,7 +368,6 @@ export function createTaskCommand() {
     .option('--rollback <text>', 'rollback notes')
     .option('--json', 'print machine-readable output')
     .option('--redact-paths', 'redact local absolute paths in public output')
-    .option('--harden', 'Report unresolved contract soft spots after creating the task.')
     .addHelpText('after', supportedTaskTypesHelp())
     .action(async (options: Record<string, unknown>) => {
       let type: TaskType | undefined;
@@ -537,12 +536,8 @@ export function createTaskCommand() {
       for (const warning of warnings) {
         printHumanWarning(warning);
       }
-      if (options.harden === true) {
-        const softSpots = analyzeContract(result.markdown);
-        console.log(renderSoftSpotsText(softSpots));
-        console.log(
-          'Run `agentloop harden --resolve <id> --answer "..."` to resolve them.',
-        );
-      }
+      const softSpots = analyzeContract(result.markdown);
+      console.log(renderSoftSpotsText(softSpots));
+      console.log('Run `agentloop harden --resolve <id> --answer "..."` to resolve them.');
     });
 }

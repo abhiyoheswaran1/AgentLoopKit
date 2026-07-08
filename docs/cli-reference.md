@@ -321,7 +321,7 @@ agentloop harden --resolve <id> --answer "..."
 
 `harden` interrogates a task contract for unresolved soft spots before work starts: placeholder text still holding template defaults, unbounded scope (an empty "Files or Areas Not to Touch" section), unstated assumptions on assumption-sensitive task types, untestable acceptance criteria with no checkable predicate, and contradictions between Acceptance Criteria and Non-Goals. It defaults to the active task when no path is given. Human output lists blocking and advisory soft spots by id; `--json` returns `blocking`, `advisory`, and a `softSpots` array. `harden` exits non-zero when a blocking soft spot remains.
 
-Use `--resolve <id> --answer <text>` (repeatable, paired by position) to record an answer for a soft spot in the contract's Hardening Log and re-run analysis against the updated contract. `agentloop create-task --harden` runs the same check immediately after creating a task contract.
+Use `--resolve <id> --answer <text>` (repeatable, paired by position) to record an answer for a soft spot in the contract's Hardening Log and re-run analysis against the updated contract. `agentloop create-task` reports the same soft spots by default immediately after creating a task contract.
 
 ## Guard
 

@@ -137,8 +137,6 @@ Options:
   --rollback <text>              rollback notes
   --json                         print machine-readable output
   --redact-paths                 redact local absolute paths in public output
-  --harden                       Report unresolved contract soft spots after
-                                 creating the task.
   -h, --help                     display help for command
 
 Supported task types:
