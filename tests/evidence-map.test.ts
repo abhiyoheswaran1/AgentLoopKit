@@ -5,6 +5,7 @@ import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
 import {
   buildEvidenceMap,
+  renderChangeIntentMarkdown,
   renderEvidenceMapCompactMarkdown,
   renderEvidenceMapMarkdown,
 } from '../src/core/evidence-map.js';
@@ -185,6 +186,38 @@ describe('evidence map', () => {
     expect(map.claims).toContain(
       'Evidence coverage is path-based local AgentLoopKit evidence, not proof of code correctness.',
     );
+  });
+
+  test('renderChangeIntentMarkdown lists files not tied to intent with explanations', async () => {
+    const { dir, config } = await createEvidenceMapFixture();
+
+    const map = await buildEvidenceMap({ cwd: dir, config });
+    const md = renderChangeIntentMarkdown(map);
+
+    expect(md).toContain('docs/private.md');
+    expect(md).toContain('Changed file matches the task forbidden-file scope.');
+    expect(md).not.toContain('All changed files are tied');
+  });
+
+  test('renderChangeIntentMarkdown shows a positive line when everything is tied', () => {
+    const md = renderChangeIntentMarkdown({
+      files: [
+        {
+          path: 'a.ts',
+          status: 'M',
+          unexplained: false,
+          forbiddenByTask: false,
+          explanation: 'x',
+          agentLoopEvidence: false,
+          coveredByTask: true,
+          coveredByRun: false,
+          riskSensitive: false,
+          area: 'core',
+        } as any,
+      ],
+    });
+
+    expect(md).toContain('All changed files are tied to task scope or recorded evidence.');
   });
 
   test('treats dot-directory task scope as a directory pattern', async () => {

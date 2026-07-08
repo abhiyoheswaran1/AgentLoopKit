@@ -173,6 +173,28 @@ describe('prepare-pr command', () => {
   });
 
   test(
+    'lists changes not tied to intent in the packet Evidence Map section',
+    async () => {
+      const dir = await createPreparePrFixture();
+      await writeFile(
+        path.join(dir, 'unexplained-file.ts'),
+        'export const untouched = true;\n',
+      );
+      await git(dir, ['add', '-N', 'unexplained-file.ts']);
+
+      const output = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'prepare-pr', '--json'], { cwd: dir })).stdout,
+      );
+
+      expect(output.body).toMatch(/## Evidence Map[\s\S]*unexplained-file\.ts/);
+      expect(output.body).toContain(
+        'No local task or recent run evidence explains this changed file path.',
+      );
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
+
+  test(
     'includes criteria coverage reconciled against the verification report',
     async () => {
       const dir = await createPreparePrFixture({

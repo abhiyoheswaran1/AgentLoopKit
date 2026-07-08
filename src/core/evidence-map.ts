@@ -550,6 +550,21 @@ export function renderEvidenceMapCompactMarkdown(
   )}; ${inlineCode(String(map.risk.riskSensitiveFileCount))} risk-sensitive.`;
 }
 
+export function renderChangeIntentMarkdown(map: Pick<EvidenceMap, 'files'>) {
+  const notTied = map.files.filter((file) => file.unexplained || file.forbiddenByTask);
+  if (notTied.length === 0) {
+    return '- All changed files are tied to task scope or recorded evidence.';
+  }
+  return notTied
+    .map(
+      (file) =>
+        `- ${inlineCode(file.path)} (${inlineCode(file.status)}): ${escapeMarkdownProse(
+          file.explanation,
+        )}`,
+    )
+    .join('\n');
+}
+
 function renderChangedFileDetails(files: EvidenceMapFile[]) {
   if (!files.length) return '- None.';
   return files

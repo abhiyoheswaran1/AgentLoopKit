@@ -17,7 +17,12 @@ import { listRuns, readRun, toPublicChangedFiles } from './runs.js';
 import { readTaskContract, TaskContract } from './task-state.js';
 import { renderCompactChangeAreas } from './change-areas.js';
 import { toSafeDisplayPath } from './display-path.js';
-import { buildEvidenceMap, renderEvidenceMapCompactMarkdown, type EvidenceMap } from './evidence-map.js';
+import {
+  buildEvidenceMap,
+  renderChangeIntentMarkdown,
+  renderEvidenceMapCompactMarkdown,
+  type EvidenceMap,
+} from './evidence-map.js';
 import {
   reconcileCriteriaCoverage,
   renderCriteriaCoverageMarkdown,
@@ -223,6 +228,7 @@ ${input.ship.readiness.claims.map((claim) => `- ${escapeSingleLineMarkdownProse(
 ## Evidence Map
 
 ${renderEvidenceMapCompactMarkdown(input.evidenceMap)}
+${renderChangeIntentMarkdown(input.evidenceMap)}
 
 ## Acceptance Criteria
 
