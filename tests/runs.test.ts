@@ -398,6 +398,37 @@ describe('run ledger commands', () => {
     ).resolves.toContain('Second Verification Report');
   });
 
+  test('recorded run changed-files include a content hash for existing files', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await git(dir, ['init', '-q']);
+    await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
+    await git(dir, ['config', 'user.name', 'AgentLoopKit Test']);
+    await writeFile(path.join(dir, 'changed.ts'), 'export const a = 1;\n');
+    await git(dir, ['add', '.']);
+    await git(dir, ['commit', '-q', '-m', 'init']);
+    await writeFile(path.join(dir, 'changed.ts'), 'export const a = 2;\n');
+
+    const { id } = await writeVerificationRun({
+      cwd: dir,
+      timestamp: '2026-06-12-00-00',
+      task: null,
+      verificationReportPath: path.join(dir, '.agentloop/reports/report.md'),
+      overallStatus: 'pass',
+      changedFiles: [{ status: 'M', path: path.join(dir, 'changed.ts') }],
+      markdown: '# Verification Report\n',
+    });
+
+    const recorded = await readRunChangedFiles(dir, id);
+    const entry = recorded.find((f) => f.path.endsWith('changed.ts'));
+    const expectedHash = (
+      await execa('git', ['hash-object', '--', 'changed.ts'], { cwd: dir })
+    ).stdout.trim();
+
+    expect(entry?.hash).toMatch(/^[a-f0-9]{40}$/);
+    expect(entry?.hash).toBe(expectedHash);
+  });
+
   test('orders same-minute runs by precise metadata timestamp', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

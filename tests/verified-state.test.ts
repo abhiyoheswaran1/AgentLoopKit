@@ -3,7 +3,7 @@ import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
-import { computeVerifiedStateFingerprint } from '../src/core/verified-state.js';
+import { computeFileContentHash, computeVerifiedStateFingerprint } from '../src/core/verified-state.js';
 
 const dirs: string[] = [];
 async function gitRepo() {
@@ -47,5 +47,25 @@ describe('computeVerifiedStateFingerprint', () => {
     const a = await computeVerifiedStateFingerprint({ cwd: dir });
     expect(a).toMatch(/^[a-f0-9]{64}$/);
     expect(a).toBe(await computeVerifiedStateFingerprint({ cwd: dir }));
+  });
+});
+
+describe('computeFileContentHash', () => {
+  test('returns a stable git blob hash for a tracked file', async () => {
+    const dir = await gitRepo();
+    const h1 = await computeFileContentHash({ cwd: dir, filePath: 'a.ts' });
+    const h2 = await computeFileContentHash({ cwd: dir, filePath: 'a.ts' });
+    expect(h1).toMatch(/^[a-f0-9]{40}$/);
+    expect(h1).toBe(h2);
+  });
+  test('changes when content changes', async () => {
+    const dir = await gitRepo();
+    const before = await computeFileContentHash({ cwd: dir, filePath: 'a.ts' });
+    await writeFile(path.join(dir, 'a.ts'), 'export const a = 99;\n');
+    expect(await computeFileContentHash({ cwd: dir, filePath: 'a.ts' })).not.toBe(before);
+  });
+  test('returns undefined for a missing file, no throw', async () => {
+    const dir = await gitRepo();
+    expect(await computeFileContentHash({ cwd: dir, filePath: 'nope.ts' })).toBeUndefined();
   });
 });

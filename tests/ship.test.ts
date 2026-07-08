@@ -383,7 +383,15 @@ None recorded yet.
         { status: '??', path: evidencePath },
       ]),
     );
-    expect(runChangedFiles).toEqual(output.changedFiles);
+    expect(
+      runChangedFiles.map((file: { status: string; path: string }) => ({
+        status: file.status,
+        path: file.path,
+      })),
+    ).toEqual(output.changedFiles);
+    for (const file of runChangedFiles as Array<{ hash?: string }>) {
+      expect(file.hash).toMatch(/^[a-f0-9]{40}$/);
+    }
     expect(markdown).toContain('- M `src/auth/callback.ts`');
     expect(markdown).toContain(
       '- AgentLoop evidence: `1` file(s) grouped under `.agentloop/reports/`.',

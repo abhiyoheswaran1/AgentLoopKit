@@ -74,3 +74,21 @@ export async function computeVerifiedStateFingerprint(options: {
   ]);
   return createHash('sha256').update(`diff\0${diff}\0status\0${status}`).digest('hex');
 }
+
+// Content-addressed hash of a single file, used to record what a run actually
+// touched (independent of path-presence). Backed by `git hash-object`, which
+// computes the git blob hash without requiring the file to be tracked or
+// staged. Returns undefined (never throws) for a missing/deleted file or any
+// git failure, so callers can treat an unhashable file as "no hash recorded"
+// rather than crash the run write path.
+export async function computeFileContentHash(options: {
+  cwd: string;
+  filePath: string;
+}): Promise<string | undefined> {
+  const result = await execa('git', ['hash-object', '--', options.filePath], {
+    cwd: options.cwd,
+    reject: false,
+  });
+  const hash = result.stdout.trim();
+  return result.exitCode === 0 && /^[a-f0-9]{40}$/.test(hash) ? hash : undefined;
+}

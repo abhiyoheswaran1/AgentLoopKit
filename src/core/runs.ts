@@ -6,6 +6,7 @@ import { isInsidePath, normalizeExistingAncestor, pathExists, writeTextFile } fr
 import { ReviewReadinessResult } from './readiness-score.js';
 import { toSafeDisplayPath } from './display-path.js';
 import { readTaskMetadata } from './task-state.js';
+import { computeFileContentHash } from './verified-state.js';
 import type { RunCommand, RunMetadata, RunSummary } from './run-types.js';
 import {
   isIgnorableRunListError,
@@ -131,11 +132,34 @@ function sanitizeRunMetadata(cwd: string, metadata: RunMetadata): RunMetadata {
   };
 }
 
+// A changed-file entry as recorded in a run's changed-files.json, widened
+// with an optional content-addressed hash so coverage can later be checked
+// against actual content rather than path-presence alone (Task 2 does the
+// checking; this only records the hash).
+export type RunChangedFile = { status: string; path: string; hash?: string };
+
 function sanitizeChangedFiles(cwd: string, changedFiles: GitFileStatus[]): GitFileStatus[] {
   return changedFiles.map((changedFile) => ({
     ...changedFile,
     path: toSafeDisplayPath(cwd, changedFile.path),
   }));
+}
+
+// Computes each file's content hash against the REAL (pre-sanitized) path —
+// hashing must happen before toSafeDisplayPath rewrites it to a repo-relative
+// display path, otherwise `git hash-object` would resolve the wrong file (or
+// nothing) relative to cwd. The recorded path is still the safe display path.
+async function changedFilesWithHashes(
+  cwd: string,
+  changedFiles: GitFileStatus[],
+): Promise<RunChangedFile[]> {
+  return Promise.all(
+    changedFiles.map(async (file) => {
+      const hash = await computeFileContentHash({ cwd, filePath: file.path });
+      const safe = toSafeDisplayPath(cwd, file.path);
+      return hash ? { status: file.status, path: safe, hash } : { status: file.status, path: safe };
+    }),
+  );
 }
 
 function normalizeDisplayPath(value: string) {
@@ -257,7 +281,7 @@ export async function writeShipRun(options: {
     changedFileCount: options.changedFiles.length,
   };
   const safeMetadata = sanitizeRunMetadata(options.cwd, metadata);
-  const safeChangedFiles = sanitizeChangedFiles(options.cwd, options.changedFiles);
+  const safeChangedFiles = await changedFilesWithHashes(options.cwd, options.changedFiles);
 
   await writeTextFile(
     path.join(directory, 'metadata.json'),
@@ -305,7 +329,7 @@ export async function writeVerificationRun(options: {
     changedFileCount: options.changedFiles.length,
   };
   const safeMetadata = sanitizeRunMetadata(options.cwd, metadata);
-  const safeChangedFiles = sanitizeChangedFiles(options.cwd, options.changedFiles);
+  const safeChangedFiles = await changedFilesWithHashes(options.cwd, options.changedFiles);
 
   await writeTextFile(
     path.join(directory, 'metadata.json'),
@@ -350,7 +374,7 @@ export async function writeHandoffRun(options: {
     changedFileCount: options.changedFiles.length,
   };
   const safeMetadata = sanitizeRunMetadata(options.cwd, metadata);
-  const safeChangedFiles = sanitizeChangedFiles(options.cwd, options.changedFiles);
+  const safeChangedFiles = await changedFilesWithHashes(options.cwd, options.changedFiles);
 
   await writeTextFile(
     path.join(directory, 'metadata.json'),
@@ -503,7 +527,7 @@ export async function listRuns(cwd: string, options: ListRunsOptions = {}): Prom
   return hydratedRuns.map((run) => run.summary);
 }
 
-export async function readRunChangedFiles(cwd: string, id: string): Promise<GitFileStatus[]> {
+export async function readRunChangedFiles(cwd: string, id: string): Promise<RunChangedFile[]> {
   const directory = runDir(cwd, id);
   if (!(await pathExists(directory))) throw new AgentLoopError(`Run not found: ${id}`, 'RUN_NOT_FOUND');
   const changedFilesArtifact = await readRunJsonFileAtPath(
