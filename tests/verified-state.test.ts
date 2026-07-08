@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
@@ -47,6 +47,41 @@ describe('computeVerifiedStateFingerprint', () => {
     const a = await computeVerifiedStateFingerprint({ cwd: dir });
     expect(a).toMatch(/^[a-f0-9]{64}$/);
     expect(a).toBe(await computeVerifiedStateFingerprint({ cwd: dir }));
+  });
+});
+
+describe('computeVerifiedStateFingerprint exclusion pathspec guard', () => {
+  test('a reportsDir of "." does not blind the fingerprint to real source edits', async () => {
+    const dir = await gitRepo();
+    const before = await computeVerifiedStateFingerprint({
+      cwd: dir,
+      reportsDir: '.',
+      handoffsDir: '.agentloop/handoffs',
+    });
+    await writeFile(path.join(dir, 'a.ts'), 'export const a = 2;\n');
+    const after = await computeVerifiedStateFingerprint({
+      cwd: dir,
+      reportsDir: '.',
+      handoffsDir: '.agentloop/handoffs',
+    });
+    expect(after).not.toBe(before);
+  });
+
+  test('a normal reportsDir still excludes report writes from the fingerprint', async () => {
+    const dir = await gitRepo();
+    const before = await computeVerifiedStateFingerprint({
+      cwd: dir,
+      reportsDir: '.agentloop/reports',
+      handoffsDir: '.agentloop/handoffs',
+    });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/reports/report.json'), '{}\n');
+    const after = await computeVerifiedStateFingerprint({
+      cwd: dir,
+      reportsDir: '.agentloop/reports',
+      handoffsDir: '.agentloop/handoffs',
+    });
+    expect(after).toBe(before);
   });
 });
 

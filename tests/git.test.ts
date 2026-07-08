@@ -9,6 +9,7 @@ import {
   getGitRoot,
   getGitStatus,
   isInsideGitRepo,
+  parseGitStatus,
 } from '../src/core/git.js';
 import { makeTempDir, removeTempDir } from './helpers.js';
 
@@ -81,5 +82,66 @@ describe('git helpers', () => {
 
     expect(status).toContain('?? src/features/alpha.ts');
     expect(status).toContain('?? src/features/beta.ts');
+  });
+
+  test('disables git path quoting so status output stays unquoted', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const { execa } = await import('execa');
+    await execa('git', ['init', '-q'], { cwd: dir });
+
+    // core.quotePath defaults to true in git; if getGitStatus omitted the
+    // override, a non-ASCII filename would come back C-quoted (e.g.
+    // "caf\303\251.txt") instead of the literal unicode path.
+    await writeFile(path.join(dir, 'café.txt'), 'unicode fixture\n');
+
+    const status = await getGitStatus(dir);
+
+    expect(status).toContain('café.txt');
+    expect(status).not.toContain('\\303\\251');
+  });
+
+  test('parseGitStatus resolves the unquoted unicode path to a real GitFileStatus', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const { execa } = await import('execa');
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await writeFile(path.join(dir, 'café.txt'), 'unicode fixture\n');
+
+    const changedFiles = await parseGitStatus(await getGitStatus(dir));
+
+    expect(changedFiles).toContainEqual({ status: '??', path: 'café.txt' });
+  });
+});
+
+describe('parseGitStatus', () => {
+  test('parses ordinary modified/added/untracked lines unchanged', async () => {
+    const status = [' M modified.ts', 'A  added.ts', '?? untracked.ts'].join('\n');
+
+    await expect(parseGitStatus(status)).resolves.toEqual([
+      { status: 'M', path: 'modified.ts' },
+      { status: 'A', path: 'added.ts' },
+      { status: '??', path: 'untracked.ts' },
+    ]);
+  });
+
+  test('resolves a rename line to the new path, not the literal "old -> new" string', async () => {
+    const status = 'R  old.ts -> new.ts';
+
+    await expect(parseGitStatus(status)).resolves.toEqual([{ status: 'R', path: 'new.ts' }]);
+  });
+
+  test('resolves a copy line to the new path', async () => {
+    const status = 'C  original.ts -> copy.ts';
+
+    await expect(parseGitStatus(status)).resolves.toEqual([{ status: 'C', path: 'copy.ts' }]);
+  });
+
+  test('resolves a rename with nested directories on both sides', async () => {
+    const status = 'R  src/old/dir/file.ts -> src/new/dir/file.ts';
+
+    await expect(parseGitStatus(status)).resolves.toEqual([
+      { status: 'R', path: 'src/new/dir/file.ts' },
+    ]);
   });
 });

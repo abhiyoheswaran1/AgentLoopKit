@@ -40,10 +40,14 @@ export async function getGitAbsoluteDir(cwd: string) {
 }
 
 export async function getGitStatus(cwd: string) {
-  const result = await execa('git', ['status', '--short', '--untracked-files=all'], {
-    cwd,
-    reject: false,
-  });
+  const result = await execa(
+    'git',
+    ['-c', 'core.quotePath=false', 'status', '--short', '--untracked-files=all'],
+    {
+      cwd,
+      reject: false,
+    },
+  );
   return result.exitCode === 0 ? result.stdout : '';
 }
 
@@ -75,8 +79,15 @@ export async function parseGitStatus(status: string): Promise<GitFileStatus[]> {
     .split('\n')
     .map((line) => line.trimEnd())
     .filter(Boolean)
-    .map((line) => ({
-      status: line.slice(0, 2).trim() || '?',
-      path: line.slice(3).trim(),
-    }));
+    .map((line) => {
+      const rawPath = line.slice(3).trim();
+      // Rename/copy entries (status R/C) are formatted as "old -> new"; the
+      // path that matters for hashing/coverage is the new (current) path.
+      const arrowIndex = rawPath.indexOf(' -> ');
+      const path = arrowIndex === -1 ? rawPath : rawPath.slice(arrowIndex + 4).trim();
+      return {
+        status: line.slice(0, 2).trim() || '?',
+        path,
+      };
+    });
 }

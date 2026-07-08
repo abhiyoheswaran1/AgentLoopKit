@@ -33,6 +33,22 @@ function normalizeEvidenceDir(dir: string): string {
   return posix.replace(/\/+$/, '');
 }
 
+// A configured reportsDir/handoffsDir that normalizes to "nothing" or to the
+// repo root itself (e.g. ".", "./", "/", "") must never become a pathspec
+// exclusion: ":(exclude)." (or equivalent) excludes the ENTIRE repo from the
+// diff/status commands below, collapsing the fingerprint to a constant value
+// regardless of real changes — a permanent false-fresh. Skipping the
+// exclusion in that case merely means the (misconfigured) dir stays IN scope
+// for hashing, which only makes the fingerprint over-eager to go stale —
+// the safe direction, never false-fresh.
+function isRepoRootLikeDir(normalizedDir: string): boolean {
+  if (!normalizedDir) return true;
+  if (normalizedDir === '.') return true;
+  if (path.posix.normalize(normalizedDir) === '.') return true;
+  if (path.posix.isAbsolute(normalizedDir) && path.posix.normalize(normalizedDir) === '/') return true;
+  return false;
+}
+
 // IMPORTANT: this exclusion set is a DELIBERATE, NARROW subset of
 // AgentLoopKit-owned paths — not "everything the evidence classifier
 // recognizes". Do NOT derive it from isAgentLoopEvidenceFile /
@@ -46,11 +62,10 @@ function normalizeEvidenceDir(dir: string): string {
 function buildExclusionPathspec(options: { reportsDir?: string; handoffsDir?: string }): string[] {
   const reportsDir = normalizeEvidenceDir(options.reportsDir ?? DEFAULT_REPORTS_DIR);
   const handoffsDir = normalizeEvidenceDir(options.handoffsDir ?? DEFAULT_HANDOFFS_DIR);
-  return [
-    `:(exclude)${reportsDir}`,
-    `:(exclude)${handoffsDir}`,
-    ...FIXED_EVIDENCE_PATHSPEC_EXCLUSIONS,
-  ];
+  const configuredExclusions = [reportsDir, handoffsDir]
+    .filter((dir) => !isRepoRootLikeDir(dir))
+    .map((dir) => `:(exclude)${dir}`);
+  return [...configuredExclusions, ...FIXED_EVIDENCE_PATHSPEC_EXCLUSIONS];
 }
 
 // Deterministic content fingerprint of the working-tree state that verification
