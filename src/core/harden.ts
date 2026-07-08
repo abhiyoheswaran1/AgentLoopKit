@@ -1,6 +1,7 @@
 import {
   extractMarkdownSectionLines,
   findPlaceholderTaskSections,
+  isFenceDelimiterLine,
   type TaskType,
 } from './task-contract.js';
 import { stripVerifiedByTag } from './criteria-coverage.js';
@@ -96,6 +97,13 @@ function significantTokens(line: string): Set<string> {
 
 function acceptanceLines(markdown: string): string[] {
   return extractMarkdownSectionLines(markdown, 'Acceptance Criteria')
+    // A fenced code block's opening/closing delimiter is markdown syntax
+    // scaffolding, not a criterion in its own right — without this it would
+    // itself get flagged as "untestable" (in harden-resolve.ts's matching
+    // replaceAcceptanceLine ordinal loop, skipping it too keeps the two
+    // files' line-counting aligned so in-place replacement can't land on a
+    // fence marker and corrupt it).
+    .filter((l) => !isFenceDelimiterLine(l))
     .map((l) => l.replace(/^-\s*/, '').trim())
     .filter(Boolean)
     .filter((l) => l.toLowerCase() !== 'add acceptance criteria before implementation starts.')

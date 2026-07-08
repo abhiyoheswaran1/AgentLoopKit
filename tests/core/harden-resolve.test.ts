@@ -322,6 +322,40 @@ describe('applyResolution rejects non-converging resolutions (FIX M1)', () => {
   });
 });
 
+describe('section boundary is fence-aware, and resolution never corrupts a fence (FIX F2)', () => {
+  it('resolves the real trailing untestable-acceptance criterion after a fenced snippet without touching the fence', () => {
+    const markdown = [
+      '## Acceptance Criteria',
+      '- `npm test` passes',
+      '- Example response for `GET /status` is shown below:',
+      '```',
+      '### Example heading',
+      'GET /status returns 200',
+      '```',
+      '- The feature works well',
+      '## Files or Areas Not to Touch',
+      '- src/legacy',
+    ].join('\n');
+
+    const spot = analyzeContract(markdown)
+      .filter((s) => s.type === 'untestable-acceptance')
+      .find((s) => s.question.includes('The feature works well'));
+    expect(spot, 'expected the real trailing criterion to be flagged').toBeDefined();
+
+    const result = applyResolution(markdown, spot!.id, PROOF_ANSWER);
+
+    // The fence and its pasted content — including the `### Example
+    // heading` line that used to wrongly terminate the section — survive
+    // untouched; a broken ordinal count could otherwise land the in-place
+    // replacement on a fence delimiter and corrupt it.
+    expect(result).toContain('```\n### Example heading\nGET /status returns 200\n```');
+    // The real trailing criterion was replaced in place.
+    expect(result).toContain(`- ${PROOF_ANSWER}`);
+    expect(result).not.toContain('- The feature works well');
+    expect(analyzeContract(result).some((s) => s.id === spot!.id)).toBe(false);
+  });
+});
+
 describe('placeholder resolution with non-canonical spacing (FIX A)', () => {
   it('detects and resolves a placeholder line with extra internal spaces', () => {
     // A placeholder with double space (non-canonical) should still be detected

@@ -92,16 +92,42 @@ function list(values: string[] | undefined, fallback = 'None recorded yet.') {
   return clean.map((value) => `- ${value}`).join('\n');
 }
 
+// A line that opens or closes a fenced code block (``` or ~~~, optionally
+// followed by a language info string, e.g. "```ts"). Section-boundary
+// detection and criteria-line filtering both need to agree on this so a
+// pasted markdown/API snippet inside a section doesn't get misread as
+// document structure.
+export function isFenceDelimiterLine(line: string): boolean {
+  return /^\s*(```|~~~)/.test(line);
+}
+
+// Fence-aware scan for the end (exclusive index) of a `## <heading>` body
+// that starts at `bodyStart` within `lines`. A `#{2,}` heading only counts
+// as a section boundary when we are NOT inside a fenced code block —
+// otherwise a `###`/`##` line pasted inside a fenced snippet (e.g. an
+// acceptance criterion quoting an API doc) would wrongly truncate the
+// section and drop everything after it.
+export function findSectionBodyEnd(lines: string[], bodyStart: number): number {
+  let inFence = false;
+  let end = bodyStart;
+  for (; end < lines.length; end += 1) {
+    const line = lines[end];
+    if (isFenceDelimiterLine(line)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (!inFence && /^#{2,}\s+/.test(line)) break;
+  }
+  return end;
+}
+
 export function extractMarkdownSectionLines(markdown: string, heading: string) {
   const lines = markdown.split('\n');
   const headingIndex = lines.findIndex((line) => line.trim() === `## ${heading}`);
   if (headingIndex === -1) return [];
 
-  const sectionLines: string[] = [];
-  for (const line of lines.slice(headingIndex + 1)) {
-    if (/^#{2,}\s+/.test(line)) break;
-    sectionLines.push(line);
-  }
+  const end = findSectionBodyEnd(lines, headingIndex + 1);
+  const sectionLines = lines.slice(headingIndex + 1, end);
 
   return sectionLines.map((line) => line.trim()).filter(Boolean);
 }

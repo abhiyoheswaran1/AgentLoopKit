@@ -75,6 +75,43 @@ describe('section boundary at `###` subheadings (FIX 1)', () => {
   });
 });
 
+describe('section boundary is fence-aware (FIX F2)', () => {
+  it('does not truncate at a `###` line inside a fenced code block, flags the real trailing criterion, and never flags the fence delimiter itself', () => {
+    const md = [
+      '## Acceptance Criteria',
+      '- `npm test` passes',
+      '- Example response for `GET /status` is shown below:',
+      '```',
+      '### Example heading',
+      'GET /status returns 200',
+      '```',
+      '- The feature works well',
+      '## Files or Areas Not to Touch',
+      '- src/legacy',
+    ].join('\n');
+
+    const spots = analyzeContract(md);
+    const untestable = spots.filter((s) => s.type === 'untestable-acceptance');
+
+    // A regression that truncates the section at the fenced `###` line
+    // would drop this trailing criterion entirely — it must be flagged.
+    expect(untestable.some((s) => s.question.includes('The feature works well'))).toBe(true);
+    // The fence delimiter itself (```) must never be treated as a criterion
+    // and questioned — it is markdown syntax scaffolding, not content.
+    expect(untestable.some((s) => s.question.includes('```'))).toBe(false);
+  });
+
+  it('still bounds a section at a real, non-fenced `### Notes` subheading (earlier fix intent preserved)', () => {
+    const md = [
+      '## Acceptance Criteria',
+      '- `npm test` passes',
+      '### Notes',
+      'Prose that must not leak into the criteria list.',
+    ].join('\n');
+    expect(analyzeContract(md).some((s) => s.type === 'untestable-acceptance')).toBe(false);
+  });
+});
+
 describe('contradiction rule', () => {
   it('flags a contradiction between acceptance and non-goals', () => {
     const md = [

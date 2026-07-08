@@ -74,6 +74,65 @@ export function filterNonAgentLoopEvidenceFiles(changedFiles: GitFileStatus[]) {
   return changedFiles.filter((file) => !isAgentLoopEvidenceFile(file.path));
 }
 
+// git wraps a path in double quotes (and C-escapes its bytes) whenever the
+// raw bytes would otherwise be ambiguous in porcelain output — most notably
+// when the path contains a space, which would collide with the " -> "
+// rename arrow or the "XY " status prefix — regardless of core.quotePath.
+// core.quotePath only controls whether *non-ASCII* bytes get octal-escaped;
+// the surrounding quoting for "unsafe" paths (e.g. containing a space)
+// still happens. Strip that quoting back off so downstream consumers
+// (coverage/scope/hash matching) see the real relative path instead of a
+// literal `"..."` string.
+export function dequoteGitPath(raw: string): string {
+  const trimmed = raw.trim();
+  if (trimmed.length < 2 || !trimmed.startsWith('"') || !trimmed.endsWith('"')) {
+    return raw;
+  }
+
+  const inner = trimmed.slice(1, -1);
+  const simpleEscapes: Record<string, number> = {
+    '"': 0x22,
+    '\\': 0x5c,
+    a: 0x07,
+    b: 0x08,
+    f: 0x0c,
+    n: 0x0a,
+    r: 0x0d,
+    t: 0x09,
+    v: 0x0b,
+  };
+
+  const bytes: number[] = [];
+  for (let i = 0; i < inner.length; i += 1) {
+    const ch = inner[i];
+    if (ch === '\\') {
+      const next = inner[i + 1];
+      if (next !== undefined && next in simpleEscapes) {
+        bytes.push(simpleEscapes[next]);
+        i += 1;
+        continue;
+      }
+      if (next >= '0' && next <= '7') {
+        let octal = '';
+        let j = i + 1;
+        while (j < inner.length && octal.length < 3 && inner[j] >= '0' && inner[j] <= '7') {
+          octal += inner[j];
+          j += 1;
+        }
+        bytes.push(parseInt(octal, 8) & 0xff);
+        i = j - 1;
+        continue;
+      }
+      // Unrecognized escape: keep the backslash and following char as-is.
+      bytes.push(...Buffer.from(ch, 'utf8'));
+      continue;
+    }
+    bytes.push(...Buffer.from(ch, 'utf8'));
+  }
+
+  return Buffer.from(bytes).toString('utf8');
+}
+
 export async function parseGitStatus(status: string): Promise<GitFileStatus[]> {
   return status
     .split('\n')
@@ -81,13 +140,18 @@ export async function parseGitStatus(status: string): Promise<GitFileStatus[]> {
     .filter(Boolean)
     .map((line) => {
       const rawPath = line.slice(3).trim();
+      const statusCode = line.slice(0, 2).trim() || '?';
       // Rename/copy entries (status R/C) are formatted as "old -> new"; the
       // path that matters for hashing/coverage is the new (current) path.
-      const arrowIndex = rawPath.indexOf(' -> ');
-      const path = arrowIndex === -1 ? rawPath : rawPath.slice(arrowIndex + 4).trim();
+      // Only R/C statuses carry an arrow at all, and we split on the LAST
+      // " -> " so an arrow occurring inside a quoted old path can't be
+      // mistaken for the real old/new separator.
+      const isRenameOrCopy = /[RC]/.test(statusCode);
+      const arrowIndex = isRenameOrCopy ? rawPath.lastIndexOf(' -> ') : -1;
+      const finalRaw = arrowIndex === -1 ? rawPath : rawPath.slice(arrowIndex + 4).trim();
       return {
-        status: line.slice(0, 2).trim() || '?',
-        path,
+        status: statusCode,
+        path: dequoteGitPath(finalRaw),
       };
     });
 }

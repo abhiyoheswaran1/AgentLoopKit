@@ -21,4 +21,43 @@ describe('extractMarkdownSectionLines', () => {
     ].join('\n');
     expect(extractMarkdownSectionLines(md, 'Acceptance Criteria')).toEqual(['- `npm test` passes']);
   });
+
+  it('is fence-aware: a `###`/`##` line inside a fenced code block is not a section boundary (FIX F2)', () => {
+    // The FIX 1 broadened terminator (/^#{2,}\s+/) must not fire on a
+    // `### Example heading` line that is *inside* a fenced code block (e.g.
+    // an acceptance criterion quoting a pasted markdown/API-doc snippet).
+    // The whole fenced block, including its delimiters, stays in the body;
+    // the section only ends at the next REAL (non-fenced) `## ` heading.
+    const md = [
+      '## Acceptance Criteria',
+      '- `npm test` passes',
+      '- Example response is shown below:',
+      '```',
+      '### Example heading inside a pasted snippet',
+      'more fenced content',
+      '```',
+      '- A real trailing criterion',
+      '## Verification Commands',
+      '- npm test',
+    ].join('\n');
+    expect(extractMarkdownSectionLines(md, 'Acceptance Criteria')).toEqual([
+      '- `npm test` passes',
+      '- Example response is shown below:',
+      '```',
+      '### Example heading inside a pasted snippet',
+      'more fenced content',
+      '```',
+      '- A real trailing criterion',
+    ]);
+  });
+
+  it('still terminates at a real, non-fenced `###` heading (earlier fix intent preserved) (FIX F2)', () => {
+    const md = [
+      '## Acceptance Criteria',
+      '- `npm test` passes',
+      '### Notes',
+      'Some prose that belongs to the subheading, not the criteria list.',
+    ].join('\n');
+    expect(extractMarkdownSectionLines(md, 'Acceptance Criteria')).toEqual(['- `npm test` passes']);
+  });
 });

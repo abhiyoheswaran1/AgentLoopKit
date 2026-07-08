@@ -3,6 +3,7 @@ import { mkdir, realpath, writeFile } from 'node:fs/promises';
 import { afterEach, describe, expect, test } from 'vitest';
 import {
   commandExists,
+  dequoteGitPath,
   getGitBranch,
   getGitCommit,
   getGitDiffStat,
@@ -112,6 +113,32 @@ describe('git helpers', () => {
 
     expect(changedFiles).toContainEqual({ status: '??', path: 'café.txt' });
   });
+
+  test('parseGitStatus resolves a rename-with-spaces to the real unquoted path', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const { execa } = await import('execa');
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await writeFile(path.join(dir, 'normal.txt'), 'fixture\n');
+    await execa('git', ['add', '.'], { cwd: dir });
+    await execa(
+      'git',
+      ['-c', 'user.email=test@example.com', '-c', 'user.name=Test User', 'commit', '-m', 'init'],
+      { cwd: dir },
+    );
+
+    // git still wraps the destination of a rename in double quotes to
+    // disambiguate it from the " -> " arrow when the filename contains a
+    // space, even with core.quotePath=false.
+    await execa('git', ['mv', 'normal.txt', 'renamed with spaces.txt'], { cwd: dir });
+
+    const rawStatus = await getGitStatus(dir);
+    expect(rawStatus).toContain('"renamed with spaces.txt"');
+
+    const changedFiles = await parseGitStatus(rawStatus);
+
+    expect(changedFiles).toContainEqual({ status: 'R', path: 'renamed with spaces.txt' });
+  });
 });
 
 describe('parseGitStatus', () => {
@@ -143,5 +170,50 @@ describe('parseGitStatus', () => {
     await expect(parseGitStatus(status)).resolves.toEqual([
       { status: 'R', path: 'src/new/dir/file.ts' },
     ]);
+  });
+
+  test('strips git quoting from a rename destination that contains a space', async () => {
+    const status = 'R  old.txt -> "renamed with spaces.txt"';
+
+    await expect(parseGitStatus(status)).resolves.toEqual([
+      { status: 'R', path: 'renamed with spaces.txt' },
+    ]);
+  });
+
+  test('does not split on an arrow embedded inside a quoted old name', async () => {
+    const status = 'R  "old -> weird.txt" -> "renamed with spaces.txt"';
+
+    await expect(parseGitStatus(status)).resolves.toEqual([
+      { status: 'R', path: 'renamed with spaces.txt' },
+    ]);
+  });
+
+  test('parses ordinary M/A/?? lines unaffected by quoting logic', async () => {
+    const status = [' M src/x.ts', 'A  added file.ts', '?? untracked.ts'].join('\n');
+
+    await expect(parseGitStatus(status)).resolves.toEqual([
+      { status: 'M', path: 'src/x.ts' },
+      { status: 'A', path: 'added file.ts' },
+      { status: '??', path: 'untracked.ts' },
+    ]);
+  });
+});
+
+describe('dequoteGitPath', () => {
+  test('leaves an unquoted path untouched', () => {
+    expect(dequoteGitPath('src/x.ts')).toBe('src/x.ts');
+  });
+
+  test('strips surrounding quotes from a quoted-for-space path', () => {
+    expect(dequoteGitPath('"renamed with spaces.txt"')).toBe('renamed with spaces.txt');
+  });
+
+  test('unescapes a C-quoted octal-escaped unicode path', () => {
+    expect(dequoteGitPath('"caf\\303\\251.txt"')).toBe('café.txt');
+  });
+
+  test('unescapes embedded quote and backslash escapes', () => {
+    expect(dequoteGitPath('"quote\\".txt"')).toBe('quote".txt');
+    expect(dequoteGitPath('"back\\\\slash.txt"')).toBe('back\\slash.txt');
   });
 });

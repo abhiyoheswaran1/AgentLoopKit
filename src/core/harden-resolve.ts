@@ -1,7 +1,12 @@
 import { AgentLoopError } from './errors.js';
 import { analyzeContract, type SoftSpot } from './harden.js';
 import { escapeMarkdownProse } from './markdown-format.js';
-import { REVIEW_CRITICAL_TASK_PLACEHOLDERS, normalizeTaskSectionLine } from './task-contract.js';
+import {
+  findSectionBodyEnd,
+  isFenceDelimiterLine,
+  normalizeTaskSectionLine,
+  REVIEW_CRITICAL_TASK_PLACEHOLDERS,
+} from './task-contract.js';
 
 const EMPTY_LINE = /^-\s*(none recorded yet\.|none\.|add acceptance criteria before implementation starts\.)?\s*$/i;
 const ACCEPTANCE_PLACEHOLDER = 'add acceptance criteria before implementation starts.';
@@ -15,13 +20,13 @@ export class HardenResolutionError extends AgentLoopError {
 
 // Find the [start, end) body-line range of a `## <heading>` section within
 // `lines`. `start` is the first line after the heading; `end` is the next
-// `## ` heading (or end of file). Returns undefined when the heading is absent.
+// `## ` heading (or end of file), fence-aware so a `###`/`##` line pasted
+// inside a fenced code block does not truncate the section early. Returns
+// undefined when the heading is absent.
 function sectionBodyRange(lines: string[], heading: string): { start: number; end: number } | undefined {
   const headingIndex = lines.findIndex((l) => l.trim() === `## ${heading}`);
   if (headingIndex === -1) return undefined;
-  let end = headingIndex + 1;
-  while (end < lines.length && !/^#{2,}\s+/.test(lines[end])) end += 1;
-  return { start: headingIndex + 1, end };
+  return { start: headingIndex + 1, end: findSectionBodyEnd(lines, headingIndex + 1) };
 }
 
 function appendToSection(markdown: string, heading: string, entry: string): string {
@@ -30,8 +35,7 @@ function appendToSection(markdown: string, heading: string, entry: string): stri
   if (headingIndex === -1) {
     return `${markdown.trimEnd()}\n\n## ${heading}\n${entry}\n`;
   }
-  let end = headingIndex + 1;
-  while (end < lines.length && !/^#{2,}\s+/.test(lines[end])) end += 1;
+  const end = findSectionBodyEnd(lines, headingIndex + 1);
   const body = lines.slice(headingIndex + 1, end);
   const placeholderIndex = body.findIndex((l) => EMPTY_LINE.test(l.trim()) && l.trim() !== '');
   if (placeholderIndex >= 0) {
@@ -46,8 +50,11 @@ function appendToSection(markdown: string, heading: string, entry: string): stri
 // Replace the qualifying acceptance line at `ordinal` in place. The qualifying
 // set matches `acceptanceLines()` in harden.ts: within the Acceptance Criteria
 // body, lines that are non-empty after stripping a leading `- ` and are not the
-// acceptance placeholder. In-place replacement keeps other lines' ordinals
-// stable, which is what makes the spot converge.
+// acceptance placeholder, skipping fence-delimiter lines (``` / ~~~) the same
+// way harden.ts does so ordinals stay aligned between the two files — and so
+// a fence delimiter can never itself be selected for in-place replacement,
+// which would corrupt the fence. In-place replacement keeps other lines'
+// ordinals stable, which is what makes the spot converge.
 function replaceAcceptanceLine(markdown: string, ordinal: number, entry: string): string {
   const lines = markdown.split('\n');
   const range = sectionBodyRange(lines, 'Acceptance Criteria');
@@ -58,6 +65,7 @@ function replaceAcceptanceLine(markdown: string, ordinal: number, entry: string)
   for (let i = range.start; i < range.end; i += 1) {
     const trimmed = lines[i].trim();
     if (!trimmed) continue;
+    if (isFenceDelimiterLine(trimmed)) continue;
     const stripped = trimmed.replace(/^-\s*/, '').trim();
     if (!stripped) continue;
     if (stripped.toLowerCase() === ACCEPTANCE_PLACEHOLDER) continue;
