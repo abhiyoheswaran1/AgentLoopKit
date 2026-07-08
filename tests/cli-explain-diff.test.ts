@@ -3,6 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { writeVerificationRun } from '../src/core/runs.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -150,5 +151,54 @@ describe('explain-diff command', () => {
       command: 'agentloop verify --task-commands --progress',
     });
     expect(JSON.stringify(payload)).not.toContain(dir);
+  });
+
+  test('run coverage in the CLI output drops once the covered file changes content', async () => {
+    const dir = await createExplainDiffFixture();
+    await writeFile(path.join(dir, 'src/other.ts'), 'export const other = 1;\n');
+
+    // Use the real write-run entrypoint so the hash is recorded from
+    // src/other.ts's content at run time.
+    await writeVerificationRun({
+      cwd: dir,
+      timestamp: '2026-06-11-12-30',
+      task: {
+        path: '.agentloop/tasks/2026-06-11-add-auth-copy.md',
+        title: 'Add auth copy',
+        status: 'in-progress',
+      },
+      verificationReportPath: path.join(dir, '.agentloop/reports/2026-06-11-12-30-verification-report.md'),
+      overallStatus: 'pass',
+      changedFiles: [{ status: '??', path: 'src/other.ts' }],
+      markdown: '# Verification Report\n\n- Overall status: pass\n',
+    });
+
+    const before = await execa(
+      tsxPath,
+      [cliPath, 'explain-diff', '--json', '--redact-paths'],
+      { cwd: dir },
+    );
+    const beforePayload = JSON.parse(before.stdout);
+    expect(
+      beforePayload.files.find((file: { path: string }) => file.path === 'src/other.ts'),
+    ).toMatchObject({
+      coveredByRun: true,
+      unexplained: false,
+    });
+
+    await writeFile(path.join(dir, 'src/other.ts'), 'export const other = 2; // edited after the run\n');
+
+    const after = await execa(
+      tsxPath,
+      [cliPath, 'explain-diff', '--json', '--redact-paths'],
+      { cwd: dir },
+    );
+    const afterPayload = JSON.parse(after.stdout);
+    expect(
+      afterPayload.files.find((file: { path: string }) => file.path === 'src/other.ts'),
+    ).toMatchObject({
+      coveredByRun: false,
+      unexplained: true,
+    });
   });
 });

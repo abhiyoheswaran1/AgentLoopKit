@@ -17,6 +17,7 @@ import { listItems, sectionContent } from './markdown-sections.js';
 import { listRuns, readRunChangedFiles, type RunSummary } from './runs.js';
 import { readTaskContract, type TaskContract } from './task-state.js';
 import { toSafeDisplayPath } from './display-path.js';
+import { computeFileContentHash } from './verified-state.js';
 
 export type EvidenceMapReviewability =
   | 'reviewable'
@@ -104,7 +105,7 @@ type PathPattern = {
 
 type RecentRunCoverage = {
   run: RunSummary;
-  paths: Set<string>;
+  hashByPath: Map<string, string | undefined>;
 };
 
 const DEFAULT_RECENT_RUN_LIMIT = 10;
@@ -279,16 +280,26 @@ async function readRecentRunCoverage(options: {
     if (!changedFiles) continue;
     coverage.push({
       run,
-      paths: new Set(changedFiles.map((file) => normalizePath(file.path))),
+      hashByPath: new Map(changedFiles.map((file) => [normalizePath(file.path), file.hash])),
     });
   }
   return coverage;
 }
 
-function findRunCoverage(filePath: string, runs: RecentRunCoverage[], currentTaskTitle?: string) {
+function findRunCoverage(
+  filePath: string,
+  runs: RecentRunCoverage[],
+  currentHashByPath: Map<string, string | undefined>,
+  currentTaskTitle?: string,
+) {
   const normalizedPath = normalizePath(filePath);
   for (const run of runs) {
-    if (!run.paths.has(normalizedPath)) continue;
+    if (!run.hashByPath.has(normalizedPath)) continue;
+    const recordedHash = run.hashByPath.get(normalizedPath);
+    if (recordedHash !== undefined) {
+      const currentHash = currentHashByPath.get(normalizedPath);
+      if (currentHash === undefined || currentHash !== recordedHash) continue; // changed since run
+    }
     return {
       id: run.run.id,
       command: run.run.command,
@@ -425,12 +436,28 @@ export async function buildEvidenceMap(options: {
     runSummaries: options.runSummaries,
   });
 
+  // Only compute current content hashes for paths some run actually recorded
+  // a hash for (bounded work; legacy runs without a hash never need one).
+  const pathsNeedingHash = new Set<string>();
+  for (const run of runs) {
+    for (const [changedPath, hash] of run.hashByPath) if (hash !== undefined) pathsNeedingHash.add(changedPath);
+  }
+  const currentHashByPath = new Map<string, string | undefined>();
+  for (const file of changedFiles) {
+    const normalized = normalizePath(file.path);
+    if (pathsNeedingHash.has(normalized)) {
+      currentHashByPath.set(normalized, await computeFileContentHash({ cwd: options.cwd, filePath: file.path }));
+    }
+  }
+
   const files = changedFiles.map((file): EvidenceMapFile => {
     const normalizedPath = normalizePath(file.path);
     const area = evidenceArea(normalizedPath, areas.get(normalizedPath) ?? 'other');
     const agentLoopEvidence = isAgentLoopEvidenceFile(file.path);
     const coveredByTask = !agentLoopEvidence && pathMatchesAny(file.path, likelyPatterns);
-    const runCoverage = agentLoopEvidence ? undefined : findRunCoverage(file.path, runs, task?.title);
+    const runCoverage = agentLoopEvidence
+      ? undefined
+      : findRunCoverage(file.path, runs, currentHashByPath, task?.title);
     const coveredByRun = Boolean(runCoverage);
     const forbiddenByTask = !agentLoopEvidence && pathMatchesAny(file.path, forbiddenPatterns);
     const riskSensitive = !agentLoopEvidence && isRiskSensitivePath(normalizedPath);

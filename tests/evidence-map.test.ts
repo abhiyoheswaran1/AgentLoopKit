@@ -8,6 +8,7 @@ import {
   renderEvidenceMapCompactMarkdown,
   renderEvidenceMapMarkdown,
 } from '../src/core/evidence-map.js';
+import { writeVerificationRun } from '../src/core/runs.js';
 import { setActiveTask } from '../src/core/task-state.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -369,5 +370,71 @@ Revert the auth callback change.
     const map = await buildEvidenceMap({ cwd: dir, config });
 
     expect(map.nextActions.some((a) => a.command === 'agentloop harden')).toBe(false);
+  });
+
+  test('run coverage drops when a covered file changes content after the run', async () => {
+    const { dir, config } = await createEvidenceMapFixture();
+    await mkdir(path.join(dir, 'src'), { recursive: true });
+    await writeFile(path.join(dir, 'src/x.ts'), 'export const x = 1;\n');
+    await git(dir, ['add', '.']);
+    await git(dir, ['commit', '-m', 'add src/x.ts']);
+    await writeFile(path.join(dir, 'src/x.ts'), 'export const x = 2;\n');
+
+    // Use the real write-run entrypoint so the hash is recorded from
+    // src/x.ts's content at run time.
+    await writeVerificationRun({
+      cwd: dir,
+      timestamp: '2026-06-11-12-20',
+      task: {
+        path: '.agentloop/tasks/2026-06-11-fix-login.md',
+        title: 'Fix login redirect bug',
+        status: 'in-progress',
+      },
+      verificationReportPath: path.join(dir, '.agentloop/reports/2026-06-11-12-00-verification-report.md'),
+      overallStatus: 'pass',
+      changedFiles: [{ status: 'M', path: 'src/x.ts' }],
+      markdown: '# Verification Report\n\n- Overall status: pass\n',
+    });
+
+    const covered = await buildEvidenceMap({ cwd: dir, config });
+    expect(covered.files.find((f) => f.path.endsWith('src/x.ts'))?.coveredByRun).toBe(true);
+
+    await writeFile(path.join(dir, 'src/x.ts'), '// edited after the run\n');
+    const after = await buildEvidenceMap({ cwd: dir, config });
+    const x = after.files.find((f) => f.path.endsWith('src/x.ts'));
+    expect(x?.coveredByRun).toBe(false);
+  });
+
+  test('legacy run entries without a hash keep path-presence coverage', async () => {
+    const { dir, config } = await createEvidenceMapFixture();
+    await mkdir(path.join(dir, 'src'), { recursive: true });
+    await writeFile(path.join(dir, 'src/x.ts'), 'export const x = 1;\n');
+    await git(dir, ['add', '.']);
+    await git(dir, ['commit', '-m', 'add src/x.ts']);
+
+    // Manually write a run's changed-files.json with entries that have NO
+    // hash field, simulating a legacy run recorded before Task 1.
+    await mkdir(path.join(dir, '.agentloop/runs/2026-06-11-12-15-verify'), { recursive: true });
+    await writeJson(path.join(dir, '.agentloop/runs/2026-06-11-12-15-verify/metadata.json'), {
+      id: '2026-06-11-12-15-verify',
+      command: 'verify',
+      createdAt: '2026-06-11-12-15',
+      createdAtEpochMs: Date.parse('2026-06-11T12:15:00Z'),
+      task: {
+        path: '.agentloop/tasks/2026-06-11-fix-login.md',
+        title: 'Fix login redirect bug',
+        status: 'in-progress',
+      },
+      overallStatus: 'pass',
+      changedFileCount: 1,
+    });
+    await writeJson(path.join(dir, '.agentloop/runs/2026-06-11-12-15-verify/changed-files.json'), [
+      { status: 'M', path: 'src/x.ts' },
+    ]);
+
+    await writeFile(path.join(dir, 'src/x.ts'), '// edited after the legacy run\n');
+
+    const map = await buildEvidenceMap({ cwd: dir, config });
+    expect(map.files.find((f) => f.path.endsWith('src/x.ts'))?.coveredByRun).toBe(true);
   });
 });
