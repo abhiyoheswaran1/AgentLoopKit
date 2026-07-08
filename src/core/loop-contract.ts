@@ -810,11 +810,11 @@ export async function createLoop(options: {
         'package.json (publish and version fields)',
       ],
       acceptanceCriteria: [
-        `\`${loopRelativePath}\`'s \`iterations\` array records a readiness status and token receipt after every tick.`,
-        `\`${loopRelativePath}\`'s \`stopConditions\` list matches its \`budget.maxIterations\` and \`budget.maxEstimatedTokens\`.`,
+        `The loop contract's \`iterations\` array records a readiness status and token receipt after every tick.`,
+        `The loop contract's \`stopConditions\` list matches its \`budget.maxIterations\` and \`budget.maxEstimatedTokens\`.`,
         ...(runner
           ? [
-              `The guarded local process recorded in \`${loopRelativePath}\` writes its exit code and changed-file count into the next iteration entry.`,
+              `The guarded local process recorded in the loop contract writes its exit code and changed-file count into the next iteration entry.`,
             ]
           : []),
       ],

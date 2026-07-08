@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { createDefaultConfig } from '../src/core/config.js';
+import { analyzeContract } from '../src/core/harden.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
 const cliPath = path.resolve('src/cli/index.ts');
@@ -116,6 +117,59 @@ describe('loop command', () => {
     expect(taskMarkdown).toContain('## Files or Areas Not to Touch');
     expect(taskMarkdown).toContain('- .github/workflows/ (CI credentials and release pipelines)');
     expect(payload.markdown).toContain('AgentLoopKit will not execute a coding agent for this loop.');
+
+    const spots = analyzeContract(taskMarkdown);
+    expect(spots.filter((s) => s.severity === 'blocking')).toHaveLength(0);
+  });
+
+  test('generated task contract has no blocking soft spots when the goal shares words with Non-Goals', async () => {
+    const dir = await createLoopFixture();
+
+    const createResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'loop',
+        'create',
+        '--goal',
+        'Keep the agent runner green',
+        '--cadence',
+        'manual',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+    const taskPath = path.join(dir, created.loop.task.nativeTaskPath);
+    const taskMarkdown = await readFile(taskPath, 'utf8');
+
+    const spots = analyzeContract(taskMarkdown);
+    expect(spots.filter((s) => s.severity === 'blocking')).toHaveLength(0);
+  });
+
+  test('generated task contract has no blocking soft spots for a colliding goal with a configured runner', async () => {
+    const dir = await createLoopFixture();
+
+    const createResult = await execa(
+      tsxPath,
+      [
+        cliPath,
+        'loop',
+        'create',
+        '--goal',
+        'Automate publish and merge checks for the agent runner',
+        '--runner-command',
+        'node src/runner.mjs',
+        '--json',
+      ],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+    const taskPath = path.join(dir, created.loop.task.nativeTaskPath);
+    const taskMarkdown = await readFile(taskPath, 'utf8');
+
+    const spots = analyzeContract(taskMarkdown);
+    expect(spots.filter((s) => s.severity === 'blocking')).toHaveLength(0);
   });
 
   test('creates dogfood loop presets without running their suggested commands', async () => {
