@@ -747,11 +747,13 @@ describe('check-gates command', () => {
           message: 'Latest verification report predates the current task. Rerun verification.',
           path: '.agentloop/reports/2026-06-09-12-30-verification-report.md',
         }),
+        expect.objectContaining({ id: 'contract-hardening', status: 'fail' }),
       ]),
     );
-    expect(output.nextAction.command).toBe(
-      'agentloop verify --task .agentloop/tasks/2026-06-09-demo.md',
-    );
+    // The task contract has no "Files or Areas Not to Touch" section, so it
+    // carries a blocking unbounded-scope soft spot. Since G3, a failing
+    // contract-hardening gate outranks verification guidance.
+    expect(output.nextAction.command).toBe('agentloop harden');
   });
 
   test('treats required harness and policy symlinks outside the repo as missing', async () => {
@@ -919,9 +921,10 @@ describe('check-gates command', () => {
     expect(humanResult.stdout).toContain(
       '- [`fail`] `Verification report`: `No verification report found.`',
     );
-    expect(humanResult.stdout).toContain(
-      'Run ``agentloop verify --task .agentloop/tasks/2026-06-11-active`gate.md``.',
-    );
+    // The task contract has no "Files or Areas Not to Touch" section, so it
+    // carries a blocking unbounded-scope soft spot. Since G3, a failing
+    // contract-hardening gate outranks verification guidance.
+    expect(humanResult.stdout).toContain('Run `agentloop harden`.');
     const output = JSON.parse(jsonResult.stdout);
     expect(output.git.branch).toBe('review`branch');
     expect(output.gates).toEqual(
@@ -931,11 +934,10 @@ describe('check-gates command', () => {
           message: 'Active `gate`',
           path: '.agentloop/tasks/2026-06-11-active`gate.md',
         }),
+        expect.objectContaining({ id: 'contract-hardening', status: 'fail' }),
       ]),
     );
-    expect(output.nextAction.command).toBe(
-      'agentloop verify --task .agentloop/tasks/2026-06-11-active`gate.md',
-    );
+    expect(output.nextAction.command).toBe('agentloop harden');
   });
 
   test('renders markdown gate values as single-line inline code when evidence contains line breaks', async () => {
@@ -965,9 +967,10 @@ describe('check-gates command', () => {
     expect(humanResult.stdout).toContain(
       '- [`pass`] `Task contract`: `2026-06-11-active\\n- [x] injected` - `.agentloop/tasks/2026-06-11-active\\n- [x] injected.md`',
     );
-    expect(humanResult.stdout).toContain(
-      'Run `agentloop verify --task .agentloop/tasks/2026-06-11-active\\n- [x] injected.md`.',
-    );
+    // The task contract has no "Files or Areas Not to Touch" section, so it
+    // carries a blocking unbounded-scope soft spot. Since G3, a failing
+    // contract-hardening gate outranks verification guidance.
+    expect(humanResult.stdout).toContain('Run `agentloop harden`.');
     expect(humanResult.stdout).not.toContain('\n- [x] injected`:');
     expect(humanResult.stdout).not.toContain('\n- [x] injected.md`');
     const output = JSON.parse(jsonResult.stdout);
@@ -978,11 +981,10 @@ describe('check-gates command', () => {
           message: '2026-06-11-active\n- [x] injected',
           path: '.agentloop/tasks/2026-06-11-active\n- [x] injected.md',
         }),
+        expect.objectContaining({ id: 'contract-hardening', status: 'fail' }),
       ]),
     );
-    expect(output.nextAction.command).toBe(
-      'agentloop verify --task .agentloop/tasks/2026-06-11-active\n- [x] injected.md',
-    );
+    expect(output.nextAction.command).toBe('agentloop harden');
   });
 
   test('warns and fails predictably when review evidence is missing', async () => {
@@ -1290,6 +1292,10 @@ describe('check-gates command', () => {
         }),
       ]),
     );
+    // Regression guard: a failing hardening gate must recommend `agentloop
+    // harden` before verify/handoff guidance, not fall through to handoff.
+    expect(output.nextAction.command).toBe('agentloop harden');
+    expect(output.nextAction.reason).toMatch(/blocking soft spot/i);
   });
 
   test('downgrades the hardening gate to warn with --allow-soft-spots', async () => {
@@ -1328,5 +1334,8 @@ describe('check-gates command', () => {
         }),
       ]),
     );
+    // A warn-level hardening gate still recommends harden ahead of the
+    // otherwise-clean next action.
+    expect(output.nextAction.command).toBe('agentloop harden');
   });
 });

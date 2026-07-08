@@ -534,6 +534,40 @@ describe('Baseframe Suite Integration v1', () => {
     expect(standalone).not.toHaveProperty('updatedContract');
   });
 
+  test('CLI human mode prints the soft-spot report for --from-projscan; --json mode stays clean', async () => {
+    // The baseframe-generated native task always has empty forbidden-files
+    // (a by-design scaffold the agent hardens), which guarantees a blocking
+    // unbounded-scope soft spot. The report must be visible at creation time
+    // in human mode, but --json output must not be polluted by it.
+    const humanDir = await createBaseframeRepo();
+    const assessment = await readFixture<ProjScanAssessmentV1>(projscanFixturePath);
+    const humanAssessmentPath = await writeAssessment(humanDir, assessment);
+
+    const humanResult = await execa(
+      tsxPath,
+      [cliPath, 'create-task', '--from-projscan', humanAssessmentPath],
+      { cwd: humanDir },
+    );
+
+    expect(humanResult.stdout).toMatch(/blocking soft spot/i);
+    expect(humanResult.stdout).toContain(
+      'Run `agentloop harden --resolve <id> --answer "..."` to resolve them.',
+    );
+
+    const jsonDir = await createBaseframeRepo();
+    const jsonAssessmentPath = await writeAssessment(jsonDir, assessment);
+
+    const jsonResult = await execa(
+      tsxPath,
+      [cliPath, 'create-task', '--from-projscan', jsonAssessmentPath, '--json'],
+      { cwd: jsonDir },
+    );
+
+    expect(() => JSON.parse(jsonResult.stdout)).not.toThrow();
+    expect(jsonResult.stdout).not.toContain('blocking soft spot');
+    expect(jsonResult.stdout).not.toContain('agentloop harden --resolve');
+  });
+
   test('check-gates no longer accepts --task for AgentFlight reconciliation', async () => {
     const dir = await createBaseframeRepo();
     const assessment = await readFixture<ProjScanAssessmentV1>(projscanFixturePath);

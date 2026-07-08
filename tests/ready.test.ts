@@ -311,6 +311,10 @@ describe('ready command', () => {
       ]),
     );
     expect(payload.status).toBe('blocked');
+    // Regression guard: a contract-hardening block must recommend `agentloop
+    // harden`, not fall through to the generic `agentloop guard` default.
+    expect(payload.nextAction.command).toBe('agentloop harden');
+    expect(payload.nextAction.reason).toMatch(/blocking soft spot/i);
 
     const allowResult = await execa(
       tsxPath,

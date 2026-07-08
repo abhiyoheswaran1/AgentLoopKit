@@ -283,6 +283,49 @@ describe('loop command', () => {
     expect(tick.loop.stopReason).toBe('readiness gates need human review');
   });
 
+  test('asks for human review (not continue) when the active task has a blocking soft spot and nothing else is dirty', async () => {
+    const dir = await createLoopFixture();
+    const createResult = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'create', '--goal', 'Soft-spot-blocked tick', '--json'],
+      { cwd: dir },
+    );
+    const created = JSON.parse(createResult.stdout);
+    const taskPath = path.join(dir, created.loop.task.nativeTaskPath);
+    const taskMarkdown = await readFile(taskPath, 'utf8');
+
+    // Empty out "Files or Areas Not to Touch" so the contract-hardening gate
+    // has exactly one blocking (unbounded-scope) soft spot and nothing else
+    // in the repo is dirty — a regression here would burn a loop iteration
+    // with `decision: 'continue'` instead of asking a human to harden.
+    const emptied = taskMarkdown.replace(
+      /## Files or Areas Not to Touch\n(?:- .*\n)+/,
+      '## Files or Areas Not to Touch\n- None recorded yet.\n',
+    );
+    expect(emptied).not.toBe(taskMarkdown);
+    const blockingSpots = analyzeContract(emptied).filter((s) => s.severity === 'blocking');
+    expect(blockingSpots).toHaveLength(1);
+    expect(blockingSpots[0].type).toBe('unbounded-scope');
+    await writeFile(taskPath, emptied);
+
+    const tickResult = await execa(
+      tsxPath,
+      [cliPath, 'loop', 'tick', '--id', created.loop.id, '--json'],
+      { cwd: dir },
+    );
+    const tick = JSON.parse(tickResult.stdout);
+
+    expect(tick.iteration).toMatchObject({
+      index: 1,
+      decision: 'ask-human',
+      readinessStatus: 'blocked',
+      stopReason: 'readiness gates need human review',
+      nextAction: 'agentloop harden',
+    });
+    expect(tick.loop.status).toBe('blocked');
+    expect(tick.loop.stopReason).toBe('readiness gates need human review');
+  });
+
   test('rejects ticks while a loop is blocked for human review', async () => {
     const dir = await createLoopFixture();
     const createResult = await execa(

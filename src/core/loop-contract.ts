@@ -906,7 +906,13 @@ export async function createLoop(options: {
 }
 
 function readinessNeedsHumanReview(ready: Awaited<ReturnType<typeof evaluateReady>>) {
-  const humanGateIds = new Set(['task-contract', 'acceptance-criteria', 'scope-drift', 'forbidden-files']);
+  const humanGateIds = new Set([
+    'task-contract',
+    'acceptance-criteria',
+    'scope-drift',
+    'forbidden-files',
+    'contract-hardening',
+  ]);
   if (ready.gates.some((gate) => gate.status === 'fail' && humanGateIds.has(gate.id))) {
     return true;
   }

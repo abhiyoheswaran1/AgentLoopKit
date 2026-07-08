@@ -446,6 +446,13 @@ export function createTaskCommand() {
           for (const warning of warnings) {
             console.log(`Warning: ${warning.message}`);
           }
+          if (task) {
+            const softSpots = analyzeContract(task.markdown);
+            console.log(renderSoftSpotsText(softSpots));
+            if (softSpots.length > 0) {
+              console.log('Run `agentloop harden --resolve <id> --answer "..."` to resolve them.');
+            }
+          }
           return;
         } catch (error) {
           if (options.json && error instanceof AgentLoopError) {

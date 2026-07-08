@@ -30,7 +30,7 @@ function appendToSection(markdown: string, heading: string, entry: string): stri
     return `${markdown.trimEnd()}\n\n## ${heading}\n${entry}\n`;
   }
   let end = headingIndex + 1;
-  while (end < lines.length && !/^##\s+/.test(lines[end])) end += 1;
+  while (end < lines.length && !/^#{2,}\s+/.test(lines[end])) end += 1;
   const body = lines.slice(headingIndex + 1, end);
   const placeholderIndex = body.findIndex((l) => EMPTY_LINE.test(l.trim()) && l.trim() !== '');
   if (placeholderIndex >= 0) {

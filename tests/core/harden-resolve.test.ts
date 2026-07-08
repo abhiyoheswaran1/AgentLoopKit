@@ -197,6 +197,50 @@ describe('`###` subheading is a section boundary, not corruptible content (FIX 1
   });
 });
 
+describe('`###` subheading is a section boundary for appended (not replaced) entries (FIX G)', () => {
+  it('appends a second Hardening Log entry before a `### Notes` subheading, and leaves the subheading untouched', () => {
+    // The Hardening Log already has one real (non-placeholder) entry, so
+    // resolving another spot exercises appendToSection's *push* path (not
+    // the in-place placeholder replacement, which is a no-op either way).
+    // A `### Notes` subheading follows within the same nominal section —
+    // the old `/^##\s+/` terminator does not match `### Notes` and would
+    // let the new entry leak past it.
+    const markdown = [
+      '## Files or Areas Not to Touch',
+      '- None recorded yet.',
+      '## Hardening Log',
+      '- [seed:entry:0] Pre-existing hardening note.',
+      '### Notes',
+      'Some prose about scope that must survive untouched.',
+      '## Acceptance Criteria',
+      `- ${PROOF_ANSWER}`,
+    ].join('\n');
+
+    const spot = analyzeContract(markdown).find((s) => s.type === 'unbounded-scope');
+    expect(spot, 'expected an unbounded-scope spot in fixture').toBeDefined();
+
+    const result = applyResolution(markdown, spot!.id, 'Published release tarballs');
+
+    const seedIndex = result.indexOf('- [seed:entry:0] Pre-existing hardening note.');
+    const notesIndex = result.indexOf('### Notes');
+    const newEntryIndex = result.indexOf(`- [${spot!.id}] Published release tarballs`);
+
+    expect(seedIndex).toBeGreaterThan(-1);
+    expect(notesIndex).toBeGreaterThan(-1);
+    expect(newEntryIndex).toBeGreaterThan(-1);
+    // The new entry must land between the existing Hardening Log entry and
+    // the `### Notes` subheading — a leaky terminator would instead push it
+    // after `### Notes`'s prose.
+    expect(newEntryIndex).toBeGreaterThan(seedIndex);
+    expect(newEntryIndex).toBeLessThan(notesIndex);
+
+    // The subheading and its prose must be preserved verbatim.
+    expect(result).toContain('### Notes');
+    expect(result).toContain('Some prose about scope that must survive untouched.');
+    expect(analyzeContract(result).some((s) => s.type === 'unbounded-scope')).toBe(false);
+  });
+});
+
 describe('placeholder resolution with non-canonical spacing (FIX A)', () => {
   it('detects and resolves a placeholder line with extra internal spaces', () => {
     // A placeholder with double space (non-canonical) should still be detected

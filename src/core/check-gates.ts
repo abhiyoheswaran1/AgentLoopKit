@@ -14,7 +14,7 @@ import {
   parseGitStatus,
 } from './git.js';
 import { dirtyCoveredByLatestHandoffRun } from './handoff-coverage.js';
-import { analyzeContract } from './harden.js';
+import { analyzeContract, hardenNextAction } from './harden.js';
 import { inlineCode } from './markdown-format.js';
 import { listRuns, RunSummary } from './runs.js';
 import { getActiveTask, inspectTaskDirectory } from './task-state.js';
@@ -126,6 +126,7 @@ function chooseNextAction(
     dirtyCoveredByLatestHandoffRun: boolean;
     dirtyNonEvidenceFileCount: number;
     dirtyNonEvidenceFileExamples: string[];
+    blockingSoftSpotCount: number;
   },
 ) {
   const withDirtyCreateTaskGuidance = (reason: string) => {
@@ -138,6 +139,7 @@ function chooseNextAction(
     return `${reason} ${input.dirtyNonEvidenceFileCount} existing dirty non-evidence ${noun} will be present when the new task starts; confirm ${pronoun} to that task before implementation.${examples}`;
   };
   const task = gates.find((item) => item.id === 'task-contract');
+  const hardening = gates.find((item) => item.id === 'contract-hardening');
   const report = gates.find((item) => item.id === 'verification-report');
   const handoff = gates.find((item) => item.id === 'handoff-summary');
   const taskHygiene = gates.find((item) => item.id === 'task-hygiene');
@@ -148,6 +150,9 @@ function chooseNextAction(
         'Create a task contract before review gates can pass.',
       ),
     };
+  }
+  if (hardening && (hardening.status === 'fail' || hardening.status === 'warn')) {
+    return hardenNextAction(input.blockingSoftSpotCount);
   }
   if (report?.status === 'fail') {
     return {
@@ -307,6 +312,7 @@ export async function checkGates(options: {
     },
   );
   const gates: GateCheck[] = [];
+  let blockingSoftSpotCount = 0;
 
   if (taskPath) {
     const taskMarkdown = await readFile(taskPath, 'utf8');
@@ -321,6 +327,7 @@ export async function checkGates(options: {
     );
     const softSpots = analyzeContract(taskMarkdown);
     const blockingCount = softSpots.filter((s) => s.severity === 'blocking').length;
+    blockingSoftSpotCount = blockingCount;
     gates.push(
       gate(
         'contract-hardening',
@@ -492,6 +499,7 @@ export async function checkGates(options: {
       dirtyNonEvidenceFileExamples: dirtyNonEvidenceFiles
         .slice(0, DIRTY_WORKTREE_EXAMPLE_LIMIT)
         .map((file) => file.path),
+      blockingSoftSpotCount,
     }),
   };
   return { ...withoutMarkdown, markdown: renderMarkdown(withoutMarkdown) };

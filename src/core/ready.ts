@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import type { AgentLoopConfig } from './config.js';
 import { buildContextBudget } from './context-budget.js';
 import { getCurrentWorkTaskPath } from './evidence.js';
-import { analyzeContract } from './harden.js';
+import { analyzeContract, hardenNextAction } from './harden.js';
 import {
   buildEvidenceMap,
   compactEvidenceMap,
@@ -128,6 +128,7 @@ function buildReadyGates(input: {
   taskMarkdown?: string;
   tokenReceipt: AgentLoopTokenReceipt;
   allowSoftSpots?: boolean;
+  blockingSoftSpotCount: number;
 }) {
   const taskPath = input.taskPath
     ? path.relative(input.cwd, input.taskPath).split(path.sep).join('/')
@@ -141,8 +142,7 @@ function buildReadyGates(input: {
   );
   gates.push(acceptanceGate({ taskPath, taskMarkdown: input.taskMarkdown }));
   if (input.taskMarkdown !== undefined) {
-    const softSpots = analyzeContract(input.taskMarkdown);
-    const blockingCount = softSpots.filter((s) => s.severity === 'blocking').length;
+    const blockingCount = input.blockingSoftSpotCount;
     gates.push(
       gate(
         'contract-hardening',
@@ -203,7 +203,7 @@ function statusFromGates(gates: ReadyGate[]): ReadyStatus {
   return gates.some((item) => item.status === 'fail') ? 'blocked' : 'ready';
 }
 
-function chooseReadyNextAction(gates: ReadyGate[]): ReadyNextAction {
+function chooseReadyNextAction(gates: ReadyGate[], blockingSoftSpotCount: number): ReadyNextAction {
   const failed = gates.find((item) => item.status === 'fail');
   if (!failed) {
     return {
@@ -222,6 +222,9 @@ function chooseReadyNextAction(gates: ReadyGate[]): ReadyNextAction {
       command: 'agentloop task doctor',
       reason: 'Replace placeholder acceptance criteria before continuing agent work.',
     };
+  }
+  if (failed.id === 'contract-hardening') {
+    return hardenNextAction(blockingSoftSpotCount);
   }
   if (failed.id === 'verification') {
     return {
@@ -301,6 +304,10 @@ export async function evaluateReady(options: {
       nextActions: map.nextActions,
     }),
   });
+  const blockingSoftSpotCount =
+    taskMarkdown !== undefined
+      ? analyzeContract(taskMarkdown).filter((spot) => spot.severity === 'blocking').length
+      : 0;
   const gates = buildReadyGates({
     cwd: options.cwd,
     map,
@@ -308,9 +315,10 @@ export async function evaluateReady(options: {
     taskMarkdown,
     tokenReceipt,
     allowSoftSpots: options.allowSoftSpots,
+    blockingSoftSpotCount,
   });
   const status = statusFromGates(gates);
-  const nextAction = chooseReadyNextAction(gates);
+  const nextAction = chooseReadyNextAction(gates, blockingSoftSpotCount);
   const withoutMarkdown = {
     status,
     gates,
