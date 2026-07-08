@@ -30,9 +30,9 @@ async function createPreparePrFixture(
   tempDirs.push(dir);
   const acceptanceCriteria =
     options.acceptanceCriteria ??
-    `- Password-reset login redirects to the requested page.
-- Existing session login still redirects to the dashboard.
-- Reviewer can see every acceptance criterion in the PR body.`;
+    `- Password-reset login redirects to the requested page. Verify with \`npm test -- auth\`.
+- Existing session login still redirects to the dashboard. Verify with \`npm test -- auth\`.
+- Reviewer can see every acceptance criterion in the PR body. Confirmed by \`prepare-pr --json\` output.`;
   const riskNotes = options.riskNotes ?? '- Auth flow touched; review redirect edge cases.';
 
   await git(dir, ['init', '-q']);
@@ -81,6 +81,9 @@ ${options.desiredOutcome ?? 'Users land on the intended destination after a succ
 
 ## Likely Files or Areas
 - src/auth
+
+## Files or Areas Not to Touch
+- node_modules/
 
 ## Acceptance Criteria
 ${acceptanceCriteria}

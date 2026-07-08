@@ -22,7 +22,7 @@ async function createRepoWithEvidence() {
   await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
   await writeFile(
     path.join(dir, '.agentloop/tasks/2026-06-10-ci-summary.md'),
-    '# CI summary task\n\n- Status: in-progress\n',
+    '# CI summary task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- node_modules/\n',
   );
   await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
   await writeFile(

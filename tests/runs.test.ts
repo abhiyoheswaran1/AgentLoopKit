@@ -79,8 +79,11 @@ Login redirects users to the wrong page after password reset.
 ## Desired Outcome
 Users land on the intended destination after a successful login.
 
+## Files or Areas Not to Touch
+- node_modules/
+
 ## Acceptance Criteria
-- Password-reset login redirects to the requested page.
+- Password-reset login redirects to the requested page. Verify with \`npm test -- auth\`.
 
 ## Verification Commands
 - npm test -- auth

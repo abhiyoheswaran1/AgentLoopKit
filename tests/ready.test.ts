@@ -19,6 +19,7 @@ async function createReadyFixture(
   options: {
     verification?: 'pass' | 'fail' | 'missing';
     acceptancePlaceholder?: boolean;
+    acceptanceCriterion?: string;
     changedFile?: string;
     forbiddenFile?: string;
   } = {},
@@ -70,7 +71,7 @@ Users understand the auth redirect.
 - ${
       options.acceptancePlaceholder
         ? 'Add acceptance criteria before implementation starts.'
-        : 'Auth copy is clearer.'
+        : options.acceptanceCriterion ?? 'Auth copy is clearer.'
     }
 
 ## Verification Commands
@@ -148,7 +149,13 @@ describe('ready command', () => {
   });
 
   test('marks review readiness when task scope, acceptance, verification, and drift gates pass', async () => {
-    const dir = await createReadyFixture();
+    // Uses a hardened acceptance criterion (references the verification command)
+    // so the contract-hardening gate itself passes; the default fixture's generic
+    // "Auth copy is clearer." criterion is deliberately a blocking soft spot, used
+    // by the contract-hardening-specific tests below.
+    const dir = await createReadyFixture({
+      acceptanceCriterion: '`npm test -- auth` passes with the new auth copy.',
+    });
 
     const result = await execa(tsxPath, [cliPath, 'ready', '--json', '--redact-paths'], {
       cwd: dir,
@@ -160,6 +167,7 @@ describe('ready command', () => {
       expect.arrayContaining([
         expect.objectContaining({ id: 'task-contract', status: 'pass' }),
         expect.objectContaining({ id: 'acceptance-criteria', status: 'pass' }),
+        expect.objectContaining({ id: 'contract-hardening', status: 'pass' }),
         expect.objectContaining({ id: 'verification', status: 'pass' }),
         expect.objectContaining({ id: 'scope-drift', status: 'pass' }),
       ]),
@@ -280,16 +288,38 @@ describe('ready command', () => {
     expect(result.stdout).not.toContain(dir);
   });
 
-  test('surfaces a contract-hardening warning for unresolved blocking soft spots', async () => {
+  test('surfaces a contract-hardening failure for unresolved blocking soft spots by default, and a warning with --allow-soft-spots', async () => {
     const dir = await createReadyFixture();
 
-    const result = await execa(tsxPath, [cliPath, 'ready', '--json'], { cwd: dir });
+    // The fixture's acceptance criterion ("Auth copy is clearer.") has no checkable
+    // predicate, which analyzeContract flags as a blocking soft spot. By default the
+    // contract-hardening gate now fails (and blocks readiness); --allow-soft-spots
+    // downgrades it to a warning that no longer blocks readiness.
+    const result = await execa(tsxPath, [cliPath, 'ready', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
     const payload = JSON.parse(result.stdout);
 
-    // The fixture's acceptance criterion ("Auth copy is clearer.") has no checkable
-    // predicate, which analyzeContract flags as a blocking soft spot. Ready surfaces
-    // it as a warn-only gate (ready only escalates status on `fail`, by design).
     expect(payload.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'contract-hardening',
+          status: 'fail',
+          message: expect.stringMatching(/soft spot/i),
+        }),
+      ]),
+    );
+    expect(payload.status).toBe('blocked');
+
+    const allowResult = await execa(
+      tsxPath,
+      [cliPath, 'ready', '--allow-soft-spots', '--json'],
+      { cwd: dir },
+    );
+    const allowPayload = JSON.parse(allowResult.stdout);
+
+    expect(allowPayload.gates).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           id: 'contract-hardening',
@@ -298,7 +328,7 @@ describe('ready command', () => {
         }),
       ]),
     );
-    expect(payload.status).toBe('ready');
+    expect(allowPayload.status).toBe('ready');
   });
 
   test('blocks readiness on a thin contract by default; --allow-soft-spots warns instead', async () => {

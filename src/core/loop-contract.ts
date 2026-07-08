@@ -775,6 +775,7 @@ export async function createLoop(options: {
 
   const id = `${formatTimestamp()}-${slugify(goal)}`;
   const loopPath = loopPathForId({ cwd: options.cwd, config: options.config, id });
+  const loopRelativePath = relativePath(options.cwd, loopPath);
   const task = await createTaskContractFile({
     cwd: options.cwd,
     config: options.config,
@@ -801,13 +802,21 @@ export async function createLoop(options: {
           : 'Do not auto-merge, auto-publish, or execute coding-agent commands.',
       ],
       likelyFiles: [
-        relativePath(options.cwd, loopPath),
+        loopRelativePath,
         ...(presetConfig?.likelyFiles ?? DEFAULT_LOOP_LIKELY_FILES),
       ],
+      forbiddenFiles: [
+        '.github/workflows/ (CI credentials and release pipelines)',
+        'package.json (publish and version fields)',
+      ],
       acceptanceCriteria: [
-        'Loop iterations record readiness and context-budget evidence.',
-        'Loop stop conditions are visible before agent work continues.',
-        ...(runner ? ['Configured runner output, exit code, and changed files are recorded per run.'] : []),
+        `\`${loopRelativePath}\`'s \`iterations\` array records a readiness status and token receipt after every tick.`,
+        `\`${loopRelativePath}\`'s \`stopConditions\` list matches its \`budget.maxIterations\` and \`budget.maxEstimatedTokens\`.`,
+        ...(runner
+          ? [
+              `The guarded local process recorded in \`${loopRelativePath}\` writes its exit code and changed-file count into the next iteration entry.`,
+            ]
+          : []),
       ],
       verificationCommands: ['agentloop ready --strict'],
       riskNotes: [
@@ -815,7 +824,7 @@ export async function createLoop(options: {
           ? 'Loop runner execution is opt-in, exact-command matched, non-shell, timeout bounded, and protected command families are blocked.'
           : 'Loop suggested commands are guidance only; AgentLoopKit does not run them.',
       ],
-      rollbackNotes: `Delete ${relativePath(options.cwd, loopPath)} and close this loop task if the loop is abandoned.`,
+      rollbackNotes: `Delete ${loopRelativePath} and close this loop task if the loop is abandoned.`,
       createdDate: formatDate(),
     },
   });

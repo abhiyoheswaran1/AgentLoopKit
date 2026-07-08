@@ -110,7 +110,11 @@ describe('loop command', () => {
     expect(taskMarkdown).toContain('- AGENTS.md');
     expect(taskMarkdown).toContain('- AGENTLOOP.md');
     expect(taskMarkdown).toContain('- DECISIONS.md');
-    expect(taskMarkdown).toContain('Loop iterations record readiness and context-budget evidence.');
+    expect(taskMarkdown).toContain(
+      "iterations` array records a readiness status and token receipt after every tick.",
+    );
+    expect(taskMarkdown).toContain('## Files or Areas Not to Touch');
+    expect(taskMarkdown).toContain('- .github/workflows/ (CI credentials and release pipelines)');
     expect(payload.markdown).toContain('AgentLoopKit will not execute a coding agent for this loop.');
   });
 

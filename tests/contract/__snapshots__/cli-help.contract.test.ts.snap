@@ -41,6 +41,8 @@ Check whether task, verification, handoff, harness, policy, and git gates pass
 Options:
   --json                         print machine-readable output
   --strict                       treat warning gates as failures
+  --allow-soft-spots             treat unresolved blocking soft spots as a
+                                 warning instead of a failure
   --redact-paths                 redact local absolute paths in public output
   --baseframe-task-id <task-id>  Baseframe task ID when reconciling AgentFlight
                                  results
@@ -409,10 +411,12 @@ exports[`CLI help contract > help for "ready" is locked 1`] = `
 Check whether local agent work is ready for review
 
 Options:
-  --strict        exit non-zero when readiness is blocked
-  --json          print machine-readable output
-  --redact-paths  redact local absolute paths in public output
-  -h, --help      display help for command"
+  --strict            exit non-zero when readiness is blocked
+  --allow-soft-spots  treat unresolved blocking soft spots as a warning instead
+                      of a failure
+  --json              print machine-readable output
+  --redact-paths      redact local absolute paths in public output
+  -h, --help          display help for command"
 `;
 
 exports[`CLI help contract > help for "release-check" is locked 1`] = `

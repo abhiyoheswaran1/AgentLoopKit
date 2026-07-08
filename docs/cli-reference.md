@@ -275,6 +275,7 @@ See [context.md](context.md).
 agentloop ready
 agentloop ready --json
 agentloop ready --strict
+agentloop ready --allow-soft-spots
 agentloop ready --redact-paths
 
 agentloop loop create --goal "Keep AgentLoopKit release-ready"
@@ -292,6 +293,8 @@ agentloop loop report --json --redact-paths
 ```
 
 `ready` checks whether the current local work is ready for review. It evaluates the active task contract, acceptance criteria, verification evidence, scope drift, forbidden files, and context-budget pressure. Human output includes gates, next action, token receipt, and the safety boundary. JSON output keeps the same data for scripts. Use `--strict` when blocked readiness should exit non-zero.
+
+The `contract-hardening` gate fails readiness by default when the active task contract has unresolved blocking soft spots (run `agentloop harden` to resolve them). Use `--allow-soft-spots` to downgrade that gate to a warning instead of blocking readiness.
 
 `loop create` writes a versioned local loop contract under `.agentloop/loops/<loop-id>/loop.json` and creates a normal AgentLoopKit task contract for the goal. The loop contract records the goal, cadence, budget, stop conditions, suggested commands, native task path, token receipt, and safety flags. Presets are `agentloopkit-maintenance`, `docs-drift`, `release-readiness`, and `baseframe-integration`. Add `--runner-command` only when a reviewed local command should run through `loop run`; add `--runner-timeout-ms` to bound that command.
 
@@ -524,6 +527,7 @@ It is read-only. It does not write reports, run verification commands, call GitH
 agentloop check-gates
 agentloop check-gates --json
 agentloop check-gates --strict
+agentloop check-gates --allow-soft-spots
 agentloop check-gates --redact-paths
 agentloop check-gates \
   --baseframe-task-id auth-password-reset-20260626-01 \
@@ -545,6 +549,8 @@ When `check-gates` recommends `agentloop create-task` while dirty non-evidence f
 Use `--baseframe-task-id <task-id> --from-agentflight <path>` to reconcile a Baseframe AgentFlight result against `.baseframe/evidence/<task-id>/agentloopkit-task.json`. This mode matches verification commands to required gates, surfaces failed, missing, incomplete, and scope-drift evidence, and updates the JSON task contract without requiring AgentFlight for normal standalone gate checks.
 
 Warnings keep exit code `0` by default. Use `--strict` in CI when warning gates should fail.
+
+The `contract-hardening` gate fails by default when the active task contract has unresolved blocking soft spots (run `agentloop harden` to resolve them). Use `--allow-soft-spots` to downgrade that gate to a warning instead of failing.
 
 Clean committed work does not fail strict gates only because there are no changed files. The Git context gate reports that state as pass when the repo is inside Git.
 

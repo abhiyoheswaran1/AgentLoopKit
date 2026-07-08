@@ -103,7 +103,7 @@ describe('check-gates command', () => {
     const dir = await createInitializedRepo();
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-17-gate-context.md'),
-      '# Gate context\n\n- Status: in-progress\n',
+      '# Gate context\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- node_modules/\n',
     );
     await writeJson(path.join(dir, '.agentloop/state.json'), {
       version: 1,
@@ -761,7 +761,7 @@ describe('check-gates command', () => {
     await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-09-demo.md'),
-      '# Demo task\n\n- Status: in-progress\n',
+      '# Demo task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- node_modules/\n',
     );
     await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
     await writeFile(
@@ -839,7 +839,7 @@ describe('check-gates command', () => {
     await writeFile(path.join(packageDir, 'changed.ts'), 'export const changed = true;\n');
     await writeFile(
       path.join(packageDir, '.agentloop/tasks/2026-06-09-demo.md'),
-      '# Demo task\n\n- Status: in-progress\n',
+      '# Demo task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- node_modules/\n',
     );
     await mkdir(path.join(packageDir, '.agentloop/reports'), { recursive: true });
     await writeFile(
@@ -1054,7 +1054,7 @@ describe('check-gates command', () => {
     await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-09-active-task.md'),
-      '# Active task\n\n- Status: in-progress\n',
+      '# Active task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- node_modules/\n',
     );
     await writeFile(
       path.join(dir, '.agentloop/tasks/2026-06-09-finished-task.md'),
@@ -1253,51 +1253,6 @@ describe('check-gates command', () => {
         }),
       ]),
     );
-  });
-
-  test('warns on unresolved contract soft spots without failing by default, and fails under --strict', async () => {
-    const dir = await createInitializedRepo();
-    await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
-    await writeFile(
-      path.join(dir, '.agentloop/tasks/2026-06-09-soft-spots.md'),
-      '# Soft spots task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- None recorded yet.\n',
-    );
-    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
-    await writeFile(
-      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
-      '# Verification Report\n\nOverall status: pass\n',
-    );
-    await writeFile(
-      path.join(dir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
-      '# PR Summary\n\nVerification status: Overall status: pass\n',
-    );
-    await commitAll(dir);
-
-    const defaultResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
-      cwd: dir,
-      reject: false,
-    });
-    const strictResult = await execa(tsxPath, [cliPath, 'check-gates', '--strict', '--json'], {
-      cwd: dir,
-      reject: false,
-    });
-
-    expect(defaultResult.exitCode).toBe(0);
-    const defaultOutput = JSON.parse(defaultResult.stdout);
-    expect(defaultOutput.overallStatus).toBe('warn');
-    expect(defaultOutput.gates).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: 'contract-hardening',
-          status: 'warn',
-          message: expect.stringMatching(/soft spot/i),
-        }),
-      ]),
-    );
-
-    expect(strictResult.exitCode).toBe(1);
-    const strictOutput = JSON.parse(strictResult.stdout);
-    expect(strictOutput.overallStatus).toBe('fail');
   });
 
   test('fails the contract-hardening gate by default on a thin contract', async () => {

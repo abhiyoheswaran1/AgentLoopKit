@@ -20,6 +20,7 @@ If a verified task was archived after handoff, `check-gates` can use the latest 
 agentloop check-gates
 agentloop check-gates --json
 agentloop check-gates --strict
+agentloop check-gates --allow-soft-spots
 agentloop check-gates --redact-paths
 agentloop check-gates \
   --baseframe-task-id auth-password-reset-20260626-01 \
@@ -37,6 +38,7 @@ Statuses:
 - `fail`: core evidence is missing or failed
 
 The command exits with code `1` when any gate fails. Warnings keep exit code `0`.
+The `contract-hardening` gate fails by default when the active task contract has unresolved blocking soft spots (run `agentloop harden` to resolve them). Use `--allow-soft-spots` to downgrade that gate to a warning instead of failing.
 Task-folder hygiene issues are warnings by default. Run `agentloop task doctor` for the detailed cleanup list.
 When task, verification, and handoff evidence are present but task hygiene still warns, the next action points to `agentloop task doctor`.
 When a clean Git tree has current task, verification, and handoff evidence, the Git context gate passes and reports that no changed files were detected.
