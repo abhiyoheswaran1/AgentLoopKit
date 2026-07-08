@@ -170,6 +170,33 @@ describe('batched sequential placeholder resolution (FIX 2 — stable ids)', () 
   });
 });
 
+describe('`###` subheading is a section boundary, not corruptible content (FIX 1)', () => {
+  it('does not treat a `### Notes` subheading following Acceptance Criteria as an untestable-acceptance line, and never overwrites it', () => {
+    const markdown = [
+      '## Acceptance Criteria',
+      '- The feature works well',
+      '### Notes',
+      'Some prose about scope that must survive untouched.',
+      '## Files or Areas Not to Touch',
+      '- src/legacy',
+    ].join('\n');
+
+    // Only the real criterion line should be flagged — the `### Notes`
+    // subheading and its prose must not leak into the Acceptance Criteria
+    // body and be misidentified as untestable-acceptance spots.
+    const spots = analyzeContract(markdown).filter((s) => s.type === 'untestable-acceptance');
+    expect(spots).toHaveLength(1);
+
+    const result = applyResolution(markdown, spots[0].id, PROOF_ANSWER);
+
+    // The subheading and its prose must be preserved verbatim — a leaky
+    // section boundary would let replaceAcceptanceLine overwrite one of them.
+    expect(result).toContain('### Notes');
+    expect(result).toContain('Some prose about scope that must survive untouched.');
+    expect(result).toContain(`- ${PROOF_ANSWER}`);
+  });
+});
+
 describe('placeholder resolution with non-canonical spacing (FIX A)', () => {
   it('detects and resolves a placeholder line with extra internal spaces', () => {
     // A placeholder with double space (non-canonical) should still be detected

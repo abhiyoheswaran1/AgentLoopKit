@@ -24,6 +24,53 @@ describe('parseVerificationCommandResults', () => {
     expect(m.get('lint')).toBe('fail');
     expect(parseVerificationCommandResults('').size).toBe(0);
   });
+
+  it('fails closed on key collision: a fail is never overwritten by a later pass (FIX 2)', () => {
+    // Multiple post-verification gates render under the shared
+    // `post-verification` key. If the first gate fails and a later one
+    // passes, the key must stay `fail` — never last-wins.
+    const collidingReport = [
+      '### post-verification: `node gate-one.mjs`',
+      '- Exit code: 1',
+      '- Status: fail',
+      '',
+      '### post-verification: `node gate-two.mjs`',
+      '- Exit code: 0',
+      '- Status: pass',
+    ].join('\n');
+    const m = parseVerificationCommandResults(collidingReport);
+    expect(m.get('post-verification')).toBe('fail');
+  });
+
+  it('fails closed regardless of pass/fail order for a colliding key', () => {
+    const passThenFail = [
+      '### post-verification: `node gate-one.mjs`',
+      '- Exit code: 0',
+      '- Status: pass',
+      '',
+      '### post-verification: `node gate-two.mjs`',
+      '- Exit code: 1',
+      '- Status: fail',
+    ].join('\n');
+    expect(parseVerificationCommandResults(passThenFail).get('post-verification')).toBe('fail');
+  });
+});
+
+describe('reconcileCriteriaCoverage — fail-closed collision (FIX 2)', () => {
+  it('does not mark a criterion "proven" when its verification key collided fail-then-pass', () => {
+    const collidingReport = [
+      '### post-verification: `node gate-one.mjs`',
+      '- Exit code: 1',
+      '- Status: fail',
+      '',
+      '### post-verification: `node gate-two.mjs`',
+      '- Exit code: 0',
+      '- Status: pass',
+    ].join('\n');
+    const task = '## Acceptance Criteria\n- Release is safe to ship (verified by: post-verification)';
+    const c = reconcileCriteriaCoverage(task, collidingReport);
+    expect(c.criteria[0].status).toBe('failing');
+  });
 });
 
 describe('reconcileCriteriaCoverage', () => {
@@ -74,5 +121,18 @@ describe('renderCriteriaCoverageMarkdown', () => {
     expect(md).toContain('## Criteria Coverage');
     expect(md).toMatch(/proven/);
     expect(md).toContain('A');
+  });
+
+  it('escapes markdown-breaking characters in criterion text (FIX 4)', () => {
+    // A criterion text containing brackets/asterisks that could break the
+    // rendered markdown (and anything downstream that parses it, e.g. PR
+    // bodies) must come out escaped, matching every sibling field.
+    const task = '## Acceptance Criteria\n- Renders [malicious](javascript:alert(1)) *bold* text (verified by: test)';
+    const c = reconcileCriteriaCoverage(task, report);
+    const md = renderCriteriaCoverageMarkdown(c);
+    // Raw markdown-breaking sequence must not appear unescaped.
+    expect(md).not.toContain('[malicious](javascript:alert(1))');
+    expect(md).toContain('\\[malicious\\]\\(javascript:alert\\(1\\)\\)');
+    expect(md).toContain('\\*bold\\*');
   });
 });

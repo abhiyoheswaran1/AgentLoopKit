@@ -19,7 +19,7 @@ function sectionBodyRange(lines: string[], heading: string): { start: number; en
   const headingIndex = lines.findIndex((l) => l.trim() === `## ${heading}`);
   if (headingIndex === -1) return undefined;
   let end = headingIndex + 1;
-  while (end < lines.length && !/^##\s+/.test(lines[end])) end += 1;
+  while (end < lines.length && !/^#{2,}\s+/.test(lines[end])) end += 1;
   return { start: headingIndex + 1, end };
 }
 

@@ -99,7 +99,7 @@ export function extractMarkdownSectionLines(markdown: string, heading: string) {
 
   const sectionLines: string[] = [];
   for (const line of lines.slice(headingIndex + 1)) {
-    if (/^##\s+/.test(line)) break;
+    if (/^#{2,}\s+/.test(line)) break;
     sectionLines.push(line);
   }
 

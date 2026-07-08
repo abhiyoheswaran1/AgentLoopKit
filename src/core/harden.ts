@@ -3,6 +3,7 @@ import {
   findPlaceholderTaskSections,
   type TaskType,
 } from './task-contract.js';
+import { stripVerifiedByTag } from './criteria-coverage.js';
 
 export type SoftSpotType =
   | 'placeholder'
@@ -97,7 +98,11 @@ function acceptanceLines(markdown: string): string[] {
   return extractMarkdownSectionLines(markdown, 'Acceptance Criteria')
     .map((l) => l.replace(/^-\s*/, '').trim())
     .filter(Boolean)
-    .filter((l) => l.toLowerCase() !== 'add acceptance criteria before implementation starts.');
+    .filter((l) => l.toLowerCase() !== 'add acceptance criteria before implementation starts.')
+    // Strip the `(verified by: ...)` tag before it reaches the untestable/
+    // contradiction rules — the tag's own tokens/digits must not mask an
+    // untestable line or manufacture a false contradiction with Non-Goals.
+    .map((l) => stripVerifiedByTag(l));
 }
 
 function untestableAcceptanceRule(markdown: string): SoftSpot[] {

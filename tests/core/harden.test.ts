@@ -57,6 +57,24 @@ describe('untestable-acceptance rule', () => {
   });
 });
 
+describe('section boundary at `###` subheadings (FIX 1)', () => {
+  it('does not treat a `### Notes` subheading + prose inside Acceptance Criteria as soft spots', () => {
+    const md = [
+      '## Problem Statement', 'Real problem.',
+      '## Non-Goals', '- No SaaS',
+      '## Assumptions', '- Vitest is the snapshot primitive',
+      '## Files or Areas Not to Touch', '- Published tarballs',
+      '## Acceptance Criteria',
+      '- `npm test` passes',
+      '### Notes',
+      'This is just explanatory prose that happens to follow the criteria list.',
+    ].join('\n');
+    const spots = analyzeContract(md);
+    expect(spots.some((s) => s.type === 'untestable-acceptance')).toBe(false);
+    expect(spots).toEqual([]);
+  });
+});
+
 describe('contradiction rule', () => {
   it('flags a contradiction between acceptance and non-goals', () => {
     const md = [
@@ -64,6 +82,33 @@ describe('contradiction rule', () => {
       '## Acceptance Criteria', '- New authentication flow works',
     ].join('\n');
     expect(analyzeContract(md).some((s) => s.type === 'contradiction' && s.severity === 'blocking')).toBe(true);
+  });
+});
+
+describe('acceptanceLines strips the (verified by: ...) tag before rule evaluation (FIX 3)', () => {
+  it('still flags a line as untestable when its only proof hint lived in the tag', () => {
+    // "perf2" contains a digit, which would satisfy PROOF_HINTS if the raw,
+    // tagged line were evaluated. After stripping the tag, "The app feels
+    // fast" has no checkable predicate and must be flagged.
+    const md = ['## Acceptance Criteria', '- The app feels fast (verified by: perf2)'].join('\n');
+    const spots = analyzeContract(md);
+    expect(spots.some((s) => s.type === 'untestable-acceptance')).toBe(true);
+  });
+
+  it('does not flag untestable-acceptance when the criterion text itself has a proof hint, even though a tag is present', () => {
+    const md = ['## Acceptance Criteria', '- `npm test` passes (verified by: test)'].join('\n');
+    expect(analyzeContract(md).some((s) => s.type === 'untestable-acceptance')).toBe(false);
+  });
+
+  it('does not raise a contradiction purely from tokens inside the (verified by: ...) tag', () => {
+    // The Non-Goals line shares "export"/"pipeline" only with the tag key
+    // ("export-pipeline-check"), not with the criterion's own text ("New CSV
+    // download completes"). Once the tag is stripped, there is no overlap.
+    const md = [
+      '## Non-Goals', '- Skip legacy export pipeline',
+      '## Acceptance Criteria', '- New CSV download completes (verified by: export-pipeline-check)',
+    ].join('\n');
+    expect(analyzeContract(md).some((s) => s.type === 'contradiction')).toBe(false);
   });
 });
 

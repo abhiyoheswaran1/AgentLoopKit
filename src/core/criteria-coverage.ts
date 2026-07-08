@@ -1,4 +1,5 @@
 import { extractMarkdownSectionLines } from './task-contract.js';
+import { escapeMarkdownProse } from './markdown-format.js';
 
 const ACCEPTANCE_PLACEHOLDER = 'add acceptance criteria before implementation starts.';
 
@@ -17,7 +18,14 @@ export function parseVerificationCommandResults(
     }
     const status = line.match(/^-\s*Status:\s*(pass|fail)\b/i);
     if (status && currentKey) {
-      results.set(currentKey, status[1].toLowerCase() as 'pass' | 'fail');
+      const value = status[1].toLowerCase() as 'pass' | 'fail';
+      // Fail-closed: once a key has recorded a failure, later occurrences of
+      // the same key (e.g. multiple post-verification gates rendered under
+      // the shared "post-verification" key) must never overwrite it with a
+      // pass — any fail for a key makes the whole key a fail.
+      if (results.get(currentKey) !== 'fail') {
+        results.set(currentKey, value);
+      }
       currentKey = undefined;
     }
   }
@@ -31,9 +39,21 @@ export type CriteriaCoverage = {
   summary: { total: number; proven: number; failing: number; notRun: number; unlinked: number };
 };
 
+const VERIFIED_BY_TAG_RE = /\(verified by:\s*([^)]*)\)\s*$/i;
+
+// Strip a trailing `(verified by: ...)` tag from a criterion line, leaving
+// just the criterion text. Shared with harden.ts's acceptanceLines() so both
+// modules agree on what counts as the criterion's testable content — the tag
+// itself must never mask an untestable line or trigger a false contradiction.
+export function stripVerifiedByTag(raw: string): string {
+  const tag = raw.match(VERIFIED_BY_TAG_RE);
+  if (!tag) return raw.trim();
+  return raw.slice(0, tag.index).trim();
+}
+
 function parseCriterion(raw: string): { text: string; linkedKeys: string[] } {
   const stripped = raw.replace(/^-\s*/, '').trim();
-  const tag = stripped.match(/\(verified by:\s*([^)]*)\)\s*$/i);
+  const tag = stripped.match(VERIFIED_BY_TAG_RE);
   if (!tag) return { text: stripped, linkedKeys: [] };
   const keys = tag[1]
     .split(',')
@@ -88,8 +108,10 @@ export function renderCriteriaCoverageMarkdown(coverage: CriteriaCoverage): stri
   };
   const bullets = criteria
     .map((c) => {
-      const keys = c.linkedKeys.length ? ` (verified by: ${c.linkedKeys.join(', ')})` : '';
-      return `- [${label[c.status]}] ${c.text}${keys}`;
+      const keys = c.linkedKeys.length
+        ? ` (verified by: ${c.linkedKeys.map((k) => escapeMarkdownProse(k)).join(', ')})`
+        : '';
+      return `- [${label[c.status]}] ${escapeMarkdownProse(c.text)}${keys}`;
     })
     .join('\n');
   return `## Criteria Coverage
