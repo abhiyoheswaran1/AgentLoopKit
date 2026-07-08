@@ -98,7 +98,7 @@ export type CompactEvidenceMap = Omit<EvidenceMap, 'files'> & {
 
 export type EvidenceMapTaskEvidenceMode = 'current-or-latest-run' | 'current-work';
 
-type PathPattern = {
+export type PathPattern = {
   value: string;
   kind: 'file' | 'directory';
 };
@@ -182,6 +182,21 @@ function pathMatchesPattern(filePath: string, pattern: PathPattern) {
 
 function pathMatchesAny(filePath: string, patterns: PathPattern[]) {
   return patterns.some((pattern) => pathMatchesPattern(filePath, pattern));
+}
+
+export function taskCoverageKind(
+  filePath: string,
+  patterns: PathPattern[],
+): 'exact' | 'directory' | undefined {
+  const normalizedFile = normalizePath(filePath);
+  let directory: 'directory' | undefined;
+  for (const pattern of patterns) {
+    if (normalizedFile === pattern.value) return 'exact';
+    if (pattern.kind === 'directory' && normalizedFile.startsWith(`${pattern.value}/`)) {
+      directory = 'directory';
+    }
+  }
+  return directory;
 }
 
 function areaByPath(changedFiles: GitFileStatus[]) {
@@ -313,12 +328,17 @@ function explanationFor(input: {
   agentLoopEvidence: boolean;
   forbiddenByTask: boolean;
   coveredByTask: boolean;
+  coveredByTaskKind?: 'exact' | 'directory';
   coveredByRun: boolean;
   riskSensitive: boolean;
 }) {
   if (input.agentLoopEvidence) return 'Generated AgentLoopKit evidence; excluded from unexplained implementation scope.';
   if (input.forbiddenByTask) return 'Changed file matches the task forbidden-file scope.';
-  if (input.coveredByTask) return 'Changed file matches the task likely-file scope.';
+  if (input.coveredByTask) {
+    return input.coveredByTaskKind === 'directory'
+      ? 'Changed file is under a task likely-file directory scope — the file itself is not named.'
+      : 'Changed file matches an exact task likely-file entry.';
+  }
   if (input.coveredByRun) return 'Changed file appears in recent local run-ledger evidence for this task.';
   if (input.riskSensitive) return 'Risk-sensitive changed file lacks local path evidence tying it to the current task.';
   return 'No local task or recent run evidence explains this changed file path.';
@@ -475,6 +495,7 @@ export async function buildEvidenceMap(options: {
       explanation: explanationFor({
         agentLoopEvidence,
         coveredByTask,
+        coveredByTaskKind: coveredByTask ? taskCoverageKind(file.path, likelyPatterns) : undefined,
         coveredByRun,
         forbiddenByTask,
         riskSensitive,

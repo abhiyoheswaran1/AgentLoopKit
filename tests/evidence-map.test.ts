@@ -8,6 +8,7 @@ import {
   renderChangeIntentMarkdown,
   renderEvidenceMapCompactMarkdown,
   renderEvidenceMapMarkdown,
+  taskCoverageKind,
 } from '../src/core/evidence-map.js';
 import { writeVerificationRun } from '../src/core/runs.js';
 import { setActiveTask } from '../src/core/task-state.js';
@@ -469,5 +470,54 @@ Revert the auth callback change.
 
     const map = await buildEvidenceMap({ cwd: dir, config });
     expect(map.files.find((f) => f.path.endsWith('src/x.ts'))?.coveredByRun).toBe(true);
+  });
+
+  test('a file under a directory likely-file entry is covered by directory scope (weaker), stated in its explanation', async () => {
+    // Fixture's task Likely Files includes "src/auth" (a directory); changed file "src/auth/callback.ts".
+    const { dir, config } = await createEvidenceMapFixture();
+
+    const map = await buildEvidenceMap({ cwd: dir, config });
+
+    const callback = map.files.find((f) => f.path === 'src/auth/callback.ts');
+    expect(callback?.coveredByTask).toBe(true);
+    expect(callback?.explanation).toMatch(/directory/i);
+    expect(callback?.explanation).not.toMatch(/exact/i);
+  });
+
+  test('a file that exactly matches a likely-file entry is covered by an exact entry, stated in its explanation', async () => {
+    // Fixture's task Likely Files includes "tests/auth/callback.test.ts" (exact); changed file matches it exactly.
+    const { dir, config } = await createEvidenceMapFixture();
+
+    const map = await buildEvidenceMap({ cwd: dir, config });
+
+    const callbackTest = map.files.find((f) => f.path === 'tests/auth/callback.test.ts');
+    expect(callbackTest?.coveredByTask).toBe(true);
+    expect(callbackTest?.explanation).toMatch(/exact/i);
+  });
+});
+
+describe('taskCoverageKind', () => {
+  test('an exact-file pattern match returns "exact"', () => {
+    expect(
+      taskCoverageKind('src/core/foo.ts', [{ value: 'src/core/foo.ts', kind: 'file' }]),
+    ).toBe('exact');
+  });
+
+  test('a file under a directory pattern returns "directory"', () => {
+    expect(
+      taskCoverageKind('src/core/foo.ts', [{ value: 'src/core', kind: 'directory' }]),
+    ).toBe('directory');
+  });
+
+  test('a file equal to a directory pattern value returns "exact"', () => {
+    expect(taskCoverageKind('src/core', [{ value: 'src/core', kind: 'directory' }])).toBe(
+      'exact',
+    );
+  });
+
+  test('no matching pattern returns undefined', () => {
+    expect(
+      taskCoverageKind('src/core/foo.ts', [{ value: 'other/dir', kind: 'directory' }]),
+    ).toBeUndefined();
   });
 });
