@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.1.0 — 2026-07-08
+
 - Added `agentloop harden`: a front-of-loop pass that interrogates a task contract for unresolved "soft spots" (placeholder sections, untestable acceptance criteria, unbounded scope, unstated assumptions, and contradictions between acceptance criteria and Non-Goals) before implementation starts. Detection is LLM-free and deterministic; the agent conducts the interrogation and AgentLoopKit structures and captures it.
 - Added `agentloop harden --resolve <id> --answer "<text>"` to write a resolution back into the correct contract section and record it in a `## Hardening Log`. Resolution converges for every soft-spot type (the offending line is replaced in place, not appended), and soft-spot ids are stable across resolutions so batched resolves are safe.
 - Surfaced blocking soft spots as a `contract-hardening` gate in `agentloop check-gates` and `agentloop ready`, and `agentloop create-task` reports soft spots by default at task-creation time. The gate warns by default and, in `check-gates --strict`, fails — consistent with the existing advisory/strict duality.

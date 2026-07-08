@@ -1,6 +1,6 @@
 {
   "name": "agentloopkit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "mcpName": "io.github.abhiyoheswaran1/agentloopkit",
   "description": "A drop-in engineering loop for software agents.",
   "type": "module",

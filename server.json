@@ -6,12 +6,12 @@
     "url": "https://github.com/abhiyoheswaran1/AgentLoopKit",
     "source": "github"
   },
-  "version": "1.0.0",
+  "version": "1.1.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "agentloopkit",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "transport": {
         "type": "stdio"
       }
