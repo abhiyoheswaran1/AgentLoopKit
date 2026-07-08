@@ -138,6 +138,14 @@ function sanitizeRunMetadata(cwd: string, metadata: RunMetadata): RunMetadata {
 // checking; this only records the hash).
 export type RunChangedFile = { status: string; path: string; hash?: string };
 
+// `hash` is an internal content-addressing detail used only by the
+// evidence-map's run-coverage comparison (see evidence-map.ts). It must never
+// reach user-facing `--json` output. Call this at the boundary where run
+// changed-file entries are handed to a serialized result object.
+export function toPublicChangedFiles(changedFiles: RunChangedFile[]): GitFileStatus[] {
+  return changedFiles.map(({ status, path: filePath }) => ({ status, path: filePath }));
+}
+
 function sanitizeChangedFiles(cwd: string, changedFiles: GitFileStatus[]): GitFileStatus[] {
   return changedFiles.map((changedFile) => ({
     ...changedFile,

@@ -47,6 +47,7 @@ import {
   listRuns,
   normalizeFileIntentPath,
   readRun,
+  toPublicChangedFiles,
 } from './runs.js';
 
 export type McpToolDefinition = {
@@ -619,7 +620,10 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
     }
     case 'agentloop_show_run': {
       const id = readStringArgument(options.arguments, 'id');
-      return textResult({ run: await readRun(options.cwd, id) });
+      const run = await readRun(options.cwd, id);
+      // Strip the internal content-addressing `hash` before this run record
+      // reaches the MCP tool's user-facing JSON result.
+      return textResult({ run: { ...run, changedFiles: toPublicChangedFiles(run.changedFiles) } });
     }
     case 'agentloop_file_intent': {
       const file = normalizeFileIntentPath(

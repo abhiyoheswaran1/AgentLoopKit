@@ -13,7 +13,7 @@ import { listItems, sectionContent } from './markdown-sections.js';
 import { verificationNotRunItems } from './verification-report-sections.js';
 import { resolveUniqueOutputArtifactPath } from './artifacts.js';
 import { createShipReport, ShipResult } from './ship.js';
-import { listRuns, readRun } from './runs.js';
+import { listRuns, readRun, toPublicChangedFiles } from './runs.js';
 import { readTaskContract, TaskContract } from './task-state.js';
 import { renderCompactChangeAreas } from './change-areas.js';
 import { toSafeDisplayPath } from './display-path.js';
@@ -311,7 +311,10 @@ async function findReusableShipEvidence(options: {
       verificationReportPath: relativePath(options.cwd, verificationReportPath),
       shipReportPath: relativePath(options.cwd, run.shipReportPath),
       handoffPath: run.handoffPath ? relativePath(options.cwd, run.handoffPath) : undefined,
-      changedFiles: record.changedFiles,
+      // Strip the internal content-addressing `hash` before this enters the
+      // user-facing prepare-pr result (top-level `changedFiles` and, via
+      // buildEvidenceMap below, `evidenceMap.files[]`).
+      changedFiles: toPublicChangedFiles(record.changedFiles),
       shipEvidence: {
         source: 'reused',
         runId: run.id,

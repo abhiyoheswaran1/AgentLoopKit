@@ -9,6 +9,7 @@ import {
   findFileIntentWithSearch,
   listRuns,
   readRun,
+  toPublicChangedFiles,
 } from '../../core/runs.js';
 import { singleLineInlineCode as inlineCode } from '../../core/markdown-format.js';
 import type { GitFileStatus } from '../../core/git.js';
@@ -144,8 +145,17 @@ export function showRunCommand() {
       if (!workspace) return;
       try {
         const run = await readRun(workspace.cwd, id);
-        if (options.json) console.log(JSON.stringify({ run }, null, 2));
-        else {
+        if (options.json) {
+          // Strip the internal content-addressing `hash` before this run
+          // record reaches user-facing `--json` output.
+          console.log(
+            JSON.stringify(
+              { run: { ...run, changedFiles: toPublicChangedFiles(run.changedFiles) } },
+              null,
+              2,
+            ),
+          );
+        } else {
           console.log(`# AgentLoopKit Run ${inlineCode(run.metadata.id)}`);
           console.log(`- Command: ${inlineCode(run.metadata.command)}`);
           if (run.metadata.score !== undefined)

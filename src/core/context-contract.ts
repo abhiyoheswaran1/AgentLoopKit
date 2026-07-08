@@ -29,7 +29,7 @@ import {
   RESUME_PACK_TARGETS,
   type ResumePackTarget,
 } from './resume-pack.js';
-import { listRuns, readRun, type RunSummary } from './runs.js';
+import { listRuns, readRun, toPublicChangedFiles, type RunSummary } from './runs.js';
 import { readTaskContract } from './task-state.js';
 
 export { RESUME_PACK_TARGETS };
@@ -682,11 +682,18 @@ export async function showContextHandle(options: {
       if (!latestRun) {
         throw new AgentLoopError('No run is available for handle run:latest.', 'CONTEXT_HANDLE_EMPTY');
       }
+      const latestRunRecord = await readRun(options.cwd, latestRun.id);
       return finalize({
         handle: options.handle,
         kind: 'run',
         content: redactContextContent(
-          `${JSON.stringify(await readRun(options.cwd, latestRun.id), null, 2)}\n`,
+          // Strip the internal content-addressing `hash` before this run
+          // record reaches user-facing context-handle output.
+          `${JSON.stringify(
+            { ...latestRunRecord, changedFiles: toPublicChangedFiles(latestRunRecord.changedFiles) },
+            null,
+            2,
+          )}\n`,
           options,
         ),
       });
