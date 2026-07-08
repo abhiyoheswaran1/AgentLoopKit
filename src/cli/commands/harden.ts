@@ -1,8 +1,9 @@
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { Command } from 'commander';
+import { resolveAgentLoopWorkspaceCwd } from '../../core/config.js';
 import { AgentLoopError } from '../../core/errors.js';
-import { writeTextFile } from '../../core/file-system.js';
+import { resolvesInsidePath, writeTextFile } from '../../core/file-system.js';
 import {
   analyzeContract,
   hasBlockingSoftSpots,
@@ -20,7 +21,22 @@ async function resolveContractPath(
   options: { json?: boolean },
 ): Promise<ResolveWorkspaceResult> {
   if (taskArg) {
-    return { contractPath: path.resolve(process.cwd(), taskArg) };
+    const cwd = process.cwd();
+    const absolutePath = path.resolve(cwd, taskArg);
+    // An explicit [task] path is otherwise spliced straight into a read +
+    // write-back (applyResolution + writeTextFile) with no containment
+    // check, so `agentloop harden ../outside/victim.md ...` could read/
+    // overwrite any file outside the repo. Require it to stay inside the
+    // repo root, mirroring how `verify`/`create-task` validate an explicit
+    // --task/--out path via resolveExplicitArtifactPath.
+    const repoRoot = await resolveAgentLoopWorkspaceCwd(cwd);
+    if (!resolvesInsidePath(repoRoot, absolutePath)) {
+      throw new AgentLoopError(
+        `Task contract path must stay inside the repo (${repoRoot}): ${taskArg}`,
+        'HARDEN_TASK_PATH_OUTSIDE_REPO',
+      );
+    }
+    return { contractPath: absolutePath };
   }
 
   const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json === true);

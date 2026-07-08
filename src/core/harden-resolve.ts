@@ -1,5 +1,6 @@
 import { AgentLoopError } from './errors.js';
 import { analyzeContract, type SoftSpot } from './harden.js';
+import { escapeMarkdownProse } from './markdown-format.js';
 import { REVIEW_CRITICAL_TASK_PLACEHOLDERS, normalizeTaskSectionLine } from './task-contract.js';
 
 const EMPTY_LINE = /^-\s*(none recorded yet\.|none\.|add acceptance criteria before implementation starts\.)?\s*$/i;
@@ -98,7 +99,17 @@ export function applyResolution(markdown: string, spotId: string, answer: string
   if (!spot) {
     throw new HardenResolutionError(`No open soft spot with id "${spotId}".`);
   }
-  const clean = answer.trim();
+  // Sanitize once, up front, and reuse everywhere the answer is spliced into
+  // the contract. An answer is always a single bullet/line — collapsing
+  // newlines prevents it from introducing new markdown line structure, and
+  // escapeMarkdownProse (which escapes a leading/embedded `#`, among other
+  // markdown-structural characters) prevents it from forging a new heading.
+  // Without this, an answer containing "\n\n## Verification Commands\n- ..."
+  // could inject a forged section that downstream parsers (e.g. the first
+  // `## Verification Commands` block picked up by verification tooling)
+  // would treat as real — a local command-injection / verification-bypass
+  // vector via a supported CLI flag.
+  const clean = escapeMarkdownProse(answer.replace(/[\r\n]+/g, ' ').trim());
 
   let withAnswer: string;
   switch (spot.type) {
@@ -123,5 +134,20 @@ export function applyResolution(markdown: string, spotId: string, answer: string
     }
   }
 
-  return appendToSection(withAnswer, 'Hardening Log', `- [${spotId}] ${clean}`);
+  const result = appendToSection(withAnswer, 'Hardening Log', `- [${spotId}] ${clean}`);
+
+  // Only record genuine resolutions. If the same soft spot is still present
+  // after the write-back, the answer didn't actually converge (e.g. an
+  // "untestable-acceptance" resolved with another vague, unverifiable line) —
+  // throw instead of returning the mutated markdown so the CLI writes
+  // nothing and the Hardening Log never claims a spot was cleared when it
+  // wasn't.
+  const remaining = analyzeContract(result);
+  if (remaining.some((s) => s.id === spotId)) {
+    throw new HardenResolutionError(
+      `Resolution did not clear soft spot ${spotId}: the answer still triggers ${spot.type}. Provide a more concrete answer.`,
+    );
+  }
+
+  return result;
 }
