@@ -13,10 +13,20 @@ export function ciSummaryCommand() {
     .description('Summarize CI context and AgentLoop evidence')
     .option('--write', 'write summary to .agentloop/reports')
     .option('--out <path>', 'output Markdown path when using --write')
+    .option(
+      '--allow-soft-spots',
+      'treat unresolved blocking soft spots as a warning instead of a failure',
+    )
     .option('--json', 'print machine-readable output')
     .option('--redact-paths', 'redact local absolute paths in public output and written summary')
     .action(
-      async (options: { write?: boolean; out?: string; json?: boolean; redactPaths?: boolean }) => {
+      async (options: {
+        write?: boolean;
+        out?: string;
+        allowSoftSpots?: boolean;
+        json?: boolean;
+        redactPaths?: boolean;
+      }) => {
         if (!validateOutRequiresWrite(options)) return;
         const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
         if (!workspace) return;
@@ -27,6 +37,7 @@ export function ciSummaryCommand() {
             config: workspace.config,
             write: options.write,
             outPath: options.out,
+            allowSoftSpots: options.allowSoftSpots === true,
             redactPaths: options.redactPaths === true,
           });
         } catch (error) {

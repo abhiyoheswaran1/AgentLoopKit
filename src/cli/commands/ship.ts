@@ -21,6 +21,10 @@ export function shipCommand() {
     .option('--task-commands', 'when using --run-verify, also run verification commands from the task contract')
     .option('--timeout-ms <ms>', 'per-command verification timeout in milliseconds')
     .option('--strict-gates', 'treat warning gates as readiness gate failures')
+    .option(
+      '--allow-soft-spots',
+      'treat unresolved blocking soft spots as a warning instead of a failure',
+    )
     .option('--github-comment', 'include or print GitHub PR comment markdown')
     .option('--redact-paths', 'redact local absolute paths in public output')
     .action(async (options: Record<string, unknown>) => {
@@ -37,6 +41,7 @@ export function shipCommand() {
           taskCommands: options.taskCommands === true,
           timeoutMs: parseTimeoutMs(options.timeoutMs),
           strictGates: options.strictGates === true,
+          allowSoftSpots: options.allowSoftSpots === true,
           redactPaths: options.redactPaths === true,
         });
       } catch (error) {

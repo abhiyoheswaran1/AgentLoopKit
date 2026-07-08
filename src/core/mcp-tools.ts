@@ -220,6 +220,11 @@ const tools: McpToolDefinition[] = [
           type: 'boolean',
           description: 'Treat warning gates as failures. Defaults to false.',
         },
+        allowSoftSpots: {
+          type: 'boolean',
+          description:
+            'Treat unresolved blocking soft spots as a warning instead of a failure. Defaults to false.',
+        },
       },
       additionalProperties: false,
     },
@@ -650,7 +655,8 @@ export async function callMcpTool(options: CallMcpToolOptions): Promise<McpToolR
     }
     case 'agentloop_check_gates': {
       const strict = readBooleanArgument(options.arguments, 'strict', false);
-      return textResult(await checkGates({ cwd: options.cwd, config, strict }));
+      const allowSoftSpots = readBooleanArgument(options.arguments, 'allowSoftSpots', false);
+      return textResult(await checkGates({ cwd: options.cwd, config, strict, allowSoftSpots }));
     }
     case 'agentloop_artifacts': {
       const type = readArtifactTypeArgument(options.arguments);

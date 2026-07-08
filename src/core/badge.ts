@@ -122,6 +122,7 @@ export async function writeEvidenceBadge(options: {
   source?: string;
   outPath?: string;
   strict?: boolean;
+  allowSoftSpots?: boolean;
 }): Promise<EvidenceBadgeResult> {
   const source = parseSource(options.source);
   let status: BadgeStatus;
@@ -153,6 +154,7 @@ export async function writeEvidenceBadge(options: {
       cwd: options.cwd,
       config: options.config,
       strict: options.strict,
+      allowSoftSpots: options.allowSoftSpots,
     });
     status = gates.overallStatus;
     label = 'gates';

@@ -24,13 +24,15 @@ exports[`CLI help contract > help for "badge" is locked 1`] = `
 Generate a local SVG evidence badge
 
 Options:
-  --source <source>  badge source: verification or gates (default:
-                     "verification")
-  --out <path>       output SVG path
-  --strict           use strict gate status when source is gates
-  --json             print machine-readable output
-  --redact-paths     redact local absolute paths in public output
-  -h, --help         display help for command"
+  --source <source>   badge source: verification or gates (default:
+                      "verification")
+  --out <path>        output SVG path
+  --strict            use strict gate status when source is gates
+  --allow-soft-spots  treat unresolved blocking soft spots as a warning instead
+                      of a failure
+  --json              print machine-readable output
+  --redact-paths      redact local absolute paths in public output
+  -h, --help          display help for command"
 `;
 
 exports[`CLI help contract > help for "check-gates" is locked 1`] = `
@@ -57,12 +59,14 @@ exports[`CLI help contract > help for "ci-summary" is locked 1`] = `
 Summarize CI context and AgentLoop evidence
 
 Options:
-  --write         write summary to .agentloop/reports
-  --out <path>    output Markdown path when using --write
-  --json          print machine-readable output
-  --redact-paths  redact local absolute paths in public output and written
-                  summary
-  -h, --help      display help for command"
+  --write             write summary to .agentloop/reports
+  --out <path>        output Markdown path when using --write
+  --allow-soft-spots  treat unresolved blocking soft spots as a warning instead
+                      of a failure
+  --json              print machine-readable output
+  --redact-paths      redact local absolute paths in public output and written
+                      summary
+  -h, --help          display help for command"
 `;
 
 exports[`CLI help contract > help for "completion" is locked 1`] = `
@@ -530,16 +534,18 @@ exports[`CLI help contract > help for "ship" is locked 1`] = `
 Run the local review-readiness flow for agent-assisted changes
 
 Options:
-  --json             print machine-readable output
-  --run-verify       run verification before scoring instead of reusing current
-                     evidence
-  --task-commands    when using --run-verify, also run verification commands
-                     from the task contract
-  --timeout-ms <ms>  per-command verification timeout in milliseconds
-  --strict-gates     treat warning gates as readiness gate failures
-  --github-comment   include or print GitHub PR comment markdown
-  --redact-paths     redact local absolute paths in public output
-  -h, --help         display help for command"
+  --json              print machine-readable output
+  --run-verify        run verification before scoring instead of reusing current
+                      evidence
+  --task-commands     when using --run-verify, also run verification commands
+                      from the task contract
+  --timeout-ms <ms>   per-command verification timeout in milliseconds
+  --strict-gates      treat warning gates as readiness gate failures
+  --allow-soft-spots  treat unresolved blocking soft spots as a warning instead
+                      of a failure
+  --github-comment    include or print GitHub PR comment markdown
+  --redact-paths      redact local absolute paths in public output
+  -h, --help          display help for command"
 `;
 
 exports[`CLI help contract > help for "show-run" is locked 1`] = `

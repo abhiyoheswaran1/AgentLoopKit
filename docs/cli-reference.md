@@ -426,6 +426,7 @@ agentloop ship --github-comment
 agentloop ship --github-comment --redact-paths
 agentloop ship --run-verify
 agentloop ship --run-verify --task-commands
+agentloop ship --allow-soft-spots
 
 agentloop prepare-pr
 agentloop prepare-pr --json
@@ -448,6 +449,8 @@ The `scope-control` score is based on non-evidence changed files. Generated Agen
 `ship` scores the review evidence it creates during the command, so the generated handoff and ship run can satisfy handoff freshness without requiring an immediate extra `agentloop handoff` run.
 
 By default, `ship` reuses current verification evidence. Use `--run-verify` when you want it to run configured verification commands first. Use `--task-commands` with `--run-verify` to also run verification commands recorded in the task contract.
+
+The `contract-hardening` gate fails `ship` by default when the active task contract has unresolved blocking soft spots (run `agentloop harden` to resolve them). Use `--allow-soft-spots` to downgrade that gate to a warning instead of failing.
 
 Use `ship --github-comment` when CI needs compact review-readiness Markdown for a pull request comment. With `--json`, the comment appears as `githubComment`. Without `--json`, the command prints only the comment Markdown. AgentLoopKit does not read GitHub tokens, call GitHub APIs, or post comments by itself.
 
@@ -609,6 +612,7 @@ agentloop report --out .agentloop/reports/review.html
 
 agentloop badge
 agentloop badge --source gates
+agentloop badge --source gates --allow-soft-spots
 agentloop badge --json
 ```
 
@@ -640,6 +644,8 @@ agentloop badge --json --redact-paths
 
 Human-readable `badge` output keeps written badge paths, sources, statuses, and messages on one Markdown line. JSON output keeps raw values for scripts by default. Use `badge --redact-paths` before copying badge output into public logs; it redacts local roots in human and JSON output without changing where the SVG file is written or changing SVG contents.
 
+When `--source gates` is used, the `contract-hardening` gate fails by default if the active task contract has unresolved blocking soft spots (run `agentloop harden` to resolve them). Use `--allow-soft-spots` to downgrade that gate to a warning instead of failing.
+
 These commands do not run tests, fetch remote assets, read `.env` contents, upload files, or call an LLM.
 
 See [html-reports.md](html-reports.md) and [badges.md](badges.md).
@@ -652,6 +658,7 @@ agentloop ci-summary --json
 agentloop ci-summary --json --redact-paths
 agentloop ci-summary --write
 agentloop ci-summary --write --redact-paths
+agentloop ci-summary --allow-soft-spots
 ```
 
 `ci-summary` reads allowlisted CI provenance fields and existing AgentLoop artifacts. It reports provider, workflow or pipeline, event, ref, commit, and run URL when supported environment variables are present.
@@ -659,6 +666,8 @@ agentloop ci-summary --write --redact-paths
 Default written CI summary paths avoid same-minute collisions by adding a numeric suffix. Explicit `--out` paths stay exact and keep the existing output-path safety checks.
 
 Human-readable `ci-summary` output keeps CI evidence paths, gate details, and written output paths on one Markdown line. JSON output keeps raw values for scripts by default. Use `--redact-paths` before copying CI summaries into public logs or uploaded artifacts; it redacts local roots in human output, JSON output, and written Markdown while preserving the real path used for `--write`.
+
+The `contract-hardening` gate fails by default when the active task contract has unresolved blocking soft spots (run `agentloop harden` to resolve them). Use `--allow-soft-spots` to downgrade that gate to a warning instead of failing.
 
 It does not call CI provider APIs, read secrets, upload files, run tests, or dump arbitrary environment variables.
 

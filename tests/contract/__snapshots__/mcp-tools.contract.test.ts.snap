@@ -167,6 +167,10 @@ exports[`MCP tool contract > MCP tool definitions are locked 1`] = `
     "inputSchema": {
       "additionalProperties": false,
       "properties": {
+        "allowSoftSpots": {
+          "description": "Treat unresolved blocking soft spots as a warning instead of a failure. Defaults to false.",
+          "type": "boolean",
+        },
         "strict": {
           "description": "Treat warning gates as failures. Defaults to false.",
           "type": "boolean",

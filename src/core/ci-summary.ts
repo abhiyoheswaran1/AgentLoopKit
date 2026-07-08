@@ -279,6 +279,7 @@ export async function getCiSummary(options: {
   nowIso?: string;
   write?: boolean;
   outPath?: string;
+  allowSoftSpots?: boolean;
   redactPaths?: boolean;
 }): Promise<CiSummaryResult> {
   const timestamp = options.timestamp ?? formatTimestamp();
@@ -298,7 +299,12 @@ export async function getCiSummary(options: {
     readTask(options.cwd, taskPath),
     readVerification(options.cwd, verificationPath),
     readHandoff(options.cwd, handoffPath),
-    checkGates({ cwd: options.cwd, config: options.config, redactPaths: options.redactPaths }),
+    checkGates({
+      cwd: options.cwd,
+      config: options.config,
+      allowSoftSpots: options.allowSoftSpots,
+      redactPaths: options.redactPaths,
+    }),
   ]);
   const ci: CiSummaryCiContext = detectCiContext(options.env ?? process.env) ?? {
     provider: 'none',

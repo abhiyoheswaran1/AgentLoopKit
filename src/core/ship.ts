@@ -241,6 +241,7 @@ export async function createShipReport(options: {
   taskCommands?: boolean;
   timeoutMs?: number;
   strictGates?: boolean;
+  allowSoftSpots?: boolean;
   redactPaths?: boolean;
 }): Promise<ShipResult> {
   const timestamp = options.timestamp ?? formatTimestamp();
@@ -318,6 +319,7 @@ export async function createShipReport(options: {
     cwd: options.cwd,
     config: options.config,
     strict: options.strictGates,
+    allowSoftSpots: options.allowSoftSpots,
     redactPaths: options.redactPaths,
     projectedReviewEvidenceRun: {
       id: `${timestamp}-ship`,

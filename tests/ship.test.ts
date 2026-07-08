@@ -109,6 +109,101 @@ Revert the auth callback change.
   return dir;
 }
 
+// Mirrors createShipFixture but leaves "Files or Areas Not to Touch" as the
+// contract-hardening placeholder, which analyzeContract flags as a blocking
+// unbounded-scope soft spot (see harden.ts's unboundedScopeRule). Used to
+// verify ship's contract-hardening gate behavior and its --allow-soft-spots
+// opt-out.
+async function createShipFixtureWithSoftSpot() {
+  const dir = await makeTempDir();
+  tempDirs.push(dir);
+
+  await git(dir, ['init', '-q']);
+  await git(dir, ['config', 'user.email', 'agentloopkit@example.com']);
+  await git(dir, ['config', 'user.name', 'AgentLoopKit Test']);
+
+  const config = createDefaultConfig({
+    name: 'demo',
+    type: 'typescript-package',
+    packageManager: 'npm',
+    commands: { test: 'npm test' },
+  });
+  await writeJson(path.join(dir, 'agentloop.config.json'), config);
+
+  await mkdir(path.join(dir, '.agentloop/tasks'), { recursive: true });
+  await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+  await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+  await mkdir(path.join(dir, '.agentloop/harness'), { recursive: true });
+  await mkdir(path.join(dir, '.agentloop/policies'), { recursive: true });
+  await writeFile(path.join(dir, 'AGENTS.md'), '# Agents\n');
+  await writeFile(path.join(dir, 'AGENTLOOP.md'), '# AgentLoop\n');
+  for (const file of [
+    'commands.md',
+    'definition-of-done.md',
+    'review-checklist.md',
+    'autonomous-work-rules.md',
+  ]) {
+    await writeFile(path.join(dir, '.agentloop/harness', file), `# ${file}\n`);
+  }
+  for (const file of ['no-destructive-actions.md', 'git-policy.md', 'secrets-policy.md']) {
+    await writeFile(path.join(dir, '.agentloop/policies', file), `# ${file}\n`);
+  }
+
+  const taskPath = path.join(dir, '.agentloop/tasks/2026-06-11-fix-login.md');
+  await writeFile(
+    taskPath,
+    `# Fix login redirect bug
+
+- Created date: 2026-06-11
+- Task type: bugfix
+- Status: in-progress
+
+## Problem Statement
+Login redirects users to the wrong page after password reset.
+
+## Desired Outcome
+Users land on the intended destination after a successful login.
+
+## Constraints
+- Keep the auth callback API unchanged.
+
+## Non-Goals
+- Do not redesign the sign-in screen.
+
+## Likely Files or Areas
+- src/auth
+
+## Files or Areas Not to Touch
+- None recorded yet.
+
+## Acceptance Criteria
+- Password-reset login redirects to the requested page (see \`npm test -- auth\`).
+- Existing login redirect tests still pass via \`npm test -- auth\`.
+
+## Verification Commands
+- npm test -- auth
+
+## Risk Notes
+- Auth flow touched; review redirect edge cases.
+
+## Rollback Notes
+Revert the auth callback change.
+`,
+  );
+  await setActiveTask({ cwd: dir, config, taskPath });
+  await writeFile(
+    path.join(dir, '.agentloop/reports/2026-06-11-12-00-verification-report.md'),
+    '# Verification Report\n\n- Overall status: pass\n',
+  );
+  await mkdir(path.join(dir, 'src/auth'), { recursive: true });
+  await writeFile(path.join(dir, 'src/auth/callback.ts'), 'export const redirect = "old";\n');
+  await git(dir, ['add', '.']);
+  await git(dir, ['commit', '-m', 'Initial state']);
+
+  await writeFile(path.join(dir, 'src/auth/callback.ts'), 'export const redirect = "fixed";\n');
+  return dir;
+}
+
 describe('ship command', () => {
   afterEach(async () => {
     await Promise.all(tempDirs.map(removeTempDir));
@@ -173,6 +268,51 @@ describe('ship command', () => {
     expect(markdown).toContain('.agentloop/reports/');
     expect(markdown).not.toContain('Latest handoff does not cover the current dirty files.');
     expect(markdown).not.toContain(dir);
+  });
+
+  test('fails and exits non-zero by default when the active task has a blocking soft spot', async () => {
+    const dir = await createShipFixtureWithSoftSpot();
+
+    const result = await execa(tsxPath, [cliPath, 'ship', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    const output = JSON.parse(result.stdout);
+    expect(output.gates.overallStatus).toBe('fail');
+    expect(output.gates.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'contract-hardening',
+          status: 'fail',
+          message: expect.stringMatching(/soft spot/i),
+        }),
+      ]),
+    );
+  });
+
+  test('--allow-soft-spots downgrades a blocking soft spot to a warning and exits zero', async () => {
+    const dir = await createShipFixtureWithSoftSpot();
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'ship', '--allow-soft-spots', '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.gates.overallStatus).toBe('warn');
+    expect(output.gates.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'contract-hardening',
+          status: 'warn',
+          message: expect.stringMatching(/soft spot/i),
+        }),
+      ]),
+    );
   });
 
   test('ship report lists skipped verification commands', async () => {

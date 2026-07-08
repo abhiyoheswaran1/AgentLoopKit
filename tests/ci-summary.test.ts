@@ -89,6 +89,56 @@ describe('ci-summary command', () => {
     expect(markdown).not.toContain('TOKEN');
   });
 
+  test('gates fail by default on a blocking soft spot; --allow-soft-spots downgrades to warn', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
+    // No "## Files or Areas Not to Touch" section at all, which
+    // analyzeContract's unboundedScopeRule treats as an empty (blocking)
+    // section — same trigger used by the check-gates/ready soft-spot tests.
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-ci-summary-soft-spot.md'),
+      '# CI summary soft spot task\n\n- Status: in-progress\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-10-11-00-verification-report.md'),
+      '# Verification Report\n\n- Overall status: pass\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-10-11-05-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+
+    const defaultResult = await execa(tsxPath, [cliPath, 'ci-summary', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const defaultPayload = JSON.parse(defaultResult.stdout);
+    expect(defaultPayload.gates.overallStatus).toBe('fail');
+    expect(defaultPayload.gates.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'contract-hardening', status: 'fail' }),
+      ]),
+    );
+
+    const allowResult = await execa(
+      tsxPath,
+      [cliPath, 'ci-summary', '--allow-soft-spots', '--json'],
+      { cwd: dir, reject: false },
+    );
+    const allowPayload = JSON.parse(allowResult.stdout);
+    expect(allowPayload.gates.overallStatus).toBe('warn');
+    expect(allowPayload.gates.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'contract-hardening', status: 'warn' }),
+      ]),
+    );
+  });
+
   test('keeps same-minute written CI summaries instead of overwriting them', async () => {
     const dir = await createRepoWithEvidence();
     const config = createDefaultConfig({ name: 'demo', type: 'generic', packageManager: 'npm' });

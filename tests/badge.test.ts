@@ -89,6 +89,46 @@ describe('badge generation', () => {
     expect(svg).toContain(payload.status);
   });
 
+  test('CLI gates badge fails by default on a blocking soft spot; --allow-soft-spots downgrades to warn', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await initializeAgentLoop({ cwd: dir });
+    // No "## Files or Areas Not to Touch" section at all, which
+    // analyzeContract's unboundedScopeRule treats as an empty (blocking)
+    // section — same trigger used by the check-gates/ready soft-spot tests.
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-10-cli-task.md'),
+      '# CLI task\n\n- Status: in-progress\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-10-12-00-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-10-12-05-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+
+    const defaultResult = await execa(
+      tsxPath,
+      [cliPath, 'badge', '--source', 'gates', '--json'],
+      { cwd: dir, reject: false },
+    );
+    const defaultPayload = JSON.parse(defaultResult.stdout);
+    expect(defaultPayload.status).toBe('fail');
+
+    const allowResult = await execa(
+      tsxPath,
+      [cliPath, 'badge', '--source', 'gates', '--allow-soft-spots', '--json'],
+      { cwd: dir, reject: false },
+    );
+    const allowPayload = JSON.parse(allowResult.stdout);
+    expect(allowPayload.status).toBe('warn');
+  });
+
   test('CLI accepts redact-paths for public badge output without changing write paths', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

@@ -41,6 +41,10 @@ export function badgeCommand() {
     .option('--source <source>', 'badge source: verification or gates', 'verification')
     .option('--out <path>', 'output SVG path')
     .option('--strict', 'use strict gate status when source is gates')
+    .option(
+      '--allow-soft-spots',
+      'treat unresolved blocking soft spots as a warning instead of a failure',
+    )
     .option('--json', 'print machine-readable output')
     .option('--redact-paths', 'redact local absolute paths in public output')
     .action(
@@ -48,6 +52,7 @@ export function badgeCommand() {
         source?: string;
         out?: string;
         strict?: boolean;
+        allowSoftSpots?: boolean;
         json?: boolean;
         redactPaths?: boolean;
       }) => {
@@ -61,6 +66,7 @@ export function badgeCommand() {
             source: options.source,
             outPath: options.out,
             strict: options.strict,
+            allowSoftSpots: options.allowSoftSpots,
           });
         } catch (error) {
           if (

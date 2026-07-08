@@ -412,6 +412,68 @@ describe('mcp tools', () => {
     expect(nextPayload.nextAction.command).toBe('agentloop harden');
   });
 
+  test('agentloop_check_gates fails the contract-hardening gate by default; allowSoftSpots downgrades to warn', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await writeFile(
+      path.join(dir, 'package.json'),
+      JSON.stringify({ name: 'demo', scripts: { test: 'vitest' } }, null, 2),
+    );
+    await initializeAgentLoop({ cwd: dir });
+    const config = await loadAgentLoopConfig(dir);
+    const task = await createTaskContractFile({
+      cwd: dir,
+      config,
+      input: {
+        title: 'Add API route',
+        type: 'feature',
+        problemStatement: 'The API route is missing.',
+        desiredOutcome: 'The API route returns JSON for callers.',
+        likelyFiles: ['src/routes/api.ts'],
+        // No forbiddenFiles - "Files or Areas Not to Touch" stays empty,
+        // which analyzeContract's unboundedScopeRule flags as a blocking
+        // soft spot (mirrors the "recommends harden" fixture above).
+        acceptanceCriteria: ['Route returns JSON'],
+        verificationCommands: ['npm test'],
+        rollbackNotes: 'Revert the route implementation.',
+      },
+    });
+    await setActiveTask({ cwd: dir, config, taskPath: task.path });
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-10-12-30-verification-report.md'),
+      '# Verification Report\n\n- Overall status: pass\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-10-12-31-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+
+    const defaultGates = await callMcpTool({ cwd: dir, name: 'agentloop_check_gates' });
+    const defaultPayload = defaultGates.payload as GatesPayload;
+    expect(defaultPayload.overallStatus).toBe('fail');
+    expect(defaultPayload.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'contract-hardening', status: 'fail' }),
+      ]),
+    );
+
+    const allowedGates = await callMcpTool({
+      cwd: dir,
+      name: 'agentloop_check_gates',
+      arguments: { allowSoftSpots: true },
+    });
+    const allowedPayload = allowedGates.payload as GatesPayload;
+    expect(allowedPayload.overallStatus).toBe('warn');
+    expect(allowedPayload.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'contract-hardening', status: 'warn' }),
+      ]),
+    );
+  });
+
   test('returns status, task, policy, report, and handoff data without running commands', async () => {
     const { dir } = await createInitializedRepo();
 
