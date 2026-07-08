@@ -538,6 +538,8 @@ export function createTaskCommand() {
       }
       const softSpots = analyzeContract(result.markdown);
       console.log(renderSoftSpotsText(softSpots));
-      console.log('Run `agentloop harden --resolve <id> --answer "..."` to resolve them.');
+      if (softSpots.length > 0) {
+        console.log('Run `agentloop harden --resolve <id> --answer "..."` to resolve them.');
+      }
     });
 }
