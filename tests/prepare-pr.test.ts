@@ -137,9 +137,11 @@ describe('prepare-pr command', () => {
     });
     expect(output.body).toContain('## Verification Evidence');
     expect(output.body).toMatch(
-      /## Verification Evidence\n\n- Overall status: pass \(`\.agentloop\/reports\/[^`]+`\)\n\n## Reviewer Checklist/,
+      /## Verification Evidence\n\n- Overall status: pass \(`\.agentloop\/reports\/[^`]+`\)\n\n## Criteria Coverage/,
     );
-    expect(output.body).not.toMatch(/## Verification Evidence[\s\S]*\n\n\n## Reviewer Checklist/);
+    expect(output.body).toMatch(/## Criteria Coverage\n\n[\s\S]*?\n\n## Reviewer Checklist/);
+    expect(output.body).not.toMatch(/## Verification Evidence[\s\S]*?\n\n\n## Criteria Coverage/);
+    expect(output.body).not.toMatch(/## Criteria Coverage[\s\S]*?\n\n\n## Reviewer Checklist/);
     expect(output.body).toContain('Password-reset login redirects to the requested page.');
     expect(output.body).toContain('Existing session login still redirects to the dashboard.');
     expect(output.body).toContain('Reviewer can see every acceptance criterion in the PR body.');
@@ -169,6 +171,34 @@ describe('prepare-pr command', () => {
       runId: shipRuns[0].id,
     });
   });
+
+  test(
+    'includes criteria coverage reconciled against the verification report',
+    async () => {
+      const dir = await createPreparePrFixture({
+        acceptanceCriteria: '- Auth works (verified by: task)',
+        verificationMarkdown: `# Verification Report
+
+- Overall status: pass
+
+## Commands Run
+### task: \`npm test -- auth\`
+- Exit code: 0
+- Status: pass
+`,
+      });
+
+      const output = JSON.parse(
+        (await execa(tsxPath, [cliPath, 'prepare-pr', '--json'], { cwd: dir })).stdout,
+      );
+
+      expect(output.body).toContain('## Criteria Coverage');
+      expect(output.body).toMatch(/\[proven\] Auth works/);
+      expect(output.criteriaCoverage.summary.proven).toBe(1);
+      expect(output.body).not.toContain('- [ ] Acceptance criteria match the implementation.');
+    },
+    CLI_PREPARE_PR_TEST_TIMEOUT_MS,
+  );
 
   test(
     'lists verification commands that were not run in the PR body',

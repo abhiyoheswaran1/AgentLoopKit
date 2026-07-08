@@ -51,6 +51,14 @@ describe('reconcileCriteriaCoverage', () => {
     expect(c.criteria[0].linkedKeys).toEqual(['test', 'lint']);
   });
 
+  it('resolves not-run when one linked key passed and another is absent from the report', () => {
+    const c = reconcileCriteriaCoverage(
+      '## Acceptance Criteria\n- Multi-key check (verified by: test, typecheck)',
+      report,
+    );
+    expect(c.criteria[0].status).toBe('not-run');
+  });
+
   it('ignores the acceptance placeholder and degrades with no report', () => {
     const c = reconcileCriteriaCoverage('## Acceptance Criteria\n- Add acceptance criteria before implementation starts.', undefined);
     expect(c.criteria).toHaveLength(0);

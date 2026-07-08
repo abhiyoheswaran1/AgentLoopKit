@@ -18,6 +18,11 @@ import { readTaskContract, TaskContract } from './task-state.js';
 import { renderCompactChangeAreas } from './change-areas.js';
 import { toSafeDisplayPath } from './display-path.js';
 import { buildEvidenceMap, renderEvidenceMapCompactMarkdown, type EvidenceMap } from './evidence-map.js';
+import {
+  reconcileCriteriaCoverage,
+  renderCriteriaCoverageMarkdown,
+  type CriteriaCoverage,
+} from './criteria-coverage.js';
 
 export type PreparePrResult = {
   titleSuggestion: string;
@@ -34,6 +39,7 @@ export type PreparePrResult = {
   readiness: ShipResult['readiness'];
   evidenceMap: EvidenceMap;
   changedFiles: ShipResult['changedFiles'];
+  criteriaCoverage: CriteriaCoverage;
 };
 
 type PreparePrShipEvidence = Pick<
@@ -183,6 +189,7 @@ function buildPrBody(input: {
   ship: PreparePrShipEvidence;
   evidenceMap: EvidenceMap;
   githubMetadata: GithubMetadataContext;
+  criteriaCoverage: CriteriaCoverage;
 }) {
   const title = input.task?.title ?? 'AgentLoopKit review-ready changes';
   const taskContent = input.task?.content ?? '';
@@ -193,6 +200,7 @@ function buildPrBody(input: {
   const rollback = sectionContent(taskContent, 'Rollback Notes');
   const githubMetadataSection = renderGithubMetadataSection(input.githubMetadata).trimEnd();
   const optionalGithubMetadataSection = githubMetadataSection ? `\n\n${githubMetadataSection}` : '';
+  const criteriaCoverageMarkdown = renderCriteriaCoverageMarkdown(input.criteriaCoverage);
 
   return `# ${escapeSingleLineMarkdownProse(title)}
 
@@ -224,9 +232,10 @@ ${renderMarkdownList(acceptance, 'No acceptance criteria were recorded.')}
 
 - ${verificationLine(input.ship, input.cwd)}${optionalGithubMetadataSection}
 
+${criteriaCoverageMarkdown}
+
 ## Reviewer Checklist
 
-- [ ] Acceptance criteria match the implementation.
 - [ ] Verification evidence is adequate for the change.
 - [ ] Risk-sensitive files have been reviewed.
 - [ ] Rollback notes are clear.
@@ -378,12 +387,17 @@ export async function preparePullRequest(options: {
         taskPath: evidence.taskPath,
       })
     : null;
+  const criteriaCoverage = reconcileCriteriaCoverage(
+    task?.content,
+    preparedShip.verificationMarkdown,
+  );
   const body = buildPrBody({
     cwd: options.cwd,
     task,
     ship: preparedShip,
     evidenceMap,
     githubMetadata,
+    criteriaCoverage,
   });
   const githubComment = options.githubComment
     ? buildGithubComment(preparedShip, options.cwd)
@@ -416,5 +430,6 @@ export async function preparePullRequest(options: {
     readiness: preparedShip.readiness,
     evidenceMap,
     changedFiles: preparedShip.changedFiles,
+    criteriaCoverage,
   } satisfies PreparePrResult;
 }

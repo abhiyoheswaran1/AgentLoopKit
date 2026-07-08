@@ -531,6 +531,22 @@ exports[`JSON output shape contract > --json shape for "handoff" is locked 1`] =
       "status": "string",
     },
   ],
+  "criteriaCoverage": {
+    "criteria": [
+      {
+        "linkedKeys": [],
+        "status": "string",
+        "text": "string",
+      },
+    ],
+    "summary": {
+      "failing": "number",
+      "notRun": "number",
+      "proven": "number",
+      "total": "number",
+      "unlinked": "number",
+    },
+  },
   "diffStat": "string",
   "markdown": "string",
   "outPath": "string",
@@ -991,6 +1007,22 @@ exports[`JSON output shape contract > --json shape for "prepare-pr" is locked 1`
       "status": "string",
     },
   ],
+  "criteriaCoverage": {
+    "criteria": [
+      {
+        "linkedKeys": [],
+        "status": "string",
+        "text": "string",
+      },
+    ],
+    "summary": {
+      "failing": "number",
+      "notRun": "number",
+      "proven": "number",
+      "total": "number",
+      "unlinked": "number",
+    },
+  },
   "evidenceMap": {
     "claims": [
       "string",
@@ -1850,6 +1882,22 @@ exports[`JSON output shape contract > --json shape for "summarize" is locked 1`]
       "status": "string",
     },
   ],
+  "criteriaCoverage": {
+    "criteria": [
+      {
+        "linkedKeys": [],
+        "status": "string",
+        "text": "string",
+      },
+    ],
+    "summary": {
+      "failing": "number",
+      "notRun": "number",
+      "proven": "number",
+      "total": "number",
+      "unlinked": "number",
+    },
+  },
   "diffStat": "string",
   "markdown": "string",
   "outPath": "string",

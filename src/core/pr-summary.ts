@@ -24,6 +24,7 @@ import {
   renderCompactChangedFiles,
 } from './change-areas.js';
 import { redactLocalRoots } from './redaction.js';
+import { reconcileCriteriaCoverage, renderCriteriaCoverageMarkdown } from './criteria-coverage.js';
 
 export type PrSummaryInput = {
   timestamp: string;
@@ -91,6 +92,8 @@ export function generatePrSummary(input: PrSummaryInput) {
     verification === 'No verification report found.'
       ? verification
       : `Overall status: ${verification}`;
+  const criteriaCoverage = reconcileCriteriaCoverage(input.taskMarkdown, input.verificationMarkdown);
+  const criteriaCoverageMarkdown = renderCriteriaCoverageMarkdown(criteriaCoverage);
 
   const markdown = `# PR Summary
 
@@ -128,8 +131,9 @@ ${renderVerificationNotRun(input.verificationMarkdown)}
 ## Rollback Notes
 - Revert the changed files or revert the merge commit if this lands as a PR.
 
+${criteriaCoverageMarkdown}
+
 ## Reviewer Checklist
-- [ ] Acceptance criteria match the task contract.
 - [ ] Verification evidence is adequate for the change.
 - [ ] Risk areas have been reviewed.
 - [ ] Rollback plan is clear.
@@ -138,7 +142,7 @@ ${renderVerificationNotRun(input.verificationMarkdown)}
 - Capture any deferred work in ROADMAP.md or a new task contract.
 `;
 
-  return { markdown };
+  return { markdown, criteriaCoverage };
 }
 
 function redactLocalGitRoot(value: string, gitRoot: string, redactPaths: boolean | undefined) {

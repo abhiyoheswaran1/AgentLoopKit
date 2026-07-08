@@ -36,6 +36,30 @@ describe('PR summary generation', () => {
     expect(summary.markdown).toContain('2 files changed');
   });
 
+  test('includes criteria coverage reconciled against the verification report', () => {
+    const summary = generatePrSummary({
+      timestamp: '2026-07-06-12-00',
+      status: ' M src/index.ts',
+      changedFiles: [{ status: 'M', path: 'src/index.ts' }],
+      taskMarkdown: '# Add settings page\n\n## Acceptance Criteria\n- Auth works (verified by: test)\n',
+      verificationMarkdown: `# Verification Report
+
+Overall status: pass
+
+## Commands Run
+### test: \`npm test\`
+- Exit code: 0
+- Status: pass
+`,
+      diffStat: '1 file changed',
+    });
+
+    expect(summary.markdown).toContain('## Criteria Coverage');
+    expect(summary.markdown).toMatch(/\[proven\] Auth works/);
+    expect(summary.criteriaCoverage.summary.proven).toBe(1);
+    expect(summary.markdown).not.toContain('- [ ] Acceptance criteria match the task contract.');
+  });
+
   test('does not claim skipped-command coverage without a verification report', () => {
     const summary = generatePrSummary({
       timestamp: '2026-06-09-12-32',
