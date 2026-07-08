@@ -4,6 +4,7 @@ import { execa } from 'execa';
 import { afterEach, describe, expect, test } from 'vitest';
 import { initializeAgentLoop } from '../src/core/init.js';
 import { loadAgentLoopConfig } from '../src/core/config.js';
+import { writeHandoffRun } from '../src/core/runs.js';
 import { runVerification } from '../src/core/verification.js';
 import { makeTempDir, removeTempDir, writeJson } from './helpers.js';
 
@@ -322,6 +323,77 @@ describe('check-gates command', () => {
         reason: 'Write a reviewer handoff after verification.',
       },
     });
+  });
+
+  test('handoff-summary gate flips to warn when a covered file changes content after the handoff run', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 1;\n');
+    await mkdir(path.join(dir, '.agentloop/tasks/archive'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/archive/2026-06-13-docs-hygiene.md'),
+      '# Docs hygiene\n\n- Status: done\n\n## Files or Areas Not to Touch\n- node_modules/\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-13-01-06-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/handoffs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/handoffs/.gitkeep'), '');
+    await mkdir(path.join(dir, '.agentloop/runs'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/runs/.gitkeep'), '');
+    await commitAll(dir);
+
+    // Dirty src.ts, then record a REAL handoff run via the real entrypoint so
+    // the changed-files entry carries a content hash of this dirty content.
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 2;\n');
+    const handoffPath = path.join(dir, '.agentloop/handoffs/2026-06-13-01-13-pr-summary.md');
+    await writeFile(handoffPath, '# PR Summary\n\nVerification status: Overall status: pass\n');
+    await writeHandoffRun({
+      cwd: dir,
+      timestamp: '2026-06-13-01-13',
+      task: {
+        path: '.agentloop/tasks/2026-06-13-docs-hygiene.md',
+        title: 'Docs hygiene',
+        status: 'done',
+      },
+      verificationReportPath: '.agentloop/reports/2026-06-13-01-06-verification-report.md',
+      handoffPath,
+      changedFiles: [{ status: 'M', path: 'src.ts' }],
+      diffStat: 'src.ts | 2 +-\n',
+      markdown: '# PR Summary\n\nVerification status: Overall status: pass\n',
+    });
+
+    const coveredResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    expect(coveredResult.exitCode).toBe(0);
+    const coveredOutput = JSON.parse(coveredResult.stdout);
+    expect(coveredOutput.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'handoff-summary', status: 'pass', message: 'Reviewer handoff found.' }),
+      ]),
+    );
+
+    // Edit src.ts again AFTER the handoff run recorded its content hash.
+    await writeFile(path.join(dir, 'src.ts'), 'export const value = 3;\n');
+
+    const uncoveredResult = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    expect(uncoveredResult.exitCode).toBe(0);
+    const uncoveredOutput = JSON.parse(uncoveredResult.stdout);
+    expect(uncoveredOutput.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'handoff-summary',
+          status: 'warn',
+          message: 'Latest handoff does not cover the current dirty files.',
+        }),
+      ]),
+    );
   });
 
   test('omits dirty examples when create-task guidance is covered by AgentLoop evidence only', async () => {

@@ -1,7 +1,8 @@
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { GitFileStatus } from './git.js';
-import { readRun, RunSummary } from './runs.js';
+import { readRun, RunChangedFile, RunSummary } from './runs.js';
+import { computeFileContentHash } from './verified-state.js';
 
 function normalizeGitStatusPath(filePath: string) {
   return filePath.replace(/\\/g, '/').replace(/\/+$/, '');
@@ -87,10 +88,12 @@ export async function dirtyCoveredByLatestHandoffRun(
   const latestRunRecord = isReviewEvidenceRun(latestRun)
     ? await readRun(cwd, latestRun.id).catch(() => undefined)
     : undefined;
+  const runChangedFiles = (latestRunChangedFiles ?? latestRunRecord?.changedFiles ?? []) as RunChangedFile[];
   const coveredPaths = new Set(
-    (latestRunChangedFiles ?? latestRunRecord?.changedFiles ?? []).map((changedFile) =>
-      normalizeGitStatusPath(changedFile.path),
-    ),
+    runChangedFiles.map((changedFile) => normalizeGitStatusPath(changedFile.path)),
+  );
+  const runChangedHashByPath = new Map<string, string | undefined>(
+    runChangedFiles.map((file) => [normalizeGitStatusPath(file.path), file.hash]),
   );
   const coveredEvidenceGroups = new Set<string>();
   if (isReviewEvidenceRun(latestRun)) {
@@ -114,10 +117,18 @@ export async function dirtyCoveredByLatestHandoffRun(
     }
   }
 
-  return changedFiles.every((changedFile) => {
-    if (isLatestReviewEvidenceRunArtifact(changedFile.path, latestRun)) return true;
-    if (isCoveredAgentLoopArtifactDirectory(changedFile.path, coveredPaths, latestRun)) return true;
-    if (isCoveredByEvidenceGroup(changedFile.path, coveredEvidenceGroups)) return true;
-    return coveredPaths.has(normalizeGitStatusPath(changedFile.path));
-  });
+  const results = await Promise.all(
+    changedFiles.map(async (changedFile) => {
+      if (isLatestReviewEvidenceRunArtifact(changedFile.path, latestRun)) return true;
+      if (isCoveredAgentLoopArtifactDirectory(changedFile.path, coveredPaths, latestRun)) return true;
+      if (isCoveredByEvidenceGroup(changedFile.path, coveredEvidenceGroups)) return true;
+      const norm = normalizeGitStatusPath(changedFile.path);
+      if (!coveredPaths.has(norm)) return false;
+      const recordedHash = runChangedHashByPath.get(norm);
+      if (recordedHash === undefined) return true; // artifact/prose/legacy: path-presence
+      const currentHash = await computeFileContentHash({ cwd, filePath: changedFile.path });
+      return currentHash !== undefined && currentHash === recordedHash;
+    }),
+  );
+  return results.every(Boolean);
 }
