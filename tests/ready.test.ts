@@ -301,6 +301,47 @@ describe('ready command', () => {
     expect(payload.status).toBe('ready');
   });
 
+  test('blocks readiness on a thin contract by default; --allow-soft-spots warns instead', async () => {
+    const dir = await createReadyFixture();
+
+    // The fixture's acceptance criterion ("Auth copy is clearer.") has no checkable
+    // predicate, which analyzeContract flags as a blocking soft spot. By default this
+    // now fails the contract-hardening gate (and blocks readiness); --allow-soft-spots
+    // downgrades it back to a warning.
+    const blockedResult = await execa(tsxPath, [cliPath, 'ready', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+    const blockedPayload = JSON.parse(blockedResult.stdout);
+    expect(blockedPayload.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'contract-hardening',
+          status: 'fail',
+          message: expect.stringMatching(/soft spot/i),
+        }),
+      ]),
+    );
+    expect(blockedPayload.status).toBe('blocked');
+
+    const lenientResult = await execa(
+      tsxPath,
+      [cliPath, 'ready', '--allow-soft-spots', '--json'],
+      { cwd: dir, reject: false },
+    );
+    const lenientPayload = JSON.parse(lenientResult.stdout);
+    expect(lenientPayload.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'contract-hardening',
+          status: 'warn',
+          message: expect.stringMatching(/soft spot/i),
+        }),
+      ]),
+    );
+    expect(lenientPayload.status).toBe('ready');
+  });
+
   test('does not warn about context cost when the repo is idle with no task', async () => {
     const dir = await createIdleFixture();
 

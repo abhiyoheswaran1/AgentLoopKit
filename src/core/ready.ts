@@ -127,6 +127,7 @@ function buildReadyGates(input: {
   taskPath?: string;
   taskMarkdown?: string;
   tokenReceipt: AgentLoopTokenReceipt;
+  allowSoftSpots?: boolean;
 }) {
   const taskPath = input.taskPath
     ? path.relative(input.cwd, input.taskPath).split(path.sep).join('/')
@@ -146,7 +147,7 @@ function buildReadyGates(input: {
       gate(
         'contract-hardening',
         'Contract hardening',
-        blockingCount > 0 ? 'warn' : 'pass',
+        blockingCount > 0 ? (input.allowSoftSpots ? 'warn' : 'fail') : 'pass',
         blockingCount > 0
           ? `${blockingCount} blocking soft spot(s) unresolved. Run \`agentloop harden\`.`
           : 'Task contract has no blocking soft spots.',
@@ -272,6 +273,7 @@ ${renderTokenReceiptMarkdown(result.tokenReceipt)}
 export async function evaluateReady(options: {
   cwd: string;
   config: AgentLoopConfig;
+  allowSoftSpots?: boolean;
 }): Promise<ReadyResult> {
   const [map, taskPath] = await Promise.all([
     buildEvidenceMap({
@@ -305,6 +307,7 @@ export async function evaluateReady(options: {
     taskPath,
     taskMarkdown,
     tokenReceipt,
+    allowSoftSpots: options.allowSoftSpots,
   });
   const status = statusFromGates(gates);
   const nextAction = chooseReadyNextAction(gates);

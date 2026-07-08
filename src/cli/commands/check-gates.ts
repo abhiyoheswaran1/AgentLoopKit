@@ -53,6 +53,10 @@ export function checkGatesCommand() {
     .description('Check whether task, verification, handoff, harness, policy, and git gates pass')
     .option('--json', 'print machine-readable output')
     .option('--strict', 'treat warning gates as failures')
+    .option(
+      '--allow-soft-spots',
+      'treat unresolved blocking soft spots as a warning instead of a failure',
+    )
     .option('--redact-paths', 'redact local absolute paths in public output')
     .option(
       '--baseframe-task-id <task-id>',
@@ -62,6 +66,7 @@ export function checkGatesCommand() {
     .action(async (options: {
       json?: boolean;
       strict?: boolean;
+      allowSoftSpots?: boolean;
       redactPaths?: boolean;
       baseframeTaskId?: string;
       fromAgentflight?: string;
@@ -115,6 +120,7 @@ export function checkGatesCommand() {
         cwd: workspace.cwd,
         config: workspace.config,
         strict: options.strict,
+        allowSoftSpots: options.allowSoftSpots,
         redactPaths: options.redactPaths === true,
       });
       if (options.json) {

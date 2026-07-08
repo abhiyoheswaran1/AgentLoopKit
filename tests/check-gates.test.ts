@@ -1299,4 +1299,79 @@ describe('check-gates command', () => {
     const strictOutput = JSON.parse(strictResult.stdout);
     expect(strictOutput.overallStatus).toBe('fail');
   });
+
+  test('fails the contract-hardening gate by default on a thin contract', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-soft-spots.md'),
+      '# Soft spots task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- None recorded yet.\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+    await commitAll(dir);
+
+    const result = await execa(tsxPath, [cliPath, 'check-gates', '--json'], {
+      cwd: dir,
+      reject: false,
+    });
+
+    expect(result.exitCode).toBe(1);
+    const output = JSON.parse(result.stdout);
+    expect(output.overallStatus).toBe('fail');
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'contract-hardening',
+          status: 'fail',
+          message: expect.stringMatching(/soft spot/i),
+        }),
+      ]),
+    );
+  });
+
+  test('downgrades the hardening gate to warn with --allow-soft-spots', async () => {
+    const dir = await createInitializedRepo();
+    await writeFile(path.join(dir, 'changed.ts'), 'export const changed = true;\n');
+    await writeFile(
+      path.join(dir, '.agentloop/tasks/2026-06-09-soft-spots.md'),
+      '# Soft spots task\n\n- Status: in-progress\n\n## Files or Areas Not to Touch\n- None recorded yet.\n',
+    );
+    await mkdir(path.join(dir, '.agentloop/reports'), { recursive: true });
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-09-12-30-verification-report.md'),
+      '# Verification Report\n\nOverall status: pass\n',
+    );
+    await writeFile(
+      path.join(dir, '.agentloop/handoffs/2026-06-09-12-35-pr-summary.md'),
+      '# PR Summary\n\nVerification status: Overall status: pass\n',
+    );
+    await commitAll(dir);
+
+    const result = await execa(
+      tsxPath,
+      [cliPath, 'check-gates', '--allow-soft-spots', '--json'],
+      { cwd: dir, reject: false },
+    );
+
+    expect(result.exitCode).toBe(0);
+    const output = JSON.parse(result.stdout);
+    expect(output.overallStatus).toBe('warn');
+    expect(output.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'contract-hardening',
+          status: 'warn',
+          message: expect.stringMatching(/soft spot/i),
+        }),
+      ]),
+    );
+  });
 });

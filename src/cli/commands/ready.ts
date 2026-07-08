@@ -7,21 +7,33 @@ export function readyCommand() {
   return new Command('ready')
     .description('Check whether local agent work is ready for review')
     .option('--strict', 'exit non-zero when readiness is blocked')
+    .option(
+      '--allow-soft-spots',
+      'treat unresolved blocking soft spots as a warning instead of a failure',
+    )
     .option('--json', 'print machine-readable output')
     .option('--redact-paths', 'redact local absolute paths in public output')
-    .action(async (options: { strict?: boolean; json?: boolean; redactPaths?: boolean }) => {
-      const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
-      if (!workspace) return;
-      const result = await evaluateReady({
-        cwd: workspace.cwd,
-        config: workspace.config,
-      });
-      const output = options.json ? JSON.stringify(result, null, 2) : result.markdown;
-      console.log(
-        options.redactPaths === true ? redactLocalRoots(output, [workspace.cwd]) : output,
-      );
-      if (options.strict && result.status !== 'ready') {
-        process.exitCode = 1;
-      }
-    });
+    .action(
+      async (options: {
+        strict?: boolean;
+        allowSoftSpots?: boolean;
+        json?: boolean;
+        redactPaths?: boolean;
+      }) => {
+        const workspace = await loadWorkspaceForJsonCommand(process.cwd(), options.json);
+        if (!workspace) return;
+        const result = await evaluateReady({
+          cwd: workspace.cwd,
+          config: workspace.config,
+          allowSoftSpots: options.allowSoftSpots,
+        });
+        const output = options.json ? JSON.stringify(result, null, 2) : result.markdown;
+        console.log(
+          options.redactPaths === true ? redactLocalRoots(output, [workspace.cwd]) : output,
+        );
+        if (options.strict && result.status !== 'ready') {
+          process.exitCode = 1;
+        }
+      },
+    );
 }

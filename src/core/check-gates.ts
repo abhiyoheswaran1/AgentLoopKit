@@ -292,6 +292,7 @@ export async function checkGates(options: {
   config: AgentLoopConfig;
   strict?: boolean;
   redactPaths?: boolean;
+  allowSoftSpots?: boolean;
   projectedReviewEvidenceRun?: ProjectedReviewEvidenceRun;
 }): Promise<CheckGatesResult> {
   const strict = options.strict ?? false;
@@ -324,7 +325,7 @@ export async function checkGates(options: {
       gate(
         'contract-hardening',
         'Contract hardening',
-        blockingCount > 0 ? 'warn' : 'pass',
+        blockingCount > 0 ? (options.allowSoftSpots ? 'warn' : 'fail') : 'pass',
         blockingCount > 0
           ? `${blockingCount} blocking soft spot(s) unresolved. Run \`agentloop harden\` to resolve them before implementation.`
           : 'Task contract has no blocking soft spots.',
