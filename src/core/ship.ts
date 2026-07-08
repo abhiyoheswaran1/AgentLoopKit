@@ -269,6 +269,7 @@ export async function createShipReport(options: {
       taskPath: evidence.taskPath ? relativePath(options.cwd, evidence.taskPath) : undefined,
       taskCommands: options.taskCommands,
       timeoutMs: options.timeoutMs,
+      redactPaths: options.redactPaths,
     });
     verificationReportPath = verification.reportPath;
     verificationMarkdown = verification.markdown;
@@ -306,6 +307,7 @@ export async function createShipReport(options: {
     reportPath: verificationReportPath,
     timestamp,
     write: true,
+    redactPaths: options.redactPaths,
   });
   const handoffPath = handoff.outPath;
   const shipReportPath = await resolveUniqueOutputArtifactPath({

@@ -812,6 +812,59 @@ None recorded yet.
     CLI_SHIP_TEST_TIMEOUT_MS,
   );
 
+  test(
+    'redacts local paths from verification report and handoff when running verify during ship',
+    async () => {
+      const dir = await createShipFixture();
+      const realRoot = await realpath(dir);
+
+      const config = createDefaultConfig({
+        name: 'demo',
+        type: 'typescript-package',
+        packageManager: 'npm',
+        commands: { test: 'node -e "console.log(process.cwd() + \\"/src/index.ts\\")"' },
+      });
+      await writeJson(path.join(dir, 'agentloop.config.json'), config);
+      await git(dir, ['add', 'agentloop.config.json']);
+      await git(dir, ['commit', '-m', 'Use path-echoing verification command']);
+
+      const defaultResult = await execa(tsxPath, [cliPath, 'ship', '--json', '--run-verify'], {
+        cwd: dir,
+      });
+      const defaultOutput = JSON.parse(defaultResult.stdout);
+      const defaultReportMarkdown = await readFile(
+        path.join(dir, defaultOutput.verificationReportPath),
+        'utf8',
+      );
+      expect(defaultReportMarkdown).toContain(realRoot);
+
+      const redactedResult = await execa(
+        tsxPath,
+        [cliPath, 'ship', '--json', '--run-verify', '--redact-paths'],
+        { cwd: dir, reject: false },
+      );
+      expect(redactedResult.exitCode).toBe(0);
+      const redactedOutput = JSON.parse(redactedResult.stdout);
+
+      const redactedReportMarkdown = await readFile(
+        path.join(dir, redactedOutput.verificationReportPath),
+        'utf8',
+      );
+      expect(redactedReportMarkdown).not.toContain(realRoot);
+      expect(redactedReportMarkdown).toContain('[git-root]/src/index.ts');
+
+      const handoffMarkdown = await readFile(path.join(dir, redactedOutput.handoffPath), 'utf8');
+      expect(handoffMarkdown).not.toContain(realRoot);
+
+      const shipReportMarkdown = await readFile(
+        path.join(dir, redactedOutput.shipReportPath),
+        'utf8',
+      );
+      expect(shipReportMarkdown).not.toContain(realRoot);
+    },
+    CLI_SHIP_TEST_TIMEOUT_MS,
+  );
+
   test('prints only GitHub comment markdown when requested without JSON', async () => {
     const dir = await createShipFixture();
 
