@@ -722,6 +722,73 @@ describe('verification', () => {
     expect(result.markdown).not.toContain('middle-0450');
   });
 
+  test('writes a full-output log and links it when command output is truncated', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const output = `${'a'.repeat(3000)}MIDDLE_MARKER_XYZ${'b'.repeat(3000)}`;
+    await writeFile(
+      path.join(dir, 'emit-truncated-output.mjs'),
+      `console.log(${JSON.stringify(output)});\n`,
+    );
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node emit-truncated-output.mjs',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-09-12-40',
+      nowIso: '2026-06-09T12:40:00.000Z',
+    });
+
+    expect(result.markdown).toMatch(/^- Full untruncated output: `.*\.full-output\.log`$/m);
+    expect(result.markdown).not.toContain('MIDDLE_MARKER_XYZ');
+
+    const logRel = result.markdown.match(/Full untruncated output: `([^`]+)`/)![1];
+    const logContent = await readFile(path.join(dir, logRel), 'utf8');
+    expect(logContent).toContain('MIDDLE_MARKER_XYZ');
+
+    const written = await readFile(result.reportPath, 'utf8');
+    expect(written).toMatch(/^- Full untruncated output: `.*\.full-output\.log`$/m);
+  });
+
+  test('does not write a full-output log when nothing is truncated', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const config = createDefaultConfig({
+      name: 'demo',
+      type: 'generic',
+      packageManager: 'npm',
+      commands: {
+        test: 'node -e "console.log(\\"short-output-ok\\")"',
+        lint: '',
+        typecheck: '',
+        build: '',
+        format: '',
+      },
+    });
+
+    const result = await runVerification({
+      cwd: dir,
+      config,
+      reportTimestamp: '2026-06-09-12-41',
+      nowIso: '2026-06-09T12:41:00.000Z',
+    });
+
+    expect(result.markdown).not.toMatch(/Full untruncated output:/);
+    const expectedLogPath = result.reportPath.replace(/\.md$/, '.full-output.log');
+    await expect(access(expectedLogPath)).rejects.toThrow();
+  });
+
   test('summarizes failed commands before full output excerpts', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

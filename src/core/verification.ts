@@ -102,7 +102,9 @@ export type VerificationResult = {
   reportPath: string;
 };
 
-function excerpt(output: string, limit = 5000) {
+const VERIFY_OUTPUT_EXCERPT_LIMIT = 5000;
+
+function excerpt(output: string, limit = VERIFY_OUTPUT_EXCERPT_LIMIT) {
   if (output.length <= limit) return output;
   const headLimit = Math.ceil(limit / 2);
   const tailLimit = Math.floor(limit / 2);
@@ -635,6 +637,24 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
     output: redactValue(result.output),
   }));
 
+  const outputTruncated = reportResults.some(
+    (result) => (result.output ?? '').length > VERIFY_OUTPUT_EXCERPT_LIMIT,
+  );
+  let fullOutputRelPath: string | undefined;
+  if (outputTruncated) {
+    const fullOutputPath = reportPath.replace(/\.md$/, '.full-output.log');
+    const fullOutputContent = `# Full Verification Command Output\n\n${reportResults
+      .map(
+        (result) =>
+          `## ${result.key}: ${result.command}\n- Exit code: ${result.exitCode}\n- Status: ${
+            result.passed ? 'pass' : 'fail'
+          }\n\n${result.output || '(no output)'}`,
+      )
+      .join('\n\n')}\n`;
+    await writeTextFile(fullOutputPath, fullOutputContent);
+    fullOutputRelPath = path.relative(options.cwd, fullOutputPath).split(path.sep).join('/');
+  }
+
   const statusForResults = (selectedResults: VerificationCommandResult[]) =>
     selectedResults.length === 0
       ? 'not-run'
@@ -669,7 +689,7 @@ export async function runVerification(options: VerificationOptions): Promise<Ver
 - Verified-state fingerprint: ${inlineCode(verifiedStateFingerprint)}
 - Working tree: ${inlineCode(workingTreeStatus)}
 - Overall status: ${renderOptions.overallStatus}
-
+${fullOutputRelPath ? `- Full untruncated output: ${inlineCode(fullOutputRelPath)}\n` : ''}
 ${renderCiContext(ciContext)}
 ${taskContext}
 ${renderTaskCommandContext(commandSelection)}
