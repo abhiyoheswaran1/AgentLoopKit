@@ -25,6 +25,7 @@ import {
 import { listItems, sectionContent } from './markdown-sections.js';
 import { summarizeRepository } from './pr-summary.js';
 import { toSafeDisplayPath } from './display-path.js';
+import { renderVerificationNotRun } from './verification-report-sections.js';
 import {
   buildEvidenceMap,
   renderEvidenceMapCompactMarkdown,
@@ -56,7 +57,11 @@ export type ShipResult = {
 };
 
 type ShipRenderInput = Omit<ShipResult, 'markdown' | 'run'>;
-type ShipMarkdownInput = ShipRenderInput & { cwd: string; taskRiskNotes: string[] };
+type ShipMarkdownInput = ShipRenderInput & {
+  cwd: string;
+  taskRiskNotes: string[];
+  verificationMarkdown?: string;
+};
 
 function relativePath(cwd: string | undefined, filePath: string | undefined) {
   if (!filePath) return undefined;
@@ -175,6 +180,10 @@ Make agent-assisted work reviewable, verifiable, and merge-ready.
   }
 - Handoff: ${handoffPath ? inlineCode(handoffPath) : 'No handoff generated.'}
 - Gates: ${inlineCode(input.gates.overallStatus)}
+
+## Verification Not Run
+
+${renderVerificationNotRun(input.verificationMarkdown)}
 
 ## Score Boundary
 
@@ -357,7 +366,12 @@ export async function createShipReport(options: {
     diffStat,
     shipReportPath,
   };
-  const markdown = renderShipMarkdown({ ...withoutMarkdown, cwd: options.cwd, taskRiskNotes });
+  const markdown = renderShipMarkdown({
+    ...withoutMarkdown,
+    cwd: options.cwd,
+    taskRiskNotes,
+    verificationMarkdown,
+  });
   await writeTextFile(shipReportPath, markdown);
   const run = await writeShipRun({
     cwd: options.cwd,

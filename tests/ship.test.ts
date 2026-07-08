@@ -175,6 +175,27 @@ describe('ship command', () => {
     expect(markdown).not.toContain(dir);
   });
 
+  test('ship report lists skipped verification commands', async () => {
+    const dir = await createShipFixture();
+    await writeFile(
+      path.join(dir, '.agentloop/reports/2026-06-11-12-00-verification-report.md'),
+      `# Verification Report
+
+- Overall status: pass
+
+## Not Run
+- build: \`npm run build\` (not configured)
+`,
+    );
+
+    const result = await execa(tsxPath, [cliPath, 'ship', '--json'], { cwd: dir });
+    const output = JSON.parse(result.stdout);
+    const shipMarkdown = await readFile(path.join(dir, output.shipReportPath), 'utf8');
+
+    expect(shipMarkdown).toContain('## Verification Not Run');
+    expect(shipMarkdown).toMatch(/build/);
+  });
+
   test('uses fresh evidence map verification after ship runs verification', async () => {
     const dir = await createShipFixture();
     const config = createDefaultConfig({

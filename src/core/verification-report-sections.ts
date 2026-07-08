@@ -1,4 +1,5 @@
 import { listItems, sectionContent } from './markdown-sections.js';
+import { escapeMarkdownProse } from './markdown-format.js';
 
 const NOTHING_SKIPPED_VALUES = new Set(['nothing skipped', 'nothing skipped.']);
 
@@ -104,4 +105,13 @@ export function verificationNotRunItems(markdown: string | undefined) {
         passedCommands.has(identity),
       ),
   );
+}
+
+export function renderVerificationNotRun(markdown: string | undefined) {
+  if (!markdown) return '- No verification report was available.';
+  const items = verificationNotRunItems(markdown);
+  if (!items.length) return '- No skipped commands were recorded.';
+  return items
+    .map((item) => `- ${escapeMarkdownProse(item).replace(/\r/g, '\\r').replace(/\n/g, '\\n')}`)
+    .join('\n');
 }

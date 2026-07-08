@@ -16,8 +16,8 @@ import {
   getLatestVerificationReportPath,
   resolveCurrentVerificationEvidence,
 } from './evidence.js';
-import { escapeMarkdownProse, fencedCodeBlock, inlineCode } from './markdown-format.js';
-import { verificationNotRunItems } from './verification-report-sections.js';
+import { fencedCodeBlock, inlineCode } from './markdown-format.js';
+import { renderVerificationNotRun } from './verification-report-sections.js';
 import {
   classifyChangedFiles,
   renderCompactChangeAreas,
@@ -70,15 +70,6 @@ function renderReviewFocus(changedFiles: GitFileStatus[]) {
 function renderDiffStat(diffStat?: string) {
   const trimmed = diffStat?.trim();
   return trimmed ? fencedCodeBlock('text', trimmed) : 'No diff stats available.';
-}
-
-function renderVerificationNotRun(markdown: string | undefined) {
-  if (!markdown) return '- No verification report was available.';
-  const items = verificationNotRunItems(markdown);
-  if (!items.length) return '- No skipped commands were recorded.';
-  return items
-    .map((item) => `- ${escapeMarkdownProse(item).replace(/\r/g, '\\r').replace(/\n/g, '\\n')}`)
-    .join('\n');
 }
 
 export function generatePrSummary(input: PrSummaryInput) {
