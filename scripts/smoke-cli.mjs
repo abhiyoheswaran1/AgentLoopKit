@@ -2275,10 +2275,13 @@ async function smokeCli({ keep = false } = {}) {
       'status --json --brief --redact-paths did not redact the git root.',
     );
     assert(
-      redactedNext.command === nextAction.command,
+      redactedNext.nextAction?.command === nextAction.nextAction?.command,
       'next --json --redact-paths changed command.',
     );
-    assert(redactedNext.reason === nextAction.reason, 'next --json --redact-paths changed reason.');
+    assert(
+      redactedNext.nextAction?.reason === nextAction.nextAction?.reason,
+      'next --json --redact-paths changed reason.',
+    );
     const redactedStatusAndNextOutput = [
       redactedStatusHuman.stdout,
       JSON.stringify(redactedStatus),
@@ -3140,11 +3143,11 @@ async function smokeCli({ keep = false } = {}) {
       'stale next',
     );
     assert(
-      staleNext.command === 'agentloop task doctor',
+      staleNext.nextAction?.command === 'agentloop task doctor',
       'next --json did not recommend task doctor for stale active task state.',
     );
     assert(
-      staleNext.reason?.includes('active task pointer is stale'),
+      staleNext.nextAction?.reason?.includes('active task pointer is stale'),
       'next --json did not explain the stale active task pointer.',
     );
 
