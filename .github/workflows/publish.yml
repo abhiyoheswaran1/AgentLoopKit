@@ -30,10 +30,10 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
-      # Pinned: npm@latest (11.x line) currently ships a broken provenance path
-      # ("Cannot find module 'sigstore'"). 10.9.2 bundles sigstore correctly and
-      # supports OIDC provenance + token auth. Revisit once npm 11.x is fixed.
-      - run: npm install -g npm@10.9.2
+      # Use Node 24's bundled npm (11.x) as-is. It supports OIDC trusted
+      # publishing and has an intact sigstore module. A global `npm install -g
+      # npm@latest` self-upgrade corrupts sigstore ("Cannot find module
+      # 'sigstore'") during provenance, so we do NOT self-upgrade npm here.
       - run: npm --version
       - name: Check npm version
         id: npm-version
