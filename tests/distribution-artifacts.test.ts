@@ -180,7 +180,9 @@ describe('distribution artifacts', () => {
     expect(smokeScript).toContain("['next', '--json', '--redact-paths']");
     expect(smokeScript).toContain("redactedStatus.git?.root === '[git-root]'");
     expect(smokeScript).toContain('redactedStatus.latestRun?.id === statusWithRun.latestRun?.id');
-    expect(smokeScript).toContain('redactedNext.command === nextAction.command');
+    expect(smokeScript).toContain(
+      'redactedNext.nextAction?.command === nextAction.nextAction?.command',
+    );
     expect(smokeScript).toContain('!redactedStatusAndNextOutput.includes(smokeRepo)');
     expect(smokeScript).toContain('Status and next redaction smoke passed.');
   });
@@ -889,7 +891,7 @@ describe('distribution artifacts', () => {
     expect(smokeScript).toContain("['next', '--json']");
     expect(smokeScript).toContain("['task', 'doctor', '--json', '--redact-paths']");
     expect(smokeScript).toContain("staleStatus.nextAction?.command === 'agentloop task doctor'");
-    expect(smokeScript).toContain("staleNext.command === 'agentloop task doctor'");
+    expect(smokeScript).toContain("staleNext.nextAction?.command === 'agentloop task doctor'");
     expect(smokeScript).toContain('staleTaskDoctor.taskDoctor?.diagnostics?.some((diagnostic) =>');
     expect(smokeScript).toContain("'agentloop task clear'");
     expect(smokeScript).toContain("'agentloop task set <path>'");
