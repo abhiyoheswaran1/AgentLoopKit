@@ -30,7 +30,10 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
-      - run: npm install -g npm@latest
+      # Pinned: npm@latest (11.x line) currently ships a broken provenance path
+      # ("Cannot find module 'sigstore'"). 10.9.2 bundles sigstore correctly and
+      # supports OIDC provenance + token auth. Revisit once npm 11.x is fixed.
+      - run: npm install -g npm@10.9.2
       - run: npm --version
       - name: Check npm version
         id: npm-version
