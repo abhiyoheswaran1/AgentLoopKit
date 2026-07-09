@@ -2,7 +2,7 @@
 
 - Created date: 2026-07-06
 - Task type: feature
-- Status: in-progress
+- Status: done
 
 ## Problem Statement
 The full AgentLoopKit command surface (~40 commands) is uncommitted 0.x, so teams cannot safely build CI pipelines or shared agent workflows on it without risking breakage on any release. Nothing is guaranteed stable and nothing enforces that guarantee.
