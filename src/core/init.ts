@@ -91,16 +91,39 @@ const AGENTLOOP_GITIGNORE_CONTENT = `# AgentLoopKit per-machine state — the CL
 ${AGENTLOOP_PER_MACHINE_PATTERNS.join('\n')}
 `;
 
-function perMachinePathspecs() {
-  return AGENTLOOP_PER_MACHINE_PATTERNS.map((pattern) => `${AGENTLOOP_DIR}/${pattern}`);
+// A gitignore pattern (relative to .agentloop/) → a git pathspec that matches the
+// same tracked files. gitignore's `dir/*/` (subdirectories only) needs git's :(glob)
+// magic plus `/**`, or git silently matches nothing (a bare trailing `/` after `*`)
+// or over-matches sibling files (dropping the `/`).
+function perMachinePathspec(pattern: string): string {
+  const target = `${AGENTLOOP_DIR}/${pattern}`;
+  if (pattern.includes('*')) {
+    return `:(glob)${target.replace(/\/$/, '')}/**`;
+  }
+  return target;
 }
 
+function perMachinePathspecs() {
+  return AGENTLOOP_PER_MACHINE_PATTERNS.map(perMachinePathspec);
+}
+
+// The literal directory prefix before any wildcard, used to attribute a tracked
+// path to its per-machine pattern group (e.g. `loops/*/` -> `.agentloop/loops`).
+function perMachinePrefix(pattern: string): string {
+  const target = `${AGENTLOOP_DIR}/${pattern}`;
+  const wildcardIndex = target.indexOf('*');
+  const literal = wildcardIndex === -1 ? target : target.slice(0, wildcardIndex);
+  return literal.replace(/\/$/, '');
+}
+
+const SHELL_METACHARACTERS = /[*():]/;
+
 function buildUntrackCommand(trackedPaths: string[]) {
-  const groups = perMachinePathspecs().filter((spec) => {
-    const prefix = spec.replace(/\*\/$/, '').replace(/\/$/, '');
+  const specs = AGENTLOOP_PER_MACHINE_PATTERNS.filter((pattern) => {
+    const prefix = perMachinePrefix(pattern);
     return trackedPaths.some((tracked) => tracked === prefix || tracked.startsWith(`${prefix}/`));
-  });
-  const quoted = groups.map((spec) => (spec.includes('*') ? `'${spec}'` : spec));
+  }).map(perMachinePathspec);
+  const quoted = specs.map((spec) => (SHELL_METACHARACTERS.test(spec) ? `'${spec}'` : spec));
   return `git rm -r --cached ${quoted.join(' ')}`;
 }
 
