@@ -194,7 +194,7 @@ Use `agentloop npm-status --agentloopkit --expect-current` after AgentLoopKit np
 - **Committed (durable evidence):** `tasks/`, `reports/`, `handoffs/`, `policies/`, `gates/`, `agents/`, `harness/`, `loops/*.md`, `manifest.json`.
 - **Ignored (per-machine state the CLI regenerates):** `state.json`, `loops/<timestamp>/` instance directories, and the local `runs/` ledger.
 
-If an older init already committed that state, run `git rm -r --cached .agentloop/state.json '.agentloop/loops/*/' .agentloop/runs/` and commit, so the ignore file takes effect.
+If an older init already committed that state, `agentloop init` prints the exact `git rm -r --cached …` command to un-track it — run that, then commit, so the ignore file takes effect.
 
 ## Monorepo Notes
 
