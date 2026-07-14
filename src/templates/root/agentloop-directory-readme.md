@@ -187,6 +187,15 @@ Use `agentloop npm-status --agentloopkit --expect-current` after AgentLoopKit np
 - `agents/`: agent-specific instructions
 - `harness/`: repo working agreement and commands
 
+## Committed vs ignored
+
+`agentloop init` writes `.agentloop/.gitignore` so per-machine state stays out of git while durable evidence is versioned.
+
+- **Committed (durable evidence):** `tasks/`, `reports/`, `handoffs/`, `policies/`, `gates/`, `agents/`, `harness/`, `loops/*.md`, `manifest.json`.
+- **Ignored (per-machine state the CLI regenerates):** `state.json`, `loops/<timestamp>/` instance directories, and the local `runs/` ledger.
+
+If an older init already committed that state, run `git rm -r --cached .agentloop/state.json '.agentloop/loops/*/' .agentloop/runs/` and commit, so the ignore file takes effect.
+
 ## Monorepo Notes
 
 When this repository has workspace markers, use both root and package-level checks as needed. Put package-specific verification commands in the task contract so agents and reviewers can see what the change requires.

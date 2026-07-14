@@ -23,6 +23,7 @@ AgentLoopKit gives software agents a repeatable engineering loop inside this rep
 - .agentloop/harness/: repo-specific working agreement, commands, and checklists.
 - .agentloop/runs/: local run ledger entries for ship, verify, and handoff evidence.
 - .agentloop/state.json: active task pointer created by `agentloop create-task` or `agentloop task set`.
+- .agentloop/.gitignore: keeps per-machine state (state.json, loops/*/, runs/) out of git; durable evidence stays tracked.
 
 ## Commands Detected During Init
 

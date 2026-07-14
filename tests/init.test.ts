@@ -853,4 +853,19 @@ describe('init', () => {
     );
     expect(result.perMachineState?.untrackCommand).not.toContain('.agentloop/runs/');
   });
+
+  test('generated docs describe the committed vs ignored split', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo' });
+
+    await initializeAgentLoop({ cwd: dir });
+    const readme = await readFile(path.join(dir, '.agentloop/README.md'), 'utf8');
+    const agentloop = await readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8');
+
+    expect(readme).toContain('Committed vs ignored');
+    expect(readme).toContain('.agentloop/.gitignore');
+    expect(readme).toContain('state.json');
+    expect(agentloop).toContain('.agentloop/.gitignore');
+  });
 });
