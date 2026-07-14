@@ -1594,11 +1594,13 @@ Document how to revert or disable this change.
       status: '??',
       path: '.agentloop/handoffs/2026-06-13-00-33-pr-summary.md',
     });
-    expect(status.workingTree.changedFiles).toContainEqual({
+    // .agentloop/runs/ is gitignored by init, so run-ledger files no longer
+    // surface as untracked working-tree changes in status.
+    expect(status.workingTree.changedFiles).not.toContainEqual({
       status: '??',
       path: `.agentloop/runs/${runId}/metadata.json`,
     });
-    expect(status.workingTree.changedFiles).toContainEqual({
+    expect(status.workingTree.changedFiles).not.toContainEqual({
       status: '??',
       path: `.agentloop/runs/${runId}/changed-files.json`,
     });
