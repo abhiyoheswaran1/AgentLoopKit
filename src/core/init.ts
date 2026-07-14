@@ -98,6 +98,14 @@ ${AGENTLOOP_PER_MACHINE_PATTERNS.join('\n')}
 function perMachinePathspec(pattern: string): string {
   const target = `${AGENTLOOP_DIR}/${pattern}`;
   if (pattern.includes('*')) {
+    // Only the `<dir>/*/` shape (a whole subdirectory tree) is supported here and
+    // in perMachinePrefix. A file glob like `*.tmp` or `cache/*.json` would convert
+    // to a silently-wrong pathspec, so reject it loudly if a future edit adds one.
+    if (!/^[^*]+\/\*\/$/.test(pattern)) {
+      throw new Error(
+        `Unsupported AGENTLOOP_PER_MACHINE_PATTERNS entry ${JSON.stringify(pattern)}: use a plain name or a "<dir>/*/" directory pattern.`,
+      );
+    }
     return `:(glob)${target.replace(/\/$/, '')}/**`;
   }
   return target;
