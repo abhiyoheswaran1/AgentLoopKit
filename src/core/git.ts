@@ -51,6 +51,16 @@ export async function getGitStatus(cwd: string) {
   return result.exitCode === 0 ? result.stdout : '';
 }
 
+export async function listTrackedPaths(cwd: string, pathspecs: string[]): Promise<string[]> {
+  if (pathspecs.length === 0) return [];
+  const result = await execa('git', ['ls-files', '-z', '--', ...pathspecs], {
+    cwd,
+    reject: false,
+  });
+  if (result.exitCode !== 0) return [];
+  return result.stdout.split('\0').filter((entry) => entry.length > 0);
+}
+
 export async function getGitDiffStat(cwd: string) {
   const result = await execa('git', ['diff', '--stat'], { cwd, reject: false });
   return result.exitCode === 0 ? result.stdout : '';
