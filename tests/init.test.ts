@@ -294,6 +294,35 @@ describe('init', () => {
     await expect(readFile(path.join(dir, 'AGENTLOOP.md'), 'utf8')).rejects.toThrow();
   });
 
+  test('human init output notes already-tracked per-machine state', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo' });
+    await mkdir(path.join(dir, '.agentloop'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/state.json'), '{}\n');
+    await execFileAsync('git', ['add', '.agentloop/state.json'], { cwd: dir });
+
+    const result = await execa(tsxPath, [cliPath, 'init'], { cwd: dir, reject: false });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('per-machine state is already git-tracked');
+    expect(result.stdout).toContain('git rm -r --cached');
+    expect(result.stdout).toContain('.agentloop/state.json');
+  });
+
+  test('human init output omits the note when no state is tracked', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo' });
+
+    const result = await execa(tsxPath, [cliPath, 'init'], { cwd: dir, reject: false });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).not.toContain('per-machine state is already git-tracked');
+  });
+
   test('dry-run human output reports git context for repository targets', async () => {
     const dir = await makeTempDir();
     tempDirs.push(dir);

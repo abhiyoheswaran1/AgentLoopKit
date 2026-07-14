@@ -85,6 +85,12 @@ export function initCommand() {
                 created,
                 updated,
                 skipped,
+                perMachineState: result.perMachineState
+                  ? {
+                      ...result.perMachineState,
+                      trackedPaths: result.perMachineState.trackedPaths.map(redact),
+                    }
+                  : undefined,
               },
               null,
               2,
@@ -127,6 +133,15 @@ export function initCommand() {
             '- AgentLoopKit files stay on disk for local agents but stay out of git status.',
           );
           logger.info('- Undo: remove the agentloopkit:local-only block from .git/info/exclude.');
+        }
+        if (result.perMachineState) {
+          logger.info(
+            `\nNote: per-machine state is already git-tracked (${result.perMachineState.trackedPaths
+              .map(redact)
+              .join(', ')}).`,
+          );
+          logger.info(`      Run: ${result.perMachineState.untrackCommand}`);
+          logger.info('      then commit, so the new .agentloop/.gitignore takes effect.');
         }
         if (!options.dryRun) {
           logger.info('\nNext steps:');
