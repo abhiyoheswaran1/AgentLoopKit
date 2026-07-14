@@ -10,6 +10,7 @@ import {
   getGitRoot,
   getGitStatus,
   isInsideGitRepo,
+  listTrackedPaths,
   parseGitStatus,
 } from '../src/core/git.js';
 import { makeTempDir, removeTempDir } from './helpers.js';
@@ -138,6 +139,29 @@ describe('git helpers', () => {
     const changedFiles = await parseGitStatus(rawStatus);
 
     expect(changedFiles).toContainEqual({ status: 'R', path: 'renamed with spaces.txt' });
+  });
+
+  test('listTrackedPaths returns only git-tracked matches', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    const { execa } = await import('execa');
+    await execa('git', ['init', '-q'], { cwd: dir });
+    await mkdir(path.join(dir, '.agentloop'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/state.json'), '{}\n');
+    await writeFile(path.join(dir, '.agentloop/untracked.txt'), 'x\n');
+    await execa('git', ['add', '.agentloop/state.json'], { cwd: dir });
+
+    const tracked = await listTrackedPaths(dir, ['.agentloop/state.json', '.agentloop/runs/']);
+    expect(tracked).toEqual(['.agentloop/state.json']);
+
+    const none = await listTrackedPaths(dir, ['.agentloop/runs/']);
+    expect(none).toEqual([]);
+  });
+
+  test('listTrackedPaths returns [] outside a git repo', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    expect(await listTrackedPaths(dir, ['.agentloop/state.json'])).toEqual([]);
   });
 });
 
