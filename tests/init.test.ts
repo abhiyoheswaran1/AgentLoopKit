@@ -740,4 +740,32 @@ describe('init', () => {
     expect(result.skipped.some((file) => file.endsWith('.agentloop/.gitignore'))).toBe(true);
     await expect(readFile(path.join(dir, '.agentloop/.gitignore'), 'utf8')).resolves.toBe('custom\n');
   });
+
+  test('init flags per-machine state that git already tracks', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo' });
+    await mkdir(path.join(dir, '.agentloop'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/state.json'), '{}\n');
+    await execFileAsync('git', ['add', '.agentloop/state.json'], { cwd: dir });
+
+    const result = await initializeAgentLoop({ cwd: dir });
+
+    expect(result.perMachineState?.trackedPaths).toEqual(['.agentloop/state.json']);
+    expect(result.perMachineState?.untrackCommand).toContain('git rm -r --cached');
+    expect(result.perMachineState?.untrackCommand).toContain('.agentloop/state.json');
+    expect(result.perMachineState?.untrackCommand).not.toContain('.agentloop/runs/');
+  });
+
+  test('init omits perMachineState when nothing per-machine is tracked', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo' });
+
+    const result = await initializeAgentLoop({ cwd: dir });
+
+    expect(result.perMachineState).toBeUndefined();
+  });
 });
