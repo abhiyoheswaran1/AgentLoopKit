@@ -768,4 +768,60 @@ describe('init', () => {
 
     expect(result.perMachineState).toBeUndefined();
   });
+
+  test('init flags a tracked loops instance directory and emits a working untrack command', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo' });
+    await mkdir(path.join(dir, '.agentloop/loops/session1'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/loops/session1/loop.json'), '{}\n');
+    await execFileAsync('git', ['add', '.agentloop/loops/session1/loop.json'], { cwd: dir });
+
+    const result = await initializeAgentLoop({ cwd: dir });
+
+    expect(result.perMachineState?.trackedPaths).toContain(
+      '.agentloop/loops/session1/loop.json',
+    );
+    expect(result.perMachineState?.untrackCommand).toContain(
+      "':(glob).agentloop/loops/*/**'",
+    );
+  });
+
+  test('init does not flag a tracked loops template as per-machine state', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo' });
+    await mkdir(path.join(dir, '.agentloop/loops'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/loops/feature.md'), '# Feature template\n');
+    await execFileAsync('git', ['add', '.agentloop/loops/feature.md'], { cwd: dir });
+
+    const result = await initializeAgentLoop({ cwd: dir });
+
+    expect(result.perMachineState).toBeUndefined();
+  });
+
+  test('init joins multiple tracked per-machine groups into one untrack command', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await initGitRepository(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo' });
+    await mkdir(path.join(dir, '.agentloop/loops/session1'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/state.json'), '{}\n');
+    await writeFile(path.join(dir, '.agentloop/loops/session1/loop.json'), '{}\n');
+    await execFileAsync(
+      'git',
+      ['add', '.agentloop/state.json', '.agentloop/loops/session1/loop.json'],
+      { cwd: dir },
+    );
+
+    const result = await initializeAgentLoop({ cwd: dir });
+
+    expect(result.perMachineState?.untrackCommand).toContain('.agentloop/state.json');
+    expect(result.perMachineState?.untrackCommand).toContain(
+      "':(glob).agentloop/loops/*/**'",
+    );
+    expect(result.perMachineState?.untrackCommand).not.toContain('.agentloop/runs/');
+  });
 });
