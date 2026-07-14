@@ -711,4 +711,33 @@ describe('init', () => {
     expect(result.stdout).toBe('');
     expect(result.stderr).toContain('agentloop: Local-only mode requires a Git repository');
   });
+
+  test('scaffolds .agentloop/.gitignore for per-machine state', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo' });
+
+    const result = await initializeAgentLoop({ cwd: dir });
+    const gitignore = await readFile(path.join(dir, '.agentloop/.gitignore'), 'utf8');
+
+    expect(result.created.some((file) => file.endsWith('.agentloop/.gitignore'))).toBe(true);
+    expect(gitignore).toContain('state.json');
+    expect(gitignore).toContain('loops/*/');
+    expect(gitignore).toContain('runs/');
+    expect(gitignore).not.toContain('research/');
+    expect(gitignore).toContain('per-machine state');
+  });
+
+  test('.agentloop/.gitignore is skipped when it already exists', async () => {
+    const dir = await makeTempDir();
+    tempDirs.push(dir);
+    await writeJson(path.join(dir, 'package.json'), { name: 'demo' });
+    await mkdir(path.join(dir, '.agentloop'), { recursive: true });
+    await writeFile(path.join(dir, '.agentloop/.gitignore'), 'custom\n');
+
+    const result = await initializeAgentLoop({ cwd: dir });
+
+    expect(result.skipped.some((file) => file.endsWith('.agentloop/.gitignore'))).toBe(true);
+    await expect(readFile(path.join(dir, '.agentloop/.gitignore'), 'utf8')).resolves.toBe('custom\n');
+  });
 });

@@ -4,7 +4,9 @@ import { homedir } from 'node:os';
 import {
   AGENTLOOP_DIR,
   AGENTLOOP_FILE,
+  AGENTLOOP_GITIGNORE_FILE,
   AGENTLOOP_MANIFEST_FILE,
+  AGENTLOOP_PER_MACHINE_PATTERNS,
   AGENTS_FILE,
   CONFIG_FILE,
   CURRENT_TEMPLATE_VERSION,
@@ -79,6 +81,12 @@ ${LOCAL_ONLY_NOTICE_END}`;
 const HOME_DIRECTORY_WARNING =
   'Target directory is your home directory. AgentLoopKit can write repository harness files there when --force is used.';
 
+const AGENTLOOP_GITIGNORE_CONTENT = `# AgentLoopKit per-machine state — the CLI regenerates these; safe to ignore.
+# Durable evidence stays tracked: tasks/, reports/, handoffs/, policies/,
+# loops/*.md, manifest.json. See .agentloop/README.md for the full split.
+${AGENTLOOP_PER_MACHINE_PATTERNS.join('\n')}
+`;
+
 function repoPath(...segments: string[]) {
   return segments.join('/');
 }
@@ -136,6 +144,11 @@ async function validateInitOutputTargets(cwd: string) {
       requestedPath: repoPath(AGENTLOOP_DIR, 'reports', 'README.md'),
       expectedDir: repoPath(AGENTLOOP_DIR, 'reports'),
       expectedExtension: '.md',
+    },
+    {
+      requestedPath: AGENTLOOP_GITIGNORE_FILE,
+      expectedDir: AGENTLOOP_DIR,
+      expectedExtension: '',
     },
     { requestedPath: AGENTS_FILE, expectedDir: '.', expectedExtension: '.md' },
     { requestedPath: AGENTLOOP_FILE, expectedDir: '.', expectedExtension: '.md' },
@@ -435,6 +448,15 @@ export async function initializeAgentLoop(options: {
     repoPath(AGENTLOOP_DIR, 'reports'),
     '.md',
     '# Verification Reports\n\nAgentLoopKit writes verification reports here when you run `agentloop verify`.\n',
+    result,
+  );
+
+  await writeGeneratedFile(
+    cwd,
+    AGENTLOOP_GITIGNORE_FILE,
+    AGENTLOOP_DIR,
+    '',
+    AGENTLOOP_GITIGNORE_CONTENT,
     result,
   );
 
