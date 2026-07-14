@@ -17,7 +17,7 @@ import {
 import { resolveOutputArtifactPath } from './artifacts.js';
 import { AgentLoopConfig, createDefaultConfig } from './config.js';
 import { pathExists, readTextIfExists, writeTextFile } from './file-system.js';
-import { getGitAbsoluteDir, getGitRoot, isInsideGitRepo } from './git.js';
+import { getGitAbsoluteDir, getGitRoot, isInsideGitRepo, listTrackedPaths } from './git.js';
 import { detectPackageManager } from './package-manager.js';
 import { detectPackageScripts, detectProjectName, detectProjectType } from './project-detection.js';
 import { getTemplateRoot, readTemplate, TemplateValues } from './template-renderer.js';
@@ -42,6 +42,10 @@ export type InitResult = {
   localOnly?: {
     excludePath: string;
     patterns: string[];
+  };
+  perMachineState?: {
+    trackedPaths: string[];
+    untrackCommand: string;
   };
 };
 
@@ -86,6 +90,19 @@ const AGENTLOOP_GITIGNORE_CONTENT = `# AgentLoopKit per-machine state — the CL
 # loops/*.md, manifest.json. See .agentloop/README.md for the full split.
 ${AGENTLOOP_PER_MACHINE_PATTERNS.join('\n')}
 `;
+
+function perMachinePathspecs() {
+  return AGENTLOOP_PER_MACHINE_PATTERNS.map((pattern) => `${AGENTLOOP_DIR}/${pattern}`);
+}
+
+function buildUntrackCommand(trackedPaths: string[]) {
+  const groups = perMachinePathspecs().filter((spec) => {
+    const prefix = spec.replace(/\*\/$/, '').replace(/\/$/, '');
+    return trackedPaths.some((tracked) => tracked === prefix || tracked.startsWith(`${prefix}/`));
+  });
+  const quoted = groups.map((spec) => (spec.includes('*') ? `'${spec}'` : spec));
+  return `git rm -r --cached ${quoted.join(' ')}`;
+}
 
 function repoPath(...segments: string[]) {
   return segments.join('/');
@@ -488,6 +505,16 @@ export async function initializeAgentLoop(options: {
   } else {
     await writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
     result.created.push(configPath);
+  }
+
+  if (result.git.isRepository) {
+    const trackedPaths = (await listTrackedPaths(cwd, perMachinePathspecs())).sort();
+    if (trackedPaths.length > 0) {
+      result.perMachineState = {
+        trackedPaths,
+        untrackCommand: buildUntrackCommand(trackedPaths),
+      };
+    }
   }
 
   return result;
