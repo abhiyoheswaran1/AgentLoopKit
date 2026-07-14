@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.2.0 — 2026-07-14
+
 - `agentloop init` now writes a `.agentloop/.gitignore` that keeps per-machine harness state out of git — `state.json` (the active-task pointer), `loops/<instance>/` loop directories, and the local `runs/` ledger — while durable evidence (task contracts, reports, handoffs, policies, `loops/*.md` templates, `manifest.json`) stays tracked. This stops the harness's own writes from dirtying the working tree and being read as scope drift by tools that watch it. The `.gitignore` is scaffolded skip-if-exists like every other generated file, and `--json`/`--redact-paths` behavior is preserved.
 - When re-running `agentloop init` over a repo that committed per-machine state under an older version, `init` now detects the already-tracked paths and prints the exact `git rm -r --cached …` command to un-track them (using a `:(glob)` pathspec so it targets loop instance directories without touching the tracked `loops/*.md` templates). Detection is read-only — `init` never runs `git rm` itself — and surfaces in both human output and `--json` (`perMachineState`).
 - Note: because `.agentloop/runs/` is now git-ignored, run-ledger files no longer appear as untracked working-tree changes in `agentloop status` / `guard` output. This is intended — local run evidence is no longer treated as pending working-tree churn.
