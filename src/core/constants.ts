@@ -8,6 +8,10 @@ export const AGENTLOOP_MANIFEST_FILE = '.agentloop/manifest.json';
 export const CURRENT_TEMPLATE_VERSION = 2;
 export const AGENTS_FILE = 'AGENTS.md';
 export const AGENTLOOP_FILE = 'AGENTLOOP.md';
+export const AGENTLOOP_GITIGNORE_FILE = '.agentloop/.gitignore';
+// Per-machine harness state the CLI regenerates; kept out of git. The .gitignore
+// body and the already-tracked check both read this one list so they never drift.
+export const AGENTLOOP_PER_MACHINE_PATTERNS = ['state.json', 'loops/*/', 'runs/'] as const;
 
 export const LOOP_STEPS = [
   'Specify',
